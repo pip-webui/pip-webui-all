@@ -1,0 +1,87 @@
+{
+  "name": "pip-webui",
+  "version": "1.0.1",
+  "author": "Digital Living Software Corp. <www.digitallivingsoftware.com>",
+  "description": "Assembly with all Pip.WebUI components",
+  "contributors": [
+    {
+      "name": "Sergey Seroukhov",
+      "email": "seroukhov@gmail.com"
+    },
+    {
+      "name": "Mark Zontak",
+      "email": "mark@zontak.me"
+    },
+    {
+      "name": "Alexey Dvoikin",
+      "email": "94dvoikin@gmail.com"
+    },
+    {
+      "name": "Anastas Fonotov",
+      "email": "anastasf@gmail.com"
+    },
+    {
+      "name": "Katerina Negrienko",
+      "email": "katya@negrienko.com"
+    }
+  ],
+  "keywords": [
+    "pip",
+    "webui",
+    "framework",
+    "controls",
+    "css",
+    "styles"
+  ],
+  "noAnalyze": true,
+  "license": "Commercial",
+  "private": true,
+  "scripts": {
+    "build": "gulp build",
+    "jshint": "gulp jshint",
+    "test": "mocha -t 5000 -R spec --recursive ./test"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "pip-webui-lib": "git+ssh://git@github.com:pip-webui/pip-webui-lib.git",
+    "pip-webui-css": "git+ssh://git@github.com:pip-webui/pip-webui-css.git",
+    "pip-webui-core": "git+ssh://git@github.com:pip-webui/pip-webui-core.git",
+    "pip-webui-rest": "git+ssh://git@github.com:pip-webui/pip-webui-rest.git",
+    "pip-webui-layouts": "git+ssh://git@github.com:pip-webui/pip-webui-layouts.git",
+    "pip-webui-controls": "git+ssh://git@github.com:pip-webui/pip-webui-controls.git",
+    "pip-webui-nav": "git+ssh://git@github.com:pip-webui/pip-webui-nav.git",
+    "pip-webui-locations": "git+ssh://git@github.com:pip-webui/pip-webui-locations.git",
+    "pip-webui-documents": "git+ssh://git@github.com:pip-webui/pip-webui-documents.git",
+    "pip-webui-pictures": "git+ssh://git@github.com:pip-webui/pip-webui-pictures.git",
+    "pip-webui-composite": "git+ssh://git@github.com:pip-webui/pip-webui-composite.git",
+    "pip-webui-entry": "git+ssh://git@github.com:pip-webui/pip-webui-entry.git",
+    "pip-webui-errors": "git+ssh://git@github.com:pip-webui/pip-webui-errors.git",
+    "pip-webui-settings": "git+ssh://git@github.com:pip-webui/pip-webui-settings.git",
+    "pip-webui-guidance": "git+ssh://git@github.com:pip-webui/pip-webui-guidance.git",
+    "pip-webui-help": "git+ssh://git@github.com:pip-webui/pip-webui-help.git",
+    "pip-webui-support": "git+ssh://git@github.com:pip-webui/pip-webui-support.git",
+    "jshint": "*",
+    "gulp": "*",
+    "gulp-concat": "*",
+    "gulp-less": "*",
+    "gulp-rename": "*",
+    "gulp-clean-css": "*",
+    "gulp-uglify": "*",
+    "gulp-minify-html": "*",
+    "gulp-minify-css": "*",
+    "gulp-ng-annotate": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-ng-html2js": "*",
+    "gulp-merge": "*",
+    "gulp-typescript": "*",
+    "gulp-jshint": "*",
+    "gulp-replace": "*",
+    "gulp-add-src": "*",
+    "gulp-webserver": "*",
+    "gulp-awspublish": "*",
+    "event-stream": "*",
+    "concurrent-transform": "*",
+    "del": "*"
+  }
+}
