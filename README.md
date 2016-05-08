@@ -1,4 +1,4 @@
-# Pip.WebUI Library [(http://git.pipdevs.com/pip-core/pip-webui)](http://git.pipdevs.com/pip-core/pip-webui)
+# Pip.WebUI Library [(http://github.com/pip-core/pip-webui)](http://github.com/pip-core/pip-webui)
 
 A composition of all libraries, services, controls and pages that prepresent Pip.WebUI framework
 
@@ -81,5 +81,5 @@ Change to your project's root directory.
 
 ```bash
 # To install the entire pip-webui library
-npm install git+ssh://git@git.pipdevs.com:pip-core/pip-webui.git
+npm install git+ssh://git@github.com:pip-core/pip-webui.git
 ```
