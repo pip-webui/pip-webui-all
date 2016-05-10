@@ -4470,624 +4470,6 @@
 
 
 /**
- * @file Global application data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDataCache', ['pipDataModel']);
-
-    thisModule.provider('pipDataCache', function() {
-        var 
-            CACHE_TIMEOUT = 5 * 60000, // 5 mins or make it configurable
-            cache = {};
-            
-        this.timeout = timeout;
-            
-        this.$get = ['$q', 'pipDataModel', function($q, pipDataModel) {
-            return {
-                timeout: timeout,
-                
-                clear: clear,
-                retrieve: retrieve,
-                retrieveOrLoad: retrieveOrLoad,
-                store: store,
-                storePermanent: storePermanent,
-                remove: remove,
-
-                addItem: addItem,
-                updateItem: updateItem,
-                removeItem: removeItem,
-                
-                addDecorator: addDecorator,
-                updateDecorator: updateDecorator,
-                removeDecorator: removeDecorator
-            };
-            //-------------
-            
-            // Clear the entire cache
-            function clear() {
-                cache = {};
-            };
-
-            // Try to retrieve collection from the cache
-            function retrieve(name) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                var holder = cache[name];
-                if (holder == null) return null;
-
-                // If expired then cleanup and return null
-                if (holder.expire 
-                    && _.now() - holder.expire > CACHE_TIMEOUT) {
-                    delete cache[name];
-                    return null;
-                }
-
-                return holder.data;
-            };
-
-            // Store collection into the cache
-            function store(name, data) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                cache[name] = {
-                    expire: _.now(),
-                    data: data
-                };
-            };
-
-            // Store collection into the cache without expiration
-            function storePermanent(name, data) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                cache[name] = {
-                    expire: null,
-                    data: data
-                };
-            };
-
-            // Remove collection from the cache
-            function remove(name) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                delete cache[name];
-            };
-
-            // Tries to retrieve collection from the cache, otherwise load it from server
-            function retrieveOrLoad(params, successCallback, errorCallback) {
-                if (params == null) throw new Error('params cannot be null');
-                // todo add check params?
-
-                var name = (params.cache || params.resource);
-                if (params && params.party_id !== null && params.party_id !== undefined)
-                    name = name + '_' + params.party_id;
-                else if (params && params.item && params.item.party_id !== null && params.item.party_id !== undefined)
-                    name = name + '_' + params.item.party_id;
-
-                // Retrieve data from cache
-                var filter = params.filter,
-                    force = !!params.force,
-                    result = !force ? retrieve(name) : null;
-
-                // Return result if it exists
-                if (result) {
-                    //console.log('***** Loaded from cache ' + name);
-                    //console.log(result);
-                    if (filter) result = filter(result);
-                    if (successCallback) successCallback(result);
-                    return result;
-                }
-
-                // Create deferred
-                var deferred = $q.defer();
-
-                // Load data from server
-                pipDataModel[params.singleResult ? 'readOne' : 'read'](
-                    params, 
-                    function (data) {
-                        // Store data in cache and return
-                        params.singleResult ? updateItem(name,data) : store(name, data);
-                        if (filter) data = filter(data);
-                        deferred.resolve(data);
-
-                    //console.log('***** Loaded from server ' + name);
-                    //console.log(data);
-
-                        if (successCallback) successCallback(data);
-                    },
-                    function (err) {
-                        // Return error
-                        deferred.reject(err);
-                        if (errorCallback) errorCallback(err);
-                    }
-                );
-
-                // Return deferred object
-                return deferred.promise;
-            };
-
-            // todo if item exist in nameSpace?
-            function addItem(name, params, item) {
-                if (name == null) throw new Error('name cannot be null');
-                if (item == null) return;
-
-                var data = retrieve(name);
-
-                if (data == null)  data = []; // todo maybe reload cache data?
-                var index = -1;
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == item.id) {
-                        index = i;
-                        break;
-                    }
-                }
-                if (index == -1) data.push(item);
-                else data[i] = item;
-                store(name, data);
-            };
-
-            function addDecorator(resource, params, successCallback) {
-                return function(item) {
-                    var  nameId, name;
-                    if (params && params.party_id) nameId = '_' + params.party_id;
-                    else if (params && params.item && params && params.item.party_id) nameId = '_' + params.item.party_id;
-                        name = resource + nameId;
-
-                    updateItem(name, params, item);
-
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-            function updateItem(name, params, item) {
-                if (name == null) throw new Error('name cannot be null');
-                if (item == null) return;
-
-                var data = retrieve(name);
-
-                if (data != null) {
-                    var isAdded = false;
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].id == item.id) {
-                            data[i] = item;
-                            isAdded = true;
-                            return;
-                        }
-                    }
-                    if (!isAdded) data.push(item);
-                    store(name, data);
-                }
-            };
-
-            function updateDecorator(resource, params, successCallback) {
-                return function(item) {
-                    var  nameId, name;
-                    if (params && params.party_id) nameId = '_' + params.party_id;
-                    else if (params && params.item && params && params.item.party_id) nameId = '_' + params.item.party_id;
-                    name = resource + nameId;
-
-                    updateItem(name, params, item);
-
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-            function removeItem(name, params, item) {
-                if (name == null) throw new Error('name cannot be null');
-                if (item == null) return;
-
-                var data = retrieve(name);
-
-                if (data == null) return;
-
-                // delete item
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == item.id) {
-                        data.splice(i, 1);
-                        i--;
-                    }
-                }
-                store(name, data);
-            };
-
-            function removeDecorator(resource, params, successCallback) {
-                return function(item) {
-                    var  nameId, name;
-                    if (params && params.party_id) nameId = '_' + params.party_id;
-                    else if (params && params.item && params && params.item.party_id) nameId = '_' + params.item.party_id;
-                    name = resource + nameId;
-
-                        removeItem(name, params, params.item);
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-        }];
-        //-----------------------
-
-        function timeout(newTimeout) {
-            if (newTimeout)
-                CACHE_TIMEOUT = newTimeout;
-            return CACHE_TIMEOUT;  
-        };
-        
-    });
-
-})();
-
-
-/**
- * @file Session data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSessionCache', ['pipCore', 'pipRest', 'pipDataCache']);
-
-    thisModule.run(['$rootScope', 'pipSessionCache', function($rootScope, pipSessionCache) {
-        $rootScope.$on('pipSessionOpened', pipSessionCache.init);
-        $rootScope.$on('pipSessionClosed', pipSessionCache.clear);
-    }]);
-
-    thisModule.service('pipSessionCache',
-        ['$rootScope', '$stateParams', 'pipTranslate', 'pipRest', 'localStorageService', 'pipAccess', 'pipEnums', 'pipSession', 'pipDataCache', function($rootScope, $stateParams, pipTranslate, pipRest, localStorageService,
-            pipAccess, pipEnums, pipSession, pipDataCache) {
-                        
-            return {
-                init: init,
-                clear: clear,
-                
-                readUser: readUser,
-				readParty: readParty,
-				readConnection: readConnection,
-                
-                readSettings: readSettings,
-                onSettingsUpdate: onSettingsUpdate
-            };
-            //-------------
-
-            function init(event, data) {
-                if (data == null)
-                    throw new Error('Unexpected error: issues in openning session');
-                
-                clear();
-                if (data.serverUrl) $rootScope.$serverUrl = data.serverUrl;
-                storeUser(data.user, null);
-            };
-
-            function clear() {
-                // Clear data cache
-                pipDataCache.clear();
-                
-                // Clear global variables
-                delete $rootScope.$user;
-                delete $rootScope.$party;
-                delete $rootScope.$serverUrl;
-                delete $rootScope.$connection;
-                delete $rootScope.$settings;
-            };
-
-            function updateUserRights(user, party) {
-                // Get parameters from cache if they are not defined
-                user = user || pipDataCache.retrieve('user');
-                party = party || pipDataCache.retrieve('party');
-                
-                // Exit if user is not defined
-                if (user == null) return;
-
-                // Update user access rights
-                if (party == null) 
-                    user = pipAccess.asOwner(user);
-                else if (user.id == party.id)
-                    user = pipAccess.asOwner(user);
-                else 
-                    user = pipAccess.toParty(user, party);
-                    
-                // Save user with new rights back to cache
-                pipDataCache.storePermanent('user', user);
-                $rootScope.$user = user;
-            };
-
-            function storeUserTheme(user) {
-                if (!user) return;
-                var userTheme = user.theme || 'blue';
-
-                if (user && $rootScope.$party) {
-                    if ($rootScope.$party.id == user.id) userTheme = user.theme;
-                    else userTheme = 'navy';
-                }
-
-                $rootScope.$theme = userTheme;
-                localStorageService.set('theme', userTheme);
-            };
-
-            function storeUser(user) {
-                if (user == null) return;                  
-
-                pipDataCache.storePermanent('user', user);
-                $rootScope.$user = user;
-                storeUserTheme(user);
-                
-                // Activate user language
-                pipTranslate.use(user.language, false, true);
-                updateUserRights(user, null);
-            };
-
-            function readUser(successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened()) 
-                    throw new Error('User is not authenticated.');
-    
-                var 
-                    userId = pipSession.userId(),
-                    user = pipDataCache.retrieve('user');
-    
-                // Return user from cache    
-                if (user) {
-                    if (user.id != userId)
-                        throw new Error('Unexpected error: issues in openning session');
-                        
-                    if (successCallback) successCallback(user);
-                        
-                    return user;
-                }
-    
-                // Read user from server
-                return pipRest.users().get(
-                    { id: userId }, 
-                    function (user) {
-                        // Double check
-                        if (user.id != userId) 
-                            user == null;
-
-                        storeUser(user);
-
-                        if (successCallback) successCallback(use);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function readParty(stateParams, successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened())
-                    throw new Error('User is not authenticated.');
-
-                var
-                    userId = pipSession.userId(),
-                    partyId = stateParams.party_id || userId,
-                    party = pipDataCache.retrieve('party');
-
-                // Skip if party already retrieved
-                if (party && party.id == partyId) {
-                    $rootScope.$party = party;
-
-                    storeUserTheme($rootScope.$user);
-
-                    if (successCallback) successCallback(party);
-                    return party;
-                }
-
-                // Read party from server
-                return pipRest.parties().get(
-                    { id: partyId },
-                    function (party) {
-                        updateUserRights(null, party);
-                        pipDataCache.storePermanent('party', party);
-                        $rootScope.$party = party;
-
-                        storeUserTheme($rootScope.$user);
-
-                        if (successCallback) successCallback(party);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function readConnection(stateParams, successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened()) 
-                    throw new Error('User is not authenticated.');
-    
-                var 
-                    userId = pipSession.userId(),
-                    partyId = stateParams.party_id || userId,
-                    connection = pipDataCache.retrieve('connection');
-
-                // Clear connection it does not match user or party
-                if (connection 
-                    && (connection.party_id != userId
-                    || connection.to_party_id != partyId)) {
-                    connection = null;
-                    pipDataCache.remove('connection');
-                    delete $rootScope.$connection;
-                }
-    
-                // For owner connection is not defined
-                if (userId == partyId) {
-                    if (successCallback) successCallback(connection);
-                        
-                    return connection;
-                }
-        
-                // Read connection from server
-                return pipRest.connections().query(
-                    { 
-                        party_id: userId, 
-                        to_party_id: partyId, 
-                        accept: pipEnums.ACCEPTANCE.ACCEPTED 
-                    }, 
-                    function (connections) {
-                        // There are shall not be more than one active connection
-                        if (connections && connections.length > 0) 
-                            connection = connections[0];                            
-                        else connection = null;
-
-                        pipDataCache.storePermanent('connection', connection);
-                        $rootScope.$connection = connection;
-                                                                                        
-                        if (successCallback) successCallback(connection);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function readSettings(successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened())
-                    throw new Error('User is not authenticated.');
-                var
-                    userId = pipSession.userId(),
-                    settings = pipDataCache.retrieve('settings' + '_' + userId);
-
-                if (settings) {
-                    if (successCallback) successCallback(settings);
-
-                    return settings;
-                }
-
-                // Read settings from server
-                return pipRest.partySettings().get(
-                    {
-                        party_id: userId
-                    },
-                    function (settings) {
-                        settings = settings || {};
-                        pipDataCache.storePermanent('settings' + '_' + userId, settings);
-                        $rootScope.$settings = settings;
-
-                        if (successCallback) successCallback(settings);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function onSettingsUpdate(item, successCallback) {
-                // return function(item) {
-                if (item == null) return;
-
-                var userId = pipSession.userId(),
-                    settings = pipDataCache.retrieve('settings' + '_' + userId);
-
-                // If tags are stored
-                if (settings) {
-                    settings = _.extend(settings, item);
-                    pipDataCache.storePermanent('settings' + '_' + userId, settings);
-                    $rootScope.$settings = settings;
-                }
-
-                if (successCallback) successCallback(item);
-                //  };
-            };
-
-        }]
-    );
-
-})();
-/**
- * @file Tags data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTagsCache', ['pipUtils', 'pipDataCache']);
-
-    thisModule.service('pipTagsCache',
-        ['pipTags', 'pipDataCache', function(pipTags, pipDataCache) {
-            return {
-                readTags: readTags,
-                // Todo: Add updateTags method
-                onTagsUpdate: onTagsUpdate,
-                tagsUpdateDecorator: tagsUpdateDecorator
-            };
-			//------------------------------
-
-            function tagsUpdate(params, item) {
-                // Extract tag from updated entity
-                var tags = item ? pipTags.extractTags(item) : [];
-                if (tags.length == 0) return;
-
-                var cacheName = 'partyTags';
-                if (params && params.party_id !== null && params.party_id !== undefined)
-                    cacheName = cacheName + '_' + params.party_id;
-                else if (params && params.item && params.item.party_id !== null && params.item.party_id !== undefined)
-                    cacheName = cacheName + '_' + params.item.party_id;
-
-                // Todo: this is a wrong way to get party_id (contributor) from entities
-                var data = pipDataCache.retrieve(cacheName);
-
-                // If tags are stored
-                if (data) {
-                    _.each(tags, function(tag) {
-                        // Find if tag already exists
-                        var t = _.find(data.tags, function(t) {
-                            return pipTags.equalTags(t.tag, tag);
-                        });
-
-                        // Otherwise add a new tag
-                        if (t) {
-                            t.tag = tag;
-                            t.count = t.count + 1;
-                            t.used = new Date();
-                        } else {
-                            if (!data.tags)
-                                data.tags = [];
-								
-                            data.tags.push({
-                                tag: tag,
-                                count: 1,
-                                used: new Date()
-                            });
-                        }
-                    });
-                    pipDataCache.store(cacheName, data);
-                }
-            };
-
-            function tagsUpdateDecorator(params, successCallback) {
-                return function(item) {
-                    tagsUpdate(params, item);
-
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-			function readTags(params, successCallback, errorCallback) {
-				params.resource = 'partyTags';
-				params.singleResult = true;
-
-				return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-			};
-
-			// Todo: Add updateTags method
-
-			function onTagsUpdate(params, successCallback) {
-				return tagsUpdateDecorator(params, successCallback);
-			};
-        }]
-    );
-
-})();
-
-
-/**
  * @file User access permissions service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -6871,6 +6253,624 @@
 
 })();
 /**
+ * @file Global application data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDataCache', ['pipDataModel']);
+
+    thisModule.provider('pipDataCache', function() {
+        var 
+            CACHE_TIMEOUT = 5 * 60000, // 5 mins or make it configurable
+            cache = {};
+            
+        this.timeout = timeout;
+            
+        this.$get = ['$q', 'pipDataModel', function($q, pipDataModel) {
+            return {
+                timeout: timeout,
+                
+                clear: clear,
+                retrieve: retrieve,
+                retrieveOrLoad: retrieveOrLoad,
+                store: store,
+                storePermanent: storePermanent,
+                remove: remove,
+
+                addItem: addItem,
+                updateItem: updateItem,
+                removeItem: removeItem,
+                
+                addDecorator: addDecorator,
+                updateDecorator: updateDecorator,
+                removeDecorator: removeDecorator
+            };
+            //-------------
+            
+            // Clear the entire cache
+            function clear() {
+                cache = {};
+            };
+
+            // Try to retrieve collection from the cache
+            function retrieve(name) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                var holder = cache[name];
+                if (holder == null) return null;
+
+                // If expired then cleanup and return null
+                if (holder.expire 
+                    && _.now() - holder.expire > CACHE_TIMEOUT) {
+                    delete cache[name];
+                    return null;
+                }
+
+                return holder.data;
+            };
+
+            // Store collection into the cache
+            function store(name, data) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                cache[name] = {
+                    expire: _.now(),
+                    data: data
+                };
+            };
+
+            // Store collection into the cache without expiration
+            function storePermanent(name, data) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                cache[name] = {
+                    expire: null,
+                    data: data
+                };
+            };
+
+            // Remove collection from the cache
+            function remove(name) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                delete cache[name];
+            };
+
+            // Tries to retrieve collection from the cache, otherwise load it from server
+            function retrieveOrLoad(params, successCallback, errorCallback) {
+                if (params == null) throw new Error('params cannot be null');
+                // todo add check params?
+
+                var name = (params.cache || params.resource);
+                if (params && params.party_id !== null && params.party_id !== undefined)
+                    name = name + '_' + params.party_id;
+                else if (params && params.item && params.item.party_id !== null && params.item.party_id !== undefined)
+                    name = name + '_' + params.item.party_id;
+
+                // Retrieve data from cache
+                var filter = params.filter,
+                    force = !!params.force,
+                    result = !force ? retrieve(name) : null;
+
+                // Return result if it exists
+                if (result) {
+                    //console.log('***** Loaded from cache ' + name);
+                    //console.log(result);
+                    if (filter) result = filter(result);
+                    if (successCallback) successCallback(result);
+                    return result;
+                }
+
+                // Create deferred
+                var deferred = $q.defer();
+
+                // Load data from server
+                pipDataModel[params.singleResult ? 'readOne' : 'read'](
+                    params, 
+                    function (data) {
+                        // Store data in cache and return
+                        params.singleResult ? updateItem(name,data) : store(name, data);
+                        if (filter) data = filter(data);
+                        deferred.resolve(data);
+
+                    //console.log('***** Loaded from server ' + name);
+                    //console.log(data);
+
+                        if (successCallback) successCallback(data);
+                    },
+                    function (err) {
+                        // Return error
+                        deferred.reject(err);
+                        if (errorCallback) errorCallback(err);
+                    }
+                );
+
+                // Return deferred object
+                return deferred.promise;
+            };
+
+            // todo if item exist in nameSpace?
+            function addItem(name, params, item) {
+                if (name == null) throw new Error('name cannot be null');
+                if (item == null) return;
+
+                var data = retrieve(name);
+
+                if (data == null)  data = []; // todo maybe reload cache data?
+                var index = -1;
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == item.id) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index == -1) data.push(item);
+                else data[i] = item;
+                store(name, data);
+            };
+
+            function addDecorator(resource, params, successCallback) {
+                return function(item) {
+                    var  nameId, name;
+                    if (params && params.party_id) nameId = '_' + params.party_id;
+                    else if (params && params.item && params && params.item.party_id) nameId = '_' + params.item.party_id;
+                        name = resource + nameId;
+
+                    updateItem(name, params, item);
+
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+            function updateItem(name, params, item) {
+                if (name == null) throw new Error('name cannot be null');
+                if (item == null) return;
+
+                var data = retrieve(name);
+
+                if (data != null) {
+                    var isAdded = false;
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].id == item.id) {
+                            data[i] = item;
+                            isAdded = true;
+                            return;
+                        }
+                    }
+                    if (!isAdded) data.push(item);
+                    store(name, data);
+                }
+            };
+
+            function updateDecorator(resource, params, successCallback) {
+                return function(item) {
+                    var  nameId, name;
+                    if (params && params.party_id) nameId = '_' + params.party_id;
+                    else if (params && params.item && params && params.item.party_id) nameId = '_' + params.item.party_id;
+                    name = resource + nameId;
+
+                    updateItem(name, params, item);
+
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+            function removeItem(name, params, item) {
+                if (name == null) throw new Error('name cannot be null');
+                if (item == null) return;
+
+                var data = retrieve(name);
+
+                if (data == null) return;
+
+                // delete item
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == item.id) {
+                        data.splice(i, 1);
+                        i--;
+                    }
+                }
+                store(name, data);
+            };
+
+            function removeDecorator(resource, params, successCallback) {
+                return function(item) {
+                    var  nameId, name;
+                    if (params && params.party_id) nameId = '_' + params.party_id;
+                    else if (params && params.item && params && params.item.party_id) nameId = '_' + params.item.party_id;
+                    name = resource + nameId;
+
+                        removeItem(name, params, params.item);
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+        }];
+        //-----------------------
+
+        function timeout(newTimeout) {
+            if (newTimeout)
+                CACHE_TIMEOUT = newTimeout;
+            return CACHE_TIMEOUT;  
+        };
+        
+    });
+
+})();
+
+
+/**
+ * @file Session data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSessionCache', ['pipCore', 'pipRest', 'pipDataCache']);
+
+    thisModule.run(['$rootScope', 'pipSessionCache', function($rootScope, pipSessionCache) {
+        $rootScope.$on('pipSessionOpened', pipSessionCache.init);
+        $rootScope.$on('pipSessionClosed', pipSessionCache.clear);
+    }]);
+
+    thisModule.service('pipSessionCache',
+        ['$rootScope', '$stateParams', 'pipTranslate', 'pipRest', 'localStorageService', 'pipAccess', 'pipEnums', 'pipSession', 'pipDataCache', function($rootScope, $stateParams, pipTranslate, pipRest, localStorageService,
+            pipAccess, pipEnums, pipSession, pipDataCache) {
+                        
+            return {
+                init: init,
+                clear: clear,
+                
+                readUser: readUser,
+				readParty: readParty,
+				readConnection: readConnection,
+                
+                readSettings: readSettings,
+                onSettingsUpdate: onSettingsUpdate
+            };
+            //-------------
+
+            function init(event, data) {
+                if (data == null)
+                    throw new Error('Unexpected error: issues in openning session');
+                
+                clear();
+                if (data.serverUrl) $rootScope.$serverUrl = data.serverUrl;
+                storeUser(data.user, null);
+            };
+
+            function clear() {
+                // Clear data cache
+                pipDataCache.clear();
+                
+                // Clear global variables
+                delete $rootScope.$user;
+                delete $rootScope.$party;
+                delete $rootScope.$serverUrl;
+                delete $rootScope.$connection;
+                delete $rootScope.$settings;
+            };
+
+            function updateUserRights(user, party) {
+                // Get parameters from cache if they are not defined
+                user = user || pipDataCache.retrieve('user');
+                party = party || pipDataCache.retrieve('party');
+                
+                // Exit if user is not defined
+                if (user == null) return;
+
+                // Update user access rights
+                if (party == null) 
+                    user = pipAccess.asOwner(user);
+                else if (user.id == party.id)
+                    user = pipAccess.asOwner(user);
+                else 
+                    user = pipAccess.toParty(user, party);
+                    
+                // Save user with new rights back to cache
+                pipDataCache.storePermanent('user', user);
+                $rootScope.$user = user;
+            };
+
+            function storeUserTheme(user) {
+                if (!user) return;
+                var userTheme = user.theme || 'blue';
+
+                if (user && $rootScope.$party) {
+                    if ($rootScope.$party.id == user.id) userTheme = user.theme;
+                    else userTheme = 'navy';
+                }
+
+                $rootScope.$theme = userTheme;
+                localStorageService.set('theme', userTheme);
+            };
+
+            function storeUser(user) {
+                if (user == null) return;                  
+
+                pipDataCache.storePermanent('user', user);
+                $rootScope.$user = user;
+                storeUserTheme(user);
+                
+                // Activate user language
+                pipTranslate.use(user.language, false, true);
+                updateUserRights(user, null);
+            };
+
+            function readUser(successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened()) 
+                    throw new Error('User is not authenticated.');
+    
+                var 
+                    userId = pipSession.userId(),
+                    user = pipDataCache.retrieve('user');
+    
+                // Return user from cache    
+                if (user) {
+                    if (user.id != userId)
+                        throw new Error('Unexpected error: issues in openning session');
+                        
+                    if (successCallback) successCallback(user);
+                        
+                    return user;
+                }
+    
+                // Read user from server
+                return pipRest.users().get(
+                    { id: userId }, 
+                    function (user) {
+                        // Double check
+                        if (user.id != userId) 
+                            user == null;
+
+                        storeUser(user);
+
+                        if (successCallback) successCallback(use);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function readParty(stateParams, successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened())
+                    throw new Error('User is not authenticated.');
+
+                var
+                    userId = pipSession.userId(),
+                    partyId = stateParams.party_id || userId,
+                    party = pipDataCache.retrieve('party');
+
+                // Skip if party already retrieved
+                if (party && party.id == partyId) {
+                    $rootScope.$party = party;
+
+                    storeUserTheme($rootScope.$user);
+
+                    if (successCallback) successCallback(party);
+                    return party;
+                }
+
+                // Read party from server
+                return pipRest.parties().get(
+                    { id: partyId },
+                    function (party) {
+                        updateUserRights(null, party);
+                        pipDataCache.storePermanent('party', party);
+                        $rootScope.$party = party;
+
+                        storeUserTheme($rootScope.$user);
+
+                        if (successCallback) successCallback(party);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function readConnection(stateParams, successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened()) 
+                    throw new Error('User is not authenticated.');
+    
+                var 
+                    userId = pipSession.userId(),
+                    partyId = stateParams.party_id || userId,
+                    connection = pipDataCache.retrieve('connection');
+
+                // Clear connection it does not match user or party
+                if (connection 
+                    && (connection.party_id != userId
+                    || connection.to_party_id != partyId)) {
+                    connection = null;
+                    pipDataCache.remove('connection');
+                    delete $rootScope.$connection;
+                }
+    
+                // For owner connection is not defined
+                if (userId == partyId) {
+                    if (successCallback) successCallback(connection);
+                        
+                    return connection;
+                }
+        
+                // Read connection from server
+                return pipRest.connections().query(
+                    { 
+                        party_id: userId, 
+                        to_party_id: partyId, 
+                        accept: pipEnums.ACCEPTANCE.ACCEPTED 
+                    }, 
+                    function (connections) {
+                        // There are shall not be more than one active connection
+                        if (connections && connections.length > 0) 
+                            connection = connections[0];                            
+                        else connection = null;
+
+                        pipDataCache.storePermanent('connection', connection);
+                        $rootScope.$connection = connection;
+                                                                                        
+                        if (successCallback) successCallback(connection);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function readSettings(successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened())
+                    throw new Error('User is not authenticated.');
+                var
+                    userId = pipSession.userId(),
+                    settings = pipDataCache.retrieve('settings' + '_' + userId);
+
+                if (settings) {
+                    if (successCallback) successCallback(settings);
+
+                    return settings;
+                }
+
+                // Read settings from server
+                return pipRest.partySettings().get(
+                    {
+                        party_id: userId
+                    },
+                    function (settings) {
+                        settings = settings || {};
+                        pipDataCache.storePermanent('settings' + '_' + userId, settings);
+                        $rootScope.$settings = settings;
+
+                        if (successCallback) successCallback(settings);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function onSettingsUpdate(item, successCallback) {
+                // return function(item) {
+                if (item == null) return;
+
+                var userId = pipSession.userId(),
+                    settings = pipDataCache.retrieve('settings' + '_' + userId);
+
+                // If tags are stored
+                if (settings) {
+                    settings = _.extend(settings, item);
+                    pipDataCache.storePermanent('settings' + '_' + userId, settings);
+                    $rootScope.$settings = settings;
+                }
+
+                if (successCallback) successCallback(item);
+                //  };
+            };
+
+        }]
+    );
+
+})();
+/**
+ * @file Tags data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTagsCache', ['pipUtils', 'pipDataCache']);
+
+    thisModule.service('pipTagsCache',
+        ['pipTags', 'pipDataCache', function(pipTags, pipDataCache) {
+            return {
+                readTags: readTags,
+                // Todo: Add updateTags method
+                onTagsUpdate: onTagsUpdate,
+                tagsUpdateDecorator: tagsUpdateDecorator
+            };
+			//------------------------------
+
+            function tagsUpdate(params, item) {
+                // Extract tag from updated entity
+                var tags = item ? pipTags.extractTags(item) : [];
+                if (tags.length == 0) return;
+
+                var cacheName = 'partyTags';
+                if (params && params.party_id !== null && params.party_id !== undefined)
+                    cacheName = cacheName + '_' + params.party_id;
+                else if (params && params.item && params.item.party_id !== null && params.item.party_id !== undefined)
+                    cacheName = cacheName + '_' + params.item.party_id;
+
+                // Todo: this is a wrong way to get party_id (contributor) from entities
+                var data = pipDataCache.retrieve(cacheName);
+
+                // If tags are stored
+                if (data) {
+                    _.each(tags, function(tag) {
+                        // Find if tag already exists
+                        var t = _.find(data.tags, function(t) {
+                            return pipTags.equalTags(t.tag, tag);
+                        });
+
+                        // Otherwise add a new tag
+                        if (t) {
+                            t.tag = tag;
+                            t.count = t.count + 1;
+                            t.used = new Date();
+                        } else {
+                            if (!data.tags)
+                                data.tags = [];
+								
+                            data.tags.push({
+                                tag: tag,
+                                count: 1,
+                                used: new Date()
+                            });
+                        }
+                    });
+                    pipDataCache.store(cacheName, data);
+                }
+            };
+
+            function tagsUpdateDecorator(params, successCallback) {
+                return function(item) {
+                    tagsUpdate(params, item);
+
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+			function readTags(params, successCallback, errorCallback) {
+				params.resource = 'partyTags';
+				params.singleResult = true;
+
+				return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+			};
+
+			// Todo: Add updateTags method
+
+			function onTagsUpdate(params, successCallback) {
+				return tagsUpdateDecorator(params, successCallback);
+			};
+        }]
+    );
+
+})();
+
+
+/**
  * @file Announces data model
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -7096,7 +7096,7 @@
                     params,
                     function(result) {
                         if (params.itemCollection)
-                            _.remove(params.itemCollection, 'id', result.id || (params.object || {}).id || (params.item || {}).id);
+                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
 
                         if (successCallback) successCallback(result);
                     },
@@ -7127,7 +7127,7 @@
                     params,
                     function(result) {
                         if (params.itemCollection && result) {
-                            var index = _.findIndex(params.itemCollection, 'id', result.id);
+                            var index = _.findIndex(params.itemCollection, {id: result.id});
                             if (index >= 0) params.itemCollection[index] = result;
                             else params.itemCollection.push(result);
                         }
@@ -8404,77 +8404,6 @@
 })();
 
 /**
- * @file Split layout
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global $, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipLayout.Split', []);
-
-    thisModule.run( ['$rootScope', 'pipSplit', function($rootScope, pipSplit) {
-        // Intercept routes
-        $rootScope.$on('$stateChangeStart',
-            function(event, toState, toParams, fromState, fromParams) {
-                // Split animation
-                var splitElements = $('.pip-split');
-                if (splitElements.length > 0) {
-                    splitElements.removeClass('pip-transition-forward');
-                    splitElements.removeClass('pip-transition-back');
-                    if (toState.name != fromState.name) {
-                        if (pipSplit.forwardTransition(toState, fromState))
-                            splitElements.addClass('pip-transition-forward');
-                        else
-                            splitElements.addClass('pip-transition-back');
-                    }
-                }
-
-            }
-        );
-
-    }]);
-
-    thisModule.provider('pipSplit', function() {
-        var transitionSequences = [];
-
-        this.addTransitionSequence = addTransitionSequence;
-
-        this.$get = function () {
-            return {
-                forwardTransition: forwardTransition
-            };
-        };
-
-        return;
-
-        //----------------------------
-
-        function addTransitionSequence(sequence) {
-            if (!_.isArray(sequence) || sequence.length == 0)
-                throw new Error('Transition sequence must be an array of state names');
-
-            transitionSequences.push(sequence);
-        }
-
-        function forwardTransition(toState, fromState) {
-            for (var i = 0; i < transitionSequences.length; i++) {
-                var toIndex = transitionSequences[i].indexOf(toState.name);
-                var fromIndex = transitionSequences[i].indexOf(fromState.name);
-
-                if (toIndex > -1)
-                    return toIndex > fromIndex;
-            }
-            return false
-        }
-
-    });
-
-})();
-
-/**
  * @file Tiles layout
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -8605,6 +8534,77 @@
         value = value.toString().toLowerCase();
         return value == '1' || value == 'true';
     };
+
+})();
+
+/**
+ * @file Split layout
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global $, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipLayout.Split', []);
+
+    thisModule.run( ['$rootScope', 'pipSplit', function($rootScope, pipSplit) {
+        // Intercept routes
+        $rootScope.$on('$stateChangeStart',
+            function(event, toState, toParams, fromState, fromParams) {
+                // Split animation
+                var splitElements = $('.pip-split');
+                if (splitElements.length > 0) {
+                    splitElements.removeClass('pip-transition-forward');
+                    splitElements.removeClass('pip-transition-back');
+                    if (toState.name != fromState.name) {
+                        if (pipSplit.forwardTransition(toState, fromState))
+                            splitElements.addClass('pip-transition-forward');
+                        else
+                            splitElements.addClass('pip-transition-back');
+                    }
+                }
+
+            }
+        );
+
+    }]);
+
+    thisModule.provider('pipSplit', function() {
+        var transitionSequences = [];
+
+        this.addTransitionSequence = addTransitionSequence;
+
+        this.$get = function () {
+            return {
+                forwardTransition: forwardTransition
+            };
+        };
+
+        return;
+
+        //----------------------------
+
+        function addTransitionSequence(sequence) {
+            if (!_.isArray(sequence) || sequence.length == 0)
+                throw new Error('Transition sequence must be an array of state names');
+
+            transitionSequences.push(sequence);
+        }
+
+        function forwardTransition(toState, fromState) {
+            for (var i = 0; i < transitionSequences.length; i++) {
+                var toIndex = transitionSequences[i].indexOf(toState.name);
+                var fromIndex = transitionSequences[i].indexOf(fromState.name);
+
+                if (toIndex > -1)
+                    return toIndex > fromIndex;
+            }
+            return false
+        }
+
+    });
 
 })();
 
@@ -11778,28 +11778,6 @@ console.log($scope.toast);
 })();
 
 
-/**
- * @file Registration of navigation WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipNav', [        
-        'pipDropdown',
-        'pipTabs',
-
-        'pipAppBar',
-        'pipSideNav'
-    ]);
-    
-})();
-
-
-
 (function(module) {
 try {
   module = angular.module('pipNav.Templates');
@@ -12069,6 +12047,40 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tabs/tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
+    '    <md-tabs class="hide-xs" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
+    '        <md-tab ng-repeat="tab in tabs"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
+    '            <md-tab-label>\n' +
+    '                {{ (tab.title || tab.name) | translate }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-tab-label>\n' +
+    '        </md-tab>\n' +
+    '    </md-tabs>\n' +
+    '    <md-content class="md-subhead md-hue-1 show-xs hide-sm hide-gt-sm">\n' +
+    '        <div class="pip-divider position-top m0"></div>\n' +
+    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
+    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
+    '            <md-option ng-repeat="tab in tabs" value="{{ ::$index }}" >\n' +
+    '                {{ (tab.title || tab.name) | translate }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-content>\n' +
+    '</md-toolbar>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/sidenav.html',
     '<!--\n' +
     '@file Side Nav component\n' +
@@ -12149,39 +12161,27 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
-    '    <md-tabs class="hide-xs" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
-    '        <md-tab ng-repeat="tab in tabs"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
-    '            <md-tab-label>\n' +
-    '                {{ (tab.title || tab.name) | translate }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-tab-label>\n' +
-    '        </md-tab>\n' +
-    '    </md-tabs>\n' +
-    '    <md-content class="md-subhead md-hue-1 show-xs hide-sm hide-gt-sm">\n' +
-    '        <div class="pip-divider position-top m0"></div>\n' +
-    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
-    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
-    '            <md-option ng-repeat="tab in tabs" value="{{ ::$index }}" >\n' +
-    '                {{ (tab.title || tab.name) | translate }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-content>\n' +
-    '</md-toolbar>\n' +
-    '');
-}]);
+/**
+ * @file Registration of navigation WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipNav', [        
+        'pipDropdown',
+        'pipTabs',
+
+        'pipAppBar',
+        'pipSideNav'
+    ]);
+    
 })();
+
+
 
 /**
  * @file Application App Bar component
@@ -13228,28 +13228,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of location WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipLocations', [        
-        'pipLocation',
-        'pipLocationMap',
-        'pipLocationIp',
-        'pipLocationEdit',
-        'pipLocationEditDialog'
-    ]);
-    
-})();
-
-
-
 (function(module) {
 try {
   module = angular.module('pipLocations.Templates');
@@ -13315,6 +13293,28 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+/**
+ * @file Registration of location WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipLocations', [        
+        'pipLocation',
+        'pipLocationMap',
+        'pipLocationIp',
+        'pipLocationEdit',
+        'pipLocationEditDialog'
+    ]);
+    
+})();
+
+
 
 /**
  * @file Location control
@@ -14876,32 +14876,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of pictures WebUI controls
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipPictures', [        
-        'pipAddImage',
-        'pipAvatar',
-        'pipAvatarEdit',
-        'pipPicture',
-        'pipPictureEdit',
-        'pipCollage',
-        'pipPictureListEdit',        
-        'pipCameraDialog',        
-        'pipPictureUrlDialog'
-    ]);
-    
-})();
-
-
-
 (function(module) {
 try {
   module = angular.module('pipPictures.Templates');
@@ -15274,6 +15248,32 @@ module.run(['$templateCache', function($templateCache) {
     '</md-dialog>');
 }]);
 })();
+
+/**
+ * @file Registration of pictures WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipPictures', [        
+        'pipAddImage',
+        'pipAvatar',
+        'pipAvatarEdit',
+        'pipPicture',
+        'pipPictureEdit',
+        'pipCollage',
+        'pipPictureListEdit',        
+        'pipCameraDialog',        
+        'pipPictureUrlDialog'
+    ]);
+    
+})();
+
+
 
 /**
  * @file Add image control
@@ -16513,7 +16513,7 @@ module.run(['$templateCache', function($templateCache) {
                     if (image.checked) {
                         images.push(image);
                     } else {
-                        _.remove(images, 'url', image.url);
+                        _.remove(images, {url: image.url});
                     }
                 } else {
                     if (image.checked) {
@@ -17261,13 +17261,13 @@ module.run(['$templateCache', function($templateCache) {
                 //pipImageUtils.addHttpHeaders();
                 $http['delete'](deleteItemUrl(item))
                 .success(function (data) {
-                    _.remove(control.items, 'pin', item.pin);
+                    _.remove(control.items, {pin: item.pin});
                     callback();
                 })
                 .error(function (data, status) {
                     // Todo: perform a better processing
                     if (data == null) {
-                        _.remove(control.items, 'pin', item.pin);
+                        _.remove(control.items, {pin: item.pin});
                     } else {
                         item.uploaded = false;
                         item.uploading = false;
@@ -17378,7 +17378,7 @@ module.run(['$templateCache', function($templateCache) {
 
             function onDeleteClick(item) {
                 if (item.state == 'added' || item.state == 'copied') {
-                    _.remove($scope.control.items, 'pin', item.pin);
+                    _.remove($scope.control.items, {pin: item.pin});
                 } else {
                     item.state = 'deleted';
                 }
@@ -17390,7 +17390,7 @@ module.run(['$templateCache', function($templateCache) {
                 if (item) {
                     if ($event.keyCode == 46 || $event.keyCode == 8) {
                         if (item.state == 'added') {
-                            _.remove($scope.control.items, 'pin', item.pin);
+                            _.remove($scope.control.items, {pin: item.pin});
                         } else {
                             item.state = 'deleted';
                         }
@@ -22179,6 +22179,8 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
+
+
     var thisModule = angular.module('pipEntry.PostSignup', ['pipEntry.Common', "pipPostSignupPanel"]);
 
     thisModule.controller('pipPostSignupController',
@@ -23045,6 +23047,127 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
+ * @file Entry verify email controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.VerifyEmail', ['pipEntry.Common']);
+
+    thisModule.controller('pipVerifyEmailController',
+        ['$scope', '$rootScope', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipFormErrors', 'pipEntryCommon', function ($scope, $rootScope, pipAuthState, pipTransaction, pipRest, 
+            pipFormErrors, pipEntryCommon) {
+
+            pipEntryCommon.configureAppBar();
+            pipEntryCommon.initScope($scope);
+
+            $scope.showServerError = true;
+            $scope.transaction = pipTransaction('entry.verify_email', $scope);
+
+            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
+            $scope.onVerify = onVerify;
+            $scope.onRecover = onRecover;
+
+            return;
+
+            //-----------------------------
+
+            function onVerify() {
+                if ($scope.form.$invalid) {
+                    pipFormErrors.resetFormErrors($scope.form, true);
+                    return;
+                }
+
+                var transactionId = $scope.transaction.begin('PROCESSING');
+                if (!transactionId) return;
+
+                pipRest.verifyEmail($scope.data.serverUrl).call(
+                    {
+                        email: $scope.data.email,
+                        code: $scope.data.code
+                    },
+                    function (data) {
+                        pipFormErrors.resetFormErrors($scope.form, false);
+                        if ($scope.transaction.aborted(transactionId)) return;
+
+                        $scope.transaction.end();
+                        pipAuthState.go('verify_email_success', {});
+                    },
+                    function (error) {
+                        $scope.error = error;
+                        $scope.transaction.end($scope.error);
+                        pipFormErrors.resetFormErrors($scope.form, true);
+                        pipFormErrors.setFormError(
+                            $scope.form, $scope.error,
+                            {
+                                1100 : 'email', // Missing email
+                                1106 : 'email', // User was not found
+                                1104 : 'email', // Email is already registered
+                                1305 : 'email', // Email is already registered
+                                1108 : 'code', // Invalid password recovery code
+                                1000 : 'form', // Unknown error
+                                1110 : 'form', // Account is locked
+                                1111 : 'form', // Number of attempts exceeded. Account was locked
+                                1112 : 'form', // Account is not active
+                                '-1' : 'form' // server not response
+                            }
+                        );
+                    }
+                );
+            };
+
+            function onRecover() {
+                if (!$rootScope.$user || !$rootScope.$user.id) {
+                    return ;
+                }
+
+                var tid = $scope.transaction.begin('PROCESSING');
+                if (!tid) return;
+                pipRest.requestEmailVerification($scope.data.serverUrl).get(
+                    {
+                        party_id: $rootScope.$user.id,
+                        email: $scope.data.email
+                    },
+                    function (data) {
+                        if ($scope.transaction.aborted(tid)) return;
+
+                        $scope.transaction.end();
+                        pipAuthState.go('reset_password', {
+                            server_url: $scope.data.serverUrl,
+                            email: $scope.data.email
+                        });
+                    },
+                    function (error) {
+                        $scope.transaction.end(error);
+                    }
+                );
+            };
+        }]
+    );
+
+    thisModule.controller('pipVerifyEmailSuccessController',
+        ['$scope', 'pipAuthState', 'pipEntryCommon', function ($scope, pipAuthState, pipEntryCommon) {
+
+            pipEntryCommon.configureAppBar();
+
+            $scope.onContinue = onContinue;
+
+            return;
+            
+            //-----------------------------
+
+            function onContinue() {
+                pipAuthState.goToAuthorized({});
+            };
+        }]
+    );
+
+})();
+/**
  * @file Entry signup controller
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -23269,127 +23392,6 @@ module.run(['$templateCache', function($templateCache) {
             }
 
         }])
-
-})();
-/**
- * @file Entry verify email controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.VerifyEmail', ['pipEntry.Common']);
-
-    thisModule.controller('pipVerifyEmailController',
-        ['$scope', '$rootScope', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipFormErrors', 'pipEntryCommon', function ($scope, $rootScope, pipAuthState, pipTransaction, pipRest, 
-            pipFormErrors, pipEntryCommon) {
-
-            pipEntryCommon.configureAppBar();
-            pipEntryCommon.initScope($scope);
-
-            $scope.showServerError = true;
-            $scope.transaction = pipTransaction('entry.verify_email', $scope);
-
-            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onVerify = onVerify;
-            $scope.onRecover = onRecover;
-
-            return;
-
-            //-----------------------------
-
-            function onVerify() {
-                if ($scope.form.$invalid) {
-                    pipFormErrors.resetFormErrors($scope.form, true);
-                    return;
-                }
-
-                var transactionId = $scope.transaction.begin('PROCESSING');
-                if (!transactionId) return;
-
-                pipRest.verifyEmail($scope.data.serverUrl).call(
-                    {
-                        email: $scope.data.email,
-                        code: $scope.data.code
-                    },
-                    function (data) {
-                        pipFormErrors.resetFormErrors($scope.form, false);
-                        if ($scope.transaction.aborted(transactionId)) return;
-
-                        $scope.transaction.end();
-                        pipAuthState.go('verify_email_success', {});
-                    },
-                    function (error) {
-                        $scope.error = error;
-                        $scope.transaction.end($scope.error);
-                        pipFormErrors.resetFormErrors($scope.form, true);
-                        pipFormErrors.setFormError(
-                            $scope.form, $scope.error,
-                            {
-                                1100 : 'email', // Missing email
-                                1106 : 'email', // User was not found
-                                1104 : 'email', // Email is already registered
-                                1305 : 'email', // Email is already registered
-                                1108 : 'code', // Invalid password recovery code
-                                1000 : 'form', // Unknown error
-                                1110 : 'form', // Account is locked
-                                1111 : 'form', // Number of attempts exceeded. Account was locked
-                                1112 : 'form', // Account is not active
-                                '-1' : 'form' // server not response
-                            }
-                        );
-                    }
-                );
-            };
-
-            function onRecover() {
-                if (!$rootScope.$user || !$rootScope.$user.id) {
-                    return ;
-                }
-
-                var tid = $scope.transaction.begin('PROCESSING');
-                if (!tid) return;
-                pipRest.requestEmailVerification($scope.data.serverUrl).get(
-                    {
-                        party_id: $rootScope.$user.id,
-                        email: $scope.data.email
-                    },
-                    function (data) {
-                        if ($scope.transaction.aborted(tid)) return;
-
-                        $scope.transaction.end();
-                        pipAuthState.go('reset_password', {
-                            server_url: $scope.data.serverUrl,
-                            email: $scope.data.email
-                        });
-                    },
-                    function (error) {
-                        $scope.transaction.end(error);
-                    }
-                );
-            };
-        }]
-    );
-
-    thisModule.controller('pipVerifyEmailSuccessController',
-        ['$scope', 'pipAuthState', 'pipEntryCommon', function ($scope, pipAuthState, pipEntryCommon) {
-
-            pipEntryCommon.configureAppBar();
-
-            $scope.onContinue = onContinue;
-
-            return;
-            
-            //-----------------------------
-
-            function onContinue() {
-                pipAuthState.goToAuthorized({});
-            };
-        }]
-    );
 
 })();
 
@@ -24366,97 +24368,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSettings.Page', [
-        'pipState', 'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates'
-    ]);
-
-    thisModule.config(['pipAuthStateProvider', function (pipAuthStateProvider) {
-        pipAuthStateProvider.state('settings', {
-            url: '/settings?party_id',
-            auth: true,
-            controller: 'pipSettingsPageController',
-            templateUrl: 'settings_page/settings_page.html'
-        });
-    }]);
-
-    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', 'pipAppBar', 'pipSettings', function ($scope, $state, $rootScope, pipAppBar, pipSettings) {
-
-        $scope.pages = _.filter(pipSettings.getPages(), function (page) {
-            if (page.visible === true && (page.access ? page.access($rootScope.$user, page) : true)) {
-                return page;
-            }
-        });
-
-        $scope.pages =_.sortBy($scope.pages, function(page){
-            return page.index;
-        });
-
-        $scope.selected = {};
-        if ($state.current.name != 'settings')
-            initSelect($state.current.name);
-        else {
-            if (pipSettings.getDefaultPage())
-                initSelect(pipSettings.getDefaultPage().state);
-            else {
-                setTimeout(function () {
-                    if (pipSettings.getDefaultPage())
-                        initSelect(pipSettings.getDefaultPage().state);
-                    else {
-                        if($scope.pages.length >0)
-                            initSelect($scope.pages[0].state);
-
-                    }
-                }, 0);
-
-            }
-
-        }
-
-        appHeader();
-
-        $scope.onNavigationSelect = onNavigationSelect;
-        $scope.onDropdownSelect = onDropdownSelect;
-
-        return;
-
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showTitleText('SETTINGS_TITLE');
-            pipAppBar.showLocalActions(null, []);
-            pipAppBar.hideShadow();
-        };
-
-        function onDropdownSelect(state) {
-            onNavigationSelect(state.state);
-        }
-
-        function onNavigationSelect(state) {
-            initSelect(state);
-
-            if ($scope.selected.page) {
-
-                $state.go(state);
-
-            }
-        };
-
-        function initSelect(state) {
-            $scope.selected.page = _.find($scope.pages, function (page) {
-                return page.state == state;
-            });
-            $scope.selected.pageIndex = _.indexOf($scope.pages, $scope.selected.page);
-            $scope.selected.pageId = state;
-        }
-    }]);
-
-
-})();
 (function () {
     'use strict';
 
@@ -24549,6 +24460,97 @@ module.run(['$templateCache', function($templateCache) {
             }
         }
     }]);
+
+})();
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSettings.Page', [
+        'pipState', 'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipSettings.Templates'
+    ]);
+
+    thisModule.config(['pipAuthStateProvider', function (pipAuthStateProvider) {
+        pipAuthStateProvider.state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controller: 'pipSettingsPageController',
+            templateUrl: 'settings_page/settings_page.html'
+        });
+    }]);
+
+    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', 'pipAppBar', 'pipSettings', function ($scope, $state, $rootScope, pipAppBar, pipSettings) {
+
+        $scope.pages = _.filter(pipSettings.getPages(), function (page) {
+            if (page.visible === true && (page.access ? page.access($rootScope.$user, page) : true)) {
+                return page;
+            }
+        });
+
+        $scope.pages =_.sortBy($scope.pages, function(page){
+            return page.index;
+        });
+
+        $scope.selected = {};
+        if ($state.current.name != 'settings')
+            initSelect($state.current.name);
+        else {
+            if (pipSettings.getDefaultPage())
+                initSelect(pipSettings.getDefaultPage().state);
+            else {
+                setTimeout(function () {
+                    if (pipSettings.getDefaultPage())
+                        initSelect(pipSettings.getDefaultPage().state);
+                    else {
+                        if($scope.pages.length >0)
+                            initSelect($scope.pages[0].state);
+
+                    }
+                }, 0);
+
+            }
+
+        }
+
+        appHeader();
+
+        $scope.onNavigationSelect = onNavigationSelect;
+        $scope.onDropdownSelect = onDropdownSelect;
+
+        return;
+
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showTitleText('SETTINGS_TITLE');
+            pipAppBar.showLocalActions(null, []);
+            pipAppBar.hideShadow();
+        };
+
+        function onDropdownSelect(state) {
+            onNavigationSelect(state.state);
+        }
+
+        function onNavigationSelect(state) {
+            initSelect(state);
+
+            if ($scope.selected.page) {
+
+                $state.go(state);
+
+            }
+        };
+
+        function initSelect(state) {
+            $scope.selected.page = _.find($scope.pages, function (page) {
+                return page.state == state;
+            });
+            $scope.selected.pageIndex = _.indexOf($scope.pages, $scope.selected.page);
+            $scope.selected.pageId = state;
+        }
+    }]);
+
 
 })();
 /**
