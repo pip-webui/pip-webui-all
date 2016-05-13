@@ -18765,6 +18765,75 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('composite_toolbar/composite_toolbar.html',
+    '<!--\n' +
+    '@file Composite toolbar control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div layout="row" layout-align="start start" flex>\n' +
+    '    <md-button class="pip-composite-button"\n' +
+    '               ng-if="!emptyState"\n' +
+    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
+    '                                \'new-item\': !emptyState }"\n' +
+    '               ng-click="onAddItem(\'text\');"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
+    '               ng-disabled="ngDisabled()">\n' +
+    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.checklist"\n' +
+    '               ng-click="onAddItem(\'checklist\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
+    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
+    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.picture"\n' +
+    '               ng-click="onAddItem(\'pictures\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
+    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
+    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
+    '               ng-if="toolbarButton.document"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
+    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
+    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'location\')"\n' +
+    '               ng-if="toolbarButton.location"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
+    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
+    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'time\')"\n' +
+    '               ng-if="toolbarButton.event"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
+    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipComposite.Templates');
+} catch (e) {
+  module = angular.module('pipComposite.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('composite_summary/composite_summary.html',
     '<div ng-repeat="item in compositeContent track by $index">\n' +
     '\n' +
@@ -18843,75 +18912,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipComposite.Templates');
-} catch (e) {
-  module = angular.module('pipComposite.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('composite_toolbar/composite_toolbar.html',
-    '<!--\n' +
-    '@file Composite toolbar control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div layout="row" layout-align="start start" flex>\n' +
-    '    <md-button class="pip-composite-button"\n' +
-    '               ng-if="!emptyState"\n' +
-    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
-    '                                \'new-item\': !emptyState }"\n' +
-    '               ng-click="onAddItem(\'text\');"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
-    '               ng-disabled="ngDisabled()">\n' +
-    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.checklist"\n' +
-    '               ng-click="onAddItem(\'checklist\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
-    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
-    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.picture"\n' +
-    '               ng-click="onAddItem(\'pictures\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
-    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
-    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
-    '               ng-if="toolbarButton.document"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
-    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
-    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'location\')"\n' +
-    '               ng-if="toolbarButton.location"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
-    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
-    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'time\')"\n' +
-    '               ng-if="toolbarButton.event"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
-    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
 }]);
 })();
 
@@ -19044,498 +19044,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Checklist edit control
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * + Improve samples in sampler app
- * + Renamed to pip-checklist-edit and implement pip-checklist (pip-checklist-view) control
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipChecklistEdit", ['pipCore', 'pipComposite.Templates']);
-
-    /**
-     * ngDisabled: '&',
-     * pipChanged: '=',
-     * pipDraggable: '=',
-     * pipOptions: '=',
-     * pipScrollContainer: '@'
-     */
-    thisModule.directive('pipChecklistEdit',
-        function () {
-            return {
-                restrict: 'EA',
-                replace: false,
-                scope: {
-                    ngDisabled: '&',
-                    pipChanged: '=',
-                    pipDraggable: '=',
-                    pipOptions: '=',
-                    pipScrollContainer: '@'
-                },
-                templateUrl: 'checklist_edit/checklist_edit.html',
-                controller: 'pipChecklistEditController'
-            }
-        }
-    );
-
-    thisModule.controller('pipChecklistEditController',
-        ['$scope', '$element', '$attrs', '$document', 'pipUtils', '$rootScope', function ($scope, $element, $attrs, $document,pipUtils, $rootScope) {
-
-            $scope.selected = {};
-            $scope.selected.index = 0;
-            $scope.selected.drag = $scope.pipDraggable;
-            $scope.selected.dragInit = $scope.pipDraggable;
-            $scope.selected.dragId = 0;
-            $scope.selected.id = now();
-            $scope.selected.isChanged = false;
-
-            generateList($scope.pipOptions);
-
-            $scope.onTextareaKeyDown = onTextareaKeyDown;
-            $scope.onAddItem = onAddItem;
-            $scope.onChangeItem = onChangeItem;
-            $scope.onClick = onClick;
-            $scope.onTextAreaClick = onTextAreaClick;
-            $scope.onDropComplete = onDropComplete;
-            $scope.onDeleteItem = onDeleteItem;
-            $scope.onChecked = onChecked;
-            $scope.updateContents = updateContents;
-            $scope.onItemFocus = onItemFocus;
-            $scope.onMove = onMove;
-            $scope.onStart = onStart;
-            $scope.onStop = onStop;
-            $scope.isDisabled = isDisabled;
-            $scope.onDownDragg = onDownDragg;
-
-            $scope.isSelectedItem = isSelectedItem;
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipOptions', function (newValue) {
-                    if (!$scope.selected.isChanged) {
-                        generateList($scope.pipOptions);
-                    } else {
-                        $scope.selected.isChanged = false;
-                    }
-                });
-            }
-
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipDraggable', function (newValue) {
-                    $scope.pipDraggable = newValue;
-                });
-            }
-
-            $scope.onChecklistChange = _.debounce(onChecklistChange , 200);
-
-            // Add class
-            $element.addClass('pip-checklist-edit');
-
-            return;
-
-            function getCaret(el) {
-                if (el.selectionStart) {
-                    return el.selectionStart;
-                } else if ($document.selection) {
-                    el.focus();
-
-                    var r = $document.selection.createRange();
-                    if (r == null) {
-                        return 0;
-                    }
-
-                    var re = el.createTextRange(),
-                        rc = re.duplicate();
-                    re.moveToBookmark(r.getBookmark());
-                    rc.setEndPoint('EndToStart', re);
-
-                    return rc.text.length;
-                }
-                return 0;
-            }
-
-            function isDisabled() {
-                if ($scope.ngDisabled) {
-                    return $scope.ngDisabled();
-                } else {
-                    return false;
-                }
-            };
-
-            function onItemFocus(index) {
-                if (isDisabled()) return;
-                $scope.selected.index = index;
-            };
-
-            function isSelectedItem(index) {
-                var empty;
-                try {
-                    empty = $scope.checklistContent[index].empty;
-                } catch (err) {
-                    empty = true;
-                }
-
-                return $scope.selected.index == index && $scope.pipDraggable && !empty;
-            };
-
-            function setSelectionRange(input, selectionStart, selectionEnd) {
-                if (input.setSelectionRange) {
-                    input.focus();
-                    input.setSelectionRange(selectionStart, selectionEnd);
-                }
-                else if (input.createTextRange) {
-                    var range = input.createTextRange();
-                    range.collapse(true);
-                    range.moveEnd('character', selectionEnd);
-                    range.moveStart('character', selectionStart);
-                    range.select();
-                }
-            }
-
-            function setCaretToPos (input, pos) {
-                setSelectionRange(input, pos, pos);
-            }
-
-            function onTextareaKeyDown($event, index, item) {
-                if (isDisabled()) return;
-                if ($scope.selected.index == -1) return;
-
-                if (item.text == '' && ($event.keyCode == 8 || $event.keyCode == 46) && !$event.ctrlKey && !$event.shiftKey) {
-                    if (!item.empty) onDeleteItem(index, item);
-                    if ($event) $event.stopPropagation();
-                    return false;
-                }
-
-                if ($event && $event.target) {
-                    // calculate caret position
-                    var posCaret = getCaret($event.target);
-                    // calculate textarea length
-                    if ($event.target.value !== undefined)
-                        var textareaLength = $event.target.value.length;
-                }
-
-                //press enter - create new item
-                if (($event.keyCode == 13 || $event.keyCode == 45) && !$event.ctrlKey && !$event.shiftKey) {  // insert
-                    if (posCaret !== undefined && posCaret == 0) {
-                        // add item before current item
-                        if ($scope.selected.index > 0) addItem('', $scope.selected.index - 1);
-                        else  {
-                            $scope.selected.index = -1;
-                            addItem('', -1);
-                        }
-                        if ($event) $event.stopPropagation();
-                        if ($event) $event.preventDefault();
-
-                        return false;
-                    }
-
-                    if (textareaLength && posCaret && textareaLength == posCaret) {
-                        // add item after current item
-                        if (!item.empty) {
-                            addItem('', $scope.selected.index);
-                        }
-                        if ($event) $event.stopPropagation();
-                        if ($event) $event.preventDefault();
-                        return false;
-                    }
-
-                    if ($event) $event.preventDefault();
-                    return false;
-                }
-
-                // move cursor up
-                if ($scope.checklistContent.length > 1 && $event.keyCode == 38 && !$event.ctrlKey && !$event.shiftKey) {  // insert
-                    if ($event) $event.stopPropagation();
-                    if ($event) $event.preventDefault();
-
-                    if (posCaret !== undefined && textareaLength !== undefined && posCaret == textareaLength) {
-                        // move to new item
-                        if ($scope.selected.index == 0) {
-                            $scope.selected.index = $scope.checklistContent.length - 1;
-                            setFocus(0);
-                        } else {
-                            $scope.selected.index -= 1;
-                            setFocus(0);
-                        }
-                    } else {
-                        // move caret to text end
-                        setFocus(textareaLength);
-                    }
-
-                    return false;
-                }
-
-                // move cursor down
-                if ($scope.checklistContent.length > 1 && $event.keyCode == 40 && !$event.ctrlKey && !$event.shiftKey) {  // insert
-                    if ($event) $event.stopPropagation();
-                    if ($event) $event.preventDefault();
-
-                    if (posCaret !== undefined && textareaLength !== undefined && posCaret == textareaLength) {
-                        // move to new item
-                        if ($scope.selected.index >= $scope.checklistContent.length - 1) {
-                            $scope.selected.index = 0;
-                            setFocus(0);
-                        } else {
-                            $scope.selected.index += 1;
-                            setFocus(0);
-                        }
-                    } else {
-                        // move caret to text end
-                        setFocus(textareaLength);
-                    }
-
-                    return false;
-                }
-
-                // delete item
-                if (!item.empty && $event.keyCode == 46 && $event.ctrlKey && !$event.shiftKey) {
-                    if ($event) $event.stopPropagation();
-                    if ($event) $event.preventDefault();
-                    onDeleteItem(index, item);
-                    return false;
-                }
-
-                // check/uncheck item
-                if ($event.keyCode == 32 && $event.ctrlKey && !$event.shiftKey) {
-                    if ($event) $event.stopPropagation();
-                    if ($event) $event.preventDefault();
-                    if (item) {
-                        item.checked = !item.checked
-                        $scope.onChecklistChange();
-                    }
-                    return false;
-                }
-            }
-
-
-            function onAddItem() {
-                addItem('', $scope.selected.index - 1);
-            };
-
-            function onChangeItem(index) {
-                if (index > -1 && $scope.checklistContent[index] && $scope.checklistContent[index].empty) {
-                    if ($scope.checklistContent[index].empty) {
-                        $scope.checklistContent[index].empty = false;
-                        $scope.checklistContent.push(getNewItem('', true));
-                    }
-                }
-                $scope.onChecklistChange();
-            };
-
-            function onClick($event, index) {
-                if (isDisabled()) return;
-                $scope.selected.index = index;
-
-               // if ($event) $event.preventDefault();
-            };
-
-            function onTextAreaClick($event, index) {
-                if (isDisabled()) return;
-                $scope.selected.index = index;
-              //  if ($event) $event.stopPropagation();
-            };
-
-            function onDropComplete(placeIndex, obj, event, componentId) {
-                if ($scope.selected.id != componentId) return;
-                if (!$scope.selected.drag) return;
-                var index = placeIndex;
-
-                var tmpIndex = $scope.selected.index;
-
-                var checklist = _.cloneDeep($scope.checklistContent);
-
-                if (!(tmpIndex == 0 && placeIndex == 1)) {
-                    if (tmpIndex > index) {
-                        if (index > checklist.length - 1) index = checklist.length - 1;
-                        // move up
-                        for (var i = 0; i < tmpIndex - index; i++) {
-                            checklist[tmpIndex - i] = checklist[tmpIndex - i - 1];
-                        }
-                        checklist[index] = obj;
-                    }
-                    if (tmpIndex < index) {
-                        index -= 1;
-                        //move down
-                        for (var i = 0; i < index - tmpIndex; i++) {
-                            checklist[tmpIndex + i] = checklist[tmpIndex + i + 1];
-                        }
-                        checklist[index] = obj;
-                    }
-
-                    $scope.selected.index = index;
-                }
-
-                $scope.checklistContent = checklist;
-
-                $scope.onChecklistChange();
-            };
-
-            function onMove() {
-                setWidth();
-                $scope.isWidth = true;
-            };
-
-
-            function onStop(id) {
-                setTimeout(function () {
-                    $scope.selected.drag = $scope.selected.dragInit;
-                    $scope.selected.dragId = 0;
-                    $scope.$apply();
-                },  50);
-
-                if($scope.isWidth) {
-                    setWidth100();
-                    $scope.isWidth  = false;
-                }
-            };
-
-            function onStart(id) {
-                $scope.selected.isChanged = true;
-                if (id && id != $scope.selected.dragId) $scope.selected.drag = false;
-            };
-
-            function onDownDragg(item) {
-                if ($scope.pipDraggable && $scope.checklistContent.length > 2 && !item.empty) {
-                    $rootScope.$broadcast('onChecklistDrag');
-                    $scope.selected.dragId = $scope.selected.id;
-                }
-            };
-
-            function onDeleteItem(index, item) {
-                var nextElement;
-                if ($scope.checklistContent.length == 1) {
-                    $scope.checklistContent[0].text = '';
-                    $scope.checklistContent[0].checked = false;
-                    $scope.checklistContent[0].empty = true;
-                    $scope.selected.index = 0;
-                } else {
-                    if (index >= 0 && index <= $scope.checklistContent.length)
-                        $scope.checklistContent.splice(index, 1);
-                    else return;
-                }
-
-                if ($scope.selected.index >= $scope.checklistContent.length)
-                    $scope.selected.index = $scope.checklistContent.length - 1;
-
-                setTimeout(function () {
-                    if ($scope.selected.index > -1) {
-                        nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + $scope.selected.index);
-                        if (nextElement) nextElement.focus();
-                    }
-                }, 550);
-
-                $scope.onChecklistChange();
-            };
-
-            function onChecked(item) {
-                $scope.onChecklistChange();
-            };
-
-            function updateContents() {
-                $scope.selected.isChanged = true;
-                var content = [], i;
-                for (i = 0; i < $scope.checklistContent.length; i++) {
-                    if ($scope.checklistContent[i] && !$scope.checklistContent[i].empty) content.push({
-                        checked: $scope.checklistContent[i].checked,
-                        text: $scope.checklistContent[i].text
-                    })
-                }
-                $scope.pipOptions = content;
-            };
-
-            function onChecklistChange() {
-                updateContents();
-                if ($scope.pipChanged) {
-                    $scope.pipChanged();
-                }
-            };
-
-            function setFocus(toPos) {
-                setTimeout(function () {
-                    var nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + $scope.selected.index);
-                    if (nextElement) {
-                        nextElement.focus();
-                        if (toPos !== undefined && nextElement[0]) setCaretToPos(nextElement[0], toPos);
-                    }
-                },  50);
-            };
-
-            function addItem(text, index) {
-                var newItem = getNewItem(text, false);
-                if (index > -1) $scope.selected.index = index;
-
-                if ($scope.checklistContent.length < 2) {
-                    $scope.checklistContent.unshift(newItem);
-                }
-                else {
-                    $scope.checklistContent.splice($scope.selected.index + 1, 0, newItem);
-                }
-                $scope.selected.index += 1;
-                setFocus();
-
-                $scope.onChecklistChange();
-            }
-
-            function getNewItem(text, isEmpty) {
-                return {
-                    checked: false,
-                    text: text || '',
-                    empty: isEmpty
-                }
-            };
-
-            function now(){
-                return +new Date;
-            }
-
-            function clearList() {
-                $scope.selected.index = 0;
-                $scope.checklistContent = [];
-                // push empty item
-                $scope.checklistContent.push(getNewItem('', true));
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                } else {
-                    $scope.checklistContent = [];
-                    _.each(content, function(item){
-                        $scope.checklistContent.push(item);
-                    });
-                    // push empty item
-                    $scope.checklistContent.push(getNewItem('', true));
-                }
-            };
-
-            function setWidth100() {
-                var element = angular.element('#check-item-' + + $scope.selected.id + '-' + $scope.selected.index);
-                element.css( "width", 'none');
-                element.css( "max-width", 'none');
-            };
-
-            function setWidth() {
-                if ($scope.isWidth) return;
-
-                var elementEtalon = angular.element('#check-item-empty-' + $scope.selected.id);
-                var value = elementEtalon.width();
-                var element = angular.element('#check-item-' + $scope.selected.id + '-' + $scope.selected.index);
-                if (element) {
-                    element.css("width", value + 'px');
-                    element.css("max-width", value + 'px');
-                }
-            };
-
-        }]
-    );
-
-})();
 /**
  * @file Checklist view control
  * @copyright Digital Living Software Corp. 2014-2016
@@ -20113,6 +19621,498 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
+ * @file Checklist edit control
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * + Improve samples in sampler app
+ * + Renamed to pip-checklist-edit and implement pip-checklist (pip-checklist-view) control
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipChecklistEdit", ['pipCore', 'pipComposite.Templates']);
+
+    /**
+     * ngDisabled: '&',
+     * pipChanged: '=',
+     * pipDraggable: '=',
+     * pipOptions: '=',
+     * pipScrollContainer: '@'
+     */
+    thisModule.directive('pipChecklistEdit',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: false,
+                scope: {
+                    ngDisabled: '&',
+                    pipChanged: '=',
+                    pipDraggable: '=',
+                    pipOptions: '=',
+                    pipScrollContainer: '@'
+                },
+                templateUrl: 'checklist_edit/checklist_edit.html',
+                controller: 'pipChecklistEditController'
+            }
+        }
+    );
+
+    thisModule.controller('pipChecklistEditController',
+        ['$scope', '$element', '$attrs', '$document', 'pipUtils', '$rootScope', function ($scope, $element, $attrs, $document,pipUtils, $rootScope) {
+
+            $scope.selected = {};
+            $scope.selected.index = 0;
+            $scope.selected.drag = $scope.pipDraggable;
+            $scope.selected.dragInit = $scope.pipDraggable;
+            $scope.selected.dragId = 0;
+            $scope.selected.id = now();
+            $scope.selected.isChanged = false;
+
+            generateList($scope.pipOptions);
+
+            $scope.onTextareaKeyDown = onTextareaKeyDown;
+            $scope.onAddItem = onAddItem;
+            $scope.onChangeItem = onChangeItem;
+            $scope.onClick = onClick;
+            $scope.onTextAreaClick = onTextAreaClick;
+            $scope.onDropComplete = onDropComplete;
+            $scope.onDeleteItem = onDeleteItem;
+            $scope.onChecked = onChecked;
+            $scope.updateContents = updateContents;
+            $scope.onItemFocus = onItemFocus;
+            $scope.onMove = onMove;
+            $scope.onStart = onStart;
+            $scope.onStop = onStop;
+            $scope.isDisabled = isDisabled;
+            $scope.onDownDragg = onDownDragg;
+
+            $scope.isSelectedItem = isSelectedItem;
+
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipOptions', function (newValue) {
+                    if (!$scope.selected.isChanged) {
+                        generateList($scope.pipOptions);
+                    } else {
+                        $scope.selected.isChanged = false;
+                    }
+                });
+            }
+
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipDraggable', function (newValue) {
+                    $scope.pipDraggable = newValue;
+                });
+            }
+
+            $scope.onChecklistChange = _.debounce(onChecklistChange , 200);
+
+            // Add class
+            $element.addClass('pip-checklist-edit');
+
+            return;
+
+            function getCaret(el) {
+                if (el.selectionStart) {
+                    return el.selectionStart;
+                } else if ($document.selection) {
+                    el.focus();
+
+                    var r = $document.selection.createRange();
+                    if (r == null) {
+                        return 0;
+                    }
+
+                    var re = el.createTextRange(),
+                        rc = re.duplicate();
+                    re.moveToBookmark(r.getBookmark());
+                    rc.setEndPoint('EndToStart', re);
+
+                    return rc.text.length;
+                }
+                return 0;
+            }
+
+            function isDisabled() {
+                if ($scope.ngDisabled) {
+                    return $scope.ngDisabled();
+                } else {
+                    return false;
+                }
+            };
+
+            function onItemFocus(index) {
+                if (isDisabled()) return;
+                $scope.selected.index = index;
+            };
+
+            function isSelectedItem(index) {
+                var empty;
+                try {
+                    empty = $scope.checklistContent[index].empty;
+                } catch (err) {
+                    empty = true;
+                }
+
+                return $scope.selected.index == index && $scope.pipDraggable && !empty;
+            };
+
+            function setSelectionRange(input, selectionStart, selectionEnd) {
+                if (input.setSelectionRange) {
+                    input.focus();
+                    input.setSelectionRange(selectionStart, selectionEnd);
+                }
+                else if (input.createTextRange) {
+                    var range = input.createTextRange();
+                    range.collapse(true);
+                    range.moveEnd('character', selectionEnd);
+                    range.moveStart('character', selectionStart);
+                    range.select();
+                }
+            }
+
+            function setCaretToPos (input, pos) {
+                setSelectionRange(input, pos, pos);
+            }
+
+            function onTextareaKeyDown($event, index, item) {
+                if (isDisabled()) return;
+                if ($scope.selected.index == -1) return;
+
+                if (item.text == '' && ($event.keyCode == 8 || $event.keyCode == 46) && !$event.ctrlKey && !$event.shiftKey) {
+                    if (!item.empty) onDeleteItem(index, item);
+                    if ($event) $event.stopPropagation();
+                    return false;
+                }
+
+                if ($event && $event.target) {
+                    // calculate caret position
+                    var posCaret = getCaret($event.target);
+                    // calculate textarea length
+                    if ($event.target.value !== undefined)
+                        var textareaLength = $event.target.value.length;
+                }
+
+                //press enter - create new item
+                if (($event.keyCode == 13 || $event.keyCode == 45) && !$event.ctrlKey && !$event.shiftKey) {  // insert
+                    if (posCaret !== undefined && posCaret == 0) {
+                        // add item before current item
+                        if ($scope.selected.index > 0) addItem('', $scope.selected.index - 1);
+                        else  {
+                            $scope.selected.index = -1;
+                            addItem('', -1);
+                        }
+                        if ($event) $event.stopPropagation();
+                        if ($event) $event.preventDefault();
+
+                        return false;
+                    }
+
+                    if (textareaLength && posCaret && textareaLength == posCaret) {
+                        // add item after current item
+                        if (!item.empty) {
+                            addItem('', $scope.selected.index);
+                        }
+                        if ($event) $event.stopPropagation();
+                        if ($event) $event.preventDefault();
+                        return false;
+                    }
+
+                    if ($event) $event.preventDefault();
+                    return false;
+                }
+
+                // move cursor up
+                if ($scope.checklistContent.length > 1 && $event.keyCode == 38 && !$event.ctrlKey && !$event.shiftKey) {  // insert
+                    if ($event) $event.stopPropagation();
+                    if ($event) $event.preventDefault();
+
+                    if (posCaret !== undefined && textareaLength !== undefined && posCaret == textareaLength) {
+                        // move to new item
+                        if ($scope.selected.index == 0) {
+                            $scope.selected.index = $scope.checklistContent.length - 1;
+                            setFocus(0);
+                        } else {
+                            $scope.selected.index -= 1;
+                            setFocus(0);
+                        }
+                    } else {
+                        // move caret to text end
+                        setFocus(textareaLength);
+                    }
+
+                    return false;
+                }
+
+                // move cursor down
+                if ($scope.checklistContent.length > 1 && $event.keyCode == 40 && !$event.ctrlKey && !$event.shiftKey) {  // insert
+                    if ($event) $event.stopPropagation();
+                    if ($event) $event.preventDefault();
+
+                    if (posCaret !== undefined && textareaLength !== undefined && posCaret == textareaLength) {
+                        // move to new item
+                        if ($scope.selected.index >= $scope.checklistContent.length - 1) {
+                            $scope.selected.index = 0;
+                            setFocus(0);
+                        } else {
+                            $scope.selected.index += 1;
+                            setFocus(0);
+                        }
+                    } else {
+                        // move caret to text end
+                        setFocus(textareaLength);
+                    }
+
+                    return false;
+                }
+
+                // delete item
+                if (!item.empty && $event.keyCode == 46 && $event.ctrlKey && !$event.shiftKey) {
+                    if ($event) $event.stopPropagation();
+                    if ($event) $event.preventDefault();
+                    onDeleteItem(index, item);
+                    return false;
+                }
+
+                // check/uncheck item
+                if ($event.keyCode == 32 && $event.ctrlKey && !$event.shiftKey) {
+                    if ($event) $event.stopPropagation();
+                    if ($event) $event.preventDefault();
+                    if (item) {
+                        item.checked = !item.checked
+                        $scope.onChecklistChange();
+                    }
+                    return false;
+                }
+            }
+
+
+            function onAddItem() {
+                addItem('', $scope.selected.index - 1);
+            };
+
+            function onChangeItem(index) {
+                if (index > -1 && $scope.checklistContent[index] && $scope.checklistContent[index].empty) {
+                    if ($scope.checklistContent[index].empty) {
+                        $scope.checklistContent[index].empty = false;
+                        $scope.checklistContent.push(getNewItem('', true));
+                    }
+                }
+                $scope.onChecklistChange();
+            };
+
+            function onClick($event, index) {
+                if (isDisabled()) return;
+                $scope.selected.index = index;
+
+               // if ($event) $event.preventDefault();
+            };
+
+            function onTextAreaClick($event, index) {
+                if (isDisabled()) return;
+                $scope.selected.index = index;
+              //  if ($event) $event.stopPropagation();
+            };
+
+            function onDropComplete(placeIndex, obj, event, componentId) {
+                if ($scope.selected.id != componentId) return;
+                if (!$scope.selected.drag) return;
+                var index = placeIndex;
+
+                var tmpIndex = $scope.selected.index;
+
+                var checklist = _.cloneDeep($scope.checklistContent);
+
+                if (!(tmpIndex == 0 && placeIndex == 1)) {
+                    if (tmpIndex > index) {
+                        if (index > checklist.length - 1) index = checklist.length - 1;
+                        // move up
+                        for (var i = 0; i < tmpIndex - index; i++) {
+                            checklist[tmpIndex - i] = checklist[tmpIndex - i - 1];
+                        }
+                        checklist[index] = obj;
+                    }
+                    if (tmpIndex < index) {
+                        index -= 1;
+                        //move down
+                        for (var i = 0; i < index - tmpIndex; i++) {
+                            checklist[tmpIndex + i] = checklist[tmpIndex + i + 1];
+                        }
+                        checklist[index] = obj;
+                    }
+
+                    $scope.selected.index = index;
+                }
+
+                $scope.checklistContent = checklist;
+
+                $scope.onChecklistChange();
+            };
+
+            function onMove() {
+                setWidth();
+                $scope.isWidth = true;
+            };
+
+
+            function onStop(id) {
+                setTimeout(function () {
+                    $scope.selected.drag = $scope.selected.dragInit;
+                    $scope.selected.dragId = 0;
+                    $scope.$apply();
+                },  50);
+
+                if($scope.isWidth) {
+                    setWidth100();
+                    $scope.isWidth  = false;
+                }
+            };
+
+            function onStart(id) {
+                $scope.selected.isChanged = true;
+                if (id && id != $scope.selected.dragId) $scope.selected.drag = false;
+            };
+
+            function onDownDragg(item) {
+                if ($scope.pipDraggable && $scope.checklistContent.length > 2 && !item.empty) {
+                    $rootScope.$broadcast('onChecklistDrag');
+                    $scope.selected.dragId = $scope.selected.id;
+                }
+            };
+
+            function onDeleteItem(index, item) {
+                var nextElement;
+                if ($scope.checklistContent.length == 1) {
+                    $scope.checklistContent[0].text = '';
+                    $scope.checklistContent[0].checked = false;
+                    $scope.checklistContent[0].empty = true;
+                    $scope.selected.index = 0;
+                } else {
+                    if (index >= 0 && index <= $scope.checklistContent.length)
+                        $scope.checklistContent.splice(index, 1);
+                    else return;
+                }
+
+                if ($scope.selected.index >= $scope.checklistContent.length)
+                    $scope.selected.index = $scope.checklistContent.length - 1;
+
+                setTimeout(function () {
+                    if ($scope.selected.index > -1) {
+                        nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + $scope.selected.index);
+                        if (nextElement) nextElement.focus();
+                    }
+                }, 550);
+
+                $scope.onChecklistChange();
+            };
+
+            function onChecked(item) {
+                $scope.onChecklistChange();
+            };
+
+            function updateContents() {
+                $scope.selected.isChanged = true;
+                var content = [], i;
+                for (i = 0; i < $scope.checklistContent.length; i++) {
+                    if ($scope.checklistContent[i] && !$scope.checklistContent[i].empty) content.push({
+                        checked: $scope.checklistContent[i].checked,
+                        text: $scope.checklistContent[i].text
+                    })
+                }
+                $scope.pipOptions = content;
+            };
+
+            function onChecklistChange() {
+                updateContents();
+                if ($scope.pipChanged) {
+                    $scope.pipChanged();
+                }
+            };
+
+            function setFocus(toPos) {
+                setTimeout(function () {
+                    var nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + $scope.selected.index);
+                    if (nextElement) {
+                        nextElement.focus();
+                        if (toPos !== undefined && nextElement[0]) setCaretToPos(nextElement[0], toPos);
+                    }
+                },  50);
+            };
+
+            function addItem(text, index) {
+                var newItem = getNewItem(text, false);
+                if (index > -1) $scope.selected.index = index;
+
+                if ($scope.checklistContent.length < 2) {
+                    $scope.checklistContent.unshift(newItem);
+                }
+                else {
+                    $scope.checklistContent.splice($scope.selected.index + 1, 0, newItem);
+                }
+                $scope.selected.index += 1;
+                setFocus();
+
+                $scope.onChecklistChange();
+            }
+
+            function getNewItem(text, isEmpty) {
+                return {
+                    checked: false,
+                    text: text || '',
+                    empty: isEmpty
+                }
+            };
+
+            function now(){
+                return +new Date;
+            }
+
+            function clearList() {
+                $scope.selected.index = 0;
+                $scope.checklistContent = [];
+                // push empty item
+                $scope.checklistContent.push(getNewItem('', true));
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                } else {
+                    $scope.checklistContent = [];
+                    _.each(content, function(item){
+                        $scope.checklistContent.push(item);
+                    });
+                    // push empty item
+                    $scope.checklistContent.push(getNewItem('', true));
+                }
+            };
+
+            function setWidth100() {
+                var element = angular.element('#check-item-' + + $scope.selected.id + '-' + $scope.selected.index);
+                element.css( "width", 'none');
+                element.css( "max-width", 'none');
+            };
+
+            function setWidth() {
+                if ($scope.isWidth) return;
+
+                var elementEtalon = angular.element('#check-item-empty-' + $scope.selected.id);
+                var value = elementEtalon.width();
+                var element = angular.element('#check-item-' + $scope.selected.id + '-' + $scope.selected.index);
+                if (element) {
+                    element.css("width", value + 'px');
+                    element.css("max-width", value + 'px');
+                }
+            };
+
+        }]
+    );
+
+})();
+/**
  * @file Composite summary control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -20344,115 +20344,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Composite view control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipCompositeView", [
-        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
-
-    thisModule.directive('pipCompositeView',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    ngDisabled: '&',
-                    pipDisabledChecklist: '&',
-                    pipChanged: '&',
-                    pipContents: '='
-                },
-                templateUrl: 'composite_view/composite_view.html',
-                controller: 'pipCompositeViewController'
-            }
-        }
-    );
-
-    thisModule.controller('pipCompositeViewController',
-        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-
-            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
-            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
-            $scope.disabledChecklist = pipUtils.toBoolean($scope.pipDisabledChecklist()) != false;
-            $scope.selected = {};
-            $scope.selected.isChanged = false;
-            generateList($scope.pipContents);
-
-            $scope.onContentChange = onContentChange;
-            $scope.isDisabled = isDisabled;
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipContents', function (newValue) {
-                    if (!Array.isArray($scope.pipContents)) {
-                        // throw new Error('Error: Attribute pip-contents must be array!');
-                        return;
-                    }
-                    if (!$scope.selected.isChanged) {
-                        generateList($scope.pipContents);
-                    } else {
-                        $scope.selected.isChanged = false;
-                    }
-                });
-            }
-
-            // Add class
-            $element.addClass('pip-composite-view');
-
-            return;
-
-            function isDisabled() {
-                return pipUtils.toBoolean($scope.pipDisabledChecklist()) == true ||
-                    pipUtils.toBoolean($scope.ngDisabled()) == true;
-            };
-
-            function updateContents() {
-                $scope.selected.isChanged = true;
-                $scope.pipContents = $scope.compositeContent;
-            };
-
-            function onContentChange() {
-                onCompositeChange();
-            };
-
-            function onCompositeChange() {
-                updateContents();
-                if ($scope.pipChanged)
-                    $scope.pipChanged();
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                    return;
-                } else {
-                    $scope.compositeContent = [];
-                    var id = 0;
-                    _.each(content, function(item){
-                        if (typeof(item) != 'object' || item == null) {
-                            throw new Error('Error: content error!');
-                        }
-                        item.id = id;
-                        id ++;
-                        $scope.compositeContent.push(item);
-                    });
-                }
-            };
-
-            function clearList() {
-                $scope.compositeContent = [];
-            };
-
-        }]
-    );
-
-})();
-
-/**
  * @file Content switch control
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -20593,6 +20484,115 @@ module.run(['$templateCache', function($templateCache) {
                 });
             }
         }
+    );
+
+})();
+
+/**
+ * @file Composite view control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipCompositeView", [
+        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
+
+    thisModule.directive('pipCompositeView',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: {
+                    ngDisabled: '&',
+                    pipDisabledChecklist: '&',
+                    pipChanged: '&',
+                    pipContents: '='
+                },
+                templateUrl: 'composite_view/composite_view.html',
+                controller: 'pipCompositeViewController'
+            }
+        }
+    );
+
+    thisModule.controller('pipCompositeViewController',
+        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+
+            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
+            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+            $scope.disabledChecklist = pipUtils.toBoolean($scope.pipDisabledChecklist()) != false;
+            $scope.selected = {};
+            $scope.selected.isChanged = false;
+            generateList($scope.pipContents);
+
+            $scope.onContentChange = onContentChange;
+            $scope.isDisabled = isDisabled;
+
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipContents', function (newValue) {
+                    if (!Array.isArray($scope.pipContents)) {
+                        // throw new Error('Error: Attribute pip-contents must be array!');
+                        return;
+                    }
+                    if (!$scope.selected.isChanged) {
+                        generateList($scope.pipContents);
+                    } else {
+                        $scope.selected.isChanged = false;
+                    }
+                });
+            }
+
+            // Add class
+            $element.addClass('pip-composite-view');
+
+            return;
+
+            function isDisabled() {
+                return pipUtils.toBoolean($scope.pipDisabledChecklist()) == true ||
+                    pipUtils.toBoolean($scope.ngDisabled()) == true;
+            };
+
+            function updateContents() {
+                $scope.selected.isChanged = true;
+                $scope.pipContents = $scope.compositeContent;
+            };
+
+            function onContentChange() {
+                onCompositeChange();
+            };
+
+            function onCompositeChange() {
+                updateContents();
+                if ($scope.pipChanged)
+                    $scope.pipChanged();
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                    return;
+                } else {
+                    $scope.compositeContent = [];
+                    var id = 0;
+                    _.each(content, function(item){
+                        if (typeof(item) != 'object' || item == null) {
+                            throw new Error('Error: content error!');
+                        }
+                        item.id = id;
+                        id ++;
+                        $scope.compositeContent.push(item);
+                    });
+                }
+            };
+
+            function clearList() {
+                $scope.compositeContent = [];
+            };
+
+        }]
     );
 
 })();
