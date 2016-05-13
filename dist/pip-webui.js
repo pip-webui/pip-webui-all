@@ -8610,6 +8610,45 @@
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipControls', [        
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeEdit',
+        'pipTimeView',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipConversionDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', [ 'pipControls' ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipBasicControls.Templates');
@@ -9289,43 +9328,73 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Registration of basic WebUI controls
+ * @file Confirmation dialog
  * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve sample in sampler app
  */
-
+ 
 /* global angular */
 
 (function () {
     'use strict';
 
-    angular.module('pipControls', [        
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
+    var thisModule = angular.module('pipConfirmationDialog', 
+        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
-        'pipDate',
-        'pipDateRange',
-        'pipTimeEdit',
-        'pipTimeView',
+    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'CONFIRM_TITLE': 'Confirm'
+        });
+        pipTranslateProvider.translations('ru', {
+            'CONFIRM_TITLE': 'Подтвердите'
+        });
+    }]);
 
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipConversionDialog',
-        'pipErrorDetailsDialog'
-    ]);
+    thisModule.factory('pipConfirmationDialog', 
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'confirmation_dialog/confirmation_dialog.html',
+                        controller: 'pipConfirmationDialogController',
+                        locals: { params: params },
+                        clickOutsideToClose: true
+                    })
+                    .then(function () {
+                        if (successCallback) {
+                            successCallback();
+                        }
+                    }, function () {
+                        if (cancelCallback) {
+                            cancelCallback();
+                        }
+                    });
+                }
+            };
+        }]
+    );
 
-    angular.module('pipBasicControls', [ 'pipControls' ]);
-    
+    thisModule.controller('pipConfirmationDialogController',
+        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
+            $scope.theme = $rootScope.$theme;
+            $scope.title = params.title || 'CONFIRM_TITLE';
+
+            $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'CANCEL';
+
+            $scope.onCancel = function () {
+                $mdDialog.cancel();
+            };
+
+            $scope.onOk = function () {
+                $mdDialog.hide();
+            };
+        }]
+    );
+
 })();
-
-
 
 /**
  * @file Color picker control
@@ -9397,75 +9466,6 @@ module.run(['$templateCache', function($templateCache) {
     }])
 
 })();
-/**
- * @file Confirmation dialog
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve sample in sampler app
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipConfirmationDialog', 
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'CONFIRM_TITLE': 'Confirm'
-        });
-        pipTranslateProvider.translations('ru', {
-            'CONFIRM_TITLE': 'Подтвердите'
-        });
-    }]);
-
-    thisModule.factory('pipConfirmationDialog', 
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'confirmation_dialog/confirmation_dialog.html',
-                        controller: 'pipConfirmationDialogController',
-                        locals: { params: params },
-                        clickOutsideToClose: true
-                    })
-                    .then(function () {
-                        if (successCallback) {
-                            successCallback();
-                        }
-                    }, function () {
-                        if (cancelCallback) {
-                            cancelCallback();
-                        }
-                    });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipConfirmationDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
-            $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'CONFIRM_TITLE';
-
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
-
-            $scope.onCancel = function () {
-                $mdDialog.cancel();
-            };
-
-            $scope.onOk = function () {
-                $mdDialog.hide();
-            };
-        }]
-    );
-
-})();
-
 /**
  * @file Convert parent dialog
  * @copyright Digital Living Software Corp. 2014-2016
@@ -10934,8 +10934,9 @@ module.run(['$templateCache', function($templateCache) {
 
                     $scope.onPopoverClick = onPopoverClick;
                     $scope = _.defaults($scope, $scope.$parent);
-                    $rootScope.$on('pipWindowResized', onResize);
+
                     $rootScope.$on('pipPopoverResize', onResize);
+                    $(window).resize(onResize);
 
                     function init() {
                         backdropElement.addClass('opened');
@@ -10978,7 +10979,7 @@ module.run(['$templateCache', function($templateCache) {
                             if (pos)
                                 popover
                                     .css('max-width', docWidth - (docWidth - pos.left))
-                                    .css('max-height', docHeight - (pos.top + height) - 32)
+                                    .css('max-height', docHeight - (pos.top + height) - 32, 0)
                                     .css('left', pos.left - popover.width() + (width / 2))
                                     .css('top', pos.top + height + 16);
                         }
@@ -10993,10 +10994,12 @@ module.run(['$templateCache', function($templateCache) {
                             content = popover.find('.pip-content'),
                             contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
 
-                        content.css('max-height', contentHeight + 'px').css('box-sizing', 'border-box');
+                        content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
                     }
 
                     function onResize () {
+                        console.log('resized func');
+
                         backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
                         position();
                         calcHeight();
