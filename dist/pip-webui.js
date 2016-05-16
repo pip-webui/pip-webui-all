@@ -9153,6 +9153,30 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tags/tag_list.html',
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
+    '     ng-if="pipType && !pipTypeLocal">\n' +
+    '\n' +
+    '    <span>{{pipType | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
+    '     ng-if="pipType && pipTypeLocal">\n' +
+    '\n' +
+    '    <span>{{pipTypeLocal | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4" ng-repeat="tag in pipTags">\n' +
+    '    <span>{{::tag}}</span>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('time_edit/time_edit.html',
     '<!--\n' +
     '@file Time edit control content\n' +
@@ -9307,6 +9331,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipPopover',
         'pipImageSlider',
         'pipToasts',
+        "pipTagList",
 
         'pipDate',
         'pipDateRange',
@@ -9626,178 +9651,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })();
-
-/**
- * @file Date control
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve samples int sampler app
- * - Optimize. It is way to slow on samples
- */
- 
- /* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipDate", ['pipBasicControls.Templates']);
-
-    thisModule.directive('pipDate',
-        ['$parse', function ($parse) {
-            return {
-                restrict: 'EA',
-                require: 'ngModel',
-                scope: {
-                    timeMode: '@pipTimeMode',
-                    disabled: '&ngDisabled',
-                    model: '=ngModel',
-                    ngChange: '&'
-                },
-                templateUrl: 'date/date.html',
-                controller: 'pipDateController'
-            }
-        }]
-    );
-
-    thisModule.controller('pipDateController',
-        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
-
-            function dayList(month, year) {
-                var count = 31;
-
-                if (month == 4 || month == 6 || month == 9 || month == 11) {
-                    count = 30;
-                } else if (month == 2) {
-                    if (year)
-                    // Calculate leap year (primitive)
-                        count = year % 4 == 0 ? 29 : 28;
-                    else count = 28;
-                }
-
-                var days = [];
-                for (var i = 1; i <= count; i++) {
-                    days.push(i);
-                }
-
-                return days;
-            };
-
-            function monthList() {
-                var months = [];
-
-                for (var i = 1; i <= 12; i++) {
-                    months.push({
-                        id: i,
-                        name: pipTranslate.translate('MONTH_' + i)
-                    })
-                }
-
-                return months;
-            };
-
-            function yearList() {
-                var
-                    currentYear = new Date().getFullYear(),
-                    startYear = $scope.timeMode == 'future' ? currentYear : currentYear - 100,
-                    endYear = $scope.timeMode == 'past' ? currentYear : currentYear + 100,
-                    years = [];
-
-                if ($scope.timeMode == 'past') {
-                    for (var i = endYear; i >= startYear; i--) {
-                        years.push(i);
-                    }
-                } else {
-                    for (var i = startYear; i <= endYear; i++) {
-                        years.push(i);
-                    }
-                }
-
-                return years;
-            };
-
-            function adjustDay() {
-                var days = dayList($scope.month, $scope.year);
-
-                if ($scope.days.length != days.length) {
-                    if ($scope.day > days.length) {
-                        $scope.day = days.length;
-                    }
-
-                    $scope.days = days;
-                }
-            };
-
-            function getValue(value) {
-                value = value ? (_.isDate(value) ? value : new Date(value)) : null;
-
-                // Define values
-                var day = value ? value.getDate() : null;
-                var month = value ? value.getMonth() + 1 : null;
-                var year = value ? value.getFullYear() : null;
-
-                // Update day list if month and year were changed
-                if ($scope.month != month
-                    && $scope.year != year) {
-                    $scope.days = dayList($scope.month, $scope.year);
-                }
-
-                // Assign values to scope
-                $scope.day = day;
-                $scope.month = month;
-                $scope.year = year;
-            };
-
-            function setValue() {
-                if ($scope.day && $scope.month && $scope.year) {
-                    var value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
-                    $scope.model = value;
-                    $scope.ngChange();
-                }
-            };
-
-            $scope.onDayChanged = function () {
-                setValue();
-            };
-
-            $scope.onMonthChanged = function () {
-                adjustDay();
-                setValue();
-            };
-
-            $scope.onYearChanged = function () {
-                adjustDay();
-                setValue();
-            };
-
-            // Set initial values
-            var value = $scope.model ? (_.isDate($scope.model) ? $scope.model : new Date($scope.model)) : null;
-            $scope.day = value ? value.getDate() : null;
-            $scope.month = value ? value.getMonth() + 1 : null;
-            $scope.year = value ? value.getFullYear() : null;
-
-            $scope.dayLabel = pipTranslate.translate('DAY');
-            $scope.monthLabel = pipTranslate.translate('MONTH');
-            $scope.yearLabel = pipTranslate.translate('YEAR');
-
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.months = monthList();
-            $scope.years = yearList();
-
-            $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-
-            // React on changes
-            $scope.$watch('model', function (newValue, oldValue) {
-                getValue(newValue);
-            });
-
-            $scope.$watch($scope.disabled, function (newValue) {
-                $scope.disableControls = newValue;
-            });
-        }]
-    );
-
-})();
-
 
 /**
  * @file Date range control
@@ -10182,6 +10035,178 @@ module.run(['$templateCache', function($templateCache) {
                 setCurrent();
                 $scope.onChange();
             }
+        }]
+    );
+
+})();
+
+
+/**
+ * @file Date control
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve samples int sampler app
+ * - Optimize. It is way to slow on samples
+ */
+ 
+ /* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipDate", ['pipBasicControls.Templates']);
+
+    thisModule.directive('pipDate',
+        ['$parse', function ($parse) {
+            return {
+                restrict: 'EA',
+                require: 'ngModel',
+                scope: {
+                    timeMode: '@pipTimeMode',
+                    disabled: '&ngDisabled',
+                    model: '=ngModel',
+                    ngChange: '&'
+                },
+                templateUrl: 'date/date.html',
+                controller: 'pipDateController'
+            }
+        }]
+    );
+
+    thisModule.controller('pipDateController',
+        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
+
+            function dayList(month, year) {
+                var count = 31;
+
+                if (month == 4 || month == 6 || month == 9 || month == 11) {
+                    count = 30;
+                } else if (month == 2) {
+                    if (year)
+                    // Calculate leap year (primitive)
+                        count = year % 4 == 0 ? 29 : 28;
+                    else count = 28;
+                }
+
+                var days = [];
+                for (var i = 1; i <= count; i++) {
+                    days.push(i);
+                }
+
+                return days;
+            };
+
+            function monthList() {
+                var months = [];
+
+                for (var i = 1; i <= 12; i++) {
+                    months.push({
+                        id: i,
+                        name: pipTranslate.translate('MONTH_' + i)
+                    })
+                }
+
+                return months;
+            };
+
+            function yearList() {
+                var
+                    currentYear = new Date().getFullYear(),
+                    startYear = $scope.timeMode == 'future' ? currentYear : currentYear - 100,
+                    endYear = $scope.timeMode == 'past' ? currentYear : currentYear + 100,
+                    years = [];
+
+                if ($scope.timeMode == 'past') {
+                    for (var i = endYear; i >= startYear; i--) {
+                        years.push(i);
+                    }
+                } else {
+                    for (var i = startYear; i <= endYear; i++) {
+                        years.push(i);
+                    }
+                }
+
+                return years;
+            };
+
+            function adjustDay() {
+                var days = dayList($scope.month, $scope.year);
+
+                if ($scope.days.length != days.length) {
+                    if ($scope.day > days.length) {
+                        $scope.day = days.length;
+                    }
+
+                    $scope.days = days;
+                }
+            };
+
+            function getValue(value) {
+                value = value ? (_.isDate(value) ? value : new Date(value)) : null;
+
+                // Define values
+                var day = value ? value.getDate() : null;
+                var month = value ? value.getMonth() + 1 : null;
+                var year = value ? value.getFullYear() : null;
+
+                // Update day list if month and year were changed
+                if ($scope.month != month
+                    && $scope.year != year) {
+                    $scope.days = dayList($scope.month, $scope.year);
+                }
+
+                // Assign values to scope
+                $scope.day = day;
+                $scope.month = month;
+                $scope.year = year;
+            };
+
+            function setValue() {
+                if ($scope.day && $scope.month && $scope.year) {
+                    var value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                    $scope.model = value;
+                    $scope.ngChange();
+                }
+            };
+
+            $scope.onDayChanged = function () {
+                setValue();
+            };
+
+            $scope.onMonthChanged = function () {
+                adjustDay();
+                setValue();
+            };
+
+            $scope.onYearChanged = function () {
+                adjustDay();
+                setValue();
+            };
+
+            // Set initial values
+            var value = $scope.model ? (_.isDate($scope.model) ? $scope.model : new Date($scope.model)) : null;
+            $scope.day = value ? value.getDate() : null;
+            $scope.month = value ? value.getMonth() + 1 : null;
+            $scope.year = value ? value.getFullYear() : null;
+
+            $scope.dayLabel = pipTranslate.translate('DAY');
+            $scope.monthLabel = pipTranslate.translate('MONTH');
+            $scope.yearLabel = pipTranslate.translate('YEAR');
+
+            $scope.days = dayList($scope.month, $scope.year);
+            $scope.months = monthList();
+            $scope.years = yearList();
+
+            $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
+
+            // React on changes
+            $scope.$watch('model', function (newValue, oldValue) {
+                getValue(newValue);
+            });
+
+            $scope.$watch($scope.disabled, function (newValue) {
+                $scope.disableControls = newValue;
+            });
         }]
     );
 
@@ -11148,6 +11173,63 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
+ * @file Tag list control
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Improve samples in sampler app
+ * - What's pipType and pipTypeLocal? Give better name
+ * - Do not use ng-if, instead generate template statically
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipTagList", ['pipCore']);
+
+    /**
+     * pipTags - set of tags
+     * pipType - additional type tag
+     * pipTypeLocal - additional translated type tag
+     */
+    thisModule.directive('pipTagList', 
+        ['$parse', function ($parse) {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipTags: '=',
+                    pipType: '=',
+                    pipTypeLocal: '='
+                },
+                templateUrl: 'tags/tag_list.html',
+                controller:
+                    ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+                        var tagsGetter = $parse($attrs.pipTags);
+                        
+                        $element.css("display", "block");
+                        
+                        // Set tags
+                        $scope.tags = tagsGetter($scope);
+
+                        // Also optimization to avoid watch if it is unnecessary
+                        if (pipUtils.toBoolean($attrs.pipRebind)) {
+                            $scope.$watch(tagsGetter, function (newValue) {
+                                $scope.tags = tagsGetter($scope)
+                            });
+                        }
+
+                        // Add class
+                        $element.addClass('pip-tag-list');
+                    }]
+            }
+        }]
+    );
+
+})();
+
+
+/**
  * @file Time control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -11398,76 +11480,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Time control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipTimeView", ['pipUtils']);
-
-    thisModule.directive('pipTimeView',
-        ['pipUtils', function (pipUtils) {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipStartDate: '=',
-                    pipEndDate: '='
-                },
-                templateUrl:  'time_view/time_view.html',
-                link: function ($scope, $element, $attrs) {
-
-                    function getDateJSON(value) {
-                        var date = value ? new Date(value) : null;
-                        return date;
-                    };
-
-                    function defineStartDate() {
-                        if (($scope.pipStartDate !== null) && ($scope.pipStartDate !== undefined)) {
-                            $scope.data.start = _.isDate($scope.pipStartDate) ?  $scope.pipStartDate : getDateJSON($scope.pipStartDate);
-                        }
-                    };
-
-                    function defineEndDate() {
-                        if (($scope.pipEndDate !== null) && ($scope.pipEndDate !== undefined)) {
-                            $scope.data.end = _.isDate($scope.pipEndDate) ?  $scope.pipEndDate : getDateJSON($scope.pipEndDate);
-                        }
-                    };
-
-                    $scope.data = {};
-                    $scope.data.start = null;
-                    $scope.data.end = null;
-                    defineStartDate();
-                    defineEndDate();
-
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch('pipStartDate',
-                            function (newValue) {
-                                $scope.data.start = null;
-                                defineStartDate();
-                            }
-                        );
-                        $scope.$watch('pipEndDate',
-                            function (newValue) {
-                                $scope.data.end = null;
-                                defineEndDate();
-                            }
-                        );
-                    }
-
-                    // Add class
-                    $element.addClass('pip-time-view');
-                }
-            }
-        }]
-    );
-
-})();
-
-/**
  * @file Toasts management service
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo Replace ngAudio with alternative service
@@ -11693,6 +11705,76 @@ console.log($scope.toast);
                 } else {
                     $mdToast.cancel();
                     toasts = [];
+                }
+            }
+        }]
+    );
+
+})();
+
+/**
+ * @file Time control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipTimeView", ['pipUtils']);
+
+    thisModule.directive('pipTimeView',
+        ['pipUtils', function (pipUtils) {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipStartDate: '=',
+                    pipEndDate: '='
+                },
+                templateUrl:  'time_view/time_view.html',
+                link: function ($scope, $element, $attrs) {
+
+                    function getDateJSON(value) {
+                        var date = value ? new Date(value) : null;
+                        return date;
+                    };
+
+                    function defineStartDate() {
+                        if (($scope.pipStartDate !== null) && ($scope.pipStartDate !== undefined)) {
+                            $scope.data.start = _.isDate($scope.pipStartDate) ?  $scope.pipStartDate : getDateJSON($scope.pipStartDate);
+                        }
+                    };
+
+                    function defineEndDate() {
+                        if (($scope.pipEndDate !== null) && ($scope.pipEndDate !== undefined)) {
+                            $scope.data.end = _.isDate($scope.pipEndDate) ?  $scope.pipEndDate : getDateJSON($scope.pipEndDate);
+                        }
+                    };
+
+                    $scope.data = {};
+                    $scope.data.start = null;
+                    $scope.data.end = null;
+                    defineStartDate();
+                    defineEndDate();
+
+                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                        $scope.$watch('pipStartDate',
+                            function (newValue) {
+                                $scope.data.start = null;
+                                defineStartDate();
+                            }
+                        );
+                        $scope.$watch('pipEndDate',
+                            function (newValue) {
+                                $scope.data.end = null;
+                                defineEndDate();
+                            }
+                        );
+                    }
+
+                    // Add class
+                    $element.addClass('pip-time-view');
                 }
             }
         }]
