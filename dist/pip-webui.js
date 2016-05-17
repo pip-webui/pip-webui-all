@@ -12065,7 +12065,8 @@ module.run(['$templateCache', function($templateCache) {
     '                <!-- Local primary actions -->\n' +
     '                <md-menu md-position-mode="target-right target" ng-repeat="action in config.primaryLocalActions">\n' +
     '                    <md-button class="pip-appbar-action md-icon-button m0"\n' +
-    '                               ng-class="{ \'pip-appbar-hide-sm\': action.hideSmall }"\n' +
+    '                               ng-class="{ \'pip-appbar-hide-sm\': action.hideSmall,\n' +
+    '                                            \'pip-appbar-show-sm\': action.showSmall,}"\n' +
     '                               ng-click="onActionClick(action, $mdOpenMenu);"\n' +
     '                               ng-hide="actionHidden(action)"\n' +
     '                               aria-label="{{action.tooltip | translate}}">\n' +

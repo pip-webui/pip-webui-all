@@ -5858,6 +5858,11 @@ md-content md-option .md-text .pip-tabs-badge {
     display: none;
   }
 }
+@media (min-width: 768px) {
+  .pip-appbar .pip-appbar-show-sm {
+    display: none;
+  }
+}
 @media (max-width: 1200px) {
   .pip-appbar md-toolbar,
   .pip-appbar .md-toolbar-tools {
