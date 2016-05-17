@@ -18961,6 +18961,75 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('composite_toolbar/composite_toolbar.html',
+    '<!--\n' +
+    '@file Composite toolbar control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div layout="row" layout-align="start start" flex>\n' +
+    '    <md-button class="pip-composite-button"\n' +
+    '               ng-if="!emptyState"\n' +
+    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
+    '                                \'new-item\': !emptyState }"\n' +
+    '               ng-click="onAddItem(\'text\');"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
+    '               ng-disabled="ngDisabled()">\n' +
+    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.checklist"\n' +
+    '               ng-click="onAddItem(\'checklist\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
+    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
+    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.picture"\n' +
+    '               ng-click="onAddItem(\'pictures\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
+    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
+    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
+    '               ng-if="toolbarButton.document"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
+    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
+    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'location\')"\n' +
+    '               ng-if="toolbarButton.location"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
+    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
+    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'time\')"\n' +
+    '               ng-if="toolbarButton.event"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
+    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipComposite.Templates');
+} catch (e) {
+  module = angular.module('pipComposite.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('composite_view/composite_view.html',
     '<div ng-repeat="item in compositeContent track by $index">\n' +
     '\n' +
@@ -19044,75 +19113,6 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('composite_toolbar/composite_toolbar.html',
-    '<!--\n' +
-    '@file Composite toolbar control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div layout="row" layout-align="start start" flex>\n' +
-    '    <md-button class="pip-composite-button"\n' +
-    '               ng-if="!emptyState"\n' +
-    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
-    '                                \'new-item\': !emptyState }"\n' +
-    '               ng-click="onAddItem(\'text\');"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
-    '               ng-disabled="ngDisabled()">\n' +
-    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.checklist"\n' +
-    '               ng-click="onAddItem(\'checklist\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
-    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
-    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.picture"\n' +
-    '               ng-click="onAddItem(\'pictures\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
-    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
-    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
-    '               ng-if="toolbarButton.document"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
-    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
-    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'location\')"\n' +
-    '               ng-if="toolbarButton.location"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
-    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
-    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'time\')"\n' +
-    '               ng-if="toolbarButton.event"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
-    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipComposite.Templates');
-} catch (e) {
-  module = angular.module('pipComposite.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('content_switch/content_switch.html',
     '<!--\n' +
     '@file Content switch control content\n' +
@@ -19150,6 +19150,103 @@ module.run(['$templateCache', function($templateCache) {
     '    <md-icon ng-class="{ \'active-location\': showLocation }" md-svg-icon="icons:location"></md-icon>\n' +
     '</md-button>\'');
 }]);
+})();
+
+/**
+ * @file Checklist view control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipChecklistView", ['pipCore', 'pipComposite.Templates']);
+
+    thisModule.directive('pipChecklistView',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: false,
+                scope: {
+                    ngDisabled: '&',
+                    pipChanged: '&',
+                    pipOptions: '='
+                },
+                templateUrl: 'checklist_view/checklist_view.html',
+                controller: 'pipChecklistViewController'
+            }
+        }
+    );
+
+    thisModule.controller('pipChecklistViewController',
+        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+
+            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
+            $scope.selected = {};
+            $scope.selected.isChanged = false;
+
+            generateList($scope.pipOptions);
+
+            // Add class
+            $element.addClass('pip-checklist-view');
+
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipOptions', function (newValue) {
+                    if (!$scope.selected.isChanged) {
+                        generateList($scope.pipOptions);
+                    } else {
+                        $scope.selected.isChanged = false;
+                    }
+                });
+            }
+
+            $scope.updateContents = updateContents;
+            $scope.onClick = onClick;
+
+            return;
+
+            function updateContents() {
+                $scope.selected.isChanged = true;
+                $scope.pipOptions = $scope.checklistContent;
+            };
+
+            function onChecklistChange() {
+                updateContents();
+                if ($scope.pipChanged) {
+                    $scope.pipChanged();
+                }
+            };
+
+            function clearList() {
+                $scope.checklistContent = [];
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                    return;
+                } else {
+                    $scope.checklistContent = [];
+                    _.each(content, function(item){
+                        $scope.checklistContent.push(item);
+                    });
+                }
+            };
+
+            function onClick($event, item) {
+                if ($event) $event.stopPropagation();
+                if ($scope.ngDisabled && $scope.ngDisabled()) return;
+
+                onChecklistChange();
+            };
+
+        }]
+    );
+
 })();
 
 /**
@@ -19377,6 +19474,8 @@ module.run(['$templateCache', function($templateCache) {
                             newItem = item.text.substring(posCaret);
                             item.text = valueCurrent;
                             addItem(newItem, $scope.selected.index);
+                            
+                            setFocus($scope.selected.index, 0);
                         }
                         if ($event) $event.stopPropagation();
                         if ($event) $event.preventDefault();
@@ -19388,7 +19487,7 @@ module.run(['$templateCache', function($templateCache) {
                 }
 
                 // move cursor up
-                if ($scope.checklistContent.length > 1 && $event.keyCode == 38 && !$event.ctrlKey && !$event.shiftKey) {  // insert
+                if ((posCaret === 0 || posCaret == textareaLength) && $scope.checklistContent.length > 1 && $event.keyCode == 38 && !$event.ctrlKey && !$event.shiftKey) {  // insert
                     if ($event) $event.stopPropagation();
                     if ($event) $event.preventDefault();
 
@@ -19412,7 +19511,7 @@ module.run(['$templateCache', function($templateCache) {
                 }
 
                 // move cursor down
-                if ($scope.checklistContent.length > 1 && $event.keyCode == 40 && !$event.ctrlKey && !$event.shiftKey) {  // insert
+                if ((posCaret === 0 || posCaret == textareaLength) && $scope.checklistContent.length > 1 && $event.keyCode == 40 && !$event.ctrlKey && !$event.shiftKey) {  // insert
                     if ($event) $event.stopPropagation();
                     if ($event) $event.preventDefault();
 
@@ -19673,103 +19772,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })();
-/**
- * @file Checklist view control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipChecklistView", ['pipCore', 'pipComposite.Templates']);
-
-    thisModule.directive('pipChecklistView',
-        function () {
-            return {
-                restrict: 'EA',
-                replace: false,
-                scope: {
-                    ngDisabled: '&',
-                    pipChanged: '&',
-                    pipOptions: '='
-                },
-                templateUrl: 'checklist_view/checklist_view.html',
-                controller: 'pipChecklistViewController'
-            }
-        }
-    );
-
-    thisModule.controller('pipChecklistViewController',
-        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-
-            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
-            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
-            $scope.selected = {};
-            $scope.selected.isChanged = false;
-
-            generateList($scope.pipOptions);
-
-            // Add class
-            $element.addClass('pip-checklist-view');
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipOptions', function (newValue) {
-                    if (!$scope.selected.isChanged) {
-                        generateList($scope.pipOptions);
-                    } else {
-                        $scope.selected.isChanged = false;
-                    }
-                });
-            }
-
-            $scope.updateContents = updateContents;
-            $scope.onClick = onClick;
-
-            return;
-
-            function updateContents() {
-                $scope.selected.isChanged = true;
-                $scope.pipOptions = $scope.checklistContent;
-            };
-
-            function onChecklistChange() {
-                updateContents();
-                if ($scope.pipChanged) {
-                    $scope.pipChanged();
-                }
-            };
-
-            function clearList() {
-                $scope.checklistContent = [];
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                    return;
-                } else {
-                    $scope.checklistContent = [];
-                    _.each(content, function(item){
-                        $scope.checklistContent.push(item);
-                    });
-                }
-            };
-
-            function onClick($event, item) {
-                if ($event) $event.stopPropagation();
-                if ($scope.ngDisabled && $scope.ngDisabled()) return;
-
-                onChecklistChange();
-            };
-
-        }]
-    );
-
-})();
-
 /**
  * @file Composite edit control
  * @copyright Digital Living Software Corp. 2014-2016
