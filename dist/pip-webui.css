@@ -5199,6 +5199,11 @@ pip-date-range md-select .md-select-value .md-text {
     font-size: 12px;
   }
 }
+@media (min-width: 768px) {
+  pip-date-range .pip-day {
+    min-width: 102px;
+  }
+}
 @media (max-width: 768px) {
   pip-date-range .md-select-value {
     min-width: 2.6em !important;

@@ -8790,7 +8790,7 @@ module.run(['$templateCache', function($templateCache) {
     '-->\n' +
     '\n' +
     '<div class="pip-date-range" tabindex="-1" layout="row" flex>\n' +
-    '    <md-input-container flex ng-show="isDay()" class="tm0">\n' +
+    '    <md-input-container flex ng-show="isDay()" class="tm0 pip-day">\n' +
     '        <md-select class="select-day w-stretch"\n' +
     '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
     '                   ng-disable="{{disableControls}}"\n' +
@@ -19314,11 +19314,6 @@ module.run(['$templateCache', function($templateCache) {
                 if (isDisabled()) return;
                 if ($scope.selected.index == -1) return;
 
-                if (item.text == '' && ($event.keyCode == 8 || $event.keyCode == 46) && !$event.ctrlKey && !$event.shiftKey) {
-                    if (!item.empty) onDeleteItem(index, item);
-                    if ($event) $event.stopPropagation();
-                    return false;
-                }
 
                 if ($event && $event.target) {
                     // calculate caret position
@@ -19326,6 +19321,27 @@ module.run(['$templateCache', function($templateCache) {
                     // calculate textarea length
                     if ($event.target.value !== undefined)
                         var textareaLength = $event.target.value.length;
+                }
+                
+                // delete empty item after backspace or del
+                if ($scope.selected.index > 0 && item.text != '' && posCaret == 0 && $event.keyCode == 8  && !$event.ctrlKey && !$event.shiftKey) {
+                    if (!item.empty) {
+                        var position = $scope.checklistContent[$scope.selected.index - 1].text.length;
+                        $scope.checklistContent[$scope.selected.index - 1].text = $scope.checklistContent[$scope.selected.index - 1].text + item.text;
+                        $scope.selected.index -= 1;
+                        $scope.checklistContent.splice($scope.selected.index + 1, 1);
+                        $scope.onChecklistChange();
+                        
+                        setFocus($scope.selected.index, position);
+                    }
+                    if ($event) $event.stopPropagation();
+                    return false;
+                }
+                
+                if (item.text == '' && ($event.keyCode == 8 || $event.keyCode == 46) && !$event.ctrlKey && !$event.shiftKey) {
+                    if (!item.empty) onDeleteItem(index, item);
+                    if ($event) $event.stopPropagation();
+                    return false;
                 }
 
                 //press enter - create new item
@@ -19351,7 +19367,21 @@ module.run(['$templateCache', function($templateCache) {
                         if ($event) $event.stopPropagation();
                         if ($event) $event.preventDefault();
                         return false;
-                    }
+                    } 
+                    
+                     if (textareaLength && posCaret && textareaLength > posCaret) {
+                        // divide current item 
+                        if (!item.empty) {
+                            var valueCurrent, newItem;
+                            valueCurrent = item.text.substring(0, posCaret);
+                            newItem = item.text.substring(posCaret);
+                            item.text = valueCurrent;
+                            addItem(newItem, $scope.selected.index);
+                        }
+                        if ($event) $event.stopPropagation();
+                        if ($event) $event.preventDefault();
+                        return false;
+                    } 
 
                     if ($event) $event.preventDefault();
                     return false;
@@ -19366,14 +19396,14 @@ module.run(['$templateCache', function($templateCache) {
                         // move to new item
                         if ($scope.selected.index == 0) {
                             $scope.selected.index = $scope.checklistContent.length - 1;
-                            setFocus(0);
+                            setFocus($scope.selected.index, 0);
                         } else {
                             $scope.selected.index -= 1;
-                            setFocus(0);
+                            setFocus($scope.selected.index, 0);
                         }
                     } else {
                         // move caret to text end
-                        setFocus(textareaLength);
+                        setFocus($scope.selected.index, textareaLength);
                     }
 
                     return false;
@@ -19388,14 +19418,14 @@ module.run(['$templateCache', function($templateCache) {
                         // move to new item
                         if ($scope.selected.index >= $scope.checklistContent.length - 1) {
                             $scope.selected.index = 0;
-                            setFocus(0);
+                            setFocus($scope.selected.index, 0);
                         } else {
                             $scope.selected.index += 1;
-                            setFocus(0);
+                            setFocus($scope.selected.index, 0);
                         }
                     } else {
                         // move caret to text end
-                        setFocus(textareaLength);
+                        setFocus($scope.selected.index, textareaLength);
                     }
 
                     return false;
@@ -19514,9 +19544,9 @@ module.run(['$templateCache', function($templateCache) {
                     $scope.selected.dragId = $scope.selected.id;
                 }
             };
-
+            
             function onDeleteItem(index, item) {
-                var nextElement;
+              
                 if ($scope.checklistContent.length == 1) {
                     $scope.checklistContent[0].text = '';
                     $scope.checklistContent[0].checked = false;
@@ -19531,13 +19561,8 @@ module.run(['$templateCache', function($templateCache) {
                 if ($scope.selected.index >= $scope.checklistContent.length)
                     $scope.selected.index = $scope.checklistContent.length - 1;
 
-                setTimeout(function () {
-                    if ($scope.selected.index > -1) {
-                        nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + $scope.selected.index);
-                        if (nextElement) nextElement.focus();
-                    }
-                }, 550);
-
+                setFocus($scope.selected.index, 0);
+                
                 $scope.onChecklistChange();
             };
 
@@ -19564,14 +19589,16 @@ module.run(['$templateCache', function($templateCache) {
                 }
             };
 
-            function setFocus(toPos) {
-                setTimeout(function () {
-                    var nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + $scope.selected.index);
-                    if (nextElement) {
-                        nextElement.focus();
-                        if (toPos !== undefined && nextElement[0]) setCaretToPos(nextElement[0], toPos);
-                    }
-                },  50);
+            function setFocus(index, toPos) {
+                if (index > -1) {
+                    setTimeout(function () {
+                        var nextElement = angular.element('#check-item-text-' + $scope.selected.id + '-' + index);
+                        if (nextElement) {
+                            nextElement.focus();
+                            if (toPos !== undefined && nextElement[0]) setCaretToPos(nextElement[0], toPos);
+                        }
+                    },  50);
+                }
             };
 
             function addItem(text, index) {
@@ -19585,7 +19612,7 @@ module.run(['$templateCache', function($templateCache) {
                     $scope.checklistContent.splice($scope.selected.index + 1, 0, newItem);
                 }
                 $scope.selected.index += 1;
-                setFocus();
+                setFocus($scope.selected.index);
 
                 $scope.onChecklistChange();
             }
