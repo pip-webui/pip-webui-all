@@ -15277,63 +15277,6 @@ try {
   module = angular.module('pipPictures.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('picture_list_edit/picture_list_edit.html',
-    '<div pip-focused>\n' +
-    '	<div class="pip-picture-upload pointer pip-focusable"\n' +
-    '		 ng-class="{\'pip-picture-error\': item.error}"\n' +
-    '		 ng-keydown="onKeyDown($event, item)"\n' +
-    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
-    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
-    '\n' +
-    '		<div class="pip-default-icon" ng-hide="item.loaded || item.error">\n' +
-    '			<md-icon  pip-cancel-drag="true" class="pip-picture-icon" md-svg-icon="icons:{{icon}}"></md-icon>\n' +
-    '		</div>\n' +
-    '		<div class="pip-default-text" ng-show="item.error">\n' +
-    '			<!--span style="color: red">{{ \'ERROR_IMAGE_PRELOADING\' | translate}}</span-->\n' +
-    '			<md-icon  pip-cancel-drag="true" md-svg-icon="icons:warn-circle"></md-icon>\n' +
-    '		</div>\n' +
-    '		<img ng-src="{{::item.url}}"\n' +
-    '			 pip-cancel-drag="true"\n' +
-    '			 ng-hide="item.error"\n' +
-    '			 ng-class="{ \'pip-image-new\': item.state == \'added\' }"\n' +
-    '			 ui-event="{ error: \'onImageError($event, item)\', load: \'onImageLoad($event, item)\' }">\n' +
-    '\n' +
-    '		<md-button ng-click="onDeleteClick(item)"\n' +
-    '				   ng-disabled="ngDisabled() || control.uploading" tabindex="-1"\n' +
-    '				   aria-label="delete"\n' +
-    '				   class="md-icon-button">\n' +
-    '\n' +
-    '			<md-icon  pip-cancel-drag="true" md-svg-icon="icons:cross"></md-icon>\n' +
-    '		</md-button>\n' +
-    '		<md-progress-linear md-mode="indeterminate" ng-show="item.uploading" value="{{ item.progress }}">\n' +
-    '		</md-progress-linear>\n' +
-    '	</div>\n' +
-    '\n' +
-    '	<button class="pip-picture-upload pip-picture-drop pip-focusable"\n' +
-    '			pip-add-image\n' +
-    '			pip-changed="readItemLocally(url, file)"\n' +
-    '			ng-disabled="ngDisabled() || control.uploading">\n' +
-    '\n' +
-    '		<div class="pip-default-icon">\n' +
-    '			<md-icon  pip-cancel-drag="true" class="pip-picture-icon" md-svg-icon="icons:{{icon}}"></md-icon>\n' +
-    '		</div>\n' +
-    '		<div class="pip-default-text">\n' +
-    '			<span>{{text | translate}}</span>\n' +
-    '		</div>\n' +
-    '	</button>\n' +
-    '	<div class="clearfix"></div>\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipPictures.Templates');
-} catch (e) {
-  module = angular.module('pipPictures.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('picture_url_dialog/picture_url_dialog.html',
     '<!--\n' +
     '@file Picture URL dialog content\n' +
@@ -15383,6 +15326,63 @@ module.run(['$templateCache', function($templateCache) {
     '        </md-button>\n' +
     '    </div>\n' +
     '</md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipPictures.Templates');
+} catch (e) {
+  module = angular.module('pipPictures.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('picture_list_edit/picture_list_edit.html',
+    '<div pip-focused>\n' +
+    '	<div class="pip-picture-upload pointer pip-focusable"\n' +
+    '		 ng-class="{\'pip-picture-error\': item.error}"\n' +
+    '		 ng-keydown="onKeyDown($event, item)"\n' +
+    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
+    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
+    '\n' +
+    '		<div class="pip-default-icon" ng-hide="item.loaded || item.error">\n' +
+    '			<md-icon  pip-cancel-drag="true" class="pip-picture-icon" md-svg-icon="icons:{{icon}}"></md-icon>\n' +
+    '		</div>\n' +
+    '		<div class="pip-default-text" ng-show="item.error">\n' +
+    '			<!--span style="color: red">{{ \'ERROR_IMAGE_PRELOADING\' | translate}}</span-->\n' +
+    '			<md-icon  pip-cancel-drag="true" md-svg-icon="icons:warn-circle"></md-icon>\n' +
+    '		</div>\n' +
+    '		<img ng-src="{{::item.url}}"\n' +
+    '			 pip-cancel-drag="true"\n' +
+    '			 ng-hide="item.error"\n' +
+    '			 ng-class="{ \'pip-image-new\': item.state == \'added\' }"\n' +
+    '			 ui-event="{ error: \'onImageError($event, item)\', load: \'onImageLoad($event, item)\' }">\n' +
+    '\n' +
+    '		<md-button ng-click="onDeleteClick(item)"\n' +
+    '				   ng-disabled="ngDisabled() || control.uploading" tabindex="-1"\n' +
+    '				   aria-label="delete"\n' +
+    '				   class="md-icon-button">\n' +
+    '\n' +
+    '			<md-icon  pip-cancel-drag="true" md-svg-icon="icons:cross"></md-icon>\n' +
+    '		</md-button>\n' +
+    '		<md-progress-linear md-mode="indeterminate" ng-show="item.uploading" value="{{ item.progress }}">\n' +
+    '		</md-progress-linear>\n' +
+    '	</div>\n' +
+    '\n' +
+    '	<button class="pip-picture-upload pip-picture-drop pip-focusable"\n' +
+    '			pip-add-image\n' +
+    '			pip-changed="readItemLocally(url, file)"\n' +
+    '			ng-disabled="ngDisabled() || control.uploading">\n' +
+    '\n' +
+    '		<div class="pip-default-icon">\n' +
+    '			<md-icon  pip-cancel-drag="true" class="pip-picture-icon" md-svg-icon="icons:{{icon}}"></md-icon>\n' +
+    '		</div>\n' +
+    '		<div class="pip-default-text">\n' +
+    '			<span>{{text | translate}}</span>\n' +
+    '		</div>\n' +
+    '	</button>\n' +
+    '	<div class="clearfix"></div>\n' +
+    '</div>\n' +
+    '');
 }]);
 })();
 
@@ -16065,6 +16065,171 @@ module.run(['$templateCache', function($templateCache) {
         }]        
     );
     
+})();
+
+
+/**
+ * @file Avatar control
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Improve samples in sampler app
+ * - Replace placeholder with default image generated on server
+ * - Fix resizing problem
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipRest', 'pipImageUtils']);
+
+    thisModule.directive('pipAvatar',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: '<md-icon></md-icon><img/>'
+                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
+                controller: 'pipAvatarController'
+            }
+        }
+    );
+
+    thisModule.controller('pipAvatarController',
+        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipStrings', 'pipRest', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipStrings, pipRest, $http, pipImageUtils) {
+            var
+                $svg = $element.children('md-icon'),
+                $image = $element.children('img'),
+                $defaultBlock = $element.children('div'),
+                $iconFilm = $element.find('#icon-film'),
+                $iconTask = $element.find('#icon-task'),
+                $iconFolder = $element.find('#icon-folder'),
+                image = null,
+
+                partyIdGetter = $parse($attrs.pipPartyId),
+                partyNameGetter = $parse($attrs.pipPartyName),
+                typeGetter = $parse($attrs.pipEntityType),
+                idGetter = $parse($attrs.pipId),
+
+                colors = pipImageUtils.getAvatarColors(),
+                colorClasses = pipImageUtils.getColorClasses(),
+                entityTypes = pipImageUtils.getEntityTypes();
+
+            // When image is loaded resize/reposition it
+            $image.load(function ($event) {
+                image = $($event.target);
+                pipImageUtils.setImageMarginCSS($element, image);
+            });
+
+            // Add class
+            $element.addClass('pip-avatar flex-fixed');
+
+            if ($attrs.ngClass) {
+                $scope.$watch($attrs.ngClass, function () {
+                    setTimeout(function () {
+                        pipImageUtils.setImageMarginCSS($element, image);
+                    }, 50);
+                });
+            }
+
+            // Optimization to avoid binding
+            bindControl();
+
+            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
+                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
+            }
+
+            // Also optimization to avoid watch if it is unnecessary
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(idGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+            }
+
+            return;
+
+            function refreshAvatar() {
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+                $image.attr('src', '');
+                $svg.css('display', 'none');
+                $image.css('display', 'inline-block');
+                bindControl();
+            };
+
+            function bindControl() {
+                var
+                    partyName = partyNameGetter($scope),
+                    partyId = partyIdGetter($scope),
+                    id = idGetter($scope),
+                    type = typeGetter($scope);
+
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+
+                // Timestamp to avoid caching images for too long
+                var url = pipImageUtils.getAvatarUrl(partyId, partyName, id, type, false, false);
+
+                if ((type && id && partyId) || (partyId && partyName)) {
+                    if (type && id && partyId) {
+                        if (type == 'category') return;
+
+                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
+                            $image.attr('src', url);
+                            $svg.css('display', 'none');
+                            $image.css('display', 'inline-block');
+                        } else {
+                            $defaultBlock.css('display', 'block');
+                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
+                            $element.addClass(colorClasses[colorClassIndex]);
+                            switch(type) {
+                                case 'vision':
+                                    $svg.css('display', 'none');
+                                    $iconFilm.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'event':
+                                    $svg.css('display', 'none');
+                                    $iconTask.css('display', 'inline-block');
+                                    $iconFilm.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'note':
+                                    $svg.css('display', 'none');
+                                    $iconFolder.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFilm.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                            }
+                        }
+                    } else {
+                        $image.attr('src', url);
+                        $svg.css('display', 'none');
+                        $image.css('display', 'inline-block');
+                    }
+                }
+            };
+
+        }]
+    );
+
 })();
 
 
