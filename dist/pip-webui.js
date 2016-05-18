@@ -8632,6 +8632,46 @@
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipControls', [        
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        "pipTagList",
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeEdit',
+        'pipTimeView',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipConversionDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', [ 'pipControls' ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipBasicControls.Templates');
@@ -9333,46 +9373,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipControls', [        
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        "pipTagList",
-
-        'pipDate',
-        'pipDateRange',
-        'pipTimeEdit',
-        'pipTimeView',
-
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipConversionDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-    angular.module('pipBasicControls', [ 'pipControls' ]);
-    
-})();
-
-
 
 /**
  * @file Color picker control
@@ -10683,7 +10683,8 @@ module.run(['$templateCache', function($templateCache) {
                         textString = marked(textString || '', options);
                         if (isClamped) height = 1.5 * clampGetter();
                         // Assign value as HTML
-                        $element.html('<div' + (isClamped ? ' class="pip-markdown-content" style="max-height: ' + height + 'em">' : '>') + textString + '</div>');
+                        $element.html('<div' + (isClamped ? listGetter()?' class="pip-markdown-content pip-markdown-list" style="max-height: ' + height + 'em">' :
+                                ' class="pip-markdown-content" style="max-height: ' + height + 'em">' :  listGetter()? ' class="pip-markdown-list">' : '>') + textString + '</div>');
                         $element.find('a').attr('target', 'blank');
                         if (!listGetter() && isClamped) $element.append('<div class="pip-gradient-block"></div>');
                     }

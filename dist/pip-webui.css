@@ -4694,6 +4694,9 @@ md-list-item .pip-markdown h3,
 md-list-item .pip-markdown h4 {
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
 }
+.pip-markdown-list ol {
+  margin: 0px !important;
+}
 pip-toggle-buttons .md-select-value .pip-tagged {
   font-size: 20px;
 }
