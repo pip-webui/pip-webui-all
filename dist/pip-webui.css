@@ -2345,12 +2345,14 @@ md-dialog .pip-progress-top {
   margin-bottom: 19px;
   width: calc(100%) !important;
 }
+.pip-check-list {
+  overflow-x: hidden;
+}
 .pip-check-list .pip-check-list-item {
   min-height: 72px;
   padding-right: 0px;
 }
 .pip-check-list .pip-check-list-item .md-list-item-inner {
-  padding-left: 0px;
   padding-right: 0px;
   display: block;
   width: 100%;
