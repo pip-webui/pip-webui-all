@@ -14986,6 +14986,32 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of pictures WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipPictures', [        
+        'pipAddImage',
+        'pipAvatar',
+        'pipAvatarEdit',
+        'pipPicture',
+        'pipPictureEdit',
+        'pipCollage',
+        'pipPictureListEdit',        
+        'pipCameraDialog',        
+        'pipPictureUrlDialog'
+    ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipPictures.Templates');
@@ -15167,6 +15193,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <div class="pip-no-images w-stretch" layout="column" layout-align="center center" flex\n' +
     '                 ng-show="$images.length == 0">\n' +
     '                <img src="images/add_from_image_library.svg" width="200" height="200">\n' +
+    '                <p class="text-secondary opacity-secondary">{{\'IMAGE_START_SEARCH\' | translate}}</p>\n' +
     '                <!--<md-icon class="text-grey" md-svg-icon="icons:images"></md-icon> -->\n' +
     '            </div>\n' +
     '        </div>\n' +
@@ -15287,6 +15314,8 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '	<button class="pip-picture-upload pip-picture-drop pip-focusable"\n' +
     '			pip-add-image\n' +
+    '		    ng-focus="onFocus()"\n' +
+    '	        ng-blur="onBlur()"\n' +
     '			pip-changed="readItemLocally(url, file)"\n' +
     '			ng-disabled="ngDisabled() || control.uploading">\n' +
     '\n' +
@@ -15361,32 +15390,6 @@ module.run(['$templateCache', function($templateCache) {
     '</md-dialog>');
 }]);
 })();
-
-/**
- * @file Registration of pictures WebUI controls
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipPictures', [        
-        'pipAddImage',
-        'pipAvatar',
-        'pipAvatarEdit',
-        'pipPicture',
-        'pipPictureEdit',
-        'pipCollage',
-        'pipPictureListEdit',        
-        'pipCameraDialog',        
-        'pipPictureUrlDialog'
-    ]);
-    
-})();
-
-
 
 /**
  * @file Add image control
@@ -16517,11 +16520,13 @@ module.run(['$templateCache', function($templateCache) {
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'IMAGE_GALLERY': 'Add from image gallery',
-            'SEARCH_PICTURES': 'Search for pictures...'
+            'SEARCH_PICTURES': 'Search for pictures...',
+            'IMAGE_START_SEARCH': 'Images will appear here once you start searching'
         });
         pipTranslateProvider.translations('ru', {
             'IMAGE_GALLERY': 'Добавить из галереи изображений',
-            'SEARCH_PICTURES': 'Поиск изображений...'
+            'SEARCH_PICTURES': 'Поиск изображений...',
+            'IMAGE_START_SEARCH': 'Картинки появятся после начала поиска'
         });
     }]);
 
@@ -17182,7 +17187,9 @@ module.run(['$templateCache', function($templateCache) {
             $scope.onImageError = onImageError;
             $scope.onImageLoad = onImageLoad;
             $scope.onChange = onChange;
-
+            $scope.onBlur = onBlur;
+            $scope.onFocus = onFocus;
+            
             // Watch for changes
             if ($scope.pipRebind) {
                 $scope.$watch(
@@ -17196,15 +17203,15 @@ module.run(['$templateCache', function($templateCache) {
                 );
             }
 
-            // Add paste listeners
-            $element.find('.pip-picture-upload').focus(function () {
-                pipPicturePaste.addPasteListener(function (item) {
-                    $scope.readItemLocally(item.url, item.file);
-                });
-            });
-            $element.find('.pip-picture-upload').blur(function () {
-                pipPicturePaste.removePasteListener();
-            });
+            // // Add paste listeners
+            // $element.find('.pip-picture-upload').focus(function () {
+            //     pipPicturePaste.addPasteListener(function (item) {
+            //         $scope.readItemLocally(item.url, item.file);
+            //     });
+            // });
+            // $element.find('.pip-picture-upload').blur(function () {
+            //     pipPicturePaste.removePasteListener();
+            // });
 
             // Add class
             $element.addClass('pip-picture-list-edit');
@@ -17232,6 +17239,16 @@ module.run(['$templateCache', function($templateCache) {
 
             function onImageError($event, item) {
                 item.error = true;
+            };
+            
+            function onFocus(a) {
+                pipPicturePaste.addPasteListener(function (item) {
+                    $scope.readItemLocally(item.url, item.file);
+                });
+            };
+
+            function onBlur () {
+                pipPicturePaste.removePasteListener();
             };
 
             function getItems() {
