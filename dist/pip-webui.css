@@ -2353,6 +2353,7 @@ md-dialog .pip-progress-top {
   padding-right: 0px;
 }
 .pip-check-list .pip-check-list-item .md-list-item-inner {
+  border-left: 5px solid #fafafa;
   padding-right: 0px;
   display: block;
   width: 100%;
