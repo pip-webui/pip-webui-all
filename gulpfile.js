@@ -118,7 +118,6 @@ gulp.task('build-prod', ['build-js-prod', 'build-css-prod']);
 
 gulp.task('copy-images', function() {
     return gulp.src([
-            './node_modules/pip-webui-css/dist/images/*',
             './node_modules/pip-webui-controls/dist/images/*',
             './node_modules/pip-webui-nav/dist/images/*',
             './node_modules/pip-webui-locations/dist/images/*',
@@ -130,7 +129,8 @@ gulp.task('copy-images', function() {
             './node_modules/pip-webui-settings/dist/images/*',
             './node_modules/pip-webui-guidance/dist/images/*',
             './node_modules/pip-webui-help/dist/images/*',
-            './node_modules/pip-webui-support/dist/images/*'
+            './node_modules/pip-webui-support/dist/images/*',
+            './node_modules/pip-webui-css/dist/images/*'
         ])
         .pipe(gulp.dest('./dist/images')); 
 });
