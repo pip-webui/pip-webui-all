@@ -2867,7 +2867,7 @@ md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
   border-left: 5px solid rgba(33, 150, 243, 0.5) !important;
 }
-md-list-item.pip-list-no-click.pip-selectable {
+md-list-item.pip-list-no-click.pip-selectable.md-no-style {
   border-left: none!important;
   padding-left: 21px!important;
 }
