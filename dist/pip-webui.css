@@ -2730,12 +2730,12 @@ table th[class*=col-] {
 .pip-type-chip {
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
   display: inline-block;
-  padding: 0px 12px 0px 12px!important;
-  margin: 4px 4px 0px 0px!important;
-  overflow: hidden!important;
-  box-shadow: none!important;
-  line-height: 20px!important;
-  vertical-align: middle!important;
+  padding: 0px 12px 0px 12px !important;
+  margin: 4px 4px 0px 0px !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  line-height: 20px !important;
+  vertical-align: middle !important;
   height: 32px !important;
   border-radius: 16px;
   background: #e0e0e0;
