@@ -2752,7 +2752,8 @@ table th[class*=col-] {
 .pip-chip.pip-type-little-chip .pip-text,
 .pip-type-chip.pip-type-little-chip .pip-text {
   margin: 3px 0 0 0;
-  font-size: 10px;
+  font-size: 10px !important;
+  margin-right: 0px !important;
 }
 .pip-chip .pip-avatar,
 .pip-type-chip .pip-avatar,
