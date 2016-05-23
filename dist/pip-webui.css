@@ -3501,6 +3501,9 @@ md-list md-list-item .md-button {
 .pip-no-hint-input .md-errors-spacer {
   min-height: 0px;
 }
+.pip-autocomplete-text md-select-value {
+  height: 35px !important;
+}
 md-datepicker {
   background: transparent !important;
 }
