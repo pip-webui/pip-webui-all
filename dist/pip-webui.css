@@ -1922,9 +1922,6 @@ tbody.collapse.in {
 }
 .pip-ref-title .pip-content .pip-subtitle {
   line-height: 1.2em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   margin: 0px 8px 0px 0px !important;
   font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
   opacity: .54;
