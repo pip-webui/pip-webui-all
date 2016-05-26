@@ -4965,8 +4965,8 @@ pip-toggle-buttons:focus {
     padding: 0px;
   }
   .pip-toast .md-toast-content {
+    padding-top: 8px;
     max-height: 92px !important;
-    padding-top: 16px;
   }
   .pip-toast .md-toast-content .pip-text {
     margin-right: 0px ;
@@ -4976,11 +4976,25 @@ pip-toggle-buttons:focus {
     width: 100%;
   }
   .pip-toast.pip-column-toast .md-toast-content {
+    padding-top: 16px;
     -webkit-box-flex-direction: column;
     -moz-box-flex-direction: column;
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
     flex-direction: column;
+  }
+  .pip-toast.pip-no-action-toast .md-toast-content {
+    padding-top: 8px;
+    -webkit-box-flex-direction: row;
+    -moz-box-flex-direction: row;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
   }
 }
 .pip-toast.pip-error .md-toast-content {
