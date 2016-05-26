@@ -8839,106 +8839,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range/date_range.html',
-    '<!--\n' +
-    '@file Date range control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-date-range" tabindex="-1" layout="row" flex>\n' +
-    '    <md-input-container flex ng-show="isDay()" class="tm0 pip-day">\n' +
-    '        <md-select class="select-day w-stretch"\n' +
-    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
-    '                   ng-disable="{{disableControls}}"\n' +
-    '                   md-on-open="onDayClick()"\n' +
-    '                   ng-model="day"\n' +
-    '                   ng-change="onDayChanged()"\n' +
-    '                   placeholder="{{dayLabel}}"\n' +
-    '                   aria-label="DAY">\n' +
-    '\n' +
-    '            <md-option ng-value="opt" ng-repeat="opt in days track by opt ">\n' +
-    '               {{nameDays[$index]}} {{ opt }}\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-input-container>\n' +
-    '    <md-input-container flex ng-show="isWeek()" class="tm0">\n' +
-    '        <md-select class="select-week w-stretch"\n' +
-    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
-    '                   ng-disable="{{disableControls}}"\n' +
-    '                   ng-model="week"\n' +
-    '                   ng-change="onWeekChange()"\n' +
-    '                   placeholder="{{weekLabel}}"\n' +
-    '                   aria-label="WEEK">\n' +
-    '\n' +
-    '            <md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">\n' +
-    '                {{ opt.name }}\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-input-container >\n' +
-    '    <div class="flex-fixed"\n' +
-    '         ng-class="{\'w16\': $mdMedia(\'gt-xs\'), \'w8\':  $mdMedia(\'xs\')}"\n' +
-    '         ng-show="isDay() || isWeek()">\n' +
-    '    </div>\n' +
-    '    <md-input-container flex ng-show="isMonth() && !monthFormatShort " class="tm0 min-w72">\n' +
-    '        <md-select class="select-month w-stretch"\n' +
-    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
-    '                   ng-disable="{{disableControls}}"\n' +
-    '                   md-on-open="onMonthClick()"\n' +
-    '                   ng-model="month"\n' +
-    '                   ng-change="onMonthChanged()"\n' +
-    '                   placeholder="{{monthLabel}}"\n' +
-    '                   aria-label="MONTH">\n' +
-    '\n' +
-    '            <md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">\n' +
-    '                {{ opt.name }}\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-input-container>\n' +
-    '    <md-input-container flex ng-show="isMonth() && monthFormatShort" class="tm0">\n' +
-    '        <md-select class="select-month w-stretch"\n' +
-    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
-    '                   ng-disable="{{disableControls}}"\n' +
-    '                   md-on-open="onMonthClick()"\n' +
-    '                   ng-model="month"\n' +
-    '                   ng-change="onMonthChanged()"\n' +
-    '                   placeholder="{{monthLabel}}"\n' +
-    '                   aria-label="MONTH">\n' +
-    '\n' +
-    '            <md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">\n' +
-    '                {{ opt.name }}\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-input-container>\n' +
-    '    <div class="flex-fixed"\n' +
-    '         ng-class="{\'w16\': $mdMedia(\'gt-xs\'), \'w8\':  $mdMedia(\'xs\')}"\n' +
-    '         ng-show="isMonth()">\n' +
-    '    </div>\n' +
-    '    <md-input-container flex class="tm0">\n' +
-    '        <md-select class="select-year w-stretch"\n' +
-    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
-    '                   ng-disable="{{disableControls}}"\n' +
-    '                   md-on-open="onYearClick()"\n' +
-    '                   ng-model="year"\n' +
-    '                   ng-change="onYearChanged()"\n' +
-    '                   placeholder="{{yearLabel}}"\n' +
-    '                   aria-label="YEAR">\n' +
-    '\n' +
-    '            <md-option ng-value="opt" ng-repeat="opt in years track by opt">\n' +
-    '                {{ opt }}\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-input-container>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('error_details_dialog/error_details_dialog.html',
     '<!--\n' +
     '@file Confirmation dialog template\n' +
@@ -8991,6 +8891,111 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('date_range/date_range.html',
+    '<!--\n' +
+    '@file Date range control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-date-range" tabindex="-1" layout="row" flex>\n' +
+    '    <md-input-container flex ng-show="isDay()" class="tm0 pip-day"\n' +
+    '            ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-day w-stretch"\n' +
+    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
+    '                   ng-disable="{{disableControls}}"\n' +
+    '                   md-on-open="onDayClick()"\n' +
+    '                   ng-model="day"\n' +
+    '                   ng-change="onDayChanged()"\n' +
+    '                   placeholder="{{dayLabel}}"\n' +
+    '                   aria-label="DAY">\n' +
+    '\n' +
+    '            <md-option ng-value="opt" ng-repeat="opt in days track by opt ">\n' +
+    '               {{nameDays[$index]}} {{ opt }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '    <md-input-container flex ng-show="isWeek()" class="tm0"\n' +
+    '                        ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-week w-stretch"\n' +
+    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
+    '                   ng-disable="{{disableControls}}"\n' +
+    '                   ng-model="week"\n' +
+    '                   ng-change="onWeekChange()"\n' +
+    '                   placeholder="{{weekLabel}}"\n' +
+    '                   aria-label="WEEK">\n' +
+    '\n' +
+    '            <md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">\n' +
+    '                {{ opt.name }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container >\n' +
+    '    <div class="flex-fixed"\n' +
+    '         ng-class="{\'w16\': $mdMedia(\'gt-xs\'), \'w8\':  $mdMedia(\'xs\')}"\n' +
+    '         ng-show="isDay() || isWeek()">\n' +
+    '    </div>\n' +
+    '    <md-input-container flex ng-show="isMonth() && !monthFormatShort " class="tm0 min-w72"\n' +
+    '                        ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-month w-stretch"\n' +
+    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
+    '                   ng-disable="{{disableControls}}"\n' +
+    '                   md-on-open="onMonthClick()"\n' +
+    '                   ng-model="month"\n' +
+    '                   ng-change="onMonthChanged()"\n' +
+    '                   placeholder="{{monthLabel}}"\n' +
+    '                   aria-label="MONTH">\n' +
+    '\n' +
+    '            <md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">\n' +
+    '                {{ opt.name }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '    <md-input-container flex ng-show="isMonth() && monthFormatShort" class="tm0"\n' +
+    '                        ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-month w-stretch"\n' +
+    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
+    '                   ng-disable="{{disableControls}}"\n' +
+    '                   md-on-open="onMonthClick()"\n' +
+    '                   ng-model="month"\n' +
+    '                   ng-change="onMonthChanged()"\n' +
+    '                   placeholder="{{monthLabel}}"\n' +
+    '                   aria-label="MONTH">\n' +
+    '\n' +
+    '            <md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">\n' +
+    '                {{ opt.name }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '    <div class="flex-fixed"\n' +
+    '         ng-class="{\'w16\': $mdMedia(\'gt-xs\'), \'w8\':  $mdMedia(\'xs\')}"\n' +
+    '         ng-show="isMonth()">\n' +
+    '    </div>\n' +
+    '    <md-input-container flex class="tm0"\n' +
+    '                        ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-year w-stretch"\n' +
+    '                   ng-class="{\'pip-no-line\' : pipNoLine}"\n' +
+    '                   ng-disable="{{disableControls}}"\n' +
+    '                   md-on-open="onYearClick()"\n' +
+    '                   ng-model="year"\n' +
+    '                   ng-change="onYearChanged()"\n' +
+    '                   placeholder="{{yearLabel}}"\n' +
+    '                   aria-label="YEAR">\n' +
+    '\n' +
+    '            <md-option ng-value="opt" ng-repeat="opt in years track by opt">\n' +
+    '                {{ opt }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '</div>');
 }]);
 })();
 
@@ -9337,34 +9342,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast"\n' +
-    '          ng-class="{\'pip-error\': toast.type==\'error\'}"\n' +
-    '          style="height:initial; max-height: initial; ">\n' +
-    '    <!--\'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1-->\n' +
-    '\n' +
-    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
-    '    <div layout="row" layout-align="end start" class="pip-actions">\n' +
-    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
-    '        <md-button class="flex-fixed m0 lm8"\n' +
-    '                   ng-click="onAction(action)"\n' +
-    '                   ng-repeat="action in actions"\n' +
-    '                   aria-label="{{::action| translate}}">\n' +
-    '            {{::action| translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '\n' +
-    '</md-toast>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toggle_buttons/toggle_buttons.html',
     '<div class="pip-toggle-buttons flex layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)"\n' +
     '     ng-if="$mdMedia(\'gt-xs\')">\n' +
@@ -9387,6 +9364,34 @@ module.run(['$templateCache', function($templateCache) {
     '    </md-select>\n' +
     '</md-input-container>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast"\n' +
+    '          ng-class="{\'pip-error\': toast.type==\'error\'}"\n' +
+    '          style="height:initial; max-height: initial; ">\n' +
+    '    <!--\'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1-->\n' +
+    '\n' +
+    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
+    '    <div layout="row" layout-align="end start" class="pip-actions">\n' +
+    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
+    '        <md-button class="flex-fixed m0 lm8"\n' +
+    '                   ng-click="onAction(action)"\n' +
+    '                   ng-repeat="action in actions"\n' +
+    '                   aria-label="{{::action| translate}}">\n' +
+    '            {{::action| translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '\n' +
+    '</md-toast>');
 }]);
 })();
 
