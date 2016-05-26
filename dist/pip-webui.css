@@ -4947,6 +4947,7 @@ pip-toggle-buttons:focus {
   overflow: hidden;
   max-height: 32px;
   margin-right: 8px;
+  vertical-align: middle;
 }
 @media (min-width: 1200px) {
   .pip-toast {
@@ -4966,11 +4967,6 @@ pip-toggle-buttons:focus {
   .pip-toast .md-toast-content {
     max-height: 92px !important;
     padding-top: 16px;
-    -webkit-box-flex-direction: column;
-    -moz-box-flex-direction: column;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
   }
   .pip-toast .md-toast-content .pip-text {
     margin-right: 0px ;

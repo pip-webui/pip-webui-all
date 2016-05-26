@@ -8839,68 +8839,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details_dialog/error_details_dialog.html',
-    '<!--\n' +
-    '@file Confirmation dialog template\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-dialog pip-details-dialog" layout="column" width="400" md-theme="{{theme}}">\n' +
-    '    <div class="pip-body">\n' +
-    '\n' +
-    '        <div class="pip-header p0 bp8  text-subhead1">{{::\'ERROR_DETAILS\' | translate}}</div>\n' +
-    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">\n' +
-    '            {{::\'CODE\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div layout="row" layout-align="start center" ng-if="error.code || (error.data && error.data.code)">\n' +
-    '            {{error.code || error.data.code}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">\n' +
-    '            {{::\'PATH\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div layout="row" layout-align="start center" ng-if="error.path || (error.data && error.data.path)">\n' +
-    '            {{error.path || error.data.path}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.error || (error.data && error.data.error)">\n' +
-    '            {{::\'ERROR\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div layout="row" layout-align="start center" ng-if="error.error || (error.data && error.data.error)">\n' +
-    '            {{error.error || error.data.error}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.method || (error.data && error.data.method)">\n' +
-    '            {{::\'METHOD\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div layout="row" layout-align="start center" ng-if="error.method || (error.data && error.data.method)">\n' +
-    '            {{error.method || error.data.method}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.message || (error.data && error.data.message)">\n' +
-    '            {{::\'MESSAGE\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div layout="row" layout-align="start center" ng-if="error.message || (error.data && error.data.message)">\n' +
-    '            {{error.message || error.data.message}}\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-footer rp16">\n' +
-    '        <div>\n' +
-    '            <md-button class="md-accent m0" ng-click="onOk()">{{::\'DISMISS\' | translate }}</md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</md-dialog>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('date_range/date_range.html',
     '<!--\n' +
     '@file Date range control content\n' +
@@ -8996,6 +8934,68 @@ module.run(['$templateCache', function($templateCache) {
     '        </md-select>\n' +
     '    </md-input-container>\n' +
     '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('error_details_dialog/error_details_dialog.html',
+    '<!--\n' +
+    '@file Confirmation dialog template\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-dialog pip-details-dialog" layout="column" width="400" md-theme="{{theme}}">\n' +
+    '    <div class="pip-body">\n' +
+    '\n' +
+    '        <div class="pip-header p0 bp8  text-subhead1">{{::\'ERROR_DETAILS\' | translate}}</div>\n' +
+    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">\n' +
+    '            {{::\'CODE\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div layout="row" layout-align="start center" ng-if="error.code || (error.data && error.data.code)">\n' +
+    '            {{error.code || error.data.code}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">\n' +
+    '            {{::\'PATH\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div layout="row" layout-align="start center" ng-if="error.path || (error.data && error.data.path)">\n' +
+    '            {{error.path || error.data.path}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.error || (error.data && error.data.error)">\n' +
+    '            {{::\'ERROR\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div layout="row" layout-align="start center" ng-if="error.error || (error.data && error.data.error)">\n' +
+    '            {{error.error || error.data.error}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.method || (error.data && error.data.method)">\n' +
+    '            {{::\'METHOD\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div layout="row" layout-align="start center" ng-if="error.method || (error.data && error.data.method)">\n' +
+    '            {{error.method || error.data.method}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div layout="row" layout-align="start center" class="h48 text-body2 color-secondary-text" ng-if="error.message || (error.data && error.data.message)">\n' +
+    '            {{::\'MESSAGE\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div layout="row" layout-align="start center" ng-if="error.message || (error.data && error.data.message)">\n' +
+    '            {{error.message || error.data.message}}\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-footer rp16">\n' +
+    '        <div>\n' +
+    '            <md-button class="md-accent m0" ng-click="onOk()">{{::\'DISMISS\' | translate }}</md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</md-dialog>\n' +
+    '');
 }]);
 })();
 
@@ -9342,6 +9342,35 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast"\n' +
+    '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
+    '          \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || !actionLenght || actionLenght > 4}"\n' +
+    '          style="height:initial; max-height: initial; ">\n' +
+    '\n' +
+    '\n' +
+    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
+    '    <div layout="row" layout-align="end start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
+    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
+    '        <md-button class="flex-fixed m0 lm8"\n' +
+    '                   ng-click="onAction(action)"\n' +
+    '                   ng-repeat="action in actions"\n' +
+    '                   aria-label="{{::action| translate}}">\n' +
+    '            {{::action| translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '\n' +
+    '</md-toast>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toggle_buttons/toggle_buttons.html',
     '<div class="pip-toggle-buttons flex layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)"\n' +
     '     ng-if="$mdMedia(\'gt-xs\')">\n' +
@@ -9364,34 +9393,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </md-select>\n' +
     '</md-input-container>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast"\n' +
-    '          ng-class="{\'pip-error\': toast.type==\'error\'}"\n' +
-    '          style="height:initial; max-height: initial; ">\n' +
-    '    <!--\'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1-->\n' +
-    '\n' +
-    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
-    '    <div layout="row" layout-align="end start" class="pip-actions">\n' +
-    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
-    '        <md-button class="flex-fixed m0 lm8"\n' +
-    '                   ng-click="onAction(action)"\n' +
-    '                   ng-repeat="action in actions"\n' +
-    '                   aria-label="{{::action| translate}}">\n' +
-    '            {{::action| translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '\n' +
-    '</md-toast>');
 }]);
 })();
 
@@ -11612,6 +11613,18 @@ module.run(['$templateCache', function($templateCache) {
             $scope.message = toast.message;
             $scope.actions = toast.actions;
             $scope.toast = toast;
+            if(toast.actions.length == 0 ){
+                $scope.actionLenght = 0;
+            } else{
+                if(toast.actions.length == 1 ){
+                    $scope.actionLenght = toast.actions[0].toString().length;
+                } else {
+                    $scope.actionLenght = null;
+                }
+
+            }
+            console.log($scope.actionLenght);
+
             $scope.onDetails =  function(event) {
                 $mdToast.hide();
                 pipErrorDetailsDialog.show(
