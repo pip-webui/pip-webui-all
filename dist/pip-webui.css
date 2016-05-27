@@ -5914,7 +5914,14 @@ md-content md-option .md-text .pip-tabs-badge {
     height: 56px !important;
     max-height: 56px !important;
   }
+}
+@media (max-width: 1200px) and (min-width: 768px) {
   .pip-appbar md-toolbar.pip-shadow-sm {
+    box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  }
+}
+@media (max-width: 768px) {
+  md-toolbar.pip-shadow-xs {
     box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
