@@ -11914,6 +11914,28 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+/**
+ * @file Registration of navigation WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipNav', [        
+        'pipDropdown',
+        'pipTabs',
+
+        'pipAppBar',
+        'pipSideNav'
+    ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipNav.Templates');
@@ -12297,28 +12319,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of navigation WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipNav', [        
-        'pipDropdown',
-        'pipTabs',
-
-        'pipAppBar',
-        'pipSideNav'
-    ]);
-    
-})();
-
-
 
 /**
  * @file Application App Bar component
@@ -24739,7 +24739,7 @@ module.run(['$templateCache', function($templateCache) {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showTitleText('SETTINGS_TITLE');
             pipAppBar.showLocalActions(null, []);
-            pipAppBar.hideShadow();
+            pipAppBar.showShadowSm();
             pipAppBar.hideSearch();
         };
 
@@ -26323,22 +26323,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
-/**
- * @file Registration of all help components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipHelp', [
-        'pipHelp.Service',
-        'pipHelp.Page'
-    ]);
-    
-})();
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -26372,6 +26356,22 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+/**
+ * @file Registration of all help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipHelp', [
+        'pipHelp.Service',
+        'pipHelp.Page'
+    ]);
+    
+})();
 // ==========================================================
 //  Title: help_page.js
 //  Description: Application help page module
@@ -26430,7 +26430,7 @@ module.run(['$templateCache', function($templateCache) {
         function appHeader () {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showTitleText('Help');
-            pipAppBar.hideShadow();
+            pipAppBar.showShadowSm();
             pipAppBar.showLocalActions(null,[]);
         };
 
