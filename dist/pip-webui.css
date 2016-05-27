@@ -2287,10 +2287,10 @@ tbody.collapse.in {
 .pip-drilldown-list .pip-drilldown-list-item .pip-icon {
   margin-right: 26px;
 }
-.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-lg {
+.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-item-lg {
   height: 64px;
 }
-.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-lg .pip-title {
+.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-item-lg .pip-title {
   margin-top: 1px !important;
   margin-bottom: 4px !important;
 }
