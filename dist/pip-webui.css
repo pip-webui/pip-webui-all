@@ -2277,8 +2277,21 @@ tbody.collapse.in {
   -ms-flex: 1;
   box-sizing: border-box;
 }
+.pip-drilldown-list .pip-drilldown-list-item .pip-subtitle {
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  opacity: 0.54;
+  text-align: justify;
+  text-align: start;
+}
 .pip-drilldown-list .pip-drilldown-list-item .pip-icon {
   margin-right: 26px;
+}
+.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-lg {
+  height: 64px;
+}
+.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-lg .pip-title {
+  margin-top: 1px !important;
+  margin-bottom: 4px !important;
 }
 .blue .pip-drilldown-list-item.pip-selected {
   border-left: 5px solid rgba(33, 150, 243, 0.54) !important;
