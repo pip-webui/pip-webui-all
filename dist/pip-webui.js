@@ -1113,7 +1113,7 @@
                         $element.find(className).removeClass('selected md-focused');
                         item = angular.element(item)
                             .addClass('selected md-focused')
-                            .focus();
+                            .focus(); // todo сдвигает список тут, на первом проходе
                         if (!noScroll) scrollToItem(item);
                         if (raiseEvent) defineSelectedIndex(items);
                     }
@@ -3813,7 +3813,7 @@
                         form[prop].$error = {};
                     };
                 }
-                if ($form && form.$error) form.$error = {};
+                if (form && form.$error) form.$error = {};
             }
         };
         
