@@ -2282,7 +2282,9 @@ tbody.collapse.in {
   opacity: 0.54;
   text-align: justify;
   text-align: start;
-  margin: 0px;
+  margin: 0px 24px 0px 0px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .pip-drilldown-list .pip-drilldown-list-item .pip-icon {
   margin-right: 26px;
