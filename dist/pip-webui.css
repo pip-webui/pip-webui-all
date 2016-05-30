@@ -2227,6 +2227,14 @@ tbody.collapse.in {
   text-transform: none !important;
   font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
 }
+.pip-drilldown-list .pip-drilldown-list-item md-icon {
+  -webkit-box-flex: 0 0 auto;
+  -moz-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  min-width: 24px;
+}
 .pip-drilldown-list .pip-drilldown-list-item .pip-content {
   display: -webkit-box;
   display: -moz-box;
@@ -2295,6 +2303,11 @@ tbody.collapse.in {
 .pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-item-lg .pip-title {
   margin-top: 1px !important;
   margin-bottom: 4px !important;
+}
+.pip-drilldown-list .pip-drilldown-list-item.pip-drilldown-list-item-lg .pip-subcontent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .blue .pip-drilldown-list-item.pip-selected {
   border-left: 5px solid rgba(33, 150, 243, 0.54) !important;
