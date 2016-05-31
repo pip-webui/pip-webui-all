@@ -7397,16 +7397,19 @@ md-content md-option .md-text .pip-tabs-badge {
 @media (min-width: 1200px) {
   md-dialog.pip-gallery-search-dialog.pip-picture-dialog {
     width: 508px !important;
+    min-width: 508px !important;
   }
 }
 @media (min-width: 768px) and (max-width: 1200px) {
   md-dialog.pip-gallery-search-dialog.pip-picture-dialog {
     width: 508px !important;
+    min-width: 508px !important;
   }
 }
 @media (max-width: 768px) {
   md-dialog.pip-gallery-search-dialog.pip-picture-dialog {
     width: 380px !important;
+    min-width: 380px !important;
   }
 }
 .pip-gallery-search-dialog .pip-no-images {
