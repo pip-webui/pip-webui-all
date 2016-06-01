@@ -4688,7 +4688,7 @@
 
                 for (var key in cache) {
                     if (key == name || key.startsWith(name + '_')) {
-                        var data = cache[key];
+                        var data = cache[key].data;
                         if (angular.isArray(data)) {
                             for (var i = 0; i < data.length; i++) {
                                 if (data[i].id == item.id) {
@@ -4722,7 +4722,7 @@
 
                     for (var key in cache) {
                         if (key == name || key.startsWith(name + '_')) {
-                            var data = cache[key];
+                            var data = cache[key].data;
                             if (angular.isArray(data)) {
                                 for (var i = 0; i < data.length; i++) {
                                     if (data[i].id == item.id) {
