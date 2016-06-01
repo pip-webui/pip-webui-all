@@ -4548,10 +4548,11 @@
             function clear(name) {
                 if (name == null) {
                     cache = {};
+                    console.log('****** Invalidated cache');
                 } else {
                     for (var key in cache) {
                         if (key == name || key.startsWith(name + '_')) {
-                            console.log('****** Invalidated cache ' + key)
+                            console.log('****** Invalidated cache ' + key);
                             delete cache[key];
                         }
                     }
@@ -4647,8 +4648,7 @@
 
                 // Return result if it exists
                 if (result) {
-                    console.log('***** Loaded from cache ' + name);
-                    console.log(result);
+                    console.log('***** Loaded from cache ' + name, result);
                     if (filter) result = filter(result);
                     if (successCallback) successCallback(result);
                     deferred.resolve(result);
@@ -4666,13 +4666,13 @@
                         if (filter) data = filter(data);
                         deferred.resolve(data);
 
-                        // console.log('***** Loaded from server ' + name);
-                        // console.log(data);
+                        console.log('***** Loaded from server ' + name, data);
 
                         if (successCallback) successCallback(data);
                     },
                     function (err) {
                         // Return error
+                        console.log('***** FAILED to load from server ' + name);
                         deferred.reject(err);
                         if (errorCallback) errorCallback(err);
                     }
@@ -7630,6 +7630,11 @@
                 partyId: pipRest.partyId,
                 
                 readTags: function(params, successCallback, errorCallback) {
+                    params = params || {};
+                    params.item = params.item || {};
+                    if(params.item.party_id == null) {
+                        params.item.party_id = pipRest.partyId($stateParams);
+                    }
                     return pipTagsCache.readTags(params, successCallback, errorCallback);
                 }
             }
