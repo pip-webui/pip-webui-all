@@ -23551,9 +23551,74 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     angular.module('pipErrorHandling', [
-        'pipErrors.Pages'
+        'pipErrors.Pages',
+        'pipNoConnectionPanel'
     ]);
     
+})();
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipErrors.Pages', [
+        'pipAppBar', 'pipRest.State', 'pipTransactions', 'pipRest', 'ngMaterial', 
+        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
+        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Templates'
+    ]);
+
+    thisModule.config(
+        ['pipAuthStateProvider', function (pipAuthStateProvider) {
+            // Configure module routes
+            pipAuthStateProvider
+                .state('errors_no_connection', {
+                    url: '/errors/no_connection',
+                    params: {
+                        error: null
+                    },
+                    auth: false,
+                    controller: 'pipErrorNoConnectionController',
+                    templateUrl: 'no_connection/no_connection.html'
+                })
+                .state('errors_maintenance', {
+                    url: '/errors/maintenance',
+                    params: {
+                        error: null
+                    },
+                    auth: false,
+                    controller: 'pipErrorMaintenanceController',
+                    templateUrl: 'maintenance/maintenance.html'
+                })
+                .state('errors_missing_route', {
+                    url: '/errors/missing_route',
+                    params: {
+                        unfoundState: null,
+                        fromState: null
+                    },
+                    auth: true,
+                    controller: 'pipErrorMissingRouteController',
+                    templateUrl: 'missing_route/missing_route.html'
+                })
+                .state('errors_unsupported', {
+                    url: '/errors/unsupported',
+                    params: {
+                        error: null
+                    },
+                    auth: false,
+                    controller: 'pipErrorUnsupportedController',
+                    templateUrl: 'unsupported/unsupported.html'
+                })
+                .state('errors_unknown', {
+                    url: '/errors/unknown',
+                    params: {
+                        error: null
+                    },
+                    auth: false,
+                    controller: 'pipErrorUnknownController',
+                    templateUrl: 'unknown/unknown.html'
+                });
+        }]);
+
 })();
 (function(module) {
 try {
@@ -23589,6 +23654,51 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection/no_connection.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'../../dist/images/no_response.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-actions h48" layout="column" layout-align="center center">\n' +
+    '        <md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">\n' +
+    '            {{::\'ERROR_RESPONDING_RETRY\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection/pip_no_connection_panel.html',
+    '    <div class="pip-empty" layout="column" layout-align="center center" flex>\n' +
+    '        <img src="images/no_response.svg" class="pip-pic block" >\n' +
+    '        \n' +
+    '            <div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div>\n' +
+    '            <div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '            <div class="pip-error-actions h48" layout="column" layout-align="center center">\n' +
+    '                <md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">\n' +
+    '                    {{::\'ERROR_RESPONDING_RETRY\' | translate}}\n' +
+    '                </md-button>\n' +
+    '            </div>\n' +
+    '    </div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
     '    <div style="background-image: url(\'../../dist/images/invalid_route.svg\');" class="pip-pic"></div>\n' +
@@ -23606,28 +23716,6 @@ module.run(['$templateCache', function($templateCache) {
     '    <div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">\n' +
     '        {{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}\n' +
     '    </a></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'../../dist/images/no_response.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-actions h48" layout="column" layout-align="center center">\n' +
-    '        <md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">\n' +
-    '            {{::\'ERROR_RESPONDING_RETRY\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
     '</div>');
 }]);
 })();
@@ -23776,70 +23864,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipErrors.Pages', [
-        'pipAppBar', 'pipRest.State', 'pipTransactions', 'pipRest', 'ngMaterial', 
-        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
-        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Templates'
-    ]);
-
-    thisModule.config(
-        ['pipAuthStateProvider', function (pipAuthStateProvider) {
-            // Configure module routes
-            pipAuthStateProvider
-                .state('errors_no_connection', {
-                    url: '/errors/no_connection',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorNoConnectionController',
-                    templateUrl: 'no_connection/no_connection.html'
-                })
-                .state('errors_maintenance', {
-                    url: '/errors/maintenance',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorMaintenanceController',
-                    templateUrl: 'maintenance/maintenance.html'
-                })
-                .state('errors_missing_route', {
-                    url: '/errors/missing_route',
-                    params: {
-                        unfoundState: null,
-                        fromState: null
-                    },
-                    auth: true,
-                    controller: 'pipErrorMissingRouteController',
-                    templateUrl: 'missing_route/missing_route.html'
-                })
-                .state('errors_unsupported', {
-                    url: '/errors/unsupported',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorUnsupportedController',
-                    templateUrl: 'unsupported/unsupported.html'
-                })
-                .state('errors_unknown', {
-                    url: '/errors/unknown',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorUnknownController',
-                    templateUrl: 'unknown/unknown.html'
-                });
-        }]);
-
-})();
 /**
  * @file Errors string resources
  * @copyright Digital Living Software Corp. 2014-2016
@@ -24050,6 +24074,50 @@ module.run(['$templateCache', function($templateCache) {
 
 
 })();
+
+/**
+ * @file No Connection Error panel
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipNoConnectionPanel", []);
+
+    thisModule.directive('pipNoConnectionPanel',
+        function () {
+            return {
+                restrict: 'E',
+                scope: {
+                    error: '=pipError',
+                    retry: '=pipRetry'
+                },
+                templateUrl: 'no_connection/pip_no_connection_panel.html',
+                controller: 'pipNoConnectionPanelController'
+            };
+        }
+    );
+
+    thisModule.controller('pipNoConnectionPanelController',
+        ['$scope', '$element', '$attrs', 'pipTranslate', function ($scope, $element, $attrs, pipTranslate) {
+
+
+            $scope.onRetry = onRetry;
+
+            return;
+
+            function onRetry() {
+                if ($scope.retry && angular.isFunction($scope.retry)) $scope.retry();
+            };
+
+        }]
+    );
+
+})();
+
 
 /**
  * @file Unknown error controller
