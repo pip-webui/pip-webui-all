@@ -4734,7 +4734,7 @@
             // OBSOLETE - WILL BE REMOVED ONCE CODE IS REFACTORED
             function addDecorator(resource, params, successCallback) {
                 return function (item) {
-                    clear(resource);
+                    if (!params || !params.notClearedCache) clear(resource);
                     if (successCallback) successCallback(item);
                 };
             };
