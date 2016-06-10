@@ -26227,6 +26227,22 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+/**
+ * @file Registration of all help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipHelp', [
+        'pipHelp.Service',
+        'pipHelp.Page'
+    ]);
+    
+})();
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -26260,22 +26276,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of all help components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipHelp', [
-        'pipHelp.Service',
-        'pipHelp.Page'
-    ]);
-    
-})();
 // ==========================================================
 //  Title: help_page.js
 //  Description: Application help page module
