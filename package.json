@@ -38,7 +38,7 @@
   "private": true,
   "scripts": {
     "build": "gulp build",
-    "jshint": "gulp jshint",
+    "lint": "gulp lint",
     "test": "mocha -t 5000 -R spec --recursive ./test"
   },
   "dependencies": {
