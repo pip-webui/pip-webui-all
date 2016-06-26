@@ -803,39 +803,39 @@
 }
 .position-fixed {
   position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 .position-fill {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 .position-top {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
   bottom: none;
 }
 .position-bottom {
   position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 .position-right {
   position: absolute;
-  top: 0px;
+  top: 0;
   left: none;
-  right: 0px;
+  right: 0;
   bottom: none;
 }
 .w0 {
-  width: 0px !important;
+  width: 0 !important;
 }
 .w2 {
   width: 2px !important;
@@ -977,7 +977,7 @@
   max-width: 100% !important;
 }
 .h0 {
-  height: 0px !important;
+  height: 0 !important;
 }
 .h2 {
   height: 2px !important;
@@ -1091,7 +1091,7 @@
   margin: -10px !important;
 }
 .m0 {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 .m1 {
   margin: 1px !important;
@@ -1124,7 +1124,7 @@
   margin-top: -10px !important;
 }
 .tm0 {
-  margin-top: 0px !important;
+  margin-top: 0 !important;
 }
 .tm2 {
   margin-top: 2px !important;
@@ -1190,7 +1190,7 @@
   margin-left: -10px !important;
 }
 .lm0 {
-  margin-left: 0px !important;
+  margin-left: 0 !important;
 }
 .lm2 {
   margin-left: 2px !important;
@@ -1290,7 +1290,7 @@
   }
 }
 .p0 {
-  padding: 0px !important;
+  padding: 0 !important;
 }
 .p2 {
   padding: 2px !important;
@@ -1326,7 +1326,7 @@
   padding: 32px !important;
 }
 .tp0 {
-  padding-top: 0px !important;
+  padding-top: 0 !important;
 }
 .tp2 {
   padding-top: 2px !important;
@@ -1359,7 +1359,7 @@
   padding-top: 32px !important;
 }
 .bp0 {
-  padding-bottom: 0px !important;
+  padding-bottom: 0 !important;
 }
 .bp2 {
   padding-bottom: 2px !important;
@@ -1392,7 +1392,7 @@
   padding-top: 32px !important;
 }
 .lp0 {
-  padding-left: 0px !important;
+  padding-left: 0 !important;
 }
 .lp2 {
   padding-left: 2px !important;
@@ -1425,7 +1425,7 @@
   padding-top: 32px !important;
 }
 .rp0 {
-  padding-right: 0px !important;
+  padding-right: 0 !important;
 }
 .rp2 {
   padding-right: 2px !important;
@@ -1752,7 +1752,7 @@ tbody.collapse.in {
   width: 40px;
 }
 .pip-ref-item .pip-pic-sm {
-  margin: 3px 26px 3px 0px;
+  margin: 3px 26px 3px 0;
   height: 30px;
   width: 30px;
 }
@@ -1764,7 +1764,7 @@ tbody.collapse.in {
 }
 .pip-ref-item .pip-content .pip-title,
 .pip-ref-item .pip-content .pip-subtitle {
-  margin: 0px;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1822,14 +1822,14 @@ tbody.collapse.in {
 }
 .pip-ref-toolbar .pip-content .pip-title,
 .pip-ref-toolbar .pip-content .pip-subtitle {
-  margin: 0px;
+  margin: 0;
   -webkit-user-select: auto;
 }
 .pip-ref-toolbar .pip-content .pip-action {
   display: inline-block;
 }
 .pip-ref-toolbar .pip-content .pip-action button {
-  margin: 8px 8px 8px 0px;
+  margin: 8px 8px 8px 0;
 }
 @media (min-width: 768px) {
   .pip-ref-toolbar {
@@ -1911,7 +1911,7 @@ tbody.collapse.in {
   max-width: calc(100% - 96px);
 }
 .pip-ref-title .pip-content .pip-title {
-  margin: 0px;
+  margin: 0;
   margin-right: 24px;
   padding-bottom: 6px;
   font: normal 500 20px Roboto, 'Helvetica Neue', sans-serif;
@@ -1922,7 +1922,7 @@ tbody.collapse.in {
 }
 .pip-ref-title .pip-content .pip-subtitle {
   line-height: 1.2em;
-  margin: 0px 8px 0px 0px !important;
+  margin: 0 8px 0 0 !important;
   font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
   opacity: .54;
   width: 100%;
@@ -1933,14 +1933,14 @@ tbody.collapse.in {
   outline: none !important;
 }
 .pip-ref-expander .pip-pic-btn-sm {
-  padding: 0px !important;
+  padding: 0 !important;
   height: 30px !important;
   width: 30px;
   min-height: 30px;
   margin-right: 20px !important;
 }
 .pip-ref-expander .pip-pic-btn {
-  padding: 0px !important;
+  padding: 0 !important;
   height: 40px !important;
   width: 40px;
   min-height: 40px;
@@ -2002,23 +2002,23 @@ tbody.collapse.in {
   margin-left: 8px;
 }
 .pip-ref-list .pip-ref-list-item {
-  padding-right: 0px;
+  padding-right: 0;
   max-width: 100%;
   width: 100%;
 }
 .pip-ref-list .pip-ref-list-item > button.md-ink-ripple {
-  padding: 0px;
+  padding: 0;
 }
 .pip-ref-list .pip-ref-list-item > button.md-ink-ripple .md-ripple-container {
   display: none;
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
 }
 .pip-ref-list .pip-ref-list-item p {
-  margin: 0px;
+  margin: 0;
 }
 .pip-ref-list .pip-ref-list-item pip-markdown p {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 .pip-ref-list .pip-ref-list-item .pip-pic {
   margin-top: 16px;
@@ -2071,8 +2071,8 @@ tbody.collapse.in {
 }
 .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title .pip-title,
 .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title .pip-subtitle {
-  min-height: 0px;
-  padding-right: 0px !important;
+  min-height: 0;
+  padding-right: 0 !important;
 }
 .pip-ref-list .pip-ref-list-item .pip-content .pip-title,
 .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold,
@@ -2091,7 +2091,7 @@ tbody.collapse.in {
 .pip-ref-list .pip-ref-list-item .pip-content .pip-title {
   font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
   margin-top: 1px !important;
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 .pip-ref-list .pip-ref-list-item .pip-content .pip-subtitle {
   font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
@@ -2128,14 +2128,14 @@ tbody.collapse.in {
 .pip-details-title .pip-title {
   min-height: 24px;
   padding-right: 36px !important;
-  margin: 0px;
+  margin: 0;
   font: normal 500 20px Roboto, 'Helvetica Neue', sans-serif;
   opacity: 1;
   -webkit-user-select: auto;
 }
 .pip-details-title .pip-subtitle {
   height: 24px;
-  margin: 0px !important;
+  margin: 0 !important;
   font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
   line-height: 1.2em;
   width: 100%;
@@ -2200,10 +2200,10 @@ tbody.collapse.in {
 .pip-drilldown-list .pip-drilldown-list-item {
   height: 48px;
   width: 100%;
-  margin: 0px !important;
+  margin: 0 !important;
   padding-left: 24px;
   padding-right: 16px;
-  border-radius: 0px !important;
+  border-radius: 0 !important;
   display: -webkit-box;
   display: -moz-box;
   display: -webkit-flex;
@@ -2278,7 +2278,7 @@ tbody.collapse.in {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0px;
+  margin: 0;
   margin-right: 16px;
   flex: 1;
   -webkit-flex: 1;
@@ -2290,7 +2290,7 @@ tbody.collapse.in {
   opacity: 0.54;
   text-align: justify;
   text-align: start;
-  margin: 0px 24px 0px 0px;
+  margin: 0 24px 0 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -2366,8 +2366,8 @@ tbody.collapse.in {
 }
 md-dialog .pip-progress-top {
   margin-top: -24px;
-  margin-left: 0px;
-  margin-right: 0px;
+  margin-left: 0;
+  margin-right: 0;
   margin-bottom: 19px;
   width: calc(100%) !important;
 }
@@ -2386,8 +2386,8 @@ md-dialog .pip-progress-top {
 }
 .pip-check-list .pip-check-list-item .md-list-item-inner .md-ripple-container {
   display: none;
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
 }
 .pip-check-list .pip-check-list-item .pip-checkbox,
 .pip-check-list .pip-check-list-item .pip-icon {
@@ -2422,7 +2422,7 @@ md-dialog .pip-progress-top {
 .pip-check-list .pip-check-list-item .pip-content .pip-title,
 .pip-check-list .pip-check-list-item .pip-content .pip-text,
 .pip-check-list .pip-check-list-item .pip-content .pip-text-bold {
-  margin: 0px;
+  margin: 0;
   -webkit-user-select: auto;
 }
 .pip-check-list .pip-check-list-item .pip-content .pip-title {
@@ -2443,7 +2443,7 @@ md-dialog .pip-progress-top {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
-  margin: 2px 0px;
+  margin: 2px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2528,7 +2528,7 @@ md-dialog .pip-progress-top {
   width: 100%;
   max-width: 100%;
   margin-bottom: 20px;
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 .table md-toolbar {
   width: 280px;
@@ -2536,7 +2536,7 @@ md-dialog .pip-progress-top {
 }
 .table .table {
   background-color: #fff;
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 .table > thead > tr > th,
 .table > tbody > tr > th,
@@ -2759,8 +2759,8 @@ table th[class*=col-] {
 .pip-type-chip {
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
   display: inline-block;
-  padding: 0px 12px 0px 12px !important;
-  margin: 4px 4px 0px 0px !important;
+  padding: 0 12px 0 12px !important;
+  margin: 4px 4px 0 0 !important;
   overflow: hidden !important;
   box-shadow: none !important;
   line-height: 20px !important;
@@ -2782,7 +2782,7 @@ table th[class*=col-] {
 .pip-type-chip.pip-type-little-chip .pip-text {
   margin: 3px 0 0 0;
   font-size: 10px !important;
-  margin-right: 0px !important;
+  margin-right: 0 !important;
 }
 .pip-chip .pip-avatar,
 .pip-type-chip .pip-avatar,
@@ -2840,13 +2840,13 @@ table th[class*=col-] {
   }
 }
 .pip-type-chip-left {
-  border-top-left-radius: 0px !important;
-  border-bottom-left-radius: 0px !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 .pip-type-chip-right {
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-  margin-right: 0px !important;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: 0 !important;
 }
 .pip-simple-list .pip-simple-list-item {
   height: 48px;
@@ -2883,7 +2883,7 @@ md-list-item.pip-selectable-tree.selected > button {
   border-left: 5px solid #03a9f4 !important;
 }
 md-list-item.pip-selectable-tree > button {
-  padding-right: 0px;
+  padding-right: 0;
 }
 md-list-item.pip-selectable.pip-simple-list-item {
   border-left: none!important;
@@ -3028,7 +3028,7 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
   width: 350px !important;
   height: 250px !important;
   min-height: 250px !important;
-  margin: 25px 25px 0px;
+  margin: 25px 25px 0;
   background-position: 50% 50%;
   background-repeat: no-repeat;
 }
@@ -3052,8 +3052,8 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .pip-empty .pip-actions .md-button {
   width: 384px !important;
   max-height: 72px !important;
-  margin-bottom: 0px;
-  margin-top: 0px;
+  margin-bottom: 0;
+  margin-top: 0;
 }
 .pip-empty .pip-actions .md-button span {
   display: block;
@@ -3236,7 +3236,7 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 }
 .pip-call-action md-icon {
   color: #fff;
-  margin-left: 0px;
+  margin-left: 0;
   margin-right: 16px;
   margin-bottom: 12px !important;
 }
@@ -3282,7 +3282,7 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 .pip-landing-toolbar .pip-button {
   border-color: #fff !important;
   border: 2px solid;
-  padding-top: 0px;
+  padding-top: 0;
 }
 .pip-info-block {
   background-color: #eeeeee;
@@ -3513,13 +3513,13 @@ a:focus,
 md-autocomplete:focus,
 span:focus,
 button:focus {
-  outline-width: 0px !important;
+  outline-width: 0 !important;
 }
 .md-contact-chips .md-chips .md-chip .md-contact-avatar img {
   width: 32px;
 }
 md-list md-list-item .md-button {
-  padding-right: 0px;
+  padding-right: 0;
 }
 .md-chips .md-chip-input-container md-autocomplete,
 .md-chips .md-chip-input-container md-autocomplete-wrap {
@@ -3529,7 +3529,7 @@ md-list md-list-item .md-button {
   min-width: 48px;
 }
 .pip-no-hint-input .md-errors-spacer {
-  min-height: 0px;
+  min-height: 0;
 }
 .pip-autocomplete-text md-select-value {
   height: 35px !important;
@@ -4681,11 +4681,11 @@ pip-document.pip-document-small {
   font-size: 16px;
 }
 .pip-markdown p {
-  margin: 0px  0px 10px !important;
+  margin: 0 0 10px !important;
   word-wrap: break-word;
 }
 .pip-markdown p :last-of-type {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 .pip-markdown h1 {
   font-size: 24px !important;
@@ -4707,10 +4707,10 @@ pip-document.pip-document-small {
 .pip-markdown h2,
 .pip-markdown h3,
 .pip-markdown h4 {
-  margin: 0px;
+  margin: 0;
 }
 .pip-markdown table {
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 .pip-markdown .pip-gradient-block {
   position: absolute;
@@ -4728,7 +4728,7 @@ pip-document.pip-document-small {
 md-list-item .pip-markdown p,
 md-list-item .pip-markdown blockquote,
 md-list-item .pip-markdown ul {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 md-list-item .pip-markdown h1,
 md-list-item .pip-markdown h2,
@@ -4737,13 +4737,13 @@ md-list-item .pip-markdown h4 {
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
 }
 .pip-markdown-list ol {
-  margin: 0px !important;
+  margin: 0 !important;
 }
 pip-toggle-buttons .md-select-value .pip-tagged {
   font-size: 20px;
 }
 pip-toggle-buttons:focus {
-  outline-width: 0px !important;
+  outline-width: 0 !important;
 }
 .dark .pip-toggle-buttons button,
 .black .pip-toggle-buttons button {
@@ -4760,7 +4760,7 @@ pip-toggle-buttons:focus {
   height: 36px;
 }
 .pip-toggle-buttons:focus {
-  outline-width: 0px !important;
+  outline-width: 0 !important;
 }
 .pip-toggle-buttons button {
   background-color: rgba(0, 0, 0, 0.12);
@@ -4768,10 +4768,10 @@ pip-toggle-buttons:focus {
 }
 .pip-toggle-buttons button.pip-chip-button.md-button {
   text-align: -webkit-center;
-  margin: 0px !important;
+  margin: 0 !important;
   height: 32px !important;
   margin-left: 2px !important;
-  border-radius: 0px !important;
+  border-radius: 0 !important;
 }
 .pip-toggle-buttons button.pip-chip-button.md-button .pip-tagged {
   font-size: 20px;
@@ -4793,7 +4793,7 @@ pip-toggle-buttons:focus {
 .pip-toggle-buttons button.pip-chip-button.md-button:first-of-type {
   border-bottom-left-radius: 4px !important;
   border-top-left-radius: 4px !important;
-  margin-left: 0px !important;
+  margin-left: 0 !important;
 }
 .pip-toggle-buttons button.pip-chip-button.md-button:last-of-type {
   border-bottom-right-radius: 4px !important;
@@ -4991,14 +4991,14 @@ pip-toggle-buttons:focus {
 @media (max-width: 768px) {
   .pip-toast {
     max-height: 124px !important;
-    padding: 0px;
+    padding: 0;
   }
   .pip-toast .md-toast-content {
     padding-top: 8px;
     max-height: 92px !important;
   }
   .pip-toast .md-toast-content .pip-text {
-    margin-right: 0px ;
+    margin-right: 0;
     width: 100%;
   }
   .pip-toast .md-toast-content .pip-actions {
@@ -5032,8 +5032,8 @@ pip-toggle-buttons:focus {
 .pip-chip {
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
   display: inline-block;
-  padding: 0px 12px 0px 12px!important;
-  margin: 4px 4px 0px 0px!important;
+  padding: 0 12px 0 12px !important;
+  margin: 4px 4px 0 0 !important;
   overflow: hidden!important;
   box-shadow: none!important;
   line-height: 20px!important;
@@ -5087,12 +5087,12 @@ pip-toggle-buttons:focus {
   }
 }
 .pip-type-chip-left {
-  border-top-left-radius: 0px !important;
-  border-bottom-left-radius: 0px !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 .pip-type-chip-right {
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .pip-tag-list {
   min-height: 36px!important;
@@ -5140,7 +5140,7 @@ pip-toggle-buttons:focus {
   transform: rotate(-15deg);
 }
 .pip-routing-progress .loader {
-  margin: 0px !important;
+  margin: 0 !important;
   position: absolute;
   top: calc( 50% - 70px);
   left: calc( 50% - 50px);
@@ -5210,7 +5210,7 @@ pip-toggle-buttons:focus {
   height: 30px;
 }
 .pip-date .md-select-value span .md-text {
-  padding-right: 0px !important;
+  padding-right: 0 !important;
   flex: 1 1 auto;
 }
 .pip-date .md-select-value span.md-select-icon {
@@ -5238,7 +5238,7 @@ pip-date-range md-select {
   display: inline-block;
   height: 30px;
   margin-top: 10px !important;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 pip-date-range md-select .md-select-value {
   height: 26px;
@@ -5268,7 +5268,7 @@ pip-date-range md-select .md-select-value .md-text {
     flex: 1 1 auto !important;
   }
   pip-date-range .md-select-value span .md-text {
-    padding-right: 0px !important;
+    padding-right: 0 !important;
     flex: 1 1 auto;
   }
   pip-date-range .md-select-value span.md-select-icon {
@@ -5346,12 +5346,12 @@ pip-date-range md-select .md-select-value .md-text {
   display: none;
 }
 .pip-time-edit .pip-datepicker-container md-datepicker .md-datepicker-input-container {
-  margin-left: 0px !important;
+  margin-left: 0 !important;
   width: 100%;
 }
 .pip-time-edit .pip-datepicker-container md-datepicker[disabled] .md-datepicker-input-container {
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.26) 0%, rgba(0, 0, 0, 0.26) 33%, transparent 0%);
-  background-image: -ms-linear-gradient(left, transparent 0%, rgba(0, 0, 0, 0.26) 100%);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.26) 0, rgba(0, 0, 0, 0.26) 33%, transparent 0);
+  background-image: -ms-linear-gradient(left, transparent 0, rgba(0, 0, 0, 0.26) 100%);
   background-position: 0 bottom;
   background-repeat: repeat-x;
   background-size: 4px 1px;
@@ -5367,14 +5367,14 @@ pip-date-range md-select .md-select-value .md-text {
 .pip-dialog.pip-options-dialog .pip-header h3 {
   width: 100%;
   text-align: left;
-  margin: 0px 0px 16px 0px;
+  margin: 0 0 16px 0;
 }
 .pip-dialog.pip-options-dialog .pip-header md-checkbox {
   font-size: 16px;
 }
 .pip-dialog.pip-options-dialog .pip-body {
-  padding-left: 0px !important;
-  padding-right: 0px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 .pip-dialog.pip-options-dialog .pip-list-item {
   cursor: pointer;
@@ -5435,14 +5435,14 @@ pip-date-range md-select .md-select-value .md-text {
 .pip-dialog.pip-options-dialog-big .pip-header h3 {
   width: 100%;
   text-align: left;
-  margin: 0px 0px 16px 0px;
+  margin: 0 0 16px 0;
 }
 .pip-dialog.pip-options-dialog-big .pip-header md-checkbox {
   font-size: 16px;
 }
 .pip-dialog.pip-options-dialog-big .pip-body {
-  padding-left: 0px !important;
-  padding-right: 0px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 .pip-dialog.pip-options-dialog-big .pip-list-item {
   cursor: pointer;
@@ -5476,7 +5476,7 @@ pip-date-range md-select .md-select-value .md-text {
 }
 .pip-dialog.pip-options-dialog-big .pip-list-item .pip-content .pip-title,
 .pip-dialog.pip-options-dialog-big .pip-list-item .pip-content .pip-subtitle {
-  margin: 0px;
+  margin: 0;
 }
 .pip-dialog.pip-options-dialog-big .pip-list-item .pip-content .pip-title {
   font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
@@ -5512,9 +5512,9 @@ pip-date-range md-select .md-select-value .md-text {
 }
 .pip-dialog.pip-options-dialog-big .dialog-hint md-icon {
   font-size: 24px;
-  width: 24px!important;
-  height: 24px!important;
-  margin: 0px 16px 0px 0px!important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 16px 0 0 !important;
 }
 .pip-dialog.pip-options-dialog md-dialog-content {
   max-height: 500px;
@@ -5553,7 +5553,7 @@ pip-date-range md-select .md-select-value .md-text {
   font-size: 24px;
   width: 24px!important;
   height: 24px!important;
-  margin: 0px 16px 0px 0px!important;
+  margin: 0 16px 0 0!important;
 }
 .pip-dialog.pip-conversion-dialog .pip-header {
   display: block;
@@ -5569,8 +5569,8 @@ pip-date-range md-select .md-select-value .md-text {
   line-height: 22px;
 }
 .pip-dialog.pip-conversion-dialog .pip-body {
-  padding-left: 0px !important;
-  padding-right: 0px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 .pip-dialog.pip-conversion-dialog .pip-list-item {
   cursor: pointer;
@@ -5593,7 +5593,7 @@ pip-date-range md-select .md-select-value .md-text {
 }
 .pip-dialog.pip-conversion-dialog .pip-list-item .pip-content .pip-title,
 .pip-dialog.pip-conversion-dialog .pip-list-item .pip-content .pip-subtitle {
-  margin: 0px;
+  margin: 0;
   line-height: 20px!important;
 }
 .pip-dialog.pip-conversion-dialog .pip-list-item .pip-content .pip-title {
@@ -8504,6 +8504,13 @@ md-dialog.pip-entry md-dialog-content {
     opacity: 0.38;
   }
 }
+.pip-settings .pip-content-container {
+  min-height: 100%;
+}
+.pip-settings .pip-body {
+  max-width: none !important;
+  min-height: 100%;
+}
 @media (min-width: 1200px) {
   .pip-settings md-list.pip-menu {
     width: 300px;
@@ -8525,78 +8532,26 @@ md-dialog.pip-entry md-dialog-content {
 .pip-settings.pip-card .pip-header ~ .pip-body,
 .pip-settings.pip-document .pip-header ~ .pip-body {
   padding-top: 24px !important;
+}
+.pip-settings .md-tile-left {
+  position: relative;
+  margin-right: 16px !important;
+  height: 80px;
+  width: 80px;
+}
+.pip-settings .pip-date md-input-container {
+  margin-top: 4px !important;
+  margin-bottom: 4px !important;
+}
+.pip-settings .pip-sessions.pip-details-title .pip-subtitle {
+  min-height: 24px;
+  line-height: 24px;
+  height: auto;
+  white-space: normal;
 }
 .change-password-dialog,
 .verify-email-dialog {
   width: 440px;
-}
-.pip-settings {
-  font-size: 14px;
-}
-.pip-settings .pip-date md-input-container {
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-.pip-settings .pip-body {
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-}
-@media (max-width: 768px) {
-  .pip-settings .pip-body {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
-}
-@media (min-width: 1200px) {
-  .pip-settings md-list:first-of-type {
-    width: 300px;
-  }
-  .pip-settings .pip-content-container {
-    width: 800px;
-    position: absolute;
-    left: 300px;
-    max-height: 100%;
-    -ms-overflow-y: auto;
-  }
-}
-@media (min-width: 1000px) and (max-width: 1200px) {
-  .pip-settings .pip-content-container {
-    width: calc(100% - 300px);
-    -ms-overflow-y: auto;
-  }
-}
-@media (min-width: 768px) and (max-width: 1200px) {
-  .pip-settings md-list:first-of-type {
-    width: 30%;
-    min-width: 0px;
-  }
-  .pip-settings .pip-content-container {
-    width: 70%;
-    position: absolute;
-    left: 30%;
-    max-height: 100%;
-    -ms-overflow-y: auto;
-  }
-}
-.pip-settings.pip-card .pip-header ~ .pip-body,
-.pip-settings.pip-document .pip-header ~ .pip-body {
-  padding-top: 24px !important;
-}
-.pip-settings .pip-contact-info md-select {
-  min-width: 150px;
-}
-.pip-settings .pip-contact-info .pip-select {
-  margin-top: 4px;
-}
-.pip-settings .pip-contact-info .pip-select md-select {
-  height: 44px;
-}
-.pip-settings .pip-contact-info md-input-container {
-  margin-bottom: 8px;
-}
-.pip-settings .pip-contact-info md-input-container .md-errors-spacer {
-  height: 0px !important;
-  min-height: 0px;
 }
 
 @-webkit-keyframes blink-hint {
@@ -8889,6 +8844,9 @@ md-dialog.pip-guide-preview {
     opacity: 0.38;
   }
 }
+.pip-help {
+  font-size: 14px;
+}
 @media (min-width: 1200px) {
   .pip-help md-list.pip-menu {
     width: 300px;
@@ -8901,7 +8859,7 @@ md-dialog.pip-guide-preview {
 @media (min-width: 768px) and (max-width: 1200px) {
   .pip-help md-list.pip-menu {
     width: 300px;
-    min-width: 0px;
+    min-width: 0;
   }
   .pip-help .pip-content-container {
     width: calc(100% - 300px);
@@ -8911,34 +8869,24 @@ md-dialog.pip-guide-preview {
 .pip-help.pip-document .pip-header ~ .pip-body {
   padding-top: 24px !important;
 }
-.pip-help {
-  font-size: 14px;
-}
 .pip-help .pip-body {
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-}
-@media (max-width: 768px) {
-  .pip-help .pip-body {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
+  max-width: none !important;
 }
 @media (min-width: 1200px) {
   .pip-help md-list:first-of-type {
-    width: 350px;
+    width: 300px;
   }
   .pip-help .pip-content-container {
-    width: 750px;
+    width: 800px;
     position: absolute;
-    left: 350px;
+    left: 300px;
     max-height: 100%;
     -ms-overflow-y: auto;
   }
 }
 @media (min-width: 1000px) and (max-width: 1200px) {
   .pip-help .pip-content-container {
-    width: calc(100% - 350px);
+    width: calc(100% - 300px);
     -ms-overflow-y: auto;
   }
 }
