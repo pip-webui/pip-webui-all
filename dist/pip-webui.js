@@ -4494,6 +4494,60 @@
 
 
 /**
+ * @file Announces data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipAnnouncesCache', ['pipAnnouncesData']);
+
+    thisModule.service('pipAnnouncesCache',
+        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
+
+            return {
+                readAnnounces: readAnnounces,
+                onAnnounceCreate: onAnnounceCreate,
+                onAnnounceUpdate: onAnnounceUpdate,
+                onAnnounceDelete: onAnnounceDelete                
+            };
+
+            function readAnnounces(params, successCallback, errorCallback) {
+                params = params || {};
+                params.resource = 'announces';
+                params.item = params.item || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            }
+            
+            function onAnnounceCreate(params, successCallback) {
+                return pipDataCache.addDecorator(
+                    'announces', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            }
+
+            function onAnnounceUpdate(params, successCallback) {
+                return pipDataCache.updateDecorator(
+                    'announces', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            }
+
+            function onAnnounceDelete(params, successCallback) {
+                return pipDataCache.removeDecorator('announces', params, successCallback);
+            }
+                        
+        }]
+    );
+
+})();
+
+
+/**
  * @file Global application data cache
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -6729,7 +6783,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipAnnouncesData', ['pipRest', 'pipDataModel']);
+    var thisModule = angular.module('pipAnnouncesData', ['pipRest', 'pipDataModel', 'pipAnnouncesCache']);
 
     thisModule.provider('pipAnnouncesData', function () {
 
@@ -6758,9 +6812,17 @@
         };
 
         // CRUD operations and other business methods
-        this.$get = ['pipRest', '$stateParams', 'pipDataModel', function (pipRest, $stateParams, pipDataModel) {
+        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipAnnouncesCache', function (pipRest, $stateParams, pipDataModel, pipAnnouncesCache) {
             return {
                 partyId: pipRest.partyId,
+                readAnnounces: function (params, successCallback, errorCallback) {
+                    params.resource = 'announces';
+                    params.item = params.item || {};
+                    params.item.search = $stateParams.search;
+                    params.item.tags = $stateParams.search;
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    return pipAnnouncesCache.readAnnounces(params, successCallback, errorCallback);
+                },
 
                 updateAnnounce: function (params, successCallback, errorCallback) {
                     params.resource = 'announces';
@@ -6768,7 +6830,7 @@
                     params.skipTransactionEnd = false;
                     pipDataModel.update(
                         params,
-                        successCallback,
+                        pipAnnouncesCache.onAnnounceCreate(params, successCallback),
                         errorCallback
                     );
                 },
@@ -6781,7 +6843,7 @@
                         params.skipTransactionEnd = false;
                         pipDataModel.update(
                             params,
-                            successCallback,
+                            pipAnnouncesCache.onAnnounceUpdate(params, successCallback),
                             errorCallback
                         );
                     });
@@ -6795,7 +6857,7 @@
                         params.skipTransactionEnd = false;
                         pipDataModel.create(
                             params,
-                            successCallback,
+                            pipAnnouncesCache.onAnnounceCreate(params, successCallback),
                             errorCallback
                         );
                     });
@@ -6807,14 +6869,14 @@
                     params.skipTransactionEnd = false;
                     pipDataModel.create(
                         params,
-                        successCallback,
+                        pipAnnouncesCache.onAnnounceCreate(params, successCallback),
                         errorCallback
                     );
                 },
 
                 deleteAnnounce: function(params, successCallback, errorCallback) {
                     params.resource = 'announces';
-                    pipDataModel.remove(params, successCallback, errorCallback);
+                    pipDataModel.remove(params, pipAnnouncesCache.onAnnounceDelete(params, successCallback), errorCallback);
                 }
             }
         }];
@@ -12167,15 +12229,13 @@ module.run(['$templateCache', function($templateCache) {
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global $, angular */
-
-(function () {
+(function (angular, _, $) {
     'use strict';
 
-    var thisModule = angular.module('pipAppBar', 
+    var thisModule = angular.module('pipAppBar',
         ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipAppBar.Service']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
 
         pipTranslateProvider.translations('en', {
             'APPBAR_SEARCH': 'Search'
@@ -12188,32 +12248,32 @@ module.run(['$templateCache', function($templateCache) {
     }]);
 
     // Main application header directive
-    thisModule.directive('pipAppbar', function() {
-       return {
-           restrict: 'E',
-           scope: {
-               title: '=pipTitle',
-               showMenu: '=pipShowMenu',
-               localActions: '=pipLocalActions',
-               globalActions: '=pipGlobalActions'
-           },
-           replace: false,
-           templateUrl: function(element, attr) {
-               return 'appbar/appbar.html';
-           },
-           controller: 'pipAppBarController'
-       };
+    thisModule.directive('pipAppbar', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                title: '=pipTitle',
+                showMenu: '=pipShowMenu',
+                localActions: '=pipLocalActions',
+                globalActions: '=pipGlobalActions'
+            },
+            replace: false,
+            templateUrl: function (element, attr) {
+                return 'appbar/appbar.html';
+            },
+            controller: 'pipAppBarController'
+        };
     });
 
     thisModule.controller('pipAppBarController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', 'pipAppBar', 'localStorageService', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate, pipAppBar, localStorageService) {
+        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate, pipAppBar) {
             // Initialize default application title
-            if ($scope.title)
-                pipAppBar.showTitleText($scope.title);                
-            if ($scope.showMenu)
+            if ($scope.title) {
+                pipAppBar.showTitleText($scope.title);
+            }
+            if ($scope.showMenu) {
                 pipAppBar.showMenuNavIcon();
-
-
+            }
             // Apply class and call resize
             $element.addClass('pip-appbar');
             $scope.$emit('pipResizeWindow');
@@ -12233,7 +12293,7 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             $scope.searchEnabled = false;
-            $scope.search = { text: '' };
+            $scope.search = {text: ''};
 
             $rootScope.$on('pipAppBarChanged', onAppBarChanged);
 
@@ -12258,28 +12318,31 @@ module.run(['$templateCache', function($templateCache) {
 
             $scope.openMenu = openMenu;
 
-            return;
-            //---------------------------
-
-             function openMenu ($mdOpenMenu, ev) {
+            function openMenu($mdOpenMenu, ev) {
                 $scope.originatorEv = ev;
                 $mdOpenMenu(ev);
-            };
+            }
 
             function getParty(prop) {
-                if (!$rootScope.$party) return;
-                else {
-                    if (prop) return $rootScope.$party[prop];
-                    else return $rootScope.$party;
+                if (!$rootScope.$party) {
+                    return;
                 }
+                if (prop) {
+                    return $rootScope.$party[prop];
+                }
+
+                return $rootScope.$party;
             }
 
             function getUser(prop) {
-                if (!$rootScope.$user) return;
-                else {
-                    if (prop) return $rootScope.$user[prop];
-                    else return $rootScope.$user;
+                if (!$rootScope.$user) {
+                    return;
                 }
+                if (prop) {
+                    return $rootScope.$user[prop];
+                }
+
+                return $rootScope.$user;
             }
 
             function onAppBarChanged(event, config) {
@@ -12293,65 +12356,80 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function actionHidden(action) {
-                return action.access
-                    && !action.access($rootScope.$party, $rootScope.$user, action);
+                return action.access && !action.access($rootScope.$party, $rootScope.$user, action);
             }
 
             function actionCount(action) {
-                if (action.count == null || action.count <= 0)
+                if (action.count === null || action.count <= 0) {
                     return '';
-                if (action.count > 99)
+                }
+                if (action.count > 99) {
                     return '!';
+                }
+
                 return action.count;
             }
 
             function calcActions(actions) {
                 var count = 0;
-                _.each(actions, function(action) {
-                    if (!actionHidden(action)) count++;
+
+                _.each(actions, function (action) {
+                    if (!actionHidden(action)) {
+                        count++;
+                    }
                 });
+
                 return count;
             }
 
             function secondaryActionsVisible() {
-                return calcActions($scope.config.secondaryGlobalActions) > 0
-                    || calcActions($scope.config.secondaryLocalActions) > 0;
+                return calcActions($scope.config.secondaryGlobalActions) > 0 ||
+                    calcActions($scope.config.secondaryLocalActions) > 0;
             }
 
             function secondaryDividerVisible() {
-                return calcActions($scope.config.secondaryGlobalActions) > 0
-                    && calcActions($scope.config.secondaryLocalActions) > 0;
+                return calcActions($scope.config.secondaryGlobalActions) > 0 &&
+                    calcActions($scope.config.secondaryLocalActions) > 0;
             }
 
             function onNavIconClick() {
+                var breadcrumb, backCallback;
+
                 if (_.isFunction($scope.config.navIconCallback)) {
                     // Execute nav icon callback
                     $scope.config.navIconCallback();
-                } else {
-                    if ($scope.config.navIconType != 'back') {
-                        // Raise an event
-                        $rootScope.$broadcast('pipAppBarNavIconClicked');
-                    }
-                    else if ($scope.config.titleType == 'breadcrumb') {
-                        var breadcrumb = $scope.config.titleBreadcrumb;
-                        // Go to the last breadcrumb item
-                        if (_.isArray(breadcrumb) && breadcrumb.length > 0) {
-                            var backCallback = breadcrumb[breadcrumb.length - 1].click;
-                            if (_.isFunction(backCallback)) backCallback();
-                            else $window.history.back();
+
+                    return;
+                }
+                if ($scope.config.navIconType !== 'back') {
+                    // Raise an event
+                    $rootScope.$broadcast('pipAppBarNavIconClicked');
+
+                    return;
+                }
+                if ($scope.config.titleType === 'breadcrumb') {
+                    breadcrumb = $scope.config.titleBreadcrumb;
+                    // Go to the last breadcrumb item
+                    if (_.isArray(breadcrumb) && breadcrumb.length > 0) {
+                        backCallback = breadcrumb[breadcrumb.length - 1].click;
+                        if (_.isFunction(backCallback)) {
+                            backCallback();
                         } else {
                             $window.history.back();
                         }
                     } else {
-                        // Go back in history
                         $window.history.back();
                     }
+                } else {
+                    // Go back in history
+                    $window.history.back();
                 }
             }
 
             function onBreadcrumbClick(item) {
-                if (_.isFunction(item.click))
+                if (_.isFunction(item.click)) {
                     item.click(item);
+                }
             }
 
             function onLanguageClick(language) {
@@ -12362,66 +12440,90 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function processStateParams(params) {
-                if (params == null) return null;
+                var result = {}, prop;
 
-                var result = {};
-                var prop;
+                if (params === null) {
+                    return null;
+                }
                 for (prop in params) {
                     if (params.hasOwnProperty(prop)) {
-                        if (params[prop] == ':party_id') {
+                        if (params[prop] === ':party_id') {
                             result[prop] = $rootScope.$party ? $rootScope.$party.id : null;
-                        } else if (params[prop] == ':user_id') {
+                        } else if (params[prop] === ':user_id') {
                             result[prop] = $rootScope.$user ? $rootScope.$user.id : null;
                         } else {
                             result[prop] = params[prop];
                         }
                     }
                 }
+
                 return result;
             }
 
             function processUrlParams(url) {
-                if (url == null) return null;
+                var result;
 
-                var result = url.replace(':party_id', $rootScope.$party ? $rootScope.$party.id : '');
+                if (url === null) {
+                    return null;
+                }
+                result = url.replace(':party_id', $rootScope.$party ? $rootScope.$party.id : '');
                 result = result.replace(':user_id', $rootScope.user ? $rootScope.$user.id : '');
+
                 return result;
             }
 
             function focusSearchText() {
-                setTimeout(function() {
-                    var element = $('.pip-search-text');
-                    if (element.length > 0)
+                var element;
+
+                setTimeout(function () {
+                    element = $('.pip-search-text');
+                    if (element.length > 0) {
                         element.focus();
+                    }
                 }, 0);
             }
 
             function onActionClick(action, $mdOpenMenu) {
-                if (action == null || action.divider) {
+                if (!action || action.divider) {
                     return;
                 }
 
-                if(action.close){
-                    $scope.originatorEv = null
+                if (action.close) {
+                    $scope.originatorEv = null;
                 }
 
-                if (action.menu)
+                if (action.menu) {
                     $mdOpenMenu($scope.originatorEv);
-                else if (action.callback)
+
+                    return;
+                }
+
+                if (action.callback) {
                     action.callback();
-                else if (action.href)
+
+                    return;
+                }
+                if (action.href) {
                     $window.location.href = processUrlParams(action.href);
-                else if (action.url)
+
+                    return;
+                }
+                if (action.url) {
                     $location.url(processUrlParams(action.url));
-                else if (action.state)
+
+                    return;
+                }
+                if (action.state) {
                     $state.go(action.state, processStateParams(action.stateParams));
-                else if (action.event)
+
+                    return;
+                }
+                if (action.event) {
                     $rootScope.$broadcast(action.event);
-                else
+                } else {
                     // Otherwise raise notification
                     $rootScope.$broadcast('pipAppBarActionClicked', action.name);
-
-
+                }
             }
 
             function onSearchEnable() {
@@ -12432,14 +12534,15 @@ module.run(['$templateCache', function($templateCache) {
 
             function onSearchClick() {
                 var searchText = $scope.search.text;
-                
+
                 $scope.search.text = '';
                 $scope.searchEnabled = false;
 
-                if ($scope.config.searchCallback)
+                if ($scope.config.searchCallback) {
                     $scope.config.searchCallback(searchText);
-                else
+                } else {
                     $rootScope.$broadcast('pipAppBarSearchClicked', searchText);
+                }
             }
 
             function onSearchClear() {
@@ -12455,25 +12558,27 @@ module.run(['$templateCache', function($templateCache) {
 
             function onSearchKeyDown(event) {
                 // Enter pressed
-                if (event.keyCode == 13)
+                if (event.keyCode === 13) {
                     $scope.onSearchClick();
+
+                    return;
+                }
                 // ESC pressed
-                else if (event.keyCode == 27) 
+                if (event.keyCode === 27) {
                     $scope.searchEnabled = false;
+                }
             }
         }]
     );
 
-})();
+})(window.angular, window._, window.jQuery);
 
 /**
  * @file Application App Bar service
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global $, angular */
-
-(function () {
+(function (angular, _) {
     'use strict';
 
     var thisModule = angular.module('pipAppBar.Service', []);
@@ -12482,7 +12587,7 @@ module.run(['$templateCache', function($templateCache) {
         var config = {
             appTitleText: null,
             appTitleLogo: 'images/piplife_logo.svg',
-            
+
             // Theme to be applied to the header
             theme: 'blue',
             cssClass: '',
@@ -12504,7 +12609,7 @@ module.run(['$templateCache', function($templateCache) {
 
             // Type of actions: 'language', 'list' or 'none'
             actionsType: 'none',
-            
+
             // Language options
             languages: ['en', 'ru'],
 
@@ -12516,7 +12621,7 @@ module.run(['$templateCache', function($templateCache) {
             searchHistory: [],
             // Callback for search
             searchCallback: null,
-            
+
             // Primary global actions visible on the screen
             primaryGlobalActions: [],
             // Primary local actions visible on the screen
@@ -12537,9 +12642,9 @@ module.run(['$templateCache', function($templateCache) {
         this.globalSecondaryActions = globalSecondaryActions;
 
         // Get the service instance
-        this.$get = ['$rootScope', function ($rootScope) {            
+        this.$get = ['$rootScope', function ($rootScope) {
             return {
-                config: getConfig,                
+                config: getConfig,
                 cssClass: cssClass,
 
                 hideNavIcon: hideNavIcon,
@@ -12571,20 +12676,19 @@ module.run(['$templateCache', function($templateCache) {
             // ----------------------
 
             function getConfig() {
-                return config;  
-            };
+                return config;
+            }
 
             function cssClass(newCssClass) {
                 if (newCssClass != undefined) {
                     config.cssClass = newCssClass;
                     sendConfigEvent();
                 }
+
                 return config.cssClass;
-            };
+            }
 
             // Show, hide appbar shadow
-            //-------------------------
-
             function showShadowSm() {
                 config.ngClasses['pip-shadow'] = false;
                 config.ngClasses['pip-shadow-sm'] = true;
@@ -12612,22 +12716,18 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             // Show navigation icon
-            //----------------------
-    
             function hideNavIcon() {
                 config.navIconType = 'none';
                 config.navIconCallback = null;
-
                 sendConfigEvent();
             }
-    
+
             function showMenuNavIcon(click) {
                 config.navIconType = 'menu';
                 config.navIconCallback = click;
-
                 sendConfigEvent();
             }
-    
+
             function showBackNavIcon(click) {
                 config.navIconType = 'back';
                 config.navIconCallback = click;
@@ -12636,8 +12736,6 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             // Show title
-            //---------------
-    
             function hideTitle() {
                 config.titleType = 'none';
                 config.titleLogo = null;
@@ -12646,7 +12744,7 @@ module.run(['$templateCache', function($templateCache) {
 
                 sendConfigEvent();
             }
-    
+
             function showTitleLogo(titleLogo) {
                 config.titleType = 'logo';
                 config.titleLogo = titleLogo;
@@ -12655,7 +12753,7 @@ module.run(['$templateCache', function($templateCache) {
 
                 sendConfigEvent();
             }
-    
+
             function showTitleText(titleText) {
                 config.titleType = 'text';
                 config.titleLogo = null;
@@ -12664,21 +12762,19 @@ module.run(['$templateCache', function($templateCache) {
 
                 sendConfigEvent();
             }
-    
+
             function showTitleBreadcrumb(titleText, titleBreadcrumb) {
                 if (_.isArray(titleText)) {
                     titleBreadcrumb = titleText;
                     titleText = titleBreadcrumb[titleBreadcrumb.length - 1].title;
                     titleBreadcrumb.splice(titleBreadcrumb.length - 1, 1);
                 }
-                            
                 config.titleType = 'breadcrumb';
                 config.titleLogo = null;
                 config.titleText = titleText;
                 config.titleBreadcrumb = titleBreadcrumb;
-    
                 if (titleBreadcrumb.length > 0) {
-                    config.navIconType = config.navIconType == 'none' ? 'back' : config.navIconType;
+                    config.navIconType = config.navIconType === 'none' ? 'back' : config.navIconType;
                     config.navIconCallback = titleBreadcrumb[titleBreadcrumb.length - 1];
                 } else {
                     config.navIconType = 'menu';
@@ -12691,14 +12787,12 @@ module.run(['$templateCache', function($templateCache) {
             function showAppTitleLogo() {
                 showTitleLogo(config.appTitleLogo);
             }
-    
+
             function showAppTitleText() {
-                showTitleText(config.appTitleText);  
+                showTitleText(config.appTitleText);
             }
-        
+
             // Show actions
-            //---------------
-    
             function hideLocalActions() {
                 config.actionsType = 'none';
                 config.primaryLocalActions = [];
@@ -12706,42 +12800,39 @@ module.run(['$templateCache', function($templateCache) {
 
                 sendConfigEvent();
             }
-    
+
             function showLanguage(languages) {
                 config.actionsType = 'language';
                 config.languages = languages || config.languages;
 
                 sendConfigEvent();
             }
-    
-            function showLocalActions(primaryActions, secondaryActions) {            
+
+            function showLocalActions(primaryActions, secondaryActions) {
                 config.actionsType = 'list';
-                config.primaryLocalActions = primaryActions || [];  
-                config.secondaryLocalActions = secondaryActions || [];  
+                config.primaryLocalActions = primaryActions || [];
+                config.secondaryLocalActions = secondaryActions || [];
 
                 sendConfigEvent();
             }
-            
+
             function updateActionCount(actionName, count) {
                 // Update global actions
-                _.each(config.primaryGlobalActions, function(action) {
-                    if (action.name == actionName) {
+                _.each(config.primaryGlobalActions, function (action) {
+                    if (action.name === actionName) {
                         action.count = count;
                     }
                 });
                 // Update local action
-                _.each(config.primaryLocalActions, function(action) {
-                    if (action.name == actionName) {
-                        action.count = count; 
+                _.each(config.primaryLocalActions, function (action) {
+                    if (action.name === actionName) {
+                        action.count = count;
                     }
                 });
-                
                 sendConfigEvent();
             }
-    
+
             // Show actions
-            //---------------
-    
             function showSearch(callback, criteria, history) {
                 config.searchVisible = true;
                 config.searchCallback = callback;
@@ -12750,7 +12841,7 @@ module.run(['$templateCache', function($templateCache) {
 
                 sendConfigEvent();
             }
-    
+
             function hideSearch() {
                 config.searchVisible = false;
                 config.searchCallback = null;
@@ -12758,12 +12849,12 @@ module.run(['$templateCache', function($templateCache) {
 
                 sendConfigEvent();
             }
-    
+
             function updateSearchCriteria(criteria) {
                 config.searchCriteria = criteria;
                 sendConfigEvent();
             }
-    
+
             function updateSearchHistory(history) {
                 config.searchHistory = history;
                 sendConfigEvent();
@@ -12773,30 +12864,31 @@ module.run(['$templateCache', function($templateCache) {
                 $rootScope.$broadcast('pipAppBarChanged', config);
             }
         }];
-        
-        return;        
-        //-----------------
-        
         function appTitleText(newTitleText) {
-            if (newTitleText != null)
+            if (newTitleText) {
                 config.appTitleText = newTitleText;
+            }
+
             return config.appTitleText;
         }
 
         function appTitleLogo(newTitleLogo) {
-            if (newTitleLogo != null)
+            if (newTitleLogo) {
                 config.appTitleLogo = newTitleLogo;
+            }
+
             return config.appTitleLogo;
         }
-        
+
         function theme(theme) {
             config.theme = theme || config.theme;
-            return config.theme;            
+
+            return config.theme;
         }
 
         function globalActions(primaryActions, secondaryActions) {
-            config.primaryGlobalActions = primaryActions || [];  
-            config.secondaryGlobalActions = secondaryActions || [];  
+            config.primaryGlobalActions = primaryActions || [];
+            config.secondaryGlobalActions = secondaryActions || [];
         }
 
         function globalPrimaryActions(primaryActions) {
@@ -12806,10 +12898,10 @@ module.run(['$templateCache', function($templateCache) {
         function globalSecondaryActions(secondaryActions) {
             config.secondaryGlobalActions = secondaryActions || [];
         }
-        
+
     });
 
-})();
+})(window.angular, window._);
 
 /**
  * @file Dropdown control
@@ -14862,6 +14954,32 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of pictures WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipPictures', [        
+        'pipAddImage',
+        'pipAvatar',
+        'pipAvatarEdit',
+        'pipPicture',
+        'pipPictureEdit',
+        'pipCollage',
+        'pipPictureListEdit',        
+        'pipCameraDialog',        
+        'pipPictureUrlDialog'
+    ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipPictures.Templates');
@@ -14927,7 +15045,8 @@ module.run(['$templateCache', function($templateCache) {
     '@copyright Digital Living Software Corp. 2014-2015\n' +
     '-->\n' +
     '\n' +
-    '<md-dialog class="pip-dialog pip-picture-dialog pip-camera-dialog" layout="column" md-theme="{{theme}}">\n' +
+    '<md-dialog class="pip-dialog pip-picture-dialog pip-camera-dialog" layout="column" md-theme="{{theme}}"\n' +
+    '           ng-show=" browser != \'android\'">\n' +
     '    <div class="pip-header"  layout="row" layout-align="start center">\n' +
     '        <md-button  ng-click="onCancelClick()" class="md-icon-button"\n' +
     '                    aria-label="{{ ::\'CANCEL\' | translate }}">\n' +
@@ -14937,9 +15056,9 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '\n' +
     '    <div class="pip-body">\n' +
-    '        <div class="camera-stream" ng-hide="webCamError"></div>\n' +
+    '        <div class="camera-stream" ng-hide="webCamError || browser == \'android\'"></div>\n' +
     '        <div class="camera-error"\n' +
-    '             ng-show="webCamError"\n' +
+    '             ng-show="webCamError || browser == \'android\'"\n' +
     '             layout="row" layout-align="center center">\n' +
     '            <span>{{ ::\'WEB_CAM_ERROR\' | translate }}</span>\n' +
     '        </div>\n' +
@@ -15242,32 +15361,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Registration of pictures WebUI controls
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipPictures', [        
-        'pipAddImage',
-        'pipAvatar',
-        'pipAvatarEdit',
-        'pipPicture',
-        'pipPictureEdit',
-        'pipCollage',
-        'pipPictureListEdit',        
-        'pipCameraDialog',        
-        'pipPictureUrlDialog'
-    ]);
-    
-})();
-
-
-
-/**
  * @file Add image control
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -15360,6 +15453,7 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function addImages(images) {
+
                 if (images === undefined) return;
 
                 if (Array.isArray(images)) {
@@ -15419,7 +15513,8 @@ module.run(['$templateCache', function($templateCache) {
 
             function onCameraClick () {
                 pipCameraDialog.show(function (result) {
-                    var blob = dataURItoBlob(result);
+                  var blob = dataURItoBlob(result);
+
                     blob.name = 'camera';
                     addImages({url: result, file: blob});
                 });
@@ -15818,7 +15913,7 @@ module.run(['$templateCache', function($templateCache) {
                 } else {
                      var url = saveItemUrl();
                      control.uploading = true;
- 
+
                      $http['post'](url)
                          .success(function (response) {
                              control.reset();
@@ -15828,7 +15923,7 @@ module.run(['$templateCache', function($templateCache) {
                          .error(function (error) {
                              control.uploading = false;
                              control.upload = false;
- 
+
                              if (errorCallback) errorCallback(error);
                              else console.error(error);
                          });
@@ -15964,7 +16059,7 @@ module.run(['$templateCache', function($templateCache) {
     var thisModule = angular.module('pipCameraDialog',
         ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'TAKE_PICTURE': 'Take a picture',
             'WEB_CAM_ERROR': 'Webcam is missing or was not found'
@@ -15985,6 +16080,7 @@ module.run(['$templateCache', function($templateCache) {
                         controller: 'pipCameraController'
                     }).then(function (result) {
                         Webcam.reset();
+                        console.log(result);
                         if (successCallback) {
                             successCallback(result);
                         }
@@ -15996,36 +16092,67 @@ module.run(['$templateCache', function($templateCache) {
         }]);
 
     thisModule.controller('pipCameraController',
-        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog) {
-
+        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
+            $scope.browser = pipUtils.getBrowser().os;
             $scope.theme = $rootScope.$theme;
-            Webcam.init();
 
-            setTimeout(function () {
-                Webcam.attach('.camera-stream');
-            },0);
+            if ($scope.browser !== 'android') {
+                console.log('webcam');
+                Webcam.init();
 
-            Webcam.on('error', function (err) {
-                $scope.webCamError = true;
-                console.error(err);
-            });
+                setTimeout(function () {
+                    Webcam.attach('.camera-stream');
+                }, 0);
 
-            Webcam.set({
-                width: 400,
-                height: 300,
+                Webcam.on('error', function (err) {
+                    $scope.webCamError = true;
+                    console.error(err);
+                });
 
-                dest_width: 400,
-                dest_height: 300,
+                Webcam.set({
+                    width: 400,
+                    height: 300,
 
-                crop_width: 400,
-                crop_height: 300,
+                    dest_width: 400,
+                    dest_height: 300,
 
-                image_format: 'jpeg',
-                jpeg_quality: 90
-            });
+                    crop_width: 400,
+                    crop_height: 300,
 
-            //Webcam.setSWFLocation('../../../dist/webcam.swf');
-            Webcam.setSWFLocation('webcam.swf');
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+
+                //Webcam.setSWFLocation('../../../dist/webcam.swf');
+                Webcam.setSWFLocation('webcam.swf');
+
+            } else {
+                document.addEventListener("deviceready",onDeviceReady,false);
+
+            }
+            // todo add logic in callbacks
+            function onDeviceReady() {
+                navigator.camera.getPicture(onSuccess, onFail,
+                    {
+                        sourceType: Camera.PictureSourceType.CAMERA,
+                        correctOrientation: true,
+                        quality: 75,
+                        targetWidth: 200,
+                        destinationType: Camera.DestinationType.DATA_URL
+                    });
+            }
+
+
+            function onSuccess(imageData) {
+                var picture = imageData;
+                var picture = 'data:image/jpeg;base64,' + imageData;
+                $mdDialog.hide(picture);
+            }
+
+            function onFail(message) {
+                alert('Failed because: ' + message);
+                $mdDialog.hide();
+            }
 
             $scope.$freeze = false;
 
@@ -16036,14 +16163,16 @@ module.run(['$templateCache', function($templateCache) {
             return;
 
             function onTakePictureClick() {
-                if ($scope.$freeze) {
-                    Webcam.snap(function(dataUri) {
-                        $scope.$freeze = false;
-                        $mdDialog.hide(dataUri);
-                    });
-                } else {
-                    $scope.$freeze = true;
-                    Webcam.freeze();
+                if (Webcam) {
+                    if ($scope.$freeze) {
+                        Webcam.snap(function (dataUri) {
+                            $scope.$freeze = false;
+                            $mdDialog.hide(dataUri);
+                        });
+                    } else {
+                        $scope.$freeze = true;
+                        Webcam.freeze();
+                    }
                 }
             };
 
@@ -16657,7 +16786,7 @@ module.run(['$templateCache', function($templateCache) {
  * @todo
  * - Improve samples in sampler app
  */
- 
+
 /* global angular */
 
 (function () {
@@ -16688,10 +16817,9 @@ module.run(['$templateCache', function($templateCache) {
                     pipReset: '&',
                     pipPictureId: '=',
                     pipAddedPicture: '='
-
                 },
                 templateUrl: 'picture_edit/picture_edit.html',
-                controller: 'pipPictureEditController' 
+                controller: 'pipPictureEditController'
             };
         }
     );
@@ -16705,7 +16833,7 @@ module.run(['$templateCache', function($templateCache) {
                 serverUrl = pipRest.serverUrl(),
                 fileUrl = serverUrl + "/api/parties/" + $rootScope.$party.id + "/files";
 
-            $scope.text = $attrs.pipDefaultText || 'PICTURE_EDIT_TEXT'; 
+            $scope.text = $attrs.pipDefaultText || 'PICTURE_EDIT_TEXT';
             $scope.icon = $attrs.pipDefaultIcon || 'picture-no-border';
             $scope.pictureStartState = pipUtils.toBoolean($scope.pipAddedPicture) ? 'copied' : 'original';
 
@@ -16793,7 +16921,7 @@ module.run(['$templateCache', function($templateCache) {
             };
 
             function saveItemUrl() {
-                var 
+                var
                     url = $scope.control.url,
                     name = url.slice(url.lastIndexOf('/') + 1, url.length).split('?')[0];
                 return fileUrl + '?name=' + name + '&url=' + url;
@@ -16816,7 +16944,7 @@ module.run(['$templateCache', function($templateCache) {
 
                 if ($scope.control.file !== null) {
                     var fileReader = new FileReader();
-                        
+
                     fileReader.onload = function (e) {
                         control.uploading = true;
                 //        pipImageUtils.addHttpHeaders();
@@ -16893,14 +17021,14 @@ module.run(['$templateCache', function($templateCache) {
                 // Process changes of the image
                 if ($scope.control.state == 'changed') {
                     savePicture(successCallback, errorCallback);
-                } 
+                }
                 // Process deletion of the image
                 else if ($scope.control.state == 'deleted') {
                     deletePicture(successCallback, errorCallback);
                 }
-                // Process if no changes were made 
+                // Process if no changes were made
                 else {
-                    if (successCallback) successCallback();                            
+                    if (successCallback) successCallback();
                 }
             };
 
@@ -16981,7 +17109,7 @@ module.run(['$templateCache', function($templateCache) {
 
         }]
     );
-    
+
 })();
 
 

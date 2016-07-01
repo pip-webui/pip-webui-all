@@ -5721,7 +5721,7 @@ pip-tabs .pip-nav md-tabs-wrapper {
   transition: all .35s ease;
 }
 pip-tabs .pip-nav.pip-shadow {
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 pip-tabs .pip-nav.pip-visible {
   min-height: 48px !important;
@@ -5808,7 +5808,7 @@ md-content md-option .md-text .pip-tabs-badge {
 }
 @media (min-width: 768px) and (max-width: 1200px) {
   md-toolbar.pip-nav {
-    box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
 .pip-appbar {
@@ -5892,7 +5892,7 @@ md-content md-option .md-text .pip-tabs-badge {
   z-index: 11;
 }
 .pip-appbar md-toolbar.pip-shadow {
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 .md-open-menu-container {
   max-width: calc(100% - 20px);
@@ -5905,12 +5905,12 @@ md-content md-option .md-text .pip-tabs-badge {
 }
 .pip-appbar-ext {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
   bottom: none;
   height: 95px;
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   z-index: 0;
 }
 @media (max-width: 768px) {
@@ -5932,12 +5932,12 @@ md-content md-option .md-text .pip-tabs-badge {
 }
 @media (max-width: 1200px) and (min-width: 768px) {
   .pip-appbar md-toolbar.pip-shadow-sm {
-    box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
 @media (max-width: 768px) {
   md-toolbar.pip-shadow-xs {
-    box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
 .pip-sidenav md-list-item .md-button .md-list-item-inner {
