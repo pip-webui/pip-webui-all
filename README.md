@@ -1,158 +1,57 @@
-# What is PIP.WebUI?
+# <img src="https://github.com/pip-webui/pip-webui/blob/master/design/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Cross-platform Line-of-Business Applications 
 
-PIP.WebUI is the open source HTML5 UI Framework for building wonderful, cross-platform and
-responsive websites with HTML, JavaScript and CSS. This library is the reference implementation of
-Google's Material Design Specification.
+Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that requires effort of large groups 
+including designers, developers and testers. Typical product line may consist of multiple applications, each with many pages 
+and dialogs. Enterprise users pay high price for their systems and demand quality of free consumer apps they see on their devices.
 
-PIP.WebUI allows developers to focus on building high quality application using common and public
-open web technologies. This library imposes some architecture solution which makes a good showing
-as reliable, accessible and speed up development of new projects.
+There are lots of good frameworks and libraries of UI controls out there. But LOB apps are still hard to implement.
+To save time and money for organizations, to make life of development and designers easier, to provide users consistent 
+and high-quality UI we created a framework that provides usage patterns and high-level controls that are common
+among enterprise applications. 
 
-The library provides assets of completed, well-tested and reusable UI components implemented Google
-Material Design. Also, it has some all-sufficient UI components for quick development of unified and
-handy applications.
+Through many years of experience in systems development we've been seen that interaction patterns of enterprise users 
+are fairly consistent. They need to monitor and keep under control their area of responsibility, they get and analyzes 
+large and complex datasets, they perform multitasking, they get interrupted when something important happens, 
+they collaborate with others. Those patterns don't change with technologies, and just get more and more automated.
 
-![Libarary components](https://i.imgsafe.org/7e4aacec49.jpeg)
+We collected those interactions patterns and put them into UX concept for LOB apps. The concept describes things like:
+- Registration and entering a system
+- Navigation through application
+- Multi-tasking
+- Notifications
+- Application settings and user preferences
+- Integrated help and user guidance
+- .. and more...
 
+Then we decided on UI design style. We found that unique design for LOB apps is a bad thing. It requires designers to constantly 
+reinvent wheels, developers to implement basic controls and interactions from scratch. Users also don't like to learn it
+and would rather go with familiar and well established design. Among all "standard" design styles only Google Material design
+fits well all platforms, devices and form factors. 
 
-Altogether, the library has the following functionality:
+Finally, we had to decide on implementation technologies. Choosing HTML5 was fairly straightforward since it is the only
+technology that allows to develop apps "once" and run them "everywhere". Selection of higher-level framework and control 
+library. But decided to go with the leader and picked **Angular** and **Angular Material** for our implementation. 
 
-* 3rd party libraries: Lodash, Angular, Angular-Material and others
-* CSS framework, reusable LESS variables and mixins, CSS components
-* Generic non-visual services
-* Pip.Services REST API and related non-visual services
-* Generic controls
-* Connected controls that work with Pip.Services platform
-* Reusable application pages and dialogs
+## Quick Links
 
+- [Official Pip.Services website](http://www.pipwebui.org)
+- [Users discussion forum]()
+- [Pip.WebUI team blog]()
 
-Thus, we build PIP.WebUI library to be the easiest way for next reproducing cross-platform
-applications in a short time and without excessive efforts.
+## Acknowledgements
 
+This project would not be possible without effort contributed by particular individuals.
 
-## Quick links
+- **Sergey Seroukhov** - the project founder, architecture, implementation
+- **Mark Zontak** - team management, implementation
+- **Alex Masliev** - UX concept, interaction and graphical design
+- **Anastas Fonotov** - web development
+- **Alex Dvoykin** - web development
+- **Kate Negrienko** - web development
+- **Andrey Podgorniy** - code cleanup, documentation, tutorials 
 
-* [Demos](#demos)
-* [Installation](#installation)
-* [Submodules](#dependcies)
-* [Documentation](#documentation)
-* [Contributing](#contributing)
-* [Building](#building)
-* [Installing](#installing)
+We also would like to recognize help received from the following companies.
 
-## <a name="documentation"></a> Online Documentation
-
-* Visit [documentation](doc/index.md) page
-* [Quick start](/docs/quick-start.md)
-
-
-## <a name="demos"></a>Demos
-
-Library online [examples](http://webui.pipdevs.com/)
-
-## <a name="installation"><a/>Installation
-
-To begin using this library you have two ways: copy the build source JS and CSS files
-(source files can be downloaded through [here](http://link.com))
-or install those ones through npm (*recommended*):
-
-```bash
-npm install https://github.com/pip-webui/pip-webui.git
-```
-
-If you don't use a mobule bundler, it's also fine. The library npm package includes precompiled
-production build in the `dist` folder. And you should manually add in a `index.html` file next lines:
-```html
-<!-- CSS styles -->
-<link rel="stylesheet" href="<path_to_styles>/pip-webui-lib.css">
-<link rel="stylesheet" href="<path_to_styles>/pip-webui.css">
-
-<!-- javascript -->
-<script src="<path_to_library>/pip-webui-lib.js"></script>
-<script src="<path_to_library>/pip-webui.js"></script>
-```
-
-We have also built a `PIP.WebUI` seed project [link](http://link.com) which might be useful if this is
-your first time using `PIP.WebUI`. To get this one, you should
-execute next commands in your bash terminal:
-
-```bash
-git clone URL_to_seed_project
-npm run init (install, build, etc)
-```
-
-
-## <a name="dependcies"></a>Submodules
-
-* [pip-webui-lib](https://github.com/pip-webui/pip-webui-lib)
-* [pip-webui-css](https://github.com/pip-webui/pip-webui-css)
-* [pip-webui-core](https://github.com/pip-webui/pip-webui-core)
-* [pip-webui-rest](https://github.com/pip-webui/pip-webui-rest)
-* [pip-webui-layouts](https://github.com/pip-webui/pip-webui-layouts)
-* [pip-webui-controls](https://github.com/pip-webui/pip-webui-controls)
-* [pip-webui-nav](https://github.com/pip-webui/pip-webui-nav)
-* [pip-webui-locations](https://github.com/pip-webui/pip-webui-locations)
-* [pip-webui-documents](https://github.com/pip-webui/pip-webui-documents)
-* [pip-webui-pictures](https://github.com/pip-webui/pip-webui-pictures)
-* [pip-webui-composite](https://github.com/pip-webui/pip-webui-composite)
-* [pip-webui-entry](https://github.com/pip-webui/pip-webui-entry)
-* [pip-webui-errors](https://github.com/pip-webui/pip-webui-errors)
-* [pip-webui-settings](https://github.com/pip-webui/pip-webui-settings)
-* [pip-webui-guidance](https://github.com/pip-webui/pip-webui-guidance)
-* [pip-webui-help](https://github.com/pip-webui/pip-webui-help)
-* [pip-webui-support](https://github.com/pip-webui/pip-webui-support)
-
-
-## <a name="contributing"></a>Contributing
-
-Developers interested in contributing should read the following guidelines:
-
-* [Issue Guidelines](http://somelink.com)
-* [Contributing Guidelines](http://somelink.com)
-* [Coding guidelines](http://somelink.com)
-
-> Please do **not** ask general questions in an issue. Issues are only to report bugs, request
-  enhancements, or request new features. For general questions and discussions, use the
-  [Pip Devs Forum](https://groups.google.com/forum/#!forum/pipdevs).
-
-It is important to note that for each release, the [ChangeLog](CHANGELOG.md) is a resource that will
-itemize all:
-
-- Bug Fixes
-- New Features
-- Breaking Changes
-
-## <a name="building"></a> Building
-
-Developers can easily build the project using NPM and gulp.
-
-* [Builds - Under the Hood](docs/guides/BUILD.md)
-
-First install or update your local project's **npm** tools:
-
-```bash
-# First install all the NPM tools:
-npm install
-
-# Or update
-npm update
-```
-
-Then run the **gulp** tasks:
-
-```bash
-# To clean '/build' and '/dist' directories
-gulp clean
-
-# To build distribution files in the `/dist` directory
-gulp build
-```
-
-For more details on how the build process works and additional commands (available for testing and
-debugging) developers should read the [Build Instructions](docs/guides/BUILD.md).
-
-
-## License
-
-PIP.WebUI is under [MIT licensed](LICENSE).
-
+- **Digital Living Software Corp.**
+- [**Modular Mining Systems Inc.**](http://www.mmsi.com)
+- [**EPAM**](http://www.epam.com)
