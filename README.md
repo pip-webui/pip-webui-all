@@ -1,4 +1,4 @@
-# <img src="https://github.com/pip-webui/pip-webui/blob/master/design/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Cross-platform Line-of-Business Applications 
+# <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> HTML5 Framework for Line-of-Business Applications 
 
 Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that requires effort of large groups 
 including designers, developers and testers. Typical product line may consist of multiple applications, each with many pages 
