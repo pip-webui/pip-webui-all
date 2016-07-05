@@ -1,26 +1,27 @@
 # <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Line-of-Business Applications 
 
-Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that requires effort of large groups 
-of designers, developers and testers. Typical product line may consist of multiple applications, each with many pages 
-and dialogs. Enterprise users pay high price for their systems and demand quality of free consumer apps they see on their devices.
-But at that scale it takes a lot of time and money. Software companies are looking for efficient ways to build
-their LOB applications, keep them up to date with modern technologies while saving money on development. 
+Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that may require effort 
+of a large group of designers, developers and testers. Typical product line may have multiple applications, 
+each comes with tens of pages and dialogs. Enterprise users pay high price for their systems and demand quality 
+of free apps they can see on their phones and tablets. But at the scale of large and complex LOB apps
+that presents an big challange. Software vendors are looking for efficient ways to build
+their applications delivering modern Look & Feel without spending a fortune on design and development. 
 
 One way to save money is to build portable responsive applications that can work on all devices, form-factors and 
 operating systems. The most common way to achieve that is to use HTML5 technology that is supported on virtually
 any platform. There are lots of good HTML5 frameworks and libraries. They offer basic mechanisms and simple controls.
 However, designers and developers have to go a long way from those basic building blocks to create
-large and complex LOB apps.
+large and complex Line-of-Business apps.
 
-Pip.WebUI framework offers a set of higher-level controls and mechanisms to simplify development of complex LOB apps.
-They were put together to implement consistent and rich [user experience](https://github.com/pip-webui/pip-webui-ux)
+Pip.WebUI framework offers a set of higher-level primitives to simplify development of LOB apps.
+They were put together to implement consistent and rich [User Experience](https://github.com/pip-webui/pip-webui-ux)
 following [Google Material](https://material.google.com) design style.
 
 <div style="border: 1px solid #ccc">
   <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Overview.png" alt="Pip.WebUI Overview" style="display:block;">
 </div>
 
-The framework is based on popular [Angular.JS 1](https://angularjs.org) framework 
+The framework is based on popular [Angular](https://angularjs.org) framework 
 and [Angular Material](https://material.angularjs.org/latest) library of web controls. On the top of that
 Pip.WebUI provides a set of modules targeted toward LOB application development.
 
