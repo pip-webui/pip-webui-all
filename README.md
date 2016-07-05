@@ -1,42 +1,64 @@
 # <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Line-of-Business Applications 
 
 Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that requires effort of large groups 
-including designers, developers and testers. Typical product line may consist of multiple applications, each with many pages 
+of designers, developers and testers. Typical product line may consist of multiple applications, each with many pages 
 and dialogs. Enterprise users pay high price for their systems and demand quality of free consumer apps they see on their devices.
+But at that scale it takes a lot of time and money. Software companies are looking for efficient ways to build
+their LOB applications, keep them up to date with modern technologies while saving money on development. 
 
-There are lots of good frameworks and libraries of UI controls out there. But LOB apps are still hard to implement.
-To save time and money for organizations, to make life of development and designers easier, to provide users consistent 
-and high-quality UI we created a framework that provides usage patterns and high-level controls that are common
-among enterprise applications. 
+One way to save money is to build portable responsive applications that can work on all devices, form-factors and 
+operating systems. The most common way to achieve that is to use HTML5 technology that is supported on virtually
+any platform. There are lots of good HTML5 frameworks and libraries. They offer basic mechanisms and simple controls.
+However, designers and developers have to go a long way from those basic building blocks to create
+large and complex LOB apps.
 
-Through many years of experience in systems development we've been seen that interaction patterns of enterprise users 
-are fairly consistent. They need to monitor and keep under control their area of responsibility, they get and analyzes 
-large and complex datasets, they perform multitasking, they get interrupted when something important happens, 
-they collaborate with others. Those patterns don't change with technologies, and just get more and more automated.
+Pip.WebUI framework offers a set of higher-level controls and mechanisms to simplify development of complex LOB apps.
+They were put together to implement consistent and rich [user experience](https://github.com/pip-webui/pip-webui-ux)
+following [Google Material](https://material.google.com) design style.
 
-We collected those interactions patterns and put them into UX concept for LOB apps. The concept describes things like:
-- Registration and entering a system
-- Navigation through application
-- Multi-tasking
-- Notifications
-- Application settings and user preferences
-- Integrated help and user guidance
-- .. and more...
+<div style="border: 1px solid #ccc">
+  <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Overview.png" alt="Pip.WebUI Overview" style="display:block;">
+</div>
 
-Then we decided on UI design style. We found that unique design for LOB apps is a bad thing. It requires designers to constantly 
-reinvent wheels, developers to implement basic controls and interactions from scratch. Users also don't like to learn it
-and would rather go with familiar and well established design. Among all "standard" design styles only Google Material design
-fits well all platforms, devices and form factors. 
+The framework is based on popular [Angular.JS 1](https://angularjs.org) framework 
+and [Angular Material](https://material.angularjs.org/latest) library of web controls. On the topic of that
+this framework provides a set of modules targeted to LOB application development:
 
-Finally, we had to decide on implementation technologies. Choosing HTML5 was fairly straightforward since it is the only
-technology that allows to develop apps "once" and run them "everywhere". Selection of higher-level framework and control 
-library. But decided to go with the leader and picked **Angular** and **Angular Material** for our implementation. 
+* [pip-webui-lib](https://github.com/pip-webui/pip-webui-lib) - collection of 3rd party libraries other modules depend on
+* [pip-webui-css](https://github.com/pip-webui/pip-webui-css) - CSS framework to extend Angular Material styles with animations, 
+visual effects and web components 
+* [pip-webui-core](https://github.com/pip-webui/pip-webui-core) - Core services, including localization, themes, error handling,
+infinite scroll, draggable, selection behaviors, and more
+* [pip-webui-rest](https://github.com/pip-webui/pip-webui-rest) - REST API for connected controls
+* [pip-webui-layouts](https://github.com/pip-webui/pip-webui-layouts) - application layouts: simple, document, master-detail, 
+tiles, split, dialog 
+* [pip-webui-controls](https://github.com/pip-webui/pip-webui-controls) - basic controls: color picker, toggle buttons, 
+popover, dialogs and more
+* [pip-webui-nav](https://github.com/pip-webui/pip-webui-nav) - navigation mechanisms: appbar and sidenav
+* [pip-webui-locations](https://github.com/pip-webui/pip-webui-locations) - location view and editing controls
+* [pip-webui-documents](https://github.com/pip-webui/pip-webui-documents) - document browsing and upload controls
+* [pip-webui-pictures](https://github.com/pip-webui/pip-webui-pictures) - picture view and editing controls, collage, avatars
+* [pip-webui-composite](https://github.com/pip-webui/pip-webui-composite) - composite view and editing control for complex mixed content
+* [pip-webui-entry](https://github.com/pip-webui/pip-webui-entry) - user signin, signup, password recovery and email verification forms
+* [pip-webui-errors](https://github.com/pip-webui/pip-webui-errors) - error handling forms and controls
+* [pip-webui-settings](https://github.com/pip-webui/pip-webui-settings) - application settings page
+* [pip-webui-guidance](https://github.com/pip-webui/pip-webui-guidance) - user context guidance, inspirational quotes, intro dialogs
+* [pip-webui-help](https://github.com/pip-webui/pip-webui-help) - integrated help page
+* [pip-webui-support](https://github.com/pip-webui/pip-webui-support) - user support and feedback pages
 
-## Quick Links
 
+## Learn more about Pip.WebUI
+
+- [Getting started guide](doc/GettingStarted.md)
 - [Official Pip.Services website](http://www.pipwebui.org)
+- [UX Concept implemented by Pip.WebUI](https://github.com/pip-webui/pip-webui-ux)
+- [Online samples](http://webui.pipdevs.com)
 - [Users discussion forum]()
 - [Pip.WebUI team blog]()
+
+## License agreement
+
+Pip.WebUI is released under [MIT license](License) and totally free for commercial and non-commercial use.
 
 ## Acknowledgements
 
