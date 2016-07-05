@@ -1,4 +1,4 @@
-# <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Line-of-Business Applications 
+# <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Line-of-Business Applications 
 
 Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that may require effort 
 of a large group of designers, developers and testers. Typical product line may have multiple applications, 
@@ -18,7 +18,7 @@ They were put together to implement consistent and rich [User Experience](https:
 following [Google Material](https://material.google.com) design style.
 
 <div style="border: 1px solid #ccc">
-  <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Overview.png" alt="Pip.WebUI Overview" style="display:block;">
+  <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Overview.png" alt="Pip.WebUI Overview" style="display:block;">
 </div>
 
 The framework is based on popular [Angular](https://angularjs.org) framework 
@@ -26,7 +26,7 @@ and [Angular Material](https://material.angularjs.org/latest) library of web con
 Pip.WebUI provides a set of modules targeted toward LOB application development.
 
 <div style="border: 1px solid #ccc">
-  <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Components.png" alt="Pip.WebUI Structure" style="display:block;">
+  <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Components.png" alt="Pip.WebUI Structure" style="display:block;">
 </div>
 
 * [pip-webui-lib](https://github.com/pip-webui/pip-webui-lib) - collection of 3rd party libraries other modules depend on
