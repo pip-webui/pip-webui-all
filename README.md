@@ -21,8 +21,12 @@ following [Google Material](https://material.google.com) design style.
 </div>
 
 The framework is based on popular [Angular.JS 1](https://angularjs.org) framework 
-and [Angular Material](https://material.angularjs.org/latest) library of web controls. On the topic of that
-this framework provides a set of modules targeted to LOB application development:
+and [Angular Material](https://material.angularjs.org/latest) library of web controls. On the top of that
+Pip.WebUI provides a set of modules targeted toward LOB application development.
+
+<div style="border: 1px solid #ccc">
+  <img src="https://github.com/pip-webui/pip-webui/blob/master/assets/Components.png" alt="Pip.WebUI Structure" style="display:block;">
+</div>
 
 * [pip-webui-lib](https://github.com/pip-webui/pip-webui-lib) - collection of 3rd party libraries other modules depend on
 * [pip-webui-css](https://github.com/pip-webui/pip-webui-css) - CSS framework to extend Angular Material styles with animations, 
