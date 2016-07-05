@@ -4872,7 +4872,7 @@ pip-toggle-buttons:focus {
   top: 72px;
   border-radius: 2px 0 2px 2px;
   z-index: 58;
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   width: 400px;
   min-height: 0;
   max-height: calc(100% - 104px);
@@ -7542,6 +7542,13 @@ md-content md-option .md-text .pip-tabs-badge {
 }
 .pip-dialog.pip-picture-url-dialog .pip-fix-empty {
   height: calc(100%);
+}
+.pip-camera-dialog.pip-android-dialog {
+  width: 0;
+  height: 0;
+  min-width: 0;
+  max-width: 0;
+  min-height: 0;
 }
 .pip-camera-dialog .pip-header {
   padding: 14px 24px 0px 8px!important;

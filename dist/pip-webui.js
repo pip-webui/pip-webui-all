@@ -8552,6 +8552,45 @@
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipTagList',
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeEdit',
+        'pipTimeView',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipConversionDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', ['pipControls']);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipBasicControls.Templates');
@@ -8902,24 +8941,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.template.html',
-    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
-    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
-    '</div>\n' +
-    '\n' +
-    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options_dialog/options_dialog.html',
     '<!--\n' +
     '@file Options dialog content\n' +
@@ -9075,6 +9096,24 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('popover/popover.template.html',
+    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
+    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
+    '</div>\n' +
+    '\n' +
+    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('progress/routing_progress.html',
     '<div class="pip-routing-progress" layout="column" layout-align="center center" ng-show="$routing || $reset">\n' +
     '    <div class="loader">\n' +
@@ -9190,6 +9229,22 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('time_view/time_view.html',
+    '<p>\n' +
+    '    <span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span>\n' +
+    '    <span  class="rm4 lm4" ng-if="data.start && data.end"> - </span>\n' +
+    '    <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span>\n' +
+    '</p>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toast/toast.html',
     '<md-toast class="md-action pip-toast"\n' +
     '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
@@ -9209,22 +9264,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '\n' +
     '</md-toast>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_view/time_view.html',
-    '<p>\n' +
-    '    <span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span>\n' +
-    '    <span  class="rm4 lm4" ng-if="data.start && data.end"> - </span>\n' +
-    '    <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span>\n' +
-    '</p>');
 }]);
 })();
 
@@ -9261,56 +9300,14 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipControls', [        
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        "pipTagList",
-
-        'pipDate',
-        'pipDateRange',
-        'pipTimeEdit',
-        'pipTimeView',
-
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipConversionDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-    angular.module('pipBasicControls', [ 'pipControls' ]);
-    
-})();
-
-
-
-/**
  * @file Color picker control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global angular */
-
-(function () {
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module("pipColorPicker", ['pipUtils', 'pipFocused', 'pipBasicControls.Templates']);
+    var thisModule = angular.module('pipColorPicker', ['pipUtils', 'pipFocused', 'pipBasicControls.Templates']);
 
     thisModule.directive('pipColorPicker',
         function () {
@@ -9334,7 +9331,7 @@ module.run(['$templateCache', function($templateCache) {
 
             $scope.class = $attrs.class || '';
 
-            if (!$scope.colors || (_.isArray($scope.colors) && $scope.colors.length === 0)) {
+            if (!$scope.colors || _.isArray($scope.colors) && $scope.colors.length === 0) {
                 $scope.colors = DEFAULT_COLORS;
             }
 
@@ -9350,42 +9347,42 @@ module.run(['$templateCache', function($templateCache) {
             };
 
             $scope.selectColor = function (index) {
-                if ($scope.disabled()) return;
+                if ($scope.disabled()) {
+                    return;
+                }
                 $scope.currentColorIndex = index;
 
                 $scope.currentColor = $scope.colors[$scope.currentColorIndex];
 
-                $timeout(function() {
+                $timeout(function () {
                     $scope.$apply();
                 });
 
                 if ($scope.colorChange) {
                     $scope.colorChange();
                 }
-            }
+            };
 
             $scope.enterSpacePress = function (event) {
                 $scope.selectColor(event.index);
             };
-    }])
+        }]
+    );
 
-})();
+})(window.angular);
+
 /**
  * @file Confirmation dialog
  * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve sample in sampler app
  */
- 
-/* global angular */
 
-(function () {
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module('pipConfirmationDialog', 
+    var thisModule = angular.module('pipConfirmationDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'CONFIRM_TITLE': 'Confirm'
         });
@@ -9394,7 +9391,7 @@ module.run(['$templateCache', function($templateCache) {
         });
     }]);
 
-    thisModule.factory('pipConfirmationDialog', 
+    thisModule.factory('pipConfirmationDialog',
         ['$mdDialog', function ($mdDialog) {
             return {
                 show: function (params, successCallback, cancelCallback) {
@@ -9437,25 +9434,23 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})();
+})(window.angular);
 
 /**
  * @file Convert parent dialog
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global $, angular */
-
-(function () {
+(function (angular, $) {
     'use strict';
-        
     var thisModule = angular.module('pipConversionDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'CONVERT_PARENT_TITLE': 'Choose type of the parent record',
-            'CONVERT_PARENT_SUBTITLE': 'The <b>%s</b> is missing and will be created from scratch. Find and clarify it later',
+            'CONVERT_PARENT_SUBTITLE': 'The <b>%s</b> is missing and will be created from scratch.' +
+            ' Find and clarify it later',
 
             'CONVERT_TO_GOAL_SUBTITLE': 'Result that requires significant efforts',
             'CONVERT_TO_TASK_SUBTITLE': 'Simple work that doesn\'t need a plan',
@@ -9471,7 +9466,8 @@ module.run(['$templateCache', function($templateCache) {
         });
         pipTranslateProvider.translations('ru', {
             'CONVERT_PARENT_TITLE': 'Определите тип родительской записи',
-            'CONVERT_PARENT_SUBTITLE': 'Запись <b>%s</b> отсутствует и будет создана с нуля. Найдите и скорректируйте ее позже',
+            'CONVERT_PARENT_SUBTITLE': 'Запись <b>%s</b> отсутствует и будет создана с нуля. ' +
+            'Найдите и скорректируйте ее позже',
 
             'CONVERT_TO_GOAL_SUBTITLE': 'Результат требующий значительных усилий',
             'CONVERT_TO_TASK_SUBTITLE': 'Простая работа, для которой не нужен план',
@@ -9495,27 +9491,34 @@ module.run(['$templateCache', function($templateCache) {
                         params.event.stopPropagation();
                         params.event.preventDefault();
                     }
-                    if (!params.options || params.options.length == 0) return;
+                    if (!params.options || params.options.length === 0) {
+                        return;
+                    }
 
                     function focusToggleControl() {
-                        if (params.event && params.event.currentTarget)
+                        if (params.event && params.event.currentTarget) {
                             params.event.currentTarget.focus();
+                        }
                     }
 
                     $mdDialog.show({
                         targetEvent: params.event,
                         templateUrl: 'conversion_dialog/conversion_dialog.html',
                         controller: 'pipConversionDialogController',
-                        locals: { params: params },
+                        locals: {params: params},
                         clickOutsideToClose: true
                     })
                         .then(function (option) {
                             focusToggleControl();
 
-                            if (successCallback) successCallback(option);
+                            if (successCallback) {
+                                successCallback(option);
+                            }
                         }, function () {
                             focusToggleControl();
-                            if (cancelCallback) cancelCallback();
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
                         });
                 }
             };
@@ -9528,19 +9531,22 @@ module.run(['$templateCache', function($templateCache) {
             $scope.theme = $rootScope.$theme;
             $scope.title = params.title || 'CONVERT_PARENT_TITLE';
             $scope.recordName = params.recordName || '';
-            $scope.subtitle = params.subtitle || pipUtils.sprintf(pipTranslate.translate('CONVERT_PARENT_SUBTITLE'), $scope.recordName);
+            $scope.subtitle = params.subtitle || pipUtils.sprintf(pipTranslate.translate('CONVERT_PARENT_SUBTITLE'),
+                    $scope.recordName);
             $scope.withoutTitle = params.deleteTitle ? params.deleteTitle : false;
             $scope.deleted = !!params.deleted;
             $scope.options = _.cloneDeep(params.options);
-            $scope.selectedIndex  = -1;
-            $scope.cancelConverting = $scope.recordName ? true : false;
+            $scope.selectedIndex = -1;
+            $scope.cancelConverting = $scope.recordName || false;
             $scope.selectedOptionName = '';
 
-            if ($scope.cancelConverting) $scope.options.push({
-                name: 'cancel',
-                title: 'CONVERT_TO_CANCEL',
-                subtitle: pipUtils.sprintf(pipTranslate.translate('CONVERT_TO_CANCEL_SUBTITLE'), $scope.recordName)
-            });
+            if ($scope.cancelConverting) {
+                $scope.options.push({
+                    name: 'cancel',
+                    title: 'CONVERT_TO_CANCEL',
+                    subtitle: pipUtils.sprintf(pipTranslate.translate('CONVERT_TO_CANCEL_SUBTITLE'), $scope.recordName)
+                });
+            }
 
             $scope.onOptionSelect = function (event, option) {
                 event.stopPropagation();
@@ -9549,31 +9555,30 @@ module.run(['$templateCache', function($templateCache) {
                 $scope.onSelect();
             };
 
-            $scope.onKeyPress = function(event) {
-                if (event.keyCode == 32 || event.keyCode == 13) {
+            $scope.onKeyPress = function (event) {
+                if (event.keyCode === 32 || event.keyCode === 13) {
                     event.stopPropagation();
                     event.preventDefault();
-                    $scope.selectedOptionName = $scope.selectedIndex == -1 ? $scope.options[0].name : $scope.options[$scope.selectedIndex].name;
+                    $scope.selectedOptionName = $scope.selectedIndex === -1 ? $scope.options[0].name
+                        : $scope.options[$scope.selectedIndex].name;
                     $scope.onSelect();
-                    return ;
                 }
             };
 
-            $scope.onKeyDown = function(event) {
-                if (event.keyCode == 40) {
+            $scope.onKeyDown = function (event) {
+                if (event.keyCode === 40) {
                     event.stopPropagation();
                     event.preventDefault();
                     $scope.selectedIndex += 1;
                     $scope.selectedIndex = $scope.selectedIndex % $scope.options.length;
                     $scope.selectedOptionName = $scope.options[$scope.selectedIndex].name;
-                    return ;
                 }
-                if (event.keyCode == 38) {
+                if (event.keyCode === 38) {
                     event.stopPropagation();
                     event.preventDefault();
-                    $scope.selectedIndex = $scope.selectedIndex <= 0 ? $scope.selectedIndex = $scope.options.length - 1 : $scope.selectedIndex - 1;
+                    $scope.selectedIndex = $scope.selectedIndex <= 0 ? $scope.selectedIndex = $scope.options.length - 1
+                        : $scope.selectedIndex - 1;
                     $scope.selectedOptionName = $scope.options[$scope.selectedIndex].name;
-                    return ;
                 }
             };
 
@@ -9584,21 +9589,27 @@ module.run(['$templateCache', function($templateCache) {
             $scope.onSelect = function () {
                 var option = _.find($scope.options, {name: $scope.selectedOptionName});
 
-                if (option && option.name != 'cancel') $mdDialog.hide({ option: option, deleted: $scope.deleted });
-                else $mdDialog.hide(null);
+                if (option && option.name !== 'cancel') {
+                    $mdDialog.hide({option: option, deleted: $scope.deleted});
+                } else {
+                    $mdDialog.hide(null);
+                }
             };
 
             // Setting focus to input control
             function focusInput() {
-                var list = $('.pip-conversion-dialog .pip-list');
+                var list;
+
+                list = $('.pip-conversion-dialog .pip-list');
                 list.focus();
-            };
+            }
+
             setTimeout(focusInput, 500);
 
         }]
     );
 
-})();
+})(window.angular, window.jQuery);
 
 /**
  * @file Date control
@@ -9607,16 +9618,14 @@ module.run(['$templateCache', function($templateCache) {
  * - Improve samples int sampler app
  * - Optimize. It is way to slow on samples
  */
- 
- /* global angular */
 
-(function () {
+(function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module("pipDate", ['pipBasicControls.Templates']);
+    var thisModule = angular.module('pipDate', ['pipBasicControls.Templates']);
 
     thisModule.directive('pipDate',
-        ['$parse', function ($parse) {
+        function () {
             return {
                 restrict: 'EA',
                 require: 'ngModel',
@@ -9628,89 +9637,88 @@ module.run(['$templateCache', function($templateCache) {
                 },
                 templateUrl: 'date/date.html',
                 controller: 'pipDateController'
-            }
-        }]
+            };
+        }
     );
 
     thisModule.controller('pipDateController',
         ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
+            var value;
 
             function dayList(month, year) {
-                var count = 31;
+                var count = 31, days = [], i;
 
-                if (month == 4 || month == 6 || month == 9 || month == 11) {
+                if (month === 4 || month === 6 || month === 9 || month === 11) {
                     count = 30;
-                } else if (month == 2) {
-                    if (year)
-                    // Calculate leap year (primitive)
-                        count = year % 4 == 0 ? 29 : 28;
-                    else count = 28;
+                } else if (month === 2) {
+                    if (year) {
+                        // Calculate leap year (primitive)
+                        count = year % 4 === 0 ? 29 : 28;
+                    } else {
+                        count = 28;
+                    }
                 }
 
-                var days = [];
-                for (var i = 1; i <= count; i++) {
+                for (i = 1; i <= count; i++) {
                     days.push(i);
                 }
 
                 return days;
-            };
+            }
 
             function monthList() {
-                var months = [];
+                var months = [], i;
 
-                for (var i = 1; i <= 12; i++) {
+                for (i = 1; i <= 12; i++) {
                     months.push({
                         id: i,
                         name: pipTranslate.translate('MONTH_' + i)
-                    })
+                    });
                 }
 
                 return months;
-            };
+            }
 
             function yearList() {
-                var
+                var i,
                     currentYear = new Date().getFullYear(),
-                    startYear = $scope.timeMode == 'future' ? currentYear : currentYear - 100,
-                    endYear = $scope.timeMode == 'past' ? currentYear : currentYear + 100,
+                    startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100,
+                    endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100,
                     years = [];
 
-                if ($scope.timeMode == 'past') {
-                    for (var i = endYear; i >= startYear; i--) {
+                if ($scope.timeMode === 'past') {
+                    for (i = endYear; i >= startYear; i--) {
                         years.push(i);
                     }
                 } else {
-                    for (var i = startYear; i <= endYear; i++) {
+                    for (i = startYear; i <= endYear; i++) {
                         years.push(i);
                     }
                 }
 
                 return years;
-            };
+            }
 
             function adjustDay() {
                 var days = dayList($scope.month, $scope.year);
 
-                if ($scope.days.length != days.length) {
+                if ($scope.days.length !== days.length) {
                     if ($scope.day > days.length) {
                         $scope.day = days.length;
                     }
 
                     $scope.days = days;
                 }
-            };
+            }
 
-            function getValue(value) {
-                value = value ? (_.isDate(value) ? value : new Date(value)) : null;
-
-                // Define values
-                var day = value ? value.getDate() : null;
-                var month = value ? value.getMonth() + 1 : null;
-                var year = value ? value.getFullYear() : null;
+            function getValue(v) {
+                var value = v ? _.isDate(v) ? v : new Date(v) : null,
+                    day = value ? value.getDate() : null,
+                    month = value ? value.getMonth() + 1 : null,
+                    year = value ? value.getFullYear() : null;
 
                 // Update day list if month and year were changed
-                if ($scope.month != month
-                    && $scope.year != year) {
+                if ($scope.month !== month && $scope.year !== year) {
                     $scope.days = dayList($scope.month, $scope.year);
                 }
 
@@ -9718,15 +9726,17 @@ module.run(['$templateCache', function($templateCache) {
                 $scope.day = day;
                 $scope.month = month;
                 $scope.year = year;
-            };
+            }
 
             function setValue() {
+                var value;
+
                 if ($scope.day && $scope.month && $scope.year) {
-                    var value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                    value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
                     $scope.model = value;
                     $scope.ngChange();
                 }
-            };
+            }
 
             $scope.onDayChanged = function () {
                 setValue();
@@ -9743,7 +9753,7 @@ module.run(['$templateCache', function($templateCache) {
             };
 
             // Set initial values
-            var value = $scope.model ? (_.isDate($scope.model) ? $scope.model : new Date($scope.model)) : null;
+            value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
             $scope.day = value ? value.getDate() : null;
             $scope.month = value ? value.getMonth() + 1 : null;
             $scope.year = value ? value.getFullYear() : null;
@@ -9769,86 +9779,8 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})();
+})(window.angular, window._);
 
-
-/**
- * @file Confirmation dialog
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve sample in sampler app
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipErrorDetailsDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'ERROR_DETAILS': 'Error details',
-            'CODE': 'Code',
-            'PATH': 'Path',
-            'ERROR': "Error code",
-            'METHOD': 'Method',
-            'MESSAGE':"Message"
-
-        });
-        pipTranslateProvider.translations('ru', {
-            'ERROR_DETAILS': 'Детали ошибки',
-            'CODE': 'Код',
-            'PATH': 'Путь',
-            'ERROR': "Код ошибки",
-            'METHOD': 'Метод',
-            'MESSAGE':"Сообщение"
-        });
-    }]);
-
-    thisModule.factory('pipErrorDetailsDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'error_details_dialog/error_details_dialog.html',
-                        controller: 'pipErrorDetailsDialogController',
-                        locals: { params: params },
-                        clickOutsideToClose: true
-                    })
-                    .then(function () {
-                        if (successCallback) {
-                            successCallback();
-                        }
-                    }, function () {
-                        if (cancelCallback) {
-                            cancelCallback();
-                        }
-                    });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipErrorDetailsDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
-           $scope.error = params.error;
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
-
-            $scope.onCancel = function () {
-                $mdDialog.cancel();
-            };
-
-            $scope.onOk = function () {
-                $mdDialog.hide();
-            };
-        }]
-    );
-
-})();
 
 /**
  * @file Date range control
@@ -9858,17 +9790,14 @@ module.run(['$templateCache', function($templateCache) {
  * - Optimize. It is way to slow on samples
  */
 
-/* global angular */
-
 /*
  pip-date-range-type
  [ daily,  weekly,  monthly,  yearly ]
  */
 
-(function () {
+(function (angular, _) {
     'use strict';
-
-    var thisModule = angular.module("pipDateRange", []);
+    var thisModule = angular.module('pipDateRange', []);
 
     thisModule.directive('pipDateRange',
         function () {
@@ -9886,17 +9815,21 @@ module.run(['$templateCache', function($templateCache) {
                 },
                 templateUrl: 'date_range/date_range.html',
                 controller: 'pipDateRangeController'
-            }
+            };
         });
 
     thisModule.controller('pipDateRangeController',
         ['$scope', '$element', 'pipTranslate', '$mdMedia', '$rootScope', function ($scope, $element, pipTranslate, $mdMedia, $rootScope) {
-            var bufMonth,
-                currentDate = new Date(),
-                currentYear = currentDate.getUTCFullYear(),
-                currentMonth = currentDate.getUTCMonth() + 1,
-                currentDay = currentDate.getUTCDate(),
+            var currentDate,
+                currentYear,
+                currentMonth,
+                currentDay,
                 prevState = {}, currentState = {};
+
+            currentDate = new Date();
+            currentYear = currentDate.getUTCFullYear();
+            currentMonth = currentDate.getUTCMonth() + 1;
+            currentDay = currentDate.getUTCDate();
             $scope.daysWeek = {
                 en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                 ru: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
@@ -9907,9 +9840,11 @@ module.run(['$templateCache', function($templateCache) {
             };
 
             $scope.onMonthChanged = function () {
-                if ($scope.pipDateRangeType == 'weekly') {
-                    var date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
-                    var dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+                if ($scope.pipDateRangeType === 'weekly') {
+                    var date, dayOfWeek;
+
+                    date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
+                    dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
                     $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
                     correctWeek();
                     adjustWeek();
@@ -9920,9 +9855,11 @@ module.run(['$templateCache', function($templateCache) {
             };
 
             $scope.onYearChanged = function () {
-                if ($scope.pipDateRangeType == 'weekly') {
-                    var date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
-                    var dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+                var date, dayOfWeek;
+
+                date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
+                dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+                if ($scope.pipDateRangeType === 'weekly') {
                     $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
                     adjustWeek();
                     correctWeek();
@@ -9933,7 +9870,7 @@ module.run(['$templateCache', function($templateCache) {
             };
 
             $scope.onWeekChange = function () {
-                if ($scope.pipDateRangeType == 'weekly') {
+                if ($scope.pipDateRangeType === 'weekly') {
                     adjustWeek();
                     correctWeek();
                 } else {
@@ -9944,17 +9881,17 @@ module.run(['$templateCache', function($templateCache) {
 
             // visibility
             $scope.isDay = function () {
-                return $scope.pipDateRangeType == 'daily';
+                return $scope.pipDateRangeType === 'daily';
             };
 
             $scope.isWeek = function () {
-                return $scope.pipDateRangeType == 'weekly';
+                return $scope.pipDateRangeType === 'weekly';
             };
 
             $scope.isMonth = function () {
-                return (($scope.pipDateRangeType == 'daily') ||
-                ($scope.pipDateRangeType == 'weekly') ||
-                ($scope.pipDateRangeType == 'monthly'));
+                return $scope.pipDateRangeType === 'daily' ||
+                    $scope.pipDateRangeType === 'weekly' ||
+                    $scope.pipDateRangeType === 'monthly';
             };
 
             $scope.onChange = function () {
@@ -9979,24 +9916,27 @@ module.run(['$templateCache', function($templateCache) {
                 $scope.shortMonths = monthList(true);
                 $scope.years = yearList();
 
-            };
+            }
 
             function correctWeek() {
-                if (!prevState.model || (prevState.model && prevState.model.getTime() >= $scope.model.getTime())) {
+                if (!prevState.model || prevState.model && prevState.model.getTime() >= $scope.model.getTime()) {
                     // if shift week -> increase month
                     if ($scope.weeks && $scope.weeks[$scope.week] && $scope.weeks[$scope.week].id <= 0) {
-                        if ($scope.month < 12) $scope.month += 1;
-                        else {
+                        if ($scope.month < 12) {
+                            $scope.month += 1;
+                        } else {
                             $scope.month = 1;
                             $scope.year += 1;
                         }
                         fillLists();
                     }
                 }
-            };
+            }
 
             function init() {
-                var value = $scope.model ? new Date($scope.model) : null;
+                var value;
+
+                value = $scope.model ? new Date($scope.model) : null;
                 $scope.day = value ? value.getUTCDate() : null;
                 $scope.month = value ? value.getUTCMonth() + 1 : null;
                 $scope.year = value ? value.getUTCFullYear() : null;
@@ -10004,7 +9944,7 @@ module.run(['$templateCache', function($templateCache) {
 
                 fillLists();
 
-                if ($scope.pipDateRangeType == 'weekly') {
+                if ($scope.pipDateRangeType === 'weekly') {
                     correctWeek();
                     adjustWeek();
                 } else {
@@ -10022,7 +9962,7 @@ module.run(['$templateCache', function($templateCache) {
 
             // React on changes
             $scope.$watch('model', function (newValue, oldValue) {
-                if (newValue != oldValue) {
+                if (newValue !== oldValue) {
                     getValue(newValue);
                 }
             });
@@ -10032,60 +9972,69 @@ module.run(['$templateCache', function($templateCache) {
             });
 
             $scope.$watch('pipDateRangeType', function (newValue, oldValue) {
-                if ((newValue != oldValue) && (oldValue)) {
+                if (newValue !== oldValue && oldValue) {
                     init();
                 }
             });
 
             $scope.onYearClick = function () {
-                if ($scope.year == null) $scope.year = currentYear;
+                if (!$scope.year) {
+                    $scope.year = currentYear;
+                }
             };
 
             $scope.onMonthClick = function () {
-                if ($scope.month == null) $scope.month = currentMonth;
+                if (!$scope.month) {
+                    $scope.month = currentMonth;
+                }
             };
 
             $scope.onDayClick = function () {
-                if ($scope.year == null) $scope.day = currentDay;
+                if (!$scope.year) {
+                    $scope.day = currentDay;
+                }
             };
-
-            return;
-
             // ---------------------------------------------------------------------------------------
 
             function getCountDay(month, year) {
                 var count = 31;
 
-                if (month == 4 || month == 6 || month == 9 || month == 11) {
+                if (month === 4 || month === 6 || month === 9 || month === 11) {
                     count = 30;
-                } else if (month == 2) {
-                    if (year)
-                    // Calculate leap year (primitive)
-                        count = year % 4 == 0 ? 29 : 28;
-                    else count = 28;
+                } else if (month === 2) {
+                    if (year) {
+                        // Calculate leap year (primitive)
+                        count = year % 4 === 0 ? 29 : 28;
+                    } else {
+                        count = 28;
+                    }
                 }
+
                 return count;
             }
 
             function dayList(month, year) {
-                var count = getCountDay(month, year);
+                var count, days, i, ln;
 
+                ln = $rootScope.$language || 'en';
+                count = getCountDay(month, year);
                 $scope.nameDays = [];
-                var days = [];
-                for (var i = 1; i <= count; i++) {
+                days = [];
+                for (i = 1; i <= count; i++) {
                     days.push(i);
-
-                    $scope.nameDays.push($scope.daysWeek[$rootScope.$language || 'en'][new Date(year, month - 1, i).getDay()]);
+                    $scope.nameDays.push($scope.daysWeek[ln][new Date(year, month - 1, i).getDay()]);
                 }
+
                 return days;
             }
 
             function getWeekByDate(day, month, year) {
-                var date = new Date(Date.UTC(year, month, day));
-                var dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
-                var startWeek;
+                var date, dayOfWeek, startWeek;
 
-                if (dayOfWeek == 1) {
+                date = new Date(Date.UTC(year, month, day));
+                dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+
+                if (dayOfWeek === 1) {
                     startWeek = day;
                 } else {
                     startWeek = day + 1 - dayOfWeek;
@@ -10095,16 +10044,20 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function getWeek(day, countDay, countPrevMonthDay) {
-                var endDay = (day + 6) > countDay ? countDay - day - 6 : day + 6;
-                var startDay = (day > 0) ? day : countPrevMonthDay + day;
-                return (startDay).toString() + ' - ' + (Math.abs(endDay)).toString();
+                var endDay, startDay;
+
+                endDay = day + 6 > countDay ? countDay - day - 6 : day + 6;
+                startDay = day > 0 ? day : countPrevMonthDay + day;
+
+                return startDay.toString() + ' - ' + (Math.abs(endDay)).toString();
             }
 
             function weekList(month, year) { // возвращает список начала надели
-                var weeks = [];  // в массиве первые дни недели в текущем месяце
-                var countDay = getCountDay(month, year);
-                var countPrevMonthDay;
-                var startWeek = getWeekByDate(1, month - 1, year);
+                var weeks, countDay, countPrevMonthDay, startWeek;
+
+                weeks = [];  // в массиве первые дни недели в текущем месяце
+                countDay = getCountDay(month, year);
+                startWeek = getWeekByDate(1, month - 1, year);
 
                 countPrevMonthDay = month - 1 ? getCountDay(month - 1, year) : getCountDay(12, year - 1);
                 while (startWeek < countDay + 1) {
@@ -10119,21 +10072,21 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function monthList(isShort) {
-                var months = [];
+                var months, i;
 
-                for (var i = 1; i <= 12; i++) {
+                months = [];
+                for (i = 1; i <= 12; i++) {
                     months.push({
                         id: i,
                         name: pipTranslate.translate('MONTH_' + i)
-                    })
+                    });
                 }
 
                 return months;
             }
 
             function yearList() {
-                var
-                    startYear,
+                var startYear, i,
                     endYear,
                     years = [];
 
@@ -10155,15 +10108,16 @@ module.run(['$templateCache', function($templateCache) {
                         endYear = currentYear + 50;
                         break;
                 }
-                if ($scope.timeMode == 'future') {
-                    for (var i = startYear; i <= endYear; i++) {
+                if ($scope.timeMode === 'future') {
+                    for (i = startYear; i <= endYear; i++) {
                         years.push(i);
                     }
                 } else {
-                    for (var i = endYear; i >= startYear; i--) {
+                    for (i = endYear; i >= startYear; i--) {
                         years.push(i);
                     }
                 }
+
                 return years;
             }
 
@@ -10179,7 +10133,7 @@ module.run(['$templateCache', function($templateCache) {
                         $scope.day = 1;
                         break;
                     default:
-                        if ($scope.days.length != days.length) {
+                        if ($scope.days.length !== days.length) {
                             if ($scope.day > days.length) {
                                 $scope.day = days.length;
                             }
@@ -10190,22 +10144,26 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function adjustWeek() {
-                var weeks = weekList($scope.month, $scope.year);
+                var weeks;
+
+                weeks = weekList($scope.month, $scope.year);
                 $scope.week = getWeekByDate($scope.week, $scope.month - 1, $scope.year);
                 $scope.weeks = weeks;
             }
 
-            function getValue(value) {
-                value = value ? new Date(value) : null;
+            function getValue(v) {
+                var value, day, month, year, week;
+
+                value = v ? new Date(v) : null;
                 // Define values
-                var day = value ? value.getUTCDate() : null;
-                var month = value ? value.getUTCMonth() + 1 : null;
-                var year = value ? value.getUTCFullYear() : null;
-                var week = value ? getWeekByDate(day, month - 1, year) : null;
+                day = value ? value.getUTCDate() : null;
+                month = value ? value.getUTCMonth() + 1 : null;
+                year = value ? value.getUTCFullYear() : null;
+                week = value ? getWeekByDate(day, month - 1, year) : null;
                 // Exit if nothing to update
-                if ($scope.day == day && $scope.month == month
-                    && $scope.year == year && $scope.week == week)
+                if ($scope.day === day && $scope.month === month && $scope.year === year && $scope.week === week) {
                     return;
+                }
                 // Assign values to scope
                 $scope.day = day;
                 $scope.month = month;
@@ -10219,7 +10177,8 @@ module.run(['$templateCache', function($templateCache) {
 
             function setValue() {
                 var value;
-                if ($scope.pipDateRangeType == 'weekly') {
+
+                if ($scope.pipDateRangeType === 'weekly') {
                     value = new Date($scope.year, $scope.month - 1, $scope.week, 0, 0, 0, 0);
                     value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
                     $scope.model = value;
@@ -10236,90 +10195,99 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})();
-
+})(window.angular, window._);
 
 /**
- * @file Information dialog
+ * @file Confirmation dialog
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
  * - Improve sample in sampler app
  */
- 
-/* global angular */
 
-(function () {
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module('pipInformationDialog', 
+    var thisModule = angular.module('pipErrorDetailsDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
-            'INFORMATION_TITLE': 'Information'
+            'ERROR_DETAILS': 'Error details',
+            'CODE': 'Code',
+            'PATH': 'Path',
+            'ERROR': 'Error code',
+            'METHOD': 'Method',
+            'MESSAGE': 'Message'
+
         });
         pipTranslateProvider.translations('ru', {
-            'INFORMATION_TITLE': 'Информация'
+            'ERROR_DETAILS': 'Детали ошибки',
+            'CODE': 'Код',
+            'PATH': 'Путь',
+            'ERROR': 'Код ошибки',
+            'METHOD': 'Метод',
+            'MESSAGE': 'Сообщение'
         });
     }]);
-        
-    thisModule.factory('pipInformationDialog', 
-        ['$mdDialog', '$timeout', function ($mdDialog, $timeout) {
+
+    thisModule.factory('pipErrorDetailsDialog',
+        ['$mdDialog', function ($mdDialog) {
             return {
-                show: function (params, callback) {
+                show: function (params, successCallback, cancelCallback) {
                     $mdDialog.show({
                         targetEvent: params.event,
-                        templateUrl: 'information_dialog/information_dialog.html',
-                        controller: 'pipInformationDialogController',
-                        locals: { params: params },
+                        templateUrl: 'error_details_dialog/error_details_dialog.html',
+                        controller: 'pipErrorDetailsDialogController',
+                        locals: {params: params},
                         clickOutsideToClose: true
                     })
-                    .then(function () {
-                        if (callback) callback();
-                    });
+                        .then(function () {
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }, function () {
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
                 }
             };
         }]
     );
 
-    thisModule.controller('pipInformationDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', 'pipUtils', function ($scope, $rootScope, $mdDialog, pipTranslate, params, pipUtils) {
-            $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'INFORMATION_TITLE';
-
-            var content = pipTranslate.translate(params.message);
-            if (params.item) {
-                var item = _.truncate(params.item, 25);
-                content = pipUtils.sprintf(content, item);
-            }
-            $scope.content = content;
+    thisModule.controller('pipErrorDetailsDialogController',
+        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
+            $scope.error = params.error;
             $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'CANCEL';
+
+            $scope.onCancel = function () {
+                $mdDialog.cancel();
+            };
 
             $scope.onOk = function () {
                 $mdDialog.hide();
             };
-        }]        
+        }]
     );
 
-})();
+})(window.angular);
 
 /**
  * @file Image slider control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global _, angular */
-
-(function () {
+(function (angular, _, $) {
     'use strict';
 
-    var thisModule = angular.module("pipImageSlider", []);
+    var thisModule = angular.module('pipImageSlider', []);
 
     thisModule.directive('pipImageSlider',
         function () {
             return {
                 scope: false,
-                controller: ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', '$pipImageSlider', function ($scope, $element, $attrs, $parse, $timeout, $interval, $pipImageSlider/*, $swipe*/) {
+                controller: ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', '$pipImageSlider', function ($scope, $element, $attrs, $parse, $timeout, $interval, $pipImageSlider) {
                     var blocks,
                         indexSetter = $parse($attrs.pipImageSliderIndex).assign,
                         index = 0, newIndex,
@@ -10327,53 +10295,55 @@ module.run(['$templateCache', function($templateCache) {
                         type = $parse($attrs.pipAnimationType)($scope),
                         DEFAULT_INTERVAL = 4500,
                         interval = $parse($attrs.pipAnimationInterval)($scope),
-                        timePromises;
+                        timePromises,
+                        throttled;
 
                     $element.addClass('pip-image-slider');
                     $element.addClass('pip-animation-' + type);
 
                     $scope.swipeStart = 0;
-/*
-                    if ($swipe)
-                        $swipe.bind($element, {
-                            'start': function(coords) {
-                                if (coords) $scope.swipeStart = coords.x;
-                                else $scope.swipeStart = 0;
-                            },
-                            'end': function(coords) {
-                                var delta;
-                                if (coords) {
-                                    delta = $scope.swipeStart - coords.x;
-                                    if (delta > 150)  $scope.nextBlock();
-                                    if (delta < -150)  $scope.prevBlock();
-                                    $scope.swipeStart = 0;
-                                } else $scope.swipeStart = 0;
-                            }
-                        });
-*/
+                    /*
+                     if ($swipe)
+                     $swipe.bind($element, {
+                     'start': function(coords) {
+                     if (coords) $scope.swipeStart = coords.x;
+                     else $scope.swipeStart = 0;
+                     },
+                     'end': function(coords) {
+                     var delta;
+                     if (coords) {
+                     delta = $scope.swipeStart - coords.x;
+                     if (delta > 150)  $scope.nextBlock();
+                     if (delta < -150)  $scope.prevBlock();
+                     $scope.swipeStart = 0;
+                     } else $scope.swipeStart = 0;
+                     }
+                     });
+                     */
                     setIndex();
 
                     $timeout(function () {
                         blocks = $element.find('.pip-animation-block');
-                        if (blocks.length > 0) $(blocks[0]).addClass('pip-show');
+                        if (blocks.length > 0) {
+                            $(blocks[0]).addClass('pip-show');
+                        }
                     });
 
                     startInterval();
-
-                    var throttled = _.throttle(function () {
+                    throttled = _.throttle(function () {
                         $pipImageSlider.toBlock(type, blocks, index, newIndex, direction);
                         index = newIndex;
                         setIndex();
                     }, 600);
 
-                    $scope.nextBlock = function() {
+                    $scope.nextBlock = function () {
                         restartInterval();
-                        newIndex = index + 1 == blocks.length ? 0 : index + 1;
+                        newIndex = index + 1 === blocks.length ? 0 : index + 1;
                         direction = 'next';
                         throttled();
                     };
 
-                    $scope.prevBlock = function() {
+                    $scope.prevBlock = function () {
                         restartInterval();
                         newIndex = index - 1 < 0 ? blocks.length - 1 : index - 1;
                         direction = 'prev';
@@ -10381,7 +10351,9 @@ module.run(['$templateCache', function($templateCache) {
                     };
 
                     $scope.slideTo = function (nextIndex) {
-                        if (nextIndex == index || nextIndex > blocks.length - 1) return;
+                        if (nextIndex === index || nextIndex > blocks.length - 1) {
+                            return;
+                        }
 
                         restartInterval();
                         newIndex = nextIndex;
@@ -10390,12 +10362,14 @@ module.run(['$templateCache', function($templateCache) {
                     };
 
                     function setIndex() {
-                        if (indexSetter) indexSetter($scope, index);
+                        if (indexSetter) {
+                            indexSetter($scope, index);
+                        }
                     }
 
                     function startInterval() {
                         timePromises = $interval(function () {
-                            newIndex = index + 1 == blocks.length ? 0 : index + 1;
+                            newIndex = index + 1 === blocks.length ? 0 : index + 1;
                             direction = 'next';
                             throttled();
                         }, interval || DEFAULT_INTERVAL);
@@ -10405,7 +10379,7 @@ module.run(['$templateCache', function($templateCache) {
                         $interval.cancel(timePromises);
                     }
 
-                    $element.on('$destroy', function() {
+                    $element.on('$destroy', function () {
                         stopInterval();
                     });
 
@@ -10427,12 +10401,14 @@ module.run(['$templateCache', function($templateCache) {
                         sliderId = $parse($attrs.pipSliderId)($scope);
 
                     $element.on('click', function () {
-                        if (!sliderId || !type) return;
+                        if (!sliderId || !type) {
+                            return;
+                        }
 
                         angular.element(document.getElementById(sliderId)).scope()[type + 'Block']();
                     });
                 }]
-            }
+            };
         }
     );
 
@@ -10446,12 +10422,14 @@ module.run(['$templateCache', function($templateCache) {
 
                     $element.css('cursor', 'pointer');
                     $element.on('click', function () {
-                        if (!sliderId || (slideTo && slideTo < 0)) return;
+                        if (!sliderId || slideTo && slideTo < 0) {
+                            return;
+                        }
 
                         angular.element(document.getElementById(sliderId)).scope().slideTo(slideTo);
                     });
                 }]
-            }
+            };
         }
     );
 
@@ -10475,7 +10453,7 @@ module.run(['$templateCache', function($templateCache) {
                 }, 100);
             }
 
-            function prevCarousel (nextBlock, prevBlock) {
+            function prevCarousel(nextBlock, prevBlock) {
                 nextBlock.removeClass('animated');
 
                 $timeout(function () {
@@ -10490,23 +10468,23 @@ module.run(['$templateCache', function($templateCache) {
 
             function toBlock(type, blocks, oldIndex, nextIndex, direction) {
                 var prevBlock = $(blocks[oldIndex]),
-                    blockIndex = nextIndex;
-                var nextBlock = $(blocks[blockIndex]);
+                    blockIndex = nextIndex,
+                    nextBlock = $(blocks[blockIndex]);
 
-                if (type == 'carousel') {
+                if (type === 'carousel') {
                     $(blocks).removeClass('pip-next').removeClass('pip-prev');
 
-                    if (direction && direction == 'prev')
+                    if (direction && direction === 'prev') {
                         prevCarousel(nextBlock, prevBlock);
-                    else {
-                        if (direction && direction == 'next') {
-                            nextCarousel(nextBlock, prevBlock);
-                        } else {
-                            if (nextIndex && nextIndex < oldIndex)
-                                prevCarousel(nextBlock, prevBlock);
-                            else
-                                nextCarousel(nextBlock, prevBlock);
-                        }
+                    }
+                    if (direction && direction === 'next') {
+                        nextCarousel(nextBlock, prevBlock);
+                    }
+                    if ((!direction || direction !== 'next' && direction !== 'prev') &&
+                        nextIndex && nextIndex < oldIndex) {
+                        prevCarousel(nextBlock, prevBlock);
+                    } else {
+                        nextCarousel(nextBlock, prevBlock);
                     }
                 } else {
                     prevBlock.addClass('animated').removeClass('pip-show');
@@ -10516,7 +10494,71 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})();
+})(window.angular, window._, window.jQuery);
+
+/**
+ * @file Information dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve sample in sampler app
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipInformationDialog',
+        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'INFORMATION_TITLE': 'Information'
+        });
+        pipTranslateProvider.translations('ru', {
+            'INFORMATION_TITLE': 'Информация'
+        });
+    }]);
+    thisModule.factory('pipInformationDialog',
+        ['$mdDialog', '$timeout', function ($mdDialog, $timeout) {
+            return {
+                show: function (params, callback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'information_dialog/information_dialog.html',
+                        controller: 'pipInformationDialogController',
+                        locals: {params: params},
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (callback) {
+                                callback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipInformationDialogController',
+        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', 'pipUtils', function ($scope, $rootScope, $mdDialog, pipTranslate, params, pipUtils) {
+            var content, item;
+
+            $scope.theme = $rootScope.$theme;
+            $scope.title = params.title || 'INFORMATION_TITLE';
+            content = pipTranslate.translate(params.message);
+            if (params.item) {
+                item = _.truncate(params.item, 25);
+                content = pipUtils.sprintf(content, item);
+            }
+            $scope.content = content;
+            $scope.ok = params.ok || 'OK';
+
+            $scope.onOk = function () {
+                $mdDialog.hide();
+            };
+        }]
+    );
+
+})(window.angular);
 
 /**
  * @file Markdown control
@@ -10526,14 +10568,12 @@ module.run(['$templateCache', function($templateCache) {
  * - Improve samples in sampler app
  */
 
-/* global angular, pip, marked */
-
-(function () {
+(function (angular, marked) {
     'use strict';
 
-    var thisModule = angular.module("pipMarkdown", ['ngSanitize', 'pipUtils', 'pipTranslate']);
+    var thisModule = angular.module('pipMarkdown', ['ngSanitize', 'pipUtils', 'pipTranslate']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'MARKDOWN_ATTACHMENTS': 'Attachments:',
             'checklist': 'Checklist',
@@ -10553,7 +10593,7 @@ module.run(['$templateCache', function($templateCache) {
     }]);
 
     thisModule.directive('pipMarkdown',
-        ['$parse', 'pipUtils', 'pipTranslate', function($parse, pipUtils, pipTranslate) {
+        ['$parse', 'pipUtils', 'pipTranslate', function ($parse, pipUtils, pipTranslate) {
             return {
                 restrict: 'EA',
                 scope: false,
@@ -10567,51 +10607,60 @@ module.run(['$templateCache', function($templateCache) {
                         var attachString = '',
                             attachTypes = [];
 
-                        _.each(array, function(attach) {
-                            if (attach.type && attach.type != 'text') {
-                                if (attachString.length == 0) attachString = pipTranslate.translate('MARKDOWN_ATTACHMENTS');
+                        _.each(array, function (attach) {
+                            if (attach.type && attach.type !== 'text') {
+                                if (attachString.length === 0) {
+                                    attachString = pipTranslate.translate('MARKDOWN_ATTACHMENTS');
+                                }
 
                                 if (attachTypes.indexOf(attach.type) < 0) {
                                     attachTypes.push(attach.type);
-                                    attachString += (attachTypes.length > 1 ? ', ' : ' ') + pipTranslate.translate(attach.type);
+                                    attachString += attachTypes.length > 1 ? ', ' : ' ';
+                                    attachString += pipTranslate.translate(attach.type);
                                 }
                             }
-                        })
+                        });
 
                         return attachString;
                     }
 
                     function bindText(value) {
-                        var textString;
+                        var textString, isClamped, height, options, obj;
 
                         if (_.isArray(value)) {
-                            var obj = _.find(value, function(item) {
-                                return item.type == 'text' && item.text;
+                            obj = _.find(value, function (item) {
+                                return item.type === 'text' && item.text;
                             });
 
-                            textString =  obj ? obj.text : describeAttachments(value);
+                            textString = obj ? obj.text : describeAttachments(value);
                         } else {
                             textString = value;
                         }
 
-                        var isClamped = $attrs.pipLineCount && _.isNumber(clampGetter()) && (textString && textString.length > 0),
-                            height,
-                            options = {
-                                gfm: true,
-                                tables: true,
-                                breaks: true,
-                                sanitize: true,
-                                pedantic: true,
-                                smartLists: true,
-                                smartypents: false
-                            };
+                        isClamped = $attrs.pipLineCount && _.isNumber(clampGetter());
+                        isClamped = isClamped && textString && textString.length > 0;
+                        options = {
+                            gfm: true,
+                            tables: true,
+                            breaks: true,
+                            sanitize: true,
+                            pedantic: true,
+                            smartLists: true,
+                            smartypents: false
+                        };
                         textString = marked(textString || '', options);
-                        if (isClamped) height = 1.5 * clampGetter();
+                        if (isClamped) {
+                            height = 1.5 * clampGetter();
+                        }
                         // Assign value as HTML
-                        $element.html('<div' + (isClamped ? listGetter()?' class="pip-markdown-content pip-markdown-list" style="max-height: ' + height + 'em">' :
-                                ' class="pip-markdown-content" style="max-height: ' + height + 'em">' :  listGetter()? ' class="pip-markdown-list">' : '>') + textString + '</div>');
+                        $element.html('<div' + (isClamped ? listGetter() ? 'class="pip-markdown-content ' +
+                            'pip-markdown-list" style="max-height: ' + height + 'em">'
+                                : ' class="pip-markdown-content" style="max-height: ' + height + 'em">' : listGetter()
+                                ? ' class="pip-markdown-list">' : '>') + textString + '</div>');
                         $element.find('a').attr('target', 'blank');
-                        if (!listGetter() && isClamped) $element.append('<div class="pip-gradient-block"></div>');
+                        if (!listGetter() && isClamped) {
+                            $element.append('<div class="pip-gradient-block"></div>');
+                        }
                     }
 
                     // Fill the text
@@ -10619,7 +10668,7 @@ module.run(['$templateCache', function($templateCache) {
 
                     // Also optimization to avoid watch if it is unnecessary
                     if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch(textGetter, function(newValue) {
+                        $scope.$watch(textGetter, function (newValue) {
                             bindText(newValue);
                         });
                     }
@@ -10631,171 +10680,12 @@ module.run(['$templateCache', function($templateCache) {
                     // Add class
                     $element.addClass('pip-markdown');
                 }
-            }
-        }]
-    );
-
-})();
-
-
-/**
- * @file Popover control
- * @copyright Digital Living Software Corp. 2014-2016
- *
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipPopover", ['pipAssert']);
-
-    thisModule.directive('pipPopover', function () {
-        return {
-            restrict: 'EA',
-            scope: true,
-            templateUrl: 'popover/popover.template.html',
-            controller:
-                ['$scope', '$rootScope', '$element', '$timeout', '$compile', function ($scope, $rootScope, $element, $timeout, $compile) {
-                    var backdropElement = $('.pip-popover-backdrop');
-                    backdropElement.on('click keydown scroll', backdropClick);
-                    backdropElement.addClass($scope.params.responsive !== false ? 'pip-responsive' : '');
-
-                    $timeout(function () {
-                        position();
-                        if ($scope.params.template) {
-                            var content = $compile($scope.params.template)($scope);
-                            $element.find('.pip-popover').append(content);
-                        }
-
-                        init();
-                    });
-
-                    $timeout(function() {
-                        calcHeight();
-                    }, 200);
-
-                    $scope.onPopoverClick = onPopoverClick;
-                    $scope = _.defaults($scope, $scope.$parent);
-
-                    $rootScope.$on('pipPopoverResize', onResize);
-                    $(window).resize(onResize);
-
-                    function init() {
-                        backdropElement.addClass('opened');
-                        $('.pip-popover-backdrop').focus();
-                        if ($scope.params.timeout) {
-                            $timeout(function () {
-                                closePopover();
-                            }, $scope.params.timeout);
-                        }
-                    }
-
-                    function backdropClick() {
-                        if ($scope.params.cancelCallback)
-                            $scope.params.cancelCallback();
-
-                        closePopover();
-                    }
-
-                    function closePopover () {
-                        backdropElement.removeClass('opened');
-                        $timeout(function () {
-                            backdropElement.remove();
-                        }, 100);
-                    }
-
-                    function onPopoverClick ($e) {
-                        $e.stopPropagation();
-                    }
-
-                    function position() {
-                        if ($scope.params.element) {
-                            var element = $($scope.params.element),
-                                pos = element.offset(),
-                                width = element.width(),
-                                height = element.height(),
-                                docWidth = $(document).width(),
-                                docHeight = $(document).height(),
-                                popover = backdropElement.find('.pip-popover');
-
-                            if (pos)
-                                popover
-                                    .css('max-width', docWidth - (docWidth - pos.left))
-                                    .css('max-height', docHeight - (pos.top + height) - 32, 0)
-                                    .css('left', pos.left - popover.width() + (width / 2))
-                                    .css('top', pos.top + height + 16);
-                        }
-                    }
-
-                    function calcHeight () {
-                        if ($scope.params.calcHeight === false) return;
-
-                        var popover = backdropElement.find('.pip-popover'),
-                            title = popover.find('.pip-title'),
-                            footer = popover.find('.pip-footer'),
-                            content = popover.find('.pip-content'),
-                            contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
-
-                        content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
-                    }
-
-                    function onResize () {
-                        backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
-                        position();
-                        calcHeight();
-                    }
-                }]
-        };
-    });
-
-    thisModule.service('$pipPopover',
-        ['$compile', '$rootScope', '$timeout', function ($compile, $rootScope, $timeout) {
-            var popoverTemplate = "<div class='pip-popover-backdrop {{ params.class }}' ng-controller='params.controller' tabindex='1'>" +
-                                    "<pip-popover pip-params='params'>" +
-                                    "</pip-popover>" +
-                                  "</div>";
-
-            return {
-                show: onShow,
-                hide: onHide,
-                resize: onResize
             };
-
-            function onShow(params) {
-                var element = $('body');
-
-                if (element.find('md-backdrop').length > 0) return;
-                onHide();
-
-                var scope = $rootScope.$new(),
-                    params = params && _.isObject(params) ? params : {},
-                    content;
-
-                scope.params = params;
-                scope.locals = params.locals;
-                content = $compile(popoverTemplate)(scope);
-                element.append(content);
-            }
-
-            function onHide () {
-                var backdropElement = $('.pip-popover-backdrop');
-
-                backdropElement.removeClass('opened');
-                $timeout(function () {
-                    backdropElement.remove();
-                }, 100);
-            }
-
-            function onResize () {
-                $rootScope.$broadcast('pipPopoverResize');
-            }
-
         }]
     );
 
-})();
+})(window.angular, window.marked);
+
 
 /**
  * @file Options dialog
@@ -10804,16 +10694,14 @@ module.run(['$templateCache', function($templateCache) {
  * - Improve sample in sampler app
  * - Remove deleted hack in the controller
  */
- 
-/* global $, angular */
 
-(function () {
+(function (angular, $) {
     'use strict';
 
-    var thisModule = angular.module('pipOptionsDialog', 
+    var thisModule = angular.module('pipOptionsDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'OPTIONS_TITLE': 'Choose Option'
         });
@@ -10822,7 +10710,7 @@ module.run(['$templateCache', function($templateCache) {
         });
     }]);
 
-    thisModule.factory('pipOptionsDialog', 
+    thisModule.factory('pipOptionsDialog',
         ['$mdDialog', function ($mdDialog) {
             return {
                 show: function (params, successCallback, cancelCallback) {
@@ -10832,30 +10720,34 @@ module.run(['$templateCache', function($templateCache) {
                     }
 
                     function focusToggleControl() {
-                        if (params.event && params.event.currentTarget)
+                        if (params.event && params.event.currentTarget) {
                             params.event.currentTarget.focus();
+                        }
                     }
 
                     $mdDialog.show({
                         targetEvent: params.event,
                         templateUrl: 'options_dialog/options_dialog.html',
                         controller: 'pipOptionsDialogController',
-                        locals: { params: params },
+                        locals: {params: params},
                         clickOutsideToClose: true
                     })
-                    .then(function (option) {
-                        focusToggleControl();
+                        .then(function (option) {
+                            focusToggleControl();
 
-                        if (successCallback) successCallback(option);
-                    }, function () {
-                        focusToggleControl();
-                        if (cancelCallback) cancelCallback();
-                    });
+                            if (successCallback) {
+                                successCallback(option);
+                            }
+                        }, function () {
+                            focusToggleControl();
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
                 }
             };
         }]
     );
-
     thisModule.controller('pipOptionsDialogController',
         ['$scope', '$rootScope', '$mdDialog', 'params', function ($scope, $rootScope, $mdDialog, params) {
             $scope.theme = $rootScope.$theme;
@@ -10864,43 +10756,41 @@ module.run(['$templateCache', function($templateCache) {
             $scope.selectedOption = _.find(params.options, {active: true}) || {};
             $scope.selectedOptionName = $scope.selectedOption.name;
             $scope.applyButtonTitle = params.appleButtonTitle || 'SELECT';
-            
             $scope.deleted = params.deleted;
             $scope.deletedTitle = params.deletedTitle;
-    
             $scope.onOptionSelect = function (event, option) {
                 event.stopPropagation();
                 $scope.selectedOptionName = option.name;
             };
-    
-            $scope.onKeyPress = function(event) {
-                if (event.keyCode == 32 || event.keyCode == 13) {
+            $scope.onKeyPress = function (event) {
+                if (event.keyCode === 32 || event.keyCode === 13) {
                     event.stopPropagation();
                     event.preventDefault();
                     $scope.onSelect();
                 }
             };
-    
             $scope.onCancel = function () {
                 $mdDialog.cancel();
             };
-            
             $scope.onSelect = function () {
-                var option = _.find(params.options, {name: $scope.selectedOptionName});
-                $mdDialog.hide({ option: option, deleted: $scope.deleted });
+                var option;
+
+                option = _.find(params.options, {name: $scope.selectedOptionName});
+                $mdDialog.hide({option: option, deleted: $scope.deleted});
             };
-    
             // Setting focus to input control
             function focusInput() {
-                var list = $('.pip-options-dialog .pip-list');
+                var list;
+
+                list = $('.pip-options-dialog .pip-list');
                 list.focus();
-            };
+            }
+
             setTimeout(focusInput, 500);
-    
         }]
     );
 
-})();
+})(window.angular, window.jQuery);
 
 /**
  * @file Options dialog
@@ -10909,16 +10799,14 @@ module.run(['$templateCache', function($templateCache) {
  * - Improve sample in sampler app
  * - Remove deleted hack in the controller
  */
- 
-/* global $, angular */
 
-(function () {
+(function (angular, $) {
     'use strict';
 
     var thisModule = angular.module('pipOptionsBigDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'OPTIONS_TITLE': 'Choose Option'
         });
@@ -10937,25 +10825,30 @@ module.run(['$templateCache', function($templateCache) {
                     }
 
                     function focusToggleControl() {
-                        if (params.event && params.event.currentTarget)
+                        if (params.event && params.event.currentTarget) {
                             params.event.currentTarget.focus();
+                        }
                     }
 
                     $mdDialog.show({
                         targetEvent: params.event,
                         templateUrl: 'options_dialog/options_dialog_big.html',
                         controller: 'pipOptionsDialogBigController',
-                        locals: { params: params },
+                        locals: {params: params},
                         clickOutsideToClose: true
                     })
-                    .then(function (option) {
-                        focusToggleControl();
+                        .then(function (option) {
+                            focusToggleControl();
 
-                        if (successCallback) successCallback(option);
-                    }, function () {
-                        focusToggleControl();
-                        if (cancelCallback) cancelCallback();
-                    });
+                            if (successCallback) {
+                                successCallback(option);
+                            }
+                        }, function () {
+                            focusToggleControl();
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
                 }
             };
         }]
@@ -10971,12 +10864,12 @@ module.run(['$templateCache', function($templateCache) {
             $scope.hint = params.hint || '';
             $scope.selectedOption = _.find(params.options, {active: true}) || {};
             $scope.selectedOptionName = $scope.selectedOption.name;
-            $scope.optionIndex  = _.findIndex(params.options,$scope.selectedOption);
+            $scope.optionIndex = _.findIndex(params.options, $scope.selectedOption);
             $scope.applyButtonTitle = params.applyButtonTitle || 'SELECT';
-            
+
             $scope.deleted = params.deleted;
             $scope.deletedTitle = params.deletedTitle;
-    
+
             $scope.onOptionSelect = function (event, option) {
                 event.stopPropagation();
                 $scope.selectedOptionName = option.name;
@@ -10993,63 +10886,289 @@ module.run(['$templateCache', function($templateCache) {
                     // $scope.onSelect();
                 }
             };
-    
-            $scope.onKeyUp = function(event, index) {
-                if (event.keyCode == 32 || event.keyCode == 13) {
+
+            $scope.onKeyUp = function (event, index) {
+                if (event.keyCode === 32 || event.keyCode === 13) {
                     event.stopPropagation();
                     event.preventDefault();
-                    if (index != undefined && index > -1 && index < $scope.options.length) {
+                    if (index !== undefined && index > -1 && index < $scope.options.length) {
                         $scope.selectedOptionName = $scope.options[index].name;
                         $scope.onSelect();
                     }
                 }
             };
-    
             $scope.onCancel = function () {
                 $mdDialog.cancel();
             };
-            
             $scope.onSelect = function () {
-                var option = _.find($scope.options, {name: $scope.selectedOptionName});
-                $mdDialog.hide({ option: option, deleted: $scope.deleted });
+                var option;
+
+                option = _.find($scope.options, {name: $scope.selectedOptionName});
+                $mdDialog.hide({option: option, deleted: $scope.deleted});
             };
-    
             // Setting focus to input control
             function focusInput() {
-                var list = $('.pip-options-dialog .pip-list');
+                var list;
+
+                list = $('.pip-options-dialog .pip-list');
                 list.focus();
-            };
+            }
+
             setTimeout(focusInput, 500);
-    
         }]
     );
 
-})();
+})(window.angular, window.jQuery);
+
+/**
+ * @file Popover control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, $) {
+    'use strict';
+
+    var thisModule = angular.module('pipPopover', ['pipAssert']);
+
+    thisModule.directive('pipPopover', function () {
+        return {
+            restrict: 'EA',
+            scope: true,
+            templateUrl: 'popover/popover.template.html',
+            controller: ['$scope', '$rootScope', '$element', '$timeout', '$compile', function ($scope, $rootScope, $element, $timeout, $compile) {
+                var backdropElement, content;
+
+                backdropElement = $('.pip-popover-backdrop');
+                backdropElement.on('click keydown scroll', backdropClick);
+                backdropElement.addClass($scope.params.responsive !== false ? 'pip-responsive' : '');
+
+                $timeout(function () {
+                    position();
+                    if ($scope.params.template) {
+                        content = $compile($scope.params.template)($scope);
+                        $element.find('.pip-popover').append(content);
+                    }
+
+                    init();
+                });
+
+                $timeout(function () {
+                    calcHeight();
+                }, 200);
+
+                $scope.onPopoverClick = onPopoverClick;
+                $scope = _.defaults($scope, $scope.$parent);
+
+                $rootScope.$on('pipPopoverResize', onResize);
+                $(window).resize(onResize);
+
+                function init() {
+                    backdropElement.addClass('opened');
+                    $('.pip-popover-backdrop').focus();
+                    if ($scope.params.timeout) {
+                        $timeout(function () {
+                            closePopover();
+                        }, $scope.params.timeout);
+                    }
+                }
+
+                function backdropClick() {
+                    if ($scope.params.cancelCallback) {
+                        $scope.params.cancelCallback();
+                    }
+
+                    closePopover();
+                }
+
+                function closePopover() {
+                    backdropElement.removeClass('opened');
+                    $timeout(function () {
+                        backdropElement.remove();
+                    }, 100);
+                }
+
+                function onPopoverClick($e) {
+                    $e.stopPropagation();
+                }
+
+                function position() {
+                    if ($scope.params.element) {
+                        var element = $($scope.params.element),
+                            pos = element.offset(),
+                            width = element.width(),
+                            height = element.height(),
+                            docWidth = $(document).width(),
+                            docHeight = $(document).height(),
+                            popover = backdropElement.find('.pip-popover');
+
+                        if (pos) {
+                            popover
+                                .css('max-width', docWidth - (docWidth - pos.left))
+                                .css('max-height', docHeight - (pos.top + height) - 32, 0)
+                                .css('left', pos.left - popover.width() + width / 2)
+                                .css('top', pos.top + height + 16);
+                        }
+                    }
+                }
+
+                function calcHeight() {
+                    if ($scope.params.calcHeight === false) { return; }
+
+                    var popover = backdropElement.find('.pip-popover'),
+                        title = popover.find('.pip-title'),
+                        footer = popover.find('.pip-footer'),
+                        content = popover.find('.pip-content'),
+                        contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
+
+                    content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
+                }
+
+                function onResize() {
+                    backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
+                    position();
+                    calcHeight();
+                }
+            }]
+        };
+    });
+
+    thisModule.service('$pipPopover',
+        ['$compile', '$rootScope', '$timeout', function ($compile, $rootScope, $timeout) {
+            var popoverTemplate;
+
+            popoverTemplate = "<div class='pip-popover-backdrop {{ params.class }}' ng-controller='params.controller'" +
+                " tabindex='1'> <pip-popover pip-params='params'> </pip-popover> </div>";
+
+            return {
+                show: onShow,
+                hide: onHide,
+                resize: onResize
+            };
+
+            function onShow(p) {
+                var element, scope, params, content;
+
+                element = $('body');
+                if (element.find('md-backdrop').length > 0) { return; }
+                onHide();
+                scope = $rootScope.$new();
+                params = p && _.isObject(p) ? p : {};
+                scope.params = params;
+                scope.locals = params.locals;
+                content = $compile(popoverTemplate)(scope);
+                element.append(content);
+            }
+
+            function onHide() {
+                var backdropElement = $('.pip-popover-backdrop');
+
+                backdropElement.removeClass('opened');
+                $timeout(function () {
+                    backdropElement.remove();
+                }, 100);
+            }
+
+            function onResize() {
+                $rootScope.$broadcast('pipPopoverResize');
+            }
+
+        }]
+    );
+
+})(window.angular, window.jQuery);
 
 /**
  * @file Routing progress control
- * @description 
- * This progress control is enabled by ui router 
+ * @description
+ * This progress control is enabled by ui router
  * while switching between pages
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global _, angular */
-
-(function () {
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module("pipRoutingProgress", ['ngMaterial']);
+    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
 
-    thisModule.directive('pipRoutingProgress', function() {
-       return {
-           restrict: 'EA',
-           replace: true,
-           templateUrl: 'progress/routing_progress.html'
-       };
+    thisModule.directive('pipRoutingProgress', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            templateUrl: 'progress/routing_progress.html'
+        };
     });
-   
-})();
+
+})(window.angular);
+
+/**
+ * @file Refresh button control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
+
+    thisModule.directive('pipRefreshButton',
+        ['$parse', function ($parse) {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: String() +
+                '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">' +
+                '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
+                '<span class="pip-refresh-text"></span>' +
+                '</md-button>',
+                replace: false,
+                link: function ($scope, $element, $attrs) {
+                    var width, text, show,
+                        textGetter = $parse($attrs.pipText),
+                        visibleGetter = $parse($attrs.pipVisible),
+                        refreshGetter = $parse($attrs.pipRefresh),
+                        $button = $element.children('.md-button'),
+                        $text = $button.children('.pip-refresh-text');
+
+                    show = function () {
+                        // Set a new text
+                        text = textGetter($scope);
+                        $text.text(text);
+
+                        // Show button
+                        $button.show();
+
+                        // Adjust position
+                        width = $button.width();
+                        $button.css('margin-left', '-' + width / 2 + 'px');
+                    };
+
+                    function hide() {
+                        $button.hide();
+                    }
+
+                    $scope.onClick = function () {
+                        refreshGetter($scope);
+                    };
+
+                    $scope.$watch(visibleGetter, function (newValue) {
+                        if (newValue) {
+                            show();
+                        } else {
+                            hide();
+                        }
+                    });
+
+                    $scope.$watch(textGetter, function (newValue) {
+                        $text.text(newValue);
+                    });
+                }
+            };
+        }]
+    );
+
+})(window.angular);
+
+
 /**
  * @file Tag list control
  * @copyright Digital Living Software Corp. 2014-2015
@@ -11058,20 +11177,18 @@ module.run(['$templateCache', function($templateCache) {
  * - What's pipType and pipTypeLocal? Give better name
  * - Do not use ng-if, instead generate template statically
  */
- 
-/* global angular */
 
-(function () {
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module("pipTagList", ['pipCore']);
+    var thisModule = angular.module('pipTagList', ['pipCore']);
 
     /**
      * pipTags - set of tags
      * pipType - additional type tag
      * pipTypeLocal - additional translated type tag
      */
-    thisModule.directive('pipTagList', 
+    thisModule.directive('pipTagList',
         ['$parse', function ($parse) {
             return {
                 restrict: 'EA',
@@ -11081,111 +11198,307 @@ module.run(['$templateCache', function($templateCache) {
                     pipTypeLocal: '='
                 },
                 templateUrl: 'tags/tag_list.html',
-                controller:
-                    ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-                        var tagsGetter = $parse($attrs.pipTags);
-                        
-                        $element.css("display", "block");
-                        
-                        // Set tags
-                        $scope.tags = tagsGetter($scope);
+                controller: ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+                    var tagsGetter;
 
-                        // Also optimization to avoid watch if it is unnecessary
-                        if (pipUtils.toBoolean($attrs.pipRebind)) {
-                            $scope.$watch(tagsGetter, function (newValue) {
-                                $scope.tags = tagsGetter($scope)
-                            });
-                        }
+                    tagsGetter = $parse($attrs.pipTags);
+                    $element.css('display', 'block');
+                    // Set tags
+                    $scope.tags = tagsGetter($scope);
 
-                        // Add class
-                        $element.addClass('pip-tag-list');
-                    }]
-            }
+                    // Also optimization to avoid watch if it is unnecessary
+                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                        $scope.$watch(tagsGetter, function (newValue) {
+                            $scope.tags = tagsGetter($scope);
+                        });
+                    }
+
+                    // Add class
+                    $element.addClass('pip-tag-list');
+                }]
+            };
         }]
     );
 
-})();
+})(window.angular);
 
 
-/**
- * @file Refresh button control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
+//
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module("pipRefreshButton", ['ngMaterial']);
+    var thisModule = angular.module('pipTimeEdit', ['pipUtils', 'pipTranslate']);
 
-    thisModule.directive('pipRefreshButton',  
-        ['$parse', function($parse) {
+    thisModule.directive('pipTimeEdit',
+        function () {
             return {
                 restrict: 'EA',
-                scope: false,
-                template: String()
-                    + '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">'
-                    + '<md-icon md-svg-icon="icons:refresh"></md-icon>'
-                    + ' <span class="pip-refresh-text"></span>'
-                    + '</md-button>',
-                replace: false,
-                link: function ($scope, $element, $attrs) {
-                    var
-                        textGetter = $parse($attrs.pipText),
-                        visibleGetter = $parse($attrs.pipVisible),
-                        refreshGetter = $parse($attrs.pipRefresh),
-                        $button = $element.children('.md-button'),
-                        $text = $button.children('.pip-refresh-text');
+                scope: {
+                    pipStartDate: '=',
+                    pipChanged: '&',
+                    pipEndDate: '=',
+                    pipStartLabel: '@',
+                    pipEndLabel: '@',
+                    disabled: '&ngDisabled',
+                    pipSize: '='
+                },
+                templateUrl: 'time_edit/time_edit.html',
+                controller: 'pipTimeEditController'
+            };
+        }
+    );
 
-                    var show = function() {
-                        // Set a new text
-                        var text = textGetter($scope);
-                        $text.text(text);
+    thisModule.controller('pipTimeEditController',
+        ['$scope', '$element', '$attrs', 'pipDates', 'pipTranslate', function ($scope, $element, $attrs, pipDates, pipTranslate) {
 
-                        // Show button
-                        $button.show();
-                        
-                        // Adjust position
-                        var width = $button.width();
-                        $button.css('margin-left', '-' + (width / 2) + 'px');
-                    };
+            function getDateJSON(value) {
+                var date;
 
-                    function hide() {
-                        $button.hide();  
-                    };
+                date = value ? new Date(value) : null;
 
-                    $scope.onClick = function(event) {
-                        refreshGetter($scope);  
-                    };
+                return date;
+            }
 
-                    $scope.$watch(visibleGetter, function(newValue) {
-                        if (newValue == true) show();
-                        else hide();
-                    });
+            function setDuration() {
+                var start, end;
 
-                    $scope.$watch(textGetter, function(newValue) {
-                        $text.text(newValue);
-                    });
+                if (!$scope.data.startDate || !$scope.data.endDate) {
+                    return null;
+                }
+                start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+
+                return end - start;
+            }
+
+            function validateStartDate() {
+                var date, start, end;
+
+                // если начальная дата не задана, обнуляем и выходим
+                if (!$scope.data.startDate) {
+                    $scope.data.startTime = null;
+
+                    return;
+                }
+                // еcли не задано начальное время - задаем его
+                if (!$scope.data.startTime) {
+                    if (!$scope.data.endTime) {
+                        date = new Date();
+                        date = date.getTime() - pipDates.toStartDay(date);
+                        $scope.data.startTime = Math.floor(date / (30 * 60 * 1000)) * 30;
+                    } else {
+                        $scope.data.startTime = $scope.data.endTime === 0 ? 0 : $scope.data.endTime - 30;
+                    }
+                }
+
+                // если конечная дата не задана, обнуляем и выходим
+                if (!$scope.data.endDate) {
+                    $scope.data.endTime = null;
+
+                    return;
+                }
+
+                start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+                // Если есть длительность, то сохраняем ее. Длительность можно изменить только изменяя конечную дату
+                if ($scope.data.duration) {
+                    end = new Date(start.getTime() + $scope.data.duration);
+                    $scope.data.endDate = pipDates.toStartDay(end);
+                    end = end.getTime() - $scope.data.endDate.getTime();
+                    $scope.data.endTime = Math.floor(end / (30 * 60 * 1000)) * 30;
+                } else {
+                    // Если нет длительности сравниваем даты
+                    end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+                    if (start >= end) {
+                        // Если начальная дата больше, то двигаем конечную дату
+                        $scope.data.endDate = pipDates.toStartDay(new Date(start.getTime() + 30 * 60000));
+                        $scope.data.endTime = ($scope.data.startTime + 30) % 1440;
+                    }
                 }
             }
+
+            function validateEndDate() {
+                var date, start, end;
+
+                // если начальная дата не задана, обнуляем и выходим
+                if (!$scope.data.endDate) {
+                    $scope.data.endTime = null;
+
+                    return;
+                }
+                // еcли не задано конечное время - задаем его
+                if (!$scope.data.endTime) {
+                    if (!$scope.data.startTime) {
+                        date = new Date();
+                        date = date.getTime() - pipDates.toStartDay(date);
+                        $scope.data.endTime = Math.floor(date / (30 * 60 * 1000)) * 30;
+                    } else {
+                        $scope.data.endTime = $scope.data.startTime === 1410 ? 1410 : $scope.data.startTime + 30;
+                    }
+                }
+
+                // если yачальная дата не задана, обнуляем и выходим
+                if (!$scope.data.startDate) {
+                    $scope.data.startTime = null;
+
+                    return;
+                }
+
+                start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+                if (start >= end) {
+                    // Если начальная дата больше, то двигаем начальную дату
+                    $scope.data.startDate = pipDates.toStartDay(new Date(end.getTime() - 30 * 60000));
+                    $scope.data.startTime = $scope.data.endTime % 1440 === 0 ? 1410 : $scope.data.endTime - 30;
+                }
+
+                $scope.data.duration = setDuration();
+            }
+
+            function setDate() {
+                var time;
+
+                $scope.data.bind = false;
+                if ($scope.data.startDate) {
+                    time = $scope.data.startTime ? $scope.data.startTime * 60 * 1000 : 0;
+                    $scope.pipStartDate = new Date($scope.data.startDate.getTime() + time);
+                }
+                if ($scope.data.endDate) {
+                    time = $scope.data.endTime ? $scope.data.endTime * 60 * 1000 : 0;
+                    $scope.pipEndDate = new Date($scope.data.endDate.getTime() + time);
+                }
+                $scope.data.bind = true;
+            }
+
+            function defineDate() {
+                var start, end;
+
+                if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                    start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate : null;
+                    if (!start) {
+                        start = getDateJSON($scope.pipStartDate);
+                    }
+                    $scope.data.startDate = pipDates.toStartDay(start);
+                    $scope.data.startTime = (new Date(start) - $scope.data.startDate) / (60 * 1000);
+                }
+
+                if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                    end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate : null;
+                    if (!start) {
+                        end = getDateJSON($scope.pipEndDate);
+                    }
+                    $scope.data.endDate = pipDates.toStartDay(end);
+                    $scope.data.endTime = (new Date(end) - $scope.data.endDate) / (60 * 1000);
+                }
+                validateStartDate();
+                $scope.data.duration = setDuration();
+                setDate();
+            }
+
+            function getTimeInterval() {
+                var result, i, j, minutes;
+
+                result = [];
+                for (i = 0; i < 24; i++) {
+                    for (j = 0; j < 2; j++) {
+                        minutes = j * 30;
+                        result.push({
+                            id: i * 60 + minutes,
+                            time: _.pad(i.toString(), 3, '0').substr(0, 2) + ':' + _.pad(minutes.toString(), 2, '0')
+                        });
+                    }
+                }
+
+                return result;
+            }
+
+            function initDate() {
+                $scope.data.startDate = null;
+                $scope.data.startTime = null;
+                $scope.data.endDate = null;
+                $scope.data.endTime = null;
+                $scope.data.duration = null;
+            }
+
+            // initialize data
+            $scope.intervalTimeCollection = getTimeInterval();
+            $scope.data = {};
+            $scope.startLabel = $scope.pipStartLabel ? pipTranslate.translate($scope.pipStartLabel)
+                : pipTranslate.translate('EVENT_NEW_START_TIME');
+            $scope.endLabel = $scope.pipEndLabel ? pipTranslate.translate($scope.pipEndLabel)
+                : pipTranslate.translate('EVENT_NEW_END_TIME');
+            initDate();
+            defineDate();
+
+            // process function
+            $scope.onChangeStartDate = function () {
+                validateStartDate();
+                $scope.data.duration = setDuration();
+                setDate();
+                $scope.pipChanged();
+            };
+
+            $scope.onChangeEndDate = function () {
+                validateEndDate();
+                $scope.data.duration = setDuration();
+                setDate();
+                $scope.pipChanged();
+            };
+
+            $scope.onChangeStartTime = function () {
+                if (!$scope.data.startDate) {
+                    $scope.data.startDate = pipDates.toStartDay(new Date());
+                }
+                validateStartDate();
+                $scope.data.duration = setDuration();
+                setDate();
+                $scope.pipChanged();
+            };
+
+            $scope.onChangeEndTime = function () {
+                if (!$scope.data.endDate) {
+                    $scope.data.endDate = pipDates.toStartDay(new Date());
+                }
+                validateEndDate();
+                $scope.data.duration = setDuration();
+                setDate();
+                $scope.pipChanged();
+            };
+
+            $scope.isDisabled = function () {
+                if ($scope.disabled) {
+                    return $scope.disabled();
+                } else {
+                    return false;
+                }
+            };
+
+            $scope.$watchGroup([$scope.pipStartDate, $scope.pipEndDate], function () {
+                if ($scope.data.bind) {
+                    initDate();
+                    defineDate();
+                }
+            });
+
+            $scope.$watch($scope.disabled, function (newValue) {
+                $scope.disableControls = newValue;
+            });
+
+            // Add class
+            $element.addClass('pip-time-edit');
         }]
     );
 
-})();
-
+})(window.angular);
 
 /**
  * @file Time control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global angular */
-
-(function () {
+(function (angular) {
     'use strict';
 
-    var thisModule = angular.module("pipTimeView", ['pipUtils']);
+    var thisModule = angular.module('pipTimeView', ['pipUtils']);
 
     thisModule.directive('pipTimeView',
         ['pipUtils', function (pipUtils) {
@@ -11195,25 +11508,28 @@ module.run(['$templateCache', function($templateCache) {
                     pipStartDate: '=',
                     pipEndDate: '='
                 },
-                templateUrl:  'time_view/time_view.html',
+                templateUrl: 'time_view/time_view.html',
                 link: function ($scope, $element, $attrs) {
 
                     function getDateJSON(value) {
                         var date = value ? new Date(value) : null;
+
                         return date;
-                    };
+                    }
 
                     function defineStartDate() {
-                        if (($scope.pipStartDate !== null) && ($scope.pipStartDate !== undefined)) {
-                            $scope.data.start = _.isDate($scope.pipStartDate) ?  $scope.pipStartDate : getDateJSON($scope.pipStartDate);
+                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
+                                : getDateJSON($scope.pipStartDate);
                         }
-                    };
+                    }
 
                     function defineEndDate() {
-                        if (($scope.pipEndDate !== null) && ($scope.pipEndDate !== undefined)) {
-                            $scope.data.end = _.isDate($scope.pipEndDate) ?  $scope.pipEndDate : getDateJSON($scope.pipEndDate);
+                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
+                                : getDateJSON($scope.pipEndDate);
                         }
-                    };
+                    }
 
                     $scope.data = {};
                     $scope.data.start = null;
@@ -11239,273 +11555,20 @@ module.run(['$templateCache', function($templateCache) {
                     // Add class
                     $element.addClass('pip-time-view');
                 }
-            }
+            };
         }]
     );
 
-})();
+})(window.angular);
 
-/**
- * @file Time control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipTimeEdit", ['pipUtils', 'pipTranslate']);
-
-    thisModule.directive('pipTimeEdit',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipStartDate: '=',
-                    pipChanged: '&',
-                    pipEndDate: '=',
-                    pipStartLabel: '@',
-                    pipEndLabel: '@',
-                    disabled: '&ngDisabled',
-                    pipSize: '='
-                },
-                templateUrl: 'time_edit/time_edit.html',
-                controller: 'pipTimeEditController'
-            }
-        }
-    );
-
-    thisModule.controller('pipTimeEditController',
-        ['$scope', '$element', '$attrs', 'pipDates', 'pipTranslate', function ($scope, $element, $attrs, pipDates, pipTranslate) {
-
-            function getDateJSON(value) {
-                var date = value ? new Date(value) : null;
-                return date;
-            };
-
-            function setDuration() {
-                if (!$scope.data.startDate || !$scope.data.endDate)
-                    return null;
-
-                var start, end;
-                start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-                return end - start;
-            };
-
-            function validateStartDate() {
-                // если начальная дата не задана, обнуляем и выходим
-                if (!$scope.data.startDate) {
-                    $scope.data.startTime = null;
-                    return;
-                }
-                // еcли не задано начальное время - задаем его
-                if (!$scope.data.startTime) {
-                    if (!$scope.data.endTime) {
-                        var date = new Date();
-                        $scope.data.startTime = Math.floor((date.getTime() -  pipDates.toStartDay(date)) / (30 * 60 * 1000)) * 30;
-                    } else {
-                        $scope.data.startTime = $scope.data.endTime == 0 ? 0 : $scope.data.endTime - 30;
-                    }
-                }
-
-                // если конечная дата не задана, обнуляем и выходим
-                if (!$scope.data.endDate) {
-                    $scope.data.endTime = null;
-                    return;
-                }
-
-                var start, end;
-                start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-                // Если есть длительность, то сохраняем ее. Длительность можно изменить только изменяя конечную дату
-                if ($scope.data.duration) {
-                    end = new Date(start.getTime() + $scope.data.duration);
-                    $scope.data.endDate = pipDates.toStartDay(end);
-                    $scope.data.endTime = Math.floor((end.getTime() - $scope.data.endDate.getTime()) / (30 * 60 * 1000)) * 30;
-                } else {
-                    // Если нет длительности сравниваем даты
-                    end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-                    if (start >= end) {
-                        // Если начальная дата больше, то двигаем конечную дату
-                        $scope.data.endDate = pipDates.toStartDay(new Date(start.getTime() + (30 * 60000)));
-                        $scope.data.endTime = ($scope.data.startTime + 30) % 1440;
-                    }
-                }
-            };
-
-            function validateEndDate() {
-                // если начальная дата не задана, обнуляем и выходим
-                if (!$scope.data.endDate) {
-                    $scope.data.endTime = null;
-                    return;
-                }
-                // еcли не задано конечное время - задаем его
-                if (!$scope.data.endTime) {
-                    if (!$scope.data.startTime) {
-                        var date = new Date();
-                        $scope.data.endTime = Math.floor((date.getTime() -  pipDates.toStartDay(date)) / (30 * 60 * 1000)) * 30;
-                    } else {
-                        $scope.data.endTime = $scope.data.startTime == 1410 ? 1410 : $scope.data.startTime + 30;
-                    }
-                }
-
-                // если yачальная дата не задана, обнуляем и выходим
-                if (!$scope.data.startDate) {
-                    $scope.data.startTime = null;
-                    return;
-                }
-
-                var start, end;
-                start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-                if (start >= end) {
-                    // Если начальная дата больше, то двигаем начальную дату
-                    $scope.data.startDate = pipDates.toStartDay(new Date(end.getTime() - 30 * 60000));
-                    $scope.data.startTime = ($scope.data.endTime % 1440 == 0) ? 1410 : $scope.data.endTime - 30;
-                }
-
-                $scope.data.duration = setDuration();
-            };
-
-            function setDate() {
-                $scope.data.bind = false;
-                if($scope.data.startDate) {
-                    var time = $scope.data.startTime ? $scope.data.startTime * 60 * 1000 : 0;
-                    $scope.pipStartDate = new Date($scope.data.startDate.getTime() + time);
-                }
-                if($scope.data.endDate) {
-                    var time = $scope.data.endTime ? $scope.data.endTime * 60 * 1000 : 0;
-                    $scope.pipEndDate = new Date($scope.data.endDate.getTime() + time);
-                }
-                $scope.data.bind = true;
-            };
-
-            function defineDate() {
-                var start, end;
-                if (($scope.pipStartDate !== null) && ($scope.pipStartDate !== undefined)) {
-                    var start = _.isDate($scope.pipStartDate) ?  $scope.pipStartDate : null;
-                    if (!start) {
-                        start = getDateJSON($scope.pipStartDate);
-                    }
-                    $scope.data.startDate = pipDates.toStartDay(start);
-                    $scope.data.startTime = (new Date(start) - $scope.data.startDate) / (60 * 1000);
-                }
-
-                if (($scope.pipEndDate !== null) && ($scope.pipEndDate !== undefined)) {
-                    var end = _.isDate($scope.pipEndDate) ?  $scope.pipEndDate : null;
-                    if (!start) {
-                        end = getDateJSON($scope.pipEndDate);
-                    }
-                    $scope.data.endDate = pipDates.toStartDay(end);
-                    $scope.data.endTime = (new Date(end) - $scope.data.endDate) / (60 * 1000);
-                }
-                validateStartDate();
-                $scope.data.duration = setDuration();
-                setDate();
-            };
-
-            function getTimeInterval() {
-                var result = [];
-
-                for (var i = 0; i < 24; i++) {
-                    for (var j = 0; j < 2; j++) {
-                        var minutes = j * 30;
-                        result.push({
-                            id: (i * 60 + minutes),
-                            time: _.pad(i.toString(),3,'0').substr(0, 2) + ':' + _.pad(minutes.toString(),2,'0')
-                        });
-                    }
-                }
-
-                return result;
-            };
-
-            function initDate() {
-                $scope.data.startDate = null;
-                $scope.data.startTime = null;
-                $scope.data.endDate = null;
-                $scope.data.endTime = null;
-                $scope.data.duration = null;
-            };
-
-            // initialize data
-            $scope.intervalTimeCollection = getTimeInterval();
-            $scope.data = {};
-            $scope.startLabel = $scope.pipStartLabel ? pipTranslate.translate($scope.pipStartLabel) : pipTranslate.translate('EVENT_NEW_START_TIME');
-            $scope.endLabel = $scope.pipEndLabel ? pipTranslate.translate($scope.pipEndLabel) : pipTranslate.translate('EVENT_NEW_END_TIME');
-            initDate();
-            defineDate();
-
-            // process function
-            $scope.onChangeStartDate = function () {
-                validateStartDate();
-                $scope.data.duration = setDuration();
-                setDate();
-                $scope.pipChanged();
-            };
-
-            $scope.onChangeEndDate = function () {
-                validateEndDate();
-                $scope.data.duration = setDuration();
-                setDate();
-                $scope.pipChanged();
-            };
-
-            $scope.onChangeStartTime = function () {
-                if (!$scope.data.startDate)
-                    $scope.data.startDate = pipDates.toStartDay(new Date());
-                validateStartDate();
-                $scope.data.duration = setDuration();
-                setDate();
-                $scope.pipChanged();
-            };
-
-            $scope.onChangeEndTime = function () {
-                if (!$scope.data.endDate)
-                    $scope.data.endDate = pipDates.toStartDay(new Date());
-                validateEndDate();
-                $scope.data.duration = setDuration();
-                setDate();
-                $scope.pipChanged();
-            };
-
-            $scope.isDisabled = function () {
-                if ($scope.disabled){
-                    return $scope.disabled();
-                } else {
-                    return false;
-                }
-            }
-
-            $scope.$watchGroup([$scope.pipStartDate, $scope.pipEndDate], function() {
-                if ($scope.data.bind) {
-                    initDate();
-                    defineDate();
-                }
-            });
-
-            $scope.$watch($scope.disabled, function(newValue) {
-                $scope.disableControls = newValue;
-            });
-
-            // Add class
-            $element.addClass('pip-time-edit');
-        }]
-    );
-
-})();
 /**
  * @file Toasts management service
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo Replace ngAudio with alternative service
  */
- 
- /* global _, angular */
- 
-(function () {
+
+(function (angular, _) {
     'use strict';
-    
     var thisModule = angular.module('pipToasts', ['pipTranslate', 'ngMaterial', 'pipAssert']);
 
     thisModule.controller('pipToastController',
@@ -11517,19 +11580,16 @@ module.run(['$templateCache', function($templateCache) {
             $scope.message = toast.message;
             $scope.actions = toast.actions;
             $scope.toast = toast;
-            if(toast.actions.length == 0 ){
+            if (toast.actions.length === 0) {
                 $scope.actionLenght = 0;
-            } else{
-                if(toast.actions.length == 1 ){
-                    $scope.actionLenght = toast.actions[0].toString().length;
-                } else {
-                    $scope.actionLenght = null;
-                }
-
             }
-            console.log($scope.actionLenght);
+            if (toast.actions.length === 1) {
+                $scope.actionLenght = toast.actions[0].toString().length;
+            } else {
+                $scope.actionLenght = null;
+            }
 
-            $scope.onDetails =  function(event) {
+            $scope.onDetails = function (event) {
                 $mdToast.hide();
                 pipErrorDetailsDialog.show(
                     {
@@ -11537,35 +11597,40 @@ module.run(['$templateCache', function($templateCache) {
                         ok: 'Ok'
                     },
                     function () {
-                        console.log('You agreed');
+                        angular.noop();
                     },
                     function () {
-                        console.log('You disagreed');
+                        angular.noop();
                     }
                 );
             };
 
             $scope.onAction = function (action) {
-                $mdToast.hide({ action: action });
+                $mdToast.hide(
+                    {
+                        action: action,
+                        id: toast.id,
+                        message: toast.message
+                    });
             };
         }]
     );
 
-    thisModule.service('pipToasts', 
+    thisModule.service('pipToasts',
         ['$rootScope', '$mdToast', 'pipAssert', function ($rootScope, $mdToast, pipAssert) {
-            var 
+            var
                 SHOW_TIMEOUT = 20000,
                 SHOW_TIMEOUT_NOTIFICATIONS = 20000,
-                toasts = [], 
+                toasts = [],
                 currentToast,
                 sounds = {};
 
             /** pre-load sounds for notifications */
-            // sounds['toast_error'] = ngAudio.load('sounds/fatal.mp3');
-            // sounds['toast_notification'] = ngAudio.load('sounds/error.mp3');
-            // sounds['toast_message'] = ngAudio.load('sounds/warning.mp3');
+                // sounds['toast_error'] = ngAudio.load('sounds/fatal.mp3');
+                // sounds['toast_notification'] = ngAudio.load('sounds/error.mp3');
+                // sounds['toast_message'] = ngAudio.load('sounds/warning.mp3');
 
-            // Remove error toasts when page is changed
+                // Remove error toasts when page is changed
             $rootScope.$on('$stateChangeSuccess', onStateChangeSuccess);
             $rootScope.$on('pipSessionClosed', onClearToasts);
 
@@ -11579,21 +11644,21 @@ module.run(['$templateCache', function($templateCache) {
                 getToastById: getToastById
             };
 
-            //---------------------------
-
             // Take the next from queue and show it
             function showNextToast() {
+                var toast;
+
                 if (toasts.length > 0) {
-                    var toast = toasts[0];
+                    toast = toasts[0];
                     toasts.splice(0, 1);
                     showToast(toast);
                 }
             }
-    
+
             // Show toast
             function showToast(toast) {
                 currentToast = toast;
-    
+
                 $mdToast.show({
                     templateUrl: 'toast/toast.html',
                     hideDelay: toast.duration || SHOW_TIMEOUT,
@@ -11604,14 +11669,14 @@ module.run(['$templateCache', function($templateCache) {
                         sounds: sounds
                     }
                 })
-                .then(
+                    .then(
                     function showToastOkResult(action) {
                         if (currentToast.successCallback) {
                             currentToast.successCallback(action);
                         }
                         currentToast = null;
                         showNextToast();
-                    }, 
+                    },
                     function showToastCancelResult(action) {
                         if (currentToast.cancelCallback) {
                             currentToast.cancelCallback(action);
@@ -11621,19 +11686,23 @@ module.run(['$templateCache', function($templateCache) {
                     }
                 );
             }
-    
+
             function addToast(toast) {
 
-                if (currentToast && toast.type !='error')
+                if (currentToast && toast.type !== 'error') {
                     toasts.push(toast);
-                else showToast(toast);
+                } else {
+                    showToast(toast);
+                }
             }
-    
+
             function removeToasts(type) {
                 var result = [];
+
                 _.each(toasts, function (toast) {
-                    if (!toast.type || toast.type != type)
+                    if (!toast.type || toast.type !== type) {
                         result.push(toast);
+                    }
                 });
                 toasts = _.cloneDeep(result);
             }
@@ -11645,13 +11714,13 @@ module.run(['$templateCache', function($templateCache) {
             function getToastById(id) {
                 return _.find(toasts, {id: id});
             }
-    
+
             function onStateChangeSuccess(event, toState, toParams, fromState, fromParams) {
-                toasts = _.reject(toasts, function(toast) {
-                    return toast.type == 'error'; 
+                toasts = _.reject(toasts, function (toast) {
+                    return toast.type === 'error';
                 });
 
-                if (currentToast && currentToast.type == 'error') {
+                if (currentToast && currentToast.type === 'error') {
                     $mdToast.cancel();
                     showNextToast();
                 }
@@ -11660,14 +11729,18 @@ module.run(['$templateCache', function($templateCache) {
             function onClearToasts(event) {
                 clearToasts();
             }
-    
+
             // Show new notification toast at the top right
             function showNotification(message, actions, successCallback, cancelCallback, id) {
                 pipAssert.isDef(message, 'pipToasts.showNotification: message should be defined');
                 pipAssert.isString(message, 'pipToasts.showNotification: message should be a string');
                 pipAssert.isArray(actions || [], 'pipToasts.showNotification: actions should be an array');
-                if (successCallback) pipAssert.isFunction(successCallback, 'pipToasts.showNotification: successCallback should be a function');
-                if (cancelCallback) pipAssert.isFunction(cancelCallback, 'pipToasts.showNotification: cancelCallback should be a function');
+                if (successCallback) {
+                    pipAssert.isFunction(successCallback, 'showNotification: successCallback should be a function');
+                }
+                if (cancelCallback) {
+                    pipAssert.isFunction(cancelCallback, 'showNotification: cancelCallback should be a function');
+                }
 
                 addToast({
                     id: id || null,
@@ -11684,8 +11757,12 @@ module.run(['$templateCache', function($templateCache) {
             function showMessage(message, successCallback, cancelCallback, id) {
                 pipAssert.isDef(message, 'pipToasts.showMessage: message should be defined');
                 pipAssert.isString(message, 'pipToasts.showMessage: message should be a string');
-                if (successCallback) pipAssert.isFunction(successCallback, 'pipToasts.showMessage: successCallback should be a function');
-                if (cancelCallback) pipAssert.isFunction(cancelCallback, 'pipToasts.showMessage: cancelCallback should be a function');
+                if (successCallback) {
+                    pipAssert.isFunction(successCallback, 'pipToasts.showMessage:successCallback should be a function');
+                }
+                if (cancelCallback) {
+                    pipAssert.isFunction(cancelCallback, 'pipToasts.showMessage: cancelCallback should be a function');
+                }
 
                 addToast({
                     id: id || null,
@@ -11701,8 +11778,12 @@ module.run(['$templateCache', function($templateCache) {
             function showError(message, successCallback, cancelCallback, id, error) {
                 pipAssert.isDef(message, 'pipToasts.showError: message should be defined');
                 pipAssert.isString(message, 'pipToasts.showError: message should be a string');
-                if (successCallback) pipAssert.isFunction(successCallback, 'pipToasts.showError: successCallback should be a function');
-                if (cancelCallback) pipAssert.isFunction(cancelCallback, 'pipToasts.showError: cancelCallback should be a function');
+                if (successCallback) {
+                    pipAssert.isFunction(successCallback, 'pipToasts.showError: successCallback should be a function');
+                }
+                if (cancelCallback) {
+                    pipAssert.isFunction(cancelCallback, 'pipToasts.showError: cancelCallback should be a function');
+                }
 
                 addToast({
                     id: id || null,
@@ -11735,19 +11816,17 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})();
+})(window.angular, window._);
 
 /**
  * @file Toggle buttons control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-/* global _, angular */
-
-(function () {
+(function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module("pipToggleButtons", ['pipBasicControls.Templates']);
+    var thisModule = angular.module('pipToggleButtons', ['pipBasicControls.Templates']);
 
     thisModule.directive('pipToggleButtons',
         function () {
@@ -11761,61 +11840,64 @@ module.run(['$templateCache', function($templateCache) {
                     change: '&ngChange'
                 },
                 templateUrl: 'toggle_buttons/toggle_buttons.html',
-                controller: 
-                    ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
-                        $scope.$mdMedia = $mdMedia;
-                        $scope.class = $attrs.class || '';
+                controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
+                    var index;
 
-                        if (!$scope.buttons || (_.isArray($scope.buttons) && $scope.buttons.length === 0)) {
-                            $scope.buttons = [];
-                            console.error('PipToggleButtons: attribute pipButtons should take array of buttons');
+                    $scope.$mdMedia = $mdMedia;
+                    $scope.class = $attrs.class || '';
+
+                    if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
+                        $scope.buttons = [];
+                    }
+
+                    index = _.indexOf($scope.buttons, _.find($scope.buttons, {id: $scope.currentButtonValue}));
+                    $scope.currentButtonIndex = index < 0 ? 0 : index;
+                    $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
+                        : $scope.currentButton;
+
+                    $scope.buttonSelected = function (index, $event) {
+                        if ($scope.disabled()) {
+                            return;
                         }
 
-                        var index = _.indexOf($scope.buttons, _.find($scope.buttons, {id: $scope.currentButtonValue}));
-                        $scope.currentButtonIndex = index < 0 ? 0 : index;
-                        $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex] : $scope.currentButton;
+                        $scope.currentButtonIndex = index;
+                        $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
+                        $scope.currentButtonValue = $scope.currentButton.id || index;
 
-                        $scope.buttonSelected = function (index, $event) {
-                            if ($scope.disabled()) return;
+                        $timeout(function () {
+                            $scope.$apply();
 
-                            $scope.currentButtonIndex = index;
-                            $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
-                            $scope.currentButtonValue = $scope.currentButton.id || index;
-
-                            $timeout(function() {
-                                $scope.$apply();
-
-                                if ($scope.change) {
-                                    $scope.change();
-                                }
-                            });
-                        };
-
-                        $scope.enterSpacePress = function (event) {
-                            $scope.buttonSelected(event.index);
-                        };
-
-                        $scope.disabled = function () {
-                            if ($scope.ngDisabled) {
-                                return $scope.ngDisabled();
+                            if ($scope.change) {
+                                $scope.change();
                             }
-                        };
-                    }],
-                link:
-                    function (scope, elem, attr) {
-                        elem
-                            .on('focusin', function () {
-                                elem.addClass('focused-container');
-                            })
-                            .on('focusout', function () {
-                                elem.removeClass('focused-container')
-                            })
+                        });
+                    };
+
+                    $scope.enterSpacePress = function (event) {
+                        $scope.buttonSelected(event.index);
+                    };
+
+                    $scope.disabled = function () {
+                        if ($scope.ngDisabled) {
+                            return $scope.ngDisabled();
+                        }
+                    };
+                }],
+                link: function (scope, elem, attr) {
+                    elem
+                        .on('focusin', function () {
+                            elem.addClass('focused-container');
+                        })
+                        .on('focusout', function () {
+                            elem.removeClass('focused-container');
+                        });
                 }
             };
         }
     );
 
-})();
+})(window.angular, window._);
+
 
 
 /**
@@ -15046,7 +15128,8 @@ module.run(['$templateCache', function($templateCache) {
     '-->\n' +
     '\n' +
     '<md-dialog class="pip-dialog pip-picture-dialog pip-camera-dialog" layout="column" md-theme="{{theme}}"\n' +
-    '           ng-show=" browser != \'android\'">\n' +
+    '           ng-show="browser != \'android\'"\n' +
+    '        ng-class="{\'pip-android-dialog\': browser == \'android\' || !browser}">\n' +
     '    <div class="pip-header"  layout="row" layout-align="start center">\n' +
     '        <md-button  ng-click="onCancelClick()" class="md-icon-button"\n' +
     '                    aria-label="{{ ::\'CANCEL\' | translate }}">\n' +
