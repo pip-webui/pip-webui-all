@@ -9115,7 +9115,8 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress" layout="column" layout-align="center center" ng-show="$routing || $reset">\n' +
+    '<div class="pip-routing-progress" layout="column" layout-align="center center"\n' +
+    '     ng-show="$routing || $reset || toolInitialized">\n' +
     '    <div class="loader">\n' +
     '        <svg class="circular" viewBox="25 25 50 50">\n' +
     '            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>\n' +
@@ -9304,7 +9305,7 @@ module.run(['$templateCache', function($templateCache) {
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-(function (angular) {
+(function (angular, _) {
     'use strict';
 
     var thisModule = angular.module('pipColorPicker', ['pipUtils', 'pipFocused', 'pipBasicControls.Templates']);
@@ -9341,9 +9342,9 @@ module.run(['$templateCache', function($templateCache) {
             $scope.disabled = function () {
                 if ($scope.ngDisabled) {
                     return $scope.ngDisabled();
-                } else {
-                    return true;
                 }
+
+                return true;
             };
 
             $scope.selectColor = function (index) {
@@ -9369,7 +9370,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular);
+})(window.angular, window._);
 
 /**
  * @file Confirmation dialog
@@ -9382,6 +9383,7 @@ module.run(['$templateCache', function($templateCache) {
     var thisModule = angular.module('pipConfirmationDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'CONFIRM_TITLE': 'Confirm'
@@ -9390,6 +9392,7 @@ module.run(['$templateCache', function($templateCache) {
             'CONFIRM_TITLE': 'Подтвердите'
         });
     }]);
+    /* eslint-enable quote-props */
 
     thisModule.factory('pipConfirmationDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -9441,11 +9444,12 @@ module.run(['$templateCache', function($templateCache) {
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-(function (angular, $) {
+(function (angular, $, _) {
     'use strict';
     var thisModule = angular.module('pipConversionDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'CONVERT_PARENT_TITLE': 'Choose type of the parent record',
@@ -9482,6 +9486,7 @@ module.run(['$templateCache', function($templateCache) {
             'CONVERT_RECORD_TO_POST': 'Любая полезная информация'
         });
     }]);
+    /* eslint-enable quote-props */
 
     thisModule.factory('pipConversionDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -9609,7 +9614,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular, window.jQuery);
+})(window.angular, window.jQuery, window._);
 
 /**
  * @file Date control
@@ -9769,7 +9774,7 @@ module.run(['$templateCache', function($templateCache) {
             $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
 
             // React on changes
-            $scope.$watch('model', function (newValue, oldValue) {
+            $scope.$watch('model', function (newValue) {
                 getValue(newValue);
             });
 
@@ -10071,7 +10076,7 @@ module.run(['$templateCache', function($templateCache) {
                 return weeks;
             }
 
-            function monthList(isShort) {
+            function monthList() {
                 var months, i;
 
                 months = [];
@@ -10210,6 +10215,7 @@ module.run(['$templateCache', function($templateCache) {
     var thisModule = angular.module('pipErrorDetailsDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'ERROR_DETAILS': 'Error details',
@@ -10229,6 +10235,7 @@ module.run(['$templateCache', function($templateCache) {
             'MESSAGE': 'Сообщение'
         });
     }]);
+    /* eslint-enable quote-props */
 
     thisModule.factory('pipErrorDetailsDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -10503,12 +10510,13 @@ module.run(['$templateCache', function($templateCache) {
  * - Improve sample in sampler app
  */
 
-(function (angular) {
+(function (angular, _) {
     'use strict';
 
     var thisModule = angular.module('pipInformationDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'INFORMATION_TITLE': 'Information'
@@ -10517,8 +10525,10 @@ module.run(['$templateCache', function($templateCache) {
             'INFORMATION_TITLE': 'Информация'
         });
     }]);
+    /* eslint-enable quote-props */
+
     thisModule.factory('pipInformationDialog',
-        ['$mdDialog', '$timeout', function ($mdDialog, $timeout) {
+        ['$mdDialog', function ($mdDialog) {
             return {
                 show: function (params, callback) {
                     $mdDialog.show({
@@ -10558,7 +10568,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular);
+})(window.angular, window._);
 
 /**
  * @file Markdown control
@@ -10568,11 +10578,12 @@ module.run(['$templateCache', function($templateCache) {
  * - Improve samples in sampler app
  */
 
-(function (angular, marked) {
+(function (angular, marked, _) {
     'use strict';
 
     var thisModule = angular.module('pipMarkdown', ['ngSanitize', 'pipUtils', 'pipTranslate']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'MARKDOWN_ATTACHMENTS': 'Attachments:',
@@ -10591,6 +10602,7 @@ module.run(['$templateCache', function($templateCache) {
             'time': 'Время'
         });
     }]);
+    /* eslint-enable quote-props */
 
     thisModule.directive('pipMarkdown',
         ['$parse', 'pipUtils', 'pipTranslate', function ($parse, pipUtils, pipTranslate) {
@@ -10684,7 +10696,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular, window.marked);
+})(window.angular, window.marked, window._);
 
 
 /**
@@ -10695,12 +10707,13 @@ module.run(['$templateCache', function($templateCache) {
  * - Remove deleted hack in the controller
  */
 
-(function (angular, $) {
+(function (angular, $, _) {
     'use strict';
 
     var thisModule = angular.module('pipOptionsDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'OPTIONS_TITLE': 'Choose Option'
@@ -10709,6 +10722,7 @@ module.run(['$templateCache', function($templateCache) {
             'OPTIONS_TITLE': 'Выберите опцию'
         });
     }]);
+    /* eslint-enable quote-props */
 
     thisModule.factory('pipOptionsDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -10790,7 +10804,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular, window.jQuery);
+})(window.angular, window.jQuery, window._);
 
 /**
  * @file Options dialog
@@ -10800,12 +10814,13 @@ module.run(['$templateCache', function($templateCache) {
  * - Remove deleted hack in the controller
  */
 
-(function (angular, $) {
+(function (angular, $, _) {
     'use strict';
 
     var thisModule = angular.module('pipOptionsBigDialog',
         ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
 
+    /* eslint-disable quote-props */
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
         pipTranslateProvider.translations('en', {
             'OPTIONS_TITLE': 'Choose Option'
@@ -10814,6 +10829,7 @@ module.run(['$templateCache', function($templateCache) {
             'OPTIONS_TITLE': 'Выберите опцию'
         });
     }]);
+    /* eslint-enable quote-props */
 
     thisModule.factory('pipOptionsBigDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -10879,7 +10895,7 @@ module.run(['$templateCache', function($templateCache) {
                 }
             };
 
-            $scope.onSelected = function (event) {
+            $scope.onSelected = function () {
                 $scope.selectedOptionName = $scope.options[$scope.optionIndex].name;
 
                 if ($scope.noActions) {
@@ -10918,14 +10934,14 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular, window.jQuery);
+})(window.angular, window.jQuery, window._);
 
 /**
  * @file Popover control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-(function (angular, $) {
+(function (angular, $, _) {
     'use strict';
 
     var thisModule = angular.module('pipPopover', ['pipAssert']);
@@ -10957,7 +10973,7 @@ module.run(['$templateCache', function($templateCache) {
                 }, 200);
 
                 $scope.onPopoverClick = onPopoverClick;
-                $scope = _.defaults($scope, $scope.$parent);
+                $scope = _.defaults($scope, $scope.$parent);    // eslint-disable-line 
 
                 $rootScope.$on('pipPopoverResize', onResize);
                 $(window).resize(onResize);
@@ -11075,7 +11091,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular, window.jQuery);
+})(window.angular, window.jQuery, window._);
 
 /**
  * @file Routing progress control
@@ -11208,7 +11224,7 @@ module.run(['$templateCache', function($templateCache) {
 
                     // Also optimization to avoid watch if it is unnecessary
                     if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch(tagsGetter, function (newValue) {
+                        $scope.$watch(tagsGetter, function () {
                             $scope.tags = tagsGetter($scope);
                         });
                     }
@@ -11223,8 +11239,8 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular);
 
 
-//
-(function (angular) {
+
+(function (angular, _) {
     'use strict';
 
     var thisModule = angular.module('pipTimeEdit', ['pipUtils', 'pipTranslate']);
@@ -11252,11 +11268,7 @@ module.run(['$templateCache', function($templateCache) {
         ['$scope', '$element', '$attrs', 'pipDates', 'pipTranslate', function ($scope, $element, $attrs, pipDates, pipTranslate) {
 
             function getDateJSON(value) {
-                var date;
-
-                date = value ? new Date(value) : null;
-
-                return date;
+                return value ? new Date(value) : null;
             }
 
             function setDuration() {
@@ -11280,6 +11292,7 @@ module.run(['$templateCache', function($templateCache) {
 
                     return;
                 }
+
                 // еcли не задано начальное время - задаем его
                 if (!$scope.data.startTime) {
                     if (!$scope.data.endTime) {
@@ -11299,6 +11312,7 @@ module.run(['$templateCache', function($templateCache) {
                 }
 
                 start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+
                 // Если есть длительность, то сохраняем ее. Длительность можно изменить только изменяя конечную дату
                 if ($scope.data.duration) {
                     end = new Date(start.getTime() + $scope.data.duration);
@@ -11325,6 +11339,7 @@ module.run(['$templateCache', function($templateCache) {
 
                     return;
                 }
+
                 // еcли не задано конечное время - задаем его
                 if (!$scope.data.endTime) {
                     if (!$scope.data.startTime) {
@@ -11345,6 +11360,7 @@ module.run(['$templateCache', function($templateCache) {
 
                 start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
                 end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+
                 if (start >= end) {
                     // Если начальная дата больше, то двигаем начальную дату
                     $scope.data.startDate = pipDates.toStartDay(new Date(end.getTime() - 30 * 60000));
@@ -11358,14 +11374,17 @@ module.run(['$templateCache', function($templateCache) {
                 var time;
 
                 $scope.data.bind = false;
+
                 if ($scope.data.startDate) {
                     time = $scope.data.startTime ? $scope.data.startTime * 60 * 1000 : 0;
                     $scope.pipStartDate = new Date($scope.data.startDate.getTime() + time);
                 }
+
                 if ($scope.data.endDate) {
                     time = $scope.data.endTime ? $scope.data.endTime * 60 * 1000 : 0;
                     $scope.pipEndDate = new Date($scope.data.endDate.getTime() + time);
                 }
+
                 $scope.data.bind = true;
             }
 
@@ -11374,21 +11393,26 @@ module.run(['$templateCache', function($templateCache) {
 
                 if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
                     start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate : null;
+
                     if (!start) {
                         start = getDateJSON($scope.pipStartDate);
                     }
+
                     $scope.data.startDate = pipDates.toStartDay(start);
                     $scope.data.startTime = (new Date(start) - $scope.data.startDate) / (60 * 1000);
                 }
 
                 if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
                     end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate : null;
+
                     if (!start) {
                         end = getDateJSON($scope.pipEndDate);
                     }
+
                     $scope.data.endDate = pipDates.toStartDay(end);
                     $scope.data.endTime = (new Date(end) - $scope.data.endDate) / (60 * 1000);
                 }
+
                 validateStartDate();
                 $scope.data.duration = setDuration();
                 setDate();
@@ -11458,6 +11482,7 @@ module.run(['$templateCache', function($templateCache) {
                 if (!$scope.data.endDate) {
                     $scope.data.endDate = pipDates.toStartDay(new Date());
                 }
+
                 validateEndDate();
                 $scope.data.duration = setDuration();
                 setDate();
@@ -11467,9 +11492,9 @@ module.run(['$templateCache', function($templateCache) {
             $scope.isDisabled = function () {
                 if ($scope.disabled) {
                     return $scope.disabled();
-                } else {
-                    return false;
                 }
+
+                return false;
             };
 
             $scope.$watchGroup([$scope.pipStartDate, $scope.pipEndDate], function () {
@@ -11488,14 +11513,14 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular);
+})(window.angular, window._);
 
 /**
  * @file Time control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-(function (angular) {
+(function (angular, _) {
     'use strict';
 
     var thisModule = angular.module('pipTimeView', ['pipUtils']);
@@ -11512,9 +11537,7 @@ module.run(['$templateCache', function($templateCache) {
                 link: function ($scope, $element, $attrs) {
 
                     function getDateJSON(value) {
-                        var date = value ? new Date(value) : null;
-
-                        return date;
+                        return value ? new Date(value) : null;
                     }
 
                     function defineStartDate() {
@@ -11539,13 +11562,13 @@ module.run(['$templateCache', function($templateCache) {
 
                     if (pipUtils.toBoolean($attrs.pipRebind)) {
                         $scope.$watch('pipStartDate',
-                            function (newValue) {
+                            function () {
                                 $scope.data.start = null;
                                 defineStartDate();
                             }
                         );
                         $scope.$watch('pipEndDate',
-                            function (newValue) {
+                            function () {
                                 $scope.data.end = null;
                                 defineEndDate();
                             }
@@ -11559,7 +11582,7 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-})(window.angular);
+})(window.angular, window._);
 
 /**
  * @file Toasts management service
@@ -11572,7 +11595,7 @@ module.run(['$templateCache', function($templateCache) {
     var thisModule = angular.module('pipToasts', ['pipTranslate', 'ngMaterial', 'pipAssert']);
 
     thisModule.controller('pipToastController',
-        ['$scope', '$mdToast', 'toast', 'pipErrorDetailsDialog', 'sounds', function ($scope, $mdToast, toast, pipErrorDetailsDialog, sounds) {
+        ['$scope', '$mdToast', 'toast', 'pipErrorDetailsDialog', function ($scope, $mdToast, toast, pipErrorDetailsDialog) {
             // if (toast.type && sounds['toast_' + toast.type]) {
             //     sounds['toast_' + toast.type].play();
             // }
@@ -11580,28 +11603,24 @@ module.run(['$templateCache', function($templateCache) {
             $scope.message = toast.message;
             $scope.actions = toast.actions;
             $scope.toast = toast;
+
             if (toast.actions.length === 0) {
                 $scope.actionLenght = 0;
-            }
-            if (toast.actions.length === 1) {
+            } else if (toast.actions.length === 1) {
                 $scope.actionLenght = toast.actions[0].toString().length;
             } else {
                 $scope.actionLenght = null;
             }
 
-            $scope.onDetails = function (event) {
+            $scope.onDetails = function () {
                 $mdToast.hide();
                 pipErrorDetailsDialog.show(
                     {
                         error: $scope.toast.error,
                         ok: 'Ok'
                     },
-                    function () {
-                        angular.noop();
-                    },
-                    function () {
-                        angular.noop();
-                    }
+                    angular.noop,
+                    angular.noop
                 );
             };
 
@@ -11715,7 +11734,7 @@ module.run(['$templateCache', function($templateCache) {
                 return _.find(toasts, {id: id});
             }
 
-            function onStateChangeSuccess(event, toState, toParams, fromState, fromParams) {
+            function onStateChangeSuccess() {
                 toasts = _.reject(toasts, function (toast) {
                     return toast.type === 'error';
                 });
@@ -11726,7 +11745,7 @@ module.run(['$templateCache', function($templateCache) {
                 }
             }
 
-            function onClearToasts(event) {
+            function onClearToasts() {
                 clearToasts();
             }
 
@@ -11855,7 +11874,7 @@ module.run(['$templateCache', function($templateCache) {
                     $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
                         : $scope.currentButton;
 
-                    $scope.buttonSelected = function (index, $event) {
+                    $scope.buttonSelected = function (index) {
                         if ($scope.disabled()) {
                             return;
                         }
@@ -11865,8 +11884,6 @@ module.run(['$templateCache', function($templateCache) {
                         $scope.currentButtonValue = $scope.currentButton.id || index;
 
                         $timeout(function () {
-                            $scope.$apply();
-
                             if ($scope.change) {
                                 $scope.change();
                             }
@@ -11883,7 +11900,7 @@ module.run(['$templateCache', function($templateCache) {
                         }
                     };
                 }],
-                link: function (scope, elem, attr) {
+                link: function (scope, elem) {
                     elem
                         .on('focusin', function () {
                             elem.addClass('focused-container');

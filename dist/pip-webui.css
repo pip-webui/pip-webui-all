@@ -4812,8 +4812,8 @@ pip-toggle-buttons:focus {
   color: rgba(0, 0, 0, 0.38) !important;
 }
 .pip-toggle-buttons button.pip-chip-button.md-button:disabled.selected {
-  color: #000000 !important;
-  opacity: 0.38;
+  color: #000 !important;
+  opacity: .38;
 }
 .pip-refresh-button {
   display: none;
@@ -5127,27 +5127,24 @@ pip-toggle-buttons:focus {
 .pip-routing-progress .pip-img {
   z-index: 100;
   position: absolute;
-  top: calc( 50% - 40px);
-  left: calc( 50% - 19px);
+  top: calc(50% - 40px);
+  left: calc(50% - 19px);
   -moz-transform: rotate(-15deg);
-  /* ��� Firefox */
   -ms-transform: rotate(-15deg);
-  /* ��� IE */
   -webkit-transform: rotate(-15deg);
-  /* ��� Safari, Chrome, iOS */
   -o-transform: rotate(-15deg);
-  /* ��� Opera */
   transform: rotate(-15deg);
 }
 .pip-routing-progress .loader {
   margin: 0 !important;
   position: absolute;
-  top: calc( 50% - 70px);
-  left: calc( 50% - 50px);
+  top: calc(50% - 70px);
+  left: calc(50% - 50px);
   width: 100px;
+  z-index: 10;
 }
 .pip-routing-progress .loader:before {
-  content: '';
+  content: "";
   display: block;
   padding-top: 100%;
 }
@@ -5191,17 +5188,17 @@ pip-toggle-buttons:focus {
 @keyframes color {
   100%,
   0% {
-    stroke: #F37047;
+    stroke: #f37047;
   }
   40% {
-    stroke: #46B2E6;
+    stroke: #46b2e6;
   }
   66% {
-    stroke: #67BC6B;
+    stroke: #67bc6b;
   }
   80%,
   90% {
-    stroke: #FFCC2A;
+    stroke: #ffcc2a;
   }
 }
 .pip-date .pip-date-day,
@@ -5518,7 +5515,7 @@ pip-date-range md-select .md-select-value .md-text {
 }
 .pip-dialog.pip-options-dialog md-dialog-content {
   max-height: 500px;
-  overflow-y: overlay!important;
+  overflow-y: overlay !important;
 }
 .pip-dialog.pip-options-dialog md-dialog-content .pip-content .pip-list-item {
   padding-left: 24px;
@@ -5532,7 +5529,7 @@ pip-date-range md-select .md-select-value .md-text {
   line-height: 24px;
 }
 .pip-dialog.pip-confirmation-dialog .pip-footer {
-  border-top: none !important;
+  border-top: 0 !important;
 }
 .pip-dialog.pip-conversion-dialog {
   width: 430px!important;
@@ -5565,7 +5562,7 @@ pip-date-range md-select .md-select-value .md-text {
   line-height: 25px;
 }
 .pip-dialog.pip-conversion-dialog .pip-header .pip-subtitle {
-  margin: 0px;
+  margin: 0;
   line-height: 22px;
 }
 .pip-dialog.pip-conversion-dialog .pip-body {
