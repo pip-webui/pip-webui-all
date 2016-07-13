@@ -80,7 +80,7 @@ This project would not be possible without effort contributed by particular indi
 ## Browsers support
  * IE11+
  * Edge
- * Chrome 47+,
+ * Chrome 47+
  * Firefox 43
  * Opera 35
 
