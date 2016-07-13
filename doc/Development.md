@@ -10,7 +10,7 @@ This document provides high-level instructions on how to build and test the libr
 
 ## <a name="setup"></a> Environment Setup
 
-TBD...
+Must be installed **[Node.js](https://nodejs.org/)**. If not installed, you can download [here](https://nodejs.org/en/download/).
 
 ## <a name="install"></a> Installing
 
@@ -41,20 +41,24 @@ gulp build
 ```
 
 ## <a name="test"></a> Testing
+Run **gulp** task:
 
-TBD...
+```bash
+# to test 
+gulp test
+
+# for linting codestyle
+gulp js-lint
+```
+
 
 ## <a name="contrib"></a> Contributing
 
 Developers interested in contributing should read the following guidelines:
 
-* [Issue Guidelines]()
-* [Contributing Guidelines]()
-* [Coding guidelines]()
-
-> Please do **not** ask general questions in an issue. Issues are only to report bugs, request
-  enhancements, or request new features. For general questions and discussions, use the
-  [Pip Devs Forum](https://groups.google.com/forum/#!forum/pipdevs).
+* [Issue Guidelines](https://github.com/pip-webui/pip-webui/blob/master/doc/Contributing.md#bugs)
+* [Contributing Guidelines](https://github.com/pip-webui/pip-webui/blob/master/doc/Contributing.md)
+* [Coding guidelines](https://github.com/pip-webui/pip-webui/blob/master/doc/Contributing.md#style-guide)
 
 It is important to note that for each release, the [ChangeLog](../CHANGELOG.md) is a resource that will
 itemize all:
