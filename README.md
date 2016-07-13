@@ -77,6 +77,13 @@ This project would not be possible without effort contributed by particular indi
 - **Kate Negrienko** - web development
 - **Andrey Podgorniy** - code cleanup, documentation, tutorials 
 
+## Browsers support
+ * IE11+,
+ * Edge
+ * Chrome 47+,
+ * Firefox 43
+ * Opera 35
+
 We also would like to recognize help received from the following companies.
 
 - **Digital Living Software Corp.**
