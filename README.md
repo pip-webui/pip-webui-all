@@ -78,7 +78,7 @@ This project would not be possible without effort contributed by particular indi
 - **Andrey Podgorniy** - code cleanup, documentation, tutorials 
 
 ## Browsers support
- * IE11+,
+ * IE11+
  * Edge
  * Chrome 47+,
  * Firefox 43
