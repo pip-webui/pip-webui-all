@@ -35,6 +35,8 @@ mkdir pipwebui-quickstart
 cd    pipwebui-quickstart
 ```
 
+**<a name="step1-b">(b) Add package definition and configuration files</a>**
+
 Create **package.json**
 ```
     {
@@ -69,19 +71,6 @@ Create **package.json**
       }
     }
 ```
-
-**<a name="step1-b">(b) Add package definition and configuration files</a>**
-
-**<a name="step1-c">(c) Install packages</a>**
-Before install packages install global _gulp_
-```bash
-npm install gulp -g && npm install gulp --save-dev
-```
-and then install dependencies
-```bash
-npm install
-```
-After installation you must _node_modules_ folder in project folder.
 
 Create **gulpfile.js** and write:
 ```text
@@ -133,6 +122,18 @@ module.exports = {
     }
 };
 ```
+
+**<a name="step1-c">(c) Install packages</a>**
+Before install packages install global _gulp_
+```bash
+npm install gulp -g && npm install gulp --save-dev
+```
+and then install dependencies
+```bash
+npm install
+```
+After installation you must _node_modules_ folder in project folder.
+
 
 After _build-dev_
 ```bash
