@@ -143,6 +143,61 @@ in your project folder will be **lib** folder with sources of Pip.WebUI componen
 Let's create anything. For example simple dialog window.
 First of all create **index.html**
 ```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+    <title>Get started with Pip.WebUI</title>
+
+    <link rel="stylesheet" href="lib/pip-webui-lib.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-css.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-layouts.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-nav.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-entry.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-locations.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-pictures.css"/>
+    <link rel="stylesheet" href="lib/pip-webui-controls.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
 
 
-```html
+    <script src="https://www.google.com/jsapi"></script>
+    <script src="lib/pip-webui-lib.js"></script>
+    <script src="lib/pip-webui-core.js"></script>
+    <script src="lib/pip-webui-rest.js"></script>
+    <script src="lib/pip-webui-layouts.js"></script>
+    <script src="lib/pip-webui-pictures.js"></script>
+    <script src="lib/pip-webui-locations.js"></script>
+    <script src="lib/pip-webui-entry.js"></script>
+    <script src="lib/pip-webui-nav.js"></script>
+    <script src="lib/pip-webui-controls.js"></script>
+
+</head>
+<body>
+<div ng-app="appBasicControls.ColorPicker" ng-controller="ColorPickerController">
+    <pip-color-picker ng-model="color" ng-disabled="disabled" pip-colors="colors">
+    </pip-color-picker>
+
+</div>
+<script charset="utf-8">
+    (function (angular) {
+        'use strict';
+
+        var thisModule = angular.module('appBasicControls.ColorPicker', ['pipControls']);
+
+        thisModule.controller('ColorPickerController',
+                function ($scope) {
+                    $scope.disabled = false;
+                    $scope.colors = ['purple', 'lightgreen', 'green', 'darkred', 'pink', 'yellow', 'cyan'];
+                    $scope.code = '<pip-color-picker ng-model="color" ng-disabled="disabled"' +
+                            'pip-colors="colors"></pip-color-picker>';
+                }
+        );
+    })(window.angular);
+</script>
+</body>
+</html>
+```
