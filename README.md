@@ -1,5 +1,7 @@
 # <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> UI Framework for Line-of-Business Applications 
 
+![](https://img.shields.io/badge/license-MIT-blue.svg)
+
 Development of complex Line-of-Business (Enteprise) applications is a serious undertaking that may require effort 
 of a large group of designers, developers and testers. Typical product line may have multiple applications, 
 each comes with tens of pages and dialogs. Enterprise users pay high price for their systems and demand quality 
