@@ -60,8 +60,8 @@ popover, dialogs and more
 - [Official Pip.Services website](http://www.pipwebui.org)
 - [UX Concept implemented by Pip.WebUI](https://github.com/pip-webui/pip-webui-ux)
 - [Online samples](http://webui.pipdevs.com)
-- [Users discussion forum]()
-- [Pip.WebUI team blog]()
+- [Pip.WebUI discussion forum](https://groups.google.com/forum/#!forum/pip-webui)
+- [Pip.WebUI team blog](https://pip-webui.blogspot.com/)
 
 ## License agreement
 
