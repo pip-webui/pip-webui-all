@@ -3628,12 +3628,13 @@ md-datepicker .md-datepicker-expand-triangle {
   -ms-flex-direction: column;
   flex-direction: column;
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #eeeeee;
   font-size: 14px;
+  overflow-x: hidden;
 }
 .pip-main .pip-body-nav {
   -webkit-box-flex: 0 0 auto;
@@ -3686,7 +3687,7 @@ md-datepicker .md-datepicker-expand-triangle {
 }
 .pip-border {
   background-color: #fafafa;
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -3695,13 +3696,13 @@ md-datepicker .md-datepicker-expand-triangle {
   background-clip: padding-box;
   background: #fafafa !important;
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
-  background: -moz-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
-  background: -webkit-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -o-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -ms-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: linear-gradient(to bottom, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.26) !important;
+  background: -moz-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
+  background: -webkit-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -o-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -ms-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: linear-gradient(to bottom, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
 }
 .pip-border-no-top {
   box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
@@ -3711,13 +3712,13 @@ md-datepicker .md-datepicker-expand-triangle {
   border-bottom-left-radius: 2px;
   background: #fafafa !important;
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
-  background: -moz-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
-  background: -webkit-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -o-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -ms-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: linear-gradient(to bottom, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.26) !important;
+  background: -moz-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
+  background: -webkit-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -o-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -ms-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: linear-gradient(to bottom, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
 }
 @media (max-width: 1200px) {
   .pip-border,
@@ -3994,10 +3995,10 @@ md-datepicker .md-datepicker-expand-triangle {
   }
   .pip-document .pip-menu {
     position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
   .pip-dialog .pip-header {
     padding: 16px;
@@ -4061,7 +4062,7 @@ md-datepicker .md-datepicker-expand-triangle {
   -ms-flex-direction: column;
   flex-direction: column;
   background-color: #fafafa;
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -4071,13 +4072,13 @@ md-datepicker .md-datepicker-expand-triangle {
   margin: 24px;
   background: #fafafa !important;
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
-  background: -moz-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
-  background: -webkit-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -o-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -ms-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: linear-gradient(to bottom, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.26) !important;
+  background: -moz-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
+  background: -webkit-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -o-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -ms-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: linear-gradient(to bottom, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
   padding-bottom: 1px;
   padding-left: 1px;
   padding-right: 1px;
@@ -4128,10 +4129,10 @@ md-datepicker .md-datepicker-expand-triangle {
 @media (max-width: 768px) {
   .pip-card {
     position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     margin: 0px;
     border: none;
     border-radius: 0;
@@ -4159,7 +4160,7 @@ pip-document {
   -ms-flex-direction: column;
   flex-direction: column;
   background-color: #fafafa;
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -4168,13 +4169,13 @@ pip-document {
   background-clip: padding-box;
   background: #fafafa !important;
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
-  background: -moz-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
-  background: -webkit-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -o-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -ms-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: linear-gradient(to bottom, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.26) !important;
+  background: -moz-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
+  background: -webkit-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -o-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -ms-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: linear-gradient(to bottom, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
   margin: 24px;
   padding-bottom: 1px;
   -webkit-box-flex: 1 0 100%;
@@ -4238,20 +4239,20 @@ pip-document.pip-document-small {
 }
 .pip-appbar-ext {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
   bottom: none;
   height: 95px;
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 @media (max-width: 1200px) {
   .pip-document {
     position: absolute;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     margin: 0px;
     border: none;
     border-radius: 0;
@@ -4360,7 +4361,7 @@ pip-document.pip-document-small {
   }
 }
 .pip-tiles .pip-tile {
-  box-shadow: 0px 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -4369,13 +4370,13 @@ pip-document.pip-document-small {
   background-clip: padding-box;
   background: #fafafa !important;
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
-  background: -moz-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
-  background: -webkit-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -o-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: -ms-linear-gradient(top, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  background: linear-gradient(to bottom, #fefefe 0%, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
-  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.26) !important;
+  background: -moz-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
+  background: -webkit-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -o-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -ms-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: linear-gradient(to bottom, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
   padding: 1px;
   min-height: 100px;
   margin-bottom: 7px;
@@ -4425,7 +4426,7 @@ pip-document.pip-document-small {
 @media (max-width: 766px) {
   .pip-tiles {
     padding: 8px 0px 0px 0px;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
   }
   .pip-tiles .pip-tile {
     width: 100%;
@@ -6302,7 +6303,7 @@ md-content md-option .md-text .pip-tabs-badge {
 .pip-documents-name {
   width: 100%;
   text-align: left;
-  padding: 0px;
+  padding: 0;
   font-size: 16px;
   text-transform: none;
   display: -webkit-box;
@@ -6320,9 +6321,9 @@ md-content md-option .md-text .pip-tabs-badge {
   cursor: pointer;
   width: 100%;
   text-align: start;
-  padding-left: 0px;
-  padding-right: 0px;
-  margin: 0px;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0;
   height: 48px !important;
 }
 .pip-documents-name .pip-documents-text {
@@ -6338,8 +6339,8 @@ md-content md-option .md-text .pip-tabs-badge {
 }
 .pip-document-list .pip-icon {
   margin-right: 26px;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 .pip-document-list-edit,
 .pip-document-list {
@@ -6352,7 +6353,7 @@ md-content md-option .md-text .pip-tabs-badge {
 .pip-document-list .pip-document-download {
   display: block;
   float: left;
-  margin: 0px 8px 8px 0px;
+  margin: 0 8px 8px 0;
   position: relative;
   width: 80px;
   height: 80px;
@@ -6388,7 +6389,7 @@ md-content md-option .md-text .pip-tabs-badge {
 .pip-document-list .pip-document-upload .pip-document-new,
 .pip-document-list-edit .pip-document-download .pip-document-new,
 .pip-document-list .pip-document-download .pip-document-new {
-  opacity: 0.54;
+  opacity: .54;
 }
 .pip-document-list-edit .pip-document-upload .pip-document-drop,
 .pip-document-list .pip-document-upload .pip-document-drop,
@@ -6408,7 +6409,7 @@ md-content md-option .md-text .pip-tabs-badge {
 .pip-document-list-edit .pip-document-download md-progress-linear,
 .pip-document-list .pip-document-download md-progress-linear {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   width: 80px;
 }
 .pip-document-list-edit .pip-document-upload .md-button.md-icon-button,
@@ -6424,8 +6425,8 @@ md-content md-option .md-text .pip-tabs-badge {
   border-radius: 10px;
   min-width: 20px !important;
   min-height: 20px !important;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   background-color: rgba(0, 0, 0, 0.25);
 }
 .pip-document-list-edit .pip-document-upload .md-button.md-icon-button > md-icon,
@@ -6461,8 +6462,8 @@ md-content md-option .md-text .pip-tabs-badge {
 .pip-document-list .pip-document-download .pip-default-text {
   position: absolute;
   display: block;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   width: 80px;
   height: 80px;
   line-height: 80px;
@@ -6507,7 +6508,7 @@ md-content md-option .md-text .pip-tabs-badge {
   min-height: 1.6em;
   line-height: 1.2em;
   vertical-align: middle;
-  letter-spacing: 0em;
+  letter-spacing: 0;
   white-space: normal;
   text-align: center;
   color: #3f3f3f;
@@ -6516,7 +6517,7 @@ md-content md-option .md-text .pip-tabs-badge {
   text-transform: none;
 }
 .pip-document-list-edit {
-  margin: 0px -8px -8px 0px;
+  margin: 0 -8px -8px 0;
 }
 .pip-document-list-edit .pip-document-upload.pip-document-drop {
   border-style: dashed;
@@ -8614,12 +8615,12 @@ md-dialog.pip-guide-preview {
   overflow-x: hidden;
 }
 .pip-guide-preview {
-  color: #fff;
   position: fixed;
   width: 100%;
   top: 0;
   height: 100%;
   opacity: 1;
+  color: #fff;
 }
 .pip-guide-preview .pip-arrow-button,
 .pip-guide-preview .pip-radio-button {
@@ -8644,7 +8645,7 @@ md-dialog.pip-guide-preview {
 }
 .pip-guide-preview .pip-guide-page-footer {
   position: fixed;
-  bottom: 0px;
+  bottom: 0;
 }
 .pip-guide-preview .button-preview {
   line-height: 48px;
@@ -8658,11 +8659,11 @@ md-dialog.pip-guide-preview {
   min-width: 88px;
 }
 .pip-guide-preview .pip-button-got.md-raised {
-  border: none;
+  border: 0;
 }
 .pip-guide-preview .pip-preview-content,
 .pip-guide-preview .pip-preview-title {
-  margin: 0px;
+  margin: 0;
   text-align: center;
 }
 .pip-guide-preview .pip-pic {
@@ -8705,7 +8706,7 @@ md-dialog.pip-guide-preview {
   }
   .pip-guide-preview pip-collage .pip-collage-section img,
   .pip-guide-preview .pip-pic .pip-collage-section img {
-    margin-left: 0px;
+    margin-left: 0;
   }
   .pip-guide-preview .pip-preview-title {
     font: normal 500 20px Roboto, 'Helvetica Neue', sans-serif;
@@ -8728,24 +8729,24 @@ md-dialog.pip-guide-preview {
   }
   .pip-guide-preview pip-collage .pip-collage-section img,
   .pip-guide-preview .pip-pic .pip-collage-section img {
-    margin-left: 0px;
+    margin-left: 0;
   }
 }
 .pip-popover-backdrop.pip-tip .pip-popover,
 .pip-popover-backdrop.pip-help .pip-popover {
-  background-color: #FBE1B0;
+  background-color: #fbe1b0;
 }
 .pip-popover-backdrop.pip-tip .pip-popover:after,
 .pip-popover-backdrop.pip-help .pip-popover:after {
   border-color: rgba(255, 255, 255, 0);
-  border-bottom-color: #FBE1B0;
+  border-bottom-color: #fbe1b0;
 }
 .pip-popover-backdrop.pip-quote .pip-popover {
-  background-color: #D9E8A9;
+  background-color: #d9e8a9;
 }
 .pip-popover-backdrop.pip-quote .pip-popover:after {
   border-color: rgba(255, 255, 255, 0);
-  border-bottom-color: #D9E8A9;
+  border-bottom-color: #d9e8a9;
 }
 .pip-popover-backdrop .pip-title {
   overflow: hidden;
@@ -8790,13 +8791,13 @@ md-dialog.pip-guide-preview {
   font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
   line-height: 24px;
   margin-top: 24px;
-  padding-bottom: 0px;
+  padding-bottom: 0;
 }
 .pip-popover-backdrop.pip-quote .pip-footer {
-  padding-bottom: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  padding-top: 0px;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
 }
 .pip-popover-backdrop.pip-quote .pip-footer .pip-author {
   height: 36px !important;
