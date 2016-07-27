@@ -2,7 +2,7 @@
     "name": "pip-webui",
     "version": "1.0.0",
     "author": "Digital Living Software Corp. <www.digitallivingsoftware.com>",
-    "description": "Pip.WebUI combined deployment package",
+    "description": "Pip.WebUI deployment bundle",
     "contributors": [
         {
             "name": "Sergey Seroukhov",
