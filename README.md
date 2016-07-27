@@ -14,13 +14,11 @@ Each artifact is represented by Javascript, CSS and Map files in regular and min
 
 Add dependency to **pip-webui** module your **bower.json** or **package.json** file depending what you use.
 ```javascript
-...
 "dependencies": {
   ...
   "pip-webui": "*"
   ...
 }
-...
 ```
 
 Alternatively you can install the module manually using bower:
@@ -35,28 +33,22 @@ npm install pip-webui
 
 Add references to module artifacts into your web application.
 ```html
-...
 <link rel="stylesheet" href=".../pip-webui-lib.min.css"/>
 <link rel="stylesheet" href=".../pip-webui.min.css"/>
 ...
 <script src=".../pip-webui-lib.min.js"></script>
 <script src=".../pip-webui.min.js"></script>
-...
 ```
 
 For testing you can reference optional test artifacts:
 ```html
-...
 <script src=".../pip-webui-lib-test.min.js"></script>
 <script src=".../pip-webui-test.min.js"></script>
-...
 ```
 
 To use less mixins from Pip.WebUI library include the following reference into your .less file(s)
 ```css
-...
 @import ".../pip-webui-css.less";
-...
 ```
 
 ## Quick links
