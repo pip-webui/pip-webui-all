@@ -62,6 +62,7 @@ To use less mixins from Pip.WebUI library include the following reference into y
 ## Quick links
 
 - [Developer's guide](doc/DevelopersGuide.md)
+- [Changelog](CHANGELOG.md)
 - [Pip.WebUI project website](http://www.pipwebui.org)
 
 ## <a name="dependencies"></a>Module dependencies
