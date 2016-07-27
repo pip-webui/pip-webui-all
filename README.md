@@ -1,5 +1,7 @@
 # <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> Deployment bindle
 
+![](https://img.shields.io/badge/license-MIT-blue.svg)
+
 This module provides a convenient package that bundles Pip.WebUI modules into few deployment artifacts 
 to minimize number of dependencies and simplify development and deployment tasks. 
 
