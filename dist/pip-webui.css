@@ -5945,6 +5945,7 @@ md-content md-option .md-text .pip-tabs-badge {
   line-height: 48px;
 }
 .pip-sidenav md-list .md-subheader .md-subheader-inner {
+  padding: 24px;
   padding-top: 0px;
   padding-bottom: 0px;
 }

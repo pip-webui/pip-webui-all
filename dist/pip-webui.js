@@ -12327,22 +12327,22 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/tabs.html',
     '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
-    '    <md-tabs class="hide-xs" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
-    '        <md-tab ng-repeat="tab in tabs"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
+    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
+    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
     '            <md-tab-label>\n' +
-    '                {{ (tab.title || tab.name) | translate }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div>\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
     '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
     '            </md-tab-label>\n' +
     '        </md-tab>\n' +
     '    </md-tabs>\n' +
-    '    <md-content class="md-subhead md-hue-1 show-xs hide-sm hide-gt-sm">\n' +
+    '    <md-content class="md-subhead md-hue-1" ng-if="$mdMedia(\'xs\')">\n' +
     '        <div class="pip-divider position-top m0"></div>\n' +
     '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
     '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
-    '            <md-option ng-repeat="tab in tabs" value="{{ ::$index }}" >\n' +
-    '                {{ (tab.title || tab.name) | translate }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div>\n' +
+    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
     '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
     '            </md-option>\n' +
     '        </md-select>\n' +
@@ -13224,7 +13224,12 @@ module.run(['$templateCache', function($templateCache) {
                         return;
                     }
 
-                    $window.location.href = processUrlParams(link.href);
+                    pipSideNav.close();
+                    $timeout(function() {
+                        $window.location.href = processUrlParams(link.href);
+                    }, 300);
+
+                    return;
                 }
                 else if (link.url) {
                     if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
@@ -13232,7 +13237,12 @@ module.run(['$templateCache', function($templateCache) {
                         return;
                     }
 
-                    $location.url(processUrlParams(link.url));
+                    pipSideNav.close();
+                    $timeout(function() {
+                        $location.url(processUrlParams(link.url));
+                    }, 300);
+
+                    return;
                 }
                 else if (link.state) {
                     if ($state.current.name === link.state) {
@@ -13240,7 +13250,12 @@ module.run(['$templateCache', function($templateCache) {
                         return;
                     }
 
-                    pipState.go(link.state, processStateParams(link.stateParams));
+                    pipSideNav.close();
+                    $timeout(function() {
+                        pipState.go(link.state, processStateParams(link.stateParams));
+                    }, 300);
+
+                    return;
                 }
                 else if (link.event)
                     $rootScope.$broadcast('pipSideNavLinkClicked', link.event);
@@ -13383,11 +13398,16 @@ module.run(['$templateCache', function($templateCache) {
                 },
                 templateUrl: 'tabs/tabs.html',
                 controller:
-                    ['$scope', '$element', '$attrs', 'localStorageService', function ($scope, $element, $attrs, localStorageService) {
+                    ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', 'pipTranslate', function ($scope, $element, $attrs, $mdMedia, localStorageService, pipTranslate) {
                         $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
                         pipAssert.isArray($scope.tabs, 'pipTabs: pipTabs attribute should take an array');
                         $scope.$mdMedia = $mdMedia;
                         $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
+                        if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
+                            pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
+                        } else {
+                            pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+                        }
                         $scope.activeIndex = $scope.activeIndex || 0;
                         $scope.activeTab = $scope.activeIndex;
 
