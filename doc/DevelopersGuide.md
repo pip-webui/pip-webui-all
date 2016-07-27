@@ -48,7 +48,7 @@ If any error found the build will fail.
 gulp build
 ```
 
-## <a name="releasing"></a> Releasing
+## <a name="release"></a> Releasing
 
 1\. Check and update **CHANGELOG.md** file.
 
