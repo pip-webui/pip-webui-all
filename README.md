@@ -1,6 +1,6 @@
-# <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> Combined deployment package
+# <img src="https://github.com/pip-webui/pip-webui/blob/master/doc/Logo.png" alt="Pip.WebUI Logo" style="max-width:30%"> <br/> Deployment bindle
 
-This module provides a convenient package that combines Pip.WebUI modules into few deployment artifacts 
+This module provides a convenient package that bundles Pip.WebUI modules into few deployment artifacts 
 to minimize number of dependencies and simplify development and deployment tasks. 
 
 * **pip-webui-lib(.js, .min.js, .css, min.css)**: 3rd party production libraries from **pip-webui-lib** module
