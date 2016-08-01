@@ -4344,10 +4344,18 @@ pip-document.pip-document-small {
   color: rgba(0, 0, 0, 0.87);
   letter-spacing: 0.005em;
 }
+.pip-tiles.pip-no-tabs {
+  max-height: calc(100% - 64px);
+  min-height: calc(100% - 64px);
+}
 @media (max-width: 766px) {
   .pip-tiles {
     max-height: calc(100% - 48px - 48px);
     min-height: calc(100% - 48px - 48px);
+  }
+  .pip-tiles.pip-no-tabs {
+    max-height: calc(100% - 48px);
+    min-height: calc(100% - 48px);
   }
 }
 .pip-tiles .pip-tiles-container {
