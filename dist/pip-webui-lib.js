@@ -9223,7 +9223,7 @@ return jQuery;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.14.0';
+  var VERSION = '4.14.1';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -9340,7 +9340,8 @@ return jQuery;
   /** Used to match property names within property paths. */
   var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
       reIsPlainProp = /^\w*$/,
-      rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g;
+      reLeadingDot = /^\./,
+      rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 
   /**
    * Used to match `RegExp`
@@ -9581,10 +9582,10 @@ return jQuery;
   var root = freeGlobal || freeSelf || Function('return this')();
 
   /** Detect free variable `exports`. */
-  var freeExports = freeGlobal && typeof exports == 'object' && exports;
+  var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
   /** Detect free variable `module`. */
-  var freeModule = freeExports && typeof module == 'object' && module;
+  var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
 
   /** Detect the popular CommonJS extension `module.exports`. */
   var moduleExports = freeModule && freeModule.exports === freeExports;
@@ -11625,9 +11626,6 @@ return jQuery;
         // Recursively populate clone (susceptible to call stack limits).
         assignValue(result, key, baseClone(subValue, isDeep, isFull, customizer, key, value, stack));
       });
-      if (!isFull) {
-        stack['delete'](value);
-      }
       return result;
     }
 
@@ -14219,15 +14217,14 @@ return jQuery;
           end = step = undefined;
         }
         // Ensure the sign of `-0` is preserved.
-        start = toNumber(start);
-        start = start === start ? start : 0;
+        start = toFinite(start);
         if (end === undefined) {
           end = start;
           start = 0;
         } else {
-          end = toNumber(end) || 0;
+          end = toFinite(end);
         }
-        step = step === undefined ? (start < end ? 1 : -1) : (toNumber(step) || 0);
+        step = step === undefined ? (start < end ? 1 : -1) : toFinite(step);
         return baseRange(start, end, step, fromRight);
       };
     }
@@ -14500,6 +14497,7 @@ return jQuery;
         }
       }
       stack['delete'](array);
+      stack['delete'](other);
       return result;
     }
 
@@ -14660,6 +14658,7 @@ return jQuery;
         }
       }
       stack['delete'](object);
+      stack['delete'](other);
       return result;
     }
 
@@ -14835,7 +14834,7 @@ return jQuery;
      * @param {Object} object The object to query.
      * @returns {Array} Returns the array of symbols.
      */
-    var getSymbolsIn = !nativeGetSymbols ? getSymbols : function(object) {
+    var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
       var result = [];
       while (object) {
         arrayPush(result, getSymbols(object));
@@ -15073,7 +15072,7 @@ return jQuery;
      */
     function isFlattenable(value) {
       return isArray(value) || isArguments(value) ||
-        !!(spreadableSymbol && value && value[spreadableSymbol])
+        !!(spreadableSymbol && value && value[spreadableSymbol]);
     }
 
     /**
@@ -15426,8 +15425,13 @@ return jQuery;
      * @returns {Array} Returns the property path array.
      */
     var stringToPath = memoize(function(string) {
+      string = toString(string);
+
       var result = [];
-      toString(string).replace(rePropName, function(match, number, quote, string) {
+      if (reLeadingDot.test(string)) {
+        result.push('');
+      }
+      string.replace(rePropName, function(match, number, quote, string) {
         result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
       });
       return result;
@@ -18989,14 +18993,18 @@ return jQuery;
      * milliseconds have elapsed since the last time the debounced function was
      * invoked. The debounced function comes with a `cancel` method to cancel
      * delayed `func` invocations and a `flush` method to immediately invoke them.
-     * Provide an options object to indicate whether `func` should be invoked on
-     * the leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-     * with the last arguments provided to the debounced function. Subsequent calls
-     * to the debounced function return the result of the last `func` invocation.
+     * Provide `options` to indicate whether `func` should be invoked on the
+     * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+     * with the last arguments provided to the debounced function. Subsequent
+     * calls to the debounced function return the result of the last `func`
+     * invocation.
      *
-     * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
-     * on the trailing edge of the timeout only if the debounced function is
-     * invoked more than once during the `wait` timeout.
+     * **Note:** If `leading` and `trailing` options are `true`, `func` is
+     * invoked on the trailing edge of the timeout only if the debounced function
+     * is invoked more than once during the `wait` timeout.
+     *
+     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+     * until to the next tick, similar to `setTimeout` with a timeout of `0`.
      *
      * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
      * for details over the differences between `_.debounce` and `_.throttle`.
@@ -19584,8 +19592,8 @@ return jQuery;
      * Creates a throttled function that only invokes `func` at most once per
      * every `wait` milliseconds. The throttled function comes with a `cancel`
      * method to cancel delayed `func` invocations and a `flush` method to
-     * immediately invoke them. Provide an options object to indicate whether
-     * `func` should be invoked on the leading and/or trailing edge of the `wait`
+     * immediately invoke them. Provide `options` to indicate whether `func`
+     * should be invoked on the leading and/or trailing edge of the `wait`
      * timeout. The `func` is invoked with the last arguments provided to the
      * throttled function. Subsequent calls to the throttled function return the
      * result of the last `func` invocation.
@@ -19593,6 +19601,9 @@ return jQuery;
      * **Note:** If `leading` and `trailing` options are `true`, `func` is
      * invoked on the trailing edge of the timeout only if the throttled function
      * is invoked more than once during the `wait` timeout.
+     *
+     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+     * until to the next tick, similar to `setTimeout` with a timeout of `0`.
      *
      * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
      * for details over the differences between `_.throttle` and `_.debounce`.
@@ -19848,9 +19859,11 @@ return jQuery;
     }
 
     /**
-     * Checks if `object` conforms to `source` by invoking the predicate properties
-     * of `source` with the corresponding property values of `object`. This method
-     * is equivalent to a `_.conforms` function when `source` is partially applied.
+     * Checks if `object` conforms to `source` by invoking the predicate
+     * properties of `source` with the corresponding property values of `object`.
+     *
+     * **Note:** This method is equivalent to `_.conforms` when `source` is
+     * partially applied.
      *
      * @static
      * @memberOf _
@@ -20518,10 +20531,10 @@ return jQuery;
 
     /**
      * Performs a partial deep comparison between `object` and `source` to
-     * determine if `object` contains equivalent property values. This method is
-     * equivalent to a `_.matches` function when `source` is partially applied.
+     * determine if `object` contains equivalent property values.
      *
-     * **Note:** This method supports comparing the same values as `_.isEqual`.
+     * **Note:** This method supports comparing the same values as `_.isEqual`
+     * and is equivalent to `_.matches` when `source` is partially applied.
      *
      * @static
      * @memberOf _
@@ -22733,12 +22746,12 @@ return jQuery;
      * // => true
      */
     function inRange(number, start, end) {
-      start = toNumber(start) || 0;
+      start = toFinite(start);
       if (end === undefined) {
         end = start;
         start = 0;
       } else {
-        end = toNumber(end) || 0;
+        end = toFinite(end);
       }
       number = toNumber(number);
       return baseInRange(number, start, end);
@@ -22794,12 +22807,12 @@ return jQuery;
         upper = 1;
       }
       else {
-        lower = toNumber(lower) || 0;
+        lower = toFinite(lower);
         if (upper === undefined) {
           upper = lower;
           lower = 0;
         } else {
-          upper = toNumber(upper) || 0;
+          upper = toFinite(upper);
         }
       }
       if (lower > upper) {
@@ -24046,6 +24059,9 @@ return jQuery;
      * the corresponding property values of a given object, returning `true` if
      * all predicates return truthy, else `false`.
      *
+     * **Note:** The created function is equivalent to `_.conformsTo` with
+     * `source` partially applied.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -24231,10 +24247,10 @@ return jQuery;
     /**
      * Creates a function that performs a partial deep comparison between a given
      * object and `source`, returning `true` if the given object has equivalent
-     * property values, else `false`. The created function is equivalent to
-     * `_.isMatch` with a `source` partially applied.
+     * property values, else `false`.
      *
-     * **Note:** This method supports comparing the same values as `_.isEqual`.
+     * **Note:** The created function supports comparing the same values as
+     * `_.isEqual` is equivalent to `_.isMatch` with `source` partially applied.
      *
      * @static
      * @memberOf _
@@ -36689,7 +36705,8 @@ function escape(html, encode) {
 }
 
 function unescape(html) {
-  return html.replace(/&([#\w]+);/g, function(_, n) {
+	// explicitly match decimal, hex, and named HTML entities 
+  return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function(_, n) {
     n = n.toLowerCase();
     if (n === 'colon') return ':';
     if (n.charAt(0) === '#') {
@@ -74392,7 +74409,7 @@ angular.module('ngAnimate', [], function initAngularHelpers() {
 
 /**
  * An Angular module that gives you access to the browsers local storage
- * @version v0.2.6 - 2016-03-16
+ * @version v0.2.8 - 2016-07-14
  * @link https://github.com/grevory/angular-local-storage
  * @author grevory <greg@gregpike.ca>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -74428,6 +74445,9 @@ angular
       path: '/'
     };
 
+    // Decides wether we should default to cookies if localstorage is not supported.
+    this.defaultToCookie = true;
+      
     // Send signals for each of the following actions?
     this.notify = {
       setItem: true,
@@ -74445,7 +74465,11 @@ angular
       this.storageType = storageType;
       return this;
     };
-
+    // Setter for defaultToCookie value, default is true.
+    this.setDefaultToCookie = function (shouldDefault) {
+      this.defaultToCookie = !!shouldDefault; // Double-not to make sure it's a bool value.
+      return this;
+    };
     // Setter for cookie config
     this.setStorageCookie = function(exp, path) {
       this.cookie.expiry = exp;
@@ -74469,7 +74493,7 @@ angular
       return this;
     };
 
-    this.$get = ['$rootScope', '$window', '$document', '$parse', function($rootScope, $window, $document, $parse) {
+    this.$get = ['$rootScope', '$window', '$document', '$parse','$timeout', function($rootScope, $window, $document, $parse, $timeout) {
       var self = this;
       var prefix = self.prefix;
       var cookie = self.cookie;
@@ -74491,8 +74515,19 @@ angular
       var deriveQualifiedKey = function(key) {
         return prefix + key;
       };
+      
+      // Removes prefix from the key.
+      var underiveQualifiedKey = function (key) {
+        return key.replace(new RegExp('^' + prefix, 'g'), '');
+      };
+      
+      // Check if the key is within our prefix namespace.
+      var isKeyPrefixOurs = function (key) {
+        return key.indexOf(prefix) === 0;
+      };
+      
       // Checks the browser to see if local storage is supported
-      var browserSupportsLocalStorage = (function () {
+      var checkSupport = function () {
         try {
           var supported = (storageType in $window && $window[storageType] !== null);
 
@@ -74510,16 +74545,21 @@ angular
 
           return supported;
         } catch (e) {
-          storageType = 'cookie';
+          // Only change storageType to cookies if defaulting is enabled.
+          if (self.defaultToCookie)
+            storageType = 'cookie';
           $rootScope.$broadcast('LocalStorageModule.notification.error', e.message);
           return false;
         }
-      }());
+      };
+      var browserSupportsLocalStorage = checkSupport();
 
       // Directly adds a value to local storage
       // If local storage is not available in the browser use cookies
       // Example use: localStorageService.add('library','angular');
-      var addToLocalStorage = function (key, value) {
+      var addToLocalStorage = function (key, value, type) {
+        setStorageType(type);
+        
         // Let's convert undefined values to null to get the value consistent
         if (isUndefined(value)) {
           value = null;
@@ -74528,7 +74568,7 @@ angular
         }
 
         // If this browser does not support local storage use cookies
-        if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage && self.defaultToCookie || self.storageType === 'cookie') {
           if (!browserSupportsLocalStorage) {
             $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
           }
@@ -74555,9 +74595,10 @@ angular
 
       // Directly get a value from local storage
       // Example use: localStorageService.get('library'); // returns 'angular'
-      var getFromLocalStorage = function (key) {
+      var getFromLocalStorage = function (key, type) {
+        setStorageType(type);
 
-        if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage && self.defaultToCookie  || self.storageType === 'cookie') {
           if (!browserSupportsLocalStorage) {
             $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
           }
@@ -74581,11 +74622,24 @@ angular
 
       // Remove an item from local storage
       // Example use: localStorageService.remove('library'); // removes the key/value pair of library='angular'
+      //
+      // This is var-arg removal, check the last argument to see if it is a storageType
+      // and set type accordingly before removing.
+      //
       var removeFromLocalStorage = function () {
+        // can't pop on arguments, so we do this
+        var consumed = 0;
+        if (arguments.length >= 1 &&
+            (arguments[arguments.length - 1] === 'localStorage' ||
+             arguments[arguments.length - 1] === 'sessionStorage')) {
+          consumed = 1;
+          setStorageType(arguments[arguments.length - 1]);
+        }
+          
         var i, key;
-        for (i=0; i<arguments.length; i++) {
+        for (i = 0; i < arguments.length - consumed; i++) {
           key = arguments[i];
-          if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
+          if (!browserSupportsLocalStorage && self.defaultToCookie || self.storageType === 'cookie') {
             if (!browserSupportsLocalStorage) {
               $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
             }
@@ -74614,8 +74668,9 @@ angular
 
       // Return array of keys for local storage
       // Example use: var keys = localStorageService.keys()
-      var getKeysForLocalStorage = function () {
-
+      var getKeysForLocalStorage = function (type) {
+        setStorageType(type);
+        
         if (!browserSupportsLocalStorage) {
           $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
           return [];
@@ -74641,20 +74696,22 @@ angular
       // Also optionally takes a regular expression string and removes the matching key-value pairs
       // Example use: localStorageService.clearAll();
       // Should be used mostly for development purposes
-      var clearAllFromLocalStorage = function (regularExpression) {
+      var clearAllFromLocalStorage = function (regularExpression, type) {
+        setStorageType(type);
 
         // Setting both regular expressions independently
         // Empty strings result in catchall RegExp
         var prefixRegex = !!prefix ? new RegExp('^' + prefix) : new RegExp();
         var testRegex = !!regularExpression ? new RegExp(regularExpression) : new RegExp();
 
-        if (!browserSupportsLocalStorage || self.storageType === 'cookie') {
+        if (!browserSupportsLocalStorage && self.defaultToCookie  || self.storageType === 'cookie') {
           if (!browserSupportsLocalStorage) {
             $rootScope.$broadcast('LocalStorageModule.notification.warning', 'LOCAL_STORAGE_NOT_SUPPORTED');
           }
           return clearAllFromCookies();
         }
-
+        if (!browserSupportsLocalStorage && !self.defaultToCookie)
+          return false;
         var prefixLength = prefix.length;
 
         for (var key in webStorage) {
@@ -74780,11 +74837,19 @@ angular
           return storageType;
         };
 
+        var setStorageType = function(type) {
+          if (type && storageType !== type) {
+            storageType = type;
+            browserSupportsLocalStorage = checkSupport();
+          }
+          return browserSupportsLocalStorage;
+        };
+        
         // Add a listener on scope variable to save its changes to local storage
         // Return a function which when called cancels binding
-        var bindToScope = function(scope, key, def, lsKey) {
+        var bindToScope = function(scope, key, def, lsKey, type) {
           lsKey = lsKey || key;
-          var value = getFromLocalStorage(lsKey);
+          var value = getFromLocalStorage(lsKey, type);
 
           if (value === null && isDefined(def)) {
             value = def;
@@ -74795,13 +74860,38 @@ angular
           $parse(key).assign(scope, value);
 
           return scope.$watch(key, function(newVal) {
-            addToLocalStorage(lsKey, newVal);
+            addToLocalStorage(lsKey, newVal, type);
           }, isObject(scope[key]));
         };
 
+        // Add listener to local storage, for update callbacks.
+        if (browserSupportsLocalStorage) {
+            if ($window.addEventListener) {
+                $window.addEventListener("storage", handleStorageChangeCallback, false);
+            } else if($window.attachEvent){
+                $window.attachEvent("onstorage", handleStorageChangeCallback);
+            };
+        }
+
+        // Callback handler for storage changed.
+        function handleStorageChangeCallback(e) {
+            if (!e) { e = $window.event; }
+            if (notify.setItem) {
+                if (isKeyPrefixOurs(e.key)) {
+                    var key = underiveQualifiedKey(e.key);
+                    // Use timeout, to avoid using $rootScope.$apply.
+                    $timeout(function () {
+                        $rootScope.$broadcast('LocalStorageModule.notification.changed', { key: key, newvalue: e.newValue, storageType: self.storageType });
+                    });
+                }
+            }
+        }
+
         // Return localStorageService.length
         // ignore keys that not owned
-        var lengthOfLocalStorage = function() {
+        var lengthOfLocalStorage = function(type) {
+          setStorageType(type);
+        
           var count = 0;
           var storage = $window[storageType];
           for(var i = 0; i < storage.length; i++) {
@@ -74815,6 +74905,7 @@ angular
         return {
           isSupported: browserSupportsLocalStorage,
           getStorageType: getStorageType,
+          setStorageType: setStorageType,
           set: addToLocalStorage,
           add: addToLocalStorage, //DEPRECATED
           get: getFromLocalStorage,
@@ -74823,7 +74914,9 @@ angular
           clearAll: clearAllFromLocalStorage,
           bind: bindToScope,
           deriveKey: deriveQualifiedKey,
+          underiveKey: underiveQualifiedKey,
           length: lengthOfLocalStorage,
+          defaultToCookie: this.defaultToCookie,
           cookie: {
             isSupported: browserSupportsCookies,
             set: addToCookies,
@@ -114081,12 +114174,12 @@ return Outlayer;
     };
   });
 }());
-// WebcamJS v1.0.10
+// WebcamJS v1.0.11
 // Webcam library for capturing JPEG/PNG images in JavaScript
 // Attempts getUserMedia, falls back to Flash
 // Author: Joseph Huckaby: http://github.com/jhuckaby
 // Based on JPEGCam: http://code.google.com/p/jpegcam/
-// Copyright (c) 2012 - 2015 Joseph Huckaby
+// Copyright (c) 2012 - 2016 Joseph Huckaby
 // Licensed under the MIT License
 
 (function(window) {
@@ -114117,7 +114210,7 @@ FlashError.prototype = new IntermediateInheritor();
 WebcamError.prototype = new IntermediateInheritor();
 
 var Webcam = {
-	version: '1.0.10',
+	version: '1.0.11',
 	
 	// globals
 	protocol: location.protocol.match(/https/i) ? 'https' : 'http',
@@ -114215,7 +114308,7 @@ var Webcam = {
 		// if force_flash is set, disable userMedia
 		if (this.params.force_flash) {
 			_userMedia = this.userMedia;
-			this.userMedia = null
+			this.userMedia = null;
 		}
 		
 		// check for default fps
@@ -114274,7 +114367,9 @@ var Webcam = {
 				video.src = window.URL.createObjectURL( stream ) || stream;
 			})
 			.catch( function(err) {
-				return self.dispatch('error', err);
+				// JH 2016-07-31 Instead of dispatching error, now falling back to Flash if userMedia fails (thx @john2014)
+				// return self.dispatch('error', err);
+				setTimeout( function() { self.params.force_flash = 1; self.attach(elem); }, 1 );
 			});
 		}
 		else {
