@@ -1,9 +1,9 @@
 {
-  "name": "pip-webui",
-  "version": "1.0.0",
-  "description": "Pip.WebUI deployment bundle",
-  "main": "",
-  "authors": [
+    "name": "pip-webui",
+    "version": "1.0.0",
+    "description": "Pip.WebUI deployment bundle",
+    "main": "",
+    "authors": [
         {
             "name": "Sergey Seroukhov",
             "email": "seroukhov@gmail.com"
@@ -24,28 +24,28 @@
             "name": "Katerina Negrienko",
             "email": "katya@negrienko.com"
         }
-  ],
-  "license": "MIT",
-  "keywords": [
-    "pip",
-    "html5",
-    "web",
-    "framework",
-    "controls",
-    "css",
-    "styles"
-  ],
-  "homepage": "https://github.com/pip-webui/pip-webui-all",
-  "ignore": [
-    ".gitignore",
-    "node_modules",
-    "bower_components",
-    "src",
-    "tests",
-    "samples",
-    "scripts",
-    "build.*",
-    "gulpfile.js",
-    "karma.conf.js"
-  ]
+    ],
+    "license": "MIT",
+    "keywords": [
+        "pip",
+        "html5",
+        "web",
+        "framework",
+        "controls",
+        "css",
+        "styles"
+    ],
+    "homepage": "https://github.com/pip-webui/pip-webui-all",
+    "ignore": [
+        ".gitignore",
+        "node_modules",
+        "bower_components",
+        "src",
+        "tests",
+        "samples",
+        "scripts",
+        "build.*",
+        "gulpfile.js",
+        "karma.conf.js"
+    ]
 }
