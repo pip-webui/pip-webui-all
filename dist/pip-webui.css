@@ -4395,6 +4395,10 @@ pip-document.pip-document-small {
 .pip-tile-body .pip-submenu-details-button > div pip-location {
   max-width: calc(100% - 56px) !important;
 }
+.pip-tile-location-container {
+  width: 100%;
+  height: 200px;
+}
 /*
  * @example - �������� �������� ��������
  *  <pip-simple ng-class="$sizeSmall ? 'bg-content' : 'bg-window'" ng-hide="selected.itemCollection.length < 1">
