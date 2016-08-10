@@ -2377,7 +2377,7 @@
 
             pipTheme.initializeTheme(currentTheme);
         } catch (ex) {
-            pipTheme.initializeTheme('blue');
+            pipTheme.initializeTheme('navy');
         }
     }
 
@@ -8342,29 +8342,6 @@
 })();
 
 /**
- * @file Simple layout
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipLayout.Simple', []);
-
-    thisModule.directive('pipSimple', function() {
-       return {
-           restrict: 'EA',
-           link: function($scope, $element, $attrs) {
-                $element.addClass('pip-simple');
-           }
-       };
-    });
-
-})();
-
-/**
  * @file Split layout
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -8431,6 +8408,29 @@
             return false
         }
 
+    });
+
+})();
+
+/**
+ * @file Simple layout
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipLayout.Simple', []);
+
+    thisModule.directive('pipSimple', function() {
+       return {
+           restrict: 'EA',
+           link: function($scope, $element, $attrs) {
+                $element.addClass('pip-simple');
+           }
+       };
     });
 
 })();
@@ -8568,44 +8568,6 @@
 
 })();
 
-
-
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipTagList',
-
-        'pipDate',
-        'pipDateRange',
-        'pipTimeRangeEdit',
-        'pipTimeRange',
-
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-    angular.module('pipBasicControls', ['pipControls']);
-
-})(window.angular);
 
 
 (function(module) {
@@ -9269,6 +9231,44 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipTagList',
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeRangeEdit',
+        'pipTimeRange',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', ['pipControls']);
+
+})(window.angular);
+
 
 /**
  * @file Color picker control
@@ -13219,28 +13219,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of location WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipLocations', [        
-        'pipLocation',
-        'pipLocationMap',
-        'pipLocationIp',
-        'pipLocationEdit',
-        'pipLocationEditDialog'
-    ]);
-    
-})();
-
-
-
 (function(module) {
 try {
   module = angular.module('pipLocations.Templates');
@@ -13306,6 +13284,28 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+/**
+ * @file Registration of location WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipLocations', [        
+        'pipLocation',
+        'pipLocationMap',
+        'pipLocationIp',
+        'pipLocationEdit',
+        'pipLocationEditDialog'
+    ]);
+    
+})();
+
+
 
 /**
  * @file Location control
@@ -14234,72 +14234,6 @@ try {
   module = angular.module('pipDocuments.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('document_list_edit/document_list_edit.html',
-    '<!--\n' +
-    '@file Document list edit control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '<div pip-focusable>\n' +
-    '	<div class="pip-document-upload pointer md-primary "\n' +
-    '		 ng-class="{\'pip-focusable\' : !ngDisabled(), \'pip-item-error\' : item.state == \'error\'}"\n' +
-    '		 ng-keydown="onKeyDown($event, item)"\n' +
-    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
-    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
-    '\n' +
-    '		<div class="pip-default-icon"\n' +
-    '			 ng-class="{ \'pip-document-new\': item.id == null }">\n' +
-    '			<md-icon pip-cancel-drag="true" class="md-primary" ng-if="item.state == \'original\' || item.state == \'added\'"\n' +
-    '					 md-svg-icon="icons:{{::documentList.icon}}">\n' +
-    '			</md-icon>\n' +
-    '			<md-icon pip-cancel-drag="true" class="md-warn" ng-if="item.state == \'error\'"\n' +
-    '					 md-svg-icon="icons:{{::documentList.iconError}}">\n' +
-    '			</md-icon>\n' +
-    '		</div>\n' +
-    '\n' +
-    '		<div class="pip-document-title" pip-cancel-drag="true">\n' +
-    '			{{::item.name}}\n' +
-    '		</div>\n' +
-    '		<md-button ng-click="onDelete(item)"\n' +
-    '				   ng-disabled="ngDisabled() || control.uploading"\n' +
-    '				   tabindex="-1"\n' +
-    '				   ng-hide="ngDisabled()"\n' +
-    '				   class="md-icon-button" aria-label="DELETE">\n' +
-    '\n' +
-    '			<md-icon md-svg-icon="icons:cross" pip-cancel-drag="true"></md-icon>\n' +
-    '		</md-button>\n' +
-    '		<md-progress-linear ng-show="item.uploading" ng-value="item.progress"></md-progress-linear>\n' +
-    '	</div>\n' +
-    '	\n' +
-    '	<button class="pip-document-upload pip-document-drop "\n' +
-    '			ng-class="{\'pip-focusable\' : !ngDisabled()}"\n' +
-    '			ng-keydown="onKeyDown($event)" tabindex="0"\n' +
-    '			ng-file-drop ng-file-select ng-file-change="onSelect($files)"\n' +
-    '			ng-multiple="true"\n' +
-    '			ng-disabled="ngDisabled() || control.uploading"\n' +
-    '			aria-label="UPLOAD">\n' +
-    '\n' +
-    '		<div class="pip-default-icon">\n' +
-    '			<md-icon pip-cancel-drag="true" md-svg-icon="icons:{{::documentList.icon}}"></md-icon>\n' +
-    '		</div>\n' +
-    '		<div class="pip-default-text">\n' +
-    '			<span>\n' +
-    '				{{documentList.text | translate}}\n' +
-    '			</span>\n' +
-    '		</div>\n' +
-    '	</button>\n' +
-    '	<div class="clearfix"></div>\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDocuments.Templates');
-} catch (e) {
-  module = angular.module('pipDocuments.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('document_list/document_list.html',
     '<!--\n' +
     '@file Document list control content\n' +
@@ -14375,6 +14309,72 @@ module.run(['$templateCache', function($templateCache) {
     '            {{::document.file_name}}\n' +
     '        </div>\n' +
     '    </md-button>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDocuments.Templates');
+} catch (e) {
+  module = angular.module('pipDocuments.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('document_list_edit/document_list_edit.html',
+    '<!--\n' +
+    '@file Document list edit control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '<div pip-focusable>\n' +
+    '	<div class="pip-document-upload pointer md-primary "\n' +
+    '		 ng-class="{\'pip-focusable\' : !ngDisabled(), \'pip-item-error\' : item.state == \'error\'}"\n' +
+    '		 ng-keydown="onKeyDown($event, item)"\n' +
+    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
+    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
+    '\n' +
+    '		<div class="pip-default-icon"\n' +
+    '			 ng-class="{ \'pip-document-new\': item.id == null }">\n' +
+    '			<md-icon pip-cancel-drag="true" class="md-primary" ng-if="item.state == \'original\' || item.state == \'added\'"\n' +
+    '					 md-svg-icon="icons:{{::documentList.icon}}">\n' +
+    '			</md-icon>\n' +
+    '			<md-icon pip-cancel-drag="true" class="md-warn" ng-if="item.state == \'error\'"\n' +
+    '					 md-svg-icon="icons:{{::documentList.iconError}}">\n' +
+    '			</md-icon>\n' +
+    '		</div>\n' +
+    '\n' +
+    '		<div class="pip-document-title" pip-cancel-drag="true">\n' +
+    '			{{::item.name}}\n' +
+    '		</div>\n' +
+    '		<md-button ng-click="onDelete(item)"\n' +
+    '				   ng-disabled="ngDisabled() || control.uploading"\n' +
+    '				   tabindex="-1"\n' +
+    '				   ng-hide="ngDisabled()"\n' +
+    '				   class="md-icon-button" aria-label="DELETE">\n' +
+    '\n' +
+    '			<md-icon md-svg-icon="icons:cross" pip-cancel-drag="true"></md-icon>\n' +
+    '		</md-button>\n' +
+    '		<md-progress-linear ng-show="item.uploading" ng-value="item.progress"></md-progress-linear>\n' +
+    '	</div>\n' +
+    '	\n' +
+    '	<button class="pip-document-upload pip-document-drop "\n' +
+    '			ng-class="{\'pip-focusable\' : !ngDisabled()}"\n' +
+    '			ng-keydown="onKeyDown($event)" tabindex="0"\n' +
+    '			ng-file-drop ng-file-select ng-file-change="onSelect($files)"\n' +
+    '			ng-multiple="true"\n' +
+    '			ng-disabled="ngDisabled() || control.uploading"\n' +
+    '			aria-label="UPLOAD">\n' +
+    '\n' +
+    '		<div class="pip-default-icon">\n' +
+    '			<md-icon pip-cancel-drag="true" md-svg-icon="icons:{{::documentList.icon}}"></md-icon>\n' +
+    '		</div>\n' +
+    '		<div class="pip-default-text">\n' +
+    '			<span>\n' +
+    '				{{documentList.text | translate}}\n' +
+    '			</span>\n' +
+    '		</div>\n' +
+    '	</button>\n' +
+    '	<div class="clearfix"></div>\n' +
     '</div>\n' +
     '');
 }]);
@@ -18665,6 +18665,34 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('checklist_view/checklist_view.html',
+    '<div ng-repeat="item in checklistContent track by $index">\n' +
+    '    <div class="pip-checklist-item layout-row layout-align-start-start">\n' +
+    '        <div class="pip-checklist-icon">\n' +
+    '            <md-checkbox  ng-model="item.checked"\n' +
+    '                          ng-click="onClick($event, item)"\n' +
+    '                          aria-label="COMPLETE"\n' +
+    '                          ng-disabled="ngDisabled()">\n' +
+    '            </md-checkbox>\n' +
+    '        </div>\n' +
+    '        <div class="pip-checklist-text flex">\n' +
+    '            <pip-markdown pip-text="item.text"\n' +
+    '                          pip-rebind="true"\n' +
+    '                          ng-disabled="true">\n' +
+    '            </pip-markdown>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipComposite.Templates');
+} catch (e) {
+  module = angular.module('pipComposite.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('composite_edit/composite_edit.html',
     '<!--\n' +
     '@file Composite edit control content\n' +
@@ -18807,34 +18835,6 @@ module.run(['$templateCache', function($templateCache) {
     '            <div class="putt_box"></div>\n' +
     '            <div class="pip-section-content h24" style="border: 0px!important;">\n' +
     '            </div>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipComposite.Templates');
-} catch (e) {
-  module = angular.module('pipComposite.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('checklist_view/checklist_view.html',
-    '<div ng-repeat="item in checklistContent track by $index">\n' +
-    '    <div class="pip-checklist-item layout-row layout-align-start-start">\n' +
-    '        <div class="pip-checklist-icon">\n' +
-    '            <md-checkbox  ng-model="item.checked"\n' +
-    '                          ng-click="onClick($event, item)"\n' +
-    '                          aria-label="COMPLETE"\n' +
-    '                          ng-disabled="ngDisabled()">\n' +
-    '            </md-checkbox>\n' +
-    '        </div>\n' +
-    '        <div class="pip-checklist-text flex">\n' +
-    '            <pip-markdown pip-text="item.text"\n' +
-    '                          pip-rebind="true"\n' +
-    '                          ng-disabled="true">\n' +
-    '            </pip-markdown>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '</div>');
@@ -20953,31 +20953,31 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password.html',
+  $templateCache.put('reset_password/reset_password.html',
     '<!--\n' +
-    '@file Password recovery page\n' +
+    '@file Password reset page\n' +
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
     '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
     '    <pip-card width="400">\n' +
-    '        <pip-recover-password-panel\n' +
+    '\n' +
+    '        <pip-reset-password-panel\n' +
     '                pip-data="data"\n' +
     '                pip-created="$panel = $control">\n' +
     '\n' +
-    '        </pip-recover-password-panel>\n' +
+    '        </pip-reset-password-panel>\n' +
     '        <div class="pip-footer">\n' +
     '            <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
     '                {{::\'CANCEL\' | translate}}\n' +
     '            </md-button>\n' +
-    '\n' +
-    '            <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
-    '                       aria-label="RECOVER_PWD_RECOVER"\n' +
-    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 || data.email.length == 0">\n' +
-    '                {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
+    '            <md-button ng-hide="transaction.busy()" ng-click="onReset()" aria-label="ENTRY_SET_PASSWORD"\n' +
+    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 ||\n' +
+    '                       data.email.length == 0 || data.code.length == 0 || data.password.length < 6"\n' +
+    '                       class="md-accent" type="submit">\n' +
+    '                {{::\'ENTRY_SET_PASSWORD\' | translate}}\n' +
     '            </md-button>\n' +
-    '\n' +
-    '            <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '            <md-button class="md-warn" ng-show="transaction.busy()" ng-click="transaction.abort()" aria-label="ABORT">\n' +
     '                {{::\'CANCEL\' | translate}}\n' +
     '            </md-button>\n' +
     '        </div>\n' +
@@ -20993,35 +20993,32 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password_dialog.html',
+  $templateCache.put('reset_password/reset_password_dialog.html',
     '<!--\n' +
-    '@file Recover password dialog\n' +
+    '@file Reset password\n' +
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
-    '<md-dialog class="pip-entry lp0 rp0">\n' +
+    '<md-dialog class="pip-entry  lp0 rp0">\n' +
     '    <md-dialog-content>\n' +
-    '        <pip-recover-password-panel\n' +
+    '        <pip-reset-password-panel\n' +
     '                pip-data="data"\n' +
-    '                pip-created="$panel = $control"\n' +
-    '                pip-goto-reset="pipGotoReset">\n' +
+    '                pip-created="$panel = $control">\n' +
     '\n' +
-    '        </pip-recover-password-panel>\n' +
+    '        </pip-reset-password-panel>\n' +
     '    </md-dialog-content>\n' +
     '\n' +
     '    <md-dialog-actions class="layout-row layout-align-end-center">\n' +
     '        <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
     '            {{::\'CANCEL\' | translate}}\n' +
     '        </md-button>\n' +
-    '\n' +
-    '        <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
-    '                   aria-label="RECOVER_PWD_RECOVER"\n' +
-    '                   ng-disabled="(form.$pristine && !data.email) || data.email== undefined ||\n' +
-    '                           || data.serverUrl.length == 0 || data.email.length == 0">\n' +
-    '            {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
+    '        <md-button ng-hide="transaction.busy()" ng-click="onReset()" aria-label="ENTRY_SET_PASSWORD"\n' +
+    '                   ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 ||\n' +
+    '                       data.email.length == 0 || data.code.length == 0 || data.password.length < 6"\n' +
+    '                   class="md-accent" type="submit">\n' +
+    '            {{::\'ENTRY_SET_PASSWORD\' | translate}}\n' +
     '        </md-button>\n' +
-    '\n' +
-    '        <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '        <md-button class="md-warn" ng-show="transaction.busy()" ng-click="transaction.abort()" aria-label="ABORT">\n' +
     '            {{::\'CANCEL\' | translate}}\n' +
     '        </md-button>\n' +
     '    </md-dialog-actions>\n' +
@@ -21036,17 +21033,18 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password_panel.html',
+  $templateCache.put('reset_password/reset_password_panel.html',
     '<div class="pip-body">\n' +
     '    <div class="pip-content">\n' +
-    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
+    '        <md-progress-linear ng-show="transaction.busy()  && showServerError" md-mode="indeterminate"\n' +
+    '                            class="pip-progress-top">\n' +
     '        </md-progress-linear>\n' +
     '\n' +
-    '        <h2>{{\'RECOVER_PWD_TITLE\' | translate}}</h2>\n' +
+    '        <h2>{{::\'RESET_PWD_PASSWORD\' | translate}}</h2>\n' +
     '\n' +
-    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_1\' | translate}} </p>\n' +
-    '\n' +
-    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_2\' | translate}}</p>\n' +
+    '        <p class="title-padding bm16">\n' +
+    '            {{::\'RESET_PWD_TEXT\' | translate}}\n' +
+    '        </p>\n' +
     '\n' +
     '        <form name="form" novalidate>\n' +
     '            <div ng-messages="form.$serverError" class="text-error bm8"  md-auto-hide="false">\n' +
@@ -21061,7 +21059,7 @@ module.run(['$templateCache', function($templateCache) {
     '            </div>\n' +
     '\n' +
     '            <a ng-hide="showServerUrl || fixedServerUrl" ng-click="showServerUrl = true" href="">\n' +
-    '                {{\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
+    '                {{::\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
     '            </a>\n' +
     '\n' +
     '            <div ng-show="showServerUrl">\n' +
@@ -21083,19 +21081,17 @@ module.run(['$templateCache', function($templateCache) {
     '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
     '                </md-autocomplete>\n' +
     '            </div>\n' +
+    '\n' +
     '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
     '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
-    '                <input name="email" type="email"\n' +
-    '                       ng-model="data.email"\n' +
-    '                       pip-email-unique="data.email"\n' +
-    '                       required step="any" pip-clear-errors\n' +
-    '                       ng-disabled="transaction.busy()" tabindex="2"/>\n' +
+    '                <input name="email" type="email" ng-model="data.email" required step="any" pip-clear-errors\n' +
+    '                       ng-disabled="transaction.busy()" tabindex="2" pip-email-unique="data.email"/>\n' +
     '\n' +
     '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
     '                    {{::\'HINT_EMAIL\' | translate}}\n' +
     '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.email)"\n' +
-    '                     class="md-input-error"  md-auto-hide="false">\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.email)" class="md-input-error"  md-auto-hide="false">\n' +
+    '\n' +
     '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
     '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
     '                    <div ng-message="emailUnique">{{::\'ERROR_1104\' | translate}}</div>\n' +
@@ -21103,8 +21099,41 @@ module.run(['$templateCache', function($templateCache) {
     '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
     '                </div>\n' +
     '            </md-input-container>\n' +
-    '        </form>\n' +
     '\n' +
+    '            <md-input-container class="pip-no-hint">\n' +
+    '                <label>{{::\'ENTRY_RESET_CODE\' | translate}}</label>\n' +
+    '                <input name="code" ng-disabled="transaction.busy()"\n' +
+    '                       ng-model="data.code" required tabindex="3" pip-clear-errors/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.code).hint">\n' +
+    '                    {{::\'ENTRY_RESET_CODE\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.code)" class="md-input-error"  md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'ERROR_CODE_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="ERROR_1108">{{::\'ERROR_1108\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1109">{{::\'ERROR_1109\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '\n' +
+    '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
+    '                <label>{{::\'PASSWORD\' | translate}}</label>\n' +
+    '                <input name="password" ng-disabled="transaction.busy()" pip-clear-errors\n' +
+    '                       type="password" tabindex="4" ng-model="data.password"\n' +
+    '                       required minlength="6"/>\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.password).hint">\n' +
+    '                    {{::\'HINT_PASSWORD\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.password)"\n' +
+    '                     class="md-input-error"  md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'MINLENGTH_PASSWORD\' | translate}}</div>\n' +
+    '                    <div ng-message="minlength">{{::\'MINLENGTH_PASSWORD\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1102">{{::\'ERROR_1102\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1103">{{::\'ERROR_1103\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1105">{{::\'ERROR_1105\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '\n' +
+    '        </form>\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -21308,31 +21337,31 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('reset_password/reset_password.html',
+  $templateCache.put('recover_password/recover_password.html',
     '<!--\n' +
-    '@file Password reset page\n' +
+    '@file Password recovery page\n' +
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
     '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
     '    <pip-card width="400">\n' +
-    '\n' +
-    '        <pip-reset-password-panel\n' +
+    '        <pip-recover-password-panel\n' +
     '                pip-data="data"\n' +
     '                pip-created="$panel = $control">\n' +
     '\n' +
-    '        </pip-reset-password-panel>\n' +
+    '        </pip-recover-password-panel>\n' +
     '        <div class="pip-footer">\n' +
     '            <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
     '                {{::\'CANCEL\' | translate}}\n' +
     '            </md-button>\n' +
-    '            <md-button ng-hide="transaction.busy()" ng-click="onReset()" aria-label="ENTRY_SET_PASSWORD"\n' +
-    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 ||\n' +
-    '                       data.email.length == 0 || data.code.length == 0 || data.password.length < 6"\n' +
-    '                       class="md-accent" type="submit">\n' +
-    '                {{::\'ENTRY_SET_PASSWORD\' | translate}}\n' +
+    '\n' +
+    '            <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
+    '                       aria-label="RECOVER_PWD_RECOVER"\n' +
+    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 || data.email.length == 0">\n' +
+    '                {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
     '            </md-button>\n' +
-    '            <md-button class="md-warn" ng-show="transaction.busy()" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '\n' +
+    '            <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
     '                {{::\'CANCEL\' | translate}}\n' +
     '            </md-button>\n' +
     '        </div>\n' +
@@ -21348,32 +21377,35 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('reset_password/reset_password_dialog.html',
+  $templateCache.put('recover_password/recover_password_dialog.html',
     '<!--\n' +
-    '@file Reset password\n' +
+    '@file Recover password dialog\n' +
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
-    '<md-dialog class="pip-entry  lp0 rp0">\n' +
+    '<md-dialog class="pip-entry lp0 rp0">\n' +
     '    <md-dialog-content>\n' +
-    '        <pip-reset-password-panel\n' +
+    '        <pip-recover-password-panel\n' +
     '                pip-data="data"\n' +
-    '                pip-created="$panel = $control">\n' +
+    '                pip-created="$panel = $control"\n' +
+    '                pip-goto-reset="pipGotoReset">\n' +
     '\n' +
-    '        </pip-reset-password-panel>\n' +
+    '        </pip-recover-password-panel>\n' +
     '    </md-dialog-content>\n' +
     '\n' +
     '    <md-dialog-actions class="layout-row layout-align-end-center">\n' +
     '        <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
     '            {{::\'CANCEL\' | translate}}\n' +
     '        </md-button>\n' +
-    '        <md-button ng-hide="transaction.busy()" ng-click="onReset()" aria-label="ENTRY_SET_PASSWORD"\n' +
-    '                   ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 ||\n' +
-    '                       data.email.length == 0 || data.code.length == 0 || data.password.length < 6"\n' +
-    '                   class="md-accent" type="submit">\n' +
-    '            {{::\'ENTRY_SET_PASSWORD\' | translate}}\n' +
+    '\n' +
+    '        <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
+    '                   aria-label="RECOVER_PWD_RECOVER"\n' +
+    '                   ng-disabled="(form.$pristine && !data.email) || data.email== undefined ||\n' +
+    '                           || data.serverUrl.length == 0 || data.email.length == 0">\n' +
+    '            {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
     '        </md-button>\n' +
-    '        <md-button class="md-warn" ng-show="transaction.busy()" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '\n' +
+    '        <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
     '            {{::\'CANCEL\' | translate}}\n' +
     '        </md-button>\n' +
     '    </md-dialog-actions>\n' +
@@ -21388,18 +21420,17 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('reset_password/reset_password_panel.html',
+  $templateCache.put('recover_password/recover_password_panel.html',
     '<div class="pip-body">\n' +
     '    <div class="pip-content">\n' +
-    '        <md-progress-linear ng-show="transaction.busy()  && showServerError" md-mode="indeterminate"\n' +
-    '                            class="pip-progress-top">\n' +
+    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
     '        </md-progress-linear>\n' +
     '\n' +
-    '        <h2>{{::\'RESET_PWD_PASSWORD\' | translate}}</h2>\n' +
+    '        <h2>{{\'RECOVER_PWD_TITLE\' | translate}}</h2>\n' +
     '\n' +
-    '        <p class="title-padding bm16">\n' +
-    '            {{::\'RESET_PWD_TEXT\' | translate}}\n' +
-    '        </p>\n' +
+    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_1\' | translate}} </p>\n' +
+    '\n' +
+    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_2\' | translate}}</p>\n' +
     '\n' +
     '        <form name="form" novalidate>\n' +
     '            <div ng-messages="form.$serverError" class="text-error bm8"  md-auto-hide="false">\n' +
@@ -21414,7 +21445,7 @@ module.run(['$templateCache', function($templateCache) {
     '            </div>\n' +
     '\n' +
     '            <a ng-hide="showServerUrl || fixedServerUrl" ng-click="showServerUrl = true" href="">\n' +
-    '                {{::\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
+    '                {{\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
     '            </a>\n' +
     '\n' +
     '            <div ng-show="showServerUrl">\n' +
@@ -21436,17 +21467,19 @@ module.run(['$templateCache', function($templateCache) {
     '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
     '                </md-autocomplete>\n' +
     '            </div>\n' +
-    '\n' +
     '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
     '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
-    '                <input name="email" type="email" ng-model="data.email" required step="any" pip-clear-errors\n' +
-    '                       ng-disabled="transaction.busy()" tabindex="2" pip-email-unique="data.email"/>\n' +
+    '                <input name="email" type="email"\n' +
+    '                       ng-model="data.email"\n' +
+    '                       pip-email-unique="data.email"\n' +
+    '                       required step="any" pip-clear-errors\n' +
+    '                       ng-disabled="transaction.busy()" tabindex="2"/>\n' +
     '\n' +
     '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
     '                    {{::\'HINT_EMAIL\' | translate}}\n' +
     '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.email)" class="md-input-error"  md-auto-hide="false">\n' +
-    '\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.email)"\n' +
+    '                     class="md-input-error"  md-auto-hide="false">\n' +
     '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
     '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
     '                    <div ng-message="emailUnique">{{::\'ERROR_1104\' | translate}}</div>\n' +
@@ -21454,41 +21487,8 @@ module.run(['$templateCache', function($templateCache) {
     '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
     '                </div>\n' +
     '            </md-input-container>\n' +
-    '\n' +
-    '            <md-input-container class="pip-no-hint">\n' +
-    '                <label>{{::\'ENTRY_RESET_CODE\' | translate}}</label>\n' +
-    '                <input name="code" ng-disabled="transaction.busy()"\n' +
-    '                       ng-model="data.code" required tabindex="3" pip-clear-errors/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.code).hint">\n' +
-    '                    {{::\'ENTRY_RESET_CODE\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.code)" class="md-input-error"  md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'ERROR_CODE_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="ERROR_1108">{{::\'ERROR_1108\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1109">{{::\'ERROR_1109\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '\n' +
-    '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
-    '                <label>{{::\'PASSWORD\' | translate}}</label>\n' +
-    '                <input name="password" ng-disabled="transaction.busy()" pip-clear-errors\n' +
-    '                       type="password" tabindex="4" ng-model="data.password"\n' +
-    '                       required minlength="6"/>\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.password).hint">\n' +
-    '                    {{::\'HINT_PASSWORD\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.password)"\n' +
-    '                     class="md-input-error"  md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'MINLENGTH_PASSWORD\' | translate}}</div>\n' +
-    '                    <div ng-message="minlength">{{::\'MINLENGTH_PASSWORD\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1102">{{::\'ERROR_1102\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1103">{{::\'ERROR_1103\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1105">{{::\'ERROR_1105\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '\n' +
     '        </form>\n' +
+    '\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -22835,230 +22835,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Entry reset password controller
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Fix error handling
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.ResetPassword', ['pipEntry.Common', 'pipResetPasswordPanel',
-        'pipEmailUnique']);
-
-    thisModule.controller('pipResetPasswordController',
-        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipToasts', 'pipTranslate', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, pipToasts, 
-            pipTranslate, pipFormErrors, pipEntryCommon, $window) {
-
-            pipEntryCommon.configureAppBar();
-            $scope.goBack = goBack;
-
-            $scope.onReset = onReset;
-
-            $scope.transaction = pipTransaction('entry.reset_password', $scope);
-
-            return
-
-
-            function goBack(){
-                $window.history.back();
-            }
-
-            function onReset() {
-                if ($scope.$panel)  $scope.$panel.onReset();
-            }
-
-
-
-        }]
-    );
-
-})();
-/**
- * @file Reset password dialog
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.ResetPasswordDialog', ['pipEntry.Common', "pipResetPasswordPanel"]);
-
-    thisModule.factory('pipResetPasswordDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'entry/dialogs/reset_password.html',
-                        controller: 'pipResetPasswordDialogController',
-                        locals: { params: params },
-                        clickOutsideToClose: true
-                    })
-                        .then(function () {
-                            if (successCallback) {
-                                successCallback();
-                            }
-                        }, function () {
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipResetPasswordDialogController',
-        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog){
-
-            $scope.onReset = onReset;
-
-            if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
-
-            $scope.goBack = $mdDialog.cancel;
-
-
-            return
-
-            function onReset() {
-                if ($scope.$panel)  $scope.$panel.onReset();
-            }
-        }]
-    );
-
-})();
-/**
- * @file Reset password panel
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipResetPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
-
-    thisModule.directive('pipResetPasswordPanel',
-        function () {
-            return {
-                restrict: 'EA',
-                replace: true,
-                scope: {
-                    data: '=pipData',
-                    created: '&pipCreated'
-
-                },
-                templateUrl: 'reset_password/reset_password_panel.html',
-                controller: 'pipResetPasswordPanelController'
-
-            };
-        }
-    );
-    thisModule.controller('pipResetPasswordPanelController',
-        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipToasts', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession, pipToasts,
-                  pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
-
-            $scope.$mdMedia = $mdMedia;
-
-            pipEntryCommon.initScope($scope);
-
-            $scope.showServerError = true;
-
-            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onReset = onReset;
-            $scope.transaction = pipTransaction('entry.recover_password', $scope);
-
-            $scope.$control = {};
-            $scope.$control.onReset = onReset;
-
-            if ($scope.created) {
-                $scope.created({
-                    $control: $scope.$control
-                });
-            }
-
-            return;
-
-            //-----------------------------
-
-            function onShowToast(message, type) {
-                if (!message) return;
-                message = pipTranslate.translate(message);
-                type = type || 'message';
-
-                if (type == 'message') {
-                    pipToasts.showMessage(message);
-                    return;
-                }
-                if (type == 'error') {
-                    pipToasts.showError(message);
-                    return;
-                }
-            };
-
-            function onReset() {
-                if ($scope.form.$invalid) {
-                    pipFormErrors.resetFormErrors($scope.form, true);
-                    return;
-                }
-
-                var transactionId = $scope.transaction.begin('PROCESSING');
-                if (!transactionId) return;
-
-                pipRest.resetPassword($scope.data.serverUrl).call(
-                    {
-                        email: $scope.data.email,
-                        code: $scope.data.code,
-                        password: $scope.data.password
-                    },
-                    function (data) {
-                        pipFormErrors.resetFormErrors($scope.form, false);
-                        if ($scope.transaction.aborted(transactionId)) return;
-
-                        var message = String() + 'RESET_PWD_SUCCESS_TEXT';
-                        onShowToast(message, 'message');
-                        $scope.transaction.end();
-                        pipAuthState.go('signin', {
-                            server_url: $scope.data.serverUrl,
-                            email: $scope.data.email
-                        });
-                    },
-                    function (error) {
-                        $scope.error = error;
-                        $scope.transaction.end($scope.error);
-                        pipFormErrors.resetFormErrors($scope.form, true);
-                        pipFormErrors.setFormError(
-                            $scope.form, error,
-                            {
-                                1100 : 'email', // Missing email
-                                1106 : 'email', // User was not found
-                                1102 : 'password', // Missing password
-                                1103 : 'password', // Password should be 5 to 20 symbols long
-                                1105 : 'password', // Old and new passwords are identical
-                                1108 : 'code', // Invalid password recovery code
-                                1109 : 'code', // Password recovery code expired
-                                1000 : 'form', // Unknown error
-                                1110 : 'form', // Account is locked
-                                1111 : 'form', // Number of attempts exceeded. Account was locked
-                                1112 : 'form', // Account is not active
-                                '-1' : 'form' // server not response
-                            }
-                        );
-                    }
-                );
-            };
-
-        }])
-
-})();
-/**
  * @file Entry signin controller
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -23285,6 +23061,230 @@ module.run(['$templateCache', function($templateCache) {
                     onSignin();
                 }
             }
+
+        }])
+
+})();
+/**
+ * @file Entry reset password controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Fix error handling
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.ResetPassword', ['pipEntry.Common', 'pipResetPasswordPanel',
+        'pipEmailUnique']);
+
+    thisModule.controller('pipResetPasswordController',
+        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipToasts', 'pipTranslate', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, pipToasts, 
+            pipTranslate, pipFormErrors, pipEntryCommon, $window) {
+
+            pipEntryCommon.configureAppBar();
+            $scope.goBack = goBack;
+
+            $scope.onReset = onReset;
+
+            $scope.transaction = pipTransaction('entry.reset_password', $scope);
+
+            return
+
+
+            function goBack(){
+                $window.history.back();
+            }
+
+            function onReset() {
+                if ($scope.$panel)  $scope.$panel.onReset();
+            }
+
+
+
+        }]
+    );
+
+})();
+/**
+ * @file Reset password dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.ResetPasswordDialog', ['pipEntry.Common', "pipResetPasswordPanel"]);
+
+    thisModule.factory('pipResetPasswordDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'entry/dialogs/reset_password.html',
+                        controller: 'pipResetPasswordDialogController',
+                        locals: { params: params },
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }, function () {
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipResetPasswordDialogController',
+        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog){
+
+            $scope.onReset = onReset;
+
+            if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
+
+            $scope.goBack = $mdDialog.cancel;
+
+
+            return
+
+            function onReset() {
+                if ($scope.$panel)  $scope.$panel.onReset();
+            }
+        }]
+    );
+
+})();
+/**
+ * @file Reset password panel
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipResetPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
+
+    thisModule.directive('pipResetPasswordPanel',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: true,
+                scope: {
+                    data: '=pipData',
+                    created: '&pipCreated'
+
+                },
+                templateUrl: 'reset_password/reset_password_panel.html',
+                controller: 'pipResetPasswordPanelController'
+
+            };
+        }
+    );
+    thisModule.controller('pipResetPasswordPanelController',
+        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipToasts', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession, pipToasts,
+                  pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
+
+            $scope.$mdMedia = $mdMedia;
+
+            pipEntryCommon.initScope($scope);
+
+            $scope.showServerError = true;
+
+            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
+            $scope.onReset = onReset;
+            $scope.transaction = pipTransaction('entry.recover_password', $scope);
+
+            $scope.$control = {};
+            $scope.$control.onReset = onReset;
+
+            if ($scope.created) {
+                $scope.created({
+                    $control: $scope.$control
+                });
+            }
+
+            return;
+
+            //-----------------------------
+
+            function onShowToast(message, type) {
+                if (!message) return;
+                message = pipTranslate.translate(message);
+                type = type || 'message';
+
+                if (type == 'message') {
+                    pipToasts.showMessage(message);
+                    return;
+                }
+                if (type == 'error') {
+                    pipToasts.showError(message);
+                    return;
+                }
+            };
+
+            function onReset() {
+                if ($scope.form.$invalid) {
+                    pipFormErrors.resetFormErrors($scope.form, true);
+                    return;
+                }
+
+                var transactionId = $scope.transaction.begin('PROCESSING');
+                if (!transactionId) return;
+
+                pipRest.resetPassword($scope.data.serverUrl).call(
+                    {
+                        email: $scope.data.email,
+                        code: $scope.data.code,
+                        password: $scope.data.password
+                    },
+                    function (data) {
+                        pipFormErrors.resetFormErrors($scope.form, false);
+                        if ($scope.transaction.aborted(transactionId)) return;
+
+                        var message = String() + 'RESET_PWD_SUCCESS_TEXT';
+                        onShowToast(message, 'message');
+                        $scope.transaction.end();
+                        pipAuthState.go('signin', {
+                            server_url: $scope.data.serverUrl,
+                            email: $scope.data.email
+                        });
+                    },
+                    function (error) {
+                        $scope.error = error;
+                        $scope.transaction.end($scope.error);
+                        pipFormErrors.resetFormErrors($scope.form, true);
+                        pipFormErrors.setFormError(
+                            $scope.form, error,
+                            {
+                                1100 : 'email', // Missing email
+                                1106 : 'email', // User was not found
+                                1102 : 'password', // Missing password
+                                1103 : 'password', // Password should be 5 to 20 symbols long
+                                1105 : 'password', // Old and new passwords are identical
+                                1108 : 'code', // Invalid password recovery code
+                                1109 : 'code', // Password recovery code expired
+                                1000 : 'form', // Unknown error
+                                1110 : 'form', // Account is locked
+                                1111 : 'form', // Number of attempts exceeded. Account was locked
+                                1112 : 'form', // Account is not active
+                                '-1' : 'form' // server not response
+                            }
+                        );
+                    }
+                );
+            };
 
         }])
 
@@ -23646,6 +23646,31 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext" ng-if="timeoutInterval">\n' +
+    '        {{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions h48 layout-column layout-align-center-center"\n' +
+    '         ng-if="isCordova">\n' +
+    '        <md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE" >\n' +
+    '            {{::\'ERROR_AVAILABLE_CLOSE\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
     '    <div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div>\n' +
@@ -23674,19 +23699,30 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
+  $templateCache.put('unknown/unknown.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext" ng-if="timeoutInterval">\n' +
-    '        {{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.\n' +
+    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
+    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
+    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
+    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
+    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
+    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
     '    </div>\n' +
-    '    <div class="pip-error-actions h48 layout-column layout-align-center-center"\n' +
-    '         ng-if="isCordova">\n' +
-    '        <md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE" >\n' +
-    '            {{::\'ERROR_AVAILABLE_CLOSE\' | translate}}\n' +
-    '        </md-button>\n' +
+    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
+    '        <div class="h48" ng-if="isCordova">\n' +
+    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '        <div class="h48">\n' +
+    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -23734,42 +23770,6 @@ module.run(['$templateCache', function($templateCache) {
     '                </md-button>\n' +
     '            </div>\n' +
     '    </div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
-    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
-    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
-    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
-    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
-    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
-    '        <div class="h48" ng-if="isCordova">\n' +
-    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '        <div class="h48">\n' +
-    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -24764,6 +24764,135 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular);
 
 /**
+ * @file Define controller for a settings tab
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipSettings.Page', [
+        'pipState', 'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipSettings.Templates'
+    ]);
+
+    thisModule.config(['pipAuthStateProvider', function (pipAuthStateProvider) {
+        pipAuthStateProvider.state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controller: 'pipSettingsPageController',
+            templateUrl: 'settings_page/settings_page.html'
+        });
+    }]);
+
+    /**
+     * @ngdoc controller
+     * @name pipSettings.Page:pipSettingsPageController
+     *
+     * @description
+     * The controller is used for the whole settings tabs and provides
+     * navigation menu on the left and load content into right panel.
+     * This component is integrated with `'pipAppBar'` component and adapt the tabs header.
+     * The component has predefined states `'settings.base_info'` and `'settings.active_sessions'`. Each of these states
+     * require user's authorization.
+     *
+     * @requires pipAppBar
+     */
+    thisModule.controller('pipSettingsPageController',
+        ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings) {
+
+            $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+                if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
+                    return tab;
+                }
+            });
+
+            $scope.tabs = _.sortBy($scope.tabs, 'index');
+
+            $scope.selected = {};
+            if ($state.current.name !== 'settings') {
+                initSelect($state.current.name);
+            }
+            if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+                initSelect(pipSettings.getDefaultTab().state);
+            } else {
+                $timeout(function () {
+                    if (pipSettings.getDefaultTab()) {
+                        initSelect(pipSettings.getDefaultTab().state);
+                    }
+                    if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
+                        initSelect($scope.tabs[0].state);
+                    }
+                });
+            }
+
+            appHeader();
+
+            /** @see onNavigationSelect */
+            $scope.onNavigationSelect = onNavigationSelect;
+            /** @see onDropdownSelect */
+            $scope.onDropdownSelect = onDropdownSelect;
+
+            /**
+             * Config header panel
+             */
+            function appHeader() {
+                pipAppBar.showMenuNavIcon();
+                pipAppBar.showTitleText('SETTINGS_TITLE');
+                pipAppBar.showLocalActions(null, []);
+                pipAppBar.showShadowSm();
+                pipAppBar.hideSearch();
+            }
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Page:pipSettingsPageController
+             * @name pipSettings.Page:pipSettingsPageController:onDropdownSelect
+             *
+             * @description
+             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
+             * It used on mobile screens.
+             *
+             * @param {Object} state    State configuration object
+             */
+            function onDropdownSelect(state) {
+                onNavigationSelect(state.state);
+            }
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Page:pipSettingsPageController
+             * @name pipSettings.Page:pipSettingsPageController:onNavigationSelect
+             *
+             * @description
+             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
+             * It uses on screens more than mobile.
+             *
+             * @param {string} state    Name of new state
+             */
+            function onNavigationSelect(state) {
+                initSelect(state);
+
+                if ($scope.selected.tab) {
+                    $state.go(state);
+                }
+            }
+
+            /**
+             * Establish selected tab
+             */
+            function initSelect(state) {
+                $scope.selected.tab = _.find($scope.tabs, function (tab) {
+                    return tab.state === state;
+                });
+                $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
+                $scope.selected.tabId = state;
+            }
+        }]);
+
+})(window.angular, window._);
+
+/**
  * @file Service for settings component
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -24982,135 +25111,6 @@ module.run(['$templateCache', function($templateCache) {
             }
         }
     }]);
-
-})(window.angular, window._);
-
-/**
- * @file Define controller for a settings tab
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipSettings.Page', [
-        'pipState', 'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates'
-    ]);
-
-    thisModule.config(['pipAuthStateProvider', function (pipAuthStateProvider) {
-        pipAuthStateProvider.state('settings', {
-            url: '/settings?party_id',
-            auth: true,
-            controller: 'pipSettingsPageController',
-            templateUrl: 'settings_page/settings_page.html'
-        });
-    }]);
-
-    /**
-     * @ngdoc controller
-     * @name pipSettings.Page:pipSettingsPageController
-     *
-     * @description
-     * The controller is used for the whole settings tabs and provides
-     * navigation menu on the left and load content into right panel.
-     * This component is integrated with `'pipAppBar'` component and adapt the tabs header.
-     * The component has predefined states `'settings.base_info'` and `'settings.active_sessions'`. Each of these states
-     * require user's authorization.
-     *
-     * @requires pipAppBar
-     */
-    thisModule.controller('pipSettingsPageController',
-        ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings) {
-
-            $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-                if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
-                    return tab;
-                }
-            });
-
-            $scope.tabs = _.sortBy($scope.tabs, 'index');
-
-            $scope.selected = {};
-            if ($state.current.name !== 'settings') {
-                initSelect($state.current.name);
-            }
-            if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-                initSelect(pipSettings.getDefaultTab().state);
-            } else {
-                $timeout(function () {
-                    if (pipSettings.getDefaultTab()) {
-                        initSelect(pipSettings.getDefaultTab().state);
-                    }
-                    if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
-                        initSelect($scope.tabs[0].state);
-                    }
-                });
-            }
-
-            appHeader();
-
-            /** @see onNavigationSelect */
-            $scope.onNavigationSelect = onNavigationSelect;
-            /** @see onDropdownSelect */
-            $scope.onDropdownSelect = onDropdownSelect;
-
-            /**
-             * Config header panel
-             */
-            function appHeader() {
-                pipAppBar.showMenuNavIcon();
-                pipAppBar.showTitleText('SETTINGS_TITLE');
-                pipAppBar.showLocalActions(null, []);
-                pipAppBar.showShadowSm();
-                pipAppBar.hideSearch();
-            }
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Page:pipSettingsPageController
-             * @name pipSettings.Page:pipSettingsPageController:onDropdownSelect
-             *
-             * @description
-             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
-             * It used on mobile screens.
-             *
-             * @param {Object} state    State configuration object
-             */
-            function onDropdownSelect(state) {
-                onNavigationSelect(state.state);
-            }
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Page:pipSettingsPageController
-             * @name pipSettings.Page:pipSettingsPageController:onNavigationSelect
-             *
-             * @description
-             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
-             * It uses on screens more than mobile.
-             *
-             * @param {string} state    Name of new state
-             */
-            function onNavigationSelect(state) {
-                initSelect(state);
-
-                if ($scope.selected.tab) {
-                    $state.go(state);
-                }
-            }
-
-            /**
-             * Establish selected tab
-             */
-            function initSelect(state) {
-                $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                    return tab.state === state;
-                });
-                $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-                $scope.selected.tabId = state;
-            }
-        }]);
 
 })(window.angular, window._);
 
