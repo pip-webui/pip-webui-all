@@ -33,193 +33,6 @@
     
 })();
 /**
- * @file Filter to format date and time
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
-
-    thisModule.filter('formatDate',  
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatDate(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatMonth(value, format);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongMonth(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortWeek',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortWeek(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatTime(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedInterval', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedInterval(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatMillisecondsToSeconds',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatMillisecondsToSeconds(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateRange(value1, value2);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateTimeRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateTimeRange(value1, value2);
-            };
-        }]
-    );
-
-
-})();
-
-/**
- * @file Filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
-
-    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
-        return function (key) {
-            return pipTranslate.translate(key) || key;
-        }
-    }]);
-
-})();
-
-/**
  * @file Special error handling for forms
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -1997,6 +1810,193 @@
         }]
     );
     
+})();
+
+/**
+ * @file Filter to format date and time
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
+
+    thisModule.filter('formatDate',  
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatDate(value, format);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDate', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDate(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDateWithYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDateWithYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatMonth',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatMonth(value, format);
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDate', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDate(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDateWithYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDateWithYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongMonth',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongMonth(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortWeek',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortWeek(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatTime(value, format);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDateTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDateTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDateTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDateTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatElapsedInterval', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatElapsedInterval(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatElapsedTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatElapsedTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatMillisecondsToSeconds',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatMillisecondsToSeconds(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatDateRange',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value1, value2) {
+                return pipDateFormat.formatDateRange(value1, value2);
+            };
+        }]
+    );
+
+    thisModule.filter('formatDateTimeRange',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value1, value2) {
+                return pipDateFormat.formatDateTimeRange(value1, value2);
+            };
+        }]
+    );
+
+
+})();
+
+/**
+ * @file Filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
+
+    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
+        return function (key) {
+            return pipTranslate.translate(key) || key;
+        }
+    }]);
+
 })();
 
 /**
@@ -8129,343 +8129,6 @@
 })();
 
 /**
- * @file pipTestCollection
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTestCollection', []);
-
-    // Collection of test data stored in test dataset
-    thisModule.factory('TestCollection', ['$log', function ($log) {
-
-        // var refs;
-
-        // Define the constructor function.
-        return function (generator, name, size, refs) {
-            if (!generator) {
-                throw new Error('TestCollection: generator is required');
-            }
-
-            this.generator = generator;
-            this.size = size ? size : 0;
-
-
-            this.refs = getRefs(generator, refs);
-
-            this.name = getName(generator, name);
-            this.collection = [];
-            this.isInit = false;
-
-            this.getGeneratorName = getGeneratorName;
-            this.getSize = getSize;         
-
-            this.init = init;         
-            this.getAll = getAll;         
-            this.getByIndex = getByIndex;         
-            this.findById = findById;         
-            this.create = create;         
-            this.update = update;         
-            this.deleteById = deleteById;         
-            this.deleteByIndex = deleteByIndex; 
-
-            return this;             
-        }
-            
-        function getGeneratorName() {
-                return this.generator.name;
-            }
-
-        function getSize() {
-                return this.collection.length;
-            }    
-
-        // public init(collection: any[]): void;
-        function init(collection) {
-            if (collection && angular.isArray(collection)) {
-                this.collection = _.cloneDeep(collection);
-                this.size = collection.length;
-
-                this.isInit = true;
-
-                return;
-            }
-
-            if (this.size === 0) { 
-                this.collection = [];
-
-                return
-            } 
-
-            this.collection = this.generator.newObjectList(this.size, this.refs);
-            this.isInit = true;
-        }
-    
-        // public getAll(): any[];
-        function getAll() {
-            return _.cloneDeep(this.collection);
-        }     
-
-        // public get(index: number): any[];
-        function getByIndex(index) {
-            var result = null;
-
-            if (index === undefined || index === null || index < 0 || index > this.collection.length - 1) {
-                return result;
-            }
-
-            result = _.cloneDeep(this.collection[index]);
-
-            return result;
-        }    
-
-        // public findById(id: string): any;
-        function findById(id, field) {
-            var result = null,
-                fieldId = field ? field : 'id';
-
-            if (id === undefined || id === null) {
-                return result;
-            }
-
-            result = _.find(this.collection, function(item) {
-                return item[fieldId] == id;
-            }); 
-            
-            return result || null;
-        }    
-
-        // public create(obj: any): any;
-        function create(obj) {
-            var result = this.generator.initObject(obj);
-
-            if (angular.isObject(result)) {
-                this.collection.push(result);
-            }
-
-            return result;
-        }    
-
-        // public update(id: string, obj: any): any;
-        function update(id, obj, idField) {
-            var result;
-
-            if (id === undefined || id === null || !angular.isObject(obj)) {
-                // todo: trow error?
-                return null;
-            }
-
-            result = this.findById(id, idField);
-
-            if (angular.isObject(result)) {
-                result = _.assign(result, obj);
-                // todo: replace into collection ???
-            } else {
-                result = null;
-            }
-
-            return result;
-        }    
-
-        // public delete(id: string): any;
-        function deleteById(id) {
-            var i, match = false;
-
-            for (i = 0; i < this.collection.length; i++) {
-                if (this.collection[i].id === id) {
-                    match = true;
-                    this.collection.splice(i, 1);
-                    break;
-                }
-            }
-
-            return match;            
-        }    
-
-        // public delete(id: string): any;
-        function deleteByIndex(index) {
-            if (index === undefined || index === null || index < 0 || index > this.collection.length - 1) {
-                return false;
-            }
-
-            this.collection.splice(index, 1);
-
-            return true;            
-        }
-
-        // ----------------------------------
-
-        function getRefsCopy(arr) {
-            var result = {};
-
-            for (var key in arr) {
-                result[key] = _.cloneDeep(arr[key]);
-            }
-
-            return result;
-        }
-
-        function getRefs(generator, refs) {
-            if (refs && angular.isObject(refs)) {
-                return getRefsCopy(refs);
-            } else if (generator.refs && angular.isObject(generator.refs)) {
-                return getRefsCopy(generator.refs);
-            } else {
-                return {}; 
-            }
-        }
-
-        function getName(generator, name) {
-            if (name) {
-                return name;
-            } else {
-                return generator.name;
-            } 
-        }
-
-    }]);
-
-})();
-/**
- * @file pipTestDataService
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTestDataService', []);
-
-    thisModule.factory('pipTestDataService', 
-        ['pipTestDataSet', function(pipTestDataSet) {
-
-            // Angular service that holds singleton test dataset that is shared across all
-
-            var dataset = new pipTestDataSet();
-
-            return {
-                
-                getDataset: getDataset
-
-            };
-
-            // Get singleton dataset
-            function getDataset() {
-
-                return dataset;
-
-            }
-
-            
-
-        }]
-    );
-
-})();
-/**
- * @file pipTestDataSet
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTestDataSet', []);
-
-    // Test dataset, that can be used to hold state of rest api
-    thisModule.factory('pipTestDataSet', ['$log', function ($log) {
-        
-        // Define the constructor function.
-        return function () {
-
-            this.currentUser = null;
-            this.currentParty = null;
-            this.dataSet = {};
-
-            this.init = init;         
-            this.add = add;         
-            this.get = get;         
-
-            this.getCurrentUser = getCurrentUser;
-            this.setCurrentUser = setCurrentUser;
-            this.clearCurrentUser = clearCurrentUser;
-            this.setCurrentParty = setCurrentParty;
-            this.getCurrentParty = getCurrentParty;
-
-            return this;        
-        }
-
-        // Initializes all registered collectons
-        function init() {
-            var i;
-console.log('init this.dataSet',this.dataSet);
-            for (i in this.dataSet) {
-                console.log('this.dataSet', this.dataSet[i]);
-                if (this.dataSet[i] && this.dataSet[i].isInit === false) {
-                    this.dataSet[i].init();
-                }
-            }    
-        }
-   
-        // Registers a new collection
-        function add(collection) {
-            var name;
-            
-            if (collection && angular.isObject(collection) && collection.name) {
-                name = collection.name;
-                this.dataSet[name] = _.cloneDeep(collection);
-            } else {
-                throw new Error('pipTestDataSet: collection is required');
-            }
-        }
-
-        // Gets registered collection by its name
-        function get(name) {
-            if (name && angular.isString(name)) {
-                return this.dataSet[name];
-            } else {
-                throw new Error('pipTestDataSet: name must be a string');
-            }
-        }
-
-        // ---------------------------
-
-        function setCurrentUser(user) {
-            if (user && angular.isObject(user) && user.id) {
-                this.currentUser = _.cloneDeep(user);
-            } else {
-                throw new Error('pipTestDataSet: currentUser must be a object');
-            }
-        }        
-
-        function getCurrentUser() {
-            return this.currentUser;
-        }
-
-        function clearCurrentUser() {
-            this.currentUser = null;
-        }
-   
-        function setCurrentParty(party) {
-            if (party && angular.isObject(party) && party.id) {
-                this.currentParty = _.cloneDeep(party);
-            } else {
-                throw new Error('pipTestDataSet: currentParty must be a object');
-            }
-        }
-
-        function getCurrentParty() {
-            return this.currentParty;
-        }      
-
-    }]);
-
-})();
-/**
  * @file pipAvatarsDataGenerator
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -9236,9 +8899,16 @@ console.log('init this.dataSet',this.dataSet);
 
             child.generateObj = function generateObj() {
                 var id = pipBasicGeneratorServices.getObjectId(),
+                    date = chance.timestamp(),
                     setting = {
-                        party_id: id,
-                        creator_id: id
+                        settings: {
+                            party_id: id,
+                            creator_id: id,
+                            goals: {},
+                            areas: {},
+                            intro: {}
+                        },
+                        updated: new Date(date).toJSON()
                     };
 
                 return setting;
@@ -9318,6 +8988,569 @@ console.log('init this.dataSet',this.dataSet);
 
 })();
  
+/**
+ * @file pipTestCollection
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTestCollection', []);
+
+    // Collection of test data stored in test dataset
+    thisModule.factory('TestCollection', ['$log', function ($log) {
+
+        // var refs;
+
+        // Define the constructor function.
+        return function (generator, name, size, refs) {
+            if (!generator) {
+                throw new Error('TestCollection: generator is required');
+            }
+
+            this.generator = generator;
+            this.size = size ? size : 0;
+
+
+            this.refs = getRefs(generator, refs);
+
+            this.name = getName(generator, name);
+            this.collection = [];
+            this.isInit = false;
+
+            this.getGeneratorName = getGeneratorName;
+            this.getSize = getSize;         
+
+            this.init = init;         
+            this.getAll = getAll;         
+            this.getByIndex = getByIndex;         
+            this.findById = findById;         
+            this.create = create;         
+            this.update = update;         
+            this.deleteById = deleteById;         
+            this.deleteByIndex = deleteByIndex; 
+
+            return this;             
+        }
+            
+        function getGeneratorName() {
+                return this.generator.name;
+            }
+
+        function getSize() {
+                return this.collection.length;
+            }    
+
+        // public init(collection: any[]): void;
+        function init(collection) {
+            if (collection && angular.isArray(collection)) {
+                this.collection = _.cloneDeep(collection);
+                this.size = collection.length;
+
+                this.isInit = true;
+
+                return;
+            }
+
+            if (this.size === 0) { 
+                this.collection = [];
+
+                return
+            } 
+
+            this.collection = this.generator.newObjectList(this.size, this.refs);
+            this.isInit = true;
+        }
+    
+        // public getAll(): any[];
+        function getAll() {
+            return _.cloneDeep(this.collection);
+        }     
+
+        // public get(index: number): any[];
+        function getByIndex(index) {
+            var result = null;
+
+            if (index === undefined || index === null || index < 0 || index > this.collection.length - 1) {
+                return result;
+            }
+
+            result = _.cloneDeep(this.collection[index]);
+
+            return result;
+        }    
+
+        // public findById(id: string): any;
+        function findById(id, field) {
+            var result = null,
+                fieldId = field ? field : 'id';
+
+            if (id === undefined || id === null) {
+                return result;
+            }
+
+            result = _.find(this.collection, function(item) {
+                return item[fieldId] == id;
+            }); 
+            
+            return result || null;
+        }    
+
+        // public create(obj: any): any;
+        function create(obj) {
+            var result = this.generator.initObject(obj);
+
+            if (angular.isObject(result)) {
+                this.collection.push(result);
+            }
+
+            return result;
+        }    
+
+        // public update(id: string, obj: any): any;
+        function update(id, obj, idField) {
+            var result;
+
+            if (id === undefined || id === null || !angular.isObject(obj)) {
+                // todo: trow error?
+                return null;
+            }
+
+            result = this.findById(id, idField);
+
+            if (angular.isObject(result)) {
+                result = _.assign(result, obj);
+                // todo: replace into collection ???
+            } else {
+                result = null;
+            }
+
+            return result;
+        }    
+
+        // public delete(id: string): any;
+        function deleteById(id) {
+            var i, match = false;
+
+            for (i = 0; i < this.collection.length; i++) {
+                if (this.collection[i].id === id) {
+                    match = true;
+                    this.collection.splice(i, 1);
+                    break;
+                }
+            }
+
+            return match;            
+        }    
+
+        // public delete(id: string): any;
+        function deleteByIndex(index) {
+            if (index === undefined || index === null || index < 0 || index > this.collection.length - 1) {
+                return false;
+            }
+
+            this.collection.splice(index, 1);
+
+            return true;            
+        }
+
+        // ----------------------------------
+
+        function getRefsCopy(arr) {
+            var result = {};
+
+            for (var key in arr) {
+                result[key] = _.cloneDeep(arr[key]);
+            }
+
+            return result;
+        }
+
+        function getRefs(generator, refs) {
+            if (refs && angular.isObject(refs)) {
+                return getRefsCopy(refs);
+            } else if (generator.refs && angular.isObject(generator.refs)) {
+                return getRefsCopy(generator.refs);
+            } else {
+                return {}; 
+            }
+        }
+
+        function getName(generator, name) {
+            if (name) {
+                return name;
+            } else {
+                return generator.name;
+            } 
+        }
+
+    }]);
+
+})();
+/**
+ * @file pipTestDataService
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTestDataService', []);
+
+    thisModule.factory('pipTestDataService', 
+        ['pipTestDataSet', 'pipUserDataGenerator', 'pipPartyAccessDataGenerator', 'pipSessionsDataGenerator', 'pipPartyDataGenerator', 'TestCollection', 'pipTestDataService', 'pipNodeDataGenerator', 'pipEventDataGenerator', 'pipSettingsDataGenerator', 'pipFeedbackDataGenerator', function(pipTestDataSet, pipUserDataGenerator, pipPartyAccessDataGenerator, pipSessionsDataGenerator,
+                 pipPartyDataGenerator, TestCollection, pipTestDataService, pipNodeDataGenerator,
+                 pipEventDataGenerator, pipSettingsDataGenerator, pipFeedbackDataGenerator) {
+
+            // Angular service that holds singleton test dataset that is shared across all
+            var dataSet = new pipTestDataSet();
+
+            return {
+                
+                getDataset: getDataset,
+                createTestDataset: createTestDataset
+
+            };
+
+            // Get singleton dataset
+            function getDataset() {
+
+                return dataSet;
+
+            }
+
+            // Create test dataset
+            function createTestDataset() {
+                var i, users, parties = [], settings =[],
+                    tcPartyAccess, tcSessions, tcUsers, tcParties, tcSettings, tcFeedback,
+                    tcNodes, tcEvents, usersRefs = new Array(), eventsRefs = new Array();
+
+                // create collection without references
+                tcPartyAccess = new TestCollection(pipPartyAccessDataGenerator, 'PartyAccessTestCollection', 20);
+                tcSessions = new TestCollection(pipSessionsDataGenerator, 'SessionsTestCollection', 20);
+                // init collection
+                tcPartyAccess.init();
+                tcSessions.init();
+                // add collection to dataset
+                dataSet.add(tcPartyAccess);
+                dataSet.add(tcSessions);
+                // form references for users collection
+                usersRefs['PartyAccess'] = tcPartyAccess.getAll();
+                usersRefs['Sessions'] = tcSessions.getAll();
+
+                // create users collection
+                tcUsers = new TestCollection(pipUserDataGenerator, 'UsersTestCollection', 20, usersRefs);
+                dataSet.add(tcUsers);
+
+                // create feedback collection
+                tcFeedback = new TestCollection(pipFeedbackDataGenerator, 'FeedbacksTestCollection', 20);
+                dataSet.add(tcFeedback);
+
+                // create collection without references
+                tcNodes = new TestCollection(pipNodeDataGenerator, 'NodesTestCollection', 20);
+                // init collection
+                tcNodes.init();
+
+                // add collection to dataset
+                dataSet.add(tcNodes);
+
+                // form references for users collection
+                eventsRefs['Nodes'] = _.cloneDeep(tcNodes.getAll());
+
+                // create events collection
+                tcEvents = new TestCollection(pipEventDataGenerator, 'EventsTestCollection', 100, eventsRefs);
+                dataSet.add(tcEvents);
+
+                // init collection
+                dataSet.init();
+
+                users = dataSet.get('UsersTestCollection').getAll();
+                // generate party and settings for each user
+                for (i = 0; i < users.length; i ++) {
+                    var party = pipPartyDataGenerator.initObject({
+                        name: users[i].name,
+                        email: users[i].email,
+                        id: users[i].id,
+                        updated: users[i].updated,
+                        created: users[i].created
+                    });
+                    parties.push(party);
+                    var setting = {
+                        party_id: party.id,
+                        creator_id: party.id
+                    };
+                    settings.push(setting);
+                }
+
+                tcParties = new TestCollection(pipPartyDataGenerator, 'PartiesTestCollection', parties.length);
+                tcParties.init(parties);
+                dataSet.add(tcParties);
+
+                tcSettings = new TestCollection(pipSettingsDataGenerator, 'SettingsTestCollection', settings.length);
+                tcSettings.init(settings);
+                dataSet.add(tcSettings);
+
+                return dataSet;
+            }
+        }]
+    );
+
+})();
+/**
+ * @file pipTestDataSet
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTestDataSet', []);
+
+    // Test dataset, that can be used to hold state of rest api
+    thisModule.factory('pipTestDataSet', ['$log', function ($log) {
+        
+        // Define the constructor function.
+        return function () {
+
+            this.currentUser = null;
+            this.currentParty = null;
+            this.dataSet = {};
+
+            this.init = init;         
+            this.add = add;         
+            this.get = get;         
+
+            this.getCurrentUser = getCurrentUser;
+            this.setCurrentUser = setCurrentUser;
+            this.clearCurrentUser = clearCurrentUser;
+            this.setCurrentParty = setCurrentParty;
+            this.getCurrentParty = getCurrentParty;
+
+            return this;        
+        }
+
+        // Initializes all registered collectons
+        function init() {
+            var i;
+console.log('init this.dataSet',this.dataSet);
+            for (i in this.dataSet) {
+                console.log('this.dataSet', this.dataSet[i]);
+                if (this.dataSet[i] && this.dataSet[i].isInit === false) {
+                    this.dataSet[i].init();
+                }
+            }    
+        }
+   
+        // Registers a new collection
+        function add(collection) {
+            var name;
+            
+            if (collection && angular.isObject(collection) && collection.name) {
+                name = collection.name;
+                this.dataSet[name] = _.cloneDeep(collection);
+            } else {
+                throw new Error('pipTestDataSet: collection is required');
+            }
+        }
+
+        // Gets registered collection by its name
+        function get(name) {
+            if (name && angular.isString(name)) {
+                return this.dataSet[name];
+            } else {
+                throw new Error('pipTestDataSet: name must be a string');
+            }
+        }
+
+        // ---------------------------
+
+        function setCurrentUser(user) {
+            if (user && angular.isObject(user) && user.id) {
+                this.currentUser = _.cloneDeep(user);
+            } else {
+                throw new Error('pipTestDataSet: currentUser must be a object');
+            }
+        }        
+
+        function getCurrentUser() {
+            return this.currentUser;
+        }
+
+        function clearCurrentUser() {
+            this.currentUser = null;
+        }
+   
+        function setCurrentParty(party) {
+            if (party && angular.isObject(party) && party.id) {
+                this.currentParty = _.cloneDeep(party);
+            } else {
+                throw new Error('pipTestDataSet: currentParty must be a object');
+            }
+        }
+
+        function getCurrentParty() {
+            return this.currentParty;
+        }      
+
+    }]);
+
+})();
+/**
+ * @file Rest API enumerations service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('PipResources.Error', []);
+
+    thisModule.factory('PipResourcesError', function () {
+
+        var Errors = {};
+        
+        Errors['1104'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1104,
+                name: 'Bad Request',
+                message: 'Email is already registered'
+            },
+            headers: {}
+        };
+        Errors['1106'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1106,
+                name: 'Bad Request',
+                message: 'User was not found'
+            },
+            headers: {}
+        };
+        Errors['1103'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1103,
+                name: 'Bad Request',
+                message: 'Invalid email verification code'
+            },
+            headers: {}
+        };
+        Errors['1108'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1108,
+                name: 'Bad Request',
+                message: 'Invalid password recovery code'
+            },
+            headers: {}
+        };
+        Errors['1700'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1700,
+                name: 'Bad Request',
+                message: 'Avatar doesn\'t exist'
+            },
+            headers: {}
+        };        
+
+        return Errors;
+    });
+    
+})();
+
+/**
+ * @file pipImageResources service
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo:
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipImageResources', []);
+
+    thisModule.provider('pipImageResources', function() {
+        var imagesMap = [],
+            size = 0;
+
+        this.setImages = setImages;
+
+        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
+
+
+            return {
+                setImages: setImages,
+                getImagesCollection: getImagesCollection,
+                getImage: getImage
+            }
+        }];
+
+        // Add images collection
+        function setImages(newImagesRes) {
+            console.log('setImages', newImagesRes);
+            if (!angular.isArray(newImagesRes)) {
+                new Error('pipImageResources setImages: first argument should be an object');
+            }
+
+            imagesMap = _.union(imagesMap, newImagesRes);
+            size = imagesMap.length;
+        }
+
+        // Get images collection
+        function getImagesCollection(size, search) {
+            console.log('getImagesCollection imagesMap', imagesMap);
+            if (!!search && !angular.isString(search)) {
+                new Error('pipImageResources getImages: second argument should be a string');
+            }
+
+            var result, queryLowercase,
+                resultSize = size && size < imagesMap.length ? size : -1;
+
+            if (!search) {
+                result = imagesMap;
+            } else {
+                queryLowercase = search.toLowerCase();
+                result = _.filter(imagesMap, function (item) {
+                        if (item.title) {
+                            return (item.title.toLowerCase().indexOf(queryLowercase) >= 0);
+                        } else return false;
+                    }) || [];
+            }
+
+            if (resultSize === -1) {
+                return _.cloneDeep(result);
+            } else {
+                return _.take(result, resultSize);
+            }                        
+        }   
+
+        function getImage() {
+            var i = _.random(0, size - 1);
+
+            if (size > 0) {
+                return _.cloneDeep(imagesMap[i]);
+            } else {
+                return null;
+            }
+        }  
+
+    });
+
+})();
 /**
  * @file String resources for Areas pages
  * @copyright Digital Living Software Corp. 2014-2016
@@ -11029,7 +11262,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function(item) {
+                        return item.email == userData.email;
+                    });
 
                     if (!user || !user.id) {
                         var error = child.getError('1106');
@@ -11072,7 +11307,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function(item) {
+                        return item.email == userData.email;
+                    });
 
                     if (user && user.id) {
                         var error = child.getError('1104');
@@ -11151,10 +11388,12 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function(item) {
+                        return item.email == userData.email;
+                    });
 
-                    if (!user || !user.id) {
-                        var error = child.getError('1106');
+                    if (user && user.id) {
+                        var error = child.getError('1104');
 
                         return [error.StatusCode, error.request, error.headers];
                     }
@@ -11192,7 +11431,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function (item) {
+                        return item.email == userData.email;
+                    });
 
                     if (!user || !user.id) {
                         var error = child.getError('1106');
@@ -11240,7 +11481,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function(item) {
+                        return item.email == userData.email;
+                    });
 
                     if (!user || !user.id) {
                         var error = child.getError('1106');
@@ -11280,7 +11523,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function(item) {
+                        return item.email == userData.email;
+                    });
 
                     if (!user || !user.id) {
                         var error = child.getError('1106');
@@ -11452,7 +11697,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     feedbacksCollection = feedbacks.getAll();
-                    feedback = _.find(feedbacksCollection, {id: feedbackData.id});
+                    feedback = _.find(feedbacksCollection, function(item) {
+                        return item.id == feedbackData.id;
+                    });
 
                     if (feedback && feedback.id) {
                         var error = child.getError('1104'); //todo error code
@@ -12004,15 +12251,31 @@ console.log('init this.dataSet',this.dataSet);
                 .respond(function(method, url, data, headers, params) {
                 console.log('MockedPartySettingsResource whenGET collection', method, url, data, headers, params);
                 var settings = child.dataset.get('SettingsTestCollection'),
-                    SettingsCollection;
+                    SettingsCollection, idParams, partyId,
+                    setting;
                   
                     if (!settings) {
                         throw new Error('MockedPartySettingsResource: Settings collection is not found')
                     }
+                    
+                    idParams = child.getUrlIdParams(url);
+
+                    if (!idParams || idParams.length == 0) {
+                        throw new Error('MockedPartyResource: party_id is not specified into url')
+                    }
+
+                    partyId = idParams[0];
 
                     SettingsCollection = settings.getAll();
+                    setting = _.find(SettingsCollection, function (item) {
+                        return item.party_id == partyId;
+                    });
 
-                    return [200, SettingsCollection, {}];                    
+                    if (!setting || !setting.party_id) {
+                        return [200, {}, {}];   
+                    }
+
+                    return [200, setting, {}];                    
                 });
 
             // POST /api/parties/:party_id/settings
@@ -12020,7 +12283,7 @@ console.log('init this.dataSet',this.dataSet);
                 .respond(function(method, url, data, headers, params) {
                     console.log('MockedPartySettingsResource whenPOST', method, url, data, headers, params);
                     var setting, match = false,
-                        settingsData = angular.fromJson(data),
+                        settingsData = angular.fromJson(data) || {},
                         settings = child.dataset.get('SettingsTestCollection'),
                         SettingsCollection;
 
@@ -12038,7 +12301,7 @@ console.log('init this.dataSet',this.dataSet);
                         return item.party_id == settingsData.party_id;
                     });
 
-                    if (setting && settings.party_id) {
+                    if (setting && setting.party_id) {
                          match = true;
                     }
 
@@ -12310,7 +12573,9 @@ console.log('init this.dataSet',this.dataSet);
                     }
 
                     usersCollection = users.getAll();
-                    user = _.find(usersCollection, {email: userData.email});
+                    user = _.find(usersCollection, function (item) {
+                         return item.email == userData.email;
+                    });
 
                     if (user && user.id) {
                         var error = child.getError('1104'); //todo error code
@@ -12505,159 +12770,6 @@ console.log('init this.dataSet',this.dataSet);
 })();
  
 
-/**
- * @file Rest API enumerations service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('PipResources.Error', []);
-
-    thisModule.factory('PipResourcesError', function () {
-
-        var Errors = {};
-        
-        Errors['1104'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1104,
-                name: 'Bad Request',
-                message: 'Email is already registered'
-            },
-            headers: {}
-        };
-        Errors['1106'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1106,
-                name: 'Bad Request',
-                message: 'User was not found'
-            },
-            headers: {}
-        };
-        Errors['1103'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1103,
-                name: 'Bad Request',
-                message: 'Invalid email verification code'
-            },
-            headers: {}
-        };
-        Errors['1108'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1108,
-                name: 'Bad Request',
-                message: 'Invalid password recovery code'
-            },
-            headers: {}
-        };
-        Errors['1700'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1700,
-                name: 'Bad Request',
-                message: 'Avatar doesn\'t exist'
-            },
-            headers: {}
-        };        
-
-        return Errors;
-    });
-    
-})();
-
-/**
- * @file pipImageResources service
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo:
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipImageResources', []);
-
-    thisModule.provider('pipImageResources', function() {
-        var imagesMap = [],
-            size = 0;
-
-        this.setImages = setImages;
-
-        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
-
-
-            return {
-                setImages: setImages,
-                getImagesCollection: getImagesCollection,
-                getImage: getImage
-            }
-        }];
-
-        // Add images collection
-        function setImages(newImagesRes) {
-            console.log('setImages', newImagesRes);
-            if (!angular.isArray(newImagesRes)) {
-                new Error('pipImageResources setImages: first argument should be an object');
-            }
-
-            imagesMap = _.union(imagesMap, newImagesRes);
-            size = imagesMap.length;
-        }
-
-        // Get images collection
-        function getImagesCollection(size, search) {
-            console.log('getImagesCollection imagesMap', imagesMap);
-            if (!!search && !angular.isString(search)) {
-                new Error('pipImageResources getImages: second argument should be a string');
-            }
-
-            var result, queryLowercase,
-                resultSize = size && size < imagesMap.length ? size : -1;
-
-            if (!search) {
-                result = imagesMap;
-            } else {
-                queryLowercase = search.toLowerCase();
-                result = _.filter(imagesMap, function (item) {
-                        if (item.title) {
-                            return (item.title.toLowerCase().indexOf(queryLowercase) >= 0);
-                        } else return false;
-                    }) || [];
-            }
-
-            if (resultSize === -1) {
-                return _.cloneDeep(result);
-            } else {
-                return _.take(result, resultSize);
-            }                        
-        }   
-
-        function getImage() {
-            var i = _.random(0, size - 1);
-
-            if (size > 0) {
-                return _.cloneDeep(imagesMap[i]);
-            } else {
-                return null;
-            }
-        }  
-
-    });
-
-})();
 
 
 /**
@@ -12799,6 +12911,34 @@ console.log('init this.dataSet',this.dataSet);
 })();
 
 /**
+ * @file Document layout
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipLayout.Document', []);
+
+    thisModule.directive('pipDocument', function() {
+        return {
+           restrict: 'EA',
+           controller: 'pipDocumentController'
+        };
+    });
+
+    thisModule.controller('pipDocumentController', 
+        ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+            // Add class to the element
+            $element.addClass('pip-document');
+        }]
+    );    
+
+})();
+
+/**
  * @file Dialog layout
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -12876,34 +13016,6 @@ console.log('init this.dataSet',this.dataSet);
             };
         }]
     );
-
-})();
-
-/**
- * @file Document layout
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipLayout.Document', []);
-
-    thisModule.directive('pipDocument', function() {
-        return {
-           restrict: 'EA',
-           controller: 'pipDocumentController'
-        };
-    });
-
-    thisModule.controller('pipDocumentController', 
-        ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-            // Add class to the element
-            $element.addClass('pip-document');
-        }]
-    );    
 
 })();
 
@@ -13257,45 +13369,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date/date.html',
-    '<!--\n' +
-    '@file Date control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
-    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '</div>\n' +
-    '					');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('date_range/date_range.html',
     '<!--\n' +
     '@file Date range control content\n' +
@@ -13391,6 +13464,45 @@ module.run(['$templateCache', function($templateCache) {
     '        </md-select>\n' +
     '    </md-input-container>\n' +
     '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('date/date.html',
+    '<!--\n' +
+    '@file Date control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
+    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '</div>\n' +
+    '					');
 }]);
 })();
 
@@ -15664,6 +15776,75 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular);
 
 
+/**
+ * @file Time control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
+
+    thisModule.directive('pipTimeRange',
+        ['pipUtils', function (pipUtils) {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipStartDate: '=',
+                    pipEndDate: '='
+                },
+                templateUrl: 'time_range/time_range.html',
+                link: function ($scope, $element, $attrs) {
+
+                    function getDateJSON(value) {
+                        return value ? new Date(value) : null;
+                    }
+
+                    function defineStartDate() {
+                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
+                                : getDateJSON($scope.pipStartDate);
+                        }
+                    }
+
+                    function defineEndDate() {
+                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
+                                : getDateJSON($scope.pipEndDate);
+                        }
+                    }
+
+                    $scope.data = {};
+                    $scope.data.start = null;
+                    $scope.data.end = null;
+                    defineStartDate();
+                    defineEndDate();
+
+                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                        $scope.$watch('pipStartDate',
+                            function () {
+                                $scope.data.start = null;
+                                defineStartDate();
+                            }
+                        );
+                        $scope.$watch('pipEndDate',
+                            function () {
+                                $scope.data.end = null;
+                                defineEndDate();
+                            }
+                        );
+                    }
+
+                    // Add class
+                    $element.addClass('pip-time-range');
+                }
+            };
+        }]
+    );
+
+})(window.angular, window._);
+
 
 (function (angular, _) {
     'use strict';
@@ -15935,75 +16116,6 @@ module.run(['$templateCache', function($templateCache) {
 
             // Add class
             $element.addClass('pip-time-range-edit');
-        }]
-    );
-
-})(window.angular, window._);
-
-/**
- * @file Time control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
-
-    thisModule.directive('pipTimeRange',
-        ['pipUtils', function (pipUtils) {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipStartDate: '=',
-                    pipEndDate: '='
-                },
-                templateUrl: 'time_range/time_range.html',
-                link: function ($scope, $element, $attrs) {
-
-                    function getDateJSON(value) {
-                        return value ? new Date(value) : null;
-                    }
-
-                    function defineStartDate() {
-                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
-                                : getDateJSON($scope.pipStartDate);
-                        }
-                    }
-
-                    function defineEndDate() {
-                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
-                                : getDateJSON($scope.pipEndDate);
-                        }
-                    }
-
-                    $scope.data = {};
-                    $scope.data.start = null;
-                    $scope.data.end = null;
-                    defineStartDate();
-                    defineEndDate();
-
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch('pipStartDate',
-                            function () {
-                                $scope.data.start = null;
-                                defineStartDate();
-                            }
-                        );
-                        $scope.$watch('pipEndDate',
-                            function () {
-                                $scope.data.end = null;
-                                defineEndDate();
-                            }
-                        );
-                    }
-
-                    // Add class
-                    $element.addClass('pip-time-range');
-                }
-            };
         }]
     );
 
@@ -18866,6 +18978,72 @@ try {
   module = angular.module('pipDocuments.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('document_list_edit/document_list_edit.html',
+    '<!--\n' +
+    '@file Document list edit control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '<div pip-focusable>\n' +
+    '	<div class="pip-document-upload pointer md-primary "\n' +
+    '		 ng-class="{\'pip-focusable\' : !ngDisabled(), \'pip-item-error\' : item.state == \'error\'}"\n' +
+    '		 ng-keydown="onKeyDown($event, item)"\n' +
+    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
+    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
+    '\n' +
+    '		<div class="pip-default-icon"\n' +
+    '			 ng-class="{ \'pip-document-new\': item.id == null }">\n' +
+    '			<md-icon pip-cancel-drag="true" class="md-primary" ng-if="item.state == \'original\' || item.state == \'added\'"\n' +
+    '					 md-svg-icon="icons:{{::documentList.icon}}">\n' +
+    '			</md-icon>\n' +
+    '			<md-icon pip-cancel-drag="true" class="md-warn" ng-if="item.state == \'error\'"\n' +
+    '					 md-svg-icon="icons:{{::documentList.iconError}}">\n' +
+    '			</md-icon>\n' +
+    '		</div>\n' +
+    '\n' +
+    '		<div class="pip-document-title" pip-cancel-drag="true">\n' +
+    '			{{::item.name}}\n' +
+    '		</div>\n' +
+    '		<md-button ng-click="onDelete(item)"\n' +
+    '				   ng-disabled="ngDisabled() || control.uploading"\n' +
+    '				   tabindex="-1"\n' +
+    '				   ng-hide="ngDisabled()"\n' +
+    '				   class="md-icon-button" aria-label="DELETE">\n' +
+    '\n' +
+    '			<md-icon md-svg-icon="icons:cross" pip-cancel-drag="true"></md-icon>\n' +
+    '		</md-button>\n' +
+    '		<md-progress-linear ng-show="item.uploading" ng-value="item.progress"></md-progress-linear>\n' +
+    '	</div>\n' +
+    '	\n' +
+    '	<button class="pip-document-upload pip-document-drop "\n' +
+    '			ng-class="{\'pip-focusable\' : !ngDisabled()}"\n' +
+    '			ng-keydown="onKeyDown($event)" tabindex="0"\n' +
+    '			ng-file-drop ng-file-select ng-file-change="onSelect($files)"\n' +
+    '			ng-multiple="true"\n' +
+    '			ng-disabled="ngDisabled() || control.uploading"\n' +
+    '			aria-label="UPLOAD">\n' +
+    '\n' +
+    '		<div class="pip-default-icon">\n' +
+    '			<md-icon pip-cancel-drag="true" md-svg-icon="icons:{{::documentList.icon}}"></md-icon>\n' +
+    '		</div>\n' +
+    '		<div class="pip-default-text">\n' +
+    '			<span>\n' +
+    '				{{documentList.text | translate}}\n' +
+    '			</span>\n' +
+    '		</div>\n' +
+    '	</button>\n' +
+    '	<div class="clearfix"></div>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDocuments.Templates');
+} catch (e) {
+  module = angular.module('pipDocuments.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('document_list/document_list.html',
     '<!--\n' +
     '@file Document list control content\n' +
@@ -18941,72 +19119,6 @@ module.run(['$templateCache', function($templateCache) {
     '            {{::document.file_name}}\n' +
     '        </div>\n' +
     '    </md-button>\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDocuments.Templates');
-} catch (e) {
-  module = angular.module('pipDocuments.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('document_list_edit/document_list_edit.html',
-    '<!--\n' +
-    '@file Document list edit control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '<div pip-focusable>\n' +
-    '	<div class="pip-document-upload pointer md-primary "\n' +
-    '		 ng-class="{\'pip-focusable\' : !ngDisabled(), \'pip-item-error\' : item.state == \'error\'}"\n' +
-    '		 ng-keydown="onKeyDown($event, item)"\n' +
-    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
-    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
-    '\n' +
-    '		<div class="pip-default-icon"\n' +
-    '			 ng-class="{ \'pip-document-new\': item.id == null }">\n' +
-    '			<md-icon pip-cancel-drag="true" class="md-primary" ng-if="item.state == \'original\' || item.state == \'added\'"\n' +
-    '					 md-svg-icon="icons:{{::documentList.icon}}">\n' +
-    '			</md-icon>\n' +
-    '			<md-icon pip-cancel-drag="true" class="md-warn" ng-if="item.state == \'error\'"\n' +
-    '					 md-svg-icon="icons:{{::documentList.iconError}}">\n' +
-    '			</md-icon>\n' +
-    '		</div>\n' +
-    '\n' +
-    '		<div class="pip-document-title" pip-cancel-drag="true">\n' +
-    '			{{::item.name}}\n' +
-    '		</div>\n' +
-    '		<md-button ng-click="onDelete(item)"\n' +
-    '				   ng-disabled="ngDisabled() || control.uploading"\n' +
-    '				   tabindex="-1"\n' +
-    '				   ng-hide="ngDisabled()"\n' +
-    '				   class="md-icon-button" aria-label="DELETE">\n' +
-    '\n' +
-    '			<md-icon md-svg-icon="icons:cross" pip-cancel-drag="true"></md-icon>\n' +
-    '		</md-button>\n' +
-    '		<md-progress-linear ng-show="item.uploading" ng-value="item.progress"></md-progress-linear>\n' +
-    '	</div>\n' +
-    '	\n' +
-    '	<button class="pip-document-upload pip-document-drop "\n' +
-    '			ng-class="{\'pip-focusable\' : !ngDisabled()}"\n' +
-    '			ng-keydown="onKeyDown($event)" tabindex="0"\n' +
-    '			ng-file-drop ng-file-select ng-file-change="onSelect($files)"\n' +
-    '			ng-multiple="true"\n' +
-    '			ng-disabled="ngDisabled() || control.uploading"\n' +
-    '			aria-label="UPLOAD">\n' +
-    '\n' +
-    '		<div class="pip-default-icon">\n' +
-    '			<md-icon pip-cancel-drag="true" md-svg-icon="icons:{{::documentList.icon}}"></md-icon>\n' +
-    '		</div>\n' +
-    '		<div class="pip-default-text">\n' +
-    '			<span>\n' +
-    '				{{documentList.text | translate}}\n' +
-    '			</span>\n' +
-    '		</div>\n' +
-    '	</button>\n' +
-    '	<div class="clearfix"></div>\n' +
     '</div>\n' +
     '');
 }]);
@@ -20301,150 +20413,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
- * @file Camera dialog
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Add sample to sampler app
- */
-
-/* global angular, Webcam */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipCameraDialog',
-        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'TAKE_PICTURE': 'Take a picture',
-            'WEB_CAM_ERROR': 'Webcam is missing or was not found'
-        });
-        pipTranslateProvider.translations('ru', {
-            'TAKE_PICTURE': 'Сделать фото',
-            'WEB_CAM_ERROR': 'Web-камера отсутствует или не найдена'
-        });
-    }]);
-
-    thisModule.factory('pipCameraDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (successCallback) {
-                    $mdDialog.show({
-                        templateUrl: 'camera_dialog/camera_dialog.html',
-                        clickOutsideToClose: true,
-                        controller: 'pipCameraController'
-                    }).then(function (result) {
-                        Webcam.reset();
-                        console.log(result);
-                        if (successCallback) {
-                            successCallback(result);
-                        }
-                    }, function () {
-                        Webcam.reset();
-                    });
-                }
-            };
-        }]);
-
-    thisModule.controller('pipCameraController',
-        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
-            $scope.browser = pipUtils.getBrowser().os;
-            $scope.theme = $rootScope.$theme;
-
-            if ($scope.browser !== 'android') {
-                console.log('webcam');
-                Webcam.init();
-
-                setTimeout(function () {
-                    Webcam.attach('.camera-stream');
-                }, 0);
-
-                Webcam.on('error', function (err) {
-                    $scope.webCamError = true;
-                    console.error(err);
-                });
-
-                Webcam.set({
-                    width: 400,
-                    height: 300,
-
-                    dest_width: 400,
-                    dest_height: 300,
-
-                    crop_width: 400,
-                    crop_height: 300,
-
-                    image_format: 'jpeg',
-                    jpeg_quality: 90
-                });
-
-                //Webcam.setSWFLocation('../../../dist/webcam.swf');
-                Webcam.setSWFLocation('webcam.swf');
-
-            } else {
-                document.addEventListener("deviceready",onDeviceReady,false);
-
-            }
-            // todo add logic in callbacks
-            function onDeviceReady() {
-                navigator.camera.getPicture(onSuccess, onFail,
-                    {
-                        sourceType: Camera.PictureSourceType.CAMERA,
-                        correctOrientation: true,
-                        quality: 75,
-                        targetWidth: 200,
-                        destinationType: Camera.DestinationType.DATA_URL
-                    });
-            }
-
-
-            function onSuccess(imageData) {
-                var picture = imageData;
-                var picture = 'data:image/jpeg;base64,' + imageData;
-                $mdDialog.hide(picture);
-            }
-
-            function onFail(message) {
-                alert('Failed because: ' + message);
-                $mdDialog.hide();
-            }
-
-            $scope.$freeze = false;
-
-            $scope.onTakePictureClick = onTakePictureClick;
-            $scope.onResetPicture = onResetPicture;
-            $scope.onCancelClick = onCancelClick;
-
-            return;
-
-            function onTakePictureClick() {
-                if (Webcam) {
-                    if ($scope.$freeze) {
-                        Webcam.snap(function (dataUri) {
-                            $scope.$freeze = false;
-                            $mdDialog.hide(dataUri);
-                        });
-                    } else {
-                        $scope.$freeze = true;
-                        Webcam.freeze();
-                    }
-                }
-            };
-
-            function onResetPicture() {
-                $scope.$freeze = false;
-                Webcam.unfreeze();
-            };
-
-            function onCancelClick() {
-                $mdDialog.cancel();
-            };
-        }]
-    );
-
-})();
-/**
  * @file Avatar control
  * @copyright Digital Living Software Corp. 2014-2015
  * @todo
@@ -20788,6 +20756,150 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+/**
+ * @file Camera dialog
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Add sample to sampler app
+ */
+
+/* global angular, Webcam */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipCameraDialog',
+        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'TAKE_PICTURE': 'Take a picture',
+            'WEB_CAM_ERROR': 'Webcam is missing or was not found'
+        });
+        pipTranslateProvider.translations('ru', {
+            'TAKE_PICTURE': 'Сделать фото',
+            'WEB_CAM_ERROR': 'Web-камера отсутствует или не найдена'
+        });
+    }]);
+
+    thisModule.factory('pipCameraDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (successCallback) {
+                    $mdDialog.show({
+                        templateUrl: 'camera_dialog/camera_dialog.html',
+                        clickOutsideToClose: true,
+                        controller: 'pipCameraController'
+                    }).then(function (result) {
+                        Webcam.reset();
+                        console.log(result);
+                        if (successCallback) {
+                            successCallback(result);
+                        }
+                    }, function () {
+                        Webcam.reset();
+                    });
+                }
+            };
+        }]);
+
+    thisModule.controller('pipCameraController',
+        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
+            $scope.browser = pipUtils.getBrowser().os;
+            $scope.theme = $rootScope.$theme;
+
+            if ($scope.browser !== 'android') {
+                console.log('webcam');
+                Webcam.init();
+
+                setTimeout(function () {
+                    Webcam.attach('.camera-stream');
+                }, 0);
+
+                Webcam.on('error', function (err) {
+                    $scope.webCamError = true;
+                    console.error(err);
+                });
+
+                Webcam.set({
+                    width: 400,
+                    height: 300,
+
+                    dest_width: 400,
+                    dest_height: 300,
+
+                    crop_width: 400,
+                    crop_height: 300,
+
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+
+                //Webcam.setSWFLocation('../../../dist/webcam.swf');
+                Webcam.setSWFLocation('webcam.swf');
+
+            } else {
+                document.addEventListener("deviceready",onDeviceReady,false);
+
+            }
+            // todo add logic in callbacks
+            function onDeviceReady() {
+                navigator.camera.getPicture(onSuccess, onFail,
+                    {
+                        sourceType: Camera.PictureSourceType.CAMERA,
+                        correctOrientation: true,
+                        quality: 75,
+                        targetWidth: 200,
+                        destinationType: Camera.DestinationType.DATA_URL
+                    });
+            }
+
+
+            function onSuccess(imageData) {
+                var picture = imageData;
+                var picture = 'data:image/jpeg;base64,' + imageData;
+                $mdDialog.hide(picture);
+            }
+
+            function onFail(message) {
+                alert('Failed because: ' + message);
+                $mdDialog.hide();
+            }
+
+            $scope.$freeze = false;
+
+            $scope.onTakePictureClick = onTakePictureClick;
+            $scope.onResetPicture = onResetPicture;
+            $scope.onCancelClick = onCancelClick;
+
+            return;
+
+            function onTakePictureClick() {
+                if (Webcam) {
+                    if ($scope.$freeze) {
+                        Webcam.snap(function (dataUri) {
+                            $scope.$freeze = false;
+                            $mdDialog.hide(dataUri);
+                        });
+                    } else {
+                        $scope.$freeze = true;
+                        Webcam.freeze();
+                    }
+                }
+            };
+
+            function onResetPicture() {
+                $scope.$freeze = false;
+                Webcam.unfreeze();
+            };
+
+            function onCancelClick() {
+                $mdDialog.cancel();
+            };
+        }]
+    );
+
+})();
 /**
  * @file Collage control
  * @copyright Digital Living Software Corp. 2014-2015
@@ -23480,75 +23592,6 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('composite_toolbar/composite_toolbar.html',
-    '<!--\n' +
-    '@file Composite toolbar control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="layout-row layout-align-start-start flex">\n' +
-    '    <md-button class="pip-composite-button"\n' +
-    '               ng-if="!emptyState"\n' +
-    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
-    '                                \'new-item\': !emptyState }"\n' +
-    '               ng-click="onAddItem(\'text\');"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
-    '               ng-disabled="ngDisabled()">\n' +
-    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.checklist"\n' +
-    '               ng-click="onAddItem(\'checklist\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
-    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
-    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.picture"\n' +
-    '               ng-click="onAddItem(\'pictures\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
-    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
-    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
-    '               ng-if="toolbarButton.document"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
-    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
-    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'location\')"\n' +
-    '               ng-if="toolbarButton.location"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
-    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
-    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'time\')"\n' +
-    '               ng-if="toolbarButton.event"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
-    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipComposite.Templates');
-} catch (e) {
-  module = angular.module('pipComposite.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('composite_summary/composite_summary.html',
     '<div ng-repeat="item in compositeContent track by $index">\n' +
     '\n' +
@@ -23627,6 +23670,75 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipComposite.Templates');
+} catch (e) {
+  module = angular.module('pipComposite.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('composite_toolbar/composite_toolbar.html',
+    '<!--\n' +
+    '@file Composite toolbar control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="layout-row layout-align-start-start flex">\n' +
+    '    <md-button class="pip-composite-button"\n' +
+    '               ng-if="!emptyState"\n' +
+    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
+    '                                \'new-item\': !emptyState }"\n' +
+    '               ng-click="onAddItem(\'text\');"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
+    '               ng-disabled="ngDisabled()">\n' +
+    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.checklist"\n' +
+    '               ng-click="onAddItem(\'checklist\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
+    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
+    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.picture"\n' +
+    '               ng-click="onAddItem(\'pictures\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
+    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
+    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
+    '               ng-if="toolbarButton.document"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
+    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
+    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'location\')"\n' +
+    '               ng-if="toolbarButton.location"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
+    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
+    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'time\')"\n' +
+    '               ng-if="toolbarButton.event"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
+    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
 }]);
 })();
 
@@ -24409,148 +24521,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Composite summary control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipCompositeSummary", [
-        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
-
-    thisModule.directive('pipCompositeSummary',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipContents: '=',
-                    pipChecklistSize: '=',
-                    pipTextSize: '=',
-                    pipPrimaryBlockLimit: '=',
-                    pipSecondaryBlockLimit: '=',
-                    pipSecondaryBlockTypes: '='
-                },
-                templateUrl: 'composite_summary/composite_summary.html',
-                controller: 'pipCompositeSummaryController'
-            }
-        }
-    );
-
-    thisModule.controller('pipCompositeSummaryController',
-        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-
-            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
-            $scope.disableControl = true;
-            $scope.disabledChecklist = true;
-
-            $scope.secondaryBlockTypes = $scope.pipSecondaryBlockTypes !== undefined &&
-                Array.isArray($scope.pipSecondaryBlockTypes) ? $scope.pipSecondaryBlockTypes :
-                 ['checklist', 'documents', 'location', 'time'];
-            $scope.textSize = $scope.pipTextSize !== undefined && $scope.pipTextSize > 0 ? $scope.pipTextSize : 0;
-            $scope.secondaryBlockLimit = $scope.pipSecondaryBlockLimit !== undefined && $scope.pipSecondaryBlockLimit > 0 ? $scope.pipSecondaryBlockLimit : -1;
-            $scope.checklistSize = $scope.pipChecklistSize !== undefined && $scope.pipChecklistSize > 0 ? $scope.pipChecklistSize : 0;
-            $scope.primaryBlockLimit = $scope.pipPrimaryBlockLimit !== undefined ? $scope.pipPrimaryBlockLimit : -1;
-
-            generateList($scope.pipContents);
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipContents', function (newValue) {
-                    if (!Array.isArray($scope.pipContents)) {
-                        throw new Error('Error: Attribute pip-contents must be array!');
-                    }
-                    generateList($scope.pipContents);
-                });
-            }
-
-            // Add class
-            $element.addClass('pip-composite-summary');
-
-            return;
-
-            // усекаем чеклист до 3
-            function limitChecklist(content, val) {
-                if (!val) return;
-                _.each(content, function(item) {
-                    if (item && item.type == 'checklist') {
-                        var checklistLength = item.checklist.length;
-                        item.checklist =_.take(item.checklist, val);
-                        if (checklistLength > val) item.checklist.push({
-                            text: '...',
-                             checked: false
-                        });
-                    }
-                });
-            };
-
-            // отбираем текст и картинки
-            function selectSummary(content) {
-                var result = [],
-                    i = 0;
-
-                _.each(content, function(item) {
-                    if ($scope.primaryBlockLimit >= 0 && i >= $scope.primaryBlockLimit) return result;
-
-                    //if (item.type == 'text' || item.type == 'pictures' ) {
-                    if ($scope.secondaryBlockTypes.indexOf(item.type) < 0) {
-                        result.push(item);
-                        i += 1;
-                    }
-                });
-
-                return result;
-            };
-
-            // отбираем остальные блоки если они есть
-            function selectSummarySecondary(content, types) {
-                var i, limit =  $scope.secondaryBlockLimit < 0 ? content.length : $scope.secondaryBlockLimit;
-                var result = [];
-
-                for (i = 0; i < content.length; i++ ) {
-                    if (types.indexOf(content[i].type) > -1) {
-                        result.push(content[i]);
-                        if (result.length >= limit) break;
-                    }
-                }
-
-                return result;
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                    return;
-                } else {
-                     var summaryContent = _.cloneDeep(content);
-                    var result = selectSummary(summaryContent);
-                    if (result.length == 0) {
-                        result = selectSummarySecondary(summaryContent, $scope.secondaryBlockTypes);
-                    }
-
-                    limitChecklist(result, $scope.checklistSize);
-
-                    var id = 0;
-                    _.each(result, function(item){
-                        item.id = id;
-                        id ++;
-                    });
-                    $scope.compositeContent = result;
-                }
-            };
-
-            function clearList() {
-                $scope.compositeContent = [];
-            };
-
-        }]
-    );
-
-})();
-
-/**
  * @file Composite edit control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -25030,7 +25000,7 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Composite toolbar control
+ * @file Composite summary control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
@@ -25039,90 +25009,138 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipCompositeToolbar", ['pipCore', 'pipComposite.Templates']);
+    var thisModule = angular.module("pipCompositeSummary", [
+        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'TEXT':'Text',
-            'CHECKLIST':'Checklist',
-            'LOCATION':'Location',
-            'PICTURE':'Picture',
-            'TIME':'Time',
-            'DOCUMENT':'Document'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            'TEXT':'Текст',
-            'CHECKLIST':'Список',
-            'LOCATION':'Локация',
-            'PICTURE':'Изображение',
-            'TIME':'Время',
-            'DOCUMENT':'Document'
-        });
-    }]);
-
-    thisModule.directive('pipCompositeToolbar',
+    thisModule.directive('pipCompositeSummary',
         function () {
             return {
                 restrict: 'EA',
-                replace: false,
                 scope: {
-                    ngDisabled: '&',
-                    pipCompositeEmpty: '&',  // set init state of toolbar
-                    pipToolbarButton: '=',  // set visibility toolbar button, true by default
-                    compositeId: '=pipCompositeId' // set pip-composite-id, for some composite in one scope
+                    pipContents: '=',
+                    pipChecklistSize: '=',
+                    pipTextSize: '=',
+                    pipPrimaryBlockLimit: '=',
+                    pipSecondaryBlockLimit: '=',
+                    pipSecondaryBlockTypes: '='
                 },
-                templateUrl: 'composite_toolbar/composite_toolbar.html',
-                controller: 'pipCompositeToolbarController'
+                templateUrl: 'composite_summary/composite_summary.html',
+                controller: 'pipCompositeSummaryController'
             }
         }
     );
 
-    thisModule.controller('pipCompositeToolbarController',
-        ['$scope', '$element', '$attrs', '$rootScope', 'pipUtils', function ($scope, $element, $attrs, $rootScope, pipUtils) {
+    thisModule.controller('pipCompositeSummaryController',
+        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
 
-            $scope.toolbarButton = {};
-            $scope.emptyState = pipUtils.toBoolean($scope.pipCompositeEmpty()) != false;
-            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
+            $scope.disableControl = true;
+            $scope.disabledChecklist = true;
 
-            setOption();
+            $scope.secondaryBlockTypes = $scope.pipSecondaryBlockTypes !== undefined &&
+                Array.isArray($scope.pipSecondaryBlockTypes) ? $scope.pipSecondaryBlockTypes :
+                 ['checklist', 'documents', 'location', 'time'];
+            $scope.textSize = $scope.pipTextSize !== undefined && $scope.pipTextSize > 0 ? $scope.pipTextSize : 0;
+            $scope.secondaryBlockLimit = $scope.pipSecondaryBlockLimit !== undefined && $scope.pipSecondaryBlockLimit > 0 ? $scope.pipSecondaryBlockLimit : -1;
+            $scope.checklistSize = $scope.pipChecklistSize !== undefined && $scope.pipChecklistSize > 0 ? $scope.pipChecklistSize : 0;
+            $scope.primaryBlockLimit = $scope.pipPrimaryBlockLimit !== undefined ? $scope.pipPrimaryBlockLimit : -1;
 
-            $scope.onAddItem = onAddItem;
+            generateList($scope.pipContents);
 
-            $rootScope.$on('pipCompositeNotEmpty', function(event, value) {
-                $scope.emptyState = !value;
-            });
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipContents', function (newValue) {
+                    if (!Array.isArray($scope.pipContents)) {
+                        throw new Error('Error: Attribute pip-contents must be array!');
+                    }
+                    generateList($scope.pipContents);
+                });
+            }
 
             // Add class
-            $element.addClass('pip-composite-toolbar');
+            $element.addClass('pip-composite-summary');
 
             return;
 
-            function onAddItem(contentType) {
-                $rootScope.$emit('pipAddCompositeItem', {type: contentType, id: $scope.compositeId});
+            // усекаем чеклист до 3
+            function limitChecklist(content, val) {
+                if (!val) return;
+                _.each(content, function(item) {
+                    if (item && item.type == 'checklist') {
+                        var checklistLength = item.checklist.length;
+                        item.checklist =_.take(item.checklist, val);
+                        if (checklistLength > val) item.checklist.push({
+                            text: '...',
+                             checked: false
+                        });
+                    }
+                });
             };
 
-            function setOption() {
-                if ($scope.pipToolbarButton !== null && $scope.pipToolbarButton !== undefined) {
-                    $scope.toolbarButton.picture = $scope.pipToolbarButton.picture === false ? $scope.pipToolbarButton.picture : true;
-                    $scope.toolbarButton.document = $scope.pipToolbarButton.document === false ? $scope.pipToolbarButton.document : true;
-                    $scope.toolbarButton.location = $scope.pipToolbarButton.location === false ? $scope.pipToolbarButton.location : true;
-                    $scope.toolbarButton.event = $scope.pipToolbarButton.event === false ? $scope.pipToolbarButton.event : true;
-                    $scope.toolbarButton.checklist = $scope.pipToolbarButton.checklist === false ? $scope.pipToolbarButton.checklist : true;
-                } else {
-                    $scope.toolbarButton.picture = true;
-                    $scope.toolbarButton.document = true;
-                    $scope.toolbarButton.location = true;
-                    $scope.toolbarButton.event = true;
-                    $scope.toolbarButton.checklist = true;
+            // отбираем текст и картинки
+            function selectSummary(content) {
+                var result = [],
+                    i = 0;
+
+                _.each(content, function(item) {
+                    if ($scope.primaryBlockLimit >= 0 && i >= $scope.primaryBlockLimit) return result;
+
+                    //if (item.type == 'text' || item.type == 'pictures' ) {
+                    if ($scope.secondaryBlockTypes.indexOf(item.type) < 0) {
+                        result.push(item);
+                        i += 1;
+                    }
+                });
+
+                return result;
+            };
+
+            // отбираем остальные блоки если они есть
+            function selectSummarySecondary(content, types) {
+                var i, limit =  $scope.secondaryBlockLimit < 0 ? content.length : $scope.secondaryBlockLimit;
+                var result = [];
+
+                for (i = 0; i < content.length; i++ ) {
+                    if (types.indexOf(content[i].type) > -1) {
+                        result.push(content[i]);
+                        if (result.length >= limit) break;
+                    }
                 }
-                $scope.toolbarButton.text = true;
+
+                return result;
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                    return;
+                } else {
+                     var summaryContent = _.cloneDeep(content);
+                    var result = selectSummary(summaryContent);
+                    if (result.length == 0) {
+                        result = selectSummarySecondary(summaryContent, $scope.secondaryBlockTypes);
+                    }
+
+                    limitChecklist(result, $scope.checklistSize);
+
+                    var id = 0;
+                    _.each(result, function(item){
+                        item.id = id;
+                        id ++;
+                    });
+                    $scope.compositeContent = result;
+                }
+            };
+
+            function clearList() {
+                $scope.compositeContent = [];
             };
 
         }]
     );
 
 })();
+
 /**
  * @file Composite view control
  * @copyright Digital Living Software Corp. 2014-2016
@@ -25232,6 +25250,100 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 
+/**
+ * @file Composite toolbar control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipCompositeToolbar", ['pipCore', 'pipComposite.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'TEXT':'Text',
+            'CHECKLIST':'Checklist',
+            'LOCATION':'Location',
+            'PICTURE':'Picture',
+            'TIME':'Time',
+            'DOCUMENT':'Document'
+        });
+
+        pipTranslateProvider.translations('ru', {
+            'TEXT':'Текст',
+            'CHECKLIST':'Список',
+            'LOCATION':'Локация',
+            'PICTURE':'Изображение',
+            'TIME':'Время',
+            'DOCUMENT':'Document'
+        });
+    }]);
+
+    thisModule.directive('pipCompositeToolbar',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: false,
+                scope: {
+                    ngDisabled: '&',
+                    pipCompositeEmpty: '&',  // set init state of toolbar
+                    pipToolbarButton: '=',  // set visibility toolbar button, true by default
+                    compositeId: '=pipCompositeId' // set pip-composite-id, for some composite in one scope
+                },
+                templateUrl: 'composite_toolbar/composite_toolbar.html',
+                controller: 'pipCompositeToolbarController'
+            }
+        }
+    );
+
+    thisModule.controller('pipCompositeToolbarController',
+        ['$scope', '$element', '$attrs', '$rootScope', 'pipUtils', function ($scope, $element, $attrs, $rootScope, pipUtils) {
+
+            $scope.toolbarButton = {};
+            $scope.emptyState = pipUtils.toBoolean($scope.pipCompositeEmpty()) != false;
+            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+
+            setOption();
+
+            $scope.onAddItem = onAddItem;
+
+            $rootScope.$on('pipCompositeNotEmpty', function(event, value) {
+                $scope.emptyState = !value;
+            });
+
+            // Add class
+            $element.addClass('pip-composite-toolbar');
+
+            return;
+
+            function onAddItem(contentType) {
+                $rootScope.$emit('pipAddCompositeItem', {type: contentType, id: $scope.compositeId});
+            };
+
+            function setOption() {
+                if ($scope.pipToolbarButton !== null && $scope.pipToolbarButton !== undefined) {
+                    $scope.toolbarButton.picture = $scope.pipToolbarButton.picture === false ? $scope.pipToolbarButton.picture : true;
+                    $scope.toolbarButton.document = $scope.pipToolbarButton.document === false ? $scope.pipToolbarButton.document : true;
+                    $scope.toolbarButton.location = $scope.pipToolbarButton.location === false ? $scope.pipToolbarButton.location : true;
+                    $scope.toolbarButton.event = $scope.pipToolbarButton.event === false ? $scope.pipToolbarButton.event : true;
+                    $scope.toolbarButton.checklist = $scope.pipToolbarButton.checklist === false ? $scope.pipToolbarButton.checklist : true;
+                } else {
+                    $scope.toolbarButton.picture = true;
+                    $scope.toolbarButton.document = true;
+                    $scope.toolbarButton.location = true;
+                    $scope.toolbarButton.event = true;
+                    $scope.toolbarButton.checklist = true;
+                }
+                $scope.toolbarButton.text = true;
+            };
+
+        }]
+    );
+
+})();
 /**
  * @file Content switch control
  * @copyright Digital Living Software Corp. 2014-2016
@@ -25841,197 +25953,6 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('signin/signin.html',
-    '<!--\n' +
-    '@file Signin page\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
-    '    <pip-card width="400">\n' +
-    '        <pip-signin-panel pipfixedServerUrl="fixedServerUrl"></pip-signin-panel>\n' +
-    '    </pip-card>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('signin/signin_dialog.html',
-    '<!--\n' +
-    '@file Signin dialog\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-entry">\n' +
-    '    <md-dialog-content>\n' +
-    '        <pip-signin-panel pip-goto-signup-dialog="pipGotoSignupDialog"\n' +
-    '                          pip-goto-recover-password-dialog="pipGotoRecoverPasswordDialog">\n' +
-    '        </pip-signin-panel>\n' +
-    '    </md-dialog-content>\n' +
-    '</md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('signin/signin_panel.html',
-    '<div class="pip-body">\n' +
-    '    <div class="pip-content">\n' +
-    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
-    '        </md-progress-linear>\n' +
-    '\n' +
-    '        <h2 pip-translate="SIGNIN_TITLE"></h2>\n' +
-    '\n' +
-    '        <form name="form" novalidate>\n' +
-    '            <div ng-messages="form.$serverError" class="text-error bm8 color-error"  md-auto-hide="false">\n' +
-    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_UNKNOWN">\n' +
-    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <a ng-hide="showServerUrl || fixedServerUrl"\n' +
-    '               ng-click="showServerUrl = true" href=""\n' +
-    '               id="link-server-url"\n' +
-    '               pip-test="link-server-url">\n' +
-    '                {{::\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
-    '            </a>\n' +
-    '\n' +
-    '            <div ng-show="showServerUrl">\n' +
-    '                <md-autocomplete\n' +
-    '                        ng-initial autofocus tabindex="1"\n' +
-    '                        class="pip-combobox w-stretch bm8"\n' +
-    '                        name="server"\n' +
-    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
-    '                        md-no-cache="true"\n' +
-    '                        md-selected-item="data.serverUrl"\n' +
-    '                        md-search-text="selected.searchURLs"\n' +
-    '                        md-items="item in getMatches()"\n' +
-    '                        md-item-text="item"\n' +
-    '                        md-selected-item-change="onServerUrlChanged()"\n' +
-    '                        md-delay="200"\n' +
-    '                        ng-model="data.serverUrl"\n' +
-    '                        ng-disabled="transaction.busy()"\n' +
-    '                        pip-clear-errors\n' +
-    '                        pip-test="autocomplete-server">\n' +
-    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
-    '                </md-autocomplete>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <md-input-container class="display  bp4">\n' +
-    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
-    '                <input name="email" type="email" ng-model="data.email" required step="any"\n' +
-    '                       ng-keypress="onEnter($event)"\n' +
-    '                       pip-clear-errors\n' +
-    '                       ng-disabled="transaction.busy()" tabindex="2"\n' +
-    '                       pip-test="input-email"/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
-    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.email)" md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1114">{{::\'ERROR_1114\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '            <md-input-container class="display bp4">\n' +
-    '                <label>{{::\'PASSWORD\' | translate}}</label>\n' +
-    '                <input name="password" ng-disabled="transaction.busy()" pip-clear-errors\n' +
-    '                       type="password" tabindex="3" ng-model="data.password"\n' +
-    '                       ng-keypress="onEnter($event)"\n' +
-    '                       required minlength="6"\n' +
-    '                       pip-test="input-password"/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.password).hint">\n' +
-    '                    {{::\'HINT_PASSWORD\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.password)"  md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'HINT_PASSWORD\' | translate}}</div>\n' +
-    '                    <div ng-message="minlength">{{::\'HINT_PASSWORD\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1102">{{::\'ERROR_1102\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1107">{{::\'ERROR_1107\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '            <a href="" class="display bm16"\n' +
-    '               ng-click="gotoRecoverPassword()"\n' +
-    '               tabindex="4">\n' +
-    '                {{::\'SIGNIN_FORGOT_PASSWORD\' | translate}}</a>\n' +
-    '\n' +
-    '            <md-checkbox ng-disabled="transaction.busy()" md-no-ink class="lm0"\n' +
-    '                         aria-label="{{\'SIGNIN_REMEMBER\' | translate}}" tabindex="5"\n' +
-    '                         ng-model="data.remember"\n' +
-    '                         pip-test-checkbox="remember">\n' +
-    '                <label class="label-check">{{::\'SIGNIN_REMEMBER\' | translate}}</label>\n' +
-    '            </md-checkbox>\n' +
-    '\n' +
-    '            <div style="height: 36px; overflow: hidden;">\n' +
-    '                <md-button ng-if="!transaction.busy()" ng-click="onSignin()" aria-label="SIGNIN"\n' +
-    '                           class="md-raised md-accent w-stretch m0" tabindex="6"\n' +
-    '                           ng-disabled="(data.email == undefined) || data.email.length == 0 || data.serverUrl == \'\' ||\n' +
-    '                                   data.serverUrl == undefined || data.serverUrl.length == 0 || (data.password == undefined)"\n' +
-    '                           pip-test="button-signin">\n' +
-    '                    {{::\'SIGNIN_TITLE\' | translate}}\n' +
-    '                </md-button>\n' +
-    '                <md-button ng-if="transaction.busy()" ng-click="transaction.abort()" class="md-raised md-warn m0 w-stretch"\n' +
-    '                           tabindex="5" aria-label="ABORT"\n' +
-    '                           pip-test="button-cancel">\n' +
-    '                    {{::\'CANCEL\' | translate}}\n' +
-    '                </md-button>\n' +
-    '            </div>\n' +
-    '            <div class="tm24 layout-row" ng-if="!adminOnly && $mdMedia(\'gt-xs\')">\n' +
-    '                <p class="m0 text-small"> <!--  <p class="a-question-text">  -->\n' +
-    '                    {{::\'SIGNIN_NOT_MEMBER\' | translate}}\n' +
-    '                    <a href=""\n' +
-    '                       ng-click="gotoSignup()"\n' +
-    '                       tabindex="6">\n' +
-    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
-    '                    </a>\n' +
-    '                </p>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <div class="tm24 divider-top"\n' +
-    '                 style="margin-right: -16px; margin-left: -16px; background-color: rgb(238, 238, 238);"\n' +
-    '                 ng-if="!adminOnly && $mdMedia(\'xs\')">\n' +
-    '                <div class="h48 layout-row layout-align-center-end">\n' +
-    '                    <p class="m0 text-small">{{::\'SIGNIN_NOT_MEMBER\' | translate}}</p>\n' +
-    '                </div>\n' +
-    '                <div class="h48 layout-row layout-align-center -start">\n' +
-    '                    <a class="text-small" ng-click="gotoSignup()" href="" tabindex="6">\n' +
-    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
-    '                    </a>\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '        </form>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('reset_password/reset_password.html',
     '<!--\n' +
     '@file Password reset page\n' +
@@ -26212,6 +26133,197 @@ module.run(['$templateCache', function($templateCache) {
     '                </div>\n' +
     '            </md-input-container>\n' +
     '\n' +
+    '        </form>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('signin/signin.html',
+    '<!--\n' +
+    '@file Signin page\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
+    '    <pip-card width="400">\n' +
+    '        <pip-signin-panel pipfixedServerUrl="fixedServerUrl"></pip-signin-panel>\n' +
+    '    </pip-card>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('signin/signin_dialog.html',
+    '<!--\n' +
+    '@file Signin dialog\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-entry">\n' +
+    '    <md-dialog-content>\n' +
+    '        <pip-signin-panel pip-goto-signup-dialog="pipGotoSignupDialog"\n' +
+    '                          pip-goto-recover-password-dialog="pipGotoRecoverPasswordDialog">\n' +
+    '        </pip-signin-panel>\n' +
+    '    </md-dialog-content>\n' +
+    '</md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('signin/signin_panel.html',
+    '<div class="pip-body">\n' +
+    '    <div class="pip-content">\n' +
+    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
+    '        </md-progress-linear>\n' +
+    '\n' +
+    '        <h2 pip-translate="SIGNIN_TITLE"></h2>\n' +
+    '\n' +
+    '        <form name="form" novalidate>\n' +
+    '            <div ng-messages="form.$serverError" class="text-error bm8 color-error"  md-auto-hide="false">\n' +
+    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_UNKNOWN">\n' +
+    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <a ng-hide="showServerUrl || fixedServerUrl"\n' +
+    '               ng-click="showServerUrl = true" href=""\n' +
+    '               id="link-server-url"\n' +
+    '               pip-test="link-server-url">\n' +
+    '                {{::\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
+    '            </a>\n' +
+    '\n' +
+    '            <div ng-show="showServerUrl">\n' +
+    '                <md-autocomplete\n' +
+    '                        ng-initial autofocus tabindex="1"\n' +
+    '                        class="pip-combobox w-stretch bm8"\n' +
+    '                        name="server"\n' +
+    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
+    '                        md-no-cache="true"\n' +
+    '                        md-selected-item="data.serverUrl"\n' +
+    '                        md-search-text="selected.searchURLs"\n' +
+    '                        md-items="item in getMatches()"\n' +
+    '                        md-item-text="item"\n' +
+    '                        md-selected-item-change="onServerUrlChanged()"\n' +
+    '                        md-delay="200"\n' +
+    '                        ng-model="data.serverUrl"\n' +
+    '                        ng-disabled="transaction.busy()"\n' +
+    '                        pip-clear-errors\n' +
+    '                        pip-test="autocomplete-server">\n' +
+    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
+    '                </md-autocomplete>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <md-input-container class="display  bp4">\n' +
+    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
+    '                <input name="email" type="email" ng-model="data.email" required step="any"\n' +
+    '                       ng-keypress="onEnter($event)"\n' +
+    '                       pip-clear-errors\n' +
+    '                       ng-disabled="transaction.busy()" tabindex="2"\n' +
+    '                       pip-test="input-email"/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
+    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.email)" md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1114">{{::\'ERROR_1114\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '            <md-input-container class="display bp4">\n' +
+    '                <label>{{::\'PASSWORD\' | translate}}</label>\n' +
+    '                <input name="password" ng-disabled="transaction.busy()" pip-clear-errors\n' +
+    '                       type="password" tabindex="3" ng-model="data.password"\n' +
+    '                       ng-keypress="onEnter($event)"\n' +
+    '                       required minlength="6"\n' +
+    '                       pip-test="input-password"/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.password).hint">\n' +
+    '                    {{::\'HINT_PASSWORD\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.password)"  md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'HINT_PASSWORD\' | translate}}</div>\n' +
+    '                    <div ng-message="minlength">{{::\'HINT_PASSWORD\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1102">{{::\'ERROR_1102\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1107">{{::\'ERROR_1107\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '            <a href="" class="display bm16"\n' +
+    '               ng-click="gotoRecoverPassword()"\n' +
+    '               tabindex="4">\n' +
+    '                {{::\'SIGNIN_FORGOT_PASSWORD\' | translate}}</a>\n' +
+    '\n' +
+    '            <md-checkbox ng-disabled="transaction.busy()" md-no-ink class="lm0"\n' +
+    '                         aria-label="{{\'SIGNIN_REMEMBER\' | translate}}" tabindex="5"\n' +
+    '                         ng-model="data.remember"\n' +
+    '                         pip-test-checkbox="remember">\n' +
+    '                <label class="label-check">{{::\'SIGNIN_REMEMBER\' | translate}}</label>\n' +
+    '            </md-checkbox>\n' +
+    '\n' +
+    '            <div style="height: 36px; overflow: hidden;">\n' +
+    '                <md-button ng-if="!transaction.busy()" ng-click="onSignin()" aria-label="SIGNIN"\n' +
+    '                           class="md-raised md-accent w-stretch m0" tabindex="6"\n' +
+    '                           ng-disabled="(data.email == undefined) || data.email.length == 0 || data.serverUrl == \'\' ||\n' +
+    '                                   data.serverUrl == undefined || data.serverUrl.length == 0 || (data.password == undefined)"\n' +
+    '                           pip-test="button-signin">\n' +
+    '                    {{::\'SIGNIN_TITLE\' | translate}}\n' +
+    '                </md-button>\n' +
+    '                <md-button ng-if="transaction.busy()" ng-click="transaction.abort()" class="md-raised md-warn m0 w-stretch"\n' +
+    '                           tabindex="5" aria-label="ABORT"\n' +
+    '                           pip-test="button-cancel">\n' +
+    '                    {{::\'CANCEL\' | translate}}\n' +
+    '                </md-button>\n' +
+    '            </div>\n' +
+    '            <div class="tm24 layout-row" ng-if="!adminOnly && $mdMedia(\'gt-xs\')">\n' +
+    '                <p class="m0 text-small"> <!--  <p class="a-question-text">  -->\n' +
+    '                    {{::\'SIGNIN_NOT_MEMBER\' | translate}}\n' +
+    '                    <a href=""\n' +
+    '                       ng-click="gotoSignup()"\n' +
+    '                       tabindex="6">\n' +
+    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
+    '                    </a>\n' +
+    '                </p>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <div class="tm24 divider-top"\n' +
+    '                 style="margin-right: -16px; margin-left: -16px; background-color: rgb(238, 238, 238);"\n' +
+    '                 ng-if="!adminOnly && $mdMedia(\'xs\')">\n' +
+    '                <div class="h48 layout-row layout-align-center-end">\n' +
+    '                    <p class="m0 text-small">{{::\'SIGNIN_NOT_MEMBER\' | translate}}</p>\n' +
+    '                </div>\n' +
+    '                <div class="h48 layout-row layout-align-center -start">\n' +
+    '                    <a class="text-small" ng-click="gotoSignup()" href="" tabindex="6">\n' +
+    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
+    '                    </a>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
     '        </form>\n' +
     '    </div>\n' +
     '</div>');
@@ -28278,59 +28390,6 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-actions h48 layout-column layout-align-center-center">\n' +
-    '        <md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">\n' +
-    '            {{::\'ERROR_ROUTE_CONTINUE\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '    <div class="h48" ng-if="url"><a ng-href="{{url}}">\n' +
-    '        {{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}\n' +
-    '    </a></div>\n' +
-    '    <div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">\n' +
-    '        {{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}\n' +
-    '    </a></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext" ng-if="timeoutInterval">\n' +
-    '        {{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.\n' +
-    '    </div>\n' +
-    '    <div class="pip-error-actions h48 layout-column layout-align-center-center"\n' +
-    '         ng-if="isCordova">\n' +
-    '        <md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE" >\n' +
-    '            {{::\'ERROR_AVAILABLE_CLOSE\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection/no_connection.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
     '    <div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div>\n' +
@@ -28376,31 +28435,48 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
+  $templateCache.put('maintenance/maintenance.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
+    '    <div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext" ng-if="timeoutInterval">\n' +
+    '        {{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions h48 layout-column layout-align-center-center"\n' +
+    '         ng-if="isCordova">\n' +
+    '        <md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE" >\n' +
+    '            {{::\'ERROR_AVAILABLE_CLOSE\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div>\n' +
     '\n' +
-    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
-    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
-    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
-    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
-    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
-    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
+    '    <div class="pip-error-actions h48 layout-column layout-align-center-center">\n' +
+    '        <md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">\n' +
+    '            {{::\'ERROR_ROUTE_CONTINUE\' | translate}}\n' +
+    '        </md-button>\n' +
     '    </div>\n' +
-    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
-    '        <div class="h48" ng-if="isCordova">\n' +
-    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '        <div class="h48">\n' +
-    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
+    '    <div class="h48" ng-if="url"><a ng-href="{{url}}">\n' +
+    '        {{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}\n' +
+    '    </a></div>\n' +
+    '    <div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">\n' +
+    '        {{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}\n' +
+    '    </a></div>\n' +
     '</div>');
 }]);
 })();
@@ -28510,6 +28586,42 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
+    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
+    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
+    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
+    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
+    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
+    '        <div class="h48" ng-if="isCordova">\n' +
+    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '        <div class="h48">\n' +
+    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -31126,6 +31238,38 @@ try {
   module = angular.module('pipGuidance.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tips/tip.template.html',
+    '<div ng-if="title" class=\'pip-title p24-flex flex-fixed bp16\'>\n' +
+    '    {{ title | translate }}\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class=\'pip-content pip-popover-content lp24-flex rp24-flex text-body1 bm64 pip-scroll\'\n' +
+    '     ng-class="{\'tm24\' : !title }">\n' +
+    '    <div ng-if="image && $mdMedia(\'gt-xs\')" class="pip-pic"></div>\n' +
+    '    <pip-markdown pip-text="content" pip-rebind="true"></pip-markdown>\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class="pip-footer lm24-flex rm24-flex position-bottom layout-row layout-align-start-center">\n' +
+    '    <a ng-if="link" target="_blank" href="{{ link }}" class="text-body2 flex">\n' +
+    '        {{:: \'MORE_URL\' | translate }}\n' +
+    '    </a>\n' +
+    '    <div  ng-if="!link" class="flex"></div>\n' +
+    '\n' +
+    '    <md-button ng-click=\'onNextClick()\' class="rm0">\n' +
+    '        {{:: \'NEXT\' | translate }}\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipGuidance.Templates');
+} catch (e) {
+  module = angular.module('pipGuidance.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('intro_guidance/intro_guidance_dialog.html',
     '<md-dialog class="pip-dialog pip-guidance-dialog pip-guide-preview layout-column" md-theme="{{theme}}">\n' +
     '    <div ng-if="!$routing" ng-swipe-left="onNextPage()" ng-swipe-right="onBackPage()"\n' +
@@ -31198,38 +31342,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipGuidance.Templates');
-} catch (e) {
-  module = angular.module('pipGuidance.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tips/tip.template.html',
-    '<div ng-if="title" class=\'pip-title p24-flex flex-fixed bp16\'>\n' +
-    '    {{ title | translate }}\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class=\'pip-content pip-popover-content lp24-flex rp24-flex text-body1 bm64 pip-scroll\'\n' +
-    '     ng-class="{\'tm24\' : !title }">\n' +
-    '    <div ng-if="image && $mdMedia(\'gt-xs\')" class="pip-pic"></div>\n' +
-    '    <pip-markdown pip-text="content" pip-rebind="true"></pip-markdown>\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class="pip-footer lm24-flex rm24-flex position-bottom layout-row layout-align-start-center">\n' +
-    '    <a ng-if="link" target="_blank" href="{{ link }}" class="text-body2 flex">\n' +
-    '        {{:: \'MORE_URL\' | translate }}\n' +
-    '    </a>\n' +
-    '    <div  ng-if="!link" class="flex"></div>\n' +
-    '\n' +
-    '    <md-button ng-click=\'onNextClick()\' class="rm0">\n' +
-    '        {{:: \'NEXT\' | translate }}\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
 }]);
 })();
 
