@@ -18,6 +18,7 @@ gulp.task('build-js-dev', function() {
     return gulp.src([
             '../pip-webui-core/dist/pip-webui-core.js',
             '../pip-webui-rest/dist/pip-webui-rest.js',
+            '../pip-webui-test/dist/pip-webui-test.js',
             '../pip-webui-layouts/dist/pip-webui-layouts.js',
             '../pip-webui-controls/dist/pip-webui-controls.js',
             '../pip-webui-nav/dist/pip-webui-nav.js',
@@ -42,6 +43,7 @@ gulp.task('build-js-prod', function() {
     return gulp.src([
             '../pip-webui-core/dist/pip-webui-core.min.js',
             '../pip-webui-rest/dist/pip-webui-rest.min.js',
+            '../pip-webui-test/dist/pip-webui-test.min.js',
             '../pip-webui-layouts/dist/pip-webui-layouts.min.js',
             '../pip-webui-controls/dist/pip-webui-controls.min.js',
             '../pip-webui-nav/dist/pip-webui-nav.min.js',
