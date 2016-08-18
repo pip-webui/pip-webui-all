@@ -7,7 +7,6 @@ var
     minifyJs = require('gulp-uglify'),
     minifyHtml = require('gulp-minify-html'),
     sourceMaps = require('gulp-sourcemaps'),
-    jshint = require('gulp-jshint'),
     replace = require('gulp-replace'),
     addsrc = require('gulp-add-src'),
     es = require('event-stream'),
@@ -31,7 +30,8 @@ gulp.task('build-js-dev', function() {
             '../pip-webui-settings/dist/pip-webui-settings.js',
             '../pip-webui-guidance/dist/pip-webui-guidance.js',
             '../pip-webui-help/dist/pip-webui-help.js',
-            '../pip-webui-support/dist/pip-webui-support.js'
+            '../pip-webui-support/dist/pip-webui-support.js',
+            '../pip-webui-data/dist/pip-webui-data.js'
         ])
         .pipe(sourceMaps.init({ loadMaps: true }))
         .pipe(concat(pkg.name + '.js'))
@@ -56,7 +56,8 @@ gulp.task('build-js-prod', function() {
             '../pip-webui-settings/dist/pip-webui-settings.min.js',
             '../pip-webui-guidance/dist/pip-webui-guidance.min.js',
             '../pip-webui-help/dist/pip-webui-help.min.js',
-            '../pip-webui-support/dist/pip-webui-support.min.js'
+            '../pip-webui-support/dist/pip-webui-support.min.js',
+            '../pip-webui-data/dist/pip-webui-data.min.js'
         ])
         //.pipe(sourceMaps.init({ loadMaps: true }))
         .pipe(concat(pkg.name + '.min.js'))
