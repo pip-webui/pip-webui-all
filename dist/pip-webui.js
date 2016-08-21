@@ -4494,6 +4494,936 @@
 
 
 /**
+ * @file Announces data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipAnnouncesCache', ['pipAnnouncesData']);
+
+    thisModule.service('pipAnnouncesCache',
+        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
+
+            return {
+                readAnnounces: readAnnounces,
+                onAnnounceCreate: onAnnounceCreate,
+                onAnnounceUpdate: onAnnounceUpdate,
+                onAnnounceDelete: onAnnounceDelete                
+            };
+
+            function readAnnounces(params, successCallback, errorCallback) {
+                params = params || {};
+                params.resource = 'announces';
+                params.item = params.item || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            }
+            
+            function onAnnounceCreate(params, successCallback) {
+                return pipDataCache.addDecorator(
+                    'announces', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            }
+
+            function onAnnounceUpdate(params, successCallback) {
+                return pipDataCache.updateDecorator(
+                    'announces', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            }
+
+            function onAnnounceDelete(params, successCallback) {
+                return pipDataCache.removeDecorator('announces', params, successCallback);
+            }
+                        
+        }]
+    );
+
+})();
+
+
+/**
+ * @file Global application data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDataCache', ['pipDataModel']);
+
+    thisModule.provider('pipDataCache', function () {
+        var
+            CACHE_TIMEOUT = 5 * 60000, // 5 mins or make it configurable
+            cache = {};
+
+        this.timeout = timeout;
+
+        this.$get = ['$q', 'pipDataModel', function ($q, pipDataModel) {
+            return {
+                timeout: timeout,
+
+                clear: clear,
+                retrieve: retrieve,
+                retrieveOrLoad: retrieveOrLoad,
+                store: store,
+                storePermanent: storePermanent,
+                remove: remove,
+                removeItem: removeItem,
+                removeDecorator: removeDecorator,
+
+                // OBSOLETE - will be removed
+                addDecorator: addDecorator,
+                updateDecorator: updateDecorator,
+            };
+            //-------------
+
+            // Converts a string value into a numeric hash code
+            function hash(data) {
+                var filteredData = {};
+
+                // Filter only the generic parameters that can be relevant to the query
+                if (data != null) {
+                    filteredData.item = data.item;
+                    filteredData.party_id = data.party_id;
+                    filteredData.search = data.search;
+                    filteredData.paging = data.paging;
+                    filteredData.take = data.take;
+                    filteredData.skip = data.skip;
+                }
+
+                filteredData = angular.toJson(filteredData);
+                var h = 0, i, chr, len;
+                if (filteredData == null || filteredData.length === 0) return h;
+                for (i = 0, len = filteredData.length; i < len; i++) {
+                    chr = filteredData.charCodeAt(i);
+                    h = ((h << 5) - h) + chr;
+                    h |= 0; // Convert to 32bit integer
+                }
+                return h;
+            };
+
+            // Generates parameterized key
+            function generateKey(name, params) {
+                var h = hash(params);
+                return name + (h != 0 ? '_' + h : '');
+            };
+
+            // Clear the cache, globally or selectively
+            function clear(name) {
+                if (name == null) {
+                    cache = {};
+                } else {
+                    for (var key in cache) {
+                        if (key == name || key.startsWith(name + '_')) {
+                            delete cache[key];
+                        }
+                    }
+                }
+            };
+
+            // Try to retrieve collection from the cache
+            function retrieve(name, params) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                var key = generateKey(name, params);
+                var holder = cache[key];
+                if (holder == null) return null;
+
+                // If expired then cleanup and return null
+                if (holder.expire
+                    && _.now() - holder.expire > CACHE_TIMEOUT) {
+                    delete cache[key];
+                    return null;
+                }
+
+                return holder.data;
+            };
+
+            // Store collection into the cache
+            function store(name, data, params) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                cache[generateKey(name, params)] = {
+                    expire: _.now(),
+                    data: data
+                };
+            };
+
+            // Store collection into the cache without expiration
+            function storePermanent(name, data, params) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                cache[generateKey(name, params)] = {
+                    expire: null,
+                    data: data
+                };
+            };
+
+            // Remove collection from the cache
+            function remove(name, params) {
+                if (name == null) throw new Error('name cannot be null');
+                if (name == '') throw new Error('name cannot be empty');
+
+                delete cache[generateKey(name, params)];
+            };
+
+            function updateItem(name, item, params) {
+                if (name == null) throw new Error('name cannot be null');
+                if (item == null) return;
+
+                var data = retrieve(name, params);
+
+                if (data != null) {
+                    var isAdded = false;
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].id == item.id) {
+                            data[i] = item;
+                            isAdded = true;
+                            return;
+                        }
+                    }
+                    if (!isAdded) data.push(item);
+                    store(name, data, params);
+                }
+            };
+
+            // Tries to retrieve collection from the cache, otherwise load it from server
+            function retrieveOrLoad(params, successCallback, errorCallback) {
+                if (params == null) throw new Error('params cannot be null');
+                // todo add check params?
+
+                var name = (params.cache || params.resource);
+
+                // Retrieve data from cache
+                var filter = params.filter,
+                    force = !!params.force,
+                    result = !force ? retrieve(name, params) : null,
+                    deferred = $q.defer();
+
+                // Return result if it exists
+                if (result) {
+                    if (filter) {
+                        if (result.data) {
+                            result.data = filter(result.data);
+                        } else {
+                            result = filter(result);
+                        }
+                    }
+                    if (successCallback) successCallback(result);
+                    deferred.resolve(result);
+                    return deferred.promise;
+                }
+
+                // Load data from server
+                if (params.item.paging == 1) {
+                    pipDataModel['page'](
+                        params,
+                        function (data) {
+                            // Store data in cache and return
+                            store(name, data, params);
+                            if (filter) data.data = filter(data.data);
+                            deferred.resolve(data);
+
+                            if (successCallback) successCallback(data);
+                        },
+                        function (err) {
+                            // Return error
+                            deferred.reject(err);
+                            if (errorCallback) errorCallback(err);
+                        }
+                    );
+                } else {
+                    pipDataModel[params.singleResult ? 'readOne' : 'read'](
+                        params,
+                        function (data) {
+                            // Store data in cache and return
+                            params.singleResult ?
+                                updateItem(name, data, params) :
+                                store(name, data, params);
+                            if (filter) data = filter(data);
+                            deferred.resolve(data);
+
+                            if (successCallback) successCallback(data);
+                        },
+                        function (err) {
+                            // Return error
+                            deferred.reject(err);
+                            if (errorCallback) errorCallback(err);
+                        }
+                    );
+                }
+
+                // Return deferred object
+                return deferred.promise;
+            };
+
+            function removeItem(name, item) {
+                if (name == null) throw new Error('name cannot be null');
+                if (item == null) return;
+
+                for (var key in cache) {
+                    if (key == name || key.startsWith(name + '_')) {
+                        var data = cache[key].data;
+                        if (angular.isArray(data)) {
+                            for (var i = 0; i < data.length; i++) {
+                                if (data[i].id == item.id) {
+                                    data.splice(i, 1);
+                                    i--;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            function removeDecorator(resource, params, successCallback) {
+                return function (item) {
+                    removeItem(resource, params);
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+            function updateDecorator(resource, params, successCallback) {
+                return function (item) {
+                    for (var key in cache) {
+                        if (key == resource || key.startsWith(resource + '_')) {
+                            var data = cache[key].data;
+                            if (angular.isArray(data)) {
+                                for (var i = 0; i < data.length; i++) {
+                                    if (data[i].id == item.id) {
+                                        data[i] = item;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+            // OBSOLETE - WILL BE REMOVED ONCE CODE IS REFACTORED
+            function addDecorator(resource, params, successCallback) {
+                return function (item) {
+                    if (!params || !params.notClearedCache) clear(resource);
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+        }];
+        //-----------------------
+
+        function timeout(newTimeout) {
+            if (newTimeout) {
+                CACHE_TIMEOUT = newTimeout;
+            }
+            return CACHE_TIMEOUT;
+        };
+    });
+})();
+
+
+/**
+ * @file Feedbacks data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipFeedbacksCache', ['pipFeedbacksData']);
+
+    thisModule.service('pipFeedbacksCache',
+        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
+
+            return {
+                readFeedbacks: readFeedbacks,
+                onFeedbackCreate: onFeedbackCreate,
+                onFeedbackUpdate: onFeedbackUpdate,
+                onFeedbackDelete: onFeedbackDelete                
+            };
+
+            function readFeedbacks(params, successCallback, errorCallback) {
+                params = params || {};
+                params.resource = 'feedbacks';
+                params.item = params.item || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            };
+            
+            function onFeedbackCreate(params, successCallback) {
+                return pipDataCache.addDecorator(
+                    'feedbacks', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onFeedbackUpdate(params, successCallback) {
+                return pipDataCache.updateDecorator(
+                    'feedbacks', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onFeedbackDelete(params, successCallback) {
+                return pipDataCache.removeDecorator('feedbacks', params, successCallback);
+            };
+                        
+        }]
+    );
+
+})();
+
+
+/**
+ * @file Guides data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipGuidesCache', ['pipGuidesData']);
+
+    thisModule.service('pipGuidesCache',
+        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
+
+            return {
+                readGuides: readGuides,
+                onGuideCreate: onGuideCreate,
+                onGuideUpdate: onGuideUpdate,
+                onGuideDelete: onGuideDelete                
+            };
+
+            function readGuides(params, successCallback, errorCallback) {
+                params = params || {};
+                params.resource = 'guides';
+                params.item = params.item || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            };
+            
+            function onGuideCreate(params, successCallback) {
+                return pipDataCache.addDecorator(
+                    'guides', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onGuideUpdate(params, successCallback) {
+                return pipDataCache.updateDecorator(
+                    'guides', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onGuideDelete(params, successCallback) {
+                return pipDataCache.removeDecorator('guides', params, successCallback);
+            };
+                        
+        }]
+    );
+
+})();
+
+
+/**
+ * @file ImageSets data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipImageSetsCache', ['pipImageSetsData']);
+
+    thisModule.service('pipImageSetsCache',
+        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
+
+            return {
+                readImageSets: readImageSets,
+                onImageSetCreate: onImageSetCreate,
+                onImageSetUpdate: onImageSetUpdate,
+                onImageSetDelete: onImageSetDelete                
+            };
+
+            function readImageSets(params, successCallback, errorCallback) {
+                params = params || {};
+                params.resource = 'image_sets';
+                params.item = params.item || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            };
+            
+            function onImageSetCreate(params, successCallback) {
+                return pipDataCache.addDecorator(
+                    'image_sets', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onImageSetUpdate(params, successCallback) {
+                return pipDataCache.updateDecorator(
+                    'image_sets', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onImageSetDelete(params, successCallback) {
+                return pipDataCache.removeDecorator('image_sets', params, successCallback);
+            };
+                        
+        }]
+    );
+
+})();
+
+
+/**
+ * @file Session data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSessionCache', ['pipCore', 'pipRest', 'pipDataCache']);
+
+    thisModule.run(['$rootScope', 'pipSessionCache', function ($rootScope, pipSessionCache) {
+        $rootScope.$on('pipSessionOpened', pipSessionCache.init);
+        $rootScope.$on('pipSessionClosed', pipSessionCache.clear);
+    }]);
+
+    thisModule.service('pipSessionCache',
+        ['$rootScope', '$stateParams', '$q', 'pipTranslate', 'pipRest', 'localStorageService', 'pipAccess', 'pipEnums', 'pipSession', 'pipDataCache', function ($rootScope, $stateParams, $q, pipTranslate, pipRest, localStorageService,
+                  pipAccess, pipEnums, pipSession, pipDataCache) {
+
+            return {
+                init: init,
+                clear: clear,
+
+                readUser: readUser,
+                readParty: readParty,
+                readConnection: readConnection,
+
+                readSettings: readSettings,
+                onSettingsUpdate: onSettingsUpdate,
+
+                readSessions: readSessions
+            };
+            //-------------
+
+            function readSessions(params, successCallback, errorCallback) {
+                params = params || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            };
+            
+            function init(event, data) {
+                if (data == null)
+                    throw new Error('Unexpected error: issues in openning session');
+
+                clear();
+                if (data.serverUrl) $rootScope.$serverUrl = data.serverUrl;
+                storeUser(data.user, null);
+            };
+
+            function clear() {
+                // Clear data cache
+                pipDataCache.clear();
+
+                // Clear global variables
+                delete $rootScope.$user;
+                delete $rootScope.$party;
+                delete $rootScope.$serverUrl;
+                delete $rootScope.$connection;
+                delete $rootScope.$settings;
+            };
+
+            function updateUserRights(user, party) {
+                // Get parameters from cache if they are not defined
+                user = user || pipDataCache.retrieve('user');
+                party = party || pipDataCache.retrieve('party');
+
+                // Exit if user is not defined
+                if (user == null) return;
+
+                // Update user access rights
+                if (party == null)
+                    user = pipAccess.asOwner(user);
+                else if (user.id == party.id)
+                    user = pipAccess.asOwner(user);
+                else
+                    user = pipAccess.toParty(user, party);
+
+                // Save user with new rights back to cache
+                pipDataCache.storePermanent('user', user);
+                $rootScope.$user = user;
+            };
+
+            function storeUserTheme(user) {
+                if (!user) return;
+                var userTheme = user.theme || 'blue';
+
+                if (user && $rootScope.$party) {
+                    if ($rootScope.$party.id == user.id) userTheme = user.theme;
+                    else userTheme = 'navy';
+                }
+
+                $rootScope.$theme = userTheme;
+                localStorageService.set('theme', userTheme);
+            };
+
+            function storeUser(user) {
+                if (user == null) return;
+
+                pipDataCache.storePermanent('user', user);
+                $rootScope.$user = user;
+                storeUserTheme(user);
+
+                // Activate user language
+                pipTranslate.use(user.language, false, true);
+                updateUserRights(user, null);
+            };
+
+            function readUser(successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened())
+                    throw new Error('User is not authenticated.');
+
+                var
+                    userId = pipSession.userId(),
+                    user = pipDataCache.retrieve('user');
+
+                // Return user from cache
+                if (user) {
+                    if (user.id != userId)
+                        throw new Error('Unexpected error: issues in opening session');
+
+                    if (successCallback) successCallback(user);
+                    var deferred = $q.defer();
+                    deferred.resolve(user);
+                    return deferred.promise;
+                }
+
+                // Read user from server
+                return pipRest.users().get(
+                    {id: userId},
+                    function (user) {
+                        // Double check
+                        if (user.id != userId)
+                            user == null;
+
+                        storeUser(user);
+
+                        if (successCallback) successCallback(use);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function readParty(stateParams, successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened())
+                    throw new Error('User is not authenticated.');
+
+                var
+                    userId = pipSession.userId(),
+                    partyId = stateParams.party_id || userId,
+                    party = pipDataCache.retrieve('party');
+
+                // Skip if party already retrieved
+                if (party && party.id == partyId) {
+                    $rootScope.$party = party;
+
+                    storeUserTheme($rootScope.$user);
+
+                    if (successCallback) successCallback(party);
+                    var deferred = $q.defer();
+                    deferred.resolve(party);
+                    return deferred.promise;
+                }
+
+                // Read party from server
+                return pipRest.parties().get(
+                    {id: partyId},
+                    function (party) {
+                        updateUserRights(null, party);
+                        pipDataCache.storePermanent('party', party);
+                        $rootScope.$party = party;
+
+                        storeUserTheme($rootScope.$user);
+
+                        if (successCallback) successCallback(party);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function readConnection(stateParams, successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened())
+                    throw new Error('User is not authenticated.');
+
+                var
+                    userId = pipSession.userId(),
+                    partyId = stateParams.party_id || userId,
+                    connection = pipDataCache.retrieve('connection');
+
+                // Clear connection it does not match user or party
+                if (connection
+                    && (connection.party_id != userId
+                    || connection.to_party_id != partyId)) {
+                    connection = null;
+                    pipDataCache.remove('connection');
+                    delete $rootScope.$connection;
+                }
+
+                // For owner connection is not defined
+                if (userId == partyId) {
+                    if (successCallback) successCallback(connection);
+                    var deferred = $q.defer();
+                    deferred.resolve(connection);
+                    return deferred.promise;
+                }
+
+                // Read connection from server
+                return pipRest.connections().query(
+                    {
+                        party_id: userId,
+                        to_party_id: partyId,
+                        accept: pipEnums.ACCEPTANCE.ACCEPTED
+                    },
+                    function (connections) {
+                        // There are shall not be more than one active connection
+                        if (connections && connections.length > 0)
+                            connection = connections[0];
+                        else connection = null;
+
+                        pipDataCache.storePermanent('connection', connection);
+                        $rootScope.$connection = connection;
+
+                        if (successCallback) successCallback(connection);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function readSettings(successCallback, errorCallback) {
+                // Avoid broken session
+                if (!pipSession.opened())
+                    throw new Error('User is not authenticated.');
+                var
+                    userId = pipSession.userId(),
+                    settings = pipDataCache.retrieve('settings' + '_' + userId);
+
+                if (settings) {
+                    if (successCallback) successCallback(settings);
+                    var deferred = $q.defer();
+                    deferred.resolve(settings);
+                    return deferred.promise;
+                }
+
+                // Read settings from server
+                return pipRest.partySettings().get(
+                    {
+                        party_id: userId
+                    },
+                    function (settings) {
+                        settings = settings || {};
+                        pipDataCache.storePermanent('settings' + '_' + userId, settings);
+                        $rootScope.$settings = settings;
+
+                        if (successCallback) successCallback(settings);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function onSettingsUpdate(item, successCallback) {
+                // return function(item) {
+                if (item == null) return;
+
+                var userId = pipSession.userId(),
+                    settings = pipDataCache.retrieve('settings' + '_' + userId);
+
+                // If tags are stored
+                if (settings) {
+                    settings = _.extend(settings, item);
+                    pipDataCache.storePermanent('settings' + '_' + userId, settings);
+                    $rootScope.$settings = settings;
+                }
+
+                if (successCallback) successCallback(item);
+            };
+        }]
+    );
+
+})();
+/**
+ * @file Tags data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTagsCache', ['pipUtils', 'pipDataCache']);
+
+    thisModule.service('pipTagsCache',
+        ['pipTags', 'pipDataCache', function(pipTags, pipDataCache) {
+            return {
+                readTags: readTags,
+                // Todo: Add updateTags method
+                onTagsUpdate: onTagsUpdate,
+                tagsUpdateDecorator: tagsUpdateDecorator
+            };
+			//------------------------------
+
+            function tagsUpdate(params, item) {
+                // Extract tag from updated entity
+                var tags = item ? pipTags.extractTags(item) : [];
+                if (tags.length == 0) return;
+
+                var cacheName = 'partyTags';
+                if (params && params.party_id !== null && params.party_id !== undefined)
+                    cacheName = cacheName + '_' + params.party_id;
+                else if (params && params.item && params.item.party_id !== null && params.item.party_id !== undefined)
+                    cacheName = cacheName + '_' + params.item.party_id;
+
+                // Todo: this is a wrong way to get party_id (contributor) from entities
+                var data = pipDataCache.retrieve(cacheName);
+
+                // If tags are stored
+                if (data) {
+                    _.each(tags, function(tag) {
+                        // Find if tag already exists
+                        var t = _.find(data.tags, function(t) {
+                            return pipTags.equalTags(t.tag, tag);
+                        });
+
+                        // Otherwise add a new tag
+                        if (t) {
+                            t.tag = tag;
+                            t.count = t.count + 1;
+                            t.used = new Date();
+                        } else {
+                            if (!data.tags)
+                                data.tags = [];
+								
+                            data.tags.push({
+                                tag: tag,
+                                count: 1,
+                                used: new Date()
+                            });
+                        }
+                    });
+                    pipDataCache.store(cacheName, data);
+                }
+            };
+
+            function tagsUpdateDecorator(params, successCallback) {
+                return function(item) {
+                    tagsUpdate(params, item);
+
+                    if (successCallback) successCallback(item);
+                };
+            };
+
+			function readTags(params, successCallback, errorCallback) {
+				params.resource = 'partyTags';
+				params.singleResult = true;
+
+				return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+			};
+
+			// Todo: Add updateTags method
+
+			function onTagsUpdate(params, successCallback) {
+				return tagsUpdateDecorator(params, successCallback);
+			};
+        }]
+    );
+
+})();
+
+
+/**
+ * @file Tips data cache
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTipsCache', ['pipTipsData']);
+
+    thisModule.service('pipTipsCache',
+        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
+
+            return {
+                readTips: readTips,
+                onTipCreate: onTipCreate,
+                onTipUpdate: onTipUpdate,
+                onTipDelete: onTipDelete                
+            };
+
+            function readTips(params, successCallback, errorCallback) {
+                params = params || {};
+                params.resource = 'tips';
+                params.item = params.item || {};
+
+                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
+            };
+            
+            function onTipCreate(params, successCallback) {
+                return pipDataCache.addDecorator(
+                    'tips', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onTipUpdate(params, successCallback) {
+                return pipDataCache.updateDecorator(
+                    'tips', params,
+                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
+                );
+            };
+
+            function onTipDelete(params, successCallback) {
+                return pipDataCache.removeDecorator('tips', params, successCallback);
+            };
+                        
+        }]
+    );
+
+})();
+
+
+/**
  * @file User access permissions service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -5978,936 +6908,6 @@
     );
 
 })();
-/**
- * @file Announces data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipAnnouncesCache', ['pipAnnouncesData']);
-
-    thisModule.service('pipAnnouncesCache',
-        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
-
-            return {
-                readAnnounces: readAnnounces,
-                onAnnounceCreate: onAnnounceCreate,
-                onAnnounceUpdate: onAnnounceUpdate,
-                onAnnounceDelete: onAnnounceDelete                
-            };
-
-            function readAnnounces(params, successCallback, errorCallback) {
-                params = params || {};
-                params.resource = 'announces';
-                params.item = params.item || {};
-
-                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-            }
-            
-            function onAnnounceCreate(params, successCallback) {
-                return pipDataCache.addDecorator(
-                    'announces', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            }
-
-            function onAnnounceUpdate(params, successCallback) {
-                return pipDataCache.updateDecorator(
-                    'announces', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            }
-
-            function onAnnounceDelete(params, successCallback) {
-                return pipDataCache.removeDecorator('announces', params, successCallback);
-            }
-                        
-        }]
-    );
-
-})();
-
-
-/**
- * @file Global application data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDataCache', ['pipDataModel']);
-
-    thisModule.provider('pipDataCache', function () {
-        var
-            CACHE_TIMEOUT = 5 * 60000, // 5 mins or make it configurable
-            cache = {};
-
-        this.timeout = timeout;
-
-        this.$get = ['$q', 'pipDataModel', function ($q, pipDataModel) {
-            return {
-                timeout: timeout,
-
-                clear: clear,
-                retrieve: retrieve,
-                retrieveOrLoad: retrieveOrLoad,
-                store: store,
-                storePermanent: storePermanent,
-                remove: remove,
-                removeItem: removeItem,
-                removeDecorator: removeDecorator,
-
-                // OBSOLETE - will be removed
-                addDecorator: addDecorator,
-                updateDecorator: updateDecorator,
-            };
-            //-------------
-
-            // Converts a string value into a numeric hash code
-            function hash(data) {
-                var filteredData = {};
-
-                // Filter only the generic parameters that can be relevant to the query
-                if (data != null) {
-                    filteredData.item = data.item;
-                    filteredData.party_id = data.party_id;
-                    filteredData.search = data.search;
-                    filteredData.paging = data.paging;
-                    filteredData.take = data.take;
-                    filteredData.skip = data.skip;
-                }
-
-                filteredData = angular.toJson(filteredData);
-                var h = 0, i, chr, len;
-                if (filteredData == null || filteredData.length === 0) return h;
-                for (i = 0, len = filteredData.length; i < len; i++) {
-                    chr = filteredData.charCodeAt(i);
-                    h = ((h << 5) - h) + chr;
-                    h |= 0; // Convert to 32bit integer
-                }
-                return h;
-            };
-
-            // Generates parameterized key
-            function generateKey(name, params) {
-                var h = hash(params);
-                return name + (h != 0 ? '_' + h : '');
-            };
-
-            // Clear the cache, globally or selectively
-            function clear(name) {
-                if (name == null) {
-                    cache = {};
-                } else {
-                    for (var key in cache) {
-                        if (key == name || key.startsWith(name + '_')) {
-                            delete cache[key];
-                        }
-                    }
-                }
-            };
-
-            // Try to retrieve collection from the cache
-            function retrieve(name, params) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                var key = generateKey(name, params);
-                var holder = cache[key];
-                if (holder == null) return null;
-
-                // If expired then cleanup and return null
-                if (holder.expire
-                    && _.now() - holder.expire > CACHE_TIMEOUT) {
-                    delete cache[key];
-                    return null;
-                }
-
-                return holder.data;
-            };
-
-            // Store collection into the cache
-            function store(name, data, params) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                cache[generateKey(name, params)] = {
-                    expire: _.now(),
-                    data: data
-                };
-            };
-
-            // Store collection into the cache without expiration
-            function storePermanent(name, data, params) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                cache[generateKey(name, params)] = {
-                    expire: null,
-                    data: data
-                };
-            };
-
-            // Remove collection from the cache
-            function remove(name, params) {
-                if (name == null) throw new Error('name cannot be null');
-                if (name == '') throw new Error('name cannot be empty');
-
-                delete cache[generateKey(name, params)];
-            };
-
-            function updateItem(name, item, params) {
-                if (name == null) throw new Error('name cannot be null');
-                if (item == null) return;
-
-                var data = retrieve(name, params);
-
-                if (data != null) {
-                    var isAdded = false;
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].id == item.id) {
-                            data[i] = item;
-                            isAdded = true;
-                            return;
-                        }
-                    }
-                    if (!isAdded) data.push(item);
-                    store(name, data, params);
-                }
-            };
-
-            // Tries to retrieve collection from the cache, otherwise load it from server
-            function retrieveOrLoad(params, successCallback, errorCallback) {
-                if (params == null) throw new Error('params cannot be null');
-                // todo add check params?
-
-                var name = (params.cache || params.resource);
-
-                // Retrieve data from cache
-                var filter = params.filter,
-                    force = !!params.force,
-                    result = !force ? retrieve(name, params) : null,
-                    deferred = $q.defer();
-
-                // Return result if it exists
-                if (result) {
-                    if (filter) {
-                        if (result.data) {
-                            result.data = filter(result.data);
-                        } else {
-                            result = filter(result);
-                        }
-                    }
-                    if (successCallback) successCallback(result);
-                    deferred.resolve(result);
-                    return deferred.promise;
-                }
-
-                // Load data from server
-                if (params.item.paging == 1) {
-                    pipDataModel['page'](
-                        params,
-                        function (data) {
-                            // Store data in cache and return
-                            store(name, data, params);
-                            if (filter) data.data = filter(data.data);
-                            deferred.resolve(data);
-
-                            if (successCallback) successCallback(data);
-                        },
-                        function (err) {
-                            // Return error
-                            deferred.reject(err);
-                            if (errorCallback) errorCallback(err);
-                        }
-                    );
-                } else {
-                    pipDataModel[params.singleResult ? 'readOne' : 'read'](
-                        params,
-                        function (data) {
-                            // Store data in cache and return
-                            params.singleResult ?
-                                updateItem(name, data, params) :
-                                store(name, data, params);
-                            if (filter) data = filter(data);
-                            deferred.resolve(data);
-
-                            if (successCallback) successCallback(data);
-                        },
-                        function (err) {
-                            // Return error
-                            deferred.reject(err);
-                            if (errorCallback) errorCallback(err);
-                        }
-                    );
-                }
-
-                // Return deferred object
-                return deferred.promise;
-            };
-
-            function removeItem(name, item) {
-                if (name == null) throw new Error('name cannot be null');
-                if (item == null) return;
-
-                for (var key in cache) {
-                    if (key == name || key.startsWith(name + '_')) {
-                        var data = cache[key].data;
-                        if (angular.isArray(data)) {
-                            for (var i = 0; i < data.length; i++) {
-                                if (data[i].id == item.id) {
-                                    data.splice(i, 1);
-                                    i--;
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            function removeDecorator(resource, params, successCallback) {
-                return function (item) {
-                    removeItem(resource, params);
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-            function updateDecorator(resource, params, successCallback) {
-                return function (item) {
-                    for (var key in cache) {
-                        if (key == resource || key.startsWith(resource + '_')) {
-                            var data = cache[key].data;
-                            if (angular.isArray(data)) {
-                                for (var i = 0; i < data.length; i++) {
-                                    if (data[i].id == item.id) {
-                                        data[i] = item;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-            // OBSOLETE - WILL BE REMOVED ONCE CODE IS REFACTORED
-            function addDecorator(resource, params, successCallback) {
-                return function (item) {
-                    if (!params || !params.notClearedCache) clear(resource);
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-        }];
-        //-----------------------
-
-        function timeout(newTimeout) {
-            if (newTimeout) {
-                CACHE_TIMEOUT = newTimeout;
-            }
-            return CACHE_TIMEOUT;
-        };
-    });
-})();
-
-
-/**
- * @file Feedbacks data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipFeedbacksCache', ['pipFeedbacksData']);
-
-    thisModule.service('pipFeedbacksCache',
-        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
-
-            return {
-                readFeedbacks: readFeedbacks,
-                onFeedbackCreate: onFeedbackCreate,
-                onFeedbackUpdate: onFeedbackUpdate,
-                onFeedbackDelete: onFeedbackDelete                
-            };
-
-            function readFeedbacks(params, successCallback, errorCallback) {
-                params = params || {};
-                params.resource = 'feedbacks';
-                params.item = params.item || {};
-
-                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-            };
-            
-            function onFeedbackCreate(params, successCallback) {
-                return pipDataCache.addDecorator(
-                    'feedbacks', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onFeedbackUpdate(params, successCallback) {
-                return pipDataCache.updateDecorator(
-                    'feedbacks', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onFeedbackDelete(params, successCallback) {
-                return pipDataCache.removeDecorator('feedbacks', params, successCallback);
-            };
-                        
-        }]
-    );
-
-})();
-
-
-/**
- * @file Guides data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipGuidesCache', ['pipGuidesData']);
-
-    thisModule.service('pipGuidesCache',
-        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
-
-            return {
-                readGuides: readGuides,
-                onGuideCreate: onGuideCreate,
-                onGuideUpdate: onGuideUpdate,
-                onGuideDelete: onGuideDelete                
-            };
-
-            function readGuides(params, successCallback, errorCallback) {
-                params = params || {};
-                params.resource = 'guides';
-                params.item = params.item || {};
-
-                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-            };
-            
-            function onGuideCreate(params, successCallback) {
-                return pipDataCache.addDecorator(
-                    'guides', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onGuideUpdate(params, successCallback) {
-                return pipDataCache.updateDecorator(
-                    'guides', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onGuideDelete(params, successCallback) {
-                return pipDataCache.removeDecorator('guides', params, successCallback);
-            };
-                        
-        }]
-    );
-
-})();
-
-
-/**
- * @file ImageSets data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipImageSetsCache', ['pipImageSetsData']);
-
-    thisModule.service('pipImageSetsCache',
-        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
-
-            return {
-                readImageSets: readImageSets,
-                onImageSetCreate: onImageSetCreate,
-                onImageSetUpdate: onImageSetUpdate,
-                onImageSetDelete: onImageSetDelete                
-            };
-
-            function readImageSets(params, successCallback, errorCallback) {
-                params = params || {};
-                params.resource = 'image_sets';
-                params.item = params.item || {};
-
-                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-            };
-            
-            function onImageSetCreate(params, successCallback) {
-                return pipDataCache.addDecorator(
-                    'image_sets', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onImageSetUpdate(params, successCallback) {
-                return pipDataCache.updateDecorator(
-                    'image_sets', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onImageSetDelete(params, successCallback) {
-                return pipDataCache.removeDecorator('image_sets', params, successCallback);
-            };
-                        
-        }]
-    );
-
-})();
-
-
-/**
- * @file Session data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSessionCache', ['pipCore', 'pipRest', 'pipDataCache']);
-
-    thisModule.run(['$rootScope', 'pipSessionCache', function ($rootScope, pipSessionCache) {
-        $rootScope.$on('pipSessionOpened', pipSessionCache.init);
-        $rootScope.$on('pipSessionClosed', pipSessionCache.clear);
-    }]);
-
-    thisModule.service('pipSessionCache',
-        ['$rootScope', '$stateParams', '$q', 'pipTranslate', 'pipRest', 'localStorageService', 'pipAccess', 'pipEnums', 'pipSession', 'pipDataCache', function ($rootScope, $stateParams, $q, pipTranslate, pipRest, localStorageService,
-                  pipAccess, pipEnums, pipSession, pipDataCache) {
-
-            return {
-                init: init,
-                clear: clear,
-
-                readUser: readUser,
-                readParty: readParty,
-                readConnection: readConnection,
-
-                readSettings: readSettings,
-                onSettingsUpdate: onSettingsUpdate,
-
-                readSessions: readSessions
-            };
-            //-------------
-
-            function readSessions(params, successCallback, errorCallback) {
-                params = params || {};
-
-                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-            };
-            
-            function init(event, data) {
-                if (data == null)
-                    throw new Error('Unexpected error: issues in openning session');
-
-                clear();
-                if (data.serverUrl) $rootScope.$serverUrl = data.serverUrl;
-                storeUser(data.user, null);
-            };
-
-            function clear() {
-                // Clear data cache
-                pipDataCache.clear();
-
-                // Clear global variables
-                delete $rootScope.$user;
-                delete $rootScope.$party;
-                delete $rootScope.$serverUrl;
-                delete $rootScope.$connection;
-                delete $rootScope.$settings;
-            };
-
-            function updateUserRights(user, party) {
-                // Get parameters from cache if they are not defined
-                user = user || pipDataCache.retrieve('user');
-                party = party || pipDataCache.retrieve('party');
-
-                // Exit if user is not defined
-                if (user == null) return;
-
-                // Update user access rights
-                if (party == null)
-                    user = pipAccess.asOwner(user);
-                else if (user.id == party.id)
-                    user = pipAccess.asOwner(user);
-                else
-                    user = pipAccess.toParty(user, party);
-
-                // Save user with new rights back to cache
-                pipDataCache.storePermanent('user', user);
-                $rootScope.$user = user;
-            };
-
-            function storeUserTheme(user) {
-                if (!user) return;
-                var userTheme = user.theme || 'blue';
-
-                if (user && $rootScope.$party) {
-                    if ($rootScope.$party.id == user.id) userTheme = user.theme;
-                    else userTheme = 'navy';
-                }
-
-                $rootScope.$theme = userTheme;
-                localStorageService.set('theme', userTheme);
-            };
-
-            function storeUser(user) {
-                if (user == null) return;
-
-                pipDataCache.storePermanent('user', user);
-                $rootScope.$user = user;
-                storeUserTheme(user);
-
-                // Activate user language
-                pipTranslate.use(user.language, false, true);
-                updateUserRights(user, null);
-            };
-
-            function readUser(successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened())
-                    throw new Error('User is not authenticated.');
-
-                var
-                    userId = pipSession.userId(),
-                    user = pipDataCache.retrieve('user');
-
-                // Return user from cache
-                if (user) {
-                    if (user.id != userId)
-                        throw new Error('Unexpected error: issues in opening session');
-
-                    if (successCallback) successCallback(user);
-                    var deferred = $q.defer();
-                    deferred.resolve(user);
-                    return deferred.promise;
-                }
-
-                // Read user from server
-                return pipRest.users().get(
-                    {id: userId},
-                    function (user) {
-                        // Double check
-                        if (user.id != userId)
-                            user == null;
-
-                        storeUser(user);
-
-                        if (successCallback) successCallback(use);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function readParty(stateParams, successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened())
-                    throw new Error('User is not authenticated.');
-
-                var
-                    userId = pipSession.userId(),
-                    partyId = stateParams.party_id || userId,
-                    party = pipDataCache.retrieve('party');
-
-                // Skip if party already retrieved
-                if (party && party.id == partyId) {
-                    $rootScope.$party = party;
-
-                    storeUserTheme($rootScope.$user);
-
-                    if (successCallback) successCallback(party);
-                    var deferred = $q.defer();
-                    deferred.resolve(party);
-                    return deferred.promise;
-                }
-
-                // Read party from server
-                return pipRest.parties().get(
-                    {id: partyId},
-                    function (party) {
-                        updateUserRights(null, party);
-                        pipDataCache.storePermanent('party', party);
-                        $rootScope.$party = party;
-
-                        storeUserTheme($rootScope.$user);
-
-                        if (successCallback) successCallback(party);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function readConnection(stateParams, successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened())
-                    throw new Error('User is not authenticated.');
-
-                var
-                    userId = pipSession.userId(),
-                    partyId = stateParams.party_id || userId,
-                    connection = pipDataCache.retrieve('connection');
-
-                // Clear connection it does not match user or party
-                if (connection
-                    && (connection.party_id != userId
-                    || connection.to_party_id != partyId)) {
-                    connection = null;
-                    pipDataCache.remove('connection');
-                    delete $rootScope.$connection;
-                }
-
-                // For owner connection is not defined
-                if (userId == partyId) {
-                    if (successCallback) successCallback(connection);
-                    var deferred = $q.defer();
-                    deferred.resolve(connection);
-                    return deferred.promise;
-                }
-
-                // Read connection from server
-                return pipRest.connections().query(
-                    {
-                        party_id: userId,
-                        to_party_id: partyId,
-                        accept: pipEnums.ACCEPTANCE.ACCEPTED
-                    },
-                    function (connections) {
-                        // There are shall not be more than one active connection
-                        if (connections && connections.length > 0)
-                            connection = connections[0];
-                        else connection = null;
-
-                        pipDataCache.storePermanent('connection', connection);
-                        $rootScope.$connection = connection;
-
-                        if (successCallback) successCallback(connection);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function readSettings(successCallback, errorCallback) {
-                // Avoid broken session
-                if (!pipSession.opened())
-                    throw new Error('User is not authenticated.');
-                var
-                    userId = pipSession.userId(),
-                    settings = pipDataCache.retrieve('settings' + '_' + userId);
-
-                if (settings) {
-                    if (successCallback) successCallback(settings);
-                    var deferred = $q.defer();
-                    deferred.resolve(settings);
-                    return deferred.promise;
-                }
-
-                // Read settings from server
-                return pipRest.partySettings().get(
-                    {
-                        party_id: userId
-                    },
-                    function (settings) {
-                        settings = settings || {};
-                        pipDataCache.storePermanent('settings' + '_' + userId, settings);
-                        $rootScope.$settings = settings;
-
-                        if (successCallback) successCallback(settings);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function onSettingsUpdate(item, successCallback) {
-                // return function(item) {
-                if (item == null) return;
-
-                var userId = pipSession.userId(),
-                    settings = pipDataCache.retrieve('settings' + '_' + userId);
-
-                // If tags are stored
-                if (settings) {
-                    settings = _.extend(settings, item);
-                    pipDataCache.storePermanent('settings' + '_' + userId, settings);
-                    $rootScope.$settings = settings;
-                }
-
-                if (successCallback) successCallback(item);
-            };
-        }]
-    );
-
-})();
-/**
- * @file Tags data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTagsCache', ['pipUtils', 'pipDataCache']);
-
-    thisModule.service('pipTagsCache',
-        ['pipTags', 'pipDataCache', function(pipTags, pipDataCache) {
-            return {
-                readTags: readTags,
-                // Todo: Add updateTags method
-                onTagsUpdate: onTagsUpdate,
-                tagsUpdateDecorator: tagsUpdateDecorator
-            };
-			//------------------------------
-
-            function tagsUpdate(params, item) {
-                // Extract tag from updated entity
-                var tags = item ? pipTags.extractTags(item) : [];
-                if (tags.length == 0) return;
-
-                var cacheName = 'partyTags';
-                if (params && params.party_id !== null && params.party_id !== undefined)
-                    cacheName = cacheName + '_' + params.party_id;
-                else if (params && params.item && params.item.party_id !== null && params.item.party_id !== undefined)
-                    cacheName = cacheName + '_' + params.item.party_id;
-
-                // Todo: this is a wrong way to get party_id (contributor) from entities
-                var data = pipDataCache.retrieve(cacheName);
-
-                // If tags are stored
-                if (data) {
-                    _.each(tags, function(tag) {
-                        // Find if tag already exists
-                        var t = _.find(data.tags, function(t) {
-                            return pipTags.equalTags(t.tag, tag);
-                        });
-
-                        // Otherwise add a new tag
-                        if (t) {
-                            t.tag = tag;
-                            t.count = t.count + 1;
-                            t.used = new Date();
-                        } else {
-                            if (!data.tags)
-                                data.tags = [];
-								
-                            data.tags.push({
-                                tag: tag,
-                                count: 1,
-                                used: new Date()
-                            });
-                        }
-                    });
-                    pipDataCache.store(cacheName, data);
-                }
-            };
-
-            function tagsUpdateDecorator(params, successCallback) {
-                return function(item) {
-                    tagsUpdate(params, item);
-
-                    if (successCallback) successCallback(item);
-                };
-            };
-
-			function readTags(params, successCallback, errorCallback) {
-				params.resource = 'partyTags';
-				params.singleResult = true;
-
-				return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-			};
-
-			// Todo: Add updateTags method
-
-			function onTagsUpdate(params, successCallback) {
-				return tagsUpdateDecorator(params, successCallback);
-			};
-        }]
-    );
-
-})();
-
-
-/**
- * @file Tips data cache
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTipsCache', ['pipTipsData']);
-
-    thisModule.service('pipTipsCache',
-        ['pipEnums', 'pipDataCache', 'pipTagsCache', function (pipEnums, pipDataCache, pipTagsCache) {
-
-            return {
-                readTips: readTips,
-                onTipCreate: onTipCreate,
-                onTipUpdate: onTipUpdate,
-                onTipDelete: onTipDelete                
-            };
-
-            function readTips(params, successCallback, errorCallback) {
-                params = params || {};
-                params.resource = 'tips';
-                params.item = params.item || {};
-
-                return pipDataCache.retrieveOrLoad(params, successCallback, errorCallback);
-            };
-            
-            function onTipCreate(params, successCallback) {
-                return pipDataCache.addDecorator(
-                    'tips', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onTipUpdate(params, successCallback) {
-                return pipDataCache.updateDecorator(
-                    'tips', params,
-                    pipTagsCache.tagsUpdateDecorator(params, successCallback)
-                );
-            };
-
-            function onTipDelete(params, successCallback) {
-                return pipDataCache.removeDecorator('tips', params, successCallback);
-            };
-                        
-        }]
-    );
-
-})();
-
-
 /**
  * @file Announces data model
  * @copyright Digital Living Software Corp. 2014-2016
@@ -9519,6 +9519,157 @@
 
 })();
  
+/**
+ * @file Rest API enumerations service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('PipResources.Error', []);
+
+    thisModule.factory('PipResourcesError', function () {
+
+        var Errors = {};
+        
+        Errors['1104'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1104,
+                name: 'Bad Request',
+                message: 'Email is already registered'
+            },
+            headers: {}
+        };
+        Errors['1106'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1106,
+                name: 'Bad Request',
+                message: 'User was not found'
+            },
+            headers: {}
+        };
+        Errors['1103'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1103,
+                name: 'Bad Request',
+                message: 'Invalid email verification code'
+            },
+            headers: {}
+        };
+        Errors['1108'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1108,
+                name: 'Bad Request',
+                message: 'Invalid password recovery code'
+            },
+            headers: {}
+        };
+        Errors['1700'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1700,
+                name: 'Bad Request',
+                message: 'Avatar doesn\'t exist'
+            },
+            headers: {}
+        };        
+
+        return Errors;
+    });
+    
+})();
+
+/**
+ * @file pipImageResources service
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo:
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipImageResources', []);
+
+    thisModule.provider('pipImageResources', function() {
+        var imagesMap = [],
+            size = 0;
+
+        this.setImages = setImages;
+
+        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
+
+
+            return {
+                setImages: setImages,
+                getImagesCollection: getImagesCollection,
+                getImage: getImage
+            }
+        }];
+
+        // Add images collection
+        function setImages(newImagesRes) {
+            if (!angular.isArray(newImagesRes)) {
+                new Error('pipImageResources setImages: first argument should be an object');
+            }
+
+            imagesMap = _.union(imagesMap, newImagesRes);
+            size = imagesMap.length;
+        }
+
+        // Get images collection
+        function getImagesCollection(size, search) {
+            if (!!search && !angular.isString(search)) {
+                new Error('pipImageResources getImages: second argument should be a string');
+            }
+
+            var result, queryLowercase,
+                resultSize = size && size < imagesMap.length ? size : -1;
+
+            if (!search) {
+                result = imagesMap;
+            } else {
+                queryLowercase = search.toLowerCase();
+                result = _.filter(imagesMap, function (item) {
+                        if (item.title) {
+                            return (item.title.toLowerCase().indexOf(queryLowercase) >= 0);
+                        } else return false;
+                    }) || [];
+            }
+
+            if (resultSize === -1) {
+                return _.cloneDeep(result);
+            } else {
+                return _.take(result, resultSize);
+            }                        
+        }   
+
+        function getImage() {
+            var i = _.random(0, size - 1);
+
+            if (size > 0) {
+                return _.cloneDeep(imagesMap[i]);
+            } else {
+                return null;
+            }
+        }  
+
+    });
+
+})();
 /**
  * @file Image  resources for samples
  * @copyright Digital Living Software Corp. 2014-2016
@@ -12634,157 +12785,6 @@
 })();
  
 
-/**
- * @file Rest API enumerations service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('PipResources.Error', []);
-
-    thisModule.factory('PipResourcesError', function () {
-
-        var Errors = {};
-        
-        Errors['1104'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1104,
-                name: 'Bad Request',
-                message: 'Email is already registered'
-            },
-            headers: {}
-        };
-        Errors['1106'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1106,
-                name: 'Bad Request',
-                message: 'User was not found'
-            },
-            headers: {}
-        };
-        Errors['1103'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1103,
-                name: 'Bad Request',
-                message: 'Invalid email verification code'
-            },
-            headers: {}
-        };
-        Errors['1108'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1108,
-                name: 'Bad Request',
-                message: 'Invalid password recovery code'
-            },
-            headers: {}
-        };
-        Errors['1700'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1700,
-                name: 'Bad Request',
-                message: 'Avatar doesn\'t exist'
-            },
-            headers: {}
-        };        
-
-        return Errors;
-    });
-    
-})();
-
-/**
- * @file pipImageResources service
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo:
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipImageResources', []);
-
-    thisModule.provider('pipImageResources', function() {
-        var imagesMap = [],
-            size = 0;
-
-        this.setImages = setImages;
-
-        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
-
-
-            return {
-                setImages: setImages,
-                getImagesCollection: getImagesCollection,
-                getImage: getImage
-            }
-        }];
-
-        // Add images collection
-        function setImages(newImagesRes) {
-            if (!angular.isArray(newImagesRes)) {
-                new Error('pipImageResources setImages: first argument should be an object');
-            }
-
-            imagesMap = _.union(imagesMap, newImagesRes);
-            size = imagesMap.length;
-        }
-
-        // Get images collection
-        function getImagesCollection(size, search) {
-            if (!!search && !angular.isString(search)) {
-                new Error('pipImageResources getImages: second argument should be a string');
-            }
-
-            var result, queryLowercase,
-                resultSize = size && size < imagesMap.length ? size : -1;
-
-            if (!search) {
-                result = imagesMap;
-            } else {
-                queryLowercase = search.toLowerCase();
-                result = _.filter(imagesMap, function (item) {
-                        if (item.title) {
-                            return (item.title.toLowerCase().indexOf(queryLowercase) >= 0);
-                        } else return false;
-                    }) || [];
-            }
-
-            if (resultSize === -1) {
-                return _.cloneDeep(result);
-            } else {
-                return _.take(result, resultSize);
-            }                        
-        }   
-
-        function getImage() {
-            var i = _.random(0, size - 1);
-
-            if (size > 0) {
-                return _.cloneDeep(imagesMap[i]);
-            } else {
-                return null;
-            }
-        }  
-
-    });
-
-})();
 
 
 /**
@@ -13124,77 +13124,6 @@
 })();
 
 /**
- * @file Split layout
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global $, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipLayout.Split', []);
-
-    thisModule.run( ['$rootScope', 'pipSplit', function($rootScope, pipSplit) {
-        // Intercept routes
-        $rootScope.$on('$stateChangeStart',
-            function(event, toState, toParams, fromState, fromParams) {
-                // Split animation
-                var splitElements = $('.pip-split');
-                if (splitElements.length > 0) {
-                    splitElements.removeClass('pip-transition-forward');
-                    splitElements.removeClass('pip-transition-back');
-                    if (toState.name != fromState.name) {
-                        if (pipSplit.forwardTransition(toState, fromState))
-                            splitElements.addClass('pip-transition-forward');
-                        else
-                            splitElements.addClass('pip-transition-back');
-                    }
-                }
-
-            }
-        );
-
-    }]);
-
-    thisModule.provider('pipSplit', function() {
-        var transitionSequences = [];
-
-        this.addTransitionSequence = addTransitionSequence;
-
-        this.$get = function () {
-            return {
-                forwardTransition: forwardTransition
-            };
-        };
-
-        return;
-
-        //----------------------------
-
-        function addTransitionSequence(sequence) {
-            if (!_.isArray(sequence) || sequence.length == 0)
-                throw new Error('Transition sequence must be an array of state names');
-
-            transitionSequences.push(sequence);
-        }
-
-        function forwardTransition(toState, fromState) {
-            for (var i = 0; i < transitionSequences.length; i++) {
-                var toIndex = transitionSequences[i].indexOf(toState.name);
-                var fromIndex = transitionSequences[i].indexOf(fromState.name);
-
-                if (toIndex > -1)
-                    return toIndex > fromIndex;
-            }
-            return false
-        }
-
-    });
-
-})();
-
-/**
  * @file Tiles layout
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -13327,6 +13256,115 @@
 
 })();
 
+/**
+ * @file Split layout
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global $, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipLayout.Split', []);
+
+    thisModule.run( ['$rootScope', 'pipSplit', function($rootScope, pipSplit) {
+        // Intercept routes
+        $rootScope.$on('$stateChangeStart',
+            function(event, toState, toParams, fromState, fromParams) {
+                // Split animation
+                var splitElements = $('.pip-split');
+                if (splitElements.length > 0) {
+                    splitElements.removeClass('pip-transition-forward');
+                    splitElements.removeClass('pip-transition-back');
+                    if (toState.name != fromState.name) {
+                        if (pipSplit.forwardTransition(toState, fromState))
+                            splitElements.addClass('pip-transition-forward');
+                        else
+                            splitElements.addClass('pip-transition-back');
+                    }
+                }
+
+            }
+        );
+
+    }]);
+
+    thisModule.provider('pipSplit', function() {
+        var transitionSequences = [];
+
+        this.addTransitionSequence = addTransitionSequence;
+
+        this.$get = function () {
+            return {
+                forwardTransition: forwardTransition
+            };
+        };
+
+        return;
+
+        //----------------------------
+
+        function addTransitionSequence(sequence) {
+            if (!_.isArray(sequence) || sequence.length == 0)
+                throw new Error('Transition sequence must be an array of state names');
+
+            transitionSequences.push(sequence);
+        }
+
+        function forwardTransition(toState, fromState) {
+            for (var i = 0; i < transitionSequences.length; i++) {
+                var toIndex = transitionSequences[i].indexOf(toState.name);
+                var fromIndex = transitionSequences[i].indexOf(fromState.name);
+
+                if (toIndex > -1)
+                    return toIndex > fromIndex;
+            }
+            return false
+        }
+
+    });
+
+})();
+
+
+
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipTagList',
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeRangeEdit',
+        'pipTimeRange',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', ['pipControls']);
+
+})(window.angular);
 
 
 (function(module) {
@@ -13413,6 +13451,74 @@ module.run(['$templateCache', function($templateCache) {
     '	</md-input-container>\n' +
     '</div>\n' +
     '					');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('error_details_dialog/error_details_dialog.html',
+    '<!--\n' +
+    '@file Confirmation dialog template\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-dialog pip-details-dialog layout-column" width="400" md-theme="{{theme}}">\n' +
+    '    <div class="pip-body">\n' +
+    '\n' +
+    '        <div class="pip-header p0 bp8  text-subhead1">{{::\'ERROR_DETAILS\' | translate}}</div>\n' +
+    '        <div class="layout-row layout-align-start-center h48 text-body2 color-secondary-text"\n' +
+    '             ng-if="error.code || (error.data && error.data.code)">\n' +
+    '            {{::\'CODE\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div class="layout-row layout-align-start-center" ng-if="error.code || (error.data && error.data.code)">\n' +
+    '            {{error.code || error.data.code}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div class="layout-row layout-align-start-center h48 text-body2 color-secondary-text"\n' +
+    '             ng-if="error.path || (error.data && error.data.path)">\n' +
+    '            {{::\'PATH\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div class="layout-row layout-align-start-center" ng-if="error.path || (error.data && error.data.path)">\n' +
+    '            {{error.path || error.data.path}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
+    '             ng-if="error.error || (error.data && error.data.error)">\n' +
+    '            {{::\'ERROR\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div class="layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">\n' +
+    '            {{error.error || error.data.error}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
+    '             ng-if="error.method || (error.data && error.data.method)">\n' +
+    '            {{::\'METHOD\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div class="layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">\n' +
+    '            {{error.method || error.data.method}}\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
+    '             ng-if="error.message || (error.data && error.data.message)">\n' +
+    '            {{::\'MESSAGE\' | translate}}\n' +
+    '        </div>\n' +
+    '        <div class="layout-row layout-align-start-center"\n' +
+    '             ng-if="error.message || (error.data && error.data.message)">\n' +
+    '            {{error.message || error.data.message}}\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-footer rp16">\n' +
+    '        <div>\n' +
+    '            <md-button class="md-accent m0" ng-click="onOk()">{{::\'DISMISS\' | translate }}</md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</md-dialog>\n' +
+    '');
 }]);
 })();
 
@@ -13528,74 +13634,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details_dialog/error_details_dialog.html',
-    '<!--\n' +
-    '@file Confirmation dialog template\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-dialog pip-details-dialog layout-column" width="400" md-theme="{{theme}}">\n' +
-    '    <div class="pip-body">\n' +
-    '\n' +
-    '        <div class="pip-header p0 bp8  text-subhead1">{{::\'ERROR_DETAILS\' | translate}}</div>\n' +
-    '        <div class="layout-row layout-align-start-center h48 text-body2 color-secondary-text"\n' +
-    '             ng-if="error.code || (error.data && error.data.code)">\n' +
-    '            {{::\'CODE\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.code || (error.data && error.data.code)">\n' +
-    '            {{error.code || error.data.code}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div class="layout-row layout-align-start-center h48 text-body2 color-secondary-text"\n' +
-    '             ng-if="error.path || (error.data && error.data.path)">\n' +
-    '            {{::\'PATH\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.path || (error.data && error.data.path)">\n' +
-    '            {{error.path || error.data.path}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
-    '             ng-if="error.error || (error.data && error.data.error)">\n' +
-    '            {{::\'ERROR\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">\n' +
-    '            {{error.error || error.data.error}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
-    '             ng-if="error.method || (error.data && error.data.method)">\n' +
-    '            {{::\'METHOD\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">\n' +
-    '            {{error.method || error.data.method}}\n' +
-    '        </div>\n' +
-    '\n' +
-    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
-    '             ng-if="error.message || (error.data && error.data.message)">\n' +
-    '            {{::\'MESSAGE\' | translate}}\n' +
-    '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center"\n' +
-    '             ng-if="error.message || (error.data && error.data.message)">\n' +
-    '            {{error.message || error.data.message}}\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-footer rp16">\n' +
-    '        <div>\n' +
-    '            <md-button class="md-accent m0" ng-click="onOk()">{{::\'DISMISS\' | translate }}</md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</md-dialog>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('information_dialog/information_dialog.html',
     '<!--\n' +
     '@file Information dialog content\n' +
@@ -13618,24 +13656,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</md-dialog>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.template.html',
-    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
-    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
-    '</div>\n' +
-    '\n' +
-    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
-    '</div>\n' +
     '');
 }]);
 })();
@@ -13794,6 +13814,24 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</md-dialog>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('popover/popover.template.html',
+    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
+    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
+    '</div>\n' +
+    '\n' +
+    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
+    '</div>\n' +
     '');
 }]);
 })();
@@ -13992,44 +14030,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipTagList',
-
-        'pipDate',
-        'pipDateRange',
-        'pipTimeRangeEdit',
-        'pipTimeRange',
-
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-    angular.module('pipBasicControls', ['pipControls']);
-
-})(window.angular);
-
-
-/**
  * @file Color picker control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -14100,177 +14100,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window._);
-
-/**
- * @file Date control
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve samples int sampler app
- * - Optimize. It is way to slow on samples
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipDate', ['pipBasicControls.Templates']);
-
-    thisModule.directive('pipDate',
-        function () {
-            return {
-                restrict: 'EA',
-                require: 'ngModel',
-                scope: {
-                    timeMode: '@pipTimeMode',
-                    disabled: '&ngDisabled',
-                    model: '=ngModel',
-                    ngChange: '&'
-                },
-                templateUrl: 'date/date.html',
-                controller: 'pipDateController'
-            };
-        }
-    );
-
-    thisModule.controller('pipDateController',
-        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
-            var value;
-
-            function dayList(month, year) {
-                var count = 31, days = [], i;
-
-                if (month === 4 || month === 6 || month === 9 || month === 11) {
-                    count = 30;
-                } else if (month === 2) {
-                    if (year) {
-                        // Calculate leap year (primitive)
-                        count = year % 4 === 0 ? 29 : 28;
-                    } else {
-                        count = 28;
-                    }
-                }
-
-                for (i = 1; i <= count; i++) {
-                    days.push(i);
-                }
-
-                return days;
-            }
-
-            function monthList() {
-                var months = [], i;
-
-                for (i = 1; i <= 12; i++) {
-                    months.push({
-                        id: i,
-                        name: pipTranslate.translate('MONTH_' + i)
-                    });
-                }
-
-                return months;
-            }
-
-            function yearList() {
-                var i,
-                    currentYear = new Date().getFullYear(),
-                    startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100,
-                    endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100,
-                    years = [];
-
-                if ($scope.timeMode === 'past') {
-                    for (i = endYear; i >= startYear; i--) {
-                        years.push(i);
-                    }
-                } else {
-                    for (i = startYear; i <= endYear; i++) {
-                        years.push(i);
-                    }
-                }
-
-                return years;
-            }
-
-            function adjustDay() {
-                var days = dayList($scope.month, $scope.year);
-
-                if ($scope.days.length !== days.length) {
-                    if ($scope.day > days.length) {
-                        $scope.day = days.length;
-                    }
-
-                    $scope.days = days;
-                }
-            }
-
-            function getValue(v) {
-                var value = v ? _.isDate(v) ? v : new Date(v) : null,
-                    day = value ? value.getDate() : null,
-                    month = value ? value.getMonth() + 1 : null,
-                    year = value ? value.getFullYear() : null;
-
-                // Update day list if month and year were changed
-                if ($scope.month !== month && $scope.year !== year) {
-                    $scope.days = dayList($scope.month, $scope.year);
-                }
-
-                // Assign values to scope
-                $scope.day = day;
-                $scope.month = month;
-                $scope.year = year;
-            }
-
-            function setValue() {
-                var value;
-
-                if ($scope.day && $scope.month && $scope.year) {
-                    value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
-                    $scope.model = value;
-                    $scope.ngChange();
-                }
-            }
-
-            $scope.onDayChanged = function () {
-                setValue();
-            };
-
-            $scope.onMonthChanged = function () {
-                adjustDay();
-                setValue();
-            };
-
-            $scope.onYearChanged = function () {
-                adjustDay();
-                setValue();
-            };
-
-            // Set initial values
-            value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
-            $scope.day = value ? value.getDate() : null;
-            $scope.month = value ? value.getMonth() + 1 : null;
-            $scope.year = value ? value.getFullYear() : null;
-
-            $scope.dayLabel = pipTranslate.translate('DAY');
-            $scope.monthLabel = pipTranslate.translate('MONTH');
-            $scope.yearLabel = pipTranslate.translate('YEAR');
-
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.months = monthList();
-            $scope.years = yearList();
-
-            $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-
-            // React on changes
-            $scope.$watch('model', function (newValue) {
-                getValue(newValue);
-            });
-
-            $scope.$watch($scope.disabled, function (newValue) {
-                $scope.disableControls = newValue;
-            });
-        }]
-    );
-
-})(window.angular, window._);
-
 
 /**
  * @file Confirmation dialog
@@ -14753,6 +14582,177 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window._);
+
+/**
+ * @file Date control
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve samples int sampler app
+ * - Optimize. It is way to slow on samples
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipDate', ['pipBasicControls.Templates']);
+
+    thisModule.directive('pipDate',
+        function () {
+            return {
+                restrict: 'EA',
+                require: 'ngModel',
+                scope: {
+                    timeMode: '@pipTimeMode',
+                    disabled: '&ngDisabled',
+                    model: '=ngModel',
+                    ngChange: '&'
+                },
+                templateUrl: 'date/date.html',
+                controller: 'pipDateController'
+            };
+        }
+    );
+
+    thisModule.controller('pipDateController',
+        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
+            var value;
+
+            function dayList(month, year) {
+                var count = 31, days = [], i;
+
+                if (month === 4 || month === 6 || month === 9 || month === 11) {
+                    count = 30;
+                } else if (month === 2) {
+                    if (year) {
+                        // Calculate leap year (primitive)
+                        count = year % 4 === 0 ? 29 : 28;
+                    } else {
+                        count = 28;
+                    }
+                }
+
+                for (i = 1; i <= count; i++) {
+                    days.push(i);
+                }
+
+                return days;
+            }
+
+            function monthList() {
+                var months = [], i;
+
+                for (i = 1; i <= 12; i++) {
+                    months.push({
+                        id: i,
+                        name: pipTranslate.translate('MONTH_' + i)
+                    });
+                }
+
+                return months;
+            }
+
+            function yearList() {
+                var i,
+                    currentYear = new Date().getFullYear(),
+                    startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100,
+                    endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100,
+                    years = [];
+
+                if ($scope.timeMode === 'past') {
+                    for (i = endYear; i >= startYear; i--) {
+                        years.push(i);
+                    }
+                } else {
+                    for (i = startYear; i <= endYear; i++) {
+                        years.push(i);
+                    }
+                }
+
+                return years;
+            }
+
+            function adjustDay() {
+                var days = dayList($scope.month, $scope.year);
+
+                if ($scope.days.length !== days.length) {
+                    if ($scope.day > days.length) {
+                        $scope.day = days.length;
+                    }
+
+                    $scope.days = days;
+                }
+            }
+
+            function getValue(v) {
+                var value = v ? _.isDate(v) ? v : new Date(v) : null,
+                    day = value ? value.getDate() : null,
+                    month = value ? value.getMonth() + 1 : null,
+                    year = value ? value.getFullYear() : null;
+
+                // Update day list if month and year were changed
+                if ($scope.month !== month && $scope.year !== year) {
+                    $scope.days = dayList($scope.month, $scope.year);
+                }
+
+                // Assign values to scope
+                $scope.day = day;
+                $scope.month = month;
+                $scope.year = year;
+            }
+
+            function setValue() {
+                var value;
+
+                if ($scope.day && $scope.month && $scope.year) {
+                    value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                    $scope.model = value;
+                    $scope.ngChange();
+                }
+            }
+
+            $scope.onDayChanged = function () {
+                setValue();
+            };
+
+            $scope.onMonthChanged = function () {
+                adjustDay();
+                setValue();
+            };
+
+            $scope.onYearChanged = function () {
+                adjustDay();
+                setValue();
+            };
+
+            // Set initial values
+            value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
+            $scope.day = value ? value.getDate() : null;
+            $scope.month = value ? value.getMonth() + 1 : null;
+            $scope.year = value ? value.getFullYear() : null;
+
+            $scope.dayLabel = pipTranslate.translate('DAY');
+            $scope.monthLabel = pipTranslate.translate('MONTH');
+            $scope.yearLabel = pipTranslate.translate('YEAR');
+
+            $scope.days = dayList($scope.month, $scope.year);
+            $scope.months = monthList();
+            $scope.years = yearList();
+
+            $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
+
+            // React on changes
+            $scope.$watch('model', function (newValue) {
+                getValue(newValue);
+            });
+
+            $scope.$watch($scope.disabled, function (newValue) {
+                $scope.disableControls = newValue;
+            });
+        }]
+    );
+
+})(window.angular, window._);
+
 
 /**
  * @file Confirmation dialog
@@ -15646,6 +15646,75 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window.jQuery, window._);
 
 /**
+ * @file Refresh button control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
+
+    thisModule.directive('pipRefreshButton',
+        ['$parse', function ($parse) {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: String() +
+                '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">' +
+                '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
+                '<span class="pip-refresh-text"></span>' +
+                '</md-button>',
+                replace: false,
+                link: function ($scope, $element, $attrs) {
+                    var width, text, show,
+                        textGetter = $parse($attrs.pipText),
+                        visibleGetter = $parse($attrs.pipVisible),
+                        refreshGetter = $parse($attrs.pipRefresh),
+                        $button = $element.children('.md-button'),
+                        $text = $button.children('.pip-refresh-text');
+
+                    show = function () {
+                        // Set a new text
+                        text = textGetter($scope);
+                        $text.text(text);
+
+                        // Show button
+                        $button.show();
+
+                        // Adjust position
+                        width = $button.width();
+                        $button.css('margin-left', '-' + width / 2 + 'px');
+                    };
+
+                    function hide() {
+                        $button.hide();
+                    }
+
+                    $scope.onClick = function () {
+                        refreshGetter($scope);
+                    };
+
+                    $scope.$watch(visibleGetter, function (newValue) {
+                        if (newValue) {
+                            show();
+                        } else {
+                            hide();
+                        }
+                    });
+
+                    $scope.$watch(textGetter, function (newValue) {
+                        $text.text(newValue);
+                    });
+                }
+            };
+        }]
+    );
+
+})(window.angular);
+
+
+/**
  * @file Routing progress control
  * @description
  * This progress control is enabled by ui router
@@ -15715,75 +15784,6 @@ module.run(['$templateCache', function($templateCache) {
                     // Add class
                     $element.addClass('pip-tag-list');
                 }]
-            };
-        }]
-    );
-
-})(window.angular);
-
-
-/**
- * @file Refresh button control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
-
-    thisModule.directive('pipRefreshButton',
-        ['$parse', function ($parse) {
-            return {
-                restrict: 'EA',
-                scope: false,
-                template: String() +
-                '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">' +
-                '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
-                '<span class="pip-refresh-text"></span>' +
-                '</md-button>',
-                replace: false,
-                link: function ($scope, $element, $attrs) {
-                    var width, text, show,
-                        textGetter = $parse($attrs.pipText),
-                        visibleGetter = $parse($attrs.pipVisible),
-                        refreshGetter = $parse($attrs.pipRefresh),
-                        $button = $element.children('.md-button'),
-                        $text = $button.children('.pip-refresh-text');
-
-                    show = function () {
-                        // Set a new text
-                        text = textGetter($scope);
-                        $text.text(text);
-
-                        // Show button
-                        $button.show();
-
-                        // Adjust position
-                        width = $button.width();
-                        $button.css('margin-left', '-' + width / 2 + 'px');
-                    };
-
-                    function hide() {
-                        $button.hide();
-                    }
-
-                    $scope.onClick = function () {
-                        refreshGetter($scope);
-                    };
-
-                    $scope.$watch(visibleGetter, function (newValue) {
-                        if (newValue) {
-                            show();
-                        } else {
-                            hide();
-                        }
-                    });
-
-                    $scope.$watch(textGetter, function (newValue) {
-                        $text.text(newValue);
-                    });
-                }
             };
         }]
     );
@@ -16137,6 +16137,84 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window._);
 
 /**
+ * @file Toggle buttons control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipToggleButtons', ['pipBasicControls.Templates']);
+
+    thisModule.directive('pipToggleButtons',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: {
+                    ngDisabled: '&',
+                    buttons: '=pipButtons',
+                    currentButtonValue: '=ngModel',
+                    currentButton: '=?pipButtonObject',
+                    change: '&ngChange'
+                },
+                templateUrl: 'toggle_buttons/toggle_buttons.html',
+                controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
+                    var index;
+
+                    $scope.$mdMedia = $mdMedia;
+                    $scope.class = $attrs.class || '';
+
+                    if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
+                        $scope.buttons = [];
+                    }
+
+                    index = _.indexOf($scope.buttons, _.find($scope.buttons, {id: $scope.currentButtonValue}));
+                    $scope.currentButtonIndex = index < 0 ? 0 : index;
+                    $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
+                        : $scope.currentButton;
+
+                    $scope.buttonSelected = function (index) {
+                        if ($scope.disabled()) {
+                            return;
+                        }
+
+                        $scope.currentButtonIndex = index;
+                        $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
+                        $scope.currentButtonValue = $scope.currentButton.id || index;
+
+                        $timeout(function () {
+                            if ($scope.change) {
+                                $scope.change();
+                            }
+                        });
+                    };
+
+                    $scope.enterSpacePress = function (event) {
+                        $scope.buttonSelected(event.index);
+                    };
+
+                    $scope.disabled = function () {
+                        if ($scope.ngDisabled) {
+                            return $scope.ngDisabled();
+                        }
+                    };
+                }],
+                link: function (scope, elem) {
+                    elem
+                        .on('focusin', function () {
+                            elem.addClass('focused-container');
+                        })
+                        .on('focusout', function () {
+                            elem.removeClass('focused-container');
+                        });
+                }
+            };
+        }
+    );
+
+})(window.angular, window._);
+
+/**
  * @file Toasts management service
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo Replace ngAudio with alternative service
@@ -16389,83 +16467,27 @@ module.run(['$templateCache', function($templateCache) {
 
 })(window.angular, window._);
 
+
+
 /**
- * @file Toggle buttons control
+ * @file Registration of navigation WebUI controls
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-(function (angular, _) {
+/* global angular */
+
+(function () {
     'use strict';
 
-    var thisModule = angular.module('pipToggleButtons', ['pipBasicControls.Templates']);
+    angular.module('pipNav', [        
+        'pipDropdown',
+        'pipTabs',
 
-    thisModule.directive('pipToggleButtons',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    ngDisabled: '&',
-                    buttons: '=pipButtons',
-                    currentButtonValue: '=ngModel',
-                    currentButton: '=?pipButtonObject',
-                    change: '&ngChange'
-                },
-                templateUrl: 'toggle_buttons/toggle_buttons.html',
-                controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
-                    var index;
-
-                    $scope.$mdMedia = $mdMedia;
-                    $scope.class = $attrs.class || '';
-
-                    if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
-                        $scope.buttons = [];
-                    }
-
-                    index = _.indexOf($scope.buttons, _.find($scope.buttons, {id: $scope.currentButtonValue}));
-                    $scope.currentButtonIndex = index < 0 ? 0 : index;
-                    $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
-                        : $scope.currentButton;
-
-                    $scope.buttonSelected = function (index) {
-                        if ($scope.disabled()) {
-                            return;
-                        }
-
-                        $scope.currentButtonIndex = index;
-                        $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
-                        $scope.currentButtonValue = $scope.currentButton.id || index;
-
-                        $timeout(function () {
-                            if ($scope.change) {
-                                $scope.change();
-                            }
-                        });
-                    };
-
-                    $scope.enterSpacePress = function (event) {
-                        $scope.buttonSelected(event.index);
-                    };
-
-                    $scope.disabled = function () {
-                        if ($scope.ngDisabled) {
-                            return $scope.ngDisabled();
-                        }
-                    };
-                }],
-                link: function (scope, elem) {
-                    elem
-                        .on('focusin', function () {
-                            elem.addClass('focused-container');
-                        })
-                        .on('focusout', function () {
-                            elem.removeClass('focused-container');
-                        });
-                }
-            };
-        }
-    );
-
-})(window.angular, window._);
+        'pipAppBar',
+        'pipSideNav'
+    ]);
+    
+})();
 
 
 
@@ -16740,6 +16762,40 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tabs/tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
+    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
+    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
+    '            <md-tab-label>\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-tab-label>\n' +
+    '        </md-tab>\n' +
+    '    </md-tabs>\n' +
+    '    <md-content class="md-subhead md-hue-1" ng-if="$mdMedia(\'xs\')">\n' +
+    '        <div class="pip-divider position-top m0"></div>\n' +
+    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
+    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
+    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-content>\n' +
+    '</md-toolbar>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/sidenav.html',
     '<!--\n' +
     '@file Side Nav component\n' +
@@ -16821,62 +16877,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
-    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
-    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
-    '            <md-tab-label>\n' +
-    '                {{ ::tab.nameLocal }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-tab-label>\n' +
-    '        </md-tab>\n' +
-    '    </md-tabs>\n' +
-    '    <md-content class="md-subhead md-hue-1" ng-if="$mdMedia(\'xs\')">\n' +
-    '        <div class="pip-divider position-top m0"></div>\n' +
-    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
-    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
-    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
-    '                {{ ::tab.nameLocal }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-content>\n' +
-    '</md-toolbar>\n' +
-    '');
-}]);
-})();
-
-/**
- * @file Registration of navigation WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipNav', [        
-        'pipDropdown',
-        'pipTabs',
-
-        'pipAppBar',
-        'pipSideNav'
-    ]);
-    
-})();
-
-
 
 /**
  * @file Application App Bar component
@@ -17622,6 +17622,88 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
+ * @file Tabs control
+ * @copyright Digital Living Software Corp. 2014-2016
+ * 
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipTabs", ['pipAssert', 'pipNav.Templates']);
+
+    thisModule.directive('pipTabs',
+        ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
+            return {
+                restrict: 'E',
+                scope: {
+                    ngDisabled: '&',
+                    tabs: '=pipTabs',
+                    showTabs: '&pipShowTabs',
+                    showTabsShadow: '&pipTabsShadow',
+                    activeIndex: '=pipActiveIndex',
+                    select: '=pipTabsSelect'
+                },
+                templateUrl: 'tabs/tabs.html',
+                controller:
+                    ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', 'pipTranslate', function ($scope, $element, $attrs, $mdMedia, localStorageService, pipTranslate) {
+                        $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
+                        pipAssert.isArray($scope.tabs, 'pipTabs: pipTabs attribute should take an array');
+                        $scope.$mdMedia = $mdMedia;
+                        $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
+                        if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
+                            pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
+                        } else {
+                            pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+                        }
+                        $scope.activeIndex = $scope.activeIndex || 0;
+                        $scope.activeTab = $scope.activeIndex;
+
+                        $scope.disabled = function () {
+                            if ($scope.ngDisabled) {
+                                return $scope.ngDisabled();
+                            }
+                        };
+
+                        $scope.tabDisabled = function (index) {
+                            return ($scope.disabled() && $scope.activeIndex != index);
+                        };
+
+                        $scope.onSelect = function (index) {
+                            if ($scope.disabled()) return;
+
+                            $scope.activeIndex = index;
+                            $scope.activeTab = $scope.activeIndex;
+                            if ($scope.select) {
+                                $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
+                            }
+                        };
+
+                        $scope.showShadow = function () {
+                            if ($scope.showTabsShadow) {
+                                return $scope.showTabsShadow();
+                            } else {
+                                return false;
+                            }
+                        };
+
+                        $scope.show = function () {
+                            if ($scope.showTabs) {
+                                return $scope.showTabs();
+                            } else {
+                                return true;
+                            }
+                        };
+                    }]
+            };
+        }]
+    );
+
+})();
+
+/**
  * @file Application Side Nav component
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -17939,86 +18021,26 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 
+
+
 /**
- * @file Tabs control
+ * @file Registration of location WebUI controls
  * @copyright Digital Living Software Corp. 2014-2016
- * 
  */
 
-/* global _, angular */
+/* global angular */
 
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipTabs", ['pipAssert', 'pipNav.Templates']);
-
-    thisModule.directive('pipTabs',
-        ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
-            return {
-                restrict: 'E',
-                scope: {
-                    ngDisabled: '&',
-                    tabs: '=pipTabs',
-                    showTabs: '&pipShowTabs',
-                    showTabsShadow: '&pipTabsShadow',
-                    activeIndex: '=pipActiveIndex',
-                    select: '=pipTabsSelect'
-                },
-                templateUrl: 'tabs/tabs.html',
-                controller:
-                    ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', 'pipTranslate', function ($scope, $element, $attrs, $mdMedia, localStorageService, pipTranslate) {
-                        $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
-                        pipAssert.isArray($scope.tabs, 'pipTabs: pipTabs attribute should take an array');
-                        $scope.$mdMedia = $mdMedia;
-                        $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
-                        if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
-                            pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
-                        } else {
-                            pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
-                        }
-                        $scope.activeIndex = $scope.activeIndex || 0;
-                        $scope.activeTab = $scope.activeIndex;
-
-                        $scope.disabled = function () {
-                            if ($scope.ngDisabled) {
-                                return $scope.ngDisabled();
-                            }
-                        };
-
-                        $scope.tabDisabled = function (index) {
-                            return ($scope.disabled() && $scope.activeIndex != index);
-                        };
-
-                        $scope.onSelect = function (index) {
-                            if ($scope.disabled()) return;
-
-                            $scope.activeIndex = index;
-                            $scope.activeTab = $scope.activeIndex;
-                            if ($scope.select) {
-                                $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
-                            }
-                        };
-
-                        $scope.showShadow = function () {
-                            if ($scope.showTabsShadow) {
-                                return $scope.showTabsShadow();
-                            } else {
-                                return false;
-                            }
-                        };
-
-                        $scope.show = function () {
-                            if ($scope.showTabs) {
-                                return $scope.showTabs();
-                            } else {
-                                return true;
-                            }
-                        };
-                    }]
-            };
-        }]
-    );
-
+    angular.module('pipLocations', [        
+        'pipLocation',
+        'pipLocationMap',
+        'pipLocationIp',
+        'pipLocationEdit',
+        'pipLocationEditDialog'
+    ]);
+    
 })();
 
 
@@ -18088,28 +18110,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of location WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipLocations', [        
-        'pipLocation',
-        'pipLocationMap',
-        'pipLocationIp',
-        'pipLocationEdit',
-        'pipLocationEditDialog'
-    ]);
-    
-})();
-
-
 
 /**
  * @file Location control
@@ -18255,238 +18255,6 @@ module.run(['$templateCache', function($templateCache) {
             if ($scope.pipLocationPos()) generateMap();
             else clearMap();
         }]    
-    );
-
-})();
-
-/**
- * @file Location edit dialog
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve sample in sampler app
- */
- 
-/* global angular, google */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipLocationEditDialog', 
-        ['ngMaterial', 'pipTranslate', 'pipTransactions', 'pipLocations.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'LOCATION_ADD_LOCATION': 'Add location',
-            'LOCATION_SET_LOCATION': 'Set location',
-            'LOCATION_ADD_PIN': 'Add pin',
-            'LOCATION_REMOVE_PIN': 'Remove pin'
-        });
-        pipTranslateProvider.translations('ru', {
-            'LOCATION_ADD_LOCATION': 'Добавить местоположение',
-            'LOCATION_SET_LOCATION': 'Определить положение',
-            'LOCATION_ADD_PIN': 'Добавить точку',
-            'LOCATION_REMOVE_PIN': 'Убрать точку'
-        });
-    }]);
-
-    thisModule.factory('pipLocationEditDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        controller: 'pipLocationEditDialogController',
-                        templateUrl: 'location_dialog/location_dialog.html',
-                        locals: {
-                            locationName: params.locationName,
-                            locationPos: params.locationPos
-                        },
-                        clickOutsideToClose: true
-                    })
-                    .then(function (result) {
-                        if (successCallback) {
-                            successCallback(result);
-                        }
-                    }, function () {
-                        if (cancelCallback) {
-                            cancelCallback();
-                        }
-                    });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipLocationEditDialogController', 
-        ['$scope', '$rootScope', '$timeout', '$mdDialog', 'pipTransaction', 'locationPos', 'locationName', function ($scope, $rootScope, $timeout, $mdDialog, pipTransaction, locationPos, locationName) {
-            $scope.theme = $rootScope.$theme;
-            $scope.locationPos = locationPos && locationPos.type == 'Point'
-                && locationPos.coordinates && locationPos.coordinates.length == 2
-                ? locationPos : null;
-            $scope.locationName = locationName;
-            $scope.supportSet = navigator.geolocation != null;
-
-            $scope.transaction = pipTransaction('location_edit_dialog', $scope);
-
-            var map = null, marker = null;
-
-            var createMarker = function(coordinates) {
-                if (marker) marker.setMap(null);
-                
-                if (coordinates) {
-                    marker = new google.maps.Marker({ 
-                        position: coordinates, 
-                        map: map,
-                        draggable: true,
-                        animation: google.maps.Animation.DROP
-                    });
-
-                    var thisMarker = marker;
-                    google.maps.event.addListener(thisMarker, 'dragend', function() {
-                       var coordinates = thisMarker.getPosition(); 
-                       changeLocation(coordinates);
-                    });
-                } else {
-                    marker = null;
-                }
-
-                return marker;
-            };
-
-            var changeLocation = function(coordinates, tid) {
-                $scope.locationPos = {
-                    type: 'Point',
-                    coordinates: [coordinates.lat(), coordinates.lng()]
-                };
-                $scope.locationName = null;
-
-                if (tid == null) {
-                    tid = $scope.transaction.begin();
-                    if (tid == null) return;
-                }
-
-                // Read address
-                var geocoder = new google.maps.Geocoder();
-                geocoder.geocode({ location: coordinates }, function(results, status) {
-                    if ($scope.transaction.aborted(tid)) return;
-
-                    // Process positive response
-                    if (status == google.maps.GeocoderStatus.OK
-                        && results && results.length > 0) {
-                        $scope.locationName = results[0].formatted_address;
-                    }
-
-                    $scope.transaction.end();
-                    $scope.$apply();
-                });
-            };
-
-            // Wait until dialog is initialized
-            $timeout(function () {
-                var mapContainer = $('.pip-location-edit-dialog .pip-location-container');
-
-                // Calculate coordinate of the center
-                var coordinates = $scope.locationPos ?
-                    new google.maps.LatLng(
-                        $scope.locationPos.coordinates[0],
-                        $scope.locationPos.coordinates[1]
-                    ) : null;
-
-                // Create the map with point marker
-                var mapOptions = {
-                    center: new google.maps.LatLng(0, 0),
-                    zoom: 1,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP,
-                    disableDefaultUI: true
-                };
-                if (coordinates != null) {
-                    mapOptions.center = coordinates;
-                    mapOptions.zoom = 12;
-                }
-
-                map = new google.maps.Map(mapContainer[0], mapOptions);
-                marker = createMarker(coordinates);
-
-                // Fix resizing issue
-                setTimeout(function () {
-                    google.maps.event.trigger(map, 'resize');
-                }, 1000);
-            }, 0);
-
-            $scope.$on('pipLayoutResized', function (event) {
-                if (map == null) return;
-                google.maps.event.trigger(map, 'resize');
-            });
-
-            $scope.onAddPin = function () {
-                if (map == null) return;
-
-                var coordinates = map.getCenter();
-                marker = createMarker(coordinates);
-                changeLocation(coordinates);
-            };
-
-            $scope.onRemovePin = function () {
-                if (map == null) return;
-                marker = createMarker(null);
-                $scope.locationPos = null;
-                $scope.locationName = null;
-            };
-
-            $scope.onZoomIn = function () {
-                if (map == null) return;
-                var zoom = map.getZoom();
-                map.setZoom(zoom + 1);
-            };
-
-            $scope.onZoomOut = function () {
-                if (map == null) return;
-                var zoom = map.getZoom();
-                map.setZoom(zoom > 1 ? zoom - 1 : zoom);
-            };
-
-            $scope.onSetLocation = function () {
-                if (map == null) return;
-
-                var tid = $scope.transaction.begin();
-                if (tid == null) return;
-
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        if ($scope.transaction.aborted(tid)) return;
-
-                        var coordinates = new google.maps.LatLng(
-                            position.coords.latitude, position.coords.longitude);
-
-                        marker = createMarker(coordinates);
-                        map.setCenter(coordinates);
-                        map.setZoom(12);
-
-                        changeLocation(coordinates, tid);
-                    },
-                    function () {
-                        $scope.transaction.end();
-                        $scope.$apply();
-                    },
-                    {
-                        maximumAge: 0,
-                        enableHighAccuracy: true,
-                        timeout: 5000
-                    }
-                );
-            };
-
-            $scope.onCancel = function () {
-                $mdDialog.cancel();
-            };
-
-            $scope.onApply = function () {
-                $mdDialog.hide({
-                    location: $scope.locationPos,
-                    locationPos: $scope.locationPos,
-                    locationName: $scope.locationName   
-                });
-            };
-        }]
     );
 
 })();
@@ -18733,6 +18501,238 @@ module.run(['$templateCache', function($templateCache) {
                     else clearMap();
                 }
             }
+        }]
+    );
+
+})();
+
+/**
+ * @file Location edit dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve sample in sampler app
+ */
+ 
+/* global angular, google */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipLocationEditDialog', 
+        ['ngMaterial', 'pipTranslate', 'pipTransactions', 'pipLocations.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'LOCATION_ADD_LOCATION': 'Add location',
+            'LOCATION_SET_LOCATION': 'Set location',
+            'LOCATION_ADD_PIN': 'Add pin',
+            'LOCATION_REMOVE_PIN': 'Remove pin'
+        });
+        pipTranslateProvider.translations('ru', {
+            'LOCATION_ADD_LOCATION': 'Добавить местоположение',
+            'LOCATION_SET_LOCATION': 'Определить положение',
+            'LOCATION_ADD_PIN': 'Добавить точку',
+            'LOCATION_REMOVE_PIN': 'Убрать точку'
+        });
+    }]);
+
+    thisModule.factory('pipLocationEditDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        controller: 'pipLocationEditDialogController',
+                        templateUrl: 'location_dialog/location_dialog.html',
+                        locals: {
+                            locationName: params.locationName,
+                            locationPos: params.locationPos
+                        },
+                        clickOutsideToClose: true
+                    })
+                    .then(function (result) {
+                        if (successCallback) {
+                            successCallback(result);
+                        }
+                    }, function () {
+                        if (cancelCallback) {
+                            cancelCallback();
+                        }
+                    });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipLocationEditDialogController', 
+        ['$scope', '$rootScope', '$timeout', '$mdDialog', 'pipTransaction', 'locationPos', 'locationName', function ($scope, $rootScope, $timeout, $mdDialog, pipTransaction, locationPos, locationName) {
+            $scope.theme = $rootScope.$theme;
+            $scope.locationPos = locationPos && locationPos.type == 'Point'
+                && locationPos.coordinates && locationPos.coordinates.length == 2
+                ? locationPos : null;
+            $scope.locationName = locationName;
+            $scope.supportSet = navigator.geolocation != null;
+
+            $scope.transaction = pipTransaction('location_edit_dialog', $scope);
+
+            var map = null, marker = null;
+
+            var createMarker = function(coordinates) {
+                if (marker) marker.setMap(null);
+                
+                if (coordinates) {
+                    marker = new google.maps.Marker({ 
+                        position: coordinates, 
+                        map: map,
+                        draggable: true,
+                        animation: google.maps.Animation.DROP
+                    });
+
+                    var thisMarker = marker;
+                    google.maps.event.addListener(thisMarker, 'dragend', function() {
+                       var coordinates = thisMarker.getPosition(); 
+                       changeLocation(coordinates);
+                    });
+                } else {
+                    marker = null;
+                }
+
+                return marker;
+            };
+
+            var changeLocation = function(coordinates, tid) {
+                $scope.locationPos = {
+                    type: 'Point',
+                    coordinates: [coordinates.lat(), coordinates.lng()]
+                };
+                $scope.locationName = null;
+
+                if (tid == null) {
+                    tid = $scope.transaction.begin();
+                    if (tid == null) return;
+                }
+
+                // Read address
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ location: coordinates }, function(results, status) {
+                    if ($scope.transaction.aborted(tid)) return;
+
+                    // Process positive response
+                    if (status == google.maps.GeocoderStatus.OK
+                        && results && results.length > 0) {
+                        $scope.locationName = results[0].formatted_address;
+                    }
+
+                    $scope.transaction.end();
+                    $scope.$apply();
+                });
+            };
+
+            // Wait until dialog is initialized
+            $timeout(function () {
+                var mapContainer = $('.pip-location-edit-dialog .pip-location-container');
+
+                // Calculate coordinate of the center
+                var coordinates = $scope.locationPos ?
+                    new google.maps.LatLng(
+                        $scope.locationPos.coordinates[0],
+                        $scope.locationPos.coordinates[1]
+                    ) : null;
+
+                // Create the map with point marker
+                var mapOptions = {
+                    center: new google.maps.LatLng(0, 0),
+                    zoom: 1,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    disableDefaultUI: true
+                };
+                if (coordinates != null) {
+                    mapOptions.center = coordinates;
+                    mapOptions.zoom = 12;
+                }
+
+                map = new google.maps.Map(mapContainer[0], mapOptions);
+                marker = createMarker(coordinates);
+
+                // Fix resizing issue
+                setTimeout(function () {
+                    google.maps.event.trigger(map, 'resize');
+                }, 1000);
+            }, 0);
+
+            $scope.$on('pipLayoutResized', function (event) {
+                if (map == null) return;
+                google.maps.event.trigger(map, 'resize');
+            });
+
+            $scope.onAddPin = function () {
+                if (map == null) return;
+
+                var coordinates = map.getCenter();
+                marker = createMarker(coordinates);
+                changeLocation(coordinates);
+            };
+
+            $scope.onRemovePin = function () {
+                if (map == null) return;
+                marker = createMarker(null);
+                $scope.locationPos = null;
+                $scope.locationName = null;
+            };
+
+            $scope.onZoomIn = function () {
+                if (map == null) return;
+                var zoom = map.getZoom();
+                map.setZoom(zoom + 1);
+            };
+
+            $scope.onZoomOut = function () {
+                if (map == null) return;
+                var zoom = map.getZoom();
+                map.setZoom(zoom > 1 ? zoom - 1 : zoom);
+            };
+
+            $scope.onSetLocation = function () {
+                if (map == null) return;
+
+                var tid = $scope.transaction.begin();
+                if (tid == null) return;
+
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        if ($scope.transaction.aborted(tid)) return;
+
+                        var coordinates = new google.maps.LatLng(
+                            position.coords.latitude, position.coords.longitude);
+
+                        marker = createMarker(coordinates);
+                        map.setCenter(coordinates);
+                        map.setZoom(12);
+
+                        changeLocation(coordinates, tid);
+                    },
+                    function () {
+                        $scope.transaction.end();
+                        $scope.$apply();
+                    },
+                    {
+                        maximumAge: 0,
+                        enableHighAccuracy: true,
+                        timeout: 5000
+                    }
+                );
+            };
+
+            $scope.onCancel = function () {
+                $mdDialog.cancel();
+            };
+
+            $scope.onApply = function () {
+                $mdDialog.hide({
+                    location: $scope.locationPos,
+                    locationPos: $scope.locationPos,
+                    locationName: $scope.locationName   
+                });
+            };
         }]
     );
 
@@ -19031,6 +19031,21 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of WebUI documents controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipDocuments', [
+        'pipDocumentList',
+        'pipDocumentListEdit'
+    ]);
+
+})(window.angular);
+
 (function(module) {
 try {
   module = angular.module('pipDocuments.Templates');
@@ -19183,21 +19198,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of WebUI documents controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipDocuments', [
-        'pipDocumentList',
-        'pipDocumentListEdit'
-    ]);
-
-})(window.angular);
 
 /**
  * @file Document list control
@@ -19727,6 +19727,32 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of pictures WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipPictures', [        
+        'pipAddImage',
+        'pipAvatar',
+        'pipAvatarEdit',
+        'pipPicture',
+        'pipPictureEdit',
+        'pipCollage',
+        'pipPictureListEdit',        
+        'pipCameraDialog',        
+        'pipPictureUrlDialog'
+    ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipPictures.Templates');
@@ -20107,379 +20133,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Registration of pictures WebUI controls
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipPictures', [        
-        'pipAddImage',
-        'pipAvatar',
-        'pipAvatarEdit',
-        'pipPicture',
-        'pipPictureEdit',
-        'pipCollage',
-        'pipPictureListEdit',        
-        'pipCameraDialog',        
-        'pipPictureUrlDialog'
-    ]);
-    
-})();
-
-
-
-/**
- * @file Add image control
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipAddImage", ['pipCameraDialog', 'pipPictureUrlDialog', 'pipGallerySearchDialog', 'pipCore']);
-
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'FILE' : 'Upload pictures',
-            'WEB_LINK' : 'Use web link',
-            'CAMERA' : 'Take photo',
-            'IMAGE_GALLERY': 'Use image library',
-        });
-        pipTranslateProvider.translations('ru', {
-            'FILE' : 'Загрузить картинку',
-            'WEB_LINK' : 'Вставить веб ссылка',
-            'CAMERA' : 'Использовать камеру',
-            'IMAGE_GALLERY': 'Открыть галерею изображений'
-        });
-    }]);
-
-    thisModule.directive('pipAddImage', 
-        function() {
-            return {
-                restrict: 'AC',
-                scope: {
-                    $images: '=pipImages',
-                    onChange: '&pipChanged',
-                    multi: '&pipMulti',
-                    ngDisabled: '&'
-                },
-                transclude: true,
-                templateUrl: 'add_image/add_image.html',
-                controller: 'pipAddImageController'
-            }
-        }
-    );
-
-    thisModule.controller('pipAddImageController',
-        ['$scope', '$element', '$mdMenu', '$timeout', 'pipCameraDialog', 'pipPictureUrlDialog', 'pipGallerySearchDialog', 'pipUtils', function ($scope, $element, $mdMenu, $timeout, pipCameraDialog, pipPictureUrlDialog, pipGallerySearchDialog, pipUtils) {
-
-            $scope.hideMenu = hideMenu;
-            $scope.onFileChange = onFileChange;
-            $scope.onWebLinkClick = onWebLinkClick;
-            $scope.onCameraClick = onCameraClick;
-            $scope.onGalleryClick = onGalleryClick;
-            $scope.isMulti = isMulti;
-
-            $element.click(function () {
-                if (!$scope.ngDisabled()) openMenu();
-            });
-
-            return;
-
-            function openMenu() {
-                $($element).find('.pip-add-image-open-button').scope().$mdOpenMenu();
-            }
-
-            function isMulti() {
-                if ($scope.multi() !== undefined)
-                    return  pipUtils.toBoolean($scope.multi());
-                else return true;
-            }
-
-            function hideMenu () {
-                $mdMenu.hide();
-            }
-
-            function dataURItoBlob(dataURI) {
-                var byteString;
-                
-                if (dataURI.split(',')[0].indexOf('base64') >= 0)
-                    byteString = atob(dataURI.split(',')[1]);
-                else
-                    byteString = unescape(dataURI.split(',')[1]);
-
-                var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-                var ia = new Uint8Array(byteString.length);
-                for (var i = 0; i < byteString.length; i++) {
-                    ia[i] = byteString.charCodeAt(i);
-                }
-
-                return new Blob([ia], {type:mimeString});
-            }
-
-            function addImages(images) {
-
-                if (images === undefined) return;
-
-                if (Array.isArray(images)) {
-                    images.forEach(function (img) {
-                        if ($scope.onChange)
-                            $scope.onChange({url: img.url, file: img.file});
-                    });
-                } else {
-                    if ($scope.onChange)
-                        $scope.onChange({url: images.url, file: images.file});
-                }
-
-                if ($scope.$images === undefined || !Array.isArray($scope.$images))
-                    return;
-
-                if (Array.isArray(images)) {
-                    images.forEach(function (img) {
-                        $scope.$images.push(img.url);
-                    });
-                } else {
-                    $scope.$images.push(images.url);
-                }
-            }
-
-            // Process user actions
-
-            function onFileChange ($files) {
-                if ($files == null || $files.length == 0)
-                    return;
-
-                $files.forEach(function (file) {
-                    if (file.type.indexOf('image') > -1) {
-                        $timeout(function() {
-                            var fileReader = new FileReader();
-                            fileReader.readAsDataURL(file);
-                            fileReader.onload = function(e) {
-                                $timeout(function() {
-                                    addImages({url: e.target.result, file: file});
-                                });
-                            }
-                        });
-                    }
-                });
-
-            }
-
-            function onWebLinkClick () {
-                pipPictureUrlDialog.show(function (result) {
-                    var blob = null;
-                    if (result.substring(0, 10) == 'data:image') {
-                        blob = dataURItoBlob(result);
-                        blob.name = result.slice(result.lastIndexOf('/') + 1, result.length).split('?')[0];
-                    }
-                    addImages({url: result, file: blob});
-                });
-            }
-
-            function onCameraClick () {
-                pipCameraDialog.show(function (result) {
-                  var blob = dataURItoBlob(result);
-
-                    blob.name = 'camera';
-                    addImages({url: result, file: blob});
-                });
-            }
-
-            function onGalleryClick () {
-                pipGallerySearchDialog.show(function (result) {
-                    var imgs = [];
-                    result.forEach(function (url) {
-                        imgs.push({url: url, file: null});
-                    });
-                    addImages(imgs);
-                }, $scope.isMulti());
-            }
-    }]);
-
-})();
-
-
-
-/**
- * @file Avatar control
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Improve samples in sampler app
- * - Replace placeholder with default image generated on server
- * - Fix resizing problem
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipRest', 'pipImageUtils']);
-
-    thisModule.directive('pipAvatar',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: false,
-                template: '<md-icon></md-icon><img/>'
-                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
-                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
-                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
-                controller: 'pipAvatarController'
-            }
-        }
-    );
-
-    thisModule.controller('pipAvatarController',
-        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipStrings', 'pipRest', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipStrings, pipRest, $http, pipImageUtils) {
-            var
-                $svg = $element.children('md-icon'),
-                $image = $element.children('img'),
-                $defaultBlock = $element.children('div'),
-                $iconFilm = $element.find('#icon-film'),
-                $iconTask = $element.find('#icon-task'),
-                $iconFolder = $element.find('#icon-folder'),
-                image = null,
-
-                partyIdGetter = $parse($attrs.pipPartyId),
-                partyNameGetter = $parse($attrs.pipPartyName),
-                typeGetter = $parse($attrs.pipEntityType),
-                idGetter = $parse($attrs.pipId),
-                urlGetter = $parse($attrs.pipImageUrl),
-
-                colors = pipImageUtils.getAvatarColors(),
-                colorClasses = pipImageUtils.getColorClasses(),
-                entityTypes = pipImageUtils.getEntityTypes();
-
-            // When image is loaded resize/reposition it
-            $image.load(function ($event) {
-                image = $($event.target);
-                pipImageUtils.setImageMarginCSS($element, image);
-            });
-
-            // Add class
-            $element.addClass('pip-avatar flex-fixed');
-
-            if ($attrs.ngClass) {
-                $scope.$watch($attrs.ngClass, function () {
-                    setTimeout(function () {
-                        pipImageUtils.setImageMarginCSS($element, image);
-                    }, 50);
-                });
-            }
-
-            // Optimization to avoid binding
-            bindControl();
-
-            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
-                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
-            }
-
-            // Also optimization to avoid watch if it is unnecessary
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-
-                $scope.$watch(idGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-
-                $scope.$watch(urlGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-            }
-
-            return;
-
-            function refreshAvatar() {
-                $iconTask.css('display', 'none');
-                $iconFilm.css('display', 'none');
-                $iconFolder.css('display', 'none');
-                $defaultBlock.css('display', 'none');
-                $image.attr('src', '');
-                $svg.css('display', 'none');
-                $image.css('display', 'inline-block');
-                bindControl();
-            };
-
-            function bindControl() {
-                var
-                    partyName = partyNameGetter($scope),
-                    partyId = partyIdGetter($scope),
-                    id = idGetter($scope),
-                    type = typeGetter($scope),
-                    transUrl = urlGetter($scope);
-
-                $iconTask.css('display', 'none');
-                $iconFilm.css('display', 'none');
-                $iconFolder.css('display', 'none');
-                $defaultBlock.css('display', 'none');
-
-                // Timestamp to avoid caching images for too long
-                var url = transUrl || pipImageUtils.getAvatarUrl(partyId, partyName, id, type, false, false);
-
-                if ((type && id && partyId) || (partyId && partyName) || transUrl) {
-                    if (type && id && partyId) {
-                        if (type == 'category') return;
-
-                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
-                            $image.attr('src', url);
-                            $svg.css('display', 'none');
-                            $image.css('display', 'inline-block');
-                        } else {
-                            $defaultBlock.css('display', 'block');
-                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
-                            $element.addClass(colorClasses[colorClassIndex]);
-                            switch(type) {
-                                case 'vision':
-                                    $svg.css('display', 'none');
-                                    $iconFilm.css('display', 'inline-block');
-                                    $iconTask.css('display', 'none');
-                                    $iconFolder.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                                case 'event':
-                                    $svg.css('display', 'none');
-                                    $iconTask.css('display', 'inline-block');
-                                    $iconFilm.css('display', 'none');
-                                    $iconFolder.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                                case 'note':
-                                    $svg.css('display', 'none');
-                                    $iconFolder.css('display', 'inline-block');
-                                    $iconTask.css('display', 'none');
-                                    $iconFilm.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                            }
-                        }
-                    } else {
-                        $image.attr('src', url);
-                        $svg.css('display', 'none');
-                        $image.css('display', 'inline-block');
-                    }
-                }
-            };
-
-        }]
-    );
-
-})();
-
-
-/**
  * @file Avatar control
  * @copyright Digital Living Software Corp. 2014-2015
  * @todo
@@ -20824,6 +20477,497 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
+ * @file Add image control
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipAddImage", ['pipCameraDialog', 'pipPictureUrlDialog', 'pipGallerySearchDialog', 'pipCore']);
+
+    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'FILE' : 'Upload pictures',
+            'WEB_LINK' : 'Use web link',
+            'CAMERA' : 'Take photo',
+            'IMAGE_GALLERY': 'Use image library',
+        });
+        pipTranslateProvider.translations('ru', {
+            'FILE' : 'Загрузить картинку',
+            'WEB_LINK' : 'Вставить веб ссылка',
+            'CAMERA' : 'Использовать камеру',
+            'IMAGE_GALLERY': 'Открыть галерею изображений'
+        });
+    }]);
+
+    thisModule.directive('pipAddImage', 
+        function() {
+            return {
+                restrict: 'AC',
+                scope: {
+                    $images: '=pipImages',
+                    onChange: '&pipChanged',
+                    multi: '&pipMulti',
+                    ngDisabled: '&'
+                },
+                transclude: true,
+                templateUrl: 'add_image/add_image.html',
+                controller: 'pipAddImageController'
+            }
+        }
+    );
+
+    thisModule.controller('pipAddImageController',
+        ['$scope', '$element', '$mdMenu', '$timeout', 'pipCameraDialog', 'pipPictureUrlDialog', 'pipGallerySearchDialog', 'pipUtils', function ($scope, $element, $mdMenu, $timeout, pipCameraDialog, pipPictureUrlDialog, pipGallerySearchDialog, pipUtils) {
+
+            $scope.hideMenu = hideMenu;
+            $scope.onFileChange = onFileChange;
+            $scope.onWebLinkClick = onWebLinkClick;
+            $scope.onCameraClick = onCameraClick;
+            $scope.onGalleryClick = onGalleryClick;
+            $scope.isMulti = isMulti;
+
+            $element.click(function () {
+                if (!$scope.ngDisabled()) openMenu();
+            });
+
+            return;
+
+            function openMenu() {
+                $($element).find('.pip-add-image-open-button').scope().$mdOpenMenu();
+            }
+
+            function isMulti() {
+                if ($scope.multi() !== undefined)
+                    return  pipUtils.toBoolean($scope.multi());
+                else return true;
+            }
+
+            function hideMenu () {
+                $mdMenu.hide();
+            }
+
+            function dataURItoBlob(dataURI) {
+                var byteString;
+                
+                if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                    byteString = atob(dataURI.split(',')[1]);
+                else
+                    byteString = unescape(dataURI.split(',')[1]);
+
+                var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+                var ia = new Uint8Array(byteString.length);
+                for (var i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+
+                return new Blob([ia], {type:mimeString});
+            }
+
+            function addImages(images) {
+
+                if (images === undefined) return;
+
+                if (Array.isArray(images)) {
+                    images.forEach(function (img) {
+                        if ($scope.onChange)
+                            $scope.onChange({url: img.url, file: img.file});
+                    });
+                } else {
+                    if ($scope.onChange)
+                        $scope.onChange({url: images.url, file: images.file});
+                }
+
+                if ($scope.$images === undefined || !Array.isArray($scope.$images))
+                    return;
+
+                if (Array.isArray(images)) {
+                    images.forEach(function (img) {
+                        $scope.$images.push(img.url);
+                    });
+                } else {
+                    $scope.$images.push(images.url);
+                }
+            }
+
+            // Process user actions
+
+            function onFileChange ($files) {
+                if ($files == null || $files.length == 0)
+                    return;
+
+                $files.forEach(function (file) {
+                    if (file.type.indexOf('image') > -1) {
+                        $timeout(function() {
+                            var fileReader = new FileReader();
+                            fileReader.readAsDataURL(file);
+                            fileReader.onload = function(e) {
+                                $timeout(function() {
+                                    addImages({url: e.target.result, file: file});
+                                });
+                            }
+                        });
+                    }
+                });
+
+            }
+
+            function onWebLinkClick () {
+                pipPictureUrlDialog.show(function (result) {
+                    var blob = null;
+                    if (result.substring(0, 10) == 'data:image') {
+                        blob = dataURItoBlob(result);
+                        blob.name = result.slice(result.lastIndexOf('/') + 1, result.length).split('?')[0];
+                    }
+                    addImages({url: result, file: blob});
+                });
+            }
+
+            function onCameraClick () {
+                pipCameraDialog.show(function (result) {
+                  var blob = dataURItoBlob(result);
+
+                    blob.name = 'camera';
+                    addImages({url: result, file: blob});
+                });
+            }
+
+            function onGalleryClick () {
+                pipGallerySearchDialog.show(function (result) {
+                    var imgs = [];
+                    result.forEach(function (url) {
+                        imgs.push({url: url, file: null});
+                    });
+                    addImages(imgs);
+                }, $scope.isMulti());
+            }
+    }]);
+
+})();
+
+
+
+/**
+ * @file Camera dialog
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Add sample to sampler app
+ */
+
+/* global angular, Webcam */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipCameraDialog',
+        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'TAKE_PICTURE': 'Take a picture',
+            'WEB_CAM_ERROR': 'Webcam is missing or was not found'
+        });
+        pipTranslateProvider.translations('ru', {
+            'TAKE_PICTURE': 'Сделать фото',
+            'WEB_CAM_ERROR': 'Web-камера отсутствует или не найдена'
+        });
+    }]);
+
+    thisModule.factory('pipCameraDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (successCallback) {
+                    $mdDialog.show({
+                        templateUrl: 'camera_dialog/camera_dialog.html',
+                        clickOutsideToClose: true,
+                        controller: 'pipCameraController'
+                    }).then(function (result) {
+                        Webcam.reset();
+                        console.log(result);
+                        if (successCallback) {
+                            successCallback(result);
+                        }
+                    }, function () {
+                        Webcam.reset();
+                    });
+                }
+            };
+        }]);
+
+    thisModule.controller('pipCameraController',
+        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
+            $scope.browser = pipUtils.getBrowser().os;
+            $scope.theme = $rootScope.$theme;
+
+            if ($scope.browser !== 'android') {
+                console.log('webcam');
+                Webcam.init();
+
+                setTimeout(function () {
+                    Webcam.attach('.camera-stream');
+                }, 0);
+
+                Webcam.on('error', function (err) {
+                    $scope.webCamError = true;
+                    console.error(err);
+                });
+
+                Webcam.set({
+                    width: 400,
+                    height: 300,
+
+                    dest_width: 400,
+                    dest_height: 300,
+
+                    crop_width: 400,
+                    crop_height: 300,
+
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+
+                //Webcam.setSWFLocation('../../../dist/webcam.swf');
+                Webcam.setSWFLocation('webcam.swf');
+
+            } else {
+                document.addEventListener("deviceready",onDeviceReady,false);
+
+            }
+            // todo add logic in callbacks
+            function onDeviceReady() {
+                navigator.camera.getPicture(onSuccess, onFail,
+                    {
+                        sourceType: Camera.PictureSourceType.CAMERA,
+                        correctOrientation: true,
+                        quality: 75,
+                        targetWidth: 200,
+                        destinationType: Camera.DestinationType.DATA_URL
+                    });
+            }
+
+
+            function onSuccess(imageData) {
+                var picture = imageData;
+                var picture = 'data:image/jpeg;base64,' + imageData;
+                $mdDialog.hide(picture);
+            }
+
+            function onFail(message) {
+                alert('Failed because: ' + message);
+                $mdDialog.hide();
+            }
+
+            $scope.$freeze = false;
+
+            $scope.onTakePictureClick = onTakePictureClick;
+            $scope.onResetPicture = onResetPicture;
+            $scope.onCancelClick = onCancelClick;
+
+            return;
+
+            function onTakePictureClick() {
+                if (Webcam) {
+                    if ($scope.$freeze) {
+                        Webcam.snap(function (dataUri) {
+                            $scope.$freeze = false;
+                            $mdDialog.hide(dataUri);
+                        });
+                    } else {
+                        $scope.$freeze = true;
+                        Webcam.freeze();
+                    }
+                }
+            };
+
+            function onResetPicture() {
+                $scope.$freeze = false;
+                Webcam.unfreeze();
+            };
+
+            function onCancelClick() {
+                $mdDialog.cancel();
+            };
+        }]
+    );
+
+})();
+/**
+ * @file Avatar control
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Improve samples in sampler app
+ * - Replace placeholder with default image generated on server
+ * - Fix resizing problem
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipRest', 'pipImageUtils']);
+
+    thisModule.directive('pipAvatar',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: '<md-icon></md-icon><img/>'
+                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
+                controller: 'pipAvatarController'
+            }
+        }
+    );
+
+    thisModule.controller('pipAvatarController',
+        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipStrings', 'pipRest', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipStrings, pipRest, $http, pipImageUtils) {
+            var
+                $svg = $element.children('md-icon'),
+                $image = $element.children('img'),
+                $defaultBlock = $element.children('div'),
+                $iconFilm = $element.find('#icon-film'),
+                $iconTask = $element.find('#icon-task'),
+                $iconFolder = $element.find('#icon-folder'),
+                image = null,
+
+                partyIdGetter = $parse($attrs.pipPartyId),
+                partyNameGetter = $parse($attrs.pipPartyName),
+                typeGetter = $parse($attrs.pipEntityType),
+                idGetter = $parse($attrs.pipId),
+                urlGetter = $parse($attrs.pipImageUrl),
+
+                colors = pipImageUtils.getAvatarColors(),
+                colorClasses = pipImageUtils.getColorClasses(),
+                entityTypes = pipImageUtils.getEntityTypes();
+
+            // When image is loaded resize/reposition it
+            $image.load(function ($event) {
+                image = $($event.target);
+                pipImageUtils.setImageMarginCSS($element, image);
+            });
+
+            // Add class
+            $element.addClass('pip-avatar flex-fixed');
+
+            if ($attrs.ngClass) {
+                $scope.$watch($attrs.ngClass, function () {
+                    setTimeout(function () {
+                        pipImageUtils.setImageMarginCSS($element, image);
+                    }, 50);
+                });
+            }
+
+            // Optimization to avoid binding
+            bindControl();
+
+            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
+                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
+            }
+
+            // Also optimization to avoid watch if it is unnecessary
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(idGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(urlGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+            }
+
+            return;
+
+            function refreshAvatar() {
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+                $image.attr('src', '');
+                $svg.css('display', 'none');
+                $image.css('display', 'inline-block');
+                bindControl();
+            };
+
+            function bindControl() {
+                var
+                    partyName = partyNameGetter($scope),
+                    partyId = partyIdGetter($scope),
+                    id = idGetter($scope),
+                    type = typeGetter($scope),
+                    transUrl = urlGetter($scope);
+
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+
+                // Timestamp to avoid caching images for too long
+                var url = transUrl || pipImageUtils.getAvatarUrl(partyId, partyName, id, type, false, false);
+
+                if ((type && id && partyId) || (partyId && partyName) || transUrl) {
+                    if (type && id && partyId) {
+                        if (type == 'category') return;
+
+                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
+                            $image.attr('src', url);
+                            $svg.css('display', 'none');
+                            $image.css('display', 'inline-block');
+                        } else {
+                            $defaultBlock.css('display', 'block');
+                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
+                            $element.addClass(colorClasses[colorClassIndex]);
+                            switch(type) {
+                                case 'vision':
+                                    $svg.css('display', 'none');
+                                    $iconFilm.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'event':
+                                    $svg.css('display', 'none');
+                                    $iconTask.css('display', 'inline-block');
+                                    $iconFilm.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'note':
+                                    $svg.css('display', 'none');
+                                    $iconFolder.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFilm.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                            }
+                        }
+                    } else {
+                        $image.attr('src', url);
+                        $svg.css('display', 'none');
+                        $image.css('display', 'inline-block');
+                    }
+                }
+            };
+
+        }]
+    );
+
+})();
+
+
+/**
  * @file Collage control
  * @copyright Digital Living Software Corp. 2014-2015
  * @todo
@@ -21142,150 +21286,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
-/**
- * @file Camera dialog
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Add sample to sampler app
- */
-
-/* global angular, Webcam */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipCameraDialog',
-        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'TAKE_PICTURE': 'Take a picture',
-            'WEB_CAM_ERROR': 'Webcam is missing or was not found'
-        });
-        pipTranslateProvider.translations('ru', {
-            'TAKE_PICTURE': 'Сделать фото',
-            'WEB_CAM_ERROR': 'Web-камера отсутствует или не найдена'
-        });
-    }]);
-
-    thisModule.factory('pipCameraDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (successCallback) {
-                    $mdDialog.show({
-                        templateUrl: 'camera_dialog/camera_dialog.html',
-                        clickOutsideToClose: true,
-                        controller: 'pipCameraController'
-                    }).then(function (result) {
-                        Webcam.reset();
-                        console.log(result);
-                        if (successCallback) {
-                            successCallback(result);
-                        }
-                    }, function () {
-                        Webcam.reset();
-                    });
-                }
-            };
-        }]);
-
-    thisModule.controller('pipCameraController',
-        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
-            $scope.browser = pipUtils.getBrowser().os;
-            $scope.theme = $rootScope.$theme;
-
-            if ($scope.browser !== 'android') {
-                console.log('webcam');
-                Webcam.init();
-
-                setTimeout(function () {
-                    Webcam.attach('.camera-stream');
-                }, 0);
-
-                Webcam.on('error', function (err) {
-                    $scope.webCamError = true;
-                    console.error(err);
-                });
-
-                Webcam.set({
-                    width: 400,
-                    height: 300,
-
-                    dest_width: 400,
-                    dest_height: 300,
-
-                    crop_width: 400,
-                    crop_height: 300,
-
-                    image_format: 'jpeg',
-                    jpeg_quality: 90
-                });
-
-                //Webcam.setSWFLocation('../../../dist/webcam.swf');
-                Webcam.setSWFLocation('webcam.swf');
-
-            } else {
-                document.addEventListener("deviceready",onDeviceReady,false);
-
-            }
-            // todo add logic in callbacks
-            function onDeviceReady() {
-                navigator.camera.getPicture(onSuccess, onFail,
-                    {
-                        sourceType: Camera.PictureSourceType.CAMERA,
-                        correctOrientation: true,
-                        quality: 75,
-                        targetWidth: 200,
-                        destinationType: Camera.DestinationType.DATA_URL
-                    });
-            }
-
-
-            function onSuccess(imageData) {
-                var picture = imageData;
-                var picture = 'data:image/jpeg;base64,' + imageData;
-                $mdDialog.hide(picture);
-            }
-
-            function onFail(message) {
-                alert('Failed because: ' + message);
-                $mdDialog.hide();
-            }
-
-            $scope.$freeze = false;
-
-            $scope.onTakePictureClick = onTakePictureClick;
-            $scope.onResetPicture = onResetPicture;
-            $scope.onCancelClick = onCancelClick;
-
-            return;
-
-            function onTakePictureClick() {
-                if (Webcam) {
-                    if ($scope.$freeze) {
-                        Webcam.snap(function (dataUri) {
-                            $scope.$freeze = false;
-                            $mdDialog.hide(dataUri);
-                        });
-                    } else {
-                        $scope.$freeze = true;
-                        Webcam.freeze();
-                    }
-                }
-            };
-
-            function onResetPicture() {
-                $scope.$freeze = false;
-                Webcam.unfreeze();
-            };
-
-            function onCancelClick() {
-                $mdDialog.cancel();
-            };
-        }]
-    );
-
-})();
 /**
  * @file Camera dialog
  * @copyright Digital Living Software Corp. 2014-2015
@@ -23361,6 +23361,34 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of composite WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipComposite', [        
+        'pipContentSwitch',
+        'pipChecklistEdit',
+        'pipChecklistView',
+        'pipCompositeEdit',
+        'pipCompositeView',
+        'pipCompositeSummary',
+        'pipCompositeToolbar',
+        'pipCompositeFocused',
+
+        'pipMobileMouseup',
+        'pipMobileMousedown'
+    ]);
+    
+})();
+
+
+
 (function(module) {
 try {
   module = angular.module('pipComposite.Templates');
@@ -23659,6 +23687,75 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('composite_toolbar/composite_toolbar.html',
+    '<!--\n' +
+    '@file Composite toolbar control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="layout-row layout-align-start-start flex">\n' +
+    '    <md-button class="pip-composite-button"\n' +
+    '               ng-if="!emptyState"\n' +
+    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
+    '                                \'new-item\': !emptyState }"\n' +
+    '               ng-click="onAddItem(\'text\');"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
+    '               ng-disabled="ngDisabled()">\n' +
+    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.checklist"\n' +
+    '               ng-click="onAddItem(\'checklist\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
+    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
+    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.picture"\n' +
+    '               ng-click="onAddItem(\'pictures\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
+    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
+    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
+    '               ng-if="toolbarButton.document"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
+    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
+    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'location\')"\n' +
+    '               ng-if="toolbarButton.location"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
+    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
+    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'time\')"\n' +
+    '               ng-if="toolbarButton.event"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
+    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipComposite.Templates');
+} catch (e) {
+  module = angular.module('pipComposite.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('composite_summary/composite_summary.html',
     '<div ng-repeat="item in compositeContent track by $index">\n' +
     '\n' +
@@ -23737,75 +23834,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipComposite.Templates');
-} catch (e) {
-  module = angular.module('pipComposite.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('composite_toolbar/composite_toolbar.html',
-    '<!--\n' +
-    '@file Composite toolbar control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="layout-row layout-align-start-start flex">\n' +
-    '    <md-button class="pip-composite-button"\n' +
-    '               ng-if="!emptyState"\n' +
-    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
-    '                                \'new-item\': !emptyState }"\n' +
-    '               ng-click="onAddItem(\'text\');"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
-    '               ng-disabled="ngDisabled()">\n' +
-    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.checklist"\n' +
-    '               ng-click="onAddItem(\'checklist\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
-    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
-    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.picture"\n' +
-    '               ng-click="onAddItem(\'pictures\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
-    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
-    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
-    '               ng-if="toolbarButton.document"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
-    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
-    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'location\')"\n' +
-    '               ng-if="toolbarButton.location"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
-    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
-    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'time\')"\n' +
-    '               ng-if="toolbarButton.event"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
-    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
 }]);
 })();
 
@@ -23938,34 +23966,6 @@ module.run(['$templateCache', function($templateCache) {
     '</md-button>');
 }]);
 })();
-
-/**
- * @file Registration of composite WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipComposite', [        
-        'pipContentSwitch',
-        'pipChecklistEdit',
-        'pipChecklistView',
-        'pipCompositeEdit',
-        'pipCompositeView',
-        'pipCompositeSummary',
-        'pipCompositeToolbar',
-        'pipCompositeFocused',
-
-        'pipMobileMouseup',
-        'pipMobileMousedown'
-    ]);
-    
-})();
-
-
 
 /**
  * @file Checklist edit control
@@ -24588,148 +24588,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Composite summary control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipCompositeSummary", [
-        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
-
-    thisModule.directive('pipCompositeSummary',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipContents: '=',
-                    pipChecklistSize: '=',
-                    pipTextSize: '=',
-                    pipPrimaryBlockLimit: '=',
-                    pipSecondaryBlockLimit: '=',
-                    pipSecondaryBlockTypes: '='
-                },
-                templateUrl: 'composite_summary/composite_summary.html',
-                controller: 'pipCompositeSummaryController'
-            }
-        }
-    );
-
-    thisModule.controller('pipCompositeSummaryController',
-        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-
-            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
-            $scope.disableControl = true;
-            $scope.disabledChecklist = true;
-
-            $scope.secondaryBlockTypes = $scope.pipSecondaryBlockTypes !== undefined &&
-                Array.isArray($scope.pipSecondaryBlockTypes) ? $scope.pipSecondaryBlockTypes :
-                 ['checklist', 'documents', 'location', 'time'];
-            $scope.textSize = $scope.pipTextSize !== undefined && $scope.pipTextSize > 0 ? $scope.pipTextSize : 0;
-            $scope.secondaryBlockLimit = $scope.pipSecondaryBlockLimit !== undefined && $scope.pipSecondaryBlockLimit > 0 ? $scope.pipSecondaryBlockLimit : -1;
-            $scope.checklistSize = $scope.pipChecklistSize !== undefined && $scope.pipChecklistSize > 0 ? $scope.pipChecklistSize : 0;
-            $scope.primaryBlockLimit = $scope.pipPrimaryBlockLimit !== undefined ? $scope.pipPrimaryBlockLimit : -1;
-
-            generateList($scope.pipContents);
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipContents', function (newValue) {
-                    if (!Array.isArray($scope.pipContents)) {
-                        throw new Error('Error: Attribute pip-contents must be array!');
-                    }
-                    generateList($scope.pipContents);
-                });
-            }
-
-            // Add class
-            $element.addClass('pip-composite-summary');
-
-            return;
-
-            // усекаем чеклист до 3
-            function limitChecklist(content, val) {
-                if (!val) return;
-                _.each(content, function(item) {
-                    if (item && item.type == 'checklist') {
-                        var checklistLength = item.checklist.length;
-                        item.checklist =_.take(item.checklist, val);
-                        if (checklistLength > val) item.checklist.push({
-                            text: '...',
-                             checked: false
-                        });
-                    }
-                });
-            };
-
-            // отбираем текст и картинки
-            function selectSummary(content) {
-                var result = [],
-                    i = 0;
-
-                _.each(content, function(item) {
-                    if ($scope.primaryBlockLimit >= 0 && i >= $scope.primaryBlockLimit) return result;
-
-                    //if (item.type == 'text' || item.type == 'pictures' ) {
-                    if ($scope.secondaryBlockTypes.indexOf(item.type) < 0) {
-                        result.push(item);
-                        i += 1;
-                    }
-                });
-
-                return result;
-            };
-
-            // отбираем остальные блоки если они есть
-            function selectSummarySecondary(content, types) {
-                var i, limit =  $scope.secondaryBlockLimit < 0 ? content.length : $scope.secondaryBlockLimit;
-                var result = [];
-
-                for (i = 0; i < content.length; i++ ) {
-                    if (types.indexOf(content[i].type) > -1) {
-                        result.push(content[i]);
-                        if (result.length >= limit) break;
-                    }
-                }
-
-                return result;
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                    return;
-                } else {
-                     var summaryContent = _.cloneDeep(content);
-                    var result = selectSummary(summaryContent);
-                    if (result.length == 0) {
-                        result = selectSummarySecondary(summaryContent, $scope.secondaryBlockTypes);
-                    }
-
-                    limitChecklist(result, $scope.checklistSize);
-
-                    var id = 0;
-                    _.each(result, function(item){
-                        item.id = id;
-                        id ++;
-                    });
-                    $scope.compositeContent = result;
-                }
-            };
-
-            function clearList() {
-                $scope.compositeContent = [];
-            };
-
-        }]
-    );
-
-})();
-
-/**
  * @file Composite edit control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -25209,6 +25067,148 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
+ * @file Composite summary control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipCompositeSummary", [
+        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
+
+    thisModule.directive('pipCompositeSummary',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipContents: '=',
+                    pipChecklistSize: '=',
+                    pipTextSize: '=',
+                    pipPrimaryBlockLimit: '=',
+                    pipSecondaryBlockLimit: '=',
+                    pipSecondaryBlockTypes: '='
+                },
+                templateUrl: 'composite_summary/composite_summary.html',
+                controller: 'pipCompositeSummaryController'
+            }
+        }
+    );
+
+    thisModule.controller('pipCompositeSummaryController',
+        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+
+            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
+            $scope.disableControl = true;
+            $scope.disabledChecklist = true;
+
+            $scope.secondaryBlockTypes = $scope.pipSecondaryBlockTypes !== undefined &&
+                Array.isArray($scope.pipSecondaryBlockTypes) ? $scope.pipSecondaryBlockTypes :
+                 ['checklist', 'documents', 'location', 'time'];
+            $scope.textSize = $scope.pipTextSize !== undefined && $scope.pipTextSize > 0 ? $scope.pipTextSize : 0;
+            $scope.secondaryBlockLimit = $scope.pipSecondaryBlockLimit !== undefined && $scope.pipSecondaryBlockLimit > 0 ? $scope.pipSecondaryBlockLimit : -1;
+            $scope.checklistSize = $scope.pipChecklistSize !== undefined && $scope.pipChecklistSize > 0 ? $scope.pipChecklistSize : 0;
+            $scope.primaryBlockLimit = $scope.pipPrimaryBlockLimit !== undefined ? $scope.pipPrimaryBlockLimit : -1;
+
+            generateList($scope.pipContents);
+
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipContents', function (newValue) {
+                    if (!Array.isArray($scope.pipContents)) {
+                        throw new Error('Error: Attribute pip-contents must be array!');
+                    }
+                    generateList($scope.pipContents);
+                });
+            }
+
+            // Add class
+            $element.addClass('pip-composite-summary');
+
+            return;
+
+            // усекаем чеклист до 3
+            function limitChecklist(content, val) {
+                if (!val) return;
+                _.each(content, function(item) {
+                    if (item && item.type == 'checklist') {
+                        var checklistLength = item.checklist.length;
+                        item.checklist =_.take(item.checklist, val);
+                        if (checklistLength > val) item.checklist.push({
+                            text: '...',
+                             checked: false
+                        });
+                    }
+                });
+            };
+
+            // отбираем текст и картинки
+            function selectSummary(content) {
+                var result = [],
+                    i = 0;
+
+                _.each(content, function(item) {
+                    if ($scope.primaryBlockLimit >= 0 && i >= $scope.primaryBlockLimit) return result;
+
+                    //if (item.type == 'text' || item.type == 'pictures' ) {
+                    if ($scope.secondaryBlockTypes.indexOf(item.type) < 0) {
+                        result.push(item);
+                        i += 1;
+                    }
+                });
+
+                return result;
+            };
+
+            // отбираем остальные блоки если они есть
+            function selectSummarySecondary(content, types) {
+                var i, limit =  $scope.secondaryBlockLimit < 0 ? content.length : $scope.secondaryBlockLimit;
+                var result = [];
+
+                for (i = 0; i < content.length; i++ ) {
+                    if (types.indexOf(content[i].type) > -1) {
+                        result.push(content[i]);
+                        if (result.length >= limit) break;
+                    }
+                }
+
+                return result;
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                    return;
+                } else {
+                     var summaryContent = _.cloneDeep(content);
+                    var result = selectSummary(summaryContent);
+                    if (result.length == 0) {
+                        result = selectSummarySecondary(summaryContent, $scope.secondaryBlockTypes);
+                    }
+
+                    limitChecklist(result, $scope.checklistSize);
+
+                    var id = 0;
+                    _.each(result, function(item){
+                        item.id = id;
+                        id ++;
+                    });
+                    $scope.compositeContent = result;
+                }
+            };
+
+            function clearList() {
+                $scope.compositeContent = [];
+            };
+
+        }]
+    );
+
+})();
+
+/**
  * @file Composite toolbar control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -25589,6 +25589,98 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Entry pages (signin, signup) logic
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry', 
+        [
+            'ui.router', 'ngMessages', 
+            
+            'pipCore', 'pipRest', 'pipBasicControls', 'pipLocations', 'pipPictures', 'pipRest.State',
+            'pipEntry.Strings', 'pipEntry.Common', 'pipEntry.Signin', 'pipEntry.Signup', 'pipEntry.PostSignup', 
+            'pipEntry.RecoverPassword', 'pipEntry.ResetPassword', 'pipEntry.VerifyEmail', 'pipEntry.Templates'
+        ]);
+
+    thisModule.config(
+        ['$stateProvider', '$locationProvider', '$httpProvider', 'pipAuthStateProvider', function ($stateProvider, $locationProvider, $httpProvider, pipAuthStateProvider) {
+
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+
+
+            // Configure module routes for all users
+            $stateProvider
+                .state('signin', {
+                    url: '/signin?email&server_url&redirect_to',
+                    auth: false,
+                    controller: 'pipSigninController',
+                    templateUrl: 'signin/signin.html'
+                })
+                .state('recover_password', {
+                    url: '/recover_password?server_url&email',
+                    auth: false,
+                    controller: 'pipRecoverPasswordController',
+                    templateUrl: 'recover_password/recover_password.html'
+                })
+                .state('reset_password', {
+                    url: '/reset_password?server_url&email&code',
+                    auth: false,
+                    controller: 'pipResetPasswordController',
+                    templateUrl: 'reset_password/reset_password.html'
+                })
+                .state('signout', { 
+                    url: '/signout',
+                    auth: false
+                })
+                .state('signup', {
+                    url: '/signup?name&email&server_url',
+                    auth: false,
+                    controller: 'pipSignupController',
+                    templateUrl: 'signup/signup.html'
+                })
+                .state('post_signup', {
+                    url: '/post_signup?party_id',
+                    auth: false,
+                    controller: 'pipPostSignupController',
+                    templateUrl: 'post_signup/post_signup.html',
+                    resolve: {
+                        $party: /* @ngInject */ ['$rootScope', '$stateParams', 'pipRest', 'pipSession', function ($rootScope, $stateParams, pipRest, pipSession) {
+                            var userId = pipSession.userId();
+                            var partyId = $stateParams.party_id || userId;
+
+                            if (partyId != userId)
+                                throw('ERROR_NOT_ALLOWED');
+                            return pipRest.parties().get({ id: partyId }).$promise;
+                        }]
+                    }
+                })
+                .state('verify_email', {
+                    url: '/verify_email?server_url&email&code',
+                    auth: false,
+                    controller: 'pipVerifyEmailController',
+                    templateUrl: 'verify_email/verify_email.html'
+                })
+                .state('verify_email_success', {
+                    url: '/verify_email_success',
+                    auth: false,
+                    controller: 'pipVerifyEmailSuccessController',
+                    templateUrl: 'verify_email/verify_email_success.html'
+                });
+
+            // Set default paths and states
+            pipAuthStateProvider.signinState('signin');
+            pipAuthStateProvider.signoutState('signout');
+        }]
+    );
+    
+})();
 (function(module) {
 try {
   module = angular.module('pipEntry.Templates');
@@ -25752,170 +25844,6 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '\n' +
     '        </form>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password.html',
-    '<!--\n' +
-    '@file Password recovery page\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
-    '    <pip-card width="400">\n' +
-    '        <pip-recover-password-panel\n' +
-    '                pip-data="data"\n' +
-    '                pip-created="$panel = $control">\n' +
-    '\n' +
-    '        </pip-recover-password-panel>\n' +
-    '        <div class="pip-footer">\n' +
-    '            <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
-    '                {{::\'CANCEL\' | translate}}\n' +
-    '            </md-button>\n' +
-    '\n' +
-    '            <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
-    '                       aria-label="RECOVER_PWD_RECOVER"\n' +
-    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 || data.email.length == 0">\n' +
-    '                {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
-    '            </md-button>\n' +
-    '\n' +
-    '            <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
-    '                {{::\'CANCEL\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </pip-card>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password_dialog.html',
-    '<!--\n' +
-    '@file Recover password dialog\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-entry lp0 rp0">\n' +
-    '    <md-dialog-content>\n' +
-    '        <pip-recover-password-panel\n' +
-    '                pip-data="data"\n' +
-    '                pip-created="$panel = $control"\n' +
-    '                pip-goto-reset="pipGotoReset">\n' +
-    '\n' +
-    '        </pip-recover-password-panel>\n' +
-    '    </md-dialog-content>\n' +
-    '\n' +
-    '    <md-dialog-actions class="layout-row layout-align-end-center">\n' +
-    '        <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
-    '            {{::\'CANCEL\' | translate}}\n' +
-    '        </md-button>\n' +
-    '\n' +
-    '        <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
-    '                   aria-label="RECOVER_PWD_RECOVER"\n' +
-    '                   ng-disabled="(form.$pristine && !data.email) || data.email== undefined ||\n' +
-    '                           || data.serverUrl.length == 0 || data.email.length == 0">\n' +
-    '            {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
-    '        </md-button>\n' +
-    '\n' +
-    '        <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
-    '            {{::\'CANCEL\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </md-dialog-actions>\n' +
-    '</md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password_panel.html',
-    '<div class="pip-body">\n' +
-    '    <div class="pip-content">\n' +
-    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
-    '        </md-progress-linear>\n' +
-    '\n' +
-    '        <h2>{{\'RECOVER_PWD_TITLE\' | translate}}</h2>\n' +
-    '\n' +
-    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_1\' | translate}} </p>\n' +
-    '\n' +
-    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_2\' | translate}}</p>\n' +
-    '\n' +
-    '        <form name="form" novalidate>\n' +
-    '            <div ng-messages="form.$serverError" class="text-error bm8"  md-auto-hide="false">\n' +
-    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_UNKNOWN">\n' +
-    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <a ng-hide="showServerUrl || fixedServerUrl" ng-click="showServerUrl = true" href="">\n' +
-    '                {{\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
-    '            </a>\n' +
-    '\n' +
-    '            <div ng-show="showServerUrl">\n' +
-    '                <md-autocomplete\n' +
-    '                        ng-initial autofocus tabindex="1"\n' +
-    '                        class="pip-combobox w-stretch bm8"\n' +
-    '                        name="server"\n' +
-    '                        ng-enabled="!transaction.busy()"\n' +
-    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
-    '                        md-no-cache="true"\n' +
-    '                        md-selected-item="data.serverUrl"\n' +
-    '                        md-search-text="selected.searchURLs"\n' +
-    '                        md-items="item in getMatches()"\n' +
-    '                        md-item-text="item"\n' +
-    '                        md-selected-item-change="onServerUrlChanged()"\n' +
-    '                        md-delay="200"\n' +
-    '                        ng-model="data.serverUrl"\n' +
-    '                        pip-clear-errors>\n' +
-    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
-    '                </md-autocomplete>\n' +
-    '            </div>\n' +
-    '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
-    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
-    '                <input name="email" type="email"\n' +
-    '                       ng-model="data.email"\n' +
-    '                       pip-email-unique="data.email"\n' +
-    '                       required step="any" pip-clear-errors\n' +
-    '                       ng-disabled="transaction.busy()" tabindex="2"/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
-    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.email)"\n' +
-    '                     class="md-input-error"  md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="emailUnique">{{::\'ERROR_1104\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '        </form>\n' +
-    '\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -26109,6 +26037,170 @@ module.run(['$templateCache', function($templateCache) {
     '            </md-input-container>\n' +
     '\n' +
     '        </form>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('recover_password/recover_password.html',
+    '<!--\n' +
+    '@file Password recovery page\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
+    '    <pip-card width="400">\n' +
+    '        <pip-recover-password-panel\n' +
+    '                pip-data="data"\n' +
+    '                pip-created="$panel = $control">\n' +
+    '\n' +
+    '        </pip-recover-password-panel>\n' +
+    '        <div class="pip-footer">\n' +
+    '            <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
+    '                {{::\'CANCEL\' | translate}}\n' +
+    '            </md-button>\n' +
+    '\n' +
+    '            <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
+    '                       aria-label="RECOVER_PWD_RECOVER"\n' +
+    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 || data.email.length == 0">\n' +
+    '                {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
+    '            </md-button>\n' +
+    '\n' +
+    '            <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '                {{::\'CANCEL\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </pip-card>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('recover_password/recover_password_dialog.html',
+    '<!--\n' +
+    '@file Recover password dialog\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-entry lp0 rp0">\n' +
+    '    <md-dialog-content>\n' +
+    '        <pip-recover-password-panel\n' +
+    '                pip-data="data"\n' +
+    '                pip-created="$panel = $control"\n' +
+    '                pip-goto-reset="pipGotoReset">\n' +
+    '\n' +
+    '        </pip-recover-password-panel>\n' +
+    '    </md-dialog-content>\n' +
+    '\n' +
+    '    <md-dialog-actions class="layout-row layout-align-end-center">\n' +
+    '        <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
+    '            {{::\'CANCEL\' | translate}}\n' +
+    '        </md-button>\n' +
+    '\n' +
+    '        <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
+    '                   aria-label="RECOVER_PWD_RECOVER"\n' +
+    '                   ng-disabled="(form.$pristine && !data.email) || data.email== undefined ||\n' +
+    '                           || data.serverUrl.length == 0 || data.email.length == 0">\n' +
+    '            {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
+    '        </md-button>\n' +
+    '\n' +
+    '        <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '            {{::\'CANCEL\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </md-dialog-actions>\n' +
+    '</md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('recover_password/recover_password_panel.html',
+    '<div class="pip-body">\n' +
+    '    <div class="pip-content">\n' +
+    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
+    '        </md-progress-linear>\n' +
+    '\n' +
+    '        <h2>{{\'RECOVER_PWD_TITLE\' | translate}}</h2>\n' +
+    '\n' +
+    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_1\' | translate}} </p>\n' +
+    '\n' +
+    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_2\' | translate}}</p>\n' +
+    '\n' +
+    '        <form name="form" novalidate>\n' +
+    '            <div ng-messages="form.$serverError" class="text-error bm8"  md-auto-hide="false">\n' +
+    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_UNKNOWN">\n' +
+    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <a ng-hide="showServerUrl || fixedServerUrl" ng-click="showServerUrl = true" href="">\n' +
+    '                {{\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
+    '            </a>\n' +
+    '\n' +
+    '            <div ng-show="showServerUrl">\n' +
+    '                <md-autocomplete\n' +
+    '                        ng-initial autofocus tabindex="1"\n' +
+    '                        class="pip-combobox w-stretch bm8"\n' +
+    '                        name="server"\n' +
+    '                        ng-enabled="!transaction.busy()"\n' +
+    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
+    '                        md-no-cache="true"\n' +
+    '                        md-selected-item="data.serverUrl"\n' +
+    '                        md-search-text="selected.searchURLs"\n' +
+    '                        md-items="item in getMatches()"\n' +
+    '                        md-item-text="item"\n' +
+    '                        md-selected-item-change="onServerUrlChanged()"\n' +
+    '                        md-delay="200"\n' +
+    '                        ng-model="data.serverUrl"\n' +
+    '                        pip-clear-errors>\n' +
+    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
+    '                </md-autocomplete>\n' +
+    '            </div>\n' +
+    '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
+    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
+    '                <input name="email" type="email"\n' +
+    '                       ng-model="data.email"\n' +
+    '                       pip-email-unique="data.email"\n' +
+    '                       required step="any" pip-clear-errors\n' +
+    '                       ng-disabled="transaction.busy()" tabindex="2"/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
+    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.email)"\n' +
+    '                     class="md-input-error"  md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="emailUnique">{{::\'ERROR_1104\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '        </form>\n' +
+    '\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -26698,98 +26790,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Entry pages (signin, signup) logic
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry', 
-        [
-            'ui.router', 'ngMessages', 
-            
-            'pipCore', 'pipRest', 'pipBasicControls', 'pipLocations', 'pipPictures', 'pipRest.State',
-            'pipEntry.Strings', 'pipEntry.Common', 'pipEntry.Signin', 'pipEntry.Signup', 'pipEntry.PostSignup', 
-            'pipEntry.RecoverPassword', 'pipEntry.ResetPassword', 'pipEntry.VerifyEmail', 'pipEntry.Templates'
-        ]);
-
-    thisModule.config(
-        ['$stateProvider', '$locationProvider', '$httpProvider', 'pipAuthStateProvider', function ($stateProvider, $locationProvider, $httpProvider, pipAuthStateProvider) {
-
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-
-
-            // Configure module routes for all users
-            $stateProvider
-                .state('signin', {
-                    url: '/signin?email&server_url&redirect_to',
-                    auth: false,
-                    controller: 'pipSigninController',
-                    templateUrl: 'signin/signin.html'
-                })
-                .state('recover_password', {
-                    url: '/recover_password?server_url&email',
-                    auth: false,
-                    controller: 'pipRecoverPasswordController',
-                    templateUrl: 'recover_password/recover_password.html'
-                })
-                .state('reset_password', {
-                    url: '/reset_password?server_url&email&code',
-                    auth: false,
-                    controller: 'pipResetPasswordController',
-                    templateUrl: 'reset_password/reset_password.html'
-                })
-                .state('signout', { 
-                    url: '/signout',
-                    auth: false
-                })
-                .state('signup', {
-                    url: '/signup?name&email&server_url',
-                    auth: false,
-                    controller: 'pipSignupController',
-                    templateUrl: 'signup/signup.html'
-                })
-                .state('post_signup', {
-                    url: '/post_signup?party_id',
-                    auth: false,
-                    controller: 'pipPostSignupController',
-                    templateUrl: 'post_signup/post_signup.html',
-                    resolve: {
-                        $party: /* @ngInject */ ['$rootScope', '$stateParams', 'pipRest', 'pipSession', function ($rootScope, $stateParams, pipRest, pipSession) {
-                            var userId = pipSession.userId();
-                            var partyId = $stateParams.party_id || userId;
-
-                            if (partyId != userId)
-                                throw('ERROR_NOT_ALLOWED');
-                            return pipRest.parties().get({ id: partyId }).$promise;
-                        }]
-                    }
-                })
-                .state('verify_email', {
-                    url: '/verify_email?server_url&email&code',
-                    auth: false,
-                    controller: 'pipVerifyEmailController',
-                    templateUrl: 'verify_email/verify_email.html'
-                })
-                .state('verify_email_success', {
-                    url: '/verify_email_success',
-                    auth: false,
-                    controller: 'pipVerifyEmailSuccessController',
-                    templateUrl: 'verify_email/verify_email_success.html'
-                });
-
-            // Set default paths and states
-            pipAuthStateProvider.signinState('signin');
-            pipAuthStateProvider.signoutState('signout');
-        }]
-    );
-    
-})();
-/**
  * @file Checking uniqueness of email in input control
  * @description
  * Email validation is performed on server via /api/signup_validate REST operation
@@ -27222,6 +27222,208 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
+ * @file Entry recover password controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.RecoverPassword', ['pipEntry.Common', "pipRecoverPasswordPanel"]);
+
+    thisModule.controller('pipRecoverPasswordController',
+        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, 
+            pipFormErrors, pipEntryCommon, $window) {
+
+            pipEntryCommon.configureAppBar();
+            $scope.goBack = goBack;
+
+            $scope.onRecover = onRecover;
+
+            $scope.transaction = pipTransaction('entry.recover_password', $scope);
+
+            return
+
+            function goBack(){
+                $window.history.back();
+            }
+            function onRecover() {
+                if ($scope.$panel)  $scope.$panel.onRecover();
+            }
+
+        }]
+    );
+
+})();
+/**
+ * @file Recover password dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.RecoverPasswordDialog', ['pipEntry.Common', "pipRecoverPasswordPanel",
+        'pipEntry.ResetPasswordDialog']);
+
+    thisModule.factory('pipRecoverPasswordDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'recover_password/recover_password_dialog.html',
+                        controller: 'pipRecoverPasswordDialogController',
+                        locals: { params: params },
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }, function () {
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipRecoverPasswordDialogController',
+        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', 'pipResetPasswordDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog, pipResetPasswordDialog){
+
+            $scope.onRecover = onRecover;
+
+            if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
+
+            $scope.goBack = $mdDialog.cancel;
+            $scope.pipGotoReset = pipGotoResetPasswordDialog;
+
+            return;
+
+            function onRecover() {
+                if ($scope.$panel)  $scope.$panel.onRecover();
+            }
+
+            function pipGotoResetPasswordDialog(){
+                pipResetPasswordDialog.show({});
+            }
+        }]
+    );
+
+})();
+/**
+ * @file Recover password panel
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipRecoverPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
+
+    thisModule.directive('pipRecoverPasswordPanel',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: true,
+                scope: {
+                    data: '=pipData',
+                    created: '&pipCreated',
+                    gotoReset: '=pipGotoReset'
+
+                },
+                templateUrl: 'recover_password/recover_password_panel.html',
+                controller: 'pipRecoverPasswordPanelController'
+
+            };
+        }
+    );
+    thisModule.controller('pipRecoverPasswordPanelController',
+        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession,
+                  pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
+
+            $scope.$mdMedia = $mdMedia;
+
+            pipEntryCommon.initScope($scope);
+
+            $scope.showServerError = true;
+
+            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
+            $scope.onRecover = onRecover;
+            $scope.transaction = pipTransaction('entry.recover_password', $scope);
+
+            $scope.$control = {};
+            $scope.$control.onRecover = onRecover;
+
+            if ($scope.created) {
+                $scope.created({
+                    $control: $scope.$control
+                });
+            }
+
+            return;
+
+            //-----------------------------
+
+            function onRecover() {
+                if ($scope.form.$invalid) {
+                    pipFormErrors.resetFormErrors($scope.form, true);
+                    return;
+                }
+
+                var transactionId = $scope.transaction.begin('PROCESSING');
+                if (!transactionId) return;
+
+                pipRest.recoverPassword($scope.data.serverUrl).call(
+                    {
+                        email: $scope.data.email
+                    },
+                    function (data) {
+                        pipFormErrors.resetFormErrors($scope.form, false);
+                        if ($scope.transaction.aborted(transactionId)) return;
+
+                        $scope.transaction.end();
+                        if (!$scope.gotoReset)
+                            pipAuthState.go('reset_password', {
+                                server_url: $scope.data.serverUrl,
+                                email: $scope.data.email
+                            });
+                        else
+                            $scope.gotoReset();
+                    },
+                    function (error) {
+                        $scope.error = error;
+                        $scope.transaction.end($scope.error);
+                        pipFormErrors.setFormError(
+                            $scope.form, $scope.error,
+                            {
+                                1100: 'email', // Missing email
+                                1106: 'email', // User was not found
+                                1000: 'form', // Unknown error
+                                1110: 'form', // Account is locked
+                                1111: 'form', // Number of attempts exceeded. Account was locked
+                                1112: 'form', // Account is not active
+                                '-1' : 'form' // server not response
+                            }
+                        );
+                        pipFormErrors.resetFormErrors($scope.form, true);
+                    }
+                );
+            };
+
+        }])
+
+})();
+/**
  * @file Entry post signup controller
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -27436,208 +27638,6 @@ module.run(['$templateCache', function($templateCache) {
                                 '-1' : 'form' // server not response
                             }
                         );
-                    }
-                );
-            };
-
-        }])
-
-})();
-/**
- * @file Entry recover password controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.RecoverPassword', ['pipEntry.Common', "pipRecoverPasswordPanel"]);
-
-    thisModule.controller('pipRecoverPasswordController',
-        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, 
-            pipFormErrors, pipEntryCommon, $window) {
-
-            pipEntryCommon.configureAppBar();
-            $scope.goBack = goBack;
-
-            $scope.onRecover = onRecover;
-
-            $scope.transaction = pipTransaction('entry.recover_password', $scope);
-
-            return
-
-            function goBack(){
-                $window.history.back();
-            }
-            function onRecover() {
-                if ($scope.$panel)  $scope.$panel.onRecover();
-            }
-
-        }]
-    );
-
-})();
-/**
- * @file Recover password dialog
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.RecoverPasswordDialog', ['pipEntry.Common', "pipRecoverPasswordPanel",
-        'pipEntry.ResetPasswordDialog']);
-
-    thisModule.factory('pipRecoverPasswordDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'recover_password/recover_password_dialog.html',
-                        controller: 'pipRecoverPasswordDialogController',
-                        locals: { params: params },
-                        clickOutsideToClose: true
-                    })
-                        .then(function () {
-                            if (successCallback) {
-                                successCallback();
-                            }
-                        }, function () {
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipRecoverPasswordDialogController',
-        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', 'pipResetPasswordDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog, pipResetPasswordDialog){
-
-            $scope.onRecover = onRecover;
-
-            if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
-
-            $scope.goBack = $mdDialog.cancel;
-            $scope.pipGotoReset = pipGotoResetPasswordDialog;
-
-            return;
-
-            function onRecover() {
-                if ($scope.$panel)  $scope.$panel.onRecover();
-            }
-
-            function pipGotoResetPasswordDialog(){
-                pipResetPasswordDialog.show({});
-            }
-        }]
-    );
-
-})();
-/**
- * @file Recover password panel
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipRecoverPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
-
-    thisModule.directive('pipRecoverPasswordPanel',
-        function () {
-            return {
-                restrict: 'EA',
-                replace: true,
-                scope: {
-                    data: '=pipData',
-                    created: '&pipCreated',
-                    gotoReset: '=pipGotoReset'
-
-                },
-                templateUrl: 'recover_password/recover_password_panel.html',
-                controller: 'pipRecoverPasswordPanelController'
-
-            };
-        }
-    );
-    thisModule.controller('pipRecoverPasswordPanelController',
-        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession,
-                  pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
-
-            $scope.$mdMedia = $mdMedia;
-
-            pipEntryCommon.initScope($scope);
-
-            $scope.showServerError = true;
-
-            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onRecover = onRecover;
-            $scope.transaction = pipTransaction('entry.recover_password', $scope);
-
-            $scope.$control = {};
-            $scope.$control.onRecover = onRecover;
-
-            if ($scope.created) {
-                $scope.created({
-                    $control: $scope.$control
-                });
-            }
-
-            return;
-
-            //-----------------------------
-
-            function onRecover() {
-                if ($scope.form.$invalid) {
-                    pipFormErrors.resetFormErrors($scope.form, true);
-                    return;
-                }
-
-                var transactionId = $scope.transaction.begin('PROCESSING');
-                if (!transactionId) return;
-
-                pipRest.recoverPassword($scope.data.serverUrl).call(
-                    {
-                        email: $scope.data.email
-                    },
-                    function (data) {
-                        pipFormErrors.resetFormErrors($scope.form, false);
-                        if ($scope.transaction.aborted(transactionId)) return;
-
-                        $scope.transaction.end();
-                        if (!$scope.gotoReset)
-                            pipAuthState.go('reset_password', {
-                                server_url: $scope.data.serverUrl,
-                                email: $scope.data.email
-                            });
-                        else
-                            $scope.gotoReset();
-                    },
-                    function (error) {
-                        $scope.error = error;
-                        $scope.transaction.end($scope.error);
-                        pipFormErrors.setFormError(
-                            $scope.form, $scope.error,
-                            {
-                                1100: 'email', // Missing email
-                                1106: 'email', // User was not found
-                                1000: 'form', // Unknown error
-                                1110: 'form', // Account is locked
-                                1111: 'form', // Number of attempts exceeded. Account was locked
-                                1112: 'form', // Account is not active
-                                '-1' : 'form' // server not response
-                            }
-                        );
-                        pipFormErrors.resetFormErrors($scope.form, true);
                     }
                 );
             };
@@ -27865,233 +27865,6 @@ module.run(['$templateCache', function($templateCache) {
                     }
                 );
             };
-
-        }])
-
-})();
-/**
- * @file Entry signup controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.Signup', ['pipEntry.Common', 'pipEmailUnique',  'pipSignupPanel',
-        'pipPasswordMatch']);
-
-    thisModule.controller('pipSignupController',
-        ['$scope', '$rootScope', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipSession', 'pipFormErrors', 'pipEntryCommon', function ($scope, $rootScope, pipAuthState, pipTransaction, pipRest, pipSession, //pipAuth,
-            pipFormErrors, pipEntryCommon) {
-
-            pipEntryCommon.configureAppBar();
-
-        }]
-    );
-
-})();
-/**
- * @file Entry signup controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.SignupDialog', ['pipEntry.Common', "pipSignupPanel", 'pipEntry.SigninDialog',
-        'pipEntry.PostSignupDialog']);
-
-    thisModule.factory('pipSignupDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'signup/signup_dialog.html',
-                        controller: 'pipSignupDialogController',
-                        locals: { params: params },
-                        clickOutsideToClose: true
-                    })
-                        .then(function () {
-                            if (successCallback) {
-                                successCallback();
-                            }
-                        }, function () {
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipSignupDialogController',
-        ['$scope', '$rootScope', '$location', 'pipSession', 'pipSigninDialog', 'pipPostSignupDialog', function ($scope, $rootScope, $location, pipSession, pipSigninDialog, pipPostSignupDialog) {
-
-            pipSession.signout();
-            $scope.pipGotoSigninDialog = pipGotoSigninDialog;
-            $scope.pipPostSignup = pipPostSignup;
-
-            return;
-
-            function pipGotoSigninDialog(){
-                pipSigninDialog.show({});
-            }
-
-            function pipPostSignup(user){
-                pipPostSignupDialog.show({
-                    $party:user
-                });
-            }
-
-
-        }]
-    );
-
-})();
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipSignupPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
-
-    thisModule.directive('pipSignupPanel',
-        function () {
-            return {
-                restrict: 'EA',
-                replace: true,
-                scope: {
-                    gotoPostSignup:'=pipPostSignup',
-                    gotoSigninPage:'=pipGotoSigninPage',
-                    gotoSigninDialog:'=pipGotoSigninDialog'
-                },
-                templateUrl: 'signup/signup_panel.html',
-                controller: 'pipSignupPanelController'
-
-            };
-        }
-    );
-    thisModule.controller('pipSignupPanelController',
-        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipFormErrors', 'pipEntryCommon', 'pipRest', '$mdMedia', '$state', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession,
-                  pipFormErrors, pipEntryCommon, pipRest, $mdMedia, $state) {
-
-            $scope.$mdMedia = $mdMedia;
-
-
-            pipEntryCommon.initScope($scope);
-
-            $scope.confirmPassword = '';
-
-            $scope.isEmpty = _.isEmpty;
-            $scope.onEnter = onEnter;
-            $scope.showServerError = true;
-            $scope.transaction = pipTransaction('entry.signup', $scope);
-
-            // фильтр по серверам
-            $scope.filterItem = filterItem;
-            $scope.getMatches = getMatches;
-            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onServerUrlChanged = function () {};
-            $scope.onSignup = onSignup;
-            $scope.gotoSignin =  gotoSignin;
-
-            return;
-
-            function gotoSignin(){
-                if(!$scope.gotoSigninPage &&  !$scope.gotoSigninDialog){
-                    $state.go('signin',{});
-                    return;
-                }
-                if($scope.gotoSigninPage){
-                    $state.go($scope.gotoSigninPage);
-                    return;
-                }
-                if($scope.gotoSigninDialog){
-                    $scope.gotoSigninDialog();
-                    return;
-                }
-            }
-
-            function filterItem(item) {
-                var result = ($scope.selected.searchURLs
-                && item
-                && item.toLowerCase().indexOf($scope.selected.searchURLs.toLowerCase()) >= 0);
-                return result;
-            };
-
-            function getMatches() {
-                if (!$scope.selected.searchURLs)
-                    return $scope.showServerUrl;
-                $scope.data.serverUrl = $scope.selected.searchURLs;
-                return _.filter($scope.serverUrls, $scope.filterItem);
-            };
-
-            function onSignup() {
-                if ($scope.form.$invalid) {
-                    pipFormErrors.resetFormErrors($scope.form, true);
-                    return;
-                }
-                var transactionId = $scope.transaction.begin('PROCESSING');
-                if (!transactionId) return;
-                pipRest.signup($scope.data.serverUrl).call(
-                    {
-                        name: $scope.data.name,
-                        email: $scope.data.email,
-                        password: $scope.data.password,
-                        language: $rootScope.$language || 'en',
-                        theme: $rootScope.theme || 'blue'
-                    },
-                    function (user) {
-                        pipFormErrors.resetFormErrors($scope.form, false);
-                        if ($scope.transaction.aborted(transactionId)) return;
-                        $scope.transaction.end();
-
-                        pipSession.open($scope.data.serverUrl, user, $scope.data.password, false);
-                        if(!$scope.gotoPostSignup)
-                            pipAuthState.go('post_signup', { party_id: user.id });
-                        else
-                            $scope.gotoPostSignup(user);
-
-                    },
-                    function (error) {
-                        $scope.error = error;
-                        pipFormErrors.resetFormErrors($scope.form, true);
-                        pipFormErrors.setFormError(
-                            $scope.form, error,
-                            {
-                                1101 : 'signupFullName', // Missing name
-                                1100 : 'userEmail', // Missing email
-                                1106 : 'userEmail', // User was not found
-                                1104 : 'userEmail', // Email is already registered
-                                1305 : 'userEmail', // Email is already registered
-                                1114 : 'userEmail', // Invalid email
-                                1301 : 'userEmail', // Invalid email
-                                1300 : 'userEmail', // Missing email
-                                1102 : 'password', // Missing password
-                                1103 : 'password', // Password should be 5 to 20 symbols long
-                                1000 : 'form', // Unknown error
-                                1110 : 'form', // Account is locked
-                                1111 : 'form', // Number of attempts exceeded. Account was locked
-                                1112 : 'form', // Account is not active
-                                '-1' : 'form' // server not response
-                            }
-                        );
-                        $scope.transaction.end(error);
-                    }
-                );
-            };
-
-            function onEnter(event) {
-                if(event.keyCode === 13) {
-                    onSignup();
-                }
-            }
 
         }])
 
@@ -28328,6 +28101,233 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
+ * @file Entry signup controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.Signup', ['pipEntry.Common', 'pipEmailUnique',  'pipSignupPanel',
+        'pipPasswordMatch']);
+
+    thisModule.controller('pipSignupController',
+        ['$scope', '$rootScope', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipSession', 'pipFormErrors', 'pipEntryCommon', function ($scope, $rootScope, pipAuthState, pipTransaction, pipRest, pipSession, //pipAuth,
+            pipFormErrors, pipEntryCommon) {
+
+            pipEntryCommon.configureAppBar();
+
+        }]
+    );
+
+})();
+/**
+ * @file Entry signup controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.SignupDialog', ['pipEntry.Common', "pipSignupPanel", 'pipEntry.SigninDialog',
+        'pipEntry.PostSignupDialog']);
+
+    thisModule.factory('pipSignupDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'signup/signup_dialog.html',
+                        controller: 'pipSignupDialogController',
+                        locals: { params: params },
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }, function () {
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipSignupDialogController',
+        ['$scope', '$rootScope', '$location', 'pipSession', 'pipSigninDialog', 'pipPostSignupDialog', function ($scope, $rootScope, $location, pipSession, pipSigninDialog, pipPostSignupDialog) {
+
+            pipSession.signout();
+            $scope.pipGotoSigninDialog = pipGotoSigninDialog;
+            $scope.pipPostSignup = pipPostSignup;
+
+            return;
+
+            function pipGotoSigninDialog(){
+                pipSigninDialog.show({});
+            }
+
+            function pipPostSignup(user){
+                pipPostSignupDialog.show({
+                    $party:user
+                });
+            }
+
+
+        }]
+    );
+
+})();
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipSignupPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
+
+    thisModule.directive('pipSignupPanel',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: true,
+                scope: {
+                    gotoPostSignup:'=pipPostSignup',
+                    gotoSigninPage:'=pipGotoSigninPage',
+                    gotoSigninDialog:'=pipGotoSigninDialog'
+                },
+                templateUrl: 'signup/signup_panel.html',
+                controller: 'pipSignupPanelController'
+
+            };
+        }
+    );
+    thisModule.controller('pipSignupPanelController',
+        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipFormErrors', 'pipEntryCommon', 'pipRest', '$mdMedia', '$state', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession,
+                  pipFormErrors, pipEntryCommon, pipRest, $mdMedia, $state) {
+
+            $scope.$mdMedia = $mdMedia;
+
+
+            pipEntryCommon.initScope($scope);
+
+            $scope.confirmPassword = '';
+
+            $scope.isEmpty = _.isEmpty;
+            $scope.onEnter = onEnter;
+            $scope.showServerError = true;
+            $scope.transaction = pipTransaction('entry.signup', $scope);
+
+            // фильтр по серверам
+            $scope.filterItem = filterItem;
+            $scope.getMatches = getMatches;
+            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
+            $scope.onServerUrlChanged = function () {};
+            $scope.onSignup = onSignup;
+            $scope.gotoSignin =  gotoSignin;
+
+            return;
+
+            function gotoSignin(){
+                if(!$scope.gotoSigninPage &&  !$scope.gotoSigninDialog){
+                    $state.go('signin',{});
+                    return;
+                }
+                if($scope.gotoSigninPage){
+                    $state.go($scope.gotoSigninPage);
+                    return;
+                }
+                if($scope.gotoSigninDialog){
+                    $scope.gotoSigninDialog();
+                    return;
+                }
+            }
+
+            function filterItem(item) {
+                var result = ($scope.selected.searchURLs
+                && item
+                && item.toLowerCase().indexOf($scope.selected.searchURLs.toLowerCase()) >= 0);
+                return result;
+            };
+
+            function getMatches() {
+                if (!$scope.selected.searchURLs)
+                    return $scope.showServerUrl;
+                $scope.data.serverUrl = $scope.selected.searchURLs;
+                return _.filter($scope.serverUrls, $scope.filterItem);
+            };
+
+            function onSignup() {
+                if ($scope.form.$invalid) {
+                    pipFormErrors.resetFormErrors($scope.form, true);
+                    return;
+                }
+                var transactionId = $scope.transaction.begin('PROCESSING');
+                if (!transactionId) return;
+                pipRest.signup($scope.data.serverUrl).call(
+                    {
+                        name: $scope.data.name,
+                        email: $scope.data.email,
+                        password: $scope.data.password,
+                        language: $rootScope.$language || 'en',
+                        theme: $rootScope.theme || 'blue'
+                    },
+                    function (user) {
+                        pipFormErrors.resetFormErrors($scope.form, false);
+                        if ($scope.transaction.aborted(transactionId)) return;
+                        $scope.transaction.end();
+
+                        pipSession.open($scope.data.serverUrl, user, $scope.data.password, false);
+                        if(!$scope.gotoPostSignup)
+                            pipAuthState.go('post_signup', { party_id: user.id });
+                        else
+                            $scope.gotoPostSignup(user);
+
+                    },
+                    function (error) {
+                        $scope.error = error;
+                        pipFormErrors.resetFormErrors($scope.form, true);
+                        pipFormErrors.setFormError(
+                            $scope.form, error,
+                            {
+                                1101 : 'signupFullName', // Missing name
+                                1100 : 'userEmail', // Missing email
+                                1106 : 'userEmail', // User was not found
+                                1104 : 'userEmail', // Email is already registered
+                                1305 : 'userEmail', // Email is already registered
+                                1114 : 'userEmail', // Invalid email
+                                1301 : 'userEmail', // Invalid email
+                                1300 : 'userEmail', // Missing email
+                                1102 : 'password', // Missing password
+                                1103 : 'password', // Password should be 5 to 20 symbols long
+                                1000 : 'form', // Unknown error
+                                1110 : 'form', // Account is locked
+                                1111 : 'form', // Number of attempts exceeded. Account was locked
+                                1112 : 'form', // Account is not active
+                                '-1' : 'form' // server not response
+                            }
+                        );
+                        $scope.transaction.end(error);
+                    }
+                );
+            };
+
+            function onEnter(event) {
+                if(event.keyCode === 13) {
+                    onSignup();
+                }
+            }
+
+        }])
+
+})();
+/**
  * @file Entry verify email controller
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -28473,31 +28473,6 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext" ng-if="timeoutInterval">\n' +
-    '        {{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.\n' +
-    '    </div>\n' +
-    '    <div class="pip-error-actions h48 layout-column layout-align-center-center"\n' +
-    '         ng-if="isCordova">\n' +
-    '        <md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE" >\n' +
-    '            {{::\'ERROR_AVAILABLE_CLOSE\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
     '    <div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div>\n' +
@@ -28515,6 +28490,31 @@ module.run(['$templateCache', function($templateCache) {
     '    <div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">\n' +
     '        {{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}\n' +
     '    </a></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext" ng-if="timeoutInterval">\n' +
+    '        {{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions h48 layout-column layout-align-center-center"\n' +
+    '         ng-if="isCordova">\n' +
+    '        <md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE" >\n' +
+    '            {{::\'ERROR_AVAILABLE_CLOSE\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
     '</div>');
 }]);
 })();
@@ -28561,6 +28561,42 @@ module.run(['$templateCache', function($templateCache) {
     '                </md-button>\n' +
     '            </div>\n' +
     '    </div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
+    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
+    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
+    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
+    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
+    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
+    '        <div class="h48" ng-if="isCordova">\n' +
+    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '        <div class="h48">\n' +
+    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -28669,42 +28705,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
-    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
-    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
-    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
-    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
-    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
-    '        <div class="h48" ng-if="isCordova">\n' +
-    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '        <div class="h48">\n' +
-    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -28866,47 +28866,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Maintenance error controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipErrors.Maintenance', []);
-
-    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
-
-        $rootScope.$routing = false;
-        $scope.isCordova = false;
-        appHeader();
-
-        $scope.error = $state && $state.params && $state.params.error ?  $state.params.error : {};
-        $scope.timeoutInterval = $scope.error && $scope.error.config &&
-                        $scope.error.config.params && $scope.error.config.params.interval ? $scope.error.config.params.interval : 0;
-
-        $scope.onClose = onClose;
-
-        return;
-
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        };
-
-        function onClose() {
-
-        };
-
-    }]);
-
-})();
-
-/**
  * @file Missing route error controller
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -28941,6 +28900,47 @@ module.run(['$templateCache', function($templateCache) {
 
         function onContinue() {
             pipAuthState.goToAuthorized();
+        };
+
+    }]);
+
+})();
+
+/**
+ * @file Maintenance error controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipErrors.Maintenance', []);
+
+    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+
+        $rootScope.$routing = false;
+        $scope.isCordova = false;
+        appHeader();
+
+        $scope.error = $state && $state.params && $state.params.error ?  $state.params.error : {};
+        $scope.timeoutInterval = $scope.error && $scope.error.config &&
+                        $scope.error.config.params && $scope.error.config.params.interval ? $scope.error.config.params.interval : 0;
+
+        $scope.onClose = onClose;
+
+        return;
+
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        };
+
+        function onClose() {
+
         };
 
     }]);
@@ -29030,39 +29030,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
- * @file Unsupported error controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipErrors.Unsupported', []);
-
-    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', 'pipAppBar', function ($scope, $state, $rootScope, $mdMedia, pipAppBar) {
-
-        $scope.$mdMedia = $mdMedia;
-        $rootScope.$routing = false;
-        appHeader();
-
-        $scope.error = $state && $state.params && $state.params.error ?  $state.params.error : {};
-
-        return;
-
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        };
-
-    }]);
-
-})();
-
-/**
  * @file Unknown error controller
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -29118,6 +29085,39 @@ module.run(['$templateCache', function($templateCache) {
 
         function onClose() {
 
+        };
+
+    }]);
+
+})();
+
+/**
+ * @file Unsupported error controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipErrors.Unsupported', []);
+
+    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', 'pipAppBar', function ($scope, $state, $rootScope, $mdMedia, pipAppBar) {
+
+        $scope.$mdMedia = $mdMedia;
+        $rootScope.$routing = false;
+        appHeader();
+
+        $scope.error = $state && $state.params && $state.params.error ?  $state.params.error : {};
+
+        return;
+
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
         };
 
     }]);
