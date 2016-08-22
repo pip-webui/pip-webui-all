@@ -1289,6 +1289,530 @@
 
 })();
 /**
+ * @file Date formatting service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+ 
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
+
+	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+
+        pipTranslateProvider.translations('en', {
+            // Months - 'MONTH_' + monthIndex
+            // start at 0 to match JS date format
+            'MONTH_1': 'January',
+            'MONTH_2': 'February',
+            'MONTH_3': 'March',
+            'MONTH_4': 'April',
+            'MONTH_5': 'May',
+            'MONTH_6': 'June',
+            'MONTH_7': 'July',
+            'MONTH_8': 'August',
+            'MONTH_9': 'September',
+            'MONTH_10': 'October',
+            'MONTH_11': 'November',
+            'MONTH_12': 'December',
+
+            'MONTH_LONG_1': 'January',
+            'MONTH_LONG_2': 'February',
+            'MONTH_LONG_3': 'March',
+            'MONTH_LONG_4': 'April',
+            'MONTH_LONG_5': 'May',
+            'MONTH_LONG_6': 'June',
+            'MONTH_LONG_7': 'July',
+            'MONTH_LONG_8': 'August',
+            'MONTH_LONG_9': 'September',
+            'MONTH_LONG_10': 'October',
+            'MONTH_LONG_11': 'November',
+            'MONTH_LONG_12': 'December',
+
+            'MONTH_SHORT_1': 'Jan',
+            'MONTH_SHORT_2': 'Feb',
+            'MONTH_SHORT_3': 'Mar',
+            'MONTH_SHORT_4': 'Apr',
+            'MONTH_SHORT_5': 'May',
+            'MONTH_SHORT_6': 'Jun',
+            'MONTH_SHORT_7': 'Jul',
+            'MONTH_SHORT_8': 'Aug',
+            'MONTH_SHORT_9': 'Sep',
+            'MONTH_SHORT_10': 'Oct',
+            'MONTH_SHORT_11': 'Nov',
+            'MONTH_SHORT_12': 'Dec',
+
+            // Days of the week - 'DAY_' + dayIndex
+            // start at 1 to match JS date format
+            'DAY_1': 'Monday',
+            'DAY_2': 'Tuesday',
+            'DAY_3': 'Wednesday',
+            'DAY_4': 'Thursday',
+            'DAY_5': 'Friday',
+            'DAY_6': 'Saturday',
+            'DAY_7': 'Sunday',
+
+            'ELAPSED_TODAY': 'Today',
+            'ELAPSED_YESTERDAY': 'Yesterday',
+            'ELAPSED_YEARS': 'y',
+            'ELAPSED_MONTHS': 'mth',
+            'ELAPSED_WEEKS': 'w',
+            'ELAPSED_DAYS': 'd',
+            'ELAPSED_HOURS': 'h',
+            'ELAPSED_MINUTES': 'm',
+            'ELAPSED_SECONDS': 's',
+            'ELAPSED_AT': 'at',
+            'ELAPSED_AGO': 'ago',
+            'ELAPSED_JUST_NOW': 'Just now',
+            'ELAPSED_FEW_MIN_AGO': 'Few min ago',
+            'ELAPSED_MIN_AGO': 'min ago',
+            'ELAPSED_HOUR_AGO': 'hour ago',
+            'ELAPSED_HOURS_AGO': 'hours ago',
+            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
+        });
+
+        pipTranslateProvider.translations('ru', {
+            // Months - 'MONTH_' + monthIndex
+            // start at 0 to match JS date format
+            'MONTH_1': 'январь',
+            'MONTH_2': 'февраль',
+            'MONTH_3': 'март',
+            'MONTH_4': 'апрель',
+            'MONTH_5': 'май',
+            'MONTH_6': 'июнь',
+            'MONTH_7': 'июль',
+            'MONTH_8': 'август',
+            'MONTH_9': 'сентябрь',
+            'MONTH_10': 'октябрь',
+            'MONTH_11': 'ноябрь',
+            'MONTH_12': 'декабрь',
+
+            'MONTH_LONG_1': 'января',
+            'MONTH_LONG_2': 'февраля',
+            'MONTH_LONG_3': 'марта',
+            'MONTH_LONG_4': 'апреля',
+            'MONTH_LONG_5': 'мая',
+            'MONTH_LONG_6': 'июня',
+            'MONTH_LONG_7': 'июля',
+            'MONTH_LONG_8': 'августа',
+            'MONTH_LONG_9': 'сентября',
+            'MONTH_LONG_10': 'октября',
+            'MONTH_LONG_11': 'ноября',
+            'MONTH_LONG_12': 'декабря',
+
+            'MONTH_SHORT_1': 'янв',
+            'MONTH_SHORT_2': 'фев',
+            'MONTH_SHORT_3': 'мар',
+            'MONTH_SHORT_4': 'апр',
+            'MONTH_SHORT_5': 'май',
+            'MONTH_SHORT_6': 'июн',
+            'MONTH_SHORT_7': 'июл',
+            'MONTH_SHORT_8': 'авг',
+            'MONTH_SHORT_9': 'сен',
+            'MONTH_SHORT_10': 'окт',
+            'MONTH_SHORT_11': 'ноя',
+            'MONTH_SHORT_12': 'дек',
+
+            // Days of the week - 'DAY_' + dayIndex
+            // start at 1 to match JS date format
+            'DAY_1': 'понедельник',
+            'DAY_2': 'вторник',
+            'DAY_3': 'среда',
+            'DAY_4': 'четверг',
+            'DAY_5': 'пятница',
+            'DAY_6': 'суббота',
+            'DAY_7': 'воскресенье',
+
+            'ELAPSED_TODAY': 'Сегодня',
+            'ELAPSED_YESTERDAY': 'Вчера',
+            'ELAPSED_YEARS': 'г',
+            'ELAPSED_MONTHS': 'мц',
+            'ELAPSED_WEEKS': 'н',
+            'ELAPSED_DAYS': 'д',
+            'ELAPSED_HOURS': 'ч',
+            'ELAPSED_MINUTES': 'м',
+            'ELAPSED_SECONDS': 'с',
+            'ELAPSED_AT': 'в',
+            'ELAPSED_AGO': 'тн',
+            'ELAPSED_JUST_NOW': 'Только что',
+            'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
+            'ELAPSED_MIN_AGO': 'мин тн',
+            'ELAPSED_HOUR_AGO': 'час тн',
+            'ELAPSED_HOURS_AGO': 'часа тн',
+            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
+        });
+		
+	}]);
+
+    thisModule.factory('pipDateFormat',
+        ['pipDates', 'pipTranslate', '$rootScope', function (pipDates, pipTranslate, $rootScope) {
+
+            return {
+                formatDate: formatDate,
+                formatLongDate: formatLongDate,
+                formatShortDate: formatShortDate,
+                formatShortDateWithYear: formatShortDateWithYear,
+                formatLongDateWithYear: formatLongDateWithYear,
+
+                formatLongMonth: formatLongMonth,
+                formatMonth: formatMonth,
+                formatYear: formatYear,
+                formatShortWeek: formatShortWeek,
+                formatShortDayAndMonth: formatShortDayAndMonth,
+                formatLongDayAndMonth: formatLongDayAndMonth,
+
+                formatDateRange: formatDateRange,
+                formatDateTimeRange: formatDateTimeRange,
+
+                formatTime: formatTime,
+                formatLongTime: formatLongTime,
+                formatShortTime: formatShortTime, 
+
+                formatLongDateTime: formatLongDateTime,
+                formatShortDateTime: formatShortDateTime,
+
+                formatElapsedTime: formatElapsedTime,
+                formatElapsedInterval: formatElapsedInterval,
+
+                formatMillisecondsToSeconds: formatMillisecondsToSeconds
+            };
+
+
+            function twoDigits(value) {
+                return value < 10 ? '0' + value : value; 
+            };
+
+            function formatDate(value, format, str) {
+                if (value == null) return '';
+
+                var
+                    strict = str || false,
+                    value = _.isDate(value) ? value : new Date(value),
+                    thisYear = new Date().getUTCFullYear(),
+                    year = value.getUTCFullYear(),
+                    month = value.getUTCMonth(),
+                    longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
+                    shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
+                    monthName = pipTranslate.translate('MONTH_' + (month + 1)),
+                    day = value.getUTCDate(),
+                    startWeek = pipDates.toStartWeek(value),
+                    endWeek = pipDates.toEndWeek(value, -1);
+
+                if (strict == false && format == 'd MMMM yyyy' && thisYear === year) {
+                        format = 'MMMM d';
+                }
+                if (strict == false && format == 'd MMM yyyy' && thisYear === year) {
+                        format = 'MMM d';
+                }
+                if ((format == 'MMM d') && $rootScope.$language == 'ru') {
+                        format = 'd MMM';
+                }
+                if ((format == 'MMMM d') && $rootScope.$language == 'ru') {
+                    format = 'd MMMM';
+                }
+
+                if (format == 'd MMMM yyyy')
+                    return '' + day + ' ' + longMonthName + ' ' + year
+                else if (format == 'MMMM d, yyyy')
+                    return '' + monthName + ' ' + day + ', ' + year
+                if (format == 'd MMM yyyy')
+                    return '' + day + ' ' + shortMonthName + ' ' + year
+                else if (format == 'MMM d, yyyy')
+                    return '' + shortMonthName + ' ' + day + ', ' + year
+                else if (format == 'd MMMM')
+                    return '' + day + ' ' + longMonthName
+                else if (format == 'd MMM')
+                    return '' + day + ' ' + shortMonthName
+                else if (format == 'MMM d')
+                    return '' + shortMonthName + ' ' + day;
+                else if (format == 'MMMM d')
+                    return '' + longMonthName + ' ' + day;
+                else if (format == 'yyyy/M/d')
+                    return '' + year + '/' + month + '/' + day;
+                else if (format == 'yyy-M-d')
+                    return '' + year + '-' + month + '-' + day;
+                else if (format == 'MMMM')
+                    return '' + longMonthName + ' ' + year;
+                else if (format == 'yyyy')
+                    return '' + year;
+                else if (format == 'ww')
+                    return '' + startWeek.getUTCDate() + ' - ' + endWeek.getUTCDate() + ' ' + monthName + ' ' + year;
+
+                return '' + day + ' ' + monthName + ' ' + year
+            }
+
+            function formatLongDate(value) {
+                return formatDate(value, 'd MMMM yyyy');
+            }
+
+            function formatShortDateWithYear(value) {
+                return formatDate(value, 'd MMM yyyy', true);
+            }
+
+            function formatLongDateWithYear(value) {
+                return formatDate(value, 'd MMMM yyyy', true);
+            }
+
+            function formatShortDate(value) {
+                return formatDate(value, 'd MMM yyyy');
+            }
+
+            function formatLongMonth(value) {
+                return formatDate(value, 'MMMM');
+            }
+
+            function formatYear(value) {
+                return formatDate(value, 'yyyy');
+            }
+
+            function formatShortWeek(value) {
+                return formatDate(value, 'ww');
+            }
+
+            function formatShortDayAndMonth(value) {
+                return formatDate(value, 'd MMM');
+            }
+
+            function formatLongDayAndMonth(value) {
+                if ($rootScope.$language == 'ru')
+                    return formatDate(value, 'd MMMM');
+                else
+                    return formatDate(value, 'MMMM d');
+            }
+
+            function formatDateRange(value1, value2) {
+                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
+                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
+
+                if (value1 == null) {
+                    if ($rootScope.$language == 'ru')
+                        return formatDate(value2, 'd MMM yyyy', true);
+                    else
+                        return formatDate(value2, 'MMM d, yyyy', true);
+                }
+
+                if (value2 == null || value1 == value2) {
+                    if ($rootScope.$language == 'ru')
+                        return formatDate(value1, 'd MMM yyyy', true);
+                    else
+                        return formatDate(value1, 'MMM d, yyyy', true);
+                }
+
+                if (value1.getUTCFullYear() !== value2.getUTCFullYear()) {
+                    if ($rootScope.$language == 'ru')
+                        return formatDate(value1, 'd MMM yyyy', true) + '-' + formatDate(value2, 'd MMM yyyy', true);
+                    else
+                        return formatDate(value1, 'MMM d, yyyy', true) + '-' + formatDate(value2, 'MMM d, yyyy', true);
+                } else {
+                        return formatDate(value1, 'd MMM') + ' - ' + formatDate(value2, 'd MMM')
+                            + ((new Date().getUTCFullYear() !== value1.getUTCFullYear()) ? ' ' + formatDate(value1, 'yyyy') : '');
+                }
+            }
+
+            function formatDateTimeRange(value1, value2) {
+                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
+                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
+                if (value1 == null && value2 == null) return '';
+
+                if (value1 == null) {
+                    return formatShortDateTime(value2);
+                }
+
+                if (value2 == null || value1 == value2) {
+                    return formatShortDateTime(value1);
+                }
+
+                var dayStart, monthStart, yearStart,
+                    dayEnd, monthEnd, yearEnd;
+
+                dayStart = value1.getUTCDate();
+                monthStart = value1.getUTCMonth();
+                yearStart = value1.getUTCFullYear();
+                dayEnd = value2.getUTCDate();
+                monthEnd = value2.getUTCMonth();
+                yearEnd = value2.getUTCFullYear();
+
+
+                if (yearStart !== yearEnd) {
+                    return formatDate(value1, 'd MMM') + ', ' + yearStart + ' ' + formatTime(value1, 'hh:mm') +
+                        ' - ' + formatDate(value2, 'd MMM') + ', ' + yearEnd + ' ' + formatTime(value2, 'hh:mm');
+                } else {
+                    if (monthStart != monthEnd && !dayStart != dayEnd)
+                        return formatDate(value1, 'd MMM') + ', ' + formatTime(value1, 'hh:mm') +
+                            ' - ' + formatDate(value2, 'd MMM') + ', ' + formatTime(value2, 'hh:mm');
+                    else
+                        return formatTime(value1, 'hh:mm') + ' - ' + formatTime(value2, 'hh:mm')
+                }
+            }
+
+            function formatTime(value, format) {
+                if (value == null) return '';
+
+                value = _.isDate(value) ? value : new Date(value);
+                
+                var 
+                    hours = value.getHours(),
+                    mins = value.getMinutes(),
+                    secs = value.getSeconds(),
+                    ampm = '';
+
+                if (pipTranslate.use() == 'en') {
+                    ampm = hours >= 12 ? ' PM' : ' AM';
+                    hours = hours % 12;
+                    if (hours == 0) hours = 12;
+                }
+
+                if (format == 'hh:mm:ss')
+                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
+                else if (format == 'hh:mm')
+                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ampm;
+
+                return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
+            }
+
+            function formatMonth(value, short) {
+                if (value == null) return '';
+                return short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
+            }
+
+            function formatLongTime(value) {
+                return formatTime(value, 'hh:mm:ss');
+            }
+
+            function formatShortTime(value) {
+                return formatTime(value, 'hh:mm');
+            }
+
+            function formatLongDateTime(value) {
+                if (value == null) return '';
+                value = _.isDate(value) ? value : new Date(value);
+                return formatLongDate(value) + ' ' + formatLongTime(value);
+            }
+
+            function formatShortDateTime(value) {
+                if (value == null) return '';
+                value = _.isDate(value) ? value : new Date(value);
+                return formatShortDate(value) + ' ' + formatShortTime(value);
+            }
+
+            function formatElapsedTime(value, format) {
+                if (value == null) return '';
+
+                value = _.isDate(value) ? value : new Date(value);
+
+                var 
+                    current = new Date(),
+                    diff = Math.floor(((current.getTime() + current.getTimezoneOffset()) - (value.getTime() + value.getTimezoneOffset())) / 1000);
+
+                if (diff < 1) return pipTranslate.translate('ELAPSED_JUST_NOW');
+
+                var years, months, weeks, days, hours, mins, secs;
+
+                secs = diff % 60;
+
+                diff = Math.floor(diff / 60);
+                mins = diff % 60;
+
+                diff = Math.floor(diff / 60);
+                hours = diff % 24;
+
+                diff = diff / 24;
+                years = Math.floor(diff / 365),
+
+                diff = diff - years * 365;
+                months = Math.floor(diff / 30),
+                days = Math.floor(diff - months * 30);
+
+                if (days % 7 == 0) {
+                    weeks = Math.floor(days / 7);
+                    days = 0;
+                } else {
+                    weeks = 0;
+                }
+
+                if (format == 'interval') {
+                    var result = '';
+
+                    if (years) {
+                        result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
+                        weeks = days = hours = mins = secs = null;
+                    }
+                    if (months) {
+                        result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
+                        days = hours = mins = secs = null;
+                    }
+                    if (weeks) {
+                        result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
+                        hours = mins = secs = null;
+                    }
+                    if (days) {
+                        result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
+                        mins = secs = null;
+                    }
+                    if (hours) {
+                        result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
+                        secs = null;
+                    }
+                    if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
+                    if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
+
+                    return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
+                        : pipTranslate.translate('ELAPSED_JUST_NOW');
+                }
+
+                // Default time format = 'default'
+
+                if (years > 0) {
+                    return formatDate(value, 'd MMM yyyy');
+                }
+
+                if (months > 0 || weeks > 0 || days > 1) {
+                    return formatDate(value, 'MMM d') 
+                        + ', ' + formatTime(value, 'hh:mm');
+                }
+
+                if (days == 1) {
+                    return pipTranslate.translate('ELAPSED_YESTERDAY') 
+                        + ', ' + formatTime(value, 'hh:mm');
+                }
+
+                if (hours > 10) {
+                    return pipTranslate.translate('ELAPSED_TODAY') 
+                        + ', ' + formatTime(value, 'hh:mm');
+                }
+
+                if (hours > 0) {
+                    return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
+                        hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
+                }
+
+                if (mins > 10) {
+                    return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
+                }
+
+                if (mins > 0) {
+                    return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
+                }
+
+                return pipTranslate.translate('ELAPSED_JUST_NOW');
+            }
+
+            function formatElapsedInterval(value) {
+                return formatElapsedTime(value, 'interval');  
+            }
+
+            function formatMillisecondsToSeconds(value) {
+                return Math.floor(value / 1000)
+            }
+
+        }]
+    );
+    
+})();
+
+/**
  * @file Filter to format date and time
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -2955,530 +3479,6 @@
     }]);
 
 })();
-/**
- * @file Date formatting service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
-
-	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-
-        pipTranslateProvider.translations('en', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'January',
-            'MONTH_2': 'February',
-            'MONTH_3': 'March',
-            'MONTH_4': 'April',
-            'MONTH_5': 'May',
-            'MONTH_6': 'June',
-            'MONTH_7': 'July',
-            'MONTH_8': 'August',
-            'MONTH_9': 'September',
-            'MONTH_10': 'October',
-            'MONTH_11': 'November',
-            'MONTH_12': 'December',
-
-            'MONTH_LONG_1': 'January',
-            'MONTH_LONG_2': 'February',
-            'MONTH_LONG_3': 'March',
-            'MONTH_LONG_4': 'April',
-            'MONTH_LONG_5': 'May',
-            'MONTH_LONG_6': 'June',
-            'MONTH_LONG_7': 'July',
-            'MONTH_LONG_8': 'August',
-            'MONTH_LONG_9': 'September',
-            'MONTH_LONG_10': 'October',
-            'MONTH_LONG_11': 'November',
-            'MONTH_LONG_12': 'December',
-
-            'MONTH_SHORT_1': 'Jan',
-            'MONTH_SHORT_2': 'Feb',
-            'MONTH_SHORT_3': 'Mar',
-            'MONTH_SHORT_4': 'Apr',
-            'MONTH_SHORT_5': 'May',
-            'MONTH_SHORT_6': 'Jun',
-            'MONTH_SHORT_7': 'Jul',
-            'MONTH_SHORT_8': 'Aug',
-            'MONTH_SHORT_9': 'Sep',
-            'MONTH_SHORT_10': 'Oct',
-            'MONTH_SHORT_11': 'Nov',
-            'MONTH_SHORT_12': 'Dec',
-
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'Monday',
-            'DAY_2': 'Tuesday',
-            'DAY_3': 'Wednesday',
-            'DAY_4': 'Thursday',
-            'DAY_5': 'Friday',
-            'DAY_6': 'Saturday',
-            'DAY_7': 'Sunday',
-
-            'ELAPSED_TODAY': 'Today',
-            'ELAPSED_YESTERDAY': 'Yesterday',
-            'ELAPSED_YEARS': 'y',
-            'ELAPSED_MONTHS': 'mth',
-            'ELAPSED_WEEKS': 'w',
-            'ELAPSED_DAYS': 'd',
-            'ELAPSED_HOURS': 'h',
-            'ELAPSED_MINUTES': 'm',
-            'ELAPSED_SECONDS': 's',
-            'ELAPSED_AT': 'at',
-            'ELAPSED_AGO': 'ago',
-            'ELAPSED_JUST_NOW': 'Just now',
-            'ELAPSED_FEW_MIN_AGO': 'Few min ago',
-            'ELAPSED_MIN_AGO': 'min ago',
-            'ELAPSED_HOUR_AGO': 'hour ago',
-            'ELAPSED_HOURS_AGO': 'hours ago',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'январь',
-            'MONTH_2': 'февраль',
-            'MONTH_3': 'март',
-            'MONTH_4': 'апрель',
-            'MONTH_5': 'май',
-            'MONTH_6': 'июнь',
-            'MONTH_7': 'июль',
-            'MONTH_8': 'август',
-            'MONTH_9': 'сентябрь',
-            'MONTH_10': 'октябрь',
-            'MONTH_11': 'ноябрь',
-            'MONTH_12': 'декабрь',
-
-            'MONTH_LONG_1': 'января',
-            'MONTH_LONG_2': 'февраля',
-            'MONTH_LONG_3': 'марта',
-            'MONTH_LONG_4': 'апреля',
-            'MONTH_LONG_5': 'мая',
-            'MONTH_LONG_6': 'июня',
-            'MONTH_LONG_7': 'июля',
-            'MONTH_LONG_8': 'августа',
-            'MONTH_LONG_9': 'сентября',
-            'MONTH_LONG_10': 'октября',
-            'MONTH_LONG_11': 'ноября',
-            'MONTH_LONG_12': 'декабря',
-
-            'MONTH_SHORT_1': 'янв',
-            'MONTH_SHORT_2': 'фев',
-            'MONTH_SHORT_3': 'мар',
-            'MONTH_SHORT_4': 'апр',
-            'MONTH_SHORT_5': 'май',
-            'MONTH_SHORT_6': 'июн',
-            'MONTH_SHORT_7': 'июл',
-            'MONTH_SHORT_8': 'авг',
-            'MONTH_SHORT_9': 'сен',
-            'MONTH_SHORT_10': 'окт',
-            'MONTH_SHORT_11': 'ноя',
-            'MONTH_SHORT_12': 'дек',
-
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'понедельник',
-            'DAY_2': 'вторник',
-            'DAY_3': 'среда',
-            'DAY_4': 'четверг',
-            'DAY_5': 'пятница',
-            'DAY_6': 'суббота',
-            'DAY_7': 'воскресенье',
-
-            'ELAPSED_TODAY': 'Сегодня',
-            'ELAPSED_YESTERDAY': 'Вчера',
-            'ELAPSED_YEARS': 'г',
-            'ELAPSED_MONTHS': 'мц',
-            'ELAPSED_WEEKS': 'н',
-            'ELAPSED_DAYS': 'д',
-            'ELAPSED_HOURS': 'ч',
-            'ELAPSED_MINUTES': 'м',
-            'ELAPSED_SECONDS': 'с',
-            'ELAPSED_AT': 'в',
-            'ELAPSED_AGO': 'тн',
-            'ELAPSED_JUST_NOW': 'Только что',
-            'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
-            'ELAPSED_MIN_AGO': 'мин тн',
-            'ELAPSED_HOUR_AGO': 'час тн',
-            'ELAPSED_HOURS_AGO': 'часа тн',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
-        });
-		
-	}]);
-
-    thisModule.factory('pipDateFormat',
-        ['pipDates', 'pipTranslate', '$rootScope', function (pipDates, pipTranslate, $rootScope) {
-
-            return {
-                formatDate: formatDate,
-                formatLongDate: formatLongDate,
-                formatShortDate: formatShortDate,
-                formatShortDateWithYear: formatShortDateWithYear,
-                formatLongDateWithYear: formatLongDateWithYear,
-
-                formatLongMonth: formatLongMonth,
-                formatMonth: formatMonth,
-                formatYear: formatYear,
-                formatShortWeek: formatShortWeek,
-                formatShortDayAndMonth: formatShortDayAndMonth,
-                formatLongDayAndMonth: formatLongDayAndMonth,
-
-                formatDateRange: formatDateRange,
-                formatDateTimeRange: formatDateTimeRange,
-
-                formatTime: formatTime,
-                formatLongTime: formatLongTime,
-                formatShortTime: formatShortTime, 
-
-                formatLongDateTime: formatLongDateTime,
-                formatShortDateTime: formatShortDateTime,
-
-                formatElapsedTime: formatElapsedTime,
-                formatElapsedInterval: formatElapsedInterval,
-
-                formatMillisecondsToSeconds: formatMillisecondsToSeconds
-            };
-
-
-            function twoDigits(value) {
-                return value < 10 ? '0' + value : value; 
-            };
-
-            function formatDate(value, format, str) {
-                if (value == null) return '';
-
-                var
-                    strict = str || false,
-                    value = _.isDate(value) ? value : new Date(value),
-                    thisYear = new Date().getUTCFullYear(),
-                    year = value.getUTCFullYear(),
-                    month = value.getUTCMonth(),
-                    longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
-                    shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
-                    monthName = pipTranslate.translate('MONTH_' + (month + 1)),
-                    day = value.getUTCDate(),
-                    startWeek = pipDates.toStartWeek(value),
-                    endWeek = pipDates.toEndWeek(value, -1);
-
-                if (strict == false && format == 'd MMMM yyyy' && thisYear === year) {
-                        format = 'MMMM d';
-                }
-                if (strict == false && format == 'd MMM yyyy' && thisYear === year) {
-                        format = 'MMM d';
-                }
-                if ((format == 'MMM d') && $rootScope.$language == 'ru') {
-                        format = 'd MMM';
-                }
-                if ((format == 'MMMM d') && $rootScope.$language == 'ru') {
-                    format = 'd MMMM';
-                }
-
-                if (format == 'd MMMM yyyy')
-                    return '' + day + ' ' + longMonthName + ' ' + year
-                else if (format == 'MMMM d, yyyy')
-                    return '' + monthName + ' ' + day + ', ' + year
-                if (format == 'd MMM yyyy')
-                    return '' + day + ' ' + shortMonthName + ' ' + year
-                else if (format == 'MMM d, yyyy')
-                    return '' + shortMonthName + ' ' + day + ', ' + year
-                else if (format == 'd MMMM')
-                    return '' + day + ' ' + longMonthName
-                else if (format == 'd MMM')
-                    return '' + day + ' ' + shortMonthName
-                else if (format == 'MMM d')
-                    return '' + shortMonthName + ' ' + day;
-                else if (format == 'MMMM d')
-                    return '' + longMonthName + ' ' + day;
-                else if (format == 'yyyy/M/d')
-                    return '' + year + '/' + month + '/' + day;
-                else if (format == 'yyy-M-d')
-                    return '' + year + '-' + month + '-' + day;
-                else if (format == 'MMMM')
-                    return '' + longMonthName + ' ' + year;
-                else if (format == 'yyyy')
-                    return '' + year;
-                else if (format == 'ww')
-                    return '' + startWeek.getUTCDate() + ' - ' + endWeek.getUTCDate() + ' ' + monthName + ' ' + year;
-
-                return '' + day + ' ' + monthName + ' ' + year
-            }
-
-            function formatLongDate(value) {
-                return formatDate(value, 'd MMMM yyyy');
-            }
-
-            function formatShortDateWithYear(value) {
-                return formatDate(value, 'd MMM yyyy', true);
-            }
-
-            function formatLongDateWithYear(value) {
-                return formatDate(value, 'd MMMM yyyy', true);
-            }
-
-            function formatShortDate(value) {
-                return formatDate(value, 'd MMM yyyy');
-            }
-
-            function formatLongMonth(value) {
-                return formatDate(value, 'MMMM');
-            }
-
-            function formatYear(value) {
-                return formatDate(value, 'yyyy');
-            }
-
-            function formatShortWeek(value) {
-                return formatDate(value, 'ww');
-            }
-
-            function formatShortDayAndMonth(value) {
-                return formatDate(value, 'd MMM');
-            }
-
-            function formatLongDayAndMonth(value) {
-                if ($rootScope.$language == 'ru')
-                    return formatDate(value, 'd MMMM');
-                else
-                    return formatDate(value, 'MMMM d');
-            }
-
-            function formatDateRange(value1, value2) {
-                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
-                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
-
-                if (value1 == null) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value2, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value2, 'MMM d, yyyy', true);
-                }
-
-                if (value2 == null || value1 == value2) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value1, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value1, 'MMM d, yyyy', true);
-                }
-
-                if (value1.getUTCFullYear() !== value2.getUTCFullYear()) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value1, 'd MMM yyyy', true) + '-' + formatDate(value2, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value1, 'MMM d, yyyy', true) + '-' + formatDate(value2, 'MMM d, yyyy', true);
-                } else {
-                        return formatDate(value1, 'd MMM') + ' - ' + formatDate(value2, 'd MMM')
-                            + ((new Date().getUTCFullYear() !== value1.getUTCFullYear()) ? ' ' + formatDate(value1, 'yyyy') : '');
-                }
-            }
-
-            function formatDateTimeRange(value1, value2) {
-                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
-                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
-                if (value1 == null && value2 == null) return '';
-
-                if (value1 == null) {
-                    return formatShortDateTime(value2);
-                }
-
-                if (value2 == null || value1 == value2) {
-                    return formatShortDateTime(value1);
-                }
-
-                var dayStart, monthStart, yearStart,
-                    dayEnd, monthEnd, yearEnd;
-
-                dayStart = value1.getUTCDate();
-                monthStart = value1.getUTCMonth();
-                yearStart = value1.getUTCFullYear();
-                dayEnd = value2.getUTCDate();
-                monthEnd = value2.getUTCMonth();
-                yearEnd = value2.getUTCFullYear();
-
-
-                if (yearStart !== yearEnd) {
-                    return formatDate(value1, 'd MMM') + ', ' + yearStart + ' ' + formatTime(value1, 'hh:mm') +
-                        ' - ' + formatDate(value2, 'd MMM') + ', ' + yearEnd + ' ' + formatTime(value2, 'hh:mm');
-                } else {
-                    if (monthStart != monthEnd && !dayStart != dayEnd)
-                        return formatDate(value1, 'd MMM') + ', ' + formatTime(value1, 'hh:mm') +
-                            ' - ' + formatDate(value2, 'd MMM') + ', ' + formatTime(value2, 'hh:mm');
-                    else
-                        return formatTime(value1, 'hh:mm') + ' - ' + formatTime(value2, 'hh:mm')
-                }
-            }
-
-            function formatTime(value, format) {
-                if (value == null) return '';
-
-                value = _.isDate(value) ? value : new Date(value);
-                
-                var 
-                    hours = value.getHours(),
-                    mins = value.getMinutes(),
-                    secs = value.getSeconds(),
-                    ampm = '';
-
-                if (pipTranslate.use() == 'en') {
-                    ampm = hours >= 12 ? ' PM' : ' AM';
-                    hours = hours % 12;
-                    if (hours == 0) hours = 12;
-                }
-
-                if (format == 'hh:mm:ss')
-                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
-                else if (format == 'hh:mm')
-                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ampm;
-
-                return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
-            }
-
-            function formatMonth(value, short) {
-                if (value == null) return '';
-                return short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
-            }
-
-            function formatLongTime(value) {
-                return formatTime(value, 'hh:mm:ss');
-            }
-
-            function formatShortTime(value) {
-                return formatTime(value, 'hh:mm');
-            }
-
-            function formatLongDateTime(value) {
-                if (value == null) return '';
-                value = _.isDate(value) ? value : new Date(value);
-                return formatLongDate(value) + ' ' + formatLongTime(value);
-            }
-
-            function formatShortDateTime(value) {
-                if (value == null) return '';
-                value = _.isDate(value) ? value : new Date(value);
-                return formatShortDate(value) + ' ' + formatShortTime(value);
-            }
-
-            function formatElapsedTime(value, format) {
-                if (value == null) return '';
-
-                value = _.isDate(value) ? value : new Date(value);
-
-                var 
-                    current = new Date(),
-                    diff = Math.floor(((current.getTime() + current.getTimezoneOffset()) - (value.getTime() + value.getTimezoneOffset())) / 1000);
-
-                if (diff < 1) return pipTranslate.translate('ELAPSED_JUST_NOW');
-
-                var years, months, weeks, days, hours, mins, secs;
-
-                secs = diff % 60;
-
-                diff = Math.floor(diff / 60);
-                mins = diff % 60;
-
-                diff = Math.floor(diff / 60);
-                hours = diff % 24;
-
-                diff = diff / 24;
-                years = Math.floor(diff / 365),
-
-                diff = diff - years * 365;
-                months = Math.floor(diff / 30),
-                days = Math.floor(diff - months * 30);
-
-                if (days % 7 == 0) {
-                    weeks = Math.floor(days / 7);
-                    days = 0;
-                } else {
-                    weeks = 0;
-                }
-
-                if (format == 'interval') {
-                    var result = '';
-
-                    if (years) {
-                        result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
-                        weeks = days = hours = mins = secs = null;
-                    }
-                    if (months) {
-                        result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
-                        days = hours = mins = secs = null;
-                    }
-                    if (weeks) {
-                        result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
-                        hours = mins = secs = null;
-                    }
-                    if (days) {
-                        result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
-                        mins = secs = null;
-                    }
-                    if (hours) {
-                        result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
-                        secs = null;
-                    }
-                    if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
-                    if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
-
-                    return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
-                        : pipTranslate.translate('ELAPSED_JUST_NOW');
-                }
-
-                // Default time format = 'default'
-
-                if (years > 0) {
-                    return formatDate(value, 'd MMM yyyy');
-                }
-
-                if (months > 0 || weeks > 0 || days > 1) {
-                    return formatDate(value, 'MMM d') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (days == 1) {
-                    return pipTranslate.translate('ELAPSED_YESTERDAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (hours > 10) {
-                    return pipTranslate.translate('ELAPSED_TODAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (hours > 0) {
-                    return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
-                        hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
-                }
-
-                if (mins > 10) {
-                    return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
-                }
-
-                if (mins > 0) {
-                    return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
-                }
-
-                return pipTranslate.translate('ELAPSED_JUST_NOW');
-            }
-
-            function formatElapsedInterval(value) {
-                return formatElapsedTime(value, 'interval');  
-            }
-
-            function formatMillisecondsToSeconds(value) {
-                return Math.floor(value / 1000)
-            }
-
-        }]
-    );
-    
-})();
-
 /**
  * @file Collection utilities
  * @copyright Digital Living Software Corp. 2014-2016
@@ -5424,6 +5424,1275 @@
 
 
 /**
+ * @file Announces data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipAnnouncesData', ['pipRest', 'pipDataModel', 'pipAnnouncesCache']);
+
+    thisModule.provider('pipAnnouncesData', function () {
+
+        // Read all announces
+        this.readAnnouncesResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', 'pipEnums', function ($stateParams, pipRest, pipEnums) {
+                return pipRest.announces().query().$promise;
+            }];
+        };
+
+        this.readCompletedAnnouncesResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', 'pipEnums', function ($stateParams, pipRest, pipEnums) {
+                return pipRest.announces().query( {
+                        status: pipEnums.EXECUTION_STATUS.COMPLETED
+                    }
+                ).$promise;
+            }];
+        };
+
+        this.readAnnounceResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.announces().get({
+                    id: $stateParams.id
+                }).$promise;
+            }];
+        };
+
+        // CRUD operations and other business methods
+        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipAnnouncesCache', function (pipRest, $stateParams, pipDataModel, pipAnnouncesCache) {
+            return {
+                partyId: pipRest.partyId,
+                readAnnounces: function (params, successCallback, errorCallback) {
+                    params.resource = 'announces';
+                    params.item = params.item || {};
+                    params.item.search = $stateParams.search;
+                    params.item.tags = $stateParams.search;
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    return pipAnnouncesCache.readAnnounces(params, successCallback, errorCallback);
+                },
+
+                updateAnnounce: function (params, successCallback, errorCallback) {
+                    params.resource = 'announces';
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    pipDataModel.update(
+                        params,
+                        pipAnnouncesCache.onAnnounceCreate(params, successCallback),
+                        errorCallback
+                    );
+                },
+                
+                updateAnnounceWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'announces';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.update(
+                            params,
+                            pipAnnouncesCache.onAnnounceUpdate(params, successCallback),
+                            errorCallback
+                        );
+                    });
+                },
+
+                createAnnounceWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'announces';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.create(
+                            params,
+                            pipAnnouncesCache.onAnnounceCreate(params, successCallback),
+                            errorCallback
+                        );
+                    });
+                },
+                
+                createAnnounce: function (params, successCallback, errorCallback) {
+                    params.resource = 'announces';
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    pipDataModel.create(
+                        params,
+                        pipAnnouncesCache.onAnnounceCreate(params, successCallback),
+                        errorCallback
+                    );
+                },
+
+                deleteAnnounce: function(params, successCallback, errorCallback) {
+                    params.resource = 'announces';
+                    pipDataModel.remove(params, pipAnnouncesCache.onAnnounceDelete(params, successCallback), errorCallback);
+                }
+            }
+        }];
+    });
+
+})();
+/**
+ * @file Registration of all data modules
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipData', [
+		'pipDataModel',
+		'pipDataCache',
+        
+        'pipUsersData',
+        'pipSettingsData',
+        'pipSessionData',
+        'pipTagsData',
+
+        'pipAnnouncesData',
+        'pipFeedbacksData',
+        'pipImageSetsData',
+
+        'pipTipsCache',
+        'pipTipsData',
+
+        'pipGuidesCache',
+        'pipGuidesData'
+    ]);
+    
+})();
+/**
+ * @file Application abstract data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular, _, async */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDataModel', ['pipUtils', 'pipRest']);
+
+    thisModule.provider('pipDataModel', function() {
+        
+        this.$get = ['$stateParams', 'pipCollections', 'pipRest', function($stateParams, pipCollections, pipRest) {
+
+            var api = [];
+            
+            for (var call in pipRest) {
+                api[call] = pipRest[call];
+            }
+
+            // function extendApi(extension) {
+            //     for (var call in extension) {
+            //         api[call] = extension[call];
+            //     }
+            // }
+
+            // Execute request to REST API
+            function executeCurl(params, successCallback, errorCallback) {
+                var t = params.transaction, tid;
+
+                if (t && !params.skipTransactionBegin) {
+                    tid = params.transactionId = t.begin(
+                        params.transactionOperation || 'PROCESSING'
+                    );
+                    if (!tid) return;
+                }
+
+                return api[params.resource]()[params.operation](
+                    params.item,
+                    function (result) {
+                        if (t && tid && t.aborted(tid)) return;
+                        if (t && !params.skipTransactionEnd) t.end();
+                        if (successCallback) successCallback(result);
+                    },
+                    function (error) {
+                        if (t) t.end(error);
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+
+            // Create an object and add it to object collection
+            function createCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'save';
+                
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            params.itemCollection.push(result);
+
+                        if (successCallback) successCallback(result);
+                    },
+                    function(error){
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+
+            // Update an object and replace it in object collection
+            function updateCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'update';
+
+                return  executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            pipCollections.replaceBy(params.itemCollection, 'id', result.id, result);
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Update an object and remove it from object collection
+            function deleteCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'remove';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a collection of objects
+            function readCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'query';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a single object and add it into collection
+            function readOneCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'page';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection && result) {
+                            var index = _.findIndex(params.itemCollection, {id: result.id});
+                            if (index >= 0) params.itemCollection[index] = result;
+                            else params.itemCollection.push(result);
+                        }
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a page and add results into object collection
+            function pageCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'page';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection && result.data) {
+                            for (var i = 0; i < result.data.length; i++)
+                                params.itemCollection.push(result.data[i]);
+                        }
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Save picture and document files
+            function saveFilesCurl(params, successCallback, errorCallback) {
+                var t = params.transaction, tid;
+
+                // Start transaction if necessary
+                if (t && !params.skipTransactionBegin) {
+                    tid = params.transactionId = t.begin(
+                        params.transactionOperation || 'SAVING'
+                    );
+                    if (!tid) return;
+                }
+
+//------------------
+
+                var uploadFiles = [{
+                    pictures: params.pictures,
+                    documents: params.documents
+                }];
+
+                // from content
+                if (params.item && params.item.content ) {
+                    var saveResult = true;
+                    async.eachSeries(_.union(params.item.content, uploadFiles),
+                        function (obj, callback) {
+                            // не выбран - пропускаем этот item  || нет этого события action
+                            if ( !obj.pictures && !obj.documents ) {
+                                callback();
+                            } else {
+                                if (obj.pictures) {
+                                    // Save pictures first
+                                    obj.pictures.save(
+                                        function () {
+                                            if (t && tid && t.aborted(tid)) {
+                                                saveResult =  false;
+                                                callback('aborted');
+                                            }
+                                            // Save documents second
+                                            if (obj.documents) {
+                                                obj.documents.save(
+                                                    function () {
+                                                        if (t && tid && t.aborted(tid)) {
+                                                            saveResult =  false;
+                                                            callback('aborted');
+                                                        }
+                                                        callback();
+                                                    },
+                                                    function (error) {
+                                                        saveResult =  false;
+                                                        callback(error);
+                                                    }
+                                                );
+                                            } else {
+                                                callback();
+                                            }
+                                        },
+                                        function (error) {
+                                            saveResult =  false;
+                                            callback(error);
+                                        }
+                                    );
+                                } else {
+                                    if (obj.documents) {
+                                        // Save documents first
+                                        obj.documents.save(
+                                            function () {
+                                                if (t && tid && t.aborted(tid)) {
+                                                    saveResult = false;
+                                                    callback('aborted');
+                                                }
+                                                callback();
+                                            },
+                                            function (error) {
+                                                saveResult = false;
+                                                callback(error);
+                                            }
+                                        );
+                                    }
+                                }
+                            }
+                        },
+                        function (error) {
+                            if (!error && saveResult) {
+                                // удаляем ненужные объекты перед сохранением
+                                // вызываем колбек
+                                if (t & !params.skipTransactionEnd) t.end();
+                                _.each(params.item.content, function(item){
+                                    delete item.pictures;
+                                    delete item.documents;
+                                });
+                                if (successCallback) successCallback();
+                            } else {
+                                // вызываем ошибочный колбек
+                                if (t) t.end(error);
+                                if (errorCallback) {
+                                    errorCallback(error);
+                                }
+                            }
+                        }
+                    );
+                } else {
+                    if (params.pictures) {
+                        // Save pictures first
+                        params.pictures.save(
+                            function () {
+                                if (t && tid && t.aborted(tid)) return;
+
+                                // Save documents second
+                                if (params.documents) {
+                                    params.documents.save(
+                                        function () {
+                                            if (t && tid && t.aborted(tid)) return;
+                                            // Do everything else
+                                            if (t & !params.skipTransactionEnd) t.end();
+                                            if (successCallback) successCallback();
+                                        },
+                                        function (error) {
+                                            if (t) t.end(error);
+                                            if (errorCallback) errorCallback(error);
+                                        }
+                                    );
+                                } else {
+                                    // Do everything else
+                                    if (t & !params.skipTransactionEnd) t.end();
+                                    if (successCallback) successCallback();
+                                }
+                            },
+                            function (error) {
+                                if (t) t.end(error);
+                                if (errorCallback) errorCallback(error);
+                            }
+                        );
+                    } else if (params.documents) {
+                        // Save documents first
+                        params.documents.save(
+                            function () {
+                                if (t && tid && t.aborted(tid)) return;
+                                // Do everything else
+                                if (t & !params.skipTransactionEnd) t.end();
+                                if (successCallback) successCallback();
+                            },
+                            function (error) {
+                                if (t) t.end(error);
+                                if (errorCallback) errorCallback(error);
+                            }
+                        );
+                    } else {
+                        // Do everything else
+                        if (t & !params.skipTransactionEnd) t.end();
+                        if (successCallback) successCallback();
+                    }
+                }
+            };
+
+            // Abort transaction with file upload
+            function abortFilesCurl(params) {
+                if (params.pictures) 
+                    params.pictures.abort();
+                if (params.documents)
+                    params.documents.abort();
+                    if (params.transaction)
+                    params.transaction.abort();  
+            };
+
+            return {
+                // extendApi: extendApi,
+
+                // Executing transactional requests to server
+                execute: executeCurl,
+
+                // Creating an object
+                create: createCurl,
+
+                // Updating an object
+                update: updateCurl,
+                save: updateCurl,
+
+                // Deleting an object
+                'delete': deleteCurl,
+                remove: deleteCurl,
+
+                // Reading objects
+                read: readCurl,
+                query: readCurl,
+
+                // Reading a single object
+                readOne: readOneCurl,
+                get: readOneCurl,
+
+                // Reading paginated results
+                page: pageCurl,
+                readPage: pageCurl,
+                queryPage: pageCurl,
+
+                // Saving files to file store
+                saveFiles: saveFilesCurl,
+                abortFiles: abortFilesCurl
+            }
+        }];
+    });
+
+})();
+
+/**
+ * @file Feedbacks data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipFeedbacksData', ['pipRest', 'pipDataModel', 'pipFeedbacksCache']);
+
+    thisModule.provider('pipFeedbacksData', function() {
+
+        this.readFeedbacksResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.feedbacks().query().$promise;
+            }];
+        };
+
+        this.readFeedbackResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.feedbacks().get({
+                    id: $stateParams.id
+                }).$promise;
+            }];
+        };
+
+        this.$get = ['$stateParams', 'pipRest', 'pipDataModel', 'pipFeedbacksCache', function($stateParams, pipRest, pipDataModel, pipFeedbacksCache) {
+            return {
+
+                sendFeedback: function(params, successCallback, errorCallback) {
+                    params.resource = 'feedbacks';
+                    pipDataModel.create(params, successCallback, errorCallback);
+                },
+
+                readFeedbacks: function (params, successCallback, errorCallback) {
+                    params.resource = 'feedbacks';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    
+                    return pipFeedbacksCache.readFeedbacks(params, successCallback, errorCallback);
+                },
+
+
+                createFeedbackWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'feedbacks';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.create(params, successCallback, errorCallback);
+                    });
+                },
+
+                updateFeedback: function (params, successCallback, errorCallback) {
+                    params.resource = 'feedbacks';
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    pipDataModel.update(
+                        params,
+                        successCallback,
+                        errorCallback
+                    );
+                },
+
+                deleteFeedback: function(params, successCallback, errorCallback) {
+                    params.resource = 'feedbacks';
+                    pipDataModel.remove(params, successCallback, errorCallback);
+                }
+            };
+        }];
+    });
+
+})();
+
+/**
+ * @file Guides data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipGuidesData', ['pipRest', 'pipDataModel']);
+
+    thisModule.provider('pipGuidesData', function () {
+        var PAGE_SIZE = 5;
+
+        // Read all guides
+        this.readGuidesResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.guides().query().$promise;
+            }];
+        };
+        
+        this.readIntroGuidesResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.guides().query({
+                        type: 'intro',
+                        status : 'completed'
+                }).$promise;
+            }];
+        };
+
+        this.readGuideResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.guides().get({
+                    id: $stateParams.id || '55bf23d3bb22aa175c3e498e'
+                }).$promise;
+            }];
+        };
+
+        // CRUD operations and other business methods
+        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipGuidesCache', function (pipRest, $stateParams, pipDataModel, pipGuidesCache) {
+            return {
+                partyId: pipRest.partyId,
+
+                readGuides: function(params, successCallback, errorCallback) {
+                    params.resource = 'guides';
+                    params.party_id = pipRest.partyId($stateParams);
+                    return pipGuidesCache.readGuides(params, successCallback, errorCallback);
+                },
+
+                readIntroGuides: function(params, successCallback, errorCallback) {
+                    params.resource = 'guides';
+                    params.party_id = pipRest.partyId($stateParams);
+                    params.type = 'intro';
+                    params.status = 'completed';
+                    return pipGuidesCache.readGuides(params, successCallback, errorCallback);
+                },
+
+                readGuide: function (params, successCallback, errorCallback) {
+                    params.resource = 'guides';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    params.item.id = params.item.id || $stateParams.id;
+                    return pipDataModel.readOne(params, pipGuidesCache.onGuideUpdate(params, successCallback), errorCallback);
+                },
+
+                createGuide: function (params, successCallback, errorCallback) {
+                    params.resource =  'guides';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    pipDataModel.create(
+                        params,
+                        pipGuidesCache.onGuideCreate(params, successCallback),
+                        errorCallback
+                    );
+                },
+
+                createGuideWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'guides';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.create(
+                            params,
+                            pipGuidesCache.onGuideCreate(params, successCallback),
+                            errorCallback
+                        );
+                    });
+                },
+
+                updateGuide: function (params, successCallback, errorCallback) {
+                    params.resource = 'guides';
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    pipDataModel.update(
+                        params,
+                        pipGuidesCache.onGuideUpdate(params, successCallback),
+                        errorCallback
+                    );
+                },
+                
+                updateGuideWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'guides';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.update(
+                            params,
+                            pipGuidesCache.onGuideUpdate(params, successCallback),
+                            errorCallback
+                        );
+                    });
+                },
+
+                
+                deleteGuide: function(params, successCallback, errorCallback) {
+                    params.resource = 'guides';
+                    pipDataModel.remove(params, pipGuidesCache.onGuideDelete(params, successCallback),  errorCallback);
+                }
+
+            }
+        }];
+    });
+
+})();
+/**
+ * @file Image sets data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+    
+    var thisModule = angular.module('pipImageSetsData', ['pipRest', 'pipDataModel', 'pipImageSetsCache']);
+
+    thisModule.provider('pipImageSetsData', function () {
+        var PAGE_SIZE = 15;
+
+        // Read all image sets
+        this.readImageSetsResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.image_sets().get({
+                    paging: 1,
+                    skip: 0,
+                    take: PAGE_SIZE,
+                    search: $stateParams.search,
+                    //tags: $stateParams.search
+                }).$promise;
+            }];
+        };
+
+        this.readImageSetResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.image_sets().get({
+                    id: $stateParams.id
+                }).$promise;
+            }];
+        };
+
+        // CRUD operations and other business methods
+        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipImageSetsCache', function (pipRest, $stateParams, pipDataModel, pipImageSetsCache) {
+
+            return {
+                partyId: pipRest.partyId,
+
+                readImageSets: function (params, transaction, successCallback, errorCallback) {
+                    params.resource = 'image_sets';
+
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    
+                    params.item = params.item || {};
+                    params.item.skip = params.item.skip || 0;
+                    params.item.search = $stateParams.search || params.item.search;
+                   // params.item.tags = $stateParams.search || params.item.search;
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    params.item.take = PAGE_SIZE;
+                    params.item.paging = 1;
+
+                    return pipDataModel.page(
+                        params,
+                        successCallback,
+                        errorCallback
+                    );
+                },
+
+                readImageSet: function (params, successCallback, errorCallback) {
+                    params.resource = 'image_sets';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    params.item.id = params.item.id || $stateParams.id;
+                    return pipDataModel.readOne(params, pipImageSetsCache.onImageSetUpdate(params, successCallback), errorCallback);
+                },
+
+                updateImageSet: function (params, successCallback, errorCallback) {
+                    params.resource = 'image_sets';
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    return pipDataModel.update(
+                        params,
+                        successCallback,
+                        errorCallback
+                    );
+                },
+
+                createImageSet: function (params, successCallback, errorCallback) {
+                    params.resource = 'image_sets';
+                    params.skipTransactionBegin = true;
+                    params.skipTransactionEnd = false;
+                    pipDataModel.create(
+                        params,
+                        pipImageSetsCache.onImageSetCreate(params, successCallback),
+                        errorCallback
+                    );
+                },
+
+                createImageSetWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'image_sets';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.create(
+                            params,
+                            pipImageSetsCache.onImageSetCreate(params, successCallback),
+                            errorCallback
+                        );
+                    });
+                },
+
+                updateImageSetWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'image_sets';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        pipDataModel.update(
+                            params,
+                            successCallback,
+                            errorCallback
+                        );
+                    });
+                },
+
+                deleteImageSet: function(params, successCallback, errorCallback) {
+                    params.resource = 'image_sets';
+                    pipDataModel.remove(params, successCallback, errorCallback);
+                }
+            }
+        }];
+    });
+
+})();
+
+/**
+ * @file Session data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSessionData', ['pipRest', 'pipSessionCache']);
+
+    thisModule.provider('pipSessionData', function() {
+
+        readUserResolver.$inject = ['pipSessionCache'];
+        readPartyResolver.$inject = ['pipSessionCache', '$stateParams'];
+        readConnectionResolver.$inject = ['pipSessionCache', '$stateParams'];
+        readSettingsResolver.$inject = ['pipSessionCache'];
+        readSessionsUserResolver.$inject = ['$stateParams', 'pipRest', '$rootScope'];
+        readSessionIdResolver.$inject = ['$stateParams', 'pipSession'];
+        this.readUserResolver = /* @ngInject */ readUserResolver;
+        this.readPartyResolver = /* @ngInject */ readPartyResolver;
+        this.readConnectionResolver = /* @ngInject */ readConnectionResolver;
+        this.readSettingsResolver = /* @ngInject */ readSettingsResolver;
+
+        this.readSessionsUserResolver = /* @ngInject */ readSessionsUserResolver;
+        this.readSessionIdResolver = /* @ngInject */ readSessionIdResolver;
+
+        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipDataModel', 'pipSessionCache', function($rootScope, $stateParams, pipRest, pipDataModel, pipSessionCache) {
+            return {
+                getSessionId: getSessionId,
+                removeSession: removeSession,
+                readSessionsUser: function (params, successCallback, errorCallback) {
+                    params.resource = 'userSessions';
+                    params.item = params.item || {};
+                    params.item.party_id = $stateParams.id;
+                    params.party_id = $stateParams.id;
+                    return  pipSessionCache.readSessions(params, successCallback, errorCallback);
+
+                }
+            };
+
+            function getSessionId(pipSession){
+                return function () {
+                    return pipSession.sessionId();
+                };
+            };
+
+            function removeSession(transaction, session, successCallback, errorCallback) {
+                var tid = transaction.begin('REMOVING');
+                if (!tid) return;
+
+                pipRest.userSessions().remove(
+                    {
+                        id: session.id,
+                        party_id: $stateParams.id
+                    },
+                    function (removedSession) {
+                        if (transaction.aborted(tid)) return;
+                        else transaction.end();
+
+                        if (successCallback) successCallback(removedSession);
+                    },
+                    function (error) {
+                        transaction.end(error);
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+            
+        }];
+        //--------------
+
+        function readUserResolver(pipSessionCache) {
+            return pipSessionCache.readUser();                             
+        };
+
+        function readPartyResolver(pipSessionCache, $stateParams) {
+            return pipSessionCache.readParty($stateParams);
+        };
+
+        function readConnectionResolver(pipSessionCache, $stateParams) {
+            return pipSessionCache.readConnection($stateParams);
+        };
+
+        function readSettingsResolver(pipSessionCache) {
+            return pipSessionCache.readSettings();                             
+        };
+
+        function readSessionsUserResolver($stateParams, pipRest, $rootScope) {
+            return pipRest.userSessions().query({
+                party_id: $stateParams.id
+            }).$promise;
+        };
+
+        function readSessionIdResolver($stateParams, pipSession) {
+            return pipSession.sessionId();
+        };
+        
+    });
+
+})();
+
+/**
+ * @file Settings data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo Rewrite, use cached settings, remove unrelated methods
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSettingsData', ['pipRest', 'pipSessionData', 'pipSessionCache', 'pipDataModel']);
+
+    thisModule.provider('pipSettingsData', ['pipSessionDataProvider', function (pipSessionDataProvider) {
+
+        this.readSettingsResolver = pipSessionDataProvider.readSettingsResolver;
+
+        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipSessionCache', 'pipSession', 'pipDataModel', function ($rootScope, $stateParams, pipRest, pipSessionCache, pipSession, pipDataModel) {
+            return {
+                // Saving generic settings
+                saveSettings: saveSettings,
+                readSettings: readSettings,
+                reReadSettings: reReadSettings
+
+            };
+
+            function readSettings(successCallback, errorCallback) {
+                return pipSessionCache.readSettings(successCallback, errorCallback)
+            };
+
+            // force read settings from server and update cache
+            function reReadSettings(successCallback, errorCallback) {
+                return pipRest.partySettings().get(
+                    {
+                        party_id: pipSession.userId()
+                    },
+                    function (settings) {
+                        settings = settings || {};
+                        pipSessionCache.onSettingsUpdate(settings);
+                        if (successCallback) successCallback(settings);
+                    },
+                    errorCallback
+                ).$promise;
+            };
+
+            function saveSettings(settings, keys, successCallback, errorCallback) {
+                // Extract specific keys
+                settings = keys ? _.pick(settings, keys) : settings;
+                settings.party_id = pipSession.userId();
+                var oldSettings = _.cloneDeep($rootScope.$settings);
+                pipSessionCache.onSettingsUpdate(settings);
+
+                var params = {};
+                params.resource = 'partySettings';
+                params.item = settings;
+                params.item.creator_id = pipSession.userId();
+
+                pipDataModel.create(
+                    params,
+                    successCallback,
+                    function (error) {
+                        pipSessionCache.onSettingsUpdate(oldSettings);
+
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+        }];
+    }]);
+
+})();
+
+/**
+ * @file Tags data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTagsData', ['pipRest' , 'pipDataModel', 'pipTagsCache']);
+
+    thisModule.provider('pipTagsData', function() {
+        
+        this.readTagsResolver = function() {
+            return /* @ngInject */ ['$stateParams', 'pipRest', 'pipTagsCache', function($stateParams, pipRest, pipTagsCache) {
+                return pipTagsCache.readTags({
+                    item: { party_id: pipRest.partyId($stateParams) }
+                });
+            }];
+        };
+
+        this.$get = ['$stateParams', '$state', 'pipRest', 'pipDataModel', 'pipTagsCache', function($stateParams, $state, pipRest, pipDataModel, pipTagsCache) {
+            return {
+                partyId: pipRest.partyId,
+                
+                readTags: function(params, successCallback, errorCallback) {
+                    params = params || {};
+                    params.item = params.item || {};
+                    if(params.item.party_id == null) {
+                        params.item.party_id = pipRest.partyId($stateParams);
+                    }
+                    return pipTagsCache.readTags(params, successCallback, errorCallback);
+                }
+            }
+        }];
+    });
+
+})();
+
+/**
+ * @file Tips data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTipsData', ['pipRest', 'pipDataModel']);
+
+    thisModule.provider('pipTipsData', function () {
+        var PAGE_SIZE = 100;
+
+        // Read all tips
+        this.readTipsResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.tips().query().$promise;
+            }];
+        };
+
+        this.readTipResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.tips().get({
+                    id: $stateParams.id
+                }).$promise;
+            }];
+        };
+
+        // CRUD operations and other business methods
+        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipTipsCache', function (pipRest, $stateParams, pipDataModel, pipTipsCache) {
+
+            return {
+                partyId: pipRest.partyId,
+
+// todo update after optimization rezolver
+                readTips: function (params, successCallback, errorCallback) {
+                    params.resource = 'tips';
+                    params.item = params.item || {};
+                    params.item.search = $stateParams.search;
+                    params.item.tags = $stateParams.search;
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    return pipTipsCache.readTips(params, successCallback, errorCallback);
+                },
+
+                readTip: function (params, successCallback, errorCallback) {
+                    params.resource = 'tips';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    params.item.id = params.item.id || $stateParams.id;
+                    return pipDataModel.readOne(params, pipTipsCache.onTipsUpdate(params, successCallback), errorCallback);
+                },
+
+                createTip: function (params, successCallback, errorCallback) {
+                    params.resource = 'tips';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    pipDataModel.create(
+                        params,
+                        pipTipsCache.onTipCreate(params, successCallback),
+                        errorCallback
+                    );
+                },
+                
+                createTipWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'tips';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        
+                        params.item.party_id = pipRest.partyId($stateParams);
+                        pipDataModel.create(
+                            params,
+                            pipTipsCache.onTipCreate(params, successCallback),
+                            errorCallback
+                        );
+                    }, errorCallback);
+                },
+
+                updateTip: function (params, successCallback, errorCallback) {
+                    params.resource = 'tips';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    pipDataModel.update(
+                        params,
+                        pipTipsCache.onTipUpdate(params, successCallback),
+                        errorCallback
+                    );
+                },
+                
+                updateTipWithFiles: function(params, successCallback, errorCallback) {
+                    params.skipTransactionEnd = true;
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    pipDataModel.saveFiles(params, function() {
+                        params.resource = 'tips';
+                        params.skipTransactionBegin = true;
+                        params.skipTransactionEnd = false;
+                        
+                        params.item.party_id = pipRest.partyId($stateParams);
+                        pipDataModel.update(
+                            params,
+                            pipTipsCache.onTipUpdate(params, successCallback),
+                            errorCallback
+                        );
+                    });
+                },
+
+                deleteTip: function(params, successCallback, errorCallback) {
+                    params.resource = 'tips';
+                    pipDataModel.remove(params, pipTipsCache.onTipDelete(params, successCallback), errorCallback);
+                }
+            }
+        }];
+    });
+
+})();
+
+/**
+ * @file Users data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipUsersData', ['pipRest']);
+
+    thisModule.provider('pipUsersData', function () {
+
+        this.readUsersResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.users().page({
+                    party_id: $stateParams.id,
+                    paging: $stateParams.paging || 1,
+                    skip: $stateParams.skip || 0,
+                    take: $stateParams.take || 15
+                }).$promise;
+            }];
+        };
+
+        this.readUserResolver = function () {
+            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
+                return pipRest.users().get({
+                    id: $stateParams.id,
+                    party_id: pipRest.partyId($stateParams)
+                }).$promise;
+
+            }];
+        };
+
+        this.readActivitiesUserResolver = /* @ngInject */
+            ['$stateParams', 'pipRest', '$rootScope', function ($stateParams, pipRest, $rootScope) {
+                return pipRest.partyActivities().page({
+                    party_id: $rootScope.$user.id,
+                    paging: 1,
+                    skip: 0,
+                    take: 25
+                }).$promise;
+            }];
+
+        // CRUD operations and other business methods
+        this.$get = ['pipRest', '$stateParams', 'pipDataModel', function (pipRest, $stateParams, pipDataModel) {   
+            return {
+                partyId: pipRest.partyId,
+
+                readUsers: function (params, transaction, successCallback, errorCallback) {
+                    return pipRest.users().page(
+                        {
+                            party_id: pipRest.partyId($stateParams),
+                            paging: 1,
+                            skip: params.start || params.item.skip || 0,
+                            search: params.item.search ,
+                            active: params.item.active,
+                            paid: params.item.paid,
+                            admin: params.item.admin,
+                            take: 15
+                        },
+                        function (pagedUsers) {
+                            if (successCallback) successCallback(pagedUsers);
+                        },
+                        function (error) {
+                            errorCallback(error);
+                        }
+                    );
+                },
+
+                readUser: function (params, successCallback, errorCallback) {
+                    params.resource = 'users';
+                    params.item = params.item || {};
+                    params.item.party_id = pipRest.partyId($stateParams);
+                    params.item.id = params.item.id || $stateParams.id;
+                    return pipDataModel.readOne(params, successCallback, errorCallback);
+                },
+                
+                updateUser: function (item, transaction, successCallback, errorCallback) {
+                    pipRest.users().update(
+                        item.item,
+                        function (updatedItem) {
+                            if (successCallback) successCallback(updatedItem);
+                        },
+                        function (error) {
+                            errorCallback(error);
+                        }
+                    );
+                }
+
+            }
+        }];
+    });
+
+})();
+/**
  * @file User access permissions service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -6908,1275 +8177,6 @@
     );
 
 })();
-/**
- * @file Announces data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipAnnouncesData', ['pipRest', 'pipDataModel', 'pipAnnouncesCache']);
-
-    thisModule.provider('pipAnnouncesData', function () {
-
-        // Read all announces
-        this.readAnnouncesResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', 'pipEnums', function ($stateParams, pipRest, pipEnums) {
-                return pipRest.announces().query().$promise;
-            }];
-        };
-
-        this.readCompletedAnnouncesResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', 'pipEnums', function ($stateParams, pipRest, pipEnums) {
-                return pipRest.announces().query( {
-                        status: pipEnums.EXECUTION_STATUS.COMPLETED
-                    }
-                ).$promise;
-            }];
-        };
-
-        this.readAnnounceResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.announces().get({
-                    id: $stateParams.id
-                }).$promise;
-            }];
-        };
-
-        // CRUD operations and other business methods
-        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipAnnouncesCache', function (pipRest, $stateParams, pipDataModel, pipAnnouncesCache) {
-            return {
-                partyId: pipRest.partyId,
-                readAnnounces: function (params, successCallback, errorCallback) {
-                    params.resource = 'announces';
-                    params.item = params.item || {};
-                    params.item.search = $stateParams.search;
-                    params.item.tags = $stateParams.search;
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    return pipAnnouncesCache.readAnnounces(params, successCallback, errorCallback);
-                },
-
-                updateAnnounce: function (params, successCallback, errorCallback) {
-                    params.resource = 'announces';
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    pipDataModel.update(
-                        params,
-                        pipAnnouncesCache.onAnnounceCreate(params, successCallback),
-                        errorCallback
-                    );
-                },
-                
-                updateAnnounceWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'announces';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.update(
-                            params,
-                            pipAnnouncesCache.onAnnounceUpdate(params, successCallback),
-                            errorCallback
-                        );
-                    });
-                },
-
-                createAnnounceWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'announces';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.create(
-                            params,
-                            pipAnnouncesCache.onAnnounceCreate(params, successCallback),
-                            errorCallback
-                        );
-                    });
-                },
-                
-                createAnnounce: function (params, successCallback, errorCallback) {
-                    params.resource = 'announces';
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    pipDataModel.create(
-                        params,
-                        pipAnnouncesCache.onAnnounceCreate(params, successCallback),
-                        errorCallback
-                    );
-                },
-
-                deleteAnnounce: function(params, successCallback, errorCallback) {
-                    params.resource = 'announces';
-                    pipDataModel.remove(params, pipAnnouncesCache.onAnnounceDelete(params, successCallback), errorCallback);
-                }
-            }
-        }];
-    });
-
-})();
-/**
- * @file Registration of all data modules
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipData', [
-		'pipDataModel',
-		'pipDataCache',
-        
-        'pipUsersData',
-        'pipSettingsData',
-        'pipSessionData',
-        'pipTagsData',
-
-        'pipAnnouncesData',
-        'pipFeedbacksData',
-        'pipImageSetsData',
-
-        'pipTipsCache',
-        'pipTipsData',
-
-        'pipGuidesCache',
-        'pipGuidesData'
-    ]);
-    
-})();
-/**
- * @file Application abstract data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular, _, async */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDataModel', ['pipUtils', 'pipRest']);
-
-    thisModule.provider('pipDataModel', function() {
-        
-        this.$get = ['$stateParams', 'pipCollections', 'pipRest', function($stateParams, pipCollections, pipRest) {
-
-            var api = [];
-            
-            for (var call in pipRest) {
-                api[call] = pipRest[call];
-            }
-
-            // function extendApi(extension) {
-            //     for (var call in extension) {
-            //         api[call] = extension[call];
-            //     }
-            // }
-
-            // Execute request to REST API
-            function executeCurl(params, successCallback, errorCallback) {
-                var t = params.transaction, tid;
-
-                if (t && !params.skipTransactionBegin) {
-                    tid = params.transactionId = t.begin(
-                        params.transactionOperation || 'PROCESSING'
-                    );
-                    if (!tid) return;
-                }
-
-                return api[params.resource]()[params.operation](
-                    params.item,
-                    function (result) {
-                        if (t && tid && t.aborted(tid)) return;
-                        if (t && !params.skipTransactionEnd) t.end();
-                        if (successCallback) successCallback(result);
-                    },
-                    function (error) {
-                        if (t) t.end(error);
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-
-            // Create an object and add it to object collection
-            function createCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'save';
-                
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            params.itemCollection.push(result);
-
-                        if (successCallback) successCallback(result);
-                    },
-                    function(error){
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-
-            // Update an object and replace it in object collection
-            function updateCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'update';
-
-                return  executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            pipCollections.replaceBy(params.itemCollection, 'id', result.id, result);
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Update an object and remove it from object collection
-            function deleteCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'remove';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a collection of objects
-            function readCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'query';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a single object and add it into collection
-            function readOneCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'page';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection && result) {
-                            var index = _.findIndex(params.itemCollection, {id: result.id});
-                            if (index >= 0) params.itemCollection[index] = result;
-                            else params.itemCollection.push(result);
-                        }
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a page and add results into object collection
-            function pageCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'page';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection && result.data) {
-                            for (var i = 0; i < result.data.length; i++)
-                                params.itemCollection.push(result.data[i]);
-                        }
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Save picture and document files
-            function saveFilesCurl(params, successCallback, errorCallback) {
-                var t = params.transaction, tid;
-
-                // Start transaction if necessary
-                if (t && !params.skipTransactionBegin) {
-                    tid = params.transactionId = t.begin(
-                        params.transactionOperation || 'SAVING'
-                    );
-                    if (!tid) return;
-                }
-
-//------------------
-
-                var uploadFiles = [{
-                    pictures: params.pictures,
-                    documents: params.documents
-                }];
-
-                // from content
-                if (params.item && params.item.content ) {
-                    var saveResult = true;
-                    async.eachSeries(_.union(params.item.content, uploadFiles),
-                        function (obj, callback) {
-                            // не выбран - пропускаем этот item  || нет этого события action
-                            if ( !obj.pictures && !obj.documents ) {
-                                callback();
-                            } else {
-                                if (obj.pictures) {
-                                    // Save pictures first
-                                    obj.pictures.save(
-                                        function () {
-                                            if (t && tid && t.aborted(tid)) {
-                                                saveResult =  false;
-                                                callback('aborted');
-                                            }
-                                            // Save documents second
-                                            if (obj.documents) {
-                                                obj.documents.save(
-                                                    function () {
-                                                        if (t && tid && t.aborted(tid)) {
-                                                            saveResult =  false;
-                                                            callback('aborted');
-                                                        }
-                                                        callback();
-                                                    },
-                                                    function (error) {
-                                                        saveResult =  false;
-                                                        callback(error);
-                                                    }
-                                                );
-                                            } else {
-                                                callback();
-                                            }
-                                        },
-                                        function (error) {
-                                            saveResult =  false;
-                                            callback(error);
-                                        }
-                                    );
-                                } else {
-                                    if (obj.documents) {
-                                        // Save documents first
-                                        obj.documents.save(
-                                            function () {
-                                                if (t && tid && t.aborted(tid)) {
-                                                    saveResult = false;
-                                                    callback('aborted');
-                                                }
-                                                callback();
-                                            },
-                                            function (error) {
-                                                saveResult = false;
-                                                callback(error);
-                                            }
-                                        );
-                                    }
-                                }
-                            }
-                        },
-                        function (error) {
-                            if (!error && saveResult) {
-                                // удаляем ненужные объекты перед сохранением
-                                // вызываем колбек
-                                if (t & !params.skipTransactionEnd) t.end();
-                                _.each(params.item.content, function(item){
-                                    delete item.pictures;
-                                    delete item.documents;
-                                });
-                                if (successCallback) successCallback();
-                            } else {
-                                // вызываем ошибочный колбек
-                                if (t) t.end(error);
-                                if (errorCallback) {
-                                    errorCallback(error);
-                                }
-                            }
-                        }
-                    );
-                } else {
-                    if (params.pictures) {
-                        // Save pictures first
-                        params.pictures.save(
-                            function () {
-                                if (t && tid && t.aborted(tid)) return;
-
-                                // Save documents second
-                                if (params.documents) {
-                                    params.documents.save(
-                                        function () {
-                                            if (t && tid && t.aborted(tid)) return;
-                                            // Do everything else
-                                            if (t & !params.skipTransactionEnd) t.end();
-                                            if (successCallback) successCallback();
-                                        },
-                                        function (error) {
-                                            if (t) t.end(error);
-                                            if (errorCallback) errorCallback(error);
-                                        }
-                                    );
-                                } else {
-                                    // Do everything else
-                                    if (t & !params.skipTransactionEnd) t.end();
-                                    if (successCallback) successCallback();
-                                }
-                            },
-                            function (error) {
-                                if (t) t.end(error);
-                                if (errorCallback) errorCallback(error);
-                            }
-                        );
-                    } else if (params.documents) {
-                        // Save documents first
-                        params.documents.save(
-                            function () {
-                                if (t && tid && t.aborted(tid)) return;
-                                // Do everything else
-                                if (t & !params.skipTransactionEnd) t.end();
-                                if (successCallback) successCallback();
-                            },
-                            function (error) {
-                                if (t) t.end(error);
-                                if (errorCallback) errorCallback(error);
-                            }
-                        );
-                    } else {
-                        // Do everything else
-                        if (t & !params.skipTransactionEnd) t.end();
-                        if (successCallback) successCallback();
-                    }
-                }
-            };
-
-            // Abort transaction with file upload
-            function abortFilesCurl(params) {
-                if (params.pictures) 
-                    params.pictures.abort();
-                if (params.documents)
-                    params.documents.abort();
-                    if (params.transaction)
-                    params.transaction.abort();  
-            };
-
-            return {
-                // extendApi: extendApi,
-
-                // Executing transactional requests to server
-                execute: executeCurl,
-
-                // Creating an object
-                create: createCurl,
-
-                // Updating an object
-                update: updateCurl,
-                save: updateCurl,
-
-                // Deleting an object
-                'delete': deleteCurl,
-                remove: deleteCurl,
-
-                // Reading objects
-                read: readCurl,
-                query: readCurl,
-
-                // Reading a single object
-                readOne: readOneCurl,
-                get: readOneCurl,
-
-                // Reading paginated results
-                page: pageCurl,
-                readPage: pageCurl,
-                queryPage: pageCurl,
-
-                // Saving files to file store
-                saveFiles: saveFilesCurl,
-                abortFiles: abortFilesCurl
-            }
-        }];
-    });
-
-})();
-
-/**
- * @file Feedbacks data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipFeedbacksData', ['pipRest', 'pipDataModel', 'pipFeedbacksCache']);
-
-    thisModule.provider('pipFeedbacksData', function() {
-
-        this.readFeedbacksResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.feedbacks().query().$promise;
-            }];
-        };
-
-        this.readFeedbackResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.feedbacks().get({
-                    id: $stateParams.id
-                }).$promise;
-            }];
-        };
-
-        this.$get = ['$stateParams', 'pipRest', 'pipDataModel', 'pipFeedbacksCache', function($stateParams, pipRest, pipDataModel, pipFeedbacksCache) {
-            return {
-
-                sendFeedback: function(params, successCallback, errorCallback) {
-                    params.resource = 'feedbacks';
-                    pipDataModel.create(params, successCallback, errorCallback);
-                },
-
-                readFeedbacks: function (params, successCallback, errorCallback) {
-                    params.resource = 'feedbacks';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    
-                    return pipFeedbacksCache.readFeedbacks(params, successCallback, errorCallback);
-                },
-
-
-                createFeedbackWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'feedbacks';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.create(params, successCallback, errorCallback);
-                    });
-                },
-
-                updateFeedback: function (params, successCallback, errorCallback) {
-                    params.resource = 'feedbacks';
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    pipDataModel.update(
-                        params,
-                        successCallback,
-                        errorCallback
-                    );
-                },
-
-                deleteFeedback: function(params, successCallback, errorCallback) {
-                    params.resource = 'feedbacks';
-                    pipDataModel.remove(params, successCallback, errorCallback);
-                }
-            };
-        }];
-    });
-
-})();
-
-/**
- * @file Guides data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipGuidesData', ['pipRest', 'pipDataModel']);
-
-    thisModule.provider('pipGuidesData', function () {
-        var PAGE_SIZE = 5;
-
-        // Read all guides
-        this.readGuidesResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.guides().query().$promise;
-            }];
-        };
-        
-        this.readIntroGuidesResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.guides().query({
-                        type: 'intro',
-                        status : 'completed'
-                }).$promise;
-            }];
-        };
-
-        this.readGuideResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.guides().get({
-                    id: $stateParams.id || '55bf23d3bb22aa175c3e498e'
-                }).$promise;
-            }];
-        };
-
-        // CRUD operations and other business methods
-        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipGuidesCache', function (pipRest, $stateParams, pipDataModel, pipGuidesCache) {
-            return {
-                partyId: pipRest.partyId,
-
-                readGuides: function(params, successCallback, errorCallback) {
-                    params.resource = 'guides';
-                    params.party_id = pipRest.partyId($stateParams);
-                    return pipGuidesCache.readGuides(params, successCallback, errorCallback);
-                },
-
-                readIntroGuides: function(params, successCallback, errorCallback) {
-                    params.resource = 'guides';
-                    params.party_id = pipRest.partyId($stateParams);
-                    params.type = 'intro';
-                    params.status = 'completed';
-                    return pipGuidesCache.readGuides(params, successCallback, errorCallback);
-                },
-
-                readGuide: function (params, successCallback, errorCallback) {
-                    params.resource = 'guides';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    params.item.id = params.item.id || $stateParams.id;
-                    return pipDataModel.readOne(params, pipGuidesCache.onGuideUpdate(params, successCallback), errorCallback);
-                },
-
-                createGuide: function (params, successCallback, errorCallback) {
-                    params.resource =  'guides';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    pipDataModel.create(
-                        params,
-                        pipGuidesCache.onGuideCreate(params, successCallback),
-                        errorCallback
-                    );
-                },
-
-                createGuideWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'guides';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.create(
-                            params,
-                            pipGuidesCache.onGuideCreate(params, successCallback),
-                            errorCallback
-                        );
-                    });
-                },
-
-                updateGuide: function (params, successCallback, errorCallback) {
-                    params.resource = 'guides';
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    pipDataModel.update(
-                        params,
-                        pipGuidesCache.onGuideUpdate(params, successCallback),
-                        errorCallback
-                    );
-                },
-                
-                updateGuideWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'guides';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.update(
-                            params,
-                            pipGuidesCache.onGuideUpdate(params, successCallback),
-                            errorCallback
-                        );
-                    });
-                },
-
-                
-                deleteGuide: function(params, successCallback, errorCallback) {
-                    params.resource = 'guides';
-                    pipDataModel.remove(params, pipGuidesCache.onGuideDelete(params, successCallback),  errorCallback);
-                }
-
-            }
-        }];
-    });
-
-})();
-/**
- * @file Image sets data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipImageSetsData', ['pipRest', 'pipDataModel', 'pipImageSetsCache']);
-
-    thisModule.provider('pipImageSetsData', function () {
-        var PAGE_SIZE = 15;
-
-        // Read all image sets
-        this.readImageSetsResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.image_sets().get({
-                    paging: 1,
-                    skip: 0,
-                    take: PAGE_SIZE,
-                    search: $stateParams.search,
-                    //tags: $stateParams.search
-                }).$promise;
-            }];
-        };
-
-        this.readImageSetResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.image_sets().get({
-                    id: $stateParams.id
-                }).$promise;
-            }];
-        };
-
-        // CRUD operations and other business methods
-        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipImageSetsCache', function (pipRest, $stateParams, pipDataModel, pipImageSetsCache) {
-
-            return {
-                partyId: pipRest.partyId,
-
-                readImageSets: function (params, transaction, successCallback, errorCallback) {
-                    params.resource = 'image_sets';
-
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    
-                    params.item = params.item || {};
-                    params.item.skip = params.item.skip || 0;
-                    params.item.search = $stateParams.search || params.item.search;
-                   // params.item.tags = $stateParams.search || params.item.search;
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    params.item.take = PAGE_SIZE;
-                    params.item.paging = 1;
-
-                    return pipDataModel.page(
-                        params,
-                        successCallback,
-                        errorCallback
-                    );
-                },
-
-                readImageSet: function (params, successCallback, errorCallback) {
-                    params.resource = 'image_sets';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    params.item.id = params.item.id || $stateParams.id;
-                    return pipDataModel.readOne(params, pipImageSetsCache.onImageSetUpdate(params, successCallback), errorCallback);
-                },
-
-                updateImageSet: function (params, successCallback, errorCallback) {
-                    params.resource = 'image_sets';
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    return pipDataModel.update(
-                        params,
-                        successCallback,
-                        errorCallback
-                    );
-                },
-
-                createImageSet: function (params, successCallback, errorCallback) {
-                    params.resource = 'image_sets';
-                    params.skipTransactionBegin = true;
-                    params.skipTransactionEnd = false;
-                    pipDataModel.create(
-                        params,
-                        pipImageSetsCache.onImageSetCreate(params, successCallback),
-                        errorCallback
-                    );
-                },
-
-                createImageSetWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'image_sets';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.create(
-                            params,
-                            pipImageSetsCache.onImageSetCreate(params, successCallback),
-                            errorCallback
-                        );
-                    });
-                },
-
-                updateImageSetWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'image_sets';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        pipDataModel.update(
-                            params,
-                            successCallback,
-                            errorCallback
-                        );
-                    });
-                },
-
-                deleteImageSet: function(params, successCallback, errorCallback) {
-                    params.resource = 'image_sets';
-                    pipDataModel.remove(params, successCallback, errorCallback);
-                }
-            }
-        }];
-    });
-
-})();
-
-/**
- * @file Session data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSessionData', ['pipRest', 'pipSessionCache']);
-
-    thisModule.provider('pipSessionData', function() {
-
-        readUserResolver.$inject = ['pipSessionCache'];
-        readPartyResolver.$inject = ['pipSessionCache', '$stateParams'];
-        readConnectionResolver.$inject = ['pipSessionCache', '$stateParams'];
-        readSettingsResolver.$inject = ['pipSessionCache'];
-        readSessionsUserResolver.$inject = ['$stateParams', 'pipRest', '$rootScope'];
-        readSessionIdResolver.$inject = ['$stateParams', 'pipSession'];
-        this.readUserResolver = /* @ngInject */ readUserResolver;
-        this.readPartyResolver = /* @ngInject */ readPartyResolver;
-        this.readConnectionResolver = /* @ngInject */ readConnectionResolver;
-        this.readSettingsResolver = /* @ngInject */ readSettingsResolver;
-
-        this.readSessionsUserResolver = /* @ngInject */ readSessionsUserResolver;
-        this.readSessionIdResolver = /* @ngInject */ readSessionIdResolver;
-
-        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipDataModel', 'pipSessionCache', function($rootScope, $stateParams, pipRest, pipDataModel, pipSessionCache) {
-            return {
-                getSessionId: getSessionId,
-                removeSession: removeSession,
-                readSessionsUser: function (params, successCallback, errorCallback) {
-                    params.resource = 'userSessions';
-                    params.item = params.item || {};
-                    params.item.party_id = $stateParams.id;
-                    params.party_id = $stateParams.id;
-                    return  pipSessionCache.readSessions(params, successCallback, errorCallback);
-
-                }
-            };
-
-            function getSessionId(pipSession){
-                return function () {
-                    return pipSession.sessionId();
-                };
-            };
-
-            function removeSession(transaction, session, successCallback, errorCallback) {
-                var tid = transaction.begin('REMOVING');
-                if (!tid) return;
-
-                pipRest.userSessions().remove(
-                    {
-                        id: session.id,
-                        party_id: $stateParams.id
-                    },
-                    function (removedSession) {
-                        if (transaction.aborted(tid)) return;
-                        else transaction.end();
-
-                        if (successCallback) successCallback(removedSession);
-                    },
-                    function (error) {
-                        transaction.end(error);
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-            
-        }];
-        //--------------
-
-        function readUserResolver(pipSessionCache) {
-            return pipSessionCache.readUser();                             
-        };
-
-        function readPartyResolver(pipSessionCache, $stateParams) {
-            return pipSessionCache.readParty($stateParams);
-        };
-
-        function readConnectionResolver(pipSessionCache, $stateParams) {
-            return pipSessionCache.readConnection($stateParams);
-        };
-
-        function readSettingsResolver(pipSessionCache) {
-            return pipSessionCache.readSettings();                             
-        };
-
-        function readSessionsUserResolver($stateParams, pipRest, $rootScope) {
-            return pipRest.userSessions().query({
-                party_id: $stateParams.id
-            }).$promise;
-        };
-
-        function readSessionIdResolver($stateParams, pipSession) {
-            return pipSession.sessionId();
-        };
-        
-    });
-
-})();
-
-/**
- * @file Settings data model
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo Rewrite, use cached settings, remove unrelated methods
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSettingsData', ['pipRest', 'pipSessionData', 'pipSessionCache', 'pipDataModel']);
-
-    thisModule.provider('pipSettingsData', ['pipSessionDataProvider', function (pipSessionDataProvider) {
-
-        this.readSettingsResolver = pipSessionDataProvider.readSettingsResolver;
-
-        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipSessionCache', 'pipSession', 'pipDataModel', function ($rootScope, $stateParams, pipRest, pipSessionCache, pipSession, pipDataModel) {
-            return {
-                // Saving generic settings
-                saveSettings: saveSettings,
-                readSettings: readSettings,
-                reReadSettings: reReadSettings
-
-            };
-
-            function readSettings(successCallback, errorCallback) {
-                return pipSessionCache.readSettings(successCallback, errorCallback)
-            };
-
-            // force read settings from server and update cache
-            function reReadSettings(successCallback, errorCallback) {
-                return pipRest.partySettings().get(
-                    {
-                        party_id: pipSession.userId()
-                    },
-                    function (settings) {
-                        settings = settings || {};
-                        pipSessionCache.onSettingsUpdate(settings);
-                        if (successCallback) successCallback(settings);
-                    },
-                    errorCallback
-                ).$promise;
-            };
-
-            function saveSettings(settings, keys, successCallback, errorCallback) {
-                // Extract specific keys
-                settings = keys ? _.pick(settings, keys) : settings;
-                settings.party_id = pipSession.userId();
-                var oldSettings = _.cloneDeep($rootScope.$settings);
-                pipSessionCache.onSettingsUpdate(settings);
-
-                var params = {};
-                params.resource = 'partySettings';
-                params.item = settings;
-                params.item.creator_id = pipSession.userId();
-
-                pipDataModel.create(
-                    params,
-                    successCallback,
-                    function (error) {
-                        pipSessionCache.onSettingsUpdate(oldSettings);
-
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-        }];
-    }]);
-
-})();
-
-/**
- * @file Tags data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTagsData', ['pipRest' , 'pipDataModel', 'pipTagsCache']);
-
-    thisModule.provider('pipTagsData', function() {
-        
-        this.readTagsResolver = function() {
-            return /* @ngInject */ ['$stateParams', 'pipRest', 'pipTagsCache', function($stateParams, pipRest, pipTagsCache) {
-                return pipTagsCache.readTags({
-                    item: { party_id: pipRest.partyId($stateParams) }
-                });
-            }];
-        };
-
-        this.$get = ['$stateParams', '$state', 'pipRest', 'pipDataModel', 'pipTagsCache', function($stateParams, $state, pipRest, pipDataModel, pipTagsCache) {
-            return {
-                partyId: pipRest.partyId,
-                
-                readTags: function(params, successCallback, errorCallback) {
-                    params = params || {};
-                    params.item = params.item || {};
-                    if(params.item.party_id == null) {
-                        params.item.party_id = pipRest.partyId($stateParams);
-                    }
-                    return pipTagsCache.readTags(params, successCallback, errorCallback);
-                }
-            }
-        }];
-    });
-
-})();
-
-/**
- * @file Tips data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTipsData', ['pipRest', 'pipDataModel']);
-
-    thisModule.provider('pipTipsData', function () {
-        var PAGE_SIZE = 100;
-
-        // Read all tips
-        this.readTipsResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.tips().query().$promise;
-            }];
-        };
-
-        this.readTipResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.tips().get({
-                    id: $stateParams.id
-                }).$promise;
-            }];
-        };
-
-        // CRUD operations and other business methods
-        this.$get = ['pipRest', '$stateParams', 'pipDataModel', 'pipTipsCache', function (pipRest, $stateParams, pipDataModel, pipTipsCache) {
-
-            return {
-                partyId: pipRest.partyId,
-
-// todo update after optimization rezolver
-                readTips: function (params, successCallback, errorCallback) {
-                    params.resource = 'tips';
-                    params.item = params.item || {};
-                    params.item.search = $stateParams.search;
-                    params.item.tags = $stateParams.search;
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    return pipTipsCache.readTips(params, successCallback, errorCallback);
-                },
-
-                readTip: function (params, successCallback, errorCallback) {
-                    params.resource = 'tips';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    params.item.id = params.item.id || $stateParams.id;
-                    return pipDataModel.readOne(params, pipTipsCache.onTipsUpdate(params, successCallback), errorCallback);
-                },
-
-                createTip: function (params, successCallback, errorCallback) {
-                    params.resource = 'tips';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    pipDataModel.create(
-                        params,
-                        pipTipsCache.onTipCreate(params, successCallback),
-                        errorCallback
-                    );
-                },
-                
-                createTipWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'tips';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        
-                        params.item.party_id = pipRest.partyId($stateParams);
-                        pipDataModel.create(
-                            params,
-                            pipTipsCache.onTipCreate(params, successCallback),
-                            errorCallback
-                        );
-                    }, errorCallback);
-                },
-
-                updateTip: function (params, successCallback, errorCallback) {
-                    params.resource = 'tips';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    pipDataModel.update(
-                        params,
-                        pipTipsCache.onTipUpdate(params, successCallback),
-                        errorCallback
-                    );
-                },
-                
-                updateTipWithFiles: function(params, successCallback, errorCallback) {
-                    params.skipTransactionEnd = true;
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    pipDataModel.saveFiles(params, function() {
-                        params.resource = 'tips';
-                        params.skipTransactionBegin = true;
-                        params.skipTransactionEnd = false;
-                        
-                        params.item.party_id = pipRest.partyId($stateParams);
-                        pipDataModel.update(
-                            params,
-                            pipTipsCache.onTipUpdate(params, successCallback),
-                            errorCallback
-                        );
-                    });
-                },
-
-                deleteTip: function(params, successCallback, errorCallback) {
-                    params.resource = 'tips';
-                    pipDataModel.remove(params, pipTipsCache.onTipDelete(params, successCallback), errorCallback);
-                }
-            }
-        }];
-    });
-
-})();
-
-/**
- * @file Users data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUsersData', ['pipRest']);
-
-    thisModule.provider('pipUsersData', function () {
-
-        this.readUsersResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.users().page({
-                    party_id: $stateParams.id,
-                    paging: $stateParams.paging || 1,
-                    skip: $stateParams.skip || 0,
-                    take: $stateParams.take || 15
-                }).$promise;
-            }];
-        };
-
-        this.readUserResolver = function () {
-            return /* @ngInject */ ['$stateParams', 'pipRest', function ($stateParams, pipRest) {
-                return pipRest.users().get({
-                    id: $stateParams.id,
-                    party_id: pipRest.partyId($stateParams)
-                }).$promise;
-
-            }];
-        };
-
-        this.readActivitiesUserResolver = /* @ngInject */
-            ['$stateParams', 'pipRest', '$rootScope', function ($stateParams, pipRest, $rootScope) {
-                return pipRest.partyActivities().page({
-                    party_id: $rootScope.$user.id,
-                    paging: 1,
-                    skip: 0,
-                    take: 25
-                }).$promise;
-            }];
-
-        // CRUD operations and other business methods
-        this.$get = ['pipRest', '$stateParams', 'pipDataModel', function (pipRest, $stateParams, pipDataModel) {   
-            return {
-                partyId: pipRest.partyId,
-
-                readUsers: function (params, transaction, successCallback, errorCallback) {
-                    return pipRest.users().page(
-                        {
-                            party_id: pipRest.partyId($stateParams),
-                            paging: 1,
-                            skip: params.start || params.item.skip || 0,
-                            search: params.item.search ,
-                            active: params.item.active,
-                            paid: params.item.paid,
-                            admin: params.item.admin,
-                            take: 15
-                        },
-                        function (pagedUsers) {
-                            if (successCallback) successCallback(pagedUsers);
-                        },
-                        function (error) {
-                            errorCallback(error);
-                        }
-                    );
-                },
-
-                readUser: function (params, successCallback, errorCallback) {
-                    params.resource = 'users';
-                    params.item = params.item || {};
-                    params.item.party_id = pipRest.partyId($stateParams);
-                    params.item.id = params.item.id || $stateParams.id;
-                    return pipDataModel.readOne(params, successCallback, errorCallback);
-                },
-                
-                updateUser: function (item, transaction, successCallback, errorCallback) {
-                    pipRest.users().update(
-                        item.item,
-                        function (updatedItem) {
-                            if (successCallback) successCallback(updatedItem);
-                        },
-                        function (error) {
-                            errorCallback(error);
-                        }
-                    );
-                }
-
-            }
-        }];
-    });
-
-})();
 
 
 /**
@@ -9519,6 +9519,157 @@
 
 })();
  
+/**
+ * @file Rest API enumerations service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('PipResources.Error', []);
+
+    thisModule.factory('PipResourcesError', function () {
+
+        var Errors = {};
+        
+        Errors['1104'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1104,
+                name: 'Bad Request',
+                message: 'Email is already registered'
+            },
+            headers: {}
+        };
+        Errors['1106'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1106,
+                name: 'Bad Request',
+                message: 'User was not found'
+            },
+            headers: {}
+        };
+        Errors['1103'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1103,
+                name: 'Bad Request',
+                message: 'Invalid email verification code'
+            },
+            headers: {}
+        };
+        Errors['1108'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1108,
+                name: 'Bad Request',
+                message: 'Invalid password recovery code'
+            },
+            headers: {}
+        };
+        Errors['1700'] = {
+            StatusCode: 400,
+            StatusMessage: 'Bad Request',
+            request: {
+                code: 1700,
+                name: 'Bad Request',
+                message: 'Avatar doesn\'t exist'
+            },
+            headers: {}
+        };        
+
+        return Errors;
+    });
+    
+})();
+
+/**
+ * @file pipImageResources service
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo:
+ */
+ 
+ /* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipImageResources', []);
+
+    thisModule.provider('pipImageResources', function() {
+        var imagesMap = [],
+            size = 0;
+
+        this.setImages = setImages;
+
+        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
+
+
+            return {
+                setImages: setImages,
+                getImagesCollection: getImagesCollection,
+                getImage: getImage
+            }
+        }];
+
+        // Add images collection
+        function setImages(newImagesRes) {
+            if (!angular.isArray(newImagesRes)) {
+                new Error('pipImageResources setImages: first argument should be an object');
+            }
+
+            imagesMap = _.union(imagesMap, newImagesRes);
+            size = imagesMap.length;
+        }
+
+        // Get images collection
+        function getImagesCollection(size, search) {
+            if (!!search && !angular.isString(search)) {
+                new Error('pipImageResources getImages: second argument should be a string');
+            }
+
+            var result, queryLowercase,
+                resultSize = size && size < imagesMap.length ? size : -1;
+
+            if (!search) {
+                result = imagesMap;
+            } else {
+                queryLowercase = search.toLowerCase();
+                result = _.filter(imagesMap, function (item) {
+                        if (item.title) {
+                            return (item.title.toLowerCase().indexOf(queryLowercase) >= 0);
+                        } else return false;
+                    }) || [];
+            }
+
+            if (resultSize === -1) {
+                return _.cloneDeep(result);
+            } else {
+                return _.take(result, resultSize);
+            }                        
+        }   
+
+        function getImage() {
+            var i = _.random(0, size - 1);
+
+            if (size > 0) {
+                return _.cloneDeep(imagesMap[i]);
+            } else {
+                return null;
+            }
+        }  
+
+    });
+
+})();
 /**
  * @file Image  resources for samples
  * @copyright Digital Living Software Corp. 2014-2016
@@ -12634,157 +12785,6 @@
 })();
  
 
-/**
- * @file Rest API enumerations service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('PipResources.Error', []);
-
-    thisModule.factory('PipResourcesError', function () {
-
-        var Errors = {};
-        
-        Errors['1104'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1104,
-                name: 'Bad Request',
-                message: 'Email is already registered'
-            },
-            headers: {}
-        };
-        Errors['1106'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1106,
-                name: 'Bad Request',
-                message: 'User was not found'
-            },
-            headers: {}
-        };
-        Errors['1103'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1103,
-                name: 'Bad Request',
-                message: 'Invalid email verification code'
-            },
-            headers: {}
-        };
-        Errors['1108'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1108,
-                name: 'Bad Request',
-                message: 'Invalid password recovery code'
-            },
-            headers: {}
-        };
-        Errors['1700'] = {
-            StatusCode: 400,
-            StatusMessage: 'Bad Request',
-            request: {
-                code: 1700,
-                name: 'Bad Request',
-                message: 'Avatar doesn\'t exist'
-            },
-            headers: {}
-        };        
-
-        return Errors;
-    });
-    
-})();
-
-/**
- * @file pipImageResources service
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo:
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipImageResources', []);
-
-    thisModule.provider('pipImageResources', function() {
-        var imagesMap = [],
-            size = 0;
-
-        this.setImages = setImages;
-
-        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
-
-
-            return {
-                setImages: setImages,
-                getImagesCollection: getImagesCollection,
-                getImage: getImage
-            }
-        }];
-
-        // Add images collection
-        function setImages(newImagesRes) {
-            if (!angular.isArray(newImagesRes)) {
-                new Error('pipImageResources setImages: first argument should be an object');
-            }
-
-            imagesMap = _.union(imagesMap, newImagesRes);
-            size = imagesMap.length;
-        }
-
-        // Get images collection
-        function getImagesCollection(size, search) {
-            if (!!search && !angular.isString(search)) {
-                new Error('pipImageResources getImages: second argument should be a string');
-            }
-
-            var result, queryLowercase,
-                resultSize = size && size < imagesMap.length ? size : -1;
-
-            if (!search) {
-                result = imagesMap;
-            } else {
-                queryLowercase = search.toLowerCase();
-                result = _.filter(imagesMap, function (item) {
-                        if (item.title) {
-                            return (item.title.toLowerCase().indexOf(queryLowercase) >= 0);
-                        } else return false;
-                    }) || [];
-            }
-
-            if (resultSize === -1) {
-                return _.cloneDeep(result);
-            } else {
-                return _.take(result, resultSize);
-            }                        
-        }   
-
-        function getImage() {
-            var i = _.random(0, size - 1);
-
-            if (size > 0) {
-                return _.cloneDeep(imagesMap[i]);
-            } else {
-                return null;
-            }
-        }  
-
-    });
-
-})();
 
 
 /**
@@ -13101,29 +13101,6 @@
 })();
 
 /**
- * @file Simple layout
- * @copyright Digital Living Software Corp. 2014-2015
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipLayout.Simple', []);
-
-    thisModule.directive('pipSimple', function() {
-       return {
-           restrict: 'EA',
-           link: function($scope, $element, $attrs) {
-                $element.addClass('pip-simple');
-           }
-       };
-    });
-
-})();
-
-/**
  * @file Split layout
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -13190,6 +13167,29 @@
             return false
         }
 
+    });
+
+})();
+
+/**
+ * @file Simple layout
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipLayout.Simple', []);
+
+    thisModule.directive('pipSimple', function() {
+       return {
+           restrict: 'EA',
+           link: function($scope, $element, $attrs) {
+                $element.addClass('pip-simple');
+           }
+       };
     });
 
 })();
@@ -13422,6 +13422,45 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('date/date.html',
+    '<!--\n' +
+    '@file Date control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
+    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '</div>\n' +
+    '					');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('date_range/date_range.html',
     '<!--\n' +
     '@file Date range control content\n' +
@@ -13517,45 +13556,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </md-select>\n' +
     '    </md-input-container>\n' +
     '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date/date.html',
-    '<!--\n' +
-    '@file Date control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
-    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '</div>\n' +
-    '					');
 }]);
 })();
 
@@ -13909,6 +13909,35 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast"\n' +
+    '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
+    '          \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || actionLenght > 4,\n' +
+    '          \'pip-no-action-toast\': actionLenght == 0}"\n' +
+    '          style="height:initial; max-height: initial; ">\n' +
+    '\n' +
+    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
+    '    <div class="layout-row layout-align-end-start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
+    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
+    '        <md-button class="flex-fixed m0 lm8"\n' +
+    '                   ng-click="onAction(action)"\n' +
+    '                   ng-repeat="action in actions"\n' +
+    '                   aria-label="{{::action| translate}}">\n' +
+    '            {{::action| translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '\n' +
+    '</md-toast>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('time_range_edit/time_range_edit.html',
     '<!--\n' +
     '@file Time edit control content\n' +
@@ -13965,35 +13994,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast"\n' +
-    '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
-    '          \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || actionLenght > 4,\n' +
-    '          \'pip-no-action-toast\': actionLenght == 0}"\n' +
-    '          style="height:initial; max-height: initial; ">\n' +
-    '\n' +
-    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
-    '    <div class="layout-row layout-align-end-start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
-    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
-    '        <md-button class="flex-fixed m0 lm8"\n' +
-    '                   ng-click="onAction(action)"\n' +
-    '                   ng-repeat="action in actions"\n' +
-    '                   aria-label="{{::action| translate}}">\n' +
-    '            {{::action| translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '\n' +
-    '</md-toast>');
 }]);
 })();
 
@@ -14338,84 +14338,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })(window.angular, window._);
 
-
-/**
- * @file Confirmation dialog
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve sample in sampler app
- */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipErrorDetailsDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'ERROR_DETAILS': 'Error details',
-            'CODE': 'Code',
-            'PATH': 'Path',
-            'ERROR': 'Error code',
-            'METHOD': 'Method',
-            'MESSAGE': 'Message'
-
-        });
-        pipTranslateProvider.translations('ru', {
-            'ERROR_DETAILS': 'Детали ошибки',
-            'CODE': 'Код',
-            'PATH': 'Путь',
-            'ERROR': 'Код ошибки',
-            'METHOD': 'Метод',
-            'MESSAGE': 'Сообщение'
-        });
-    }]);
-    /* eslint-enable quote-props */
-
-    thisModule.factory('pipErrorDetailsDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'error_details_dialog/error_details_dialog.html',
-                        controller: 'pipErrorDetailsDialogController',
-                        locals: {params: params},
-                        clickOutsideToClose: true
-                    })
-                        .then(function () {
-                            if (successCallback) {
-                                successCallback();
-                            }
-                        }, function () {
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipErrorDetailsDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
-            $scope.error = params.error;
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
-
-            $scope.onCancel = function () {
-                $mdDialog.cancel();
-            };
-
-            $scope.onOk = function () {
-                $mdDialog.hide();
-            };
-        }]
-    );
-
-})(window.angular);
 
 /**
  * @file Date range control
@@ -14831,6 +14753,84 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window._);
+
+/**
+ * @file Confirmation dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve sample in sampler app
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipErrorDetailsDialog',
+        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
+
+    /* eslint-disable quote-props */
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'ERROR_DETAILS': 'Error details',
+            'CODE': 'Code',
+            'PATH': 'Path',
+            'ERROR': 'Error code',
+            'METHOD': 'Method',
+            'MESSAGE': 'Message'
+
+        });
+        pipTranslateProvider.translations('ru', {
+            'ERROR_DETAILS': 'Детали ошибки',
+            'CODE': 'Код',
+            'PATH': 'Путь',
+            'ERROR': 'Код ошибки',
+            'METHOD': 'Метод',
+            'MESSAGE': 'Сообщение'
+        });
+    }]);
+    /* eslint-enable quote-props */
+
+    thisModule.factory('pipErrorDetailsDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'error_details_dialog/error_details_dialog.html',
+                        controller: 'pipErrorDetailsDialogController',
+                        locals: {params: params},
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }, function () {
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipErrorDetailsDialogController',
+        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
+            $scope.error = params.error;
+            $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'CANCEL';
+
+            $scope.onCancel = function () {
+                $mdDialog.cancel();
+            };
+
+            $scope.onOk = function () {
+                $mdDialog.hide();
+            };
+        }]
+    );
+
+})(window.angular);
 
 /**
  * @file Image slider control
@@ -15646,29 +15646,6 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window.jQuery, window._);
 
 /**
- * @file Routing progress control
- * @description
- * This progress control is enabled by ui router
- * while switching between pages
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
-
-    thisModule.directive('pipRoutingProgress', function () {
-        return {
-            restrict: 'EA',
-            replace: true,
-            templateUrl: 'progress/routing_progress.html'
-        };
-    });
-
-})(window.angular);
-
-/**
  * @file Refresh button control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -15738,6 +15715,29 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
+ * @file Routing progress control
+ * @description
+ * This progress control is enabled by ui router
+ * while switching between pages
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
+
+    thisModule.directive('pipRoutingProgress', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            templateUrl: 'progress/routing_progress.html'
+        };
+    });
+
+})(window.angular);
+
+/**
  * @file Tag list control
  * @copyright Digital Living Software Corp. 2014-2015
  * @todo
@@ -15790,75 +15790,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })(window.angular);
 
-
-/**
- * @file Time control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
-
-    thisModule.directive('pipTimeRange',
-        ['pipUtils', function (pipUtils) {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipStartDate: '=',
-                    pipEndDate: '='
-                },
-                templateUrl: 'time_range/time_range.html',
-                link: function ($scope, $element, $attrs) {
-
-                    function getDateJSON(value) {
-                        return value ? new Date(value) : null;
-                    }
-
-                    function defineStartDate() {
-                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
-                                : getDateJSON($scope.pipStartDate);
-                        }
-                    }
-
-                    function defineEndDate() {
-                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
-                                : getDateJSON($scope.pipEndDate);
-                        }
-                    }
-
-                    $scope.data = {};
-                    $scope.data.start = null;
-                    $scope.data.end = null;
-                    defineStartDate();
-                    defineEndDate();
-
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch('pipStartDate',
-                            function () {
-                                $scope.data.start = null;
-                                defineStartDate();
-                            }
-                        );
-                        $scope.$watch('pipEndDate',
-                            function () {
-                                $scope.data.end = null;
-                                defineEndDate();
-                            }
-                        );
-                    }
-
-                    // Add class
-                    $element.addClass('pip-time-range');
-                }
-            };
-        }]
-    );
-
-})(window.angular, window._);
 
 
 (function (angular, _) {
@@ -16131,6 +16062,75 @@ module.run(['$templateCache', function($templateCache) {
 
             // Add class
             $element.addClass('pip-time-range-edit');
+        }]
+    );
+
+})(window.angular, window._);
+
+/**
+ * @file Time control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
+
+    thisModule.directive('pipTimeRange',
+        ['pipUtils', function (pipUtils) {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipStartDate: '=',
+                    pipEndDate: '='
+                },
+                templateUrl: 'time_range/time_range.html',
+                link: function ($scope, $element, $attrs) {
+
+                    function getDateJSON(value) {
+                        return value ? new Date(value) : null;
+                    }
+
+                    function defineStartDate() {
+                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
+                                : getDateJSON($scope.pipStartDate);
+                        }
+                    }
+
+                    function defineEndDate() {
+                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
+                                : getDateJSON($scope.pipEndDate);
+                        }
+                    }
+
+                    $scope.data = {};
+                    $scope.data.start = null;
+                    $scope.data.end = null;
+                    defineStartDate();
+                    defineEndDate();
+
+                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                        $scope.$watch('pipStartDate',
+                            function () {
+                                $scope.data.start = null;
+                                defineStartDate();
+                            }
+                        );
+                        $scope.$watch('pipEndDate',
+                            function () {
+                                $scope.data.end = null;
+                                defineEndDate();
+                            }
+                        );
+                    }
+
+                    // Add class
+                    $element.addClass('pip-time-range');
+                }
+            };
         }]
     );
 
@@ -20308,150 +20308,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
- * @file Camera dialog
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Add sample to sampler app
- */
-
-/* global angular, Webcam */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipCameraDialog',
-        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'TAKE_PICTURE': 'Take a picture',
-            'WEB_CAM_ERROR': 'Webcam is missing or was not found'
-        });
-        pipTranslateProvider.translations('ru', {
-            'TAKE_PICTURE': 'Сделать фото',
-            'WEB_CAM_ERROR': 'Web-камера отсутствует или не найдена'
-        });
-    }]);
-
-    thisModule.factory('pipCameraDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (successCallback) {
-                    $mdDialog.show({
-                        templateUrl: 'camera_dialog/camera_dialog.html',
-                        clickOutsideToClose: true,
-                        controller: 'pipCameraController'
-                    }).then(function (result) {
-                        Webcam.reset();
-                        console.log(result);
-                        if (successCallback) {
-                            successCallback(result);
-                        }
-                    }, function () {
-                        Webcam.reset();
-                    });
-                }
-            };
-        }]);
-
-    thisModule.controller('pipCameraController',
-        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
-            $scope.browser = pipUtils.getBrowser().os;
-            $scope.theme = $rootScope.$theme;
-
-            if ($scope.browser !== 'android') {
-                console.log('webcam');
-                Webcam.init();
-
-                setTimeout(function () {
-                    Webcam.attach('.camera-stream');
-                }, 0);
-
-                Webcam.on('error', function (err) {
-                    $scope.webCamError = true;
-                    console.error(err);
-                });
-
-                Webcam.set({
-                    width: 400,
-                    height: 300,
-
-                    dest_width: 400,
-                    dest_height: 300,
-
-                    crop_width: 400,
-                    crop_height: 300,
-
-                    image_format: 'jpeg',
-                    jpeg_quality: 90
-                });
-
-                //Webcam.setSWFLocation('../../../dist/webcam.swf');
-                Webcam.setSWFLocation('webcam.swf');
-
-            } else {
-                document.addEventListener("deviceready",onDeviceReady,false);
-
-            }
-            // todo add logic in callbacks
-            function onDeviceReady() {
-                navigator.camera.getPicture(onSuccess, onFail,
-                    {
-                        sourceType: Camera.PictureSourceType.CAMERA,
-                        correctOrientation: true,
-                        quality: 75,
-                        targetWidth: 200,
-                        destinationType: Camera.DestinationType.DATA_URL
-                    });
-            }
-
-
-            function onSuccess(imageData) {
-                var picture = imageData;
-                var picture = 'data:image/jpeg;base64,' + imageData;
-                $mdDialog.hide(picture);
-            }
-
-            function onFail(message) {
-                alert('Failed because: ' + message);
-                $mdDialog.hide();
-            }
-
-            $scope.$freeze = false;
-
-            $scope.onTakePictureClick = onTakePictureClick;
-            $scope.onResetPicture = onResetPicture;
-            $scope.onCancelClick = onCancelClick;
-
-            return;
-
-            function onTakePictureClick() {
-                if (Webcam) {
-                    if ($scope.$freeze) {
-                        Webcam.snap(function (dataUri) {
-                            $scope.$freeze = false;
-                            $mdDialog.hide(dataUri);
-                        });
-                    } else {
-                        $scope.$freeze = true;
-                        Webcam.freeze();
-                    }
-                }
-            };
-
-            function onResetPicture() {
-                $scope.$freeze = false;
-                Webcam.unfreeze();
-            };
-
-            function onCancelClick() {
-                $mdDialog.cancel();
-            };
-        }]
-    );
-
-})();
-/**
  * @file Avatar control
  * @copyright Digital Living Software Corp. 2014-2015
  * @todo
@@ -20967,6 +20823,150 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+/**
+ * @file Camera dialog
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Add sample to sampler app
+ */
+
+/* global angular, Webcam */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipCameraDialog',
+        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'TAKE_PICTURE': 'Take a picture',
+            'WEB_CAM_ERROR': 'Webcam is missing or was not found'
+        });
+        pipTranslateProvider.translations('ru', {
+            'TAKE_PICTURE': 'Сделать фото',
+            'WEB_CAM_ERROR': 'Web-камера отсутствует или не найдена'
+        });
+    }]);
+
+    thisModule.factory('pipCameraDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (successCallback) {
+                    $mdDialog.show({
+                        templateUrl: 'camera_dialog/camera_dialog.html',
+                        clickOutsideToClose: true,
+                        controller: 'pipCameraController'
+                    }).then(function (result) {
+                        Webcam.reset();
+                        console.log(result);
+                        if (successCallback) {
+                            successCallback(result);
+                        }
+                    }, function () {
+                        Webcam.reset();
+                    });
+                }
+            };
+        }]);
+
+    thisModule.controller('pipCameraController',
+        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipUtils) { // $cordovaCamera
+            $scope.browser = pipUtils.getBrowser().os;
+            $scope.theme = $rootScope.$theme;
+
+            if ($scope.browser !== 'android') {
+                console.log('webcam');
+                Webcam.init();
+
+                setTimeout(function () {
+                    Webcam.attach('.camera-stream');
+                }, 0);
+
+                Webcam.on('error', function (err) {
+                    $scope.webCamError = true;
+                    console.error(err);
+                });
+
+                Webcam.set({
+                    width: 400,
+                    height: 300,
+
+                    dest_width: 400,
+                    dest_height: 300,
+
+                    crop_width: 400,
+                    crop_height: 300,
+
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+
+                //Webcam.setSWFLocation('../../../dist/webcam.swf');
+                Webcam.setSWFLocation('webcam.swf');
+
+            } else {
+                document.addEventListener("deviceready",onDeviceReady,false);
+
+            }
+            // todo add logic in callbacks
+            function onDeviceReady() {
+                navigator.camera.getPicture(onSuccess, onFail,
+                    {
+                        sourceType: Camera.PictureSourceType.CAMERA,
+                        correctOrientation: true,
+                        quality: 75,
+                        targetWidth: 200,
+                        destinationType: Camera.DestinationType.DATA_URL
+                    });
+            }
+
+
+            function onSuccess(imageData) {
+                var picture = imageData;
+                var picture = 'data:image/jpeg;base64,' + imageData;
+                $mdDialog.hide(picture);
+            }
+
+            function onFail(message) {
+                alert('Failed because: ' + message);
+                $mdDialog.hide();
+            }
+
+            $scope.$freeze = false;
+
+            $scope.onTakePictureClick = onTakePictureClick;
+            $scope.onResetPicture = onResetPicture;
+            $scope.onCancelClick = onCancelClick;
+
+            return;
+
+            function onTakePictureClick() {
+                if (Webcam) {
+                    if ($scope.$freeze) {
+                        Webcam.snap(function (dataUri) {
+                            $scope.$freeze = false;
+                            $mdDialog.hide(dataUri);
+                        });
+                    } else {
+                        $scope.$freeze = true;
+                        Webcam.freeze();
+                    }
+                }
+            };
+
+            function onResetPicture() {
+                $scope.$freeze = false;
+                Webcam.unfreeze();
+            };
+
+            function onCancelClick() {
+                $mdDialog.cancel();
+            };
+        }]
+    );
+
+})();
 /**
  * @file Collage control
  * @copyright Digital Living Software Corp. 2014-2015
@@ -24588,148 +24588,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Composite summary control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipCompositeSummary", [
-        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
-
-    thisModule.directive('pipCompositeSummary',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipContents: '=',
-                    pipChecklistSize: '=',
-                    pipTextSize: '=',
-                    pipPrimaryBlockLimit: '=',
-                    pipSecondaryBlockLimit: '=',
-                    pipSecondaryBlockTypes: '='
-                },
-                templateUrl: 'composite_summary/composite_summary.html',
-                controller: 'pipCompositeSummaryController'
-            }
-        }
-    );
-
-    thisModule.controller('pipCompositeSummaryController',
-        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-
-            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
-            $scope.disableControl = true;
-            $scope.disabledChecklist = true;
-
-            $scope.secondaryBlockTypes = $scope.pipSecondaryBlockTypes !== undefined &&
-                Array.isArray($scope.pipSecondaryBlockTypes) ? $scope.pipSecondaryBlockTypes :
-                 ['checklist', 'documents', 'location', 'time'];
-            $scope.textSize = $scope.pipTextSize !== undefined && $scope.pipTextSize > 0 ? $scope.pipTextSize : 0;
-            $scope.secondaryBlockLimit = $scope.pipSecondaryBlockLimit !== undefined && $scope.pipSecondaryBlockLimit > 0 ? $scope.pipSecondaryBlockLimit : -1;
-            $scope.checklistSize = $scope.pipChecklistSize !== undefined && $scope.pipChecklistSize > 0 ? $scope.pipChecklistSize : 0;
-            $scope.primaryBlockLimit = $scope.pipPrimaryBlockLimit !== undefined ? $scope.pipPrimaryBlockLimit : -1;
-
-            generateList($scope.pipContents);
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipContents', function (newValue) {
-                    if (!Array.isArray($scope.pipContents)) {
-                        throw new Error('Error: Attribute pip-contents must be array!');
-                    }
-                    generateList($scope.pipContents);
-                });
-            }
-
-            // Add class
-            $element.addClass('pip-composite-summary');
-
-            return;
-
-            // усекаем чеклист до 3
-            function limitChecklist(content, val) {
-                if (!val) return;
-                _.each(content, function(item) {
-                    if (item && item.type == 'checklist') {
-                        var checklistLength = item.checklist.length;
-                        item.checklist =_.take(item.checklist, val);
-                        if (checklistLength > val) item.checklist.push({
-                            text: '...',
-                             checked: false
-                        });
-                    }
-                });
-            };
-
-            // отбираем текст и картинки
-            function selectSummary(content) {
-                var result = [],
-                    i = 0;
-
-                _.each(content, function(item) {
-                    if ($scope.primaryBlockLimit >= 0 && i >= $scope.primaryBlockLimit) return result;
-
-                    //if (item.type == 'text' || item.type == 'pictures' ) {
-                    if ($scope.secondaryBlockTypes.indexOf(item.type) < 0) {
-                        result.push(item);
-                        i += 1;
-                    }
-                });
-
-                return result;
-            };
-
-            // отбираем остальные блоки если они есть
-            function selectSummarySecondary(content, types) {
-                var i, limit =  $scope.secondaryBlockLimit < 0 ? content.length : $scope.secondaryBlockLimit;
-                var result = [];
-
-                for (i = 0; i < content.length; i++ ) {
-                    if (types.indexOf(content[i].type) > -1) {
-                        result.push(content[i]);
-                        if (result.length >= limit) break;
-                    }
-                }
-
-                return result;
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                    return;
-                } else {
-                     var summaryContent = _.cloneDeep(content);
-                    var result = selectSummary(summaryContent);
-                    if (result.length == 0) {
-                        result = selectSummarySecondary(summaryContent, $scope.secondaryBlockTypes);
-                    }
-
-                    limitChecklist(result, $scope.checklistSize);
-
-                    var id = 0;
-                    _.each(result, function(item){
-                        item.id = id;
-                        id ++;
-                    });
-                    $scope.compositeContent = result;
-                }
-            };
-
-            function clearList() {
-                $scope.compositeContent = [];
-            };
-
-        }]
-    );
-
-})();
-
-/**
  * @file Composite edit control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -25209,7 +25067,7 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Composite toolbar control
+ * @file Composite summary control
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
@@ -25218,90 +25076,138 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipCompositeToolbar", ['pipCore', 'pipComposite.Templates']);
+    var thisModule = angular.module("pipCompositeSummary", [
+        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'TEXT':'Text',
-            'CHECKLIST':'Checklist',
-            'LOCATION':'Location',
-            'PICTURE':'Picture',
-            'TIME':'Time',
-            'DOCUMENT':'Document'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            'TEXT':'Текст',
-            'CHECKLIST':'Список',
-            'LOCATION':'Локация',
-            'PICTURE':'Изображение',
-            'TIME':'Время',
-            'DOCUMENT':'Document'
-        });
-    }]);
-
-    thisModule.directive('pipCompositeToolbar',
+    thisModule.directive('pipCompositeSummary',
         function () {
             return {
                 restrict: 'EA',
-                replace: false,
                 scope: {
-                    ngDisabled: '&',
-                    pipCompositeEmpty: '&',  // set init state of toolbar
-                    pipToolbarButton: '=',  // set visibility toolbar button, true by default
-                    compositeId: '=pipCompositeId' // set pip-composite-id, for some composite in one scope
+                    pipContents: '=',
+                    pipChecklistSize: '=',
+                    pipTextSize: '=',
+                    pipPrimaryBlockLimit: '=',
+                    pipSecondaryBlockLimit: '=',
+                    pipSecondaryBlockTypes: '='
                 },
-                templateUrl: 'composite_toolbar/composite_toolbar.html',
-                controller: 'pipCompositeToolbarController'
+                templateUrl: 'composite_summary/composite_summary.html',
+                controller: 'pipCompositeSummaryController'
             }
         }
     );
 
-    thisModule.controller('pipCompositeToolbarController',
-        ['$scope', '$element', '$attrs', '$rootScope', 'pipUtils', function ($scope, $element, $attrs, $rootScope, pipUtils) {
+    thisModule.controller('pipCompositeSummaryController',
+        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
 
-            $scope.toolbarButton = {};
-            $scope.emptyState = pipUtils.toBoolean($scope.pipCompositeEmpty()) != false;
-            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
+            $scope.disableControl = true;
+            $scope.disabledChecklist = true;
 
-            setOption();
+            $scope.secondaryBlockTypes = $scope.pipSecondaryBlockTypes !== undefined &&
+                Array.isArray($scope.pipSecondaryBlockTypes) ? $scope.pipSecondaryBlockTypes :
+                 ['checklist', 'documents', 'location', 'time'];
+            $scope.textSize = $scope.pipTextSize !== undefined && $scope.pipTextSize > 0 ? $scope.pipTextSize : 0;
+            $scope.secondaryBlockLimit = $scope.pipSecondaryBlockLimit !== undefined && $scope.pipSecondaryBlockLimit > 0 ? $scope.pipSecondaryBlockLimit : -1;
+            $scope.checklistSize = $scope.pipChecklistSize !== undefined && $scope.pipChecklistSize > 0 ? $scope.pipChecklistSize : 0;
+            $scope.primaryBlockLimit = $scope.pipPrimaryBlockLimit !== undefined ? $scope.pipPrimaryBlockLimit : -1;
 
-            $scope.onAddItem = onAddItem;
+            generateList($scope.pipContents);
 
-            $rootScope.$on('pipCompositeNotEmpty', function(event, value) {
-                $scope.emptyState = !value;
-            });
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipContents', function (newValue) {
+                    if (!Array.isArray($scope.pipContents)) {
+                        throw new Error('Error: Attribute pip-contents must be array!');
+                    }
+                    generateList($scope.pipContents);
+                });
+            }
 
             // Add class
-            $element.addClass('pip-composite-toolbar');
+            $element.addClass('pip-composite-summary');
 
             return;
 
-            function onAddItem(contentType) {
-                $rootScope.$emit('pipAddCompositeItem', {type: contentType, id: $scope.compositeId});
+            // усекаем чеклист до 3
+            function limitChecklist(content, val) {
+                if (!val) return;
+                _.each(content, function(item) {
+                    if (item && item.type == 'checklist') {
+                        var checklistLength = item.checklist.length;
+                        item.checklist =_.take(item.checklist, val);
+                        if (checklistLength > val) item.checklist.push({
+                            text: '...',
+                             checked: false
+                        });
+                    }
+                });
             };
 
-            function setOption() {
-                if ($scope.pipToolbarButton !== null && $scope.pipToolbarButton !== undefined) {
-                    $scope.toolbarButton.picture = $scope.pipToolbarButton.picture === false ? $scope.pipToolbarButton.picture : true;
-                    $scope.toolbarButton.document = $scope.pipToolbarButton.document === false ? $scope.pipToolbarButton.document : true;
-                    $scope.toolbarButton.location = $scope.pipToolbarButton.location === false ? $scope.pipToolbarButton.location : true;
-                    $scope.toolbarButton.event = $scope.pipToolbarButton.event === false ? $scope.pipToolbarButton.event : true;
-                    $scope.toolbarButton.checklist = $scope.pipToolbarButton.checklist === false ? $scope.pipToolbarButton.checklist : true;
-                } else {
-                    $scope.toolbarButton.picture = true;
-                    $scope.toolbarButton.document = true;
-                    $scope.toolbarButton.location = true;
-                    $scope.toolbarButton.event = true;
-                    $scope.toolbarButton.checklist = true;
+            // отбираем текст и картинки
+            function selectSummary(content) {
+                var result = [],
+                    i = 0;
+
+                _.each(content, function(item) {
+                    if ($scope.primaryBlockLimit >= 0 && i >= $scope.primaryBlockLimit) return result;
+
+                    //if (item.type == 'text' || item.type == 'pictures' ) {
+                    if ($scope.secondaryBlockTypes.indexOf(item.type) < 0) {
+                        result.push(item);
+                        i += 1;
+                    }
+                });
+
+                return result;
+            };
+
+            // отбираем остальные блоки если они есть
+            function selectSummarySecondary(content, types) {
+                var i, limit =  $scope.secondaryBlockLimit < 0 ? content.length : $scope.secondaryBlockLimit;
+                var result = [];
+
+                for (i = 0; i < content.length; i++ ) {
+                    if (types.indexOf(content[i].type) > -1) {
+                        result.push(content[i]);
+                        if (result.length >= limit) break;
+                    }
                 }
-                $scope.toolbarButton.text = true;
+
+                return result;
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                    return;
+                } else {
+                     var summaryContent = _.cloneDeep(content);
+                    var result = selectSummary(summaryContent);
+                    if (result.length == 0) {
+                        result = selectSummarySecondary(summaryContent, $scope.secondaryBlockTypes);
+                    }
+
+                    limitChecklist(result, $scope.checklistSize);
+
+                    var id = 0;
+                    _.each(result, function(item){
+                        item.id = id;
+                        id ++;
+                    });
+                    $scope.compositeContent = result;
+                }
+            };
+
+            function clearList() {
+                $scope.compositeContent = [];
             };
 
         }]
     );
 
 })();
+
 /**
  * @file Composite view control
  * @copyright Digital Living Software Corp. 2014-2016
@@ -25412,6 +25318,100 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
+ * @file Composite toolbar control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipCompositeToolbar", ['pipCore', 'pipComposite.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'TEXT':'Text',
+            'CHECKLIST':'Checklist',
+            'LOCATION':'Location',
+            'PICTURE':'Picture',
+            'TIME':'Time',
+            'DOCUMENT':'Document'
+        });
+
+        pipTranslateProvider.translations('ru', {
+            'TEXT':'Текст',
+            'CHECKLIST':'Список',
+            'LOCATION':'Локация',
+            'PICTURE':'Изображение',
+            'TIME':'Время',
+            'DOCUMENT':'Document'
+        });
+    }]);
+
+    thisModule.directive('pipCompositeToolbar',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: false,
+                scope: {
+                    ngDisabled: '&',
+                    pipCompositeEmpty: '&',  // set init state of toolbar
+                    pipToolbarButton: '=',  // set visibility toolbar button, true by default
+                    compositeId: '=pipCompositeId' // set pip-composite-id, for some composite in one scope
+                },
+                templateUrl: 'composite_toolbar/composite_toolbar.html',
+                controller: 'pipCompositeToolbarController'
+            }
+        }
+    );
+
+    thisModule.controller('pipCompositeToolbarController',
+        ['$scope', '$element', '$attrs', '$rootScope', 'pipUtils', function ($scope, $element, $attrs, $rootScope, pipUtils) {
+
+            $scope.toolbarButton = {};
+            $scope.emptyState = pipUtils.toBoolean($scope.pipCompositeEmpty()) != false;
+            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+
+            setOption();
+
+            $scope.onAddItem = onAddItem;
+
+            $rootScope.$on('pipCompositeNotEmpty', function(event, value) {
+                $scope.emptyState = !value;
+            });
+
+            // Add class
+            $element.addClass('pip-composite-toolbar');
+
+            return;
+
+            function onAddItem(contentType) {
+                $rootScope.$emit('pipAddCompositeItem', {type: contentType, id: $scope.compositeId});
+            };
+
+            function setOption() {
+                if ($scope.pipToolbarButton !== null && $scope.pipToolbarButton !== undefined) {
+                    $scope.toolbarButton.picture = $scope.pipToolbarButton.picture === false ? $scope.pipToolbarButton.picture : true;
+                    $scope.toolbarButton.document = $scope.pipToolbarButton.document === false ? $scope.pipToolbarButton.document : true;
+                    $scope.toolbarButton.location = $scope.pipToolbarButton.location === false ? $scope.pipToolbarButton.location : true;
+                    $scope.toolbarButton.event = $scope.pipToolbarButton.event === false ? $scope.pipToolbarButton.event : true;
+                    $scope.toolbarButton.checklist = $scope.pipToolbarButton.checklist === false ? $scope.pipToolbarButton.checklist : true;
+                } else {
+                    $scope.toolbarButton.picture = true;
+                    $scope.toolbarButton.document = true;
+                    $scope.toolbarButton.location = true;
+                    $scope.toolbarButton.event = true;
+                    $scope.toolbarButton.checklist = true;
+                }
+                $scope.toolbarButton.text = true;
+            };
+
+        }]
+    );
+
+})();
+/**
  * @file Touch start control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -25463,6 +25463,37 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })();
+
+/**
+ * @file Keyboard navigation with scrolling over non-focusable controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipCompositeFocused", []);
+
+    thisModule.directive('pipCompositeFocused', function () {
+        return {
+            restrict: 'A',
+            scope: false,
+            controller: 'pipCompositeFocusedController'
+        };
+    });
+
+    thisModule.controller('pipCompositeFocusedController',
+        ['$scope', '$element', '$rootScope', function ($scope, $element, $rootScope) {
+            $element.bind("touchstart mousedown", function (e) {
+                $rootScope.$broadcast('focusedComposite');
+            });
+        }]
+    );
+
+})();
+
 
 /**
  * @file Content switch control
@@ -25555,37 +25586,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })();
-
-/**
- * @file Keyboard navigation with scrolling over non-focusable controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipCompositeFocused", []);
-
-    thisModule.directive('pipCompositeFocused', function () {
-        return {
-            restrict: 'A',
-            scope: false,
-            controller: 'pipCompositeFocusedController'
-        };
-    });
-
-    thisModule.controller('pipCompositeFocusedController',
-        ['$scope', '$element', '$rootScope', function ($scope, $element, $rootScope) {
-            $element.bind("touchstart mousedown", function (e) {
-                $rootScope.$broadcast('focusedComposite');
-            });
-        }]
-    );
-
-})();
-
 
 
 
@@ -25856,170 +25856,6 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password.html',
-    '<!--\n' +
-    '@file Password recovery page\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
-    '    <pip-card width="400">\n' +
-    '        <pip-recover-password-panel\n' +
-    '                pip-data="data"\n' +
-    '                pip-created="$panel = $control">\n' +
-    '\n' +
-    '        </pip-recover-password-panel>\n' +
-    '        <div class="pip-footer">\n' +
-    '            <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
-    '                {{::\'CANCEL\' | translate}}\n' +
-    '            </md-button>\n' +
-    '\n' +
-    '            <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
-    '                       aria-label="RECOVER_PWD_RECOVER"\n' +
-    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 || data.email.length == 0">\n' +
-    '                {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
-    '            </md-button>\n' +
-    '\n' +
-    '            <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
-    '                {{::\'CANCEL\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </pip-card>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password_dialog.html',
-    '<!--\n' +
-    '@file Recover password dialog\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-entry lp0 rp0">\n' +
-    '    <md-dialog-content>\n' +
-    '        <pip-recover-password-panel\n' +
-    '                pip-data="data"\n' +
-    '                pip-created="$panel = $control"\n' +
-    '                pip-goto-reset="pipGotoReset">\n' +
-    '\n' +
-    '        </pip-recover-password-panel>\n' +
-    '    </md-dialog-content>\n' +
-    '\n' +
-    '    <md-dialog-actions class="layout-row layout-align-end-center">\n' +
-    '        <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
-    '            {{::\'CANCEL\' | translate}}\n' +
-    '        </md-button>\n' +
-    '\n' +
-    '        <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
-    '                   aria-label="RECOVER_PWD_RECOVER"\n' +
-    '                   ng-disabled="(form.$pristine && !data.email) || data.email== undefined ||\n' +
-    '                           || data.serverUrl.length == 0 || data.email.length == 0">\n' +
-    '            {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
-    '        </md-button>\n' +
-    '\n' +
-    '        <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
-    '            {{::\'CANCEL\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </md-dialog-actions>\n' +
-    '</md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('recover_password/recover_password_panel.html',
-    '<div class="pip-body">\n' +
-    '    <div class="pip-content">\n' +
-    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
-    '        </md-progress-linear>\n' +
-    '\n' +
-    '        <h2>{{\'RECOVER_PWD_TITLE\' | translate}}</h2>\n' +
-    '\n' +
-    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_1\' | translate}} </p>\n' +
-    '\n' +
-    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_2\' | translate}}</p>\n' +
-    '\n' +
-    '        <form name="form" novalidate>\n' +
-    '            <div ng-messages="form.$serverError" class="text-error bm8"  md-auto-hide="false">\n' +
-    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_UNKNOWN">\n' +
-    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <a ng-hide="showServerUrl || fixedServerUrl" ng-click="showServerUrl = true" href="">\n' +
-    '                {{\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
-    '            </a>\n' +
-    '\n' +
-    '            <div ng-show="showServerUrl">\n' +
-    '                <md-autocomplete\n' +
-    '                        ng-initial autofocus tabindex="1"\n' +
-    '                        class="pip-combobox w-stretch bm8"\n' +
-    '                        name="server"\n' +
-    '                        ng-enabled="!transaction.busy()"\n' +
-    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
-    '                        md-no-cache="true"\n' +
-    '                        md-selected-item="data.serverUrl"\n' +
-    '                        md-search-text="selected.searchURLs"\n' +
-    '                        md-items="item in getMatches()"\n' +
-    '                        md-item-text="item"\n' +
-    '                        md-selected-item-change="onServerUrlChanged()"\n' +
-    '                        md-delay="200"\n' +
-    '                        ng-model="data.serverUrl"\n' +
-    '                        pip-clear-errors>\n' +
-    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
-    '                </md-autocomplete>\n' +
-    '            </div>\n' +
-    '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
-    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
-    '                <input name="email" type="email"\n' +
-    '                       ng-model="data.email"\n' +
-    '                       pip-email-unique="data.email"\n' +
-    '                       required step="any" pip-clear-errors\n' +
-    '                       ng-disabled="transaction.busy()" tabindex="2"/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
-    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.email)"\n' +
-    '                     class="md-input-error"  md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="emailUnique">{{::\'ERROR_1104\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '        </form>\n' +
-    '\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('reset_password/reset_password.html',
     '<!--\n' +
     '@file Password reset page\n' +
@@ -26201,6 +26037,170 @@ module.run(['$templateCache', function($templateCache) {
     '            </md-input-container>\n' +
     '\n' +
     '        </form>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('recover_password/recover_password.html',
+    '<!--\n' +
+    '@file Password recovery page\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
+    '    <pip-card width="400">\n' +
+    '        <pip-recover-password-panel\n' +
+    '                pip-data="data"\n' +
+    '                pip-created="$panel = $control">\n' +
+    '\n' +
+    '        </pip-recover-password-panel>\n' +
+    '        <div class="pip-footer">\n' +
+    '            <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
+    '                {{::\'CANCEL\' | translate}}\n' +
+    '            </md-button>\n' +
+    '\n' +
+    '            <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
+    '                       aria-label="RECOVER_PWD_RECOVER"\n' +
+    '                       ng-disabled="(form.$pristine && !data.email) || data.serverUrl.length == 0 || data.email.length == 0">\n' +
+    '                {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
+    '            </md-button>\n' +
+    '\n' +
+    '            <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '                {{::\'CANCEL\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </pip-card>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('recover_password/recover_password_dialog.html',
+    '<!--\n' +
+    '@file Recover password dialog\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-entry lp0 rp0">\n' +
+    '    <md-dialog-content>\n' +
+    '        <pip-recover-password-panel\n' +
+    '                pip-data="data"\n' +
+    '                pip-created="$panel = $control"\n' +
+    '                pip-goto-reset="pipGotoReset">\n' +
+    '\n' +
+    '        </pip-recover-password-panel>\n' +
+    '    </md-dialog-content>\n' +
+    '\n' +
+    '    <md-dialog-actions class="layout-row layout-align-end-center">\n' +
+    '        <md-button ng-hide="transaction.busy()" ng-click="goBack()" class="rm8" aria-label="CANCEL">\n' +
+    '            {{::\'CANCEL\' | translate}}\n' +
+    '        </md-button>\n' +
+    '\n' +
+    '        <md-button ng-hide="transaction.busy()" class="md-accent" ng-click="onRecover()"\n' +
+    '                   aria-label="RECOVER_PWD_RECOVER"\n' +
+    '                   ng-disabled="(form.$pristine && !data.email) || data.email== undefined ||\n' +
+    '                           || data.serverUrl.length == 0 || data.email.length == 0">\n' +
+    '            {{::\'RECOVER_PWD_RECOVER\' | translate}}\n' +
+    '        </md-button>\n' +
+    '\n' +
+    '        <md-button ng-show="transaction.busy()" class="md-warn" ng-click="transaction.abort()" aria-label="ABORT">\n' +
+    '            {{::\'CANCEL\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </md-dialog-actions>\n' +
+    '</md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('recover_password/recover_password_panel.html',
+    '<div class="pip-body">\n' +
+    '    <div class="pip-content">\n' +
+    '        <md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
+    '        </md-progress-linear>\n' +
+    '\n' +
+    '        <h2>{{\'RECOVER_PWD_TITLE\' | translate}}</h2>\n' +
+    '\n' +
+    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_1\' | translate}} </p>\n' +
+    '\n' +
+    '        <p class="text-primary tm0 bm16">{{\'RECOVER_PWD_TEXT_2\' | translate}}</p>\n' +
+    '\n' +
+    '        <form name="form" novalidate>\n' +
+    '            <div ng-messages="form.$serverError" class="text-error bm8"  md-auto-hide="false">\n' +
+    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_UNKNOWN">\n' +
+    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <a ng-hide="showServerUrl || fixedServerUrl" ng-click="showServerUrl = true" href="">\n' +
+    '                {{\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
+    '            </a>\n' +
+    '\n' +
+    '            <div ng-show="showServerUrl">\n' +
+    '                <md-autocomplete\n' +
+    '                        ng-initial autofocus tabindex="1"\n' +
+    '                        class="pip-combobox w-stretch bm8"\n' +
+    '                        name="server"\n' +
+    '                        ng-enabled="!transaction.busy()"\n' +
+    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
+    '                        md-no-cache="true"\n' +
+    '                        md-selected-item="data.serverUrl"\n' +
+    '                        md-search-text="selected.searchURLs"\n' +
+    '                        md-items="item in getMatches()"\n' +
+    '                        md-item-text="item"\n' +
+    '                        md-selected-item-change="onServerUrlChanged()"\n' +
+    '                        md-delay="200"\n' +
+    '                        ng-model="data.serverUrl"\n' +
+    '                        pip-clear-errors>\n' +
+    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
+    '                </md-autocomplete>\n' +
+    '            </div>\n' +
+    '            <md-input-container class="pip-no-hint" style="padding-bottom: 4px!important;">\n' +
+    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
+    '                <input name="email" type="email"\n' +
+    '                       ng-model="data.email"\n' +
+    '                       pip-email-unique="data.email"\n' +
+    '                       required step="any" pip-clear-errors\n' +
+    '                       ng-disabled="transaction.busy()" tabindex="2"/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint">\n' +
+    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.email)"\n' +
+    '                     class="md-input-error"  md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="emailUnique">{{::\'ERROR_1104\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '        </form>\n' +
+    '\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -27222,6 +27222,208 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
+ * @file Entry recover password controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.RecoverPassword', ['pipEntry.Common', "pipRecoverPasswordPanel"]);
+
+    thisModule.controller('pipRecoverPasswordController',
+        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, 
+            pipFormErrors, pipEntryCommon, $window) {
+
+            pipEntryCommon.configureAppBar();
+            $scope.goBack = goBack;
+
+            $scope.onRecover = onRecover;
+
+            $scope.transaction = pipTransaction('entry.recover_password', $scope);
+
+            return
+
+            function goBack(){
+                $window.history.back();
+            }
+            function onRecover() {
+                if ($scope.$panel)  $scope.$panel.onRecover();
+            }
+
+        }]
+    );
+
+})();
+/**
+ * @file Recover password dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.RecoverPasswordDialog', ['pipEntry.Common', "pipRecoverPasswordPanel",
+        'pipEntry.ResetPasswordDialog']);
+
+    thisModule.factory('pipRecoverPasswordDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, successCallback, cancelCallback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'recover_password/recover_password_dialog.html',
+                        controller: 'pipRecoverPasswordDialogController',
+                        locals: { params: params },
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (successCallback) {
+                                successCallback();
+                            }
+                        }, function () {
+                            if (cancelCallback) {
+                                cancelCallback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipRecoverPasswordDialogController',
+        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', 'pipResetPasswordDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog, pipResetPasswordDialog){
+
+            $scope.onRecover = onRecover;
+
+            if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
+
+            $scope.goBack = $mdDialog.cancel;
+            $scope.pipGotoReset = pipGotoResetPasswordDialog;
+
+            return;
+
+            function onRecover() {
+                if ($scope.$panel)  $scope.$panel.onRecover();
+            }
+
+            function pipGotoResetPasswordDialog(){
+                pipResetPasswordDialog.show({});
+            }
+        }]
+    );
+
+})();
+/**
+ * @file Recover password panel
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipRecoverPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
+
+    thisModule.directive('pipRecoverPasswordPanel',
+        function () {
+            return {
+                restrict: 'EA',
+                replace: true,
+                scope: {
+                    data: '=pipData',
+                    created: '&pipCreated',
+                    gotoReset: '=pipGotoReset'
+
+                },
+                templateUrl: 'recover_password/recover_password_panel.html',
+                controller: 'pipRecoverPasswordPanelController'
+
+            };
+        }
+    );
+    thisModule.controller('pipRecoverPasswordPanelController',
+        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession,
+                  pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
+
+            $scope.$mdMedia = $mdMedia;
+
+            pipEntryCommon.initScope($scope);
+
+            $scope.showServerError = true;
+
+            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
+            $scope.onRecover = onRecover;
+            $scope.transaction = pipTransaction('entry.recover_password', $scope);
+
+            $scope.$control = {};
+            $scope.$control.onRecover = onRecover;
+
+            if ($scope.created) {
+                $scope.created({
+                    $control: $scope.$control
+                });
+            }
+
+            return;
+
+            //-----------------------------
+
+            function onRecover() {
+                if ($scope.form.$invalid) {
+                    pipFormErrors.resetFormErrors($scope.form, true);
+                    return;
+                }
+
+                var transactionId = $scope.transaction.begin('PROCESSING');
+                if (!transactionId) return;
+
+                pipRest.recoverPassword($scope.data.serverUrl).call(
+                    {
+                        email: $scope.data.email
+                    },
+                    function (data) {
+                        pipFormErrors.resetFormErrors($scope.form, false);
+                        if ($scope.transaction.aborted(transactionId)) return;
+
+                        $scope.transaction.end();
+                        if (!$scope.gotoReset)
+                            pipAuthState.go('reset_password', {
+                                server_url: $scope.data.serverUrl,
+                                email: $scope.data.email
+                            });
+                        else
+                            $scope.gotoReset();
+                    },
+                    function (error) {
+                        $scope.error = error;
+                        $scope.transaction.end($scope.error);
+                        pipFormErrors.setFormError(
+                            $scope.form, $scope.error,
+                            {
+                                1100: 'email', // Missing email
+                                1106: 'email', // User was not found
+                                1000: 'form', // Unknown error
+                                1110: 'form', // Account is locked
+                                1111: 'form', // Number of attempts exceeded. Account was locked
+                                1112: 'form', // Account is not active
+                                '-1' : 'form' // server not response
+                            }
+                        );
+                        pipFormErrors.resetFormErrors($scope.form, true);
+                    }
+                );
+            };
+
+        }])
+
+})();
+/**
  * @file Entry post signup controller
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -27444,8 +27646,10 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Entry recover password controller
+ * @file Entry reset password controller
  * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Fix error handling
  */
 
 /* global angular */
@@ -27453,34 +27657,39 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipEntry.RecoverPassword', ['pipEntry.Common', "pipRecoverPasswordPanel"]);
+    var thisModule = angular.module('pipEntry.ResetPassword', ['pipEntry.Common', 'pipResetPasswordPanel',
+        'pipEmailUnique']);
 
-    thisModule.controller('pipRecoverPasswordController',
-        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, 
-            pipFormErrors, pipEntryCommon, $window) {
+    thisModule.controller('pipResetPasswordController',
+        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipToasts', 'pipTranslate', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, pipToasts, 
+            pipTranslate, pipFormErrors, pipEntryCommon, $window) {
 
             pipEntryCommon.configureAppBar();
             $scope.goBack = goBack;
 
-            $scope.onRecover = onRecover;
+            $scope.onReset = onReset;
 
-            $scope.transaction = pipTransaction('entry.recover_password', $scope);
+            $scope.transaction = pipTransaction('entry.reset_password', $scope);
 
             return
+
 
             function goBack(){
                 $window.history.back();
             }
-            function onRecover() {
-                if ($scope.$panel)  $scope.$panel.onRecover();
+
+            function onReset() {
+                if ($scope.$panel)  $scope.$panel.onReset();
             }
+
+
 
         }]
     );
 
 })();
 /**
- * @file Recover password dialog
+ * @file Reset password dialog
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
@@ -27489,17 +27698,16 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipEntry.RecoverPasswordDialog', ['pipEntry.Common', "pipRecoverPasswordPanel",
-        'pipEntry.ResetPasswordDialog']);
+    var thisModule = angular.module('pipEntry.ResetPasswordDialog', ['pipEntry.Common', "pipResetPasswordPanel"]);
 
-    thisModule.factory('pipRecoverPasswordDialog',
+    thisModule.factory('pipResetPasswordDialog',
         ['$mdDialog', function ($mdDialog) {
             return {
                 show: function (params, successCallback, cancelCallback) {
                     $mdDialog.show({
                         targetEvent: params.event,
-                        templateUrl: 'recover_password/recover_password_dialog.html',
-                        controller: 'pipRecoverPasswordDialogController',
+                        templateUrl: 'entry/dialogs/reset_password.html',
+                        controller: 'pipResetPasswordDialogController',
                         locals: { params: params },
                         clickOutsideToClose: true
                     })
@@ -27517,31 +27725,27 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
 
-    thisModule.controller('pipRecoverPasswordDialogController',
-        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', 'pipResetPasswordDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog, pipResetPasswordDialog){
+    thisModule.controller('pipResetPasswordDialogController',
+        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog){
 
-            $scope.onRecover = onRecover;
+            $scope.onReset = onReset;
 
             if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
 
             $scope.goBack = $mdDialog.cancel;
-            $scope.pipGotoReset = pipGotoResetPasswordDialog;
 
-            return;
 
-            function onRecover() {
-                if ($scope.$panel)  $scope.$panel.onRecover();
-            }
+            return
 
-            function pipGotoResetPasswordDialog(){
-                pipResetPasswordDialog.show({});
+            function onReset() {
+                if ($scope.$panel)  $scope.$panel.onReset();
             }
         }]
     );
 
 })();
 /**
- * @file Recover password panel
+ * @file Reset password panel
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
@@ -27550,27 +27754,26 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipRecoverPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
+    var thisModule = angular.module("pipResetPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
 
-    thisModule.directive('pipRecoverPasswordPanel',
+    thisModule.directive('pipResetPasswordPanel',
         function () {
             return {
                 restrict: 'EA',
                 replace: true,
                 scope: {
                     data: '=pipData',
-                    created: '&pipCreated',
-                    gotoReset: '=pipGotoReset'
+                    created: '&pipCreated'
 
                 },
-                templateUrl: 'recover_password/recover_password_panel.html',
-                controller: 'pipRecoverPasswordPanelController'
+                templateUrl: 'reset_password/reset_password_panel.html',
+                controller: 'pipResetPasswordPanelController'
 
             };
         }
     );
-    thisModule.controller('pipRecoverPasswordPanelController',
-        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession,
+    thisModule.controller('pipResetPasswordPanelController',
+        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipToasts', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession, pipToasts,
                   pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
 
             $scope.$mdMedia = $mdMedia;
@@ -27580,11 +27783,11 @@ module.run(['$templateCache', function($templateCache) {
             $scope.showServerError = true;
 
             $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onRecover = onRecover;
+            $scope.onReset = onReset;
             $scope.transaction = pipTransaction('entry.recover_password', $scope);
 
             $scope.$control = {};
-            $scope.$control.onRecover = onRecover;
+            $scope.$control.onReset = onReset;
 
             if ($scope.created) {
                 $scope.created({
@@ -27596,7 +27799,22 @@ module.run(['$templateCache', function($templateCache) {
 
             //-----------------------------
 
-            function onRecover() {
+            function onShowToast(message, type) {
+                if (!message) return;
+                message = pipTranslate.translate(message);
+                type = type || 'message';
+
+                if (type == 'message') {
+                    pipToasts.showMessage(message);
+                    return;
+                }
+                if (type == 'error') {
+                    pipToasts.showError(message);
+                    return;
+                }
+            };
+
+            function onReset() {
                 if ($scope.form.$invalid) {
                     pipFormErrors.resetFormErrors($scope.form, true);
                     return;
@@ -27605,39 +27823,45 @@ module.run(['$templateCache', function($templateCache) {
                 var transactionId = $scope.transaction.begin('PROCESSING');
                 if (!transactionId) return;
 
-                pipRest.recoverPassword($scope.data.serverUrl).call(
+                pipRest.resetPassword($scope.data.serverUrl).call(
                     {
-                        email: $scope.data.email
+                        email: $scope.data.email,
+                        code: $scope.data.code,
+                        password: $scope.data.password
                     },
                     function (data) {
                         pipFormErrors.resetFormErrors($scope.form, false);
                         if ($scope.transaction.aborted(transactionId)) return;
 
+                        var message = String() + 'RESET_PWD_SUCCESS_TEXT';
+                        onShowToast(message, 'message');
                         $scope.transaction.end();
-                        if (!$scope.gotoReset)
-                            pipAuthState.go('reset_password', {
-                                server_url: $scope.data.serverUrl,
-                                email: $scope.data.email
-                            });
-                        else
-                            $scope.gotoReset();
+                        pipAuthState.go('signin', {
+                            server_url: $scope.data.serverUrl,
+                            email: $scope.data.email
+                        });
                     },
                     function (error) {
                         $scope.error = error;
                         $scope.transaction.end($scope.error);
+                        pipFormErrors.resetFormErrors($scope.form, true);
                         pipFormErrors.setFormError(
-                            $scope.form, $scope.error,
+                            $scope.form, error,
                             {
-                                1100: 'email', // Missing email
-                                1106: 'email', // User was not found
-                                1000: 'form', // Unknown error
-                                1110: 'form', // Account is locked
-                                1111: 'form', // Number of attempts exceeded. Account was locked
-                                1112: 'form', // Account is not active
+                                1100 : 'email', // Missing email
+                                1106 : 'email', // User was not found
+                                1102 : 'password', // Missing password
+                                1103 : 'password', // Password should be 5 to 20 symbols long
+                                1105 : 'password', // Old and new passwords are identical
+                                1108 : 'code', // Invalid password recovery code
+                                1109 : 'code', // Password recovery code expired
+                                1000 : 'form', // Unknown error
+                                1110 : 'form', // Account is locked
+                                1111 : 'form', // Number of attempts exceeded. Account was locked
+                                1112 : 'form', // Account is not active
                                 '-1' : 'form' // server not response
                             }
                         );
-                        pipFormErrors.resetFormErrors($scope.form, true);
                     }
                 );
             };
@@ -27872,230 +28096,6 @@ module.run(['$templateCache', function($templateCache) {
                     onSignin();
                 }
             }
-
-        }])
-
-})();
-/**
- * @file Entry reset password controller
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Fix error handling
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.ResetPassword', ['pipEntry.Common', 'pipResetPasswordPanel',
-        'pipEmailUnique']);
-
-    thisModule.controller('pipResetPasswordController',
-        ['$scope', '$rootScope', 'pipUtils', 'pipAuthState', 'pipTransaction', 'pipRest', 'pipToasts', 'pipTranslate', 'pipFormErrors', 'pipEntryCommon', '$window', function ($scope, $rootScope, pipUtils, pipAuthState, pipTransaction, pipRest, pipToasts, 
-            pipTranslate, pipFormErrors, pipEntryCommon, $window) {
-
-            pipEntryCommon.configureAppBar();
-            $scope.goBack = goBack;
-
-            $scope.onReset = onReset;
-
-            $scope.transaction = pipTransaction('entry.reset_password', $scope);
-
-            return
-
-
-            function goBack(){
-                $window.history.back();
-            }
-
-            function onReset() {
-                if ($scope.$panel)  $scope.$panel.onReset();
-            }
-
-
-
-        }]
-    );
-
-})();
-/**
- * @file Reset password dialog
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.ResetPasswordDialog', ['pipEntry.Common', "pipResetPasswordPanel"]);
-
-    thisModule.factory('pipResetPasswordDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, successCallback, cancelCallback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'entry/dialogs/reset_password.html',
-                        controller: 'pipResetPasswordDialogController',
-                        locals: { params: params },
-                        clickOutsideToClose: true
-                    })
-                        .then(function () {
-                            if (successCallback) {
-                                successCallback();
-                            }
-                        }, function () {
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipResetPasswordDialogController',
-        ['$scope', '$rootScope', '$location', 'pipSession', 'params', '$mdDialog', function ($scope, $rootScope, $location, pipSession, params, $mdDialog){
-
-            $scope.onReset = onReset;
-
-            if ($scope.$panel) $scope.transaction = $scope.$panel.transacton;
-
-            $scope.goBack = $mdDialog.cancel;
-
-
-            return
-
-            function onReset() {
-                if ($scope.$panel)  $scope.$panel.onReset();
-            }
-        }]
-    );
-
-})();
-/**
- * @file Reset password panel
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipResetPasswordPanel", ['pipUtils', 'pipFocused', 'pipEntry.Strings']);
-
-    thisModule.directive('pipResetPasswordPanel',
-        function () {
-            return {
-                restrict: 'EA',
-                replace: true,
-                scope: {
-                    data: '=pipData',
-                    created: '&pipCreated'
-
-                },
-                templateUrl: 'reset_password/reset_password_panel.html',
-                controller: 'pipResetPasswordPanelController'
-
-            };
-        }
-    );
-    thisModule.controller('pipResetPasswordPanelController',
-        ['$scope', '$rootScope', '$location', 'pipTransaction', 'pipAuthState', 'pipSession', 'pipToasts', 'pipFormErrors', 'pipEntryCommon', '$state', '$mdMedia', 'pipTranslate', 'pipEnums', 'pipRest', 'pipUtils', function ($scope, $rootScope, $location, pipTransaction, pipAuthState, pipSession, pipToasts,
-                  pipFormErrors, pipEntryCommon, $state, $mdMedia, pipTranslate, pipEnums, pipRest, pipUtils) {
-
-            $scope.$mdMedia = $mdMedia;
-
-            pipEntryCommon.initScope($scope);
-
-            $scope.showServerError = true;
-
-            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onReset = onReset;
-            $scope.transaction = pipTransaction('entry.recover_password', $scope);
-
-            $scope.$control = {};
-            $scope.$control.onReset = onReset;
-
-            if ($scope.created) {
-                $scope.created({
-                    $control: $scope.$control
-                });
-            }
-
-            return;
-
-            //-----------------------------
-
-            function onShowToast(message, type) {
-                if (!message) return;
-                message = pipTranslate.translate(message);
-                type = type || 'message';
-
-                if (type == 'message') {
-                    pipToasts.showMessage(message);
-                    return;
-                }
-                if (type == 'error') {
-                    pipToasts.showError(message);
-                    return;
-                }
-            };
-
-            function onReset() {
-                if ($scope.form.$invalid) {
-                    pipFormErrors.resetFormErrors($scope.form, true);
-                    return;
-                }
-
-                var transactionId = $scope.transaction.begin('PROCESSING');
-                if (!transactionId) return;
-
-                pipRest.resetPassword($scope.data.serverUrl).call(
-                    {
-                        email: $scope.data.email,
-                        code: $scope.data.code,
-                        password: $scope.data.password
-                    },
-                    function (data) {
-                        pipFormErrors.resetFormErrors($scope.form, false);
-                        if ($scope.transaction.aborted(transactionId)) return;
-
-                        var message = String() + 'RESET_PWD_SUCCESS_TEXT';
-                        onShowToast(message, 'message');
-                        $scope.transaction.end();
-                        pipAuthState.go('signin', {
-                            server_url: $scope.data.serverUrl,
-                            email: $scope.data.email
-                        });
-                    },
-                    function (error) {
-                        $scope.error = error;
-                        $scope.transaction.end($scope.error);
-                        pipFormErrors.resetFormErrors($scope.form, true);
-                        pipFormErrors.setFormError(
-                            $scope.form, error,
-                            {
-                                1100 : 'email', // Missing email
-                                1106 : 'email', // User was not found
-                                1102 : 'password', // Missing password
-                                1103 : 'password', // Password should be 5 to 20 symbols long
-                                1105 : 'password', // Old and new passwords are identical
-                                1108 : 'code', // Invalid password recovery code
-                                1109 : 'code', // Password recovery code expired
-                                1000 : 'form', // Unknown error
-                                1110 : 'form', // Account is locked
-                                1111 : 'form', // Number of attempts exceeded. Account was locked
-                                1112 : 'form', // Account is not active
-                                '-1' : 'form' // server not response
-                            }
-                        );
-                    }
-                );
-            };
 
         }])
 
@@ -28571,6 +28571,42 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
+    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
+    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
+    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
+    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
+    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
+    '        <div class="h48" ng-if="isCordova">\n' +
+    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '        <div class="h48">\n' +
+    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('unsupported/unsupported.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
     '\n' +
@@ -28669,42 +28705,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
-    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
-    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
-    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
-    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
-    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
-    '        <div class="h48" ng-if="isCordova">\n' +
-    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '        <div class="h48">\n' +
-    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -29125,21 +29125,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
-
-/**
- * @file Registration of settings components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipSettings', [
-        'pipSettings.Service',
-        'pipSettings.Page'
-    ]);
-
-})(window.angular);
 
 (function(module) {
 try {
@@ -29573,6 +29558,21 @@ module.run(['$templateCache', function($templateCache) {
     '</md-dialog>');
 }]);
 })();
+
+/**
+ * @file Registration of settings components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipSettings', [
+        'pipSettings.Service',
+        'pipSettings.Page'
+    ]);
+
+})(window.angular);
 
 /**
  * @file Define controller for a settings tab
