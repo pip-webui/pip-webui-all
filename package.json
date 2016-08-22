@@ -1,6 +1,6 @@
 {
     "name": "pip-webui-all",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "author": "Digital Living Software Corp. <www.digitallivingsoftware.com>",
     "description": "Pip.WebUI deployment bundle",
     "contributors": [
