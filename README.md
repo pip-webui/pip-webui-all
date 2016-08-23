@@ -5,32 +5,32 @@
 This module provides a convenient package that bundles Pip.WebUI modules into few deployment artifacts 
 to minimize number of dependencies and simplify development and deployment tasks. 
 
-* **pip-webui-lib(.js, .min.js, .css, min.css)**: 3rd party production libraries from **pip-webui-lib** module
-* **pip-webui-lib-test(.js, .min.js)**: 3rd party test libraries from **pip-webui-lib** module
-* **pip-webui(.js, .min.js, .css, min.css)**: All modules included into Pip.WebUI framework exception **pip-webui-test** that comes separate
-* **pip-webui-test(.js, .min.js)**: Optional testing primitives from **pip-webui-test** module
+* **pip-webui-lib (.js, .min.js, .css, min.css)**: 3rd party production libraries from **pip-webui-lib** module
+* **pip-webui-lib-test (.js, .min.js)**: 3rd party test libraries from **pip-webui-lib** module
+* **pip-webui (.js, .min.js, .css, min.css)**: All modules included into Pip.WebUI framework exception **pip-webui-test** that comes separate
+* **pip-webui-test (.js, .min.js)**: Optional testing primitives from **pip-webui-test** module
 
 Each artifact is represented by Javascript, CSS and Map files in regular and minified versions.
 
 ## Usage
 
-Add dependency to **pip-webui** module your **bower.json** or **package.json** file depending what you use.
+Add dependency to **pip-webui-all** module in your **bower.json** or **package.json** file depending what you use.
 ```javascript
 "dependencies": {
   ...
-  "pip-webui": "*"
+  "pip-webui-all": "*"
   ...
 }
 ```
 
 Alternatively you can install the module manually using bower:
 ```bash
-bower install pip-webui
+bower install pip-webui-all
 ```
 
 or install it using npm:
 ```bash
-npm install pip-webui
+npm install pip-webui-all
 ```
 
 Add references to module artifacts into your web application.
@@ -82,6 +82,7 @@ To use less mixins from Pip.WebUI library include the following reference into y
 * <a href="https://github.com/pip-webui/pip-webui-guidance">pip-webui-guidance</a> - included into **pip-webui** artifact
 * <a href="https://github.com/pip-webui/pip-webui-help">pip-webui-help</a> - included into **pip-webui** artifact
 * <a href="https://github.com/pip-webui/pip-webui-support">pip-webui-support</a> - included into **pip-webui** artifact
+* <a href="https://github.com/pip-webui/pip-webui-data">pip-webui-data</a> - included into **pip-webui** artifact
 
 ## <a name="license"></a>License
 
