@@ -2380,6 +2380,7 @@ md-dialog .pip-progress-top {
 }
 .pip-check-list .pip-check-list-item .md-list-item-inner {
   padding-left: 0px;
+  content: none;
   padding-right: 0px;
   display: block;
   width: calc(100% - 21px);
@@ -8849,4 +8850,52 @@ md-dialog.pip-guide-preview {
 .pip-help.pip-card .pip-header ~ .pip-body,
 .pip-help.pip-document .pip-header ~ .pip-body {
   padding-top: 24px !important;
+}
+
+@-webkit-keyframes blink-hint {
+  0% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.38;
+  }
+}
+@-moz-keyframes blink-hint {
+  0% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.38;
+  }
+}
+@-o-keyframes blink-hint {
+  0% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.38;
+  }
+}
+@keyframes blink-hint {
+  0% {
+    opacity: 0.38;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.38;
+  }
+}
+.pip-feedback-dialog {
+  width: 80%;
 }
