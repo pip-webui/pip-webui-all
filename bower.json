@@ -1,6 +1,6 @@
 {
     "name": "pip-webui",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "description": "Pip.WebUI deployment bundle",
     "main": "",
     "authors": [

@@ -1,6 +1,13 @@
 # Pip.WebUI.All Changelog
 
-## <a name="1.0.0"></a> 1.0.0 (2016-07-30)
+## 1.0.5 (2016-08-22)
+
+Renamed package to pip-webui-all.
+
+### Breaking Changes
+Renamed package name to pip-webui-all from pip-webui to prevent conflict with another package
+
+## 1.0.0 (2016-07-30)
 
 Initial release of Pip.WebUI.All composite package. 
 
