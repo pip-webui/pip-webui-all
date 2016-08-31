@@ -13330,6 +13330,44 @@
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipTagList',
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeRangeEdit',
+        'pipTimeRange',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', ['pipControls']);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipBasicControls.Templates');
@@ -13375,45 +13413,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date/date.html',
-    '<!--\n' +
-    '@file Date control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
-    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '</div>\n' +
-    '					');
 }]);
 })();
 
@@ -13519,6 +13518,45 @@ module.run(['$templateCache', function($templateCache) {
     '        </md-select>\n' +
     '    </md-input-container>\n' +
     '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('date/date.html',
+    '<!--\n' +
+    '@file Date control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
+    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '</div>\n' +
+    '					');
 }]);
 })();
 
@@ -13991,44 +14029,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipTagList',
-
-        'pipDate',
-        'pipDateRange',
-        'pipTimeRangeEdit',
-        'pipTimeRange',
-
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-    angular.module('pipBasicControls', ['pipControls']);
-
-})(window.angular);
-
 
 /**
  * @file Color picker control
@@ -14834,6 +14834,73 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular);
 
 /**
+ * @file Information dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve sample in sampler app
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipInformationDialog',
+        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
+
+    /* eslint-disable quote-props */
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'INFORMATION_TITLE': 'Information'
+        });
+        pipTranslateProvider.translations('ru', {
+            'INFORMATION_TITLE': 'Информация'
+        });
+    }]);
+    /* eslint-enable quote-props */
+
+    thisModule.factory('pipInformationDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (params, callback) {
+                    $mdDialog.show({
+                        targetEvent: params.event,
+                        templateUrl: 'information_dialog/information_dialog.html',
+                        controller: 'pipInformationDialogController',
+                        locals: {params: params},
+                        clickOutsideToClose: true
+                    })
+                        .then(function () {
+                            if (callback) {
+                                callback();
+                            }
+                        });
+                }
+            };
+        }]
+    );
+
+    thisModule.controller('pipInformationDialogController',
+        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', 'pipUtils', function ($scope, $rootScope, $mdDialog, pipTranslate, params, pipUtils) {
+            var content, item;
+
+            $scope.theme = $rootScope.$theme;
+            $scope.title = params.title || 'INFORMATION_TITLE';
+            content = pipTranslate.translate(params.message);
+            if (params.item) {
+                item = _.truncate(params.item, 25);
+                content = pipUtils.sprintf(content, item);
+            }
+            $scope.content = content;
+            $scope.ok = params.ok || 'OK';
+
+            $scope.onOk = function () {
+                $mdDialog.hide();
+            };
+        }]
+    );
+
+})(window.angular, window._);
+
+/**
  * @file Image slider control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -15055,73 +15122,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window._, window.jQuery);
-
-/**
- * @file Information dialog
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve sample in sampler app
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipInformationDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipBasicControls.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'INFORMATION_TITLE': 'Information'
-        });
-        pipTranslateProvider.translations('ru', {
-            'INFORMATION_TITLE': 'Информация'
-        });
-    }]);
-    /* eslint-enable quote-props */
-
-    thisModule.factory('pipInformationDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (params, callback) {
-                    $mdDialog.show({
-                        targetEvent: params.event,
-                        templateUrl: 'information_dialog/information_dialog.html',
-                        controller: 'pipInformationDialogController',
-                        locals: {params: params},
-                        clickOutsideToClose: true
-                    })
-                        .then(function () {
-                            if (callback) {
-                                callback();
-                            }
-                        });
-                }
-            };
-        }]
-    );
-
-    thisModule.controller('pipInformationDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', 'pipUtils', function ($scope, $rootScope, $mdDialog, pipTranslate, params, pipUtils) {
-            var content, item;
-
-            $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'INFORMATION_TITLE';
-            content = pipTranslate.translate(params.message);
-            if (params.item) {
-                item = _.truncate(params.item, 25);
-                content = pipUtils.sprintf(content, item);
-            }
-            $scope.content = content;
-            $scope.ok = params.ok || 'OK';
-
-            $scope.onOk = function () {
-                $mdDialog.hide();
-            };
-        }]
-    );
-
-})(window.angular, window._);
 
 /**
  * @file Markdown control
@@ -16764,6 +16764,40 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tabs/tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
+    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
+    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
+    '            <md-tab-label>\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-tab-label>\n' +
+    '        </md-tab>\n' +
+    '    </md-tabs>\n' +
+    '    <md-content class="md-subhead md-hue-1" ng-if="$mdMedia(\'xs\')">\n' +
+    '        <div class="pip-divider position-top m0"></div>\n' +
+    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
+    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
+    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-content>\n' +
+    '</md-toolbar>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/sidenav.html',
     '<!--\n' +
     '@file Side Nav component\n' +
@@ -16842,40 +16876,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </md-list>\n' +
     '\n' +
     '</md-sidenav>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
-    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
-    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
-    '            <md-tab-label>\n' +
-    '                {{ ::tab.nameLocal }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-tab-label>\n' +
-    '        </md-tab>\n' +
-    '    </md-tabs>\n' +
-    '    <md-content class="md-subhead md-hue-1" ng-if="$mdMedia(\'xs\')">\n' +
-    '        <div class="pip-divider position-top m0"></div>\n' +
-    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
-    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
-    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
-    '                {{ ::tab.nameLocal }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-content>\n' +
-    '</md-toolbar>\n' +
     '');
 }]);
 })();
@@ -19033,6 +19033,21 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of WebUI documents controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipDocuments', [
+        'pipDocumentList',
+        'pipDocumentListEdit'
+    ]);
+
+})(window.angular);
+
 (function(module) {
 try {
   module = angular.module('pipDocuments.Templates');
@@ -19185,137 +19200,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of WebUI documents controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipDocuments', [
-        'pipDocumentList',
-        'pipDocumentListEdit'
-    ]);
-
-})(window.angular);
-
-/**
- * @file Document list control
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve samples in sampler app
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipDocumentList', ['pipCore', 'pipRest', 'pipFocused', 'pipDocuments.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            DOCUMENTS_ATTACHED: 'document(s) attached',
-            ERROR_DOCUMENTS_LOADED: 'Error: <%= error_number %> document(s) are not loaded'
-        });
-        pipTranslateProvider.translations('ru', {
-            DOCUMENTS_ATTACHED: 'документов добавлено',
-            ERROR_DOCUMENTS_LOADED: 'Ошибка: <%= error_number %> документ(ов) не загружено'
-        });
-    }]);
-
-    thisModule.directive('pipDocumentList',
-        ['$parse', '$rootScope', 'pipUtils', 'pipRest', 'pipToasts', 'pipTranslate', function ($parse, $rootScope, pipUtils, pipRest, pipToasts, pipTranslate) {  // eslint-disable-line no-unused-vars
-            return {
-                restrict: 'EA',
-                scope: true,
-                templateUrl: 'document_list/document_list.html',
-                link: function ($scope, $element, $attrs) {
-                    var documentsGetter = $parse($attrs.pipDocuments),
-                        $documentsContainer = $element.children('.pip-documents-container'),
-                        $up = $element.find('.icon-up'),
-                        $down = $element.find('.icon-down'),
-                        collapsable = pipUtils.toBoolean($attrs.pipCollapse);
-
-                    $scope.documentList = {};
-                    $scope.documentList.icon = 'document';
-                    $scope.documents = documentsGetter($scope);
-
-                    if ($attrs.pipDocumentIcon) {
-                        $scope.pipDocumentIcon = true;
-                    }
-
-                    $scope.showDocuments = collapsable;
-
-                    if (!collapsable) {
-                        $up.hide();
-                        $documentsContainer.hide();
-                    } else {
-                        $down.hide();
-                    }
-
-                    if ($attrs.disabled) {
-                        $up.hide();
-                        $down.hide();
-                    }
-
-                    // Also optimization to avoid watch if it is unnecessary
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch(documentsGetter, function (newValue) {
-                            if (differentDocumentList(newValue)) {
-                                $scope.documents = newValue;
-                            }
-                        });
-                    }
-
-                    $scope.onTitleClick = onTitleClick;
-                    $scope.documentUrl = documentUrl;
-
-                    // Add class
-                    $element.addClass('pip-document-list');
-
-                    function differentDocumentList(newList) {
-                        var i, obj;
-
-                        if (!$scope.documents && newList) { return true; }
-                        if ($scope.documents && !newList) { return true; }
-                        if ($scope.documents.length !== newList.length) { return true; }
-
-                        for (i = 0; i < newList.length; i++) {
-                            obj = _.find($scope.documents, {file_id: newList[i].file_id});
-
-                            if (obj === undefined) { return true; }
-                        }
-
-                        return false;
-                    }
-
-                    function onTitleClick(event) {
-                        if (event) { event.stopPropagation(); }
-
-                        if ($attrs.disabled) { return; }
-
-                        $scope.showDocuments = !$scope.showDocuments;
-                        $up[$scope.showDocuments ? 'show' : 'hide']();
-                        $down[!$scope.showDocuments ? 'show' : 'hide']();
-                        $documentsContainer[$scope.showDocuments ? 'show' : 'hide']();
-                    }
-
-                    function documentUrl(document) {
-                        var
-                            serverUrl = pipRest.serverUrl(),
-                            userId = ($rootScope.$user || {}).id,
-                            partyId = ($rootScope.$party || {}).id || userId;
-
-                        return serverUrl + '/api/parties/' + partyId + '/files/' + document.file_id + '/content';
-                    }
-                }
-            };
-        }]
-    );
-
-})(window.angular, window._);
-
 
 /**
  * @file Document list edit control
@@ -19721,6 +19605,122 @@ module.run(['$templateCache', function($templateCache) {
                 }
             }
 
+        }]
+    );
+
+})(window.angular, window._);
+
+
+/**
+ * @file Document list control
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve samples in sampler app
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipDocumentList', ['pipCore', 'pipRest', 'pipFocused', 'pipDocuments.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            DOCUMENTS_ATTACHED: 'document(s) attached',
+            ERROR_DOCUMENTS_LOADED: 'Error: <%= error_number %> document(s) are not loaded'
+        });
+        pipTranslateProvider.translations('ru', {
+            DOCUMENTS_ATTACHED: 'документов добавлено',
+            ERROR_DOCUMENTS_LOADED: 'Ошибка: <%= error_number %> документ(ов) не загружено'
+        });
+    }]);
+
+    thisModule.directive('pipDocumentList',
+        ['$parse', '$rootScope', 'pipUtils', 'pipRest', 'pipToasts', 'pipTranslate', function ($parse, $rootScope, pipUtils, pipRest, pipToasts, pipTranslate) {  // eslint-disable-line no-unused-vars
+            return {
+                restrict: 'EA',
+                scope: true,
+                templateUrl: 'document_list/document_list.html',
+                link: function ($scope, $element, $attrs) {
+                    var documentsGetter = $parse($attrs.pipDocuments),
+                        $documentsContainer = $element.children('.pip-documents-container'),
+                        $up = $element.find('.icon-up'),
+                        $down = $element.find('.icon-down'),
+                        collapsable = pipUtils.toBoolean($attrs.pipCollapse);
+
+                    $scope.documentList = {};
+                    $scope.documentList.icon = 'document';
+                    $scope.documents = documentsGetter($scope);
+
+                    if ($attrs.pipDocumentIcon) {
+                        $scope.pipDocumentIcon = true;
+                    }
+
+                    $scope.showDocuments = collapsable;
+
+                    if (!collapsable) {
+                        $up.hide();
+                        $documentsContainer.hide();
+                    } else {
+                        $down.hide();
+                    }
+
+                    if ($attrs.disabled) {
+                        $up.hide();
+                        $down.hide();
+                    }
+
+                    // Also optimization to avoid watch if it is unnecessary
+                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                        $scope.$watch(documentsGetter, function (newValue) {
+                            if (differentDocumentList(newValue)) {
+                                $scope.documents = newValue;
+                            }
+                        });
+                    }
+
+                    $scope.onTitleClick = onTitleClick;
+                    $scope.documentUrl = documentUrl;
+
+                    // Add class
+                    $element.addClass('pip-document-list');
+
+                    function differentDocumentList(newList) {
+                        var i, obj;
+
+                        if (!$scope.documents && newList) { return true; }
+                        if ($scope.documents && !newList) { return true; }
+                        if ($scope.documents.length !== newList.length) { return true; }
+
+                        for (i = 0; i < newList.length; i++) {
+                            obj = _.find($scope.documents, {file_id: newList[i].file_id});
+
+                            if (obj === undefined) { return true; }
+                        }
+
+                        return false;
+                    }
+
+                    function onTitleClick(event) {
+                        if (event) { event.stopPropagation(); }
+
+                        if ($attrs.disabled) { return; }
+
+                        $scope.showDocuments = !$scope.showDocuments;
+                        $up[$scope.showDocuments ? 'show' : 'hide']();
+                        $down[!$scope.showDocuments ? 'show' : 'hide']();
+                        $documentsContainer[$scope.showDocuments ? 'show' : 'hide']();
+                    }
+
+                    function documentUrl(document) {
+                        var
+                            serverUrl = pipRest.serverUrl(),
+                            userId = ($rootScope.$user || {}).id,
+                            partyId = ($rootScope.$party || {}).id || userId;
+
+                        return serverUrl + '/api/parties/' + partyId + '/files/' + document.file_id + '/content';
+                    }
+                }
+            };
         }]
     );
 
@@ -20133,178 +20133,6 @@ module.run(['$templateCache', function($templateCache) {
     '</md-dialog>');
 }]);
 })();
-
-/**
- * @file Avatar control
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Improve samples in sampler app
- * - Replace placeholder with default image generated on server
- * - Fix resizing problem
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipRest', 'pipImageUtils']);
-
-    thisModule.directive('pipAvatar',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: false,
-                template: '<md-icon></md-icon><img/>'
-                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
-                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
-                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
-                controller: 'pipAvatarController'
-            }
-        }
-    );
-
-    thisModule.controller('pipAvatarController',
-        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipStrings', 'pipRest', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipStrings, pipRest, $http, pipImageUtils) {
-            var
-                $svg = $element.children('md-icon'),
-                $image = $element.children('img'),
-                $defaultBlock = $element.children('div'),
-                $iconFilm = $element.find('#icon-film'),
-                $iconTask = $element.find('#icon-task'),
-                $iconFolder = $element.find('#icon-folder'),
-                image = null,
-
-                partyIdGetter = $parse($attrs.pipPartyId),
-                partyNameGetter = $parse($attrs.pipPartyName),
-                typeGetter = $parse($attrs.pipEntityType),
-                idGetter = $parse($attrs.pipId),
-                urlGetter = $parse($attrs.pipImageUrl),
-
-                colors = pipImageUtils.getAvatarColors(),
-                colorClasses = pipImageUtils.getColorClasses(),
-                entityTypes = pipImageUtils.getEntityTypes();
-
-            // When image is loaded resize/reposition it
-            $image.load(function ($event) {
-                image = $($event.target);
-                pipImageUtils.setImageMarginCSS($element, image);
-            });
-
-            // Add class
-            $element.addClass('pip-avatar flex-fixed');
-
-            if ($attrs.ngClass) {
-                $scope.$watch($attrs.ngClass, function () {
-                    setTimeout(function () {
-                        pipImageUtils.setImageMarginCSS($element, image);
-                    }, 50);
-                });
-            }
-
-            // Optimization to avoid binding
-            bindControl();
-
-            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
-                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
-            }
-
-            // Also optimization to avoid watch if it is unnecessary
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-
-                $scope.$watch(idGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-
-                $scope.$watch(urlGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-            }
-
-            return;
-
-            function refreshAvatar() {
-                $iconTask.css('display', 'none');
-                $iconFilm.css('display', 'none');
-                $iconFolder.css('display', 'none');
-                $defaultBlock.css('display', 'none');
-                $image.attr('src', '');
-                $svg.css('display', 'none');
-                $image.css('display', 'inline-block');
-                bindControl();
-            };
-
-            function bindControl() {
-                var
-                    partyName = partyNameGetter($scope),
-                    partyId = partyIdGetter($scope),
-                    id = idGetter($scope),
-                    type = typeGetter($scope),
-                    transUrl = urlGetter($scope);
-
-                $iconTask.css('display', 'none');
-                $iconFilm.css('display', 'none');
-                $iconFolder.css('display', 'none');
-                $defaultBlock.css('display', 'none');
-
-                // Timestamp to avoid caching images for too long
-                var url = transUrl || pipImageUtils.getAvatarUrl(partyId, partyName, id, type, false, false);
-
-                if ((type && id && partyId) || (partyId && partyName) || transUrl) {
-                    if (type && id && partyId) {
-                        if (type == 'category') return;
-
-                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
-                            $image.attr('src', url);
-                            $svg.css('display', 'none');
-                            $image.css('display', 'inline-block');
-                        } else {
-                            $defaultBlock.css('display', 'block');
-                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
-                            $element.addClass(colorClasses[colorClassIndex]);
-                            switch(type) {
-                                case 'vision':
-                                    $svg.css('display', 'none');
-                                    $iconFilm.css('display', 'inline-block');
-                                    $iconTask.css('display', 'none');
-                                    $iconFolder.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                                case 'event':
-                                    $svg.css('display', 'none');
-                                    $iconTask.css('display', 'inline-block');
-                                    $iconFilm.css('display', 'none');
-                                    $iconFolder.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                                case 'note':
-                                    $svg.css('display', 'none');
-                                    $iconFolder.css('display', 'inline-block');
-                                    $iconTask.css('display', 'none');
-                                    $iconFilm.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                            }
-                        }
-                    } else {
-                        $image.attr('src', url);
-                        $svg.css('display', 'none');
-                        $image.css('display', 'inline-block');
-                    }
-                }
-            };
-
-        }]
-    );
-
-})();
-
 
 /**
  * @file Add image control
@@ -20822,6 +20650,178 @@ module.run(['$templateCache', function($templateCache) {
         }]        
     );
     
+})();
+
+
+/**
+ * @file Avatar control
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Improve samples in sampler app
+ * - Replace placeholder with default image generated on server
+ * - Fix resizing problem
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipRest', 'pipImageUtils']);
+
+    thisModule.directive('pipAvatar',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: '<md-icon></md-icon><img/>'
+                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
+                controller: 'pipAvatarController'
+            }
+        }
+    );
+
+    thisModule.controller('pipAvatarController',
+        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipStrings', 'pipRest', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipStrings, pipRest, $http, pipImageUtils) {
+            var
+                $svg = $element.children('md-icon'),
+                $image = $element.children('img'),
+                $defaultBlock = $element.children('div'),
+                $iconFilm = $element.find('#icon-film'),
+                $iconTask = $element.find('#icon-task'),
+                $iconFolder = $element.find('#icon-folder'),
+                image = null,
+
+                partyIdGetter = $parse($attrs.pipPartyId),
+                partyNameGetter = $parse($attrs.pipPartyName),
+                typeGetter = $parse($attrs.pipEntityType),
+                idGetter = $parse($attrs.pipId),
+                urlGetter = $parse($attrs.pipImageUrl),
+
+                colors = pipImageUtils.getAvatarColors(),
+                colorClasses = pipImageUtils.getColorClasses(),
+                entityTypes = pipImageUtils.getEntityTypes();
+
+            // When image is loaded resize/reposition it
+            $image.load(function ($event) {
+                image = $($event.target);
+                pipImageUtils.setImageMarginCSS($element, image);
+            });
+
+            // Add class
+            $element.addClass('pip-avatar flex-fixed');
+
+            if ($attrs.ngClass) {
+                $scope.$watch($attrs.ngClass, function () {
+                    setTimeout(function () {
+                        pipImageUtils.setImageMarginCSS($element, image);
+                    }, 50);
+                });
+            }
+
+            // Optimization to avoid binding
+            bindControl();
+
+            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
+                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
+            }
+
+            // Also optimization to avoid watch if it is unnecessary
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(idGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(urlGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+            }
+
+            return;
+
+            function refreshAvatar() {
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+                $image.attr('src', '');
+                $svg.css('display', 'none');
+                $image.css('display', 'inline-block');
+                bindControl();
+            };
+
+            function bindControl() {
+                var
+                    partyName = partyNameGetter($scope),
+                    partyId = partyIdGetter($scope),
+                    id = idGetter($scope),
+                    type = typeGetter($scope),
+                    transUrl = urlGetter($scope);
+
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+
+                // Timestamp to avoid caching images for too long
+                var url = transUrl || pipImageUtils.getAvatarUrl(partyId, partyName, id, type, false, false);
+
+                if ((type && id && partyId) || (partyId && partyName) || transUrl) {
+                    if (type && id && partyId) {
+                        if (type == 'category') return;
+
+                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
+                            $image.attr('src', url);
+                            $svg.css('display', 'none');
+                            $image.css('display', 'inline-block');
+                        } else {
+                            $defaultBlock.css('display', 'block');
+                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
+                            $element.addClass(colorClasses[colorClassIndex]);
+                            switch(type) {
+                                case 'vision':
+                                    $svg.css('display', 'none');
+                                    $iconFilm.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'event':
+                                    $svg.css('display', 'none');
+                                    $iconTask.css('display', 'inline-block');
+                                    $iconFilm.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'note':
+                                    $svg.css('display', 'none');
+                                    $iconFolder.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFilm.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                            }
+                        }
+                    } else {
+                        $image.attr('src', url);
+                        $svg.css('display', 'none');
+                        $image.css('display', 'inline-block');
+                    }
+                }
+            };
+
+        }]
+    );
+
 })();
 
 
@@ -23689,75 +23689,6 @@ try {
   module = angular.module('pipComposite.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('composite_toolbar/composite_toolbar.html',
-    '<!--\n' +
-    '@file Composite toolbar control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="layout-row layout-align-start-start flex">\n' +
-    '    <md-button class="pip-composite-button"\n' +
-    '               ng-if="!emptyState"\n' +
-    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
-    '                                \'new-item\': !emptyState }"\n' +
-    '               ng-click="onAddItem(\'text\');"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
-    '               ng-disabled="ngDisabled()">\n' +
-    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.checklist"\n' +
-    '               ng-click="onAddItem(\'checklist\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
-    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
-    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-if="toolbarButton.picture"\n' +
-    '               ng-click="onAddItem(\'pictures\')"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
-    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
-    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
-    '               ng-if="toolbarButton.document"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
-    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
-    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'location\')"\n' +
-    '               ng-if="toolbarButton.location"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
-    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
-    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '    <md-button ng-click="onAddItem(\'time\')"\n' +
-    '               ng-if="toolbarButton.event"\n' +
-    '               ng-disabled="ngDisabled()"\n' +
-    '               class="pip-composite-button"\n' +
-    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
-    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
-    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipComposite.Templates');
-} catch (e) {
-  module = angular.module('pipComposite.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('composite_summary/composite_summary.html',
     '<div ng-repeat="item in compositeContent track by $index">\n' +
     '\n' +
@@ -23836,6 +23767,75 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</div>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipComposite.Templates');
+} catch (e) {
+  module = angular.module('pipComposite.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('composite_toolbar/composite_toolbar.html',
+    '<!--\n' +
+    '@file Composite toolbar control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="layout-row layout-align-start-start flex">\n' +
+    '    <md-button class="pip-composite-button"\n' +
+    '               ng-if="!emptyState"\n' +
+    '               ng-class="{ \'remove-item\': !emptyState ,\n' +
+    '                                \'new-item\': !emptyState }"\n' +
+    '               ng-click="onAddItem(\'text\');"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TEXT"\n' +
+    '               ng-disabled="ngDisabled()">\n' +
+    '        <md-icon class="icon-text-block" md-svg-icon="icons:text"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TEXT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.checklist"\n' +
+    '               ng-click="onAddItem(\'checklist\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-CHECKLIST">\n' +
+    '        <md-icon class="icon-checkbox-on" md-svg-icon="icons:checkbox-on"></md-icon>\n' +
+    '        <md-tooltip>{{::\'CHECKLIST\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-if="toolbarButton.picture"\n' +
+    '               ng-click="onAddItem(\'pictures\')"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-PICTURES">\n' +
+    '        <md-icon class="icon-camera" md-svg-icon="icons:camera"></md-icon>\n' +
+    '        <md-tooltip>{{::\'PICTURE\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'documents\')"\n' +
+    '               ng-if="toolbarButton.document"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-DOCUMENTS">\n' +
+    '        <md-icon class="icon-document" md-svg-icon="icons:document"></md-icon>\n' +
+    '        <md-tooltip>{{::\'DOCUMENT\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'location\')"\n' +
+    '               ng-if="toolbarButton.location"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-LOCATIONS">\n' +
+    '        <md-icon class="icon-location" md-svg-icon="icons:location"></md-icon>\n' +
+    '        <md-tooltip>{{::\'LOCATION\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '    <md-button ng-click="onAddItem(\'time\')"\n' +
+    '               ng-if="toolbarButton.event"\n' +
+    '               ng-disabled="ngDisabled()"\n' +
+    '               class="pip-composite-button"\n' +
+    '               aria-label="COMPOSITE-BUTTON-TIME">\n' +
+    '        <md-icon class="icon-time" md-svg-icon="icons:time"></md-icon>\n' +
+    '        <md-tooltip>{{::\'TIME\'| translate}}</md-tooltip>\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
 }]);
 })();
 
@@ -28452,6 +28452,22 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+/**
+ * @file Registration of all error handling components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipErrorHandling', [
+        'pipErrors.Pages',
+        'pipNoConnectionPanel'
+    ]);
+    
+})();
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -28694,22 +28710,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of all error handling components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipErrorHandling', [
-        'pipErrors.Pages',
-        'pipNoConnectionPanel'
-    ]);
-    
-})();
 /* global angular */
 
 (function () {
@@ -29577,135 +29577,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Define controller for a settings tab
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipSettings.Page', [
-        'pipState', 'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates'
-    ]);
-
-    thisModule.config(['pipAuthStateProvider', function (pipAuthStateProvider) {
-        pipAuthStateProvider.state('settings', {
-            url: '/settings?party_id',
-            auth: true,
-            controller: 'pipSettingsPageController',
-            templateUrl: 'settings_page/settings_page.html'
-        });
-    }]);
-
-    /**
-     * @ngdoc controller
-     * @name pipSettings.Page:pipSettingsPageController
-     *
-     * @description
-     * The controller is used for the whole settings tabs and provides
-     * navigation menu on the left and load content into right panel.
-     * This component is integrated with `'pipAppBar'` component and adapt the tabs header.
-     * The component has predefined states `'settings.base_info'` and `'settings.active_sessions'`. Each of these states
-     * require user's authorization.
-     *
-     * @requires pipAppBar
-     */
-    thisModule.controller('pipSettingsPageController',
-        ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings) {
-
-            $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-                if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
-                    return tab;
-                }
-            });
-
-            $scope.tabs = _.sortBy($scope.tabs, 'index');
-
-            $scope.selected = {};
-            if ($state.current.name !== 'settings') {
-                initSelect($state.current.name);
-            }
-            if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-                initSelect(pipSettings.getDefaultTab().state);
-            } else {
-                $timeout(function () {
-                    if (pipSettings.getDefaultTab()) {
-                        initSelect(pipSettings.getDefaultTab().state);
-                    }
-                    if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
-                        initSelect($scope.tabs[0].state);
-                    }
-                });
-            }
-
-            appHeader();
-
-            /** @see onNavigationSelect */
-            $scope.onNavigationSelect = onNavigationSelect;
-            /** @see onDropdownSelect */
-            $scope.onDropdownSelect = onDropdownSelect;
-
-            /**
-             * Config header panel
-             */
-            function appHeader() {
-                pipAppBar.showMenuNavIcon();
-                pipAppBar.showTitleText('SETTINGS_TITLE');
-                pipAppBar.showLocalActions(null, []);
-                pipAppBar.showShadowSm();
-                pipAppBar.hideSearch();
-            }
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Page:pipSettingsPageController
-             * @name pipSettings.Page:pipSettingsPageController:onDropdownSelect
-             *
-             * @description
-             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
-             * It used on mobile screens.
-             *
-             * @param {Object} state    State configuration object
-             */
-            function onDropdownSelect(state) {
-                onNavigationSelect(state.state);
-            }
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Page:pipSettingsPageController
-             * @name pipSettings.Page:pipSettingsPageController:onNavigationSelect
-             *
-             * @description
-             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
-             * It uses on screens more than mobile.
-             *
-             * @param {string} state    Name of new state
-             */
-            function onNavigationSelect(state) {
-                initSelect(state);
-
-                if ($scope.selected.tab) {
-                    $state.go(state);
-                }
-            }
-
-            /**
-             * Establish selected tab
-             */
-            function initSelect(state) {
-                $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                    return tab.state === state;
-                });
-                $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-                $scope.selected.tabId = state;
-            }
-        }]);
-
-})(window.angular, window._);
-
-/**
  * @file Service for settings component
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -29924,6 +29795,135 @@ module.run(['$templateCache', function($templateCache) {
             }
         }
     }]);
+
+})(window.angular, window._);
+
+/**
+ * @file Define controller for a settings tab
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipSettings.Page', [
+        'pipState', 'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipSettings.Templates'
+    ]);
+
+    thisModule.config(['pipAuthStateProvider', function (pipAuthStateProvider) {
+        pipAuthStateProvider.state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controller: 'pipSettingsPageController',
+            templateUrl: 'settings_page/settings_page.html'
+        });
+    }]);
+
+    /**
+     * @ngdoc controller
+     * @name pipSettings.Page:pipSettingsPageController
+     *
+     * @description
+     * The controller is used for the whole settings tabs and provides
+     * navigation menu on the left and load content into right panel.
+     * This component is integrated with `'pipAppBar'` component and adapt the tabs header.
+     * The component has predefined states `'settings.base_info'` and `'settings.active_sessions'`. Each of these states
+     * require user's authorization.
+     *
+     * @requires pipAppBar
+     */
+    thisModule.controller('pipSettingsPageController',
+        ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings) {
+
+            $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+                if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
+                    return tab;
+                }
+            });
+
+            $scope.tabs = _.sortBy($scope.tabs, 'index');
+
+            $scope.selected = {};
+            if ($state.current.name !== 'settings') {
+                initSelect($state.current.name);
+            }
+            if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+                initSelect(pipSettings.getDefaultTab().state);
+            } else {
+                $timeout(function () {
+                    if (pipSettings.getDefaultTab()) {
+                        initSelect(pipSettings.getDefaultTab().state);
+                    }
+                    if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
+                        initSelect($scope.tabs[0].state);
+                    }
+                });
+            }
+
+            appHeader();
+
+            /** @see onNavigationSelect */
+            $scope.onNavigationSelect = onNavigationSelect;
+            /** @see onDropdownSelect */
+            $scope.onDropdownSelect = onDropdownSelect;
+
+            /**
+             * Config header panel
+             */
+            function appHeader() {
+                pipAppBar.showMenuNavIcon();
+                pipAppBar.showTitleText('SETTINGS_TITLE');
+                pipAppBar.showLocalActions(null, []);
+                pipAppBar.showShadowSm();
+                pipAppBar.hideSearch();
+            }
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Page:pipSettingsPageController
+             * @name pipSettings.Page:pipSettingsPageController:onDropdownSelect
+             *
+             * @description
+             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
+             * It used on mobile screens.
+             *
+             * @param {Object} state    State configuration object
+             */
+            function onDropdownSelect(state) {
+                onNavigationSelect(state.state);
+            }
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Page:pipSettingsPageController
+             * @name pipSettings.Page:pipSettingsPageController:onNavigationSelect
+             *
+             * @description
+             * Method changes selected tab in the navigation menu and transfer to selected tab(state).
+             * It uses on screens more than mobile.
+             *
+             * @param {string} state    Name of new state
+             */
+            function onNavigationSelect(state) {
+                initSelect(state);
+
+                if ($scope.selected.tab) {
+                    $state.go(state);
+                }
+            }
+
+            /**
+             * Establish selected tab
+             */
+            function initSelect(state) {
+                $scope.selected.tab = _.find($scope.tabs, function (tab) {
+                    return tab.state === state;
+                });
+                $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
+                $scope.selected.tabId = state;
+            }
+        }]);
 
 })(window.angular, window._);
 
@@ -31324,38 +31324,6 @@ try {
   module = angular.module('pipGuidance.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tips/tip.template.html',
-    '<div ng-if="title" class=\'pip-title p24-flex flex-fixed bp16\'>\n' +
-    '    {{ title | translate }}\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class=\'pip-content pip-popover-content lp24-flex rp24-flex text-body1 bm64 pip-scroll\'\n' +
-    '     ng-class="{\'tm24\' : !title }">\n' +
-    '    <div ng-if="image && $mdMedia(\'gt-xs\')" class="pip-pic"></div>\n' +
-    '    <pip-markdown pip-text="content" pip-rebind="true"></pip-markdown>\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class="pip-footer lm24-flex rm24-flex position-bottom layout-row layout-align-start-center">\n' +
-    '    <a ng-if="link" target="_blank" href="{{ link }}" class="text-body2 flex">\n' +
-    '        {{:: \'MORE_URL\' | translate }}\n' +
-    '    </a>\n' +
-    '    <div  ng-if="!link" class="flex"></div>\n' +
-    '\n' +
-    '    <md-button ng-click=\'onNextClick()\' class="rm0">\n' +
-    '        {{:: \'NEXT\' | translate }}\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipGuidance.Templates');
-} catch (e) {
-  module = angular.module('pipGuidance.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('intro_guidance/intro_guidance_dialog.html',
     '<md-dialog class="pip-dialog pip-guidance-dialog pip-guide-preview layout-column" md-theme="{{theme}}">\n' +
     '    <div ng-if="!$routing" ng-swipe-left="onNextPage()" ng-swipe-right="onBackPage()"\n' +
@@ -31428,6 +31396,38 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipGuidance.Templates');
+} catch (e) {
+  module = angular.module('pipGuidance.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tips/tip.template.html',
+    '<div ng-if="title" class=\'pip-title p24-flex flex-fixed bp16\'>\n' +
+    '    {{ title | translate }}\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class=\'pip-content pip-popover-content lp24-flex rp24-flex text-body1 bm64 pip-scroll\'\n' +
+    '     ng-class="{\'tm24\' : !title }">\n' +
+    '    <div ng-if="image && $mdMedia(\'gt-xs\')" class="pip-pic"></div>\n' +
+    '    <pip-markdown pip-text="content" pip-rebind="true"></pip-markdown>\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class="pip-footer lm24-flex rm24-flex position-bottom layout-row layout-align-start-center">\n' +
+    '    <a ng-if="link" target="_blank" href="{{ link }}" class="text-body2 flex">\n' +
+    '        {{:: \'MORE_URL\' | translate }}\n' +
+    '    </a>\n' +
+    '    <div  ng-if="!link" class="flex"></div>\n' +
+    '\n' +
+    '    <md-button ng-click=\'onNextClick()\' class="rm0">\n' +
+    '        {{:: \'NEXT\' | translate }}\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
 }]);
 })();
 
@@ -31530,6 +31530,247 @@ module.run(['$templateCache', function($templateCache) {
                 }
             };
         }]);
+
+})(window.angular);
+
+/**
+ * @file Tips service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global $ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipTips.Service', ['pipGuidance.Templates']);
+
+    /**
+     * @ngdoc service
+     * @name pipTips.Service.pipTips
+     *
+     * @description
+     * Service provides an interface to manage tips state.
+     * The service is available only on run phase.
+     */
+    thisModule.factory('pipTips', ['$timeout', '$rootScope', '$pipPopover', 'pipTipsData', 'pipRest', 'pipSettingsData', function ($timeout, $rootScope, $pipPopover, pipTipsData, pipRest, pipSettingsData) {
+        var tips;
+
+        return {
+            /** @see getTips */
+            getTips: getTips,
+            /** @see filterTips */
+            filterTips: filterTips,
+            /** @see showTips */
+            showTips: showTips,
+            /** @see firstShowTips */
+            firstShowTips: firstShowTips
+        };
+
+        function checkStatus(item) {
+            return item.status === 'completed';
+        }
+
+        function compareRandom() {
+            return Math.random() - 0.5;
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf pipTips.Service.pipTips
+         * @name pipTips.Service.pipTips:filterTips
+         *
+         * @description
+         * Filters passed tips by passed topic and sorts result collection.
+         *
+         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L63 View source}
+         *
+         * @param {Array} data  Source array of tips entities
+         * @param {string} topic    Name of topic to filter by it
+         *
+         * @returns {Array} Filtered and sorted collection.
+         *
+         * @example
+         * <pre>
+         *     pipTips.filterTips(tips, 'goals');
+         * </pre>
+         */
+        function filterTips(data, topic) {
+            tips = [];
+            var tipsCollection = _.filter(data, checkStatus),
+                index;
+
+            for (index = 0; index < tipsCollection.length; index++) {
+                var topic = _.find(tipsCollection[index].topics, function (t) { return t == topic; });
+
+                if (topic) {
+                    tips.push(tipsCollection[index]);
+                }
+            }
+
+            tips.sort(compareRandom);
+
+            return tips;
+        }
+
+        function tipController($scope, $timeout, $mdMedia) {
+
+            $scope.index = 0;
+
+            $scope.$mdMedia = $mdMedia;
+
+            init();
+
+            $scope.onNextClick = function () {
+                $scope.index++;
+
+                if ($scope.index === $scope.locals.tips.length) {
+                    $pipPopover.hide();
+                } else {
+                    init();
+                    $pipPopover.resize();
+                    // $rootScope.$broadcast('pipWindowResized');
+                }
+            };
+
+            $scope.$on('pipWindowResized', init);
+
+            function init() {
+
+                $scope.title = $scope.locals.tips[$scope.index].title[$scope.locals.ln];
+                $scope.content = $scope.locals.tips[$scope.index].content[$scope.locals.ln];
+                if ($scope.locals.tips[$scope.index].pic_id) {
+                    $scope.image = pipRest.serverUrl() + '/api/parties/' + $scope.locals.tips[$scope.index].creator_id
+                        + '/files/' + $scope.locals.tips[$scope.index].pic_id + '/content';
+                }
+
+                $scope.link = $scope.locals.tips[$scope.index].more_url;
+
+                if ($scope.image) {
+                    $timeout(function () {
+                        var backdropElement = $('.pip-popover-backdrop'),
+                            popover = backdropElement.find('.pip-popover');
+
+                        popover.find('.pip-pic').css('background-image', 'url(' + $scope.image + ')');
+                    }, 100);
+                }
+            }
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf pipTips.Service.pipTips
+         * @name pipTips.Service.pipTips:showTips
+         *
+         * @description
+         * Shows tip to user.
+         *
+         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L144 View source}
+         *
+         * @param {Array} tips  Array of tips
+         * @param {string} ln   Chosen language
+         * @param {Object=} [$event=null]    Event object
+         *
+         * @example
+         * <pre>
+         *      pipTips.showTips(tips, 'en');
+         * </pre>
+         */
+        function showTips(tips, ln, $event) {
+
+            if (tips && tips.length > 0) {
+                $pipPopover.hide();
+                $pipPopover.show({
+                    element: $event ? $event.currentTarget : null,
+                    class: 'pip-tip',
+                    cancelCallback: function () {
+                        return false;
+                    },
+                    locals: {
+                        tips: tips,
+                        ln: ln || 'en'
+                    },
+                    controller: ['$scope', '$timeout', '$mdMedia', tipController],
+                    templateUrl: 'tips/tip.template.html'
+                });
+            }
+
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf pipTips.Service.pipTips
+         * @name pipTips.Service.pipTips:firstShowTips
+         *
+         * @description
+         * Shows a tip
+         *
+         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L181 View source}
+         *
+         * @param {Array} tips  Collection of tips
+         * @param {string} [ln='en']   Language for tip content
+         * @param {string} topic    Name of needed topic
+         * @param {Object} settings Settings object
+         * @param {Object} [kolDay=2]   Days amount throughout tips should be shown
+         */
+        function firstShowTips(tips, ln, topic, settings, kolDay) {
+            var ln = ln || 'en',
+                kolDay = kolDay || 2,
+                now = new Date(),
+                show;
+
+            if (settings && settings[topic].tips) {
+                show = (now.getTime() - new Date(settings[topic].tips).getTime()) / (1000 * 60 * 60 * 24);
+
+                // TODO [apidhirnyi] Extract the same code part into the function
+                if (show > kolDay) {
+                    $pipPopover.hide();
+                    showTips(tips, ln);
+                    settings[topic].tips = new Date();
+                    pipSettingsData.saveSettings(settings, topic);
+                }
+            } else if (settings[topic]) {
+                $pipPopover.hide();
+                showTips(tips, ln);
+                settings[topic].tips = new Date();
+                pipSettingsData.saveSettings(settings, topic);
+            }
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf pipTips.Service.pipTips
+         * @name pipTips.Service.pipTips:getTips
+         *
+         * @description
+         * Returns tips collection according to topic.
+         *
+         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L220 View source}
+         *
+         * @param {Object} party    User's party object
+         * @param {string} ln       Language for tip content
+         * @param {string} topic    Name of needed topic
+         * @param {Function} callback   Callback function. It gets tips collection as argument.
+         */
+        function getTips(party, ln, topic, callback) {
+
+            pipTipsData.readTips(
+                {item: {}},
+                null,
+                function (result) {
+                    filterTips(result.data, topic);
+
+                    if (callback) { callback(tips); }
+
+                    return tips;
+                },
+                function () {
+                    return null;
+                }
+            );
+        }
+
+    }]);
 
 })(window.angular);
 
@@ -31818,247 +32059,6 @@ module.run(['$templateCache', function($templateCache) {
     }]);
 
 })(window.angular, window._);
-
-/**
- * @file Tips service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global $ */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipTips.Service', ['pipGuidance.Templates']);
-
-    /**
-     * @ngdoc service
-     * @name pipTips.Service.pipTips
-     *
-     * @description
-     * Service provides an interface to manage tips state.
-     * The service is available only on run phase.
-     */
-    thisModule.factory('pipTips', ['$timeout', '$rootScope', '$pipPopover', 'pipTipsData', 'pipRest', 'pipSettingsData', function ($timeout, $rootScope, $pipPopover, pipTipsData, pipRest, pipSettingsData) {
-        var tips;
-
-        return {
-            /** @see getTips */
-            getTips: getTips,
-            /** @see filterTips */
-            filterTips: filterTips,
-            /** @see showTips */
-            showTips: showTips,
-            /** @see firstShowTips */
-            firstShowTips: firstShowTips
-        };
-
-        function checkStatus(item) {
-            return item.status === 'completed';
-        }
-
-        function compareRandom() {
-            return Math.random() - 0.5;
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf pipTips.Service.pipTips
-         * @name pipTips.Service.pipTips:filterTips
-         *
-         * @description
-         * Filters passed tips by passed topic and sorts result collection.
-         *
-         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L63 View source}
-         *
-         * @param {Array} data  Source array of tips entities
-         * @param {string} topic    Name of topic to filter by it
-         *
-         * @returns {Array} Filtered and sorted collection.
-         *
-         * @example
-         * <pre>
-         *     pipTips.filterTips(tips, 'goals');
-         * </pre>
-         */
-        function filterTips(data, topic) {
-            tips = [];
-            var tipsCollection = _.filter(data, checkStatus),
-                index;
-
-            for (index = 0; index < tipsCollection.length; index++) {
-                var topic = _.find(tipsCollection[index].topics, function (t) { return t == topic; });
-
-                if (topic) {
-                    tips.push(tipsCollection[index]);
-                }
-            }
-
-            tips.sort(compareRandom);
-
-            return tips;
-        }
-
-        function tipController($scope, $timeout, $mdMedia) {
-
-            $scope.index = 0;
-
-            $scope.$mdMedia = $mdMedia;
-
-            init();
-
-            $scope.onNextClick = function () {
-                $scope.index++;
-
-                if ($scope.index === $scope.locals.tips.length) {
-                    $pipPopover.hide();
-                } else {
-                    init();
-                    $pipPopover.resize();
-                    // $rootScope.$broadcast('pipWindowResized');
-                }
-            };
-
-            $scope.$on('pipWindowResized', init);
-
-            function init() {
-
-                $scope.title = $scope.locals.tips[$scope.index].title[$scope.locals.ln];
-                $scope.content = $scope.locals.tips[$scope.index].content[$scope.locals.ln];
-                if ($scope.locals.tips[$scope.index].pic_id) {
-                    $scope.image = pipRest.serverUrl() + '/api/parties/' + $scope.locals.tips[$scope.index].creator_id
-                        + '/files/' + $scope.locals.tips[$scope.index].pic_id + '/content';
-                }
-
-                $scope.link = $scope.locals.tips[$scope.index].more_url;
-
-                if ($scope.image) {
-                    $timeout(function () {
-                        var backdropElement = $('.pip-popover-backdrop'),
-                            popover = backdropElement.find('.pip-popover');
-
-                        popover.find('.pip-pic').css('background-image', 'url(' + $scope.image + ')');
-                    }, 100);
-                }
-            }
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf pipTips.Service.pipTips
-         * @name pipTips.Service.pipTips:showTips
-         *
-         * @description
-         * Shows tip to user.
-         *
-         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L144 View source}
-         *
-         * @param {Array} tips  Array of tips
-         * @param {string} ln   Chosen language
-         * @param {Object=} [$event=null]    Event object
-         *
-         * @example
-         * <pre>
-         *      pipTips.showTips(tips, 'en');
-         * </pre>
-         */
-        function showTips(tips, ln, $event) {
-
-            if (tips && tips.length > 0) {
-                $pipPopover.hide();
-                $pipPopover.show({
-                    element: $event ? $event.currentTarget : null,
-                    class: 'pip-tip',
-                    cancelCallback: function () {
-                        return false;
-                    },
-                    locals: {
-                        tips: tips,
-                        ln: ln || 'en'
-                    },
-                    controller: ['$scope', '$timeout', '$mdMedia', tipController],
-                    templateUrl: 'tips/tip.template.html'
-                });
-            }
-
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf pipTips.Service.pipTips
-         * @name pipTips.Service.pipTips:firstShowTips
-         *
-         * @description
-         * Shows a tip
-         *
-         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L181 View source}
-         *
-         * @param {Array} tips  Collection of tips
-         * @param {string} [ln='en']   Language for tip content
-         * @param {string} topic    Name of needed topic
-         * @param {Object} settings Settings object
-         * @param {Object} [kolDay=2]   Days amount throughout tips should be shown
-         */
-        function firstShowTips(tips, ln, topic, settings, kolDay) {
-            var ln = ln || 'en',
-                kolDay = kolDay || 2,
-                now = new Date(),
-                show;
-
-            if (settings && settings[topic].tips) {
-                show = (now.getTime() - new Date(settings[topic].tips).getTime()) / (1000 * 60 * 60 * 24);
-
-                // TODO [apidhirnyi] Extract the same code part into the function
-                if (show > kolDay) {
-                    $pipPopover.hide();
-                    showTips(tips, ln);
-                    settings[topic].tips = new Date();
-                    pipSettingsData.saveSettings(settings, topic);
-                }
-            } else if (settings[topic]) {
-                $pipPopover.hide();
-                showTips(tips, ln);
-                settings[topic].tips = new Date();
-                pipSettingsData.saveSettings(settings, topic);
-            }
-        }
-
-        /**
-         * @ngdoc method
-         * @methodOf pipTips.Service.pipTips
-         * @name pipTips.Service.pipTips:getTips
-         *
-         * @description
-         * Returns tips collection according to topic.
-         *
-         * {@link https://github.com/pip-webui/pip-webui-guidance/blob/master/src/tips/tips_service.js#L220 View source}
-         *
-         * @param {Object} party    User's party object
-         * @param {string} ln       Language for tip content
-         * @param {string} topic    Name of needed topic
-         * @param {Function} callback   Callback function. It gets tips collection as argument.
-         */
-        function getTips(party, ln, topic, callback) {
-
-            pipTipsData.readTips(
-                {item: {}},
-                null,
-                function (result) {
-                    filterTips(result.data, topic);
-
-                    if (callback) { callback(tips); }
-
-                    return tips;
-                },
-                function () {
-                    return null;
-                }
-            );
-        }
-
-    }]);
-
-})(window.angular);
 
 
 
@@ -32471,6 +32471,21 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of support all pages
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipSupport', [
+        'pipFeedback',
+        'pipAnalytics'
+    ]);
+})();
 (function(module) {
 try {
   module = angular.module('pipSupport.Templates');
@@ -32733,21 +32748,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of support all pages
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipSupport', [
-        'pipFeedback',
-        'pipAnalytics'
-    ]);
-})();
 /**
  * @file Web analytics service
  * @copyright Digital Living Software Corp. 2014-2016
