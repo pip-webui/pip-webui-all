@@ -5724,6 +5724,9 @@ pip-tabs md-content md-select[disabled] md-select-value {
   background: none !important;
   opacity: 0.54;
 }
+.pip-full-width-dropdown md-select-menu md-content md-option .md-text {
+  padding-right: 25px !important;
+}
 md-tabs md-tab-item .md-text,
 md-content md-option .md-text,
 md-select md-select-value .md-text {
