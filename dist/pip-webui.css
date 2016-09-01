@@ -3591,6 +3591,9 @@ md-datepicker .md-datepicker-expand-triangle {
   width: 18px;
   margin-right: 16px;
 }
+md-menu-content {
+  background-color: #fafafa!important;
+}
 
 @-webkit-keyframes blink-hint {
   0% {
