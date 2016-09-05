@@ -8308,6 +8308,11 @@ md-dialog.pip-entry md-dialog-content {
 .pip-entry .pip-ref-item {
   height: auto;
 }
+.pip-entry .text-signup {
+  margin-right: -16px !important;
+  margin-left: -16px !important;
+  background-color: #eeeeee !important;
+}
 @media (max-width: 768px) {
   .pip-entry .pip-body {
     padding-left: 0px;
