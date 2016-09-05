@@ -7243,9 +7243,10 @@ md-content md-option .md-text .pip-tabs-badge {
   padding: 0px;
 }
 .pip-picture-upload .md-button.md-icon-button > md-icon {
-  margin-top: -5px;
-  width: 16px !important;
-  height: 16px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  height: 20px;
+  width: 20px;
   fill: white;
 }
 .pip-picture-upload .md-button.md-icon-button:hover,
