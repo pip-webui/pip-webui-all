@@ -1751,6 +1751,10 @@ tbody.collapse.in {
   height: 40px;
   width: 40px;
 }
+.pip-ref-item .md-no-style {
+  height: 100%;
+  padding-right: 0px;
+}
 .pip-ref-item .pip-pic-sm {
   margin: 3px 26px 3px 0;
   height: 30px;
@@ -2911,6 +2915,15 @@ md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
   border-left: 5px solid rgba(33, 150, 243, 0.5) !important;
 }
+md-list-item.pip-selectable.pip-ref-list-item {
+  border-left: none!important;
+  padding-left: 21px!important;
+}
+md-list-item.pip-selectable.pip-ref-list-item.selected {
+  padding-left: 16px!important;
+  background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(33, 150, 243, 0.5) !important;
+}
 md-list-item.pip-list-no-click.pip-selectable .md-no-style {
   border-left: none!important;
   padding-left: 21px!important;
@@ -2931,8 +2944,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .blue md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.blue md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .blue md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(33, 150, 243, 0.54) !important;
+}
+.blue md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(33, 150, 243, 0.54) !important;
 }
 .pink md-list-item.pip-selectable.selected .md-no-style {
@@ -2946,8 +2965,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .pink md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.pink md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .pink md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(188, 86, 121, 0.54) !important;
+}
+.pink md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(188, 86, 121, 0.54) !important;
 }
 .orange md-list-item.pip-selectable.selected .md-no-style {
@@ -2961,8 +2986,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .orange md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.orange md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .orange md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(255, 112, 67, 0.54) !important;
+}
+.orange md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(255, 112, 67, 0.54) !important;
 }
 .amber md-list-item.pip-selectable.selected .md-no-style {
@@ -2976,8 +3007,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .amber md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.amber md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .amber md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(255, 152, 0, 0.54) !important;
+}
+.amber md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(255, 152, 0, 0.54) !important;
 }
 .green md-list-item.pip-selectable.selected .md-no-style {
@@ -2991,8 +3028,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .green md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.green md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .green md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(76, 175, 80, 0.54) !important;
+}
+.green md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(76, 175, 80, 0.54) !important;
 }
 .navy md-list-item.pip-selectable.selected .md-no-style {
@@ -3006,8 +3049,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .navy md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.navy md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .navy md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(86, 97, 125, 0.54) !important;
+}
+.navy md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(86, 97, 125, 0.54) !important;
 }
 .grey md-list-item.pip-selectable.selected .md-no-style {
@@ -3021,8 +3070,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .grey md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.grey md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .grey md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(96, 125, 139, 0.54) !important;
+}
+.grey md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(96, 125, 139, 0.54) !important;
 }
 .dark md-list-item.pip-selectable.selected .md-no-style {
@@ -3036,8 +3091,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .dark md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.dark md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .dark md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(33, 33, 33, 0.54) !important;
+}
+.dark md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(33, 33, 33, 0.54) !important;
 }
 .black md-list-item.pip-selectable.selected .md-no-style {
@@ -3051,8 +3112,14 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
 .black md-list-item.pip-ref-list-item.selected > .md-no-style > button {
   border-left: none!important;
 }
+.black md-list-item.pip-ref-list.selected > .md-no-style > button {
+  border-left: none!important;
+}
 .black md-list-item.pip-selectable.pip-simple-list-item.selected {
   background-color: rgba(158, 158, 158, 0.2);
+  border-left: 5px solid rgba(38, 50, 56, 0.54) !important;
+}
+.black md-list-item.pip-selectable.pip-ref-list-item.selected {
   border-left: 5px solid rgba(38, 50, 56, 0.54) !important;
 }
 .pip-empty {
