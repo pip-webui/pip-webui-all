@@ -5077,6 +5077,488 @@
 
 })();
 /**
+ * @file Registration of all data modules
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipData', [
+		'pipDataModel',
+		'pipDataCache',
+       
+        'pipSessionData',
+    ]);
+    
+})();
+/**
+ * @file Application abstract data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular, _, async */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDataModel', ['pipUtils', 'pipRest']);
+
+    thisModule.provider('pipDataModel', function() {
+        
+        this.$get = ['$stateParams', 'pipCollections', 'pipRest', function($stateParams, pipCollections, pipRest) {
+
+            var api = [];
+            
+            for (var call in pipRest) {
+                api[call] = pipRest[call];
+            }
+
+            // function extendApi(extension) {
+            //     for (var call in extension) {
+            //         api[call] = extension[call];
+            //     }
+            // }
+
+            // Execute request to REST API
+            function executeCurl(params, successCallback, errorCallback) {
+                var t = params.transaction, tid;
+
+                if (t && !params.skipTransactionBegin) {
+                    tid = params.transactionId = t.begin(
+                        params.transactionOperation || 'PROCESSING'
+                    );
+                    if (!tid) return;
+                }
+
+                return api[params.resource]()[params.operation](
+                    params.item,
+                    function (result) {
+                        if (t && tid && t.aborted(tid)) return;
+                        if (t && !params.skipTransactionEnd) t.end();
+                        if (successCallback) successCallback(result);
+                    },
+                    function (error) {
+                        if (t) t.end(error);
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+
+            // Create an object and add it to object collection
+            function createCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'save';
+                
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            params.itemCollection.push(result);
+
+                        if (successCallback) successCallback(result);
+                    },
+                    function(error){
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+
+            // Update an object and replace it in object collection
+            function updateCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'update';
+
+                return  executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            pipCollections.replaceBy(params.itemCollection, 'id', result.id, result);
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Update an object and remove it from object collection
+            function deleteCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'remove';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a collection of objects
+            function readCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'query';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a single object and add it into collection
+            function readOneCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'page';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection && result) {
+                            var index = _.findIndex(params.itemCollection, {id: result.id});
+                            if (index >= 0) params.itemCollection[index] = result;
+                            else params.itemCollection.push(result);
+                        }
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a page and add results into object collection
+            function pageCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'page';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection && result.data) {
+                            for (var i = 0; i < result.data.length; i++)
+                                params.itemCollection.push(result.data[i]);
+                        }
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Save picture and document files
+            function saveFilesCurl(params, successCallback, errorCallback) {
+                var t = params.transaction, tid;
+
+                // Start transaction if necessary
+                if (t && !params.skipTransactionBegin) {
+                    tid = params.transactionId = t.begin(
+                        params.transactionOperation || 'SAVING'
+                    );
+                    if (!tid) return;
+                }
+
+//------------------
+
+                var uploadFiles = [{
+                    pictures: params.pictures,
+                    documents: params.documents
+                }];
+
+                // from content
+                if (params.item && params.item.content ) {
+                    var saveResult = true;
+                    async.eachSeries(_.union(params.item.content, uploadFiles),
+                        function (obj, callback) {
+                            // не выбран - пропускаем этот item  || нет этого события action
+                            if ( !obj.pictures && !obj.documents ) {
+                                callback();
+                            } else {
+                                if (obj.pictures) {
+                                    // Save pictures first
+                                    obj.pictures.save(
+                                        function () {
+                                            if (t && tid && t.aborted(tid)) {
+                                                saveResult =  false;
+                                                callback('aborted');
+                                            }
+                                            // Save documents second
+                                            if (obj.documents) {
+                                                obj.documents.save(
+                                                    function () {
+                                                        if (t && tid && t.aborted(tid)) {
+                                                            saveResult =  false;
+                                                            callback('aborted');
+                                                        }
+                                                        callback();
+                                                    },
+                                                    function (error) {
+                                                        saveResult =  false;
+                                                        callback(error);
+                                                    }
+                                                );
+                                            } else {
+                                                callback();
+                                            }
+                                        },
+                                        function (error) {
+                                            saveResult =  false;
+                                            callback(error);
+                                        }
+                                    );
+                                } else {
+                                    if (obj.documents) {
+                                        // Save documents first
+                                        obj.documents.save(
+                                            function () {
+                                                if (t && tid && t.aborted(tid)) {
+                                                    saveResult = false;
+                                                    callback('aborted');
+                                                }
+                                                callback();
+                                            },
+                                            function (error) {
+                                                saveResult = false;
+                                                callback(error);
+                                            }
+                                        );
+                                    }
+                                }
+                            }
+                        },
+                        function (error) {
+                            if (!error && saveResult) {
+                                // удаляем ненужные объекты перед сохранением
+                                // вызываем колбек
+                                if (t & !params.skipTransactionEnd) t.end();
+                                _.each(params.item.content, function(item){
+                                    delete item.pictures;
+                                    delete item.documents;
+                                });
+                                if (successCallback) successCallback();
+                            } else {
+                                // вызываем ошибочный колбек
+                                if (t) t.end(error);
+                                if (errorCallback) {
+                                    errorCallback(error);
+                                }
+                            }
+                        }
+                    );
+                } else {
+                    if (params.pictures) {
+                        // Save pictures first
+                        params.pictures.save(
+                            function () {
+                                if (t && tid && t.aborted(tid)) return;
+
+                                // Save documents second
+                                if (params.documents) {
+                                    params.documents.save(
+                                        function () {
+                                            if (t && tid && t.aborted(tid)) return;
+                                            // Do everything else
+                                            if (t & !params.skipTransactionEnd) t.end();
+                                            if (successCallback) successCallback();
+                                        },
+                                        function (error) {
+                                            if (t) t.end(error);
+                                            if (errorCallback) errorCallback(error);
+                                        }
+                                    );
+                                } else {
+                                    // Do everything else
+                                    if (t & !params.skipTransactionEnd) t.end();
+                                    if (successCallback) successCallback();
+                                }
+                            },
+                            function (error) {
+                                if (t) t.end(error);
+                                if (errorCallback) errorCallback(error);
+                            }
+                        );
+                    } else if (params.documents) {
+                        // Save documents first
+                        params.documents.save(
+                            function () {
+                                if (t && tid && t.aborted(tid)) return;
+                                // Do everything else
+                                if (t & !params.skipTransactionEnd) t.end();
+                                if (successCallback) successCallback();
+                            },
+                            function (error) {
+                                if (t) t.end(error);
+                                if (errorCallback) errorCallback(error);
+                            }
+                        );
+                    } else {
+                        // Do everything else
+                        if (t & !params.skipTransactionEnd) t.end();
+                        if (successCallback) successCallback();
+                    }
+                }
+            };
+
+            // Abort transaction with file upload
+            function abortFilesCurl(params) {
+                if (params.pictures) 
+                    params.pictures.abort();
+                if (params.documents)
+                    params.documents.abort();
+                    if (params.transaction)
+                    params.transaction.abort();  
+            };
+
+            return {
+                // extendApi: extendApi,
+
+                // Executing transactional requests to server
+                execute: executeCurl,
+
+                // Creating an object
+                create: createCurl,
+
+                // Updating an object
+                update: updateCurl,
+                save: updateCurl,
+
+                // Deleting an object
+                'delete': deleteCurl,
+                remove: deleteCurl,
+
+                // Reading objects
+                read: readCurl,
+                query: readCurl,
+
+                // Reading a single object
+                readOne: readOneCurl,
+                get: readOneCurl,
+
+                // Reading paginated results
+                page: pageCurl,
+                readPage: pageCurl,
+                queryPage: pageCurl,
+
+                // Saving files to file store
+                saveFiles: saveFilesCurl,
+                abortFiles: abortFilesCurl
+            }
+        }];
+    });
+
+})();
+
+/**
+ * @file Session data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSessionData', ['pipRest', 'pipSessionCache']);
+
+    thisModule.provider('pipSessionData', function() {
+
+        readUserResolver.$inject = ['pipSessionCache'];
+        readPartyResolver.$inject = ['pipSessionCache', '$stateParams'];
+        readConnectionResolver.$inject = ['pipSessionCache', '$stateParams'];
+        readSettingsResolver.$inject = ['pipSessionCache'];
+        readSessionsUserResolver.$inject = ['$stateParams', 'pipRest', '$rootScope'];
+        readSessionIdResolver.$inject = ['$stateParams', 'pipSession'];
+        this.readUserResolver = /* @ngInject */ readUserResolver;
+        this.readPartyResolver = /* @ngInject */ readPartyResolver;
+        this.readConnectionResolver = /* @ngInject */ readConnectionResolver;
+        this.readSettingsResolver = /* @ngInject */ readSettingsResolver;
+
+        this.readSessionsUserResolver = /* @ngInject */ readSessionsUserResolver;
+        this.readSessionIdResolver = /* @ngInject */ readSessionIdResolver;
+
+        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipDataModel', 'pipSessionCache', function($rootScope, $stateParams, pipRest, pipDataModel, pipSessionCache) {
+            return {
+                getSessionId: getSessionId,
+                removeSession: removeSession,
+                readSessionsUser: function (params, successCallback, errorCallback) {
+                    params.resource = 'userSessions';
+                    params.item = params.item || {};
+                    params.item.party_id = $stateParams.id;
+                    params.party_id = $stateParams.id;
+                    return  pipSessionCache.readSessions(params, successCallback, errorCallback);
+
+                }
+            };
+
+            function getSessionId(pipSession){
+                return function () {
+                    return pipSession.sessionId();
+                };
+            };
+
+            function removeSession(transaction, session, successCallback, errorCallback) {
+                var tid = transaction.begin('REMOVING');
+                if (!tid) return;
+
+                pipRest.userSessions().remove(
+                    {
+                        id: session.id,
+                        party_id: $stateParams.id
+                    },
+                    function (removedSession) {
+                        if (transaction.aborted(tid)) return;
+                        else transaction.end();
+
+                        if (successCallback) successCallback(removedSession);
+                    },
+                    function (error) {
+                        transaction.end(error);
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+            
+        }];
+        //--------------
+
+        function readUserResolver(pipSessionCache) {
+            return pipSessionCache.readUser();                             
+        };
+
+        function readPartyResolver(pipSessionCache, $stateParams) {
+            return pipSessionCache.readParty($stateParams);
+        };
+
+        function readConnectionResolver(pipSessionCache, $stateParams) {
+            return pipSessionCache.readConnection($stateParams);
+        };
+
+        function readSettingsResolver(pipSessionCache) {
+            return pipSessionCache.readSettings();                             
+        };
+
+        function readSessionsUserResolver($stateParams, pipRest, $rootScope) {
+            return pipRest.userSessions().query({
+                party_id: $stateParams.id
+            }).$promise;
+        };
+
+        function readSessionIdResolver($stateParams, pipSession) {
+            return pipSession.sessionId();
+        };
+        
+    });
+
+})();
+
+/**
  * @file User access permissions service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -6565,488 +7047,6 @@
     );
 
 })();
-/**
- * @file Registration of all data modules
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipData', [
-		'pipDataModel',
-		'pipDataCache',
-       
-        'pipSessionData',
-    ]);
-    
-})();
-/**
- * @file Application abstract data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular, _, async */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDataModel', ['pipUtils', 'pipRest']);
-
-    thisModule.provider('pipDataModel', function() {
-        
-        this.$get = ['$stateParams', 'pipCollections', 'pipRest', function($stateParams, pipCollections, pipRest) {
-
-            var api = [];
-            
-            for (var call in pipRest) {
-                api[call] = pipRest[call];
-            }
-
-            // function extendApi(extension) {
-            //     for (var call in extension) {
-            //         api[call] = extension[call];
-            //     }
-            // }
-
-            // Execute request to REST API
-            function executeCurl(params, successCallback, errorCallback) {
-                var t = params.transaction, tid;
-
-                if (t && !params.skipTransactionBegin) {
-                    tid = params.transactionId = t.begin(
-                        params.transactionOperation || 'PROCESSING'
-                    );
-                    if (!tid) return;
-                }
-
-                return api[params.resource]()[params.operation](
-                    params.item,
-                    function (result) {
-                        if (t && tid && t.aborted(tid)) return;
-                        if (t && !params.skipTransactionEnd) t.end();
-                        if (successCallback) successCallback(result);
-                    },
-                    function (error) {
-                        if (t) t.end(error);
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-
-            // Create an object and add it to object collection
-            function createCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'save';
-                
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            params.itemCollection.push(result);
-
-                        if (successCallback) successCallback(result);
-                    },
-                    function(error){
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-
-            // Update an object and replace it in object collection
-            function updateCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'update';
-
-                return  executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            pipCollections.replaceBy(params.itemCollection, 'id', result.id, result);
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Update an object and remove it from object collection
-            function deleteCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'remove';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a collection of objects
-            function readCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'query';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a single object and add it into collection
-            function readOneCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'page';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection && result) {
-                            var index = _.findIndex(params.itemCollection, {id: result.id});
-                            if (index >= 0) params.itemCollection[index] = result;
-                            else params.itemCollection.push(result);
-                        }
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a page and add results into object collection
-            function pageCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'page';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection && result.data) {
-                            for (var i = 0; i < result.data.length; i++)
-                                params.itemCollection.push(result.data[i]);
-                        }
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Save picture and document files
-            function saveFilesCurl(params, successCallback, errorCallback) {
-                var t = params.transaction, tid;
-
-                // Start transaction if necessary
-                if (t && !params.skipTransactionBegin) {
-                    tid = params.transactionId = t.begin(
-                        params.transactionOperation || 'SAVING'
-                    );
-                    if (!tid) return;
-                }
-
-//------------------
-
-                var uploadFiles = [{
-                    pictures: params.pictures,
-                    documents: params.documents
-                }];
-
-                // from content
-                if (params.item && params.item.content ) {
-                    var saveResult = true;
-                    async.eachSeries(_.union(params.item.content, uploadFiles),
-                        function (obj, callback) {
-                            // не выбран - пропускаем этот item  || нет этого события action
-                            if ( !obj.pictures && !obj.documents ) {
-                                callback();
-                            } else {
-                                if (obj.pictures) {
-                                    // Save pictures first
-                                    obj.pictures.save(
-                                        function () {
-                                            if (t && tid && t.aborted(tid)) {
-                                                saveResult =  false;
-                                                callback('aborted');
-                                            }
-                                            // Save documents second
-                                            if (obj.documents) {
-                                                obj.documents.save(
-                                                    function () {
-                                                        if (t && tid && t.aborted(tid)) {
-                                                            saveResult =  false;
-                                                            callback('aborted');
-                                                        }
-                                                        callback();
-                                                    },
-                                                    function (error) {
-                                                        saveResult =  false;
-                                                        callback(error);
-                                                    }
-                                                );
-                                            } else {
-                                                callback();
-                                            }
-                                        },
-                                        function (error) {
-                                            saveResult =  false;
-                                            callback(error);
-                                        }
-                                    );
-                                } else {
-                                    if (obj.documents) {
-                                        // Save documents first
-                                        obj.documents.save(
-                                            function () {
-                                                if (t && tid && t.aborted(tid)) {
-                                                    saveResult = false;
-                                                    callback('aborted');
-                                                }
-                                                callback();
-                                            },
-                                            function (error) {
-                                                saveResult = false;
-                                                callback(error);
-                                            }
-                                        );
-                                    }
-                                }
-                            }
-                        },
-                        function (error) {
-                            if (!error && saveResult) {
-                                // удаляем ненужные объекты перед сохранением
-                                // вызываем колбек
-                                if (t & !params.skipTransactionEnd) t.end();
-                                _.each(params.item.content, function(item){
-                                    delete item.pictures;
-                                    delete item.documents;
-                                });
-                                if (successCallback) successCallback();
-                            } else {
-                                // вызываем ошибочный колбек
-                                if (t) t.end(error);
-                                if (errorCallback) {
-                                    errorCallback(error);
-                                }
-                            }
-                        }
-                    );
-                } else {
-                    if (params.pictures) {
-                        // Save pictures first
-                        params.pictures.save(
-                            function () {
-                                if (t && tid && t.aborted(tid)) return;
-
-                                // Save documents second
-                                if (params.documents) {
-                                    params.documents.save(
-                                        function () {
-                                            if (t && tid && t.aborted(tid)) return;
-                                            // Do everything else
-                                            if (t & !params.skipTransactionEnd) t.end();
-                                            if (successCallback) successCallback();
-                                        },
-                                        function (error) {
-                                            if (t) t.end(error);
-                                            if (errorCallback) errorCallback(error);
-                                        }
-                                    );
-                                } else {
-                                    // Do everything else
-                                    if (t & !params.skipTransactionEnd) t.end();
-                                    if (successCallback) successCallback();
-                                }
-                            },
-                            function (error) {
-                                if (t) t.end(error);
-                                if (errorCallback) errorCallback(error);
-                            }
-                        );
-                    } else if (params.documents) {
-                        // Save documents first
-                        params.documents.save(
-                            function () {
-                                if (t && tid && t.aborted(tid)) return;
-                                // Do everything else
-                                if (t & !params.skipTransactionEnd) t.end();
-                                if (successCallback) successCallback();
-                            },
-                            function (error) {
-                                if (t) t.end(error);
-                                if (errorCallback) errorCallback(error);
-                            }
-                        );
-                    } else {
-                        // Do everything else
-                        if (t & !params.skipTransactionEnd) t.end();
-                        if (successCallback) successCallback();
-                    }
-                }
-            };
-
-            // Abort transaction with file upload
-            function abortFilesCurl(params) {
-                if (params.pictures) 
-                    params.pictures.abort();
-                if (params.documents)
-                    params.documents.abort();
-                    if (params.transaction)
-                    params.transaction.abort();  
-            };
-
-            return {
-                // extendApi: extendApi,
-
-                // Executing transactional requests to server
-                execute: executeCurl,
-
-                // Creating an object
-                create: createCurl,
-
-                // Updating an object
-                update: updateCurl,
-                save: updateCurl,
-
-                // Deleting an object
-                'delete': deleteCurl,
-                remove: deleteCurl,
-
-                // Reading objects
-                read: readCurl,
-                query: readCurl,
-
-                // Reading a single object
-                readOne: readOneCurl,
-                get: readOneCurl,
-
-                // Reading paginated results
-                page: pageCurl,
-                readPage: pageCurl,
-                queryPage: pageCurl,
-
-                // Saving files to file store
-                saveFiles: saveFilesCurl,
-                abortFiles: abortFilesCurl
-            }
-        }];
-    });
-
-})();
-
-/**
- * @file Session data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSessionData', ['pipRest', 'pipSessionCache']);
-
-    thisModule.provider('pipSessionData', function() {
-
-        readUserResolver.$inject = ['pipSessionCache'];
-        readPartyResolver.$inject = ['pipSessionCache', '$stateParams'];
-        readConnectionResolver.$inject = ['pipSessionCache', '$stateParams'];
-        readSettingsResolver.$inject = ['pipSessionCache'];
-        readSessionsUserResolver.$inject = ['$stateParams', 'pipRest', '$rootScope'];
-        readSessionIdResolver.$inject = ['$stateParams', 'pipSession'];
-        this.readUserResolver = /* @ngInject */ readUserResolver;
-        this.readPartyResolver = /* @ngInject */ readPartyResolver;
-        this.readConnectionResolver = /* @ngInject */ readConnectionResolver;
-        this.readSettingsResolver = /* @ngInject */ readSettingsResolver;
-
-        this.readSessionsUserResolver = /* @ngInject */ readSessionsUserResolver;
-        this.readSessionIdResolver = /* @ngInject */ readSessionIdResolver;
-
-        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipDataModel', 'pipSessionCache', function($rootScope, $stateParams, pipRest, pipDataModel, pipSessionCache) {
-            return {
-                getSessionId: getSessionId,
-                removeSession: removeSession,
-                readSessionsUser: function (params, successCallback, errorCallback) {
-                    params.resource = 'userSessions';
-                    params.item = params.item || {};
-                    params.item.party_id = $stateParams.id;
-                    params.party_id = $stateParams.id;
-                    return  pipSessionCache.readSessions(params, successCallback, errorCallback);
-
-                }
-            };
-
-            function getSessionId(pipSession){
-                return function () {
-                    return pipSession.sessionId();
-                };
-            };
-
-            function removeSession(transaction, session, successCallback, errorCallback) {
-                var tid = transaction.begin('REMOVING');
-                if (!tid) return;
-
-                pipRest.userSessions().remove(
-                    {
-                        id: session.id,
-                        party_id: $stateParams.id
-                    },
-                    function (removedSession) {
-                        if (transaction.aborted(tid)) return;
-                        else transaction.end();
-
-                        if (successCallback) successCallback(removedSession);
-                    },
-                    function (error) {
-                        transaction.end(error);
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-            
-        }];
-        //--------------
-
-        function readUserResolver(pipSessionCache) {
-            return pipSessionCache.readUser();                             
-        };
-
-        function readPartyResolver(pipSessionCache, $stateParams) {
-            return pipSessionCache.readParty($stateParams);
-        };
-
-        function readConnectionResolver(pipSessionCache, $stateParams) {
-            return pipSessionCache.readConnection($stateParams);
-        };
-
-        function readSettingsResolver(pipSessionCache) {
-            return pipSessionCache.readSettings();                             
-        };
-
-        function readSessionsUserResolver($stateParams, pipRest, $rootScope) {
-            return pipRest.userSessions().query({
-                party_id: $stateParams.id
-            }).$promise;
-        };
-
-        function readSessionIdResolver($stateParams, pipSession) {
-            return pipSession.sessionId();
-        };
-        
-    });
-
-})();
-
 
 
 /**
@@ -12200,6 +12200,44 @@
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipTagList',
+
+        'pipDate',
+        'pipDateRange',
+        'pipTimeRangeEdit',
+        'pipTimeRange',
+
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+    angular.module('pipBasicControls', ['pipControls']);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipBasicControls.Templates');
@@ -12861,44 +12899,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipTagList',
-
-        'pipDate',
-        'pipDateRange',
-        'pipTimeRangeEdit',
-        'pipTimeRange',
-
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-    angular.module('pipBasicControls', ['pipControls']);
-
-})(window.angular);
-
 
 /**
  * @file Color picker control
@@ -15617,7 +15617,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dropdown/dropdown.html',
-    '<md-content class="md-subhead md-hue-1 {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}">\n' +
+    '<md-content class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}">\n' +
     '    <div class="pip-divider position-top m0"></div>\n' +
     '        <md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple md-on-close="onSelect(selectedIndex)">\n' +
     '            <md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">\n' +
@@ -25013,6 +25013,200 @@ try {
   module = angular.module('pipEntry.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('signin/signin.html',
+    '<!--\n' +
+    '@file Signin page\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
+    '    <pip-card width="400">\n' +
+    '        <pip-signin-panel pipfixedServerUrl="fixedServerUrl" >\n' +
+    '        </pip-signin-panel>\n' +
+    '    </pip-card>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('signin/signin_dialog.html',
+    '<!--\n' +
+    '@file Signin dialog\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-entry">\n' +
+    '    <md-dialog-content>\n' +
+    '        <pip-signin-panel pip-goto-signup-dialog="pipGotoSignupDialog"\n' +
+    '                          pip-goto-recover-password-dialog="pipGotoRecoverPasswordDialog">\n' +
+    '        </pip-signin-panel>\n' +
+    '    </md-dialog-content>\n' +
+    '</md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('signin/signin_panel.html',
+    '<div class="pip-body">\n' +
+    '    <div class="pip-content">\n' +
+    '        <md-progress-linear ng-show="transaction.busy() && !hideObject.progress" md-mode="indeterminate" class="pip-progress-top">\n' +
+    '        </md-progress-linear>\n' +
+    '\n' +
+    '        <h2 pip-translate="SIGNIN_TITLE" ng-if="!hideObject.title"></h2>\n' +
+    '\n' +
+    '        <form name="form" novalidate>\n' +
+    '            <div ng-messages="form.$serverError" class="text-error bm8 color-error"  md-auto-hide="false">\n' +
+    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
+    '                <div ng-message="ERROR_UNKNOWN">\n' +
+    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <a ng-hide="showServerUrl || fixedServerUrl || hideObject.server"\n' +
+    '               ng-click="showServerUrl = true" href=""\n' +
+    '               id="link-server-url"\n' +
+    '               pip-test="link-server-url">\n' +
+    '                {{::\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
+    '            </a>\n' +
+    '\n' +
+    '            <div ng-show="showServerUrl && !hideObject.server">\n' +
+    '                <md-autocomplete\n' +
+    '                        ng-initial autofocus tabindex="1"\n' +
+    '                        class="pip-combobox w-stretch bm8"\n' +
+    '                        name="server"\n' +
+    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
+    '                        md-no-cache="true"\n' +
+    '                        md-selected-item="data.serverUrl"\n' +
+    '                        md-search-text="selected.searchURLs"\n' +
+    '                        md-items="item in getMatches()"\n' +
+    '                        md-item-text="item"\n' +
+    '                        md-selected-item-change="onServerUrlChanged()"\n' +
+    '                        md-delay="200"\n' +
+    '                        ng-model="data.serverUrl"\n' +
+    '                        ng-disabled="transaction.busy()"\n' +
+    '                        pip-clear-errors\n' +
+    '                        pip-test="autocomplete-server">\n' +
+    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
+    '                </md-autocomplete>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <md-input-container class="display  bp4">\n' +
+    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
+    '                <input name="email" type="email" ng-model="data.email" required step="any"\n' +
+    '                       ng-keypress="onEnter($event)"\n' +
+    '                       pip-clear-errors\n' +
+    '                       ng-disabled="transaction.busy()" tabindex="2"\n' +
+    '                       pip-test="input-email"/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint && !hideObject.hint">\n' +
+    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.email)" md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
+    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1114">{{::\'ERROR_1114\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '            <md-input-container class="display bp4">\n' +
+    '                <label>{{::\'PASSWORD\' | translate}}</label>\n' +
+    '                <input name="password" ng-disabled="transaction.busy()" pip-clear-errors\n' +
+    '                       type="password" tabindex="3" ng-model="data.password"\n' +
+    '                       ng-keypress="onEnter($event)"\n' +
+    '                       required minlength="6"\n' +
+    '                       pip-test="input-password"/>\n' +
+    '\n' +
+    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.password).hint && !hideObject.hint">\n' +
+    '                    {{::\'SIGNIN_HINT_PASSWORD\' | translate}}\n' +
+    '                </div>\n' +
+    '                <div ng-messages="touchedErrorsWithHint(form, form.password)"  md-auto-hide="false">\n' +
+    '                    <div ng-message="required">{{::\'SIGNIN_HINT_PASSWORD\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1102">{{::\'ERROR_1102\' | translate}}</div>\n' +
+    '                    <div ng-message="ERROR_1107">{{::\'ERROR_1107\' | translate}}</div>\n' +
+    '                </div>\n' +
+    '            </md-input-container>\n' +
+    '            <a href="" class="display bm16"\n' +
+    '               ng-if="!hideObject.forgotPassword"\n' +
+    '               ng-click="gotoRecoverPassword()"\n' +
+    '               tabindex="4">\n' +
+    '                {{::\'SIGNIN_FORGOT_PASSWORD\' | translate}}\n' +
+    '            </a>\n' +
+    '\n' +
+    '            <md-checkbox ng-disabled="transaction.busy()" \n' +
+    '                         ng-if="!hideObject.forgotPassword"\n' +
+    '                         md-no-ink class="lm0"\n' +
+    '                         aria-label="{{\'SIGNIN_REMEMBER\' | translate}}" tabindex="5"\n' +
+    '                         ng-model="data.remember"\n' +
+    '                         pip-test-checkbox="remember">\n' +
+    '                <label class="label-check">{{::\'SIGNIN_REMEMBER\' | translate}}</label>\n' +
+    '            </md-checkbox>\n' +
+    '\n' +
+    '            <div style="height: 36px; overflow: hidden;">\n' +
+    '                <md-button ng-if="!transaction.busy()" ng-click="onSignin()" aria-label="SIGNIN"\n' +
+    '                           class="md-raised md-accent w-stretch m0" tabindex="6"\n' +
+    '                           ng-disabled="(data.email == undefined) || data.email.length == 0 || data.serverUrl == \'\' ||\n' +
+    '                                   data.serverUrl == undefined || data.serverUrl.length == 0 || (data.password == undefined)"\n' +
+    '                           pip-test="button-signin">\n' +
+    '                    {{::\'SIGNIN_TITLE\' | translate}}\n' +
+    '                </md-button>\n' +
+    '                <md-button ng-if="transaction.busy()" ng-click="transaction.abort()" class="md-raised md-warn m0 w-stretch"\n' +
+    '                           tabindex="5" aria-label="ABORT"\n' +
+    '                           pip-test="button-cancel">\n' +
+    '                    {{::\'CANCEL\' | translate}}\n' +
+    '                </md-button>\n' +
+    '            </div>\n' +
+    '            <div class="tm24 layout-row" ng-if="!adminOnly && $mdMedia(\'gt-xs\') && !hideObject.signup">\n' +
+    '                <p class="m0 text-small"> <!--  <p class="a-question-text">  -->\n' +
+    '                    {{::\'SIGNIN_NOT_MEMBER\' | translate}}\n' +
+    '                    <a href=""\n' +
+    '                       ng-click="gotoSignup()"\n' +
+    '                       tabindex="6">\n' +
+    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
+    '                    </a>\n' +
+    '                </p>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <div class="tm24 divider-top text-signup" \n' +
+    '                 ng-if="!adminOnly && $mdMedia(\'xs\') && !hideObject.signup">\n' +
+    '                <div class="h48 layout-row layout-align-center-end">\n' +
+    '                    <p class="m0 text-small">{{::\'SIGNIN_NOT_MEMBER\' | translate}}</p>\n' +
+    '                </div>\n' +
+    '                <div class="h48 layout-row layout-align-center-start">\n' +
+    '                    <a class="text-small" ng-click="gotoSignup()" href="" tabindex="6">\n' +
+    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
+    '                    </a>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </form>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipEntry.Templates');
+} catch (e) {
+  module = angular.module('pipEntry.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('signup/signup.html',
     '<!--\n' +
     '@file Signup page\n' +
@@ -25242,200 +25436,6 @@ module.run(['$templateCache', function($templateCache) {
     '                <div class="h48 layout-row layout-align-center-start">\n' +
     '                    <p class="bm0 text-small"><a href="" ng-click="gotoSignin()">\n' +
     '                        {{::\'SIGNUP_SIGNIN_HERE\' | translate}}</a></p>\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '        </form>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('signin/signin.html',
-    '<!--\n' +
-    '@file Signin page\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-card-container pip-outer-scroll pip-entry">\n' +
-    '    <pip-card width="400">\n' +
-    '        <pip-signin-panel pipfixedServerUrl="fixedServerUrl" >\n' +
-    '        </pip-signin-panel>\n' +
-    '    </pip-card>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('signin/signin_dialog.html',
-    '<!--\n' +
-    '@file Signin dialog\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-entry">\n' +
-    '    <md-dialog-content>\n' +
-    '        <pip-signin-panel pip-goto-signup-dialog="pipGotoSignupDialog"\n' +
-    '                          pip-goto-recover-password-dialog="pipGotoRecoverPasswordDialog">\n' +
-    '        </pip-signin-panel>\n' +
-    '    </md-dialog-content>\n' +
-    '</md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipEntry.Templates');
-} catch (e) {
-  module = angular.module('pipEntry.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('signin/signin_panel.html',
-    '<div class="pip-body">\n' +
-    '    <div class="pip-content">\n' +
-    '        <md-progress-linear ng-show="transaction.busy() && !hideObject.progress" md-mode="indeterminate" class="pip-progress-top">\n' +
-    '        </md-progress-linear>\n' +
-    '\n' +
-    '        <h2 pip-translate="SIGNIN_TITLE" ng-if="!hideObject.title"></h2>\n' +
-    '\n' +
-    '        <form name="form" novalidate>\n' +
-    '            <div ng-messages="form.$serverError" class="text-error bm8 color-error"  md-auto-hide="false">\n' +
-    '                <div ng-message="ERROR_1000">{{::\'ERROR_1000\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1110">{{::\'ERROR_1110\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1111">{{::\'ERROR_1111\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_1112">{{::\'ERROR_1112\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_-1">{{::\'ERROR_SERVER\' | translate}}</div>\n' +
-    '                <div ng-message="ERROR_UNKNOWN">\n' +
-    '                    {{ form.$serverError.ERROR_UNKNOWN | translate }}\n' +
-    '                </div>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <a ng-hide="showServerUrl || fixedServerUrl || hideObject.server"\n' +
-    '               ng-click="showServerUrl = true" href=""\n' +
-    '               id="link-server-url"\n' +
-    '               pip-test="link-server-url">\n' +
-    '                {{::\'ENTRY_CHANGE_SERVER\' | translate}}\n' +
-    '            </a>\n' +
-    '\n' +
-    '            <div ng-show="showServerUrl && !hideObject.server">\n' +
-    '                <md-autocomplete\n' +
-    '                        ng-initial autofocus tabindex="1"\n' +
-    '                        class="pip-combobox w-stretch bm8"\n' +
-    '                        name="server"\n' +
-    '                        placeholder="{{::\'ENTRY_SERVER_URL\' | translate}}"\n' +
-    '                        md-no-cache="true"\n' +
-    '                        md-selected-item="data.serverUrl"\n' +
-    '                        md-search-text="selected.searchURLs"\n' +
-    '                        md-items="item in getMatches()"\n' +
-    '                        md-item-text="item"\n' +
-    '                        md-selected-item-change="onServerUrlChanged()"\n' +
-    '                        md-delay="200"\n' +
-    '                        ng-model="data.serverUrl"\n' +
-    '                        ng-disabled="transaction.busy()"\n' +
-    '                        pip-clear-errors\n' +
-    '                        pip-test="autocomplete-server">\n' +
-    '                    <span md-highlight-text="selected.searchURLs">{{item}}</span>\n' +
-    '                </md-autocomplete>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <md-input-container class="display  bp4">\n' +
-    '                <label>{{::\'EMAIL\' | translate}}</label>\n' +
-    '                <input name="email" type="email" ng-model="data.email" required step="any"\n' +
-    '                       ng-keypress="onEnter($event)"\n' +
-    '                       pip-clear-errors\n' +
-    '                       ng-disabled="transaction.busy()" tabindex="2"\n' +
-    '                       pip-test="input-email"/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.email).hint && !hideObject.hint">\n' +
-    '                    {{::\'HINT_EMAIL\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.email)" md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div>\n' +
-    '                    <div ng-message="ERROR_1100">{{::\'ERROR_1100\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1106">{{::\'ERROR_1106\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1114">{{::\'ERROR_1114\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '            <md-input-container class="display bp4">\n' +
-    '                <label>{{::\'PASSWORD\' | translate}}</label>\n' +
-    '                <input name="password" ng-disabled="transaction.busy()" pip-clear-errors\n' +
-    '                       type="password" tabindex="3" ng-model="data.password"\n' +
-    '                       ng-keypress="onEnter($event)"\n' +
-    '                       required minlength="6"\n' +
-    '                       pip-test="input-password"/>\n' +
-    '\n' +
-    '                <div class="hint" ng-if="touchedErrorsWithHint(form, form.password).hint && !hideObject.hint">\n' +
-    '                    {{::\'SIGNIN_HINT_PASSWORD\' | translate}}\n' +
-    '                </div>\n' +
-    '                <div ng-messages="touchedErrorsWithHint(form, form.password)"  md-auto-hide="false">\n' +
-    '                    <div ng-message="required">{{::\'SIGNIN_HINT_PASSWORD\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1102">{{::\'ERROR_1102\' | translate}}</div>\n' +
-    '                    <div ng-message="ERROR_1107">{{::\'ERROR_1107\' | translate}}</div>\n' +
-    '                </div>\n' +
-    '            </md-input-container>\n' +
-    '            <a href="" class="display bm16"\n' +
-    '               ng-if="!hideObject.forgotPassword"\n' +
-    '               ng-click="gotoRecoverPassword()"\n' +
-    '               tabindex="4">\n' +
-    '                {{::\'SIGNIN_FORGOT_PASSWORD\' | translate}}\n' +
-    '            </a>\n' +
-    '\n' +
-    '            <md-checkbox ng-disabled="transaction.busy()" \n' +
-    '                         ng-if="!hideObject.forgotPassword"\n' +
-    '                         md-no-ink class="lm0"\n' +
-    '                         aria-label="{{\'SIGNIN_REMEMBER\' | translate}}" tabindex="5"\n' +
-    '                         ng-model="data.remember"\n' +
-    '                         pip-test-checkbox="remember">\n' +
-    '                <label class="label-check">{{::\'SIGNIN_REMEMBER\' | translate}}</label>\n' +
-    '            </md-checkbox>\n' +
-    '\n' +
-    '            <div style="height: 36px; overflow: hidden;">\n' +
-    '                <md-button ng-if="!transaction.busy()" ng-click="onSignin()" aria-label="SIGNIN"\n' +
-    '                           class="md-raised md-accent w-stretch m0" tabindex="6"\n' +
-    '                           ng-disabled="(data.email == undefined) || data.email.length == 0 || data.serverUrl == \'\' ||\n' +
-    '                                   data.serverUrl == undefined || data.serverUrl.length == 0 || (data.password == undefined)"\n' +
-    '                           pip-test="button-signin">\n' +
-    '                    {{::\'SIGNIN_TITLE\' | translate}}\n' +
-    '                </md-button>\n' +
-    '                <md-button ng-if="transaction.busy()" ng-click="transaction.abort()" class="md-raised md-warn m0 w-stretch"\n' +
-    '                           tabindex="5" aria-label="ABORT"\n' +
-    '                           pip-test="button-cancel">\n' +
-    '                    {{::\'CANCEL\' | translate}}\n' +
-    '                </md-button>\n' +
-    '            </div>\n' +
-    '            <div class="tm24 layout-row" ng-if="!adminOnly && $mdMedia(\'gt-xs\') && !hideObject.signup">\n' +
-    '                <p class="m0 text-small"> <!--  <p class="a-question-text">  -->\n' +
-    '                    {{::\'SIGNIN_NOT_MEMBER\' | translate}}\n' +
-    '                    <a href=""\n' +
-    '                       ng-click="gotoSignup()"\n' +
-    '                       tabindex="6">\n' +
-    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
-    '                    </a>\n' +
-    '                </p>\n' +
-    '            </div>\n' +
-    '\n' +
-    '            <div class="tm24 divider-top text-signup" \n' +
-    '                 ng-if="!adminOnly && $mdMedia(\'xs\') && !hideObject.signup">\n' +
-    '                <div class="h48 layout-row layout-align-center-end">\n' +
-    '                    <p class="m0 text-small">{{::\'SIGNIN_NOT_MEMBER\' | translate}}</p>\n' +
-    '                </div>\n' +
-    '                <div class="h48 layout-row layout-align-center-start">\n' +
-    '                    <a class="text-small" ng-click="gotoSignup()" href="" tabindex="6">\n' +
-    '                        {{::\'SIGNIN_SIGNUP_HERE\' | translate}}\n' +
-    '                    </a>\n' +
     '                </div>\n' +
     '            </div>\n' +
     '        </form>\n' +
@@ -27989,21 +27989,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of settings components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipSettings', [
-        'pipSettings.Service',
-        'pipSettings.Page'
-    ]);
-
-})(window.angular);
-
 (function(module) {
 try {
   module = angular.module('pipSettings.Templates');
@@ -28436,6 +28421,21 @@ module.run(['$templateCache', function($templateCache) {
     '</md-dialog>');
 }]);
 })();
+
+/**
+ * @file Registration of settings components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipSettings', [
+        'pipSettings.Service',
+        'pipSettings.Page'
+    ]);
+
+})(window.angular);
 
 /**
  * @file Define controller for a settings tab
