@@ -1302,717 +1302,6 @@
 
 })();
 /**
- * @file Filter to format date and time
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
-
-    thisModule.filter('formatDate',  
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatDate(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatMonth(value, format);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongMonth(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortWeek',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortWeek(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatTime(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedInterval', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedInterval(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatMillisecondsToSeconds',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatMillisecondsToSeconds(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateRange(value1, value2);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateTimeRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateTimeRange(value1, value2);
-            };
-        }]
-    );
-
-
-})();
-
-/**
- * @file Filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
-
-    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
-        return function (key) {
-            return pipTranslate.translate(key) || key;
-        }
-    }]);
-
-})();
-
-/**
- * @file Date formatting service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
-
-	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-
-        pipTranslateProvider.translations('en', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'January',
-            'MONTH_2': 'February',
-            'MONTH_3': 'March',
-            'MONTH_4': 'April',
-            'MONTH_5': 'May',
-            'MONTH_6': 'June',
-            'MONTH_7': 'July',
-            'MONTH_8': 'August',
-            'MONTH_9': 'September',
-            'MONTH_10': 'October',
-            'MONTH_11': 'November',
-            'MONTH_12': 'December',
-
-            'MONTH_LONG_1': 'January',
-            'MONTH_LONG_2': 'February',
-            'MONTH_LONG_3': 'March',
-            'MONTH_LONG_4': 'April',
-            'MONTH_LONG_5': 'May',
-            'MONTH_LONG_6': 'June',
-            'MONTH_LONG_7': 'July',
-            'MONTH_LONG_8': 'August',
-            'MONTH_LONG_9': 'September',
-            'MONTH_LONG_10': 'October',
-            'MONTH_LONG_11': 'November',
-            'MONTH_LONG_12': 'December',
-
-            'MONTH_SHORT_1': 'Jan',
-            'MONTH_SHORT_2': 'Feb',
-            'MONTH_SHORT_3': 'Mar',
-            'MONTH_SHORT_4': 'Apr',
-            'MONTH_SHORT_5': 'May',
-            'MONTH_SHORT_6': 'Jun',
-            'MONTH_SHORT_7': 'Jul',
-            'MONTH_SHORT_8': 'Aug',
-            'MONTH_SHORT_9': 'Sep',
-            'MONTH_SHORT_10': 'Oct',
-            'MONTH_SHORT_11': 'Nov',
-            'MONTH_SHORT_12': 'Dec',
-
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'Monday',
-            'DAY_2': 'Tuesday',
-            'DAY_3': 'Wednesday',
-            'DAY_4': 'Thursday',
-            'DAY_5': 'Friday',
-            'DAY_6': 'Saturday',
-            'DAY_7': 'Sunday',
-
-            'ELAPSED_TODAY': 'Today',
-            'ELAPSED_YESTERDAY': 'Yesterday',
-            'ELAPSED_YEARS': 'y',
-            'ELAPSED_MONTHS': 'mth',
-            'ELAPSED_WEEKS': 'w',
-            'ELAPSED_DAYS': 'd',
-            'ELAPSED_HOURS': 'h',
-            'ELAPSED_MINUTES': 'm',
-            'ELAPSED_SECONDS': 's',
-            'ELAPSED_AT': 'at',
-            'ELAPSED_AGO': 'ago',
-            'ELAPSED_JUST_NOW': 'Just now',
-            'ELAPSED_FEW_MIN_AGO': 'Few min ago',
-            'ELAPSED_MIN_AGO': 'min ago',
-            'ELAPSED_HOUR_AGO': 'hour ago',
-            'ELAPSED_HOURS_AGO': 'hours ago',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'январь',
-            'MONTH_2': 'февраль',
-            'MONTH_3': 'март',
-            'MONTH_4': 'апрель',
-            'MONTH_5': 'май',
-            'MONTH_6': 'июнь',
-            'MONTH_7': 'июль',
-            'MONTH_8': 'август',
-            'MONTH_9': 'сентябрь',
-            'MONTH_10': 'октябрь',
-            'MONTH_11': 'ноябрь',
-            'MONTH_12': 'декабрь',
-
-            'MONTH_LONG_1': 'января',
-            'MONTH_LONG_2': 'февраля',
-            'MONTH_LONG_3': 'марта',
-            'MONTH_LONG_4': 'апреля',
-            'MONTH_LONG_5': 'мая',
-            'MONTH_LONG_6': 'июня',
-            'MONTH_LONG_7': 'июля',
-            'MONTH_LONG_8': 'августа',
-            'MONTH_LONG_9': 'сентября',
-            'MONTH_LONG_10': 'октября',
-            'MONTH_LONG_11': 'ноября',
-            'MONTH_LONG_12': 'декабря',
-
-            'MONTH_SHORT_1': 'янв',
-            'MONTH_SHORT_2': 'фев',
-            'MONTH_SHORT_3': 'мар',
-            'MONTH_SHORT_4': 'апр',
-            'MONTH_SHORT_5': 'май',
-            'MONTH_SHORT_6': 'июн',
-            'MONTH_SHORT_7': 'июл',
-            'MONTH_SHORT_8': 'авг',
-            'MONTH_SHORT_9': 'сен',
-            'MONTH_SHORT_10': 'окт',
-            'MONTH_SHORT_11': 'ноя',
-            'MONTH_SHORT_12': 'дек',
-
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'понедельник',
-            'DAY_2': 'вторник',
-            'DAY_3': 'среда',
-            'DAY_4': 'четверг',
-            'DAY_5': 'пятница',
-            'DAY_6': 'суббота',
-            'DAY_7': 'воскресенье',
-
-            'ELAPSED_TODAY': 'Сегодня',
-            'ELAPSED_YESTERDAY': 'Вчера',
-            'ELAPSED_YEARS': 'г',
-            'ELAPSED_MONTHS': 'мц',
-            'ELAPSED_WEEKS': 'н',
-            'ELAPSED_DAYS': 'д',
-            'ELAPSED_HOURS': 'ч',
-            'ELAPSED_MINUTES': 'м',
-            'ELAPSED_SECONDS': 'с',
-            'ELAPSED_AT': 'в',
-            'ELAPSED_AGO': 'тн',
-            'ELAPSED_JUST_NOW': 'Только что',
-            'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
-            'ELAPSED_MIN_AGO': 'мин тн',
-            'ELAPSED_HOUR_AGO': 'час тн',
-            'ELAPSED_HOURS_AGO': 'часа тн',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
-        });
-		
-	}]);
-
-    thisModule.factory('pipDateFormat',
-        ['pipDates', 'pipTranslate', '$rootScope', function (pipDates, pipTranslate, $rootScope) {
-
-            return {
-                formatDate: formatDate,
-                formatLongDate: formatLongDate,
-                formatShortDate: formatShortDate,
-                formatShortDateWithYear: formatShortDateWithYear,
-                formatLongDateWithYear: formatLongDateWithYear,
-
-                formatLongMonth: formatLongMonth,
-                formatMonth: formatMonth,
-                formatYear: formatYear,
-                formatShortWeek: formatShortWeek,
-                formatShortDayAndMonth: formatShortDayAndMonth,
-                formatLongDayAndMonth: formatLongDayAndMonth,
-
-                formatDateRange: formatDateRange,
-                formatDateTimeRange: formatDateTimeRange,
-
-                formatTime: formatTime,
-                formatLongTime: formatLongTime,
-                formatShortTime: formatShortTime, 
-
-                formatLongDateTime: formatLongDateTime,
-                formatShortDateTime: formatShortDateTime,
-
-                formatElapsedTime: formatElapsedTime,
-                formatElapsedInterval: formatElapsedInterval,
-
-                formatMillisecondsToSeconds: formatMillisecondsToSeconds
-            };
-
-
-            function twoDigits(value) {
-                return value < 10 ? '0' + value : value; 
-            };
-
-            function formatDate(value, format, str) {
-                if (value == null) return '';
-
-                var
-                    strict = str || false,
-                    value = _.isDate(value) ? value : new Date(value),
-                    thisYear = new Date().getUTCFullYear(),
-                    year = value.getUTCFullYear(),
-                    month = value.getUTCMonth(),
-                    longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
-                    shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
-                    monthName = pipTranslate.translate('MONTH_' + (month + 1)),
-                    day = value.getUTCDate(),
-                    startWeek = pipDates.toStartWeek(value),
-                    endWeek = pipDates.toEndWeek(value, -1);
-
-                if (strict == false && format == 'd MMMM yyyy' && thisYear === year) {
-                        format = 'MMMM d';
-                }
-                if (strict == false && format == 'd MMM yyyy' && thisYear === year) {
-                        format = 'MMM d';
-                }
-                if ((format == 'MMM d') && $rootScope.$language == 'ru') {
-                        format = 'd MMM';
-                }
-                if ((format == 'MMMM d') && $rootScope.$language == 'ru') {
-                    format = 'd MMMM';
-                }
-
-                if (format == 'd MMMM yyyy')
-                    return '' + day + ' ' + longMonthName + ' ' + year
-                else if (format == 'MMMM d, yyyy')
-                    return '' + monthName + ' ' + day + ', ' + year
-                if (format == 'd MMM yyyy')
-                    return '' + day + ' ' + shortMonthName + ' ' + year
-                else if (format == 'MMM d, yyyy')
-                    return '' + shortMonthName + ' ' + day + ', ' + year
-                else if (format == 'd MMMM')
-                    return '' + day + ' ' + longMonthName
-                else if (format == 'd MMM')
-                    return '' + day + ' ' + shortMonthName
-                else if (format == 'MMM d')
-                    return '' + shortMonthName + ' ' + day;
-                else if (format == 'MMMM d')
-                    return '' + longMonthName + ' ' + day;
-                else if (format == 'yyyy/M/d')
-                    return '' + year + '/' + month + '/' + day;
-                else if (format == 'yyy-M-d')
-                    return '' + year + '-' + month + '-' + day;
-                else if (format == 'MMMM')
-                    return '' + longMonthName + ' ' + year;
-                else if (format == 'yyyy')
-                    return '' + year;
-                else if (format == 'ww')
-                    return '' + startWeek.getUTCDate() + ' - ' + endWeek.getUTCDate() + ' ' + monthName + ' ' + year;
-
-                return '' + day + ' ' + monthName + ' ' + year
-            }
-
-            function formatLongDate(value) {
-                return formatDate(value, 'd MMMM yyyy');
-            }
-
-            function formatShortDateWithYear(value) {
-                return formatDate(value, 'd MMM yyyy', true);
-            }
-
-            function formatLongDateWithYear(value) {
-                return formatDate(value, 'd MMMM yyyy', true);
-            }
-
-            function formatShortDate(value) {
-                return formatDate(value, 'd MMM yyyy');
-            }
-
-            function formatLongMonth(value) {
-                return formatDate(value, 'MMMM');
-            }
-
-            function formatYear(value) {
-                return formatDate(value, 'yyyy');
-            }
-
-            function formatShortWeek(value) {
-                return formatDate(value, 'ww');
-            }
-
-            function formatShortDayAndMonth(value) {
-                return formatDate(value, 'd MMM');
-            }
-
-            function formatLongDayAndMonth(value) {
-                if ($rootScope.$language == 'ru')
-                    return formatDate(value, 'd MMMM');
-                else
-                    return formatDate(value, 'MMMM d');
-            }
-
-            function formatDateRange(value1, value2) {
-                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
-                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
-
-                if (value1 == null) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value2, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value2, 'MMM d, yyyy', true);
-                }
-
-                if (value2 == null || value1 == value2) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value1, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value1, 'MMM d, yyyy', true);
-                }
-
-                if (value1.getUTCFullYear() !== value2.getUTCFullYear()) {
-                    if ($rootScope.$language == 'ru')
-                        return formatDate(value1, 'd MMM yyyy', true) + '-' + formatDate(value2, 'd MMM yyyy', true);
-                    else
-                        return formatDate(value1, 'MMM d, yyyy', true) + '-' + formatDate(value2, 'MMM d, yyyy', true);
-                } else {
-                        return formatDate(value1, 'd MMM') + ' - ' + formatDate(value2, 'd MMM')
-                            + ((new Date().getUTCFullYear() !== value1.getUTCFullYear()) ? ' ' + formatDate(value1, 'yyyy') : '');
-                }
-            }
-
-            function formatDateTimeRange(value1, value2) {
-                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
-                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
-                if (value1 == null && value2 == null) return '';
-
-                if (value1 == null) {
-                    return formatShortDateTime(value2);
-                }
-
-                if (value2 == null || value1 == value2) {
-                    return formatShortDateTime(value1);
-                }
-
-                var dayStart, monthStart, yearStart,
-                    dayEnd, monthEnd, yearEnd;
-
-                dayStart = value1.getUTCDate();
-                monthStart = value1.getUTCMonth();
-                yearStart = value1.getUTCFullYear();
-                dayEnd = value2.getUTCDate();
-                monthEnd = value2.getUTCMonth();
-                yearEnd = value2.getUTCFullYear();
-
-
-                if (yearStart !== yearEnd) {
-                    return formatDate(value1, 'd MMM') + ', ' + yearStart + ' ' + formatTime(value1, 'hh:mm') +
-                        ' - ' + formatDate(value2, 'd MMM') + ', ' + yearEnd + ' ' + formatTime(value2, 'hh:mm');
-                } else {
-                    if (monthStart != monthEnd && !dayStart != dayEnd)
-                        return formatDate(value1, 'd MMM') + ', ' + formatTime(value1, 'hh:mm') +
-                            ' - ' + formatDate(value2, 'd MMM') + ', ' + formatTime(value2, 'hh:mm');
-                    else
-                        return formatTime(value1, 'hh:mm') + ' - ' + formatTime(value2, 'hh:mm')
-                }
-            }
-
-            function formatTime(value, format) {
-                if (value == null) return '';
-
-                value = _.isDate(value) ? value : new Date(value);
-                
-                var 
-                    hours = value.getHours(),
-                    mins = value.getMinutes(),
-                    secs = value.getSeconds(),
-                    ampm = '';
-
-                if (pipTranslate.use() == 'en') {
-                    ampm = hours >= 12 ? ' PM' : ' AM';
-                    hours = hours % 12;
-                    if (hours == 0) hours = 12;
-                }
-
-                if (format == 'hh:mm:ss')
-                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
-                else if (format == 'hh:mm')
-                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ampm;
-
-                return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
-            }
-
-            function formatMonth(value, short) {
-                if (value == null) return '';
-                return short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
-            }
-
-            function formatLongTime(value) {
-                return formatTime(value, 'hh:mm:ss');
-            }
-
-            function formatShortTime(value) {
-                return formatTime(value, 'hh:mm');
-            }
-
-            function formatLongDateTime(value) {
-                if (value == null) return '';
-                value = _.isDate(value) ? value : new Date(value);
-                return formatLongDate(value) + ' ' + formatLongTime(value);
-            }
-
-            function formatShortDateTime(value) {
-                if (value == null) return '';
-                value = _.isDate(value) ? value : new Date(value);
-                return formatShortDate(value) + ' ' + formatShortTime(value);
-            }
-
-            function formatElapsedTime(value, format) {
-                if (value == null) return '';
-
-                value = _.isDate(value) ? value : new Date(value);
-
-                var 
-                    current = new Date(),
-                    diff = Math.floor(((current.getTime() + current.getTimezoneOffset()) - (value.getTime() + value.getTimezoneOffset())) / 1000);
-
-                if (diff < 1) return pipTranslate.translate('ELAPSED_JUST_NOW');
-
-                var years, months, weeks, days, hours, mins, secs;
-
-                secs = diff % 60;
-
-                diff = Math.floor(diff / 60);
-                mins = diff % 60;
-
-                diff = Math.floor(diff / 60);
-                hours = diff % 24;
-
-                diff = diff / 24;
-                years = Math.floor(diff / 365),
-
-                diff = diff - years * 365;
-                months = Math.floor(diff / 30),
-                days = Math.floor(diff - months * 30);
-
-                if (days % 7 == 0) {
-                    weeks = Math.floor(days / 7);
-                    days = 0;
-                } else {
-                    weeks = 0;
-                }
-
-                if (format == 'interval') {
-                    var result = '';
-
-                    if (years) {
-                        result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
-                        weeks = days = hours = mins = secs = null;
-                    }
-                    if (months) {
-                        result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
-                        days = hours = mins = secs = null;
-                    }
-                    if (weeks) {
-                        result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
-                        hours = mins = secs = null;
-                    }
-                    if (days) {
-                        result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
-                        mins = secs = null;
-                    }
-                    if (hours) {
-                        result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
-                        secs = null;
-                    }
-                    if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
-                    if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
-
-                    return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
-                        : pipTranslate.translate('ELAPSED_JUST_NOW');
-                }
-
-                // Default time format = 'default'
-
-                if (years > 0) {
-                    return formatDate(value, 'd MMM yyyy');
-                }
-
-                if (months > 0 || weeks > 0 || days > 1) {
-                    return formatDate(value, 'MMM d') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (days == 1) {
-                    return pipTranslate.translate('ELAPSED_YESTERDAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (hours > 10) {
-                    return pipTranslate.translate('ELAPSED_TODAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
-
-                if (hours > 0) {
-                    return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
-                        hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
-                }
-
-                if (mins > 10) {
-                    return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
-                }
-
-                if (mins > 0) {
-                    return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
-                }
-
-                return pipTranslate.translate('ELAPSED_JUST_NOW');
-            }
-
-            function formatElapsedInterval(value) {
-                return formatElapsedTime(value, 'interval');  
-            }
-
-            function formatMillisecondsToSeconds(value) {
-                return Math.floor(value / 1000)
-            }
-
-        }]
-    );
-    
-})();
-
-/**
  * @file Assertion utilities
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -3492,6 +2781,717 @@
     }]);
 
 })();
+/**
+ * @file Filter to format date and time
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
+
+    thisModule.filter('formatDate',  
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatDate(value, format);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDate', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDate(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDateWithYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDateWithYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatMonth',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatMonth(value, format);
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDate', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDate(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDateWithYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDateWithYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongMonth',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongMonth(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortWeek',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortWeek(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatTime(value, format);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDateTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDateTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDateTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDateTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatElapsedInterval', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatElapsedInterval(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatElapsedTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatElapsedTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatMillisecondsToSeconds',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatMillisecondsToSeconds(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatDateRange',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value1, value2) {
+                return pipDateFormat.formatDateRange(value1, value2);
+            };
+        }]
+    );
+
+    thisModule.filter('formatDateTimeRange',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value1, value2) {
+                return pipDateFormat.formatDateTimeRange(value1, value2);
+            };
+        }]
+    );
+
+
+})();
+
+/**
+ * @file Filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTranslateFilters', ['pipTranslate']);
+
+    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
+        return function (key) {
+            return pipTranslate.translate(key) || key;
+        }
+    }]);
+
+})();
+
+/**
+ * @file Date formatting service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global _, angular */
+ 
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
+
+	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+
+        pipTranslateProvider.translations('en', {
+            // Months - 'MONTH_' + monthIndex
+            // start at 0 to match JS date format
+            'MONTH_1': 'January',
+            'MONTH_2': 'February',
+            'MONTH_3': 'March',
+            'MONTH_4': 'April',
+            'MONTH_5': 'May',
+            'MONTH_6': 'June',
+            'MONTH_7': 'July',
+            'MONTH_8': 'August',
+            'MONTH_9': 'September',
+            'MONTH_10': 'October',
+            'MONTH_11': 'November',
+            'MONTH_12': 'December',
+
+            'MONTH_LONG_1': 'January',
+            'MONTH_LONG_2': 'February',
+            'MONTH_LONG_3': 'March',
+            'MONTH_LONG_4': 'April',
+            'MONTH_LONG_5': 'May',
+            'MONTH_LONG_6': 'June',
+            'MONTH_LONG_7': 'July',
+            'MONTH_LONG_8': 'August',
+            'MONTH_LONG_9': 'September',
+            'MONTH_LONG_10': 'October',
+            'MONTH_LONG_11': 'November',
+            'MONTH_LONG_12': 'December',
+
+            'MONTH_SHORT_1': 'Jan',
+            'MONTH_SHORT_2': 'Feb',
+            'MONTH_SHORT_3': 'Mar',
+            'MONTH_SHORT_4': 'Apr',
+            'MONTH_SHORT_5': 'May',
+            'MONTH_SHORT_6': 'Jun',
+            'MONTH_SHORT_7': 'Jul',
+            'MONTH_SHORT_8': 'Aug',
+            'MONTH_SHORT_9': 'Sep',
+            'MONTH_SHORT_10': 'Oct',
+            'MONTH_SHORT_11': 'Nov',
+            'MONTH_SHORT_12': 'Dec',
+
+            // Days of the week - 'DAY_' + dayIndex
+            // start at 1 to match JS date format
+            'DAY_1': 'Monday',
+            'DAY_2': 'Tuesday',
+            'DAY_3': 'Wednesday',
+            'DAY_4': 'Thursday',
+            'DAY_5': 'Friday',
+            'DAY_6': 'Saturday',
+            'DAY_7': 'Sunday',
+
+            'ELAPSED_TODAY': 'Today',
+            'ELAPSED_YESTERDAY': 'Yesterday',
+            'ELAPSED_YEARS': 'y',
+            'ELAPSED_MONTHS': 'mth',
+            'ELAPSED_WEEKS': 'w',
+            'ELAPSED_DAYS': 'd',
+            'ELAPSED_HOURS': 'h',
+            'ELAPSED_MINUTES': 'm',
+            'ELAPSED_SECONDS': 's',
+            'ELAPSED_AT': 'at',
+            'ELAPSED_AGO': 'ago',
+            'ELAPSED_JUST_NOW': 'Just now',
+            'ELAPSED_FEW_MIN_AGO': 'Few min ago',
+            'ELAPSED_MIN_AGO': 'min ago',
+            'ELAPSED_HOUR_AGO': 'hour ago',
+            'ELAPSED_HOURS_AGO': 'hours ago',
+            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
+        });
+
+        pipTranslateProvider.translations('ru', {
+            // Months - 'MONTH_' + monthIndex
+            // start at 0 to match JS date format
+            'MONTH_1': 'январь',
+            'MONTH_2': 'февраль',
+            'MONTH_3': 'март',
+            'MONTH_4': 'апрель',
+            'MONTH_5': 'май',
+            'MONTH_6': 'июнь',
+            'MONTH_7': 'июль',
+            'MONTH_8': 'август',
+            'MONTH_9': 'сентябрь',
+            'MONTH_10': 'октябрь',
+            'MONTH_11': 'ноябрь',
+            'MONTH_12': 'декабрь',
+
+            'MONTH_LONG_1': 'января',
+            'MONTH_LONG_2': 'февраля',
+            'MONTH_LONG_3': 'марта',
+            'MONTH_LONG_4': 'апреля',
+            'MONTH_LONG_5': 'мая',
+            'MONTH_LONG_6': 'июня',
+            'MONTH_LONG_7': 'июля',
+            'MONTH_LONG_8': 'августа',
+            'MONTH_LONG_9': 'сентября',
+            'MONTH_LONG_10': 'октября',
+            'MONTH_LONG_11': 'ноября',
+            'MONTH_LONG_12': 'декабря',
+
+            'MONTH_SHORT_1': 'янв',
+            'MONTH_SHORT_2': 'фев',
+            'MONTH_SHORT_3': 'мар',
+            'MONTH_SHORT_4': 'апр',
+            'MONTH_SHORT_5': 'май',
+            'MONTH_SHORT_6': 'июн',
+            'MONTH_SHORT_7': 'июл',
+            'MONTH_SHORT_8': 'авг',
+            'MONTH_SHORT_9': 'сен',
+            'MONTH_SHORT_10': 'окт',
+            'MONTH_SHORT_11': 'ноя',
+            'MONTH_SHORT_12': 'дек',
+
+            // Days of the week - 'DAY_' + dayIndex
+            // start at 1 to match JS date format
+            'DAY_1': 'понедельник',
+            'DAY_2': 'вторник',
+            'DAY_3': 'среда',
+            'DAY_4': 'четверг',
+            'DAY_5': 'пятница',
+            'DAY_6': 'суббота',
+            'DAY_7': 'воскресенье',
+
+            'ELAPSED_TODAY': 'Сегодня',
+            'ELAPSED_YESTERDAY': 'Вчера',
+            'ELAPSED_YEARS': 'г',
+            'ELAPSED_MONTHS': 'мц',
+            'ELAPSED_WEEKS': 'н',
+            'ELAPSED_DAYS': 'д',
+            'ELAPSED_HOURS': 'ч',
+            'ELAPSED_MINUTES': 'м',
+            'ELAPSED_SECONDS': 'с',
+            'ELAPSED_AT': 'в',
+            'ELAPSED_AGO': 'тн',
+            'ELAPSED_JUST_NOW': 'Только что',
+            'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
+            'ELAPSED_MIN_AGO': 'мин тн',
+            'ELAPSED_HOUR_AGO': 'час тн',
+            'ELAPSED_HOURS_AGO': 'часа тн',
+            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
+        });
+		
+	}]);
+
+    thisModule.factory('pipDateFormat',
+        ['pipDates', 'pipTranslate', '$rootScope', function (pipDates, pipTranslate, $rootScope) {
+
+            return {
+                formatDate: formatDate,
+                formatLongDate: formatLongDate,
+                formatShortDate: formatShortDate,
+                formatShortDateWithYear: formatShortDateWithYear,
+                formatLongDateWithYear: formatLongDateWithYear,
+
+                formatLongMonth: formatLongMonth,
+                formatMonth: formatMonth,
+                formatYear: formatYear,
+                formatShortWeek: formatShortWeek,
+                formatShortDayAndMonth: formatShortDayAndMonth,
+                formatLongDayAndMonth: formatLongDayAndMonth,
+
+                formatDateRange: formatDateRange,
+                formatDateTimeRange: formatDateTimeRange,
+
+                formatTime: formatTime,
+                formatLongTime: formatLongTime,
+                formatShortTime: formatShortTime, 
+
+                formatLongDateTime: formatLongDateTime,
+                formatShortDateTime: formatShortDateTime,
+
+                formatElapsedTime: formatElapsedTime,
+                formatElapsedInterval: formatElapsedInterval,
+
+                formatMillisecondsToSeconds: formatMillisecondsToSeconds
+            };
+
+
+            function twoDigits(value) {
+                return value < 10 ? '0' + value : value; 
+            };
+
+            function formatDate(value, format, str) {
+                if (value == null) return '';
+
+                var
+                    strict = str || false,
+                    value = _.isDate(value) ? value : new Date(value),
+                    thisYear = new Date().getUTCFullYear(),
+                    year = value.getUTCFullYear(),
+                    month = value.getUTCMonth(),
+                    longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
+                    shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
+                    monthName = pipTranslate.translate('MONTH_' + (month + 1)),
+                    day = value.getUTCDate(),
+                    startWeek = pipDates.toStartWeek(value),
+                    endWeek = pipDates.toEndWeek(value, -1);
+
+                if (strict == false && format == 'd MMMM yyyy' && thisYear === year) {
+                        format = 'MMMM d';
+                }
+                if (strict == false && format == 'd MMM yyyy' && thisYear === year) {
+                        format = 'MMM d';
+                }
+                if ((format == 'MMM d') && $rootScope.$language == 'ru') {
+                        format = 'd MMM';
+                }
+                if ((format == 'MMMM d') && $rootScope.$language == 'ru') {
+                    format = 'd MMMM';
+                }
+
+                if (format == 'd MMMM yyyy')
+                    return '' + day + ' ' + longMonthName + ' ' + year
+                else if (format == 'MMMM d, yyyy')
+                    return '' + monthName + ' ' + day + ', ' + year
+                if (format == 'd MMM yyyy')
+                    return '' + day + ' ' + shortMonthName + ' ' + year
+                else if (format == 'MMM d, yyyy')
+                    return '' + shortMonthName + ' ' + day + ', ' + year
+                else if (format == 'd MMMM')
+                    return '' + day + ' ' + longMonthName
+                else if (format == 'd MMM')
+                    return '' + day + ' ' + shortMonthName
+                else if (format == 'MMM d')
+                    return '' + shortMonthName + ' ' + day;
+                else if (format == 'MMMM d')
+                    return '' + longMonthName + ' ' + day;
+                else if (format == 'yyyy/M/d')
+                    return '' + year + '/' + month + '/' + day;
+                else if (format == 'yyy-M-d')
+                    return '' + year + '-' + month + '-' + day;
+                else if (format == 'MMMM')
+                    return '' + longMonthName + ' ' + year;
+                else if (format == 'yyyy')
+                    return '' + year;
+                else if (format == 'ww')
+                    return '' + startWeek.getUTCDate() + ' - ' + endWeek.getUTCDate() + ' ' + monthName + ' ' + year;
+
+                return '' + day + ' ' + monthName + ' ' + year
+            }
+
+            function formatLongDate(value) {
+                return formatDate(value, 'd MMMM yyyy');
+            }
+
+            function formatShortDateWithYear(value) {
+                return formatDate(value, 'd MMM yyyy', true);
+            }
+
+            function formatLongDateWithYear(value) {
+                return formatDate(value, 'd MMMM yyyy', true);
+            }
+
+            function formatShortDate(value) {
+                return formatDate(value, 'd MMM yyyy');
+            }
+
+            function formatLongMonth(value) {
+                return formatDate(value, 'MMMM');
+            }
+
+            function formatYear(value) {
+                return formatDate(value, 'yyyy');
+            }
+
+            function formatShortWeek(value) {
+                return formatDate(value, 'ww');
+            }
+
+            function formatShortDayAndMonth(value) {
+                return formatDate(value, 'd MMM');
+            }
+
+            function formatLongDayAndMonth(value) {
+                if ($rootScope.$language == 'ru')
+                    return formatDate(value, 'd MMMM');
+                else
+                    return formatDate(value, 'MMMM d');
+            }
+
+            function formatDateRange(value1, value2) {
+                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
+                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
+
+                if (value1 == null) {
+                    if ($rootScope.$language == 'ru')
+                        return formatDate(value2, 'd MMM yyyy', true);
+                    else
+                        return formatDate(value2, 'MMM d, yyyy', true);
+                }
+
+                if (value2 == null || value1 == value2) {
+                    if ($rootScope.$language == 'ru')
+                        return formatDate(value1, 'd MMM yyyy', true);
+                    else
+                        return formatDate(value1, 'MMM d, yyyy', true);
+                }
+
+                if (value1.getUTCFullYear() !== value2.getUTCFullYear()) {
+                    if ($rootScope.$language == 'ru')
+                        return formatDate(value1, 'd MMM yyyy', true) + '-' + formatDate(value2, 'd MMM yyyy', true);
+                    else
+                        return formatDate(value1, 'MMM d, yyyy', true) + '-' + formatDate(value2, 'MMM d, yyyy', true);
+                } else {
+                        return formatDate(value1, 'd MMM') + ' - ' + formatDate(value2, 'd MMM')
+                            + ((new Date().getUTCFullYear() !== value1.getUTCFullYear()) ? ' ' + formatDate(value1, 'yyyy') : '');
+                }
+            }
+
+            function formatDateTimeRange(value1, value2) {
+                value1 =  value1 ? (_.isDate(value1) ? value1 : new Date(value1)) : null;
+                value2 =  value2 ? (_.isDate(value2) ? value2 : new Date(value2)) : null;
+                if (value1 == null && value2 == null) return '';
+
+                if (value1 == null) {
+                    return formatShortDateTime(value2);
+                }
+
+                if (value2 == null || value1 == value2) {
+                    return formatShortDateTime(value1);
+                }
+
+                var dayStart, monthStart, yearStart,
+                    dayEnd, monthEnd, yearEnd;
+
+                dayStart = value1.getUTCDate();
+                monthStart = value1.getUTCMonth();
+                yearStart = value1.getUTCFullYear();
+                dayEnd = value2.getUTCDate();
+                monthEnd = value2.getUTCMonth();
+                yearEnd = value2.getUTCFullYear();
+
+
+                if (yearStart !== yearEnd) {
+                    return formatDate(value1, 'd MMM') + ', ' + yearStart + ' ' + formatTime(value1, 'hh:mm') +
+                        ' - ' + formatDate(value2, 'd MMM') + ', ' + yearEnd + ' ' + formatTime(value2, 'hh:mm');
+                } else {
+                    if (monthStart != monthEnd && !dayStart != dayEnd)
+                        return formatDate(value1, 'd MMM') + ', ' + formatTime(value1, 'hh:mm') +
+                            ' - ' + formatDate(value2, 'd MMM') + ', ' + formatTime(value2, 'hh:mm');
+                    else
+                        return formatTime(value1, 'hh:mm') + ' - ' + formatTime(value2, 'hh:mm')
+                }
+            }
+
+            function formatTime(value, format) {
+                if (value == null) return '';
+
+                value = _.isDate(value) ? value : new Date(value);
+                
+                var 
+                    hours = value.getHours(),
+                    mins = value.getMinutes(),
+                    secs = value.getSeconds(),
+                    ampm = '';
+
+                if (pipTranslate.use() == 'en') {
+                    ampm = hours >= 12 ? ' PM' : ' AM';
+                    hours = hours % 12;
+                    if (hours == 0) hours = 12;
+                }
+
+                if (format == 'hh:mm:ss')
+                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
+                else if (format == 'hh:mm')
+                    return '' + twoDigits(hours) + ':' + twoDigits(mins) + ampm;
+
+                return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
+            }
+
+            function formatMonth(value, short) {
+                if (value == null) return '';
+                return short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
+            }
+
+            function formatLongTime(value) {
+                return formatTime(value, 'hh:mm:ss');
+            }
+
+            function formatShortTime(value) {
+                return formatTime(value, 'hh:mm');
+            }
+
+            function formatLongDateTime(value) {
+                if (value == null) return '';
+                value = _.isDate(value) ? value : new Date(value);
+                return formatLongDate(value) + ' ' + formatLongTime(value);
+            }
+
+            function formatShortDateTime(value) {
+                if (value == null) return '';
+                value = _.isDate(value) ? value : new Date(value);
+                return formatShortDate(value) + ' ' + formatShortTime(value);
+            }
+
+            function formatElapsedTime(value, format) {
+                if (value == null) return '';
+
+                value = _.isDate(value) ? value : new Date(value);
+
+                var 
+                    current = new Date(),
+                    diff = Math.floor(((current.getTime() + current.getTimezoneOffset()) - (value.getTime() + value.getTimezoneOffset())) / 1000);
+
+                if (diff < 1) return pipTranslate.translate('ELAPSED_JUST_NOW');
+
+                var years, months, weeks, days, hours, mins, secs;
+
+                secs = diff % 60;
+
+                diff = Math.floor(diff / 60);
+                mins = diff % 60;
+
+                diff = Math.floor(diff / 60);
+                hours = diff % 24;
+
+                diff = diff / 24;
+                years = Math.floor(diff / 365),
+
+                diff = diff - years * 365;
+                months = Math.floor(diff / 30),
+                days = Math.floor(diff - months * 30);
+
+                if (days % 7 == 0) {
+                    weeks = Math.floor(days / 7);
+                    days = 0;
+                } else {
+                    weeks = 0;
+                }
+
+                if (format == 'interval') {
+                    var result = '';
+
+                    if (years) {
+                        result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
+                        weeks = days = hours = mins = secs = null;
+                    }
+                    if (months) {
+                        result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
+                        days = hours = mins = secs = null;
+                    }
+                    if (weeks) {
+                        result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
+                        hours = mins = secs = null;
+                    }
+                    if (days) {
+                        result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
+                        mins = secs = null;
+                    }
+                    if (hours) {
+                        result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
+                        secs = null;
+                    }
+                    if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
+                    if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
+
+                    return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
+                        : pipTranslate.translate('ELAPSED_JUST_NOW');
+                }
+
+                // Default time format = 'default'
+
+                if (years > 0) {
+                    return formatDate(value, 'd MMM yyyy');
+                }
+
+                if (months > 0 || weeks > 0 || days > 1) {
+                    return formatDate(value, 'MMM d') 
+                        + ', ' + formatTime(value, 'hh:mm');
+                }
+
+                if (days == 1) {
+                    return pipTranslate.translate('ELAPSED_YESTERDAY') 
+                        + ', ' + formatTime(value, 'hh:mm');
+                }
+
+                if (hours > 10) {
+                    return pipTranslate.translate('ELAPSED_TODAY') 
+                        + ', ' + formatTime(value, 'hh:mm');
+                }
+
+                if (hours > 0) {
+                    return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
+                        hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
+                }
+
+                if (mins > 10) {
+                    return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
+                }
+
+                if (mins > 0) {
+                    return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
+                }
+
+                return pipTranslate.translate('ELAPSED_JUST_NOW');
+            }
+
+            function formatElapsedInterval(value) {
+                return formatElapsedTime(value, 'interval');  
+            }
+
+            function formatMillisecondsToSeconds(value) {
+                return Math.floor(value / 1000)
+            }
+
+        }]
+    );
+    
+})();
+
 /**
  * @file Collection utilities
  * @copyright Digital Living Software Corp. 2014-2016
@@ -5077,488 +5077,6 @@
 
 })();
 /**
- * @file Registration of all data modules
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipData', [
-		'pipDataModel',
-		'pipDataCache',
-       
-        'pipSessionData',
-    ]);
-    
-})();
-/**
- * @file Application abstract data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular, _, async */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDataModel', ['pipUtils', 'pipRest']);
-
-    thisModule.provider('pipDataModel', function() {
-        
-        this.$get = ['$stateParams', 'pipCollections', 'pipRest', function($stateParams, pipCollections, pipRest) {
-
-            var api = [];
-            
-            for (var call in pipRest) {
-                api[call] = pipRest[call];
-            }
-
-            // function extendApi(extension) {
-            //     for (var call in extension) {
-            //         api[call] = extension[call];
-            //     }
-            // }
-
-            // Execute request to REST API
-            function executeCurl(params, successCallback, errorCallback) {
-                var t = params.transaction, tid;
-
-                if (t && !params.skipTransactionBegin) {
-                    tid = params.transactionId = t.begin(
-                        params.transactionOperation || 'PROCESSING'
-                    );
-                    if (!tid) return;
-                }
-
-                return api[params.resource]()[params.operation](
-                    params.item,
-                    function (result) {
-                        if (t && tid && t.aborted(tid)) return;
-                        if (t && !params.skipTransactionEnd) t.end();
-                        if (successCallback) successCallback(result);
-                    },
-                    function (error) {
-                        if (t) t.end(error);
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-
-            // Create an object and add it to object collection
-            function createCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'save';
-                
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            params.itemCollection.push(result);
-
-                        if (successCallback) successCallback(result);
-                    },
-                    function(error){
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-
-            // Update an object and replace it in object collection
-            function updateCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'update';
-
-                return  executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            pipCollections.replaceBy(params.itemCollection, 'id', result.id, result);
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Update an object and remove it from object collection
-            function deleteCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'SAVING';
-                params.operation = params.operation || 'remove';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection)
-                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a collection of objects
-            function readCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'query';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a single object and add it into collection
-            function readOneCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'page';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection && result) {
-                            var index = _.findIndex(params.itemCollection, {id: result.id});
-                            if (index >= 0) params.itemCollection[index] = result;
-                            else params.itemCollection.push(result);
-                        }
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Read a page and add results into object collection
-            function pageCurl(params, successCallback, errorCallback) {
-                params.transactionOperation = params.transactionOperation || 'READING';
-                params.operation = params.operation || 'page';
-
-                return executeCurl(
-                    params,
-                    function(result) {
-                        if (params.itemCollection && result.data) {
-                            for (var i = 0; i < result.data.length; i++)
-                                params.itemCollection.push(result.data[i]);
-                        }
-
-                        if (successCallback) successCallback(result);
-                    },
-                    errorCallback
-                );
-            };
-
-            // Save picture and document files
-            function saveFilesCurl(params, successCallback, errorCallback) {
-                var t = params.transaction, tid;
-
-                // Start transaction if necessary
-                if (t && !params.skipTransactionBegin) {
-                    tid = params.transactionId = t.begin(
-                        params.transactionOperation || 'SAVING'
-                    );
-                    if (!tid) return;
-                }
-
-//------------------
-
-                var uploadFiles = [{
-                    pictures: params.pictures,
-                    documents: params.documents
-                }];
-
-                // from content
-                if (params.item && params.item.content ) {
-                    var saveResult = true;
-                    async.eachSeries(_.union(params.item.content, uploadFiles),
-                        function (obj, callback) {
-                            // не выбран - пропускаем этот item  || нет этого события action
-                            if ( !obj.pictures && !obj.documents ) {
-                                callback();
-                            } else {
-                                if (obj.pictures) {
-                                    // Save pictures first
-                                    obj.pictures.save(
-                                        function () {
-                                            if (t && tid && t.aborted(tid)) {
-                                                saveResult =  false;
-                                                callback('aborted');
-                                            }
-                                            // Save documents second
-                                            if (obj.documents) {
-                                                obj.documents.save(
-                                                    function () {
-                                                        if (t && tid && t.aborted(tid)) {
-                                                            saveResult =  false;
-                                                            callback('aborted');
-                                                        }
-                                                        callback();
-                                                    },
-                                                    function (error) {
-                                                        saveResult =  false;
-                                                        callback(error);
-                                                    }
-                                                );
-                                            } else {
-                                                callback();
-                                            }
-                                        },
-                                        function (error) {
-                                            saveResult =  false;
-                                            callback(error);
-                                        }
-                                    );
-                                } else {
-                                    if (obj.documents) {
-                                        // Save documents first
-                                        obj.documents.save(
-                                            function () {
-                                                if (t && tid && t.aborted(tid)) {
-                                                    saveResult = false;
-                                                    callback('aborted');
-                                                }
-                                                callback();
-                                            },
-                                            function (error) {
-                                                saveResult = false;
-                                                callback(error);
-                                            }
-                                        );
-                                    }
-                                }
-                            }
-                        },
-                        function (error) {
-                            if (!error && saveResult) {
-                                // удаляем ненужные объекты перед сохранением
-                                // вызываем колбек
-                                if (t & !params.skipTransactionEnd) t.end();
-                                _.each(params.item.content, function(item){
-                                    delete item.pictures;
-                                    delete item.documents;
-                                });
-                                if (successCallback) successCallback();
-                            } else {
-                                // вызываем ошибочный колбек
-                                if (t) t.end(error);
-                                if (errorCallback) {
-                                    errorCallback(error);
-                                }
-                            }
-                        }
-                    );
-                } else {
-                    if (params.pictures) {
-                        // Save pictures first
-                        params.pictures.save(
-                            function () {
-                                if (t && tid && t.aborted(tid)) return;
-
-                                // Save documents second
-                                if (params.documents) {
-                                    params.documents.save(
-                                        function () {
-                                            if (t && tid && t.aborted(tid)) return;
-                                            // Do everything else
-                                            if (t & !params.skipTransactionEnd) t.end();
-                                            if (successCallback) successCallback();
-                                        },
-                                        function (error) {
-                                            if (t) t.end(error);
-                                            if (errorCallback) errorCallback(error);
-                                        }
-                                    );
-                                } else {
-                                    // Do everything else
-                                    if (t & !params.skipTransactionEnd) t.end();
-                                    if (successCallback) successCallback();
-                                }
-                            },
-                            function (error) {
-                                if (t) t.end(error);
-                                if (errorCallback) errorCallback(error);
-                            }
-                        );
-                    } else if (params.documents) {
-                        // Save documents first
-                        params.documents.save(
-                            function () {
-                                if (t && tid && t.aborted(tid)) return;
-                                // Do everything else
-                                if (t & !params.skipTransactionEnd) t.end();
-                                if (successCallback) successCallback();
-                            },
-                            function (error) {
-                                if (t) t.end(error);
-                                if (errorCallback) errorCallback(error);
-                            }
-                        );
-                    } else {
-                        // Do everything else
-                        if (t & !params.skipTransactionEnd) t.end();
-                        if (successCallback) successCallback();
-                    }
-                }
-            };
-
-            // Abort transaction with file upload
-            function abortFilesCurl(params) {
-                if (params.pictures) 
-                    params.pictures.abort();
-                if (params.documents)
-                    params.documents.abort();
-                    if (params.transaction)
-                    params.transaction.abort();  
-            };
-
-            return {
-                // extendApi: extendApi,
-
-                // Executing transactional requests to server
-                execute: executeCurl,
-
-                // Creating an object
-                create: createCurl,
-
-                // Updating an object
-                update: updateCurl,
-                save: updateCurl,
-
-                // Deleting an object
-                'delete': deleteCurl,
-                remove: deleteCurl,
-
-                // Reading objects
-                read: readCurl,
-                query: readCurl,
-
-                // Reading a single object
-                readOne: readOneCurl,
-                get: readOneCurl,
-
-                // Reading paginated results
-                page: pageCurl,
-                readPage: pageCurl,
-                queryPage: pageCurl,
-
-                // Saving files to file store
-                saveFiles: saveFilesCurl,
-                abortFiles: abortFilesCurl
-            }
-        }];
-    });
-
-})();
-
-/**
- * @file Session data model
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipSessionData', ['pipRest', 'pipSessionCache']);
-
-    thisModule.provider('pipSessionData', function() {
-
-        readUserResolver.$inject = ['pipSessionCache'];
-        readPartyResolver.$inject = ['pipSessionCache', '$stateParams'];
-        readConnectionResolver.$inject = ['pipSessionCache', '$stateParams'];
-        readSettingsResolver.$inject = ['pipSessionCache'];
-        readSessionsUserResolver.$inject = ['$stateParams', 'pipRest', '$rootScope'];
-        readSessionIdResolver.$inject = ['$stateParams', 'pipSession'];
-        this.readUserResolver = /* @ngInject */ readUserResolver;
-        this.readPartyResolver = /* @ngInject */ readPartyResolver;
-        this.readConnectionResolver = /* @ngInject */ readConnectionResolver;
-        this.readSettingsResolver = /* @ngInject */ readSettingsResolver;
-
-        this.readSessionsUserResolver = /* @ngInject */ readSessionsUserResolver;
-        this.readSessionIdResolver = /* @ngInject */ readSessionIdResolver;
-
-        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipDataModel', 'pipSessionCache', function($rootScope, $stateParams, pipRest, pipDataModel, pipSessionCache) {
-            return {
-                getSessionId: getSessionId,
-                removeSession: removeSession,
-                readSessionsUser: function (params, successCallback, errorCallback) {
-                    params.resource = 'userSessions';
-                    params.item = params.item || {};
-                    params.item.party_id = $stateParams.id;
-                    params.party_id = $stateParams.id;
-                    return  pipSessionCache.readSessions(params, successCallback, errorCallback);
-
-                }
-            };
-
-            function getSessionId(pipSession){
-                return function () {
-                    return pipSession.sessionId();
-                };
-            };
-
-            function removeSession(transaction, session, successCallback, errorCallback) {
-                var tid = transaction.begin('REMOVING');
-                if (!tid) return;
-
-                pipRest.userSessions().remove(
-                    {
-                        id: session.id,
-                        party_id: $stateParams.id
-                    },
-                    function (removedSession) {
-                        if (transaction.aborted(tid)) return;
-                        else transaction.end();
-
-                        if (successCallback) successCallback(removedSession);
-                    },
-                    function (error) {
-                        transaction.end(error);
-                        if (errorCallback) errorCallback(error);
-                    }
-                );
-            };
-            
-        }];
-        //--------------
-
-        function readUserResolver(pipSessionCache) {
-            return pipSessionCache.readUser();                             
-        };
-
-        function readPartyResolver(pipSessionCache, $stateParams) {
-            return pipSessionCache.readParty($stateParams);
-        };
-
-        function readConnectionResolver(pipSessionCache, $stateParams) {
-            return pipSessionCache.readConnection($stateParams);
-        };
-
-        function readSettingsResolver(pipSessionCache) {
-            return pipSessionCache.readSettings();                             
-        };
-
-        function readSessionsUserResolver($stateParams, pipRest, $rootScope) {
-            return pipRest.userSessions().query({
-                party_id: $stateParams.id
-            }).$promise;
-        };
-
-        function readSessionIdResolver($stateParams, pipSession) {
-            return pipSession.sessionId();
-        };
-        
-    });
-
-})();
-
-/**
  * @file User access permissions service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -7047,6 +6565,488 @@
     );
 
 })();
+/**
+ * @file Registration of all data modules
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipData', [
+		'pipDataModel',
+		'pipDataCache',
+       
+        'pipSessionData',
+    ]);
+    
+})();
+/**
+ * @file Application abstract data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular, _, async */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDataModel', ['pipUtils', 'pipRest']);
+
+    thisModule.provider('pipDataModel', function() {
+        
+        this.$get = ['$stateParams', 'pipCollections', 'pipRest', function($stateParams, pipCollections, pipRest) {
+
+            var api = [];
+            
+            for (var call in pipRest) {
+                api[call] = pipRest[call];
+            }
+
+            // function extendApi(extension) {
+            //     for (var call in extension) {
+            //         api[call] = extension[call];
+            //     }
+            // }
+
+            // Execute request to REST API
+            function executeCurl(params, successCallback, errorCallback) {
+                var t = params.transaction, tid;
+
+                if (t && !params.skipTransactionBegin) {
+                    tid = params.transactionId = t.begin(
+                        params.transactionOperation || 'PROCESSING'
+                    );
+                    if (!tid) return;
+                }
+
+                return api[params.resource]()[params.operation](
+                    params.item,
+                    function (result) {
+                        if (t && tid && t.aborted(tid)) return;
+                        if (t && !params.skipTransactionEnd) t.end();
+                        if (successCallback) successCallback(result);
+                    },
+                    function (error) {
+                        if (t) t.end(error);
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+
+            // Create an object and add it to object collection
+            function createCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'save';
+                
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            params.itemCollection.push(result);
+
+                        if (successCallback) successCallback(result);
+                    },
+                    function(error){
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+
+            // Update an object and replace it in object collection
+            function updateCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'update';
+
+                return  executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            pipCollections.replaceBy(params.itemCollection, 'id', result.id, result);
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Update an object and remove it from object collection
+            function deleteCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'SAVING';
+                params.operation = params.operation || 'remove';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection)
+                            _.remove(params.itemCollection, {id: result.id || (params.object || {}).id || (params.item || {}).id});
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a collection of objects
+            function readCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'query';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a single object and add it into collection
+            function readOneCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'page';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection && result) {
+                            var index = _.findIndex(params.itemCollection, {id: result.id});
+                            if (index >= 0) params.itemCollection[index] = result;
+                            else params.itemCollection.push(result);
+                        }
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Read a page and add results into object collection
+            function pageCurl(params, successCallback, errorCallback) {
+                params.transactionOperation = params.transactionOperation || 'READING';
+                params.operation = params.operation || 'page';
+
+                return executeCurl(
+                    params,
+                    function(result) {
+                        if (params.itemCollection && result.data) {
+                            for (var i = 0; i < result.data.length; i++)
+                                params.itemCollection.push(result.data[i]);
+                        }
+
+                        if (successCallback) successCallback(result);
+                    },
+                    errorCallback
+                );
+            };
+
+            // Save picture and document files
+            function saveFilesCurl(params, successCallback, errorCallback) {
+                var t = params.transaction, tid;
+
+                // Start transaction if necessary
+                if (t && !params.skipTransactionBegin) {
+                    tid = params.transactionId = t.begin(
+                        params.transactionOperation || 'SAVING'
+                    );
+                    if (!tid) return;
+                }
+
+//------------------
+
+                var uploadFiles = [{
+                    pictures: params.pictures,
+                    documents: params.documents
+                }];
+
+                // from content
+                if (params.item && params.item.content ) {
+                    var saveResult = true;
+                    async.eachSeries(_.union(params.item.content, uploadFiles),
+                        function (obj, callback) {
+                            // не выбран - пропускаем этот item  || нет этого события action
+                            if ( !obj.pictures && !obj.documents ) {
+                                callback();
+                            } else {
+                                if (obj.pictures) {
+                                    // Save pictures first
+                                    obj.pictures.save(
+                                        function () {
+                                            if (t && tid && t.aborted(tid)) {
+                                                saveResult =  false;
+                                                callback('aborted');
+                                            }
+                                            // Save documents second
+                                            if (obj.documents) {
+                                                obj.documents.save(
+                                                    function () {
+                                                        if (t && tid && t.aborted(tid)) {
+                                                            saveResult =  false;
+                                                            callback('aborted');
+                                                        }
+                                                        callback();
+                                                    },
+                                                    function (error) {
+                                                        saveResult =  false;
+                                                        callback(error);
+                                                    }
+                                                );
+                                            } else {
+                                                callback();
+                                            }
+                                        },
+                                        function (error) {
+                                            saveResult =  false;
+                                            callback(error);
+                                        }
+                                    );
+                                } else {
+                                    if (obj.documents) {
+                                        // Save documents first
+                                        obj.documents.save(
+                                            function () {
+                                                if (t && tid && t.aborted(tid)) {
+                                                    saveResult = false;
+                                                    callback('aborted');
+                                                }
+                                                callback();
+                                            },
+                                            function (error) {
+                                                saveResult = false;
+                                                callback(error);
+                                            }
+                                        );
+                                    }
+                                }
+                            }
+                        },
+                        function (error) {
+                            if (!error && saveResult) {
+                                // удаляем ненужные объекты перед сохранением
+                                // вызываем колбек
+                                if (t & !params.skipTransactionEnd) t.end();
+                                _.each(params.item.content, function(item){
+                                    delete item.pictures;
+                                    delete item.documents;
+                                });
+                                if (successCallback) successCallback();
+                            } else {
+                                // вызываем ошибочный колбек
+                                if (t) t.end(error);
+                                if (errorCallback) {
+                                    errorCallback(error);
+                                }
+                            }
+                        }
+                    );
+                } else {
+                    if (params.pictures) {
+                        // Save pictures first
+                        params.pictures.save(
+                            function () {
+                                if (t && tid && t.aborted(tid)) return;
+
+                                // Save documents second
+                                if (params.documents) {
+                                    params.documents.save(
+                                        function () {
+                                            if (t && tid && t.aborted(tid)) return;
+                                            // Do everything else
+                                            if (t & !params.skipTransactionEnd) t.end();
+                                            if (successCallback) successCallback();
+                                        },
+                                        function (error) {
+                                            if (t) t.end(error);
+                                            if (errorCallback) errorCallback(error);
+                                        }
+                                    );
+                                } else {
+                                    // Do everything else
+                                    if (t & !params.skipTransactionEnd) t.end();
+                                    if (successCallback) successCallback();
+                                }
+                            },
+                            function (error) {
+                                if (t) t.end(error);
+                                if (errorCallback) errorCallback(error);
+                            }
+                        );
+                    } else if (params.documents) {
+                        // Save documents first
+                        params.documents.save(
+                            function () {
+                                if (t && tid && t.aborted(tid)) return;
+                                // Do everything else
+                                if (t & !params.skipTransactionEnd) t.end();
+                                if (successCallback) successCallback();
+                            },
+                            function (error) {
+                                if (t) t.end(error);
+                                if (errorCallback) errorCallback(error);
+                            }
+                        );
+                    } else {
+                        // Do everything else
+                        if (t & !params.skipTransactionEnd) t.end();
+                        if (successCallback) successCallback();
+                    }
+                }
+            };
+
+            // Abort transaction with file upload
+            function abortFilesCurl(params) {
+                if (params.pictures) 
+                    params.pictures.abort();
+                if (params.documents)
+                    params.documents.abort();
+                    if (params.transaction)
+                    params.transaction.abort();  
+            };
+
+            return {
+                // extendApi: extendApi,
+
+                // Executing transactional requests to server
+                execute: executeCurl,
+
+                // Creating an object
+                create: createCurl,
+
+                // Updating an object
+                update: updateCurl,
+                save: updateCurl,
+
+                // Deleting an object
+                'delete': deleteCurl,
+                remove: deleteCurl,
+
+                // Reading objects
+                read: readCurl,
+                query: readCurl,
+
+                // Reading a single object
+                readOne: readOneCurl,
+                get: readOneCurl,
+
+                // Reading paginated results
+                page: pageCurl,
+                readPage: pageCurl,
+                queryPage: pageCurl,
+
+                // Saving files to file store
+                saveFiles: saveFilesCurl,
+                abortFiles: abortFilesCurl
+            }
+        }];
+    });
+
+})();
+
+/**
+ * @file Session data model
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global _, angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipSessionData', ['pipRest', 'pipSessionCache']);
+
+    thisModule.provider('pipSessionData', function() {
+
+        readUserResolver.$inject = ['pipSessionCache'];
+        readPartyResolver.$inject = ['pipSessionCache', '$stateParams'];
+        readConnectionResolver.$inject = ['pipSessionCache', '$stateParams'];
+        readSettingsResolver.$inject = ['pipSessionCache'];
+        readSessionsUserResolver.$inject = ['$stateParams', 'pipRest', '$rootScope'];
+        readSessionIdResolver.$inject = ['$stateParams', 'pipSession'];
+        this.readUserResolver = /* @ngInject */ readUserResolver;
+        this.readPartyResolver = /* @ngInject */ readPartyResolver;
+        this.readConnectionResolver = /* @ngInject */ readConnectionResolver;
+        this.readSettingsResolver = /* @ngInject */ readSettingsResolver;
+
+        this.readSessionsUserResolver = /* @ngInject */ readSessionsUserResolver;
+        this.readSessionIdResolver = /* @ngInject */ readSessionIdResolver;
+
+        this.$get = ['$rootScope', '$stateParams', 'pipRest', 'pipDataModel', 'pipSessionCache', function($rootScope, $stateParams, pipRest, pipDataModel, pipSessionCache) {
+            return {
+                getSessionId: getSessionId,
+                removeSession: removeSession,
+                readSessionsUser: function (params, successCallback, errorCallback) {
+                    params.resource = 'userSessions';
+                    params.item = params.item || {};
+                    params.item.party_id = $stateParams.id;
+                    params.party_id = $stateParams.id;
+                    return  pipSessionCache.readSessions(params, successCallback, errorCallback);
+
+                }
+            };
+
+            function getSessionId(pipSession){
+                return function () {
+                    return pipSession.sessionId();
+                };
+            };
+
+            function removeSession(transaction, session, successCallback, errorCallback) {
+                var tid = transaction.begin('REMOVING');
+                if (!tid) return;
+
+                pipRest.userSessions().remove(
+                    {
+                        id: session.id,
+                        party_id: $stateParams.id
+                    },
+                    function (removedSession) {
+                        if (transaction.aborted(tid)) return;
+                        else transaction.end();
+
+                        if (successCallback) successCallback(removedSession);
+                    },
+                    function (error) {
+                        transaction.end(error);
+                        if (errorCallback) errorCallback(error);
+                    }
+                );
+            };
+            
+        }];
+        //--------------
+
+        function readUserResolver(pipSessionCache) {
+            return pipSessionCache.readUser();                             
+        };
+
+        function readPartyResolver(pipSessionCache, $stateParams) {
+            return pipSessionCache.readParty($stateParams);
+        };
+
+        function readConnectionResolver(pipSessionCache, $stateParams) {
+            return pipSessionCache.readConnection($stateParams);
+        };
+
+        function readSettingsResolver(pipSessionCache) {
+            return pipSessionCache.readSettings();                             
+        };
+
+        function readSessionsUserResolver($stateParams, pipRest, $rootScope) {
+            return pipRest.userSessions().query({
+                party_id: $stateParams.id
+            }).$promise;
+        };
+
+        function readSessionIdResolver($stateParams, pipSession) {
+            return pipSession.sessionId();
+        };
+        
+    });
+
+})();
+
 
 
 /**
@@ -12293,45 +12293,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date/date.html',
-    '<!--\n' +
-    '@file Date control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
-    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '	<div class="w16 flex-fixed"></div>\n' +
-    '	<md-input-container class="tm0 flex">\n' +
-    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
-    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
-    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
-    '		</md-select>\n' +
-    '	</md-input-container>\n' +
-    '</div>\n' +
-    '					');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('date_range/date_range.html',
     '<!--\n' +
     '@file Date range control content\n' +
@@ -12495,6 +12456,45 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('date/date.html',
+    '<!--\n' +
+    '@file Date control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-day tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-month tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()">\n' +
+    '			<md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="w16 flex-fixed"></div>\n' +
+    '	<md-input-container class="tm0 flex">\n' +
+    '		<md-select class="pip-date-year tm0 flex" ng-disabled="disableControls"\n' +
+    '				   ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '</div>\n' +
+    '					');
 }]);
 })();
 
@@ -12696,24 +12696,6 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.template.html',
-    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
-    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
-    '</div>\n' +
-    '\n' +
-    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipBasicControls.Templates');
-} catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('progress/routing_progress.html',
     '<div class="pip-routing-progress layout-column layout-align-center-center"\n' +
     '     ng-show="$routing || $reset || toolInitialized">\n' +
@@ -12740,20 +12722,14 @@ try {
   module = angular.module('pipBasicControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tags/tag_list.html',
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
-    '     ng-if="pipType && !pipTypeLocal">\n' +
-    '\n' +
-    '    <span>{{pipType.toUpperCase() | translate | uppercase}}</span>\n' +
+  $templateCache.put('popover/popover.template.html',
+    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
+    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
     '</div>\n' +
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
-    '     ng-if="pipType && pipTypeLocal">\n' +
     '\n' +
-    '    <span>{{pipTypeLocal.toUpperCase() | translate | uppercase}}</span>\n' +
+    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
     '</div>\n' +
-    '<div class="pip-chip rm4" ng-repeat="tag in pipTags">\n' +
-    '    <span>{{::tag}}</span>\n' +
-    '</div>');
+    '');
 }]);
 })();
 
@@ -12770,6 +12746,30 @@ module.run(['$templateCache', function($templateCache) {
     '    <span  class="rm4 lm4" ng-if="data.start && data.end"> - </span>\n' +
     '    <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span>\n' +
     '</p>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipBasicControls.Templates');
+} catch (e) {
+  module = angular.module('pipBasicControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tags/tag_list.html',
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
+    '     ng-if="pipType && !pipTypeLocal">\n' +
+    '\n' +
+    '    <span>{{pipType.toUpperCase() | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
+    '     ng-if="pipType && pipTypeLocal">\n' +
+    '\n' +
+    '    <span>{{pipTypeLocal.toUpperCase() | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4" ng-repeat="tag in pipTags">\n' +
+    '    <span>{{::tag}}</span>\n' +
+    '</div>');
 }]);
 })();
 
@@ -13038,177 +13038,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular);
-
-/**
- * @file Date control
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Improve samples int sampler app
- * - Optimize. It is way to slow on samples
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipDate', ['pipBasicControls.Templates']);
-
-    thisModule.directive('pipDate',
-        function () {
-            return {
-                restrict: 'EA',
-                require: 'ngModel',
-                scope: {
-                    timeMode: '@pipTimeMode',
-                    disabled: '&ngDisabled',
-                    model: '=ngModel',
-                    ngChange: '&'
-                },
-                templateUrl: 'date/date.html',
-                controller: 'pipDateController'
-            };
-        }
-    );
-
-    thisModule.controller('pipDateController',
-        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
-            var value;
-
-            function dayList(month, year) {
-                var count = 31, days = [], i;
-
-                if (month === 4 || month === 6 || month === 9 || month === 11) {
-                    count = 30;
-                } else if (month === 2) {
-                    if (year) {
-                        // Calculate leap year (primitive)
-                        count = year % 4 === 0 ? 29 : 28;
-                    } else {
-                        count = 28;
-                    }
-                }
-
-                for (i = 1; i <= count; i++) {
-                    days.push(i);
-                }
-
-                return days;
-            }
-
-            function monthList() {
-                var months = [], i;
-
-                for (i = 1; i <= 12; i++) {
-                    months.push({
-                        id: i,
-                        name: pipTranslate.translate('MONTH_' + i)
-                    });
-                }
-
-                return months;
-            }
-
-            function yearList() {
-                var i,
-                    currentYear = new Date().getFullYear(),
-                    startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100,
-                    endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100,
-                    years = [];
-
-                if ($scope.timeMode === 'past') {
-                    for (i = endYear; i >= startYear; i--) {
-                        years.push(i);
-                    }
-                } else {
-                    for (i = startYear; i <= endYear; i++) {
-                        years.push(i);
-                    }
-                }
-
-                return years;
-            }
-
-            function adjustDay() {
-                var days = dayList($scope.month, $scope.year);
-
-                if ($scope.days.length !== days.length) {
-                    if ($scope.day > days.length) {
-                        $scope.day = days.length;
-                    }
-
-                    $scope.days = days;
-                }
-            }
-
-            function getValue(v) {
-                var value = v ? _.isDate(v) ? v : new Date(v) : null,
-                    day = value ? value.getDate() : null,
-                    month = value ? value.getMonth() + 1 : null,
-                    year = value ? value.getFullYear() : null;
-
-                // Update day list if month and year were changed
-                if ($scope.month !== month && $scope.year !== year) {
-                    $scope.days = dayList($scope.month, $scope.year);
-                }
-
-                // Assign values to scope
-                $scope.day = day;
-                $scope.month = month;
-                $scope.year = year;
-            }
-
-            function setValue() {
-                var value;
-
-                if ($scope.day && $scope.month && $scope.year) {
-                    value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
-                    $scope.model = value;
-                    $scope.ngChange();
-                }
-            }
-
-            $scope.onDayChanged = function () {
-                setValue();
-            };
-
-            $scope.onMonthChanged = function () {
-                adjustDay();
-                setValue();
-            };
-
-            $scope.onYearChanged = function () {
-                adjustDay();
-                setValue();
-            };
-
-            // Set initial values
-            value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
-            $scope.day = value ? value.getDate() : null;
-            $scope.month = value ? value.getMonth() + 1 : null;
-            $scope.year = value ? value.getFullYear() : null;
-
-            $scope.dayLabel = pipTranslate.translate('DAY');
-            $scope.monthLabel = pipTranslate.translate('MONTH');
-            $scope.yearLabel = pipTranslate.translate('YEAR');
-
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.months = monthList();
-            $scope.years = yearList();
-
-            $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-
-            // React on changes
-            $scope.$watch('model', function (newValue) {
-                getValue(newValue);
-            });
-
-            $scope.$watch($scope.disabled, function (newValue) {
-                $scope.disableControls = newValue;
-            });
-        }]
-    );
-
-})(window.angular, window._);
-
 
 /**
  * @file Date range control
@@ -13624,6 +13453,177 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window._);
+
+/**
+ * @file Date control
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Improve samples int sampler app
+ * - Optimize. It is way to slow on samples
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipDate', ['pipBasicControls.Templates']);
+
+    thisModule.directive('pipDate',
+        function () {
+            return {
+                restrict: 'EA',
+                require: 'ngModel',
+                scope: {
+                    timeMode: '@pipTimeMode',
+                    disabled: '&ngDisabled',
+                    model: '=ngModel',
+                    ngChange: '&'
+                },
+                templateUrl: 'date/date.html',
+                controller: 'pipDateController'
+            };
+        }
+    );
+
+    thisModule.controller('pipDateController',
+        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
+            var value;
+
+            function dayList(month, year) {
+                var count = 31, days = [], i;
+
+                if (month === 4 || month === 6 || month === 9 || month === 11) {
+                    count = 30;
+                } else if (month === 2) {
+                    if (year) {
+                        // Calculate leap year (primitive)
+                        count = year % 4 === 0 ? 29 : 28;
+                    } else {
+                        count = 28;
+                    }
+                }
+
+                for (i = 1; i <= count; i++) {
+                    days.push(i);
+                }
+
+                return days;
+            }
+
+            function monthList() {
+                var months = [], i;
+
+                for (i = 1; i <= 12; i++) {
+                    months.push({
+                        id: i,
+                        name: pipTranslate.translate('MONTH_' + i)
+                    });
+                }
+
+                return months;
+            }
+
+            function yearList() {
+                var i,
+                    currentYear = new Date().getFullYear(),
+                    startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100,
+                    endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100,
+                    years = [];
+
+                if ($scope.timeMode === 'past') {
+                    for (i = endYear; i >= startYear; i--) {
+                        years.push(i);
+                    }
+                } else {
+                    for (i = startYear; i <= endYear; i++) {
+                        years.push(i);
+                    }
+                }
+
+                return years;
+            }
+
+            function adjustDay() {
+                var days = dayList($scope.month, $scope.year);
+
+                if ($scope.days.length !== days.length) {
+                    if ($scope.day > days.length) {
+                        $scope.day = days.length;
+                    }
+
+                    $scope.days = days;
+                }
+            }
+
+            function getValue(v) {
+                var value = v ? _.isDate(v) ? v : new Date(v) : null,
+                    day = value ? value.getDate() : null,
+                    month = value ? value.getMonth() + 1 : null,
+                    year = value ? value.getFullYear() : null;
+
+                // Update day list if month and year were changed
+                if ($scope.month !== month && $scope.year !== year) {
+                    $scope.days = dayList($scope.month, $scope.year);
+                }
+
+                // Assign values to scope
+                $scope.day = day;
+                $scope.month = month;
+                $scope.year = year;
+            }
+
+            function setValue() {
+                var value;
+
+                if ($scope.day && $scope.month && $scope.year) {
+                    value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                    $scope.model = value;
+                    $scope.ngChange();
+                }
+            }
+
+            $scope.onDayChanged = function () {
+                setValue();
+            };
+
+            $scope.onMonthChanged = function () {
+                adjustDay();
+                setValue();
+            };
+
+            $scope.onYearChanged = function () {
+                adjustDay();
+                setValue();
+            };
+
+            // Set initial values
+            value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
+            $scope.day = value ? value.getDate() : null;
+            $scope.month = value ? value.getMonth() + 1 : null;
+            $scope.year = value ? value.getFullYear() : null;
+
+            $scope.dayLabel = pipTranslate.translate('DAY');
+            $scope.monthLabel = pipTranslate.translate('MONTH');
+            $scope.yearLabel = pipTranslate.translate('YEAR');
+
+            $scope.days = dayList($scope.month, $scope.year);
+            $scope.months = monthList();
+            $scope.years = yearList();
+
+            $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
+
+            // React on changes
+            $scope.$watch('model', function (newValue) {
+                getValue(newValue);
+            });
+
+            $scope.$watch($scope.disabled, function (newValue) {
+                $scope.disableControls = newValue;
+            });
+        }]
+    );
+
+})(window.angular, window._);
+
 
 /**
  * @file Confirmation dialog
@@ -14123,6 +14123,186 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
+ * @file Popover control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, $, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipPopover', ['pipAssert']);
+
+    thisModule.directive('pipPopover', function () {
+        return {
+            restrict: 'EA',
+            scope: true,
+            templateUrl: 'popover/popover.template.html',
+            controller: ['$scope', '$rootScope', '$element', '$timeout', '$compile', function ($scope, $rootScope, $element, $timeout, $compile) {
+                var backdropElement, content;
+
+                backdropElement = $('.pip-popover-backdrop');
+                backdropElement.on('click keydown scroll', backdropClick);
+                backdropElement.addClass($scope.params.responsive !== false ? 'pip-responsive' : '');
+
+                $timeout(function () {
+                    position();
+                    if ($scope.params.template) {
+                        content = $compile($scope.params.template)($scope);
+                        $element.find('.pip-popover').append(content);
+                    }
+
+                    init();
+                });
+
+                $timeout(function () {
+                    calcHeight();
+                }, 200);
+
+                $scope.onPopoverClick = onPopoverClick;
+                $scope = _.defaults($scope, $scope.$parent);    // eslint-disable-line 
+
+                $rootScope.$on('pipPopoverResize', onResize);
+                $(window).resize(onResize);
+
+                function init() {
+                    backdropElement.addClass('opened');
+                    $('.pip-popover-backdrop').focus();
+                    if ($scope.params.timeout) {
+                        $timeout(function () {
+                            closePopover();
+                        }, $scope.params.timeout);
+                    }
+                }
+
+                function backdropClick() {
+                    if ($scope.params.cancelCallback) {
+                        $scope.params.cancelCallback();
+                    }
+
+                    closePopover();
+                }
+
+                function closePopover() {
+                    backdropElement.removeClass('opened');
+                    $timeout(function () {
+                        backdropElement.remove();
+                    }, 100);
+                }
+
+                function onPopoverClick($e) {
+                    $e.stopPropagation();
+                }
+
+                function position() {
+                    if ($scope.params.element) {
+                        var element = $($scope.params.element),
+                            pos = element.offset(),
+                            width = element.width(),
+                            height = element.height(),
+                            docWidth = $(document).width(),
+                            docHeight = $(document).height(),
+                            popover = backdropElement.find('.pip-popover');
+
+                        if (pos) {
+                            popover
+                                .css('max-width', docWidth - (docWidth - pos.left))
+                                .css('max-height', docHeight - (pos.top + height) - 32, 0)
+                                .css('left', pos.left - popover.width() + width / 2)
+                                .css('top', pos.top + height + 16);
+                        }
+                    }
+                }
+
+                function calcHeight() {
+                    if ($scope.params.calcHeight === false) { return; }
+
+                    var popover = backdropElement.find('.pip-popover'),
+                        title = popover.find('.pip-title'),
+                        footer = popover.find('.pip-footer'),
+                        content = popover.find('.pip-content'),
+                        contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
+
+                    content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
+                }
+
+                function onResize() {
+                    backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
+                    position();
+                    calcHeight();
+                }
+            }]
+        };
+    });
+
+    thisModule.service('$pipPopover',
+        ['$compile', '$rootScope', '$timeout', function ($compile, $rootScope, $timeout) {
+            var popoverTemplate;
+
+            popoverTemplate = "<div class='pip-popover-backdrop {{ params.class }}' ng-controller='params.controller'" +
+                " tabindex='1'> <pip-popover pip-params='params'> </pip-popover> </div>";
+
+            return {
+                show: onShow,
+                hide: onHide,
+                resize: onResize
+            };
+
+            function onShow(p) {
+                var element, scope, params, content;
+
+                element = $('body');
+                if (element.find('md-backdrop').length > 0) { return; }
+                onHide();
+                scope = $rootScope.$new();
+                params = p && _.isObject(p) ? p : {};
+                scope.params = params;
+                scope.locals = params.locals;
+                content = $compile(popoverTemplate)(scope);
+                element.append(content);
+            }
+
+            function onHide() {
+                var backdropElement = $('.pip-popover-backdrop');
+
+                backdropElement.removeClass('opened');
+                $timeout(function () {
+                    backdropElement.remove();
+                }, 100);
+            }
+
+            function onResize() {
+                $rootScope.$broadcast('pipPopoverResize');
+            }
+
+        }]
+    );
+
+})(window.angular, window.jQuery, window._);
+
+/**
+ * @file Routing progress control
+ * @description
+ * This progress control is enabled by ui router
+ * while switching between pages
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
+
+    thisModule.directive('pipRoutingProgress', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            templateUrl: 'progress/routing_progress.html'
+        };
+    });
+
+})(window.angular);
+
+/**
  * @file Options dialog
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -14360,186 +14540,6 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window.jQuery, window._);
 
 /**
- * @file Popover control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, $, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipPopover', ['pipAssert']);
-
-    thisModule.directive('pipPopover', function () {
-        return {
-            restrict: 'EA',
-            scope: true,
-            templateUrl: 'popover/popover.template.html',
-            controller: ['$scope', '$rootScope', '$element', '$timeout', '$compile', function ($scope, $rootScope, $element, $timeout, $compile) {
-                var backdropElement, content;
-
-                backdropElement = $('.pip-popover-backdrop');
-                backdropElement.on('click keydown scroll', backdropClick);
-                backdropElement.addClass($scope.params.responsive !== false ? 'pip-responsive' : '');
-
-                $timeout(function () {
-                    position();
-                    if ($scope.params.template) {
-                        content = $compile($scope.params.template)($scope);
-                        $element.find('.pip-popover').append(content);
-                    }
-
-                    init();
-                });
-
-                $timeout(function () {
-                    calcHeight();
-                }, 200);
-
-                $scope.onPopoverClick = onPopoverClick;
-                $scope = _.defaults($scope, $scope.$parent);    // eslint-disable-line 
-
-                $rootScope.$on('pipPopoverResize', onResize);
-                $(window).resize(onResize);
-
-                function init() {
-                    backdropElement.addClass('opened');
-                    $('.pip-popover-backdrop').focus();
-                    if ($scope.params.timeout) {
-                        $timeout(function () {
-                            closePopover();
-                        }, $scope.params.timeout);
-                    }
-                }
-
-                function backdropClick() {
-                    if ($scope.params.cancelCallback) {
-                        $scope.params.cancelCallback();
-                    }
-
-                    closePopover();
-                }
-
-                function closePopover() {
-                    backdropElement.removeClass('opened');
-                    $timeout(function () {
-                        backdropElement.remove();
-                    }, 100);
-                }
-
-                function onPopoverClick($e) {
-                    $e.stopPropagation();
-                }
-
-                function position() {
-                    if ($scope.params.element) {
-                        var element = $($scope.params.element),
-                            pos = element.offset(),
-                            width = element.width(),
-                            height = element.height(),
-                            docWidth = $(document).width(),
-                            docHeight = $(document).height(),
-                            popover = backdropElement.find('.pip-popover');
-
-                        if (pos) {
-                            popover
-                                .css('max-width', docWidth - (docWidth - pos.left))
-                                .css('max-height', docHeight - (pos.top + height) - 32, 0)
-                                .css('left', pos.left - popover.width() + width / 2)
-                                .css('top', pos.top + height + 16);
-                        }
-                    }
-                }
-
-                function calcHeight() {
-                    if ($scope.params.calcHeight === false) { return; }
-
-                    var popover = backdropElement.find('.pip-popover'),
-                        title = popover.find('.pip-title'),
-                        footer = popover.find('.pip-footer'),
-                        content = popover.find('.pip-content'),
-                        contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
-
-                    content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
-                }
-
-                function onResize() {
-                    backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
-                    position();
-                    calcHeight();
-                }
-            }]
-        };
-    });
-
-    thisModule.service('$pipPopover',
-        ['$compile', '$rootScope', '$timeout', function ($compile, $rootScope, $timeout) {
-            var popoverTemplate;
-
-            popoverTemplate = "<div class='pip-popover-backdrop {{ params.class }}' ng-controller='params.controller'" +
-                " tabindex='1'> <pip-popover pip-params='params'> </pip-popover> </div>";
-
-            return {
-                show: onShow,
-                hide: onHide,
-                resize: onResize
-            };
-
-            function onShow(p) {
-                var element, scope, params, content;
-
-                element = $('body');
-                if (element.find('md-backdrop').length > 0) { return; }
-                onHide();
-                scope = $rootScope.$new();
-                params = p && _.isObject(p) ? p : {};
-                scope.params = params;
-                scope.locals = params.locals;
-                content = $compile(popoverTemplate)(scope);
-                element.append(content);
-            }
-
-            function onHide() {
-                var backdropElement = $('.pip-popover-backdrop');
-
-                backdropElement.removeClass('opened');
-                $timeout(function () {
-                    backdropElement.remove();
-                }, 100);
-            }
-
-            function onResize() {
-                $rootScope.$broadcast('pipPopoverResize');
-            }
-
-        }]
-    );
-
-})(window.angular, window.jQuery, window._);
-
-/**
- * @file Routing progress control
- * @description
- * This progress control is enabled by ui router
- * while switching between pages
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
-
-    thisModule.directive('pipRoutingProgress', function () {
-        return {
-            restrict: 'EA',
-            replace: true,
-            templateUrl: 'progress/routing_progress.html'
-        };
-    });
-
-})(window.angular);
-
-/**
  * @file Refresh button control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -14661,75 +14661,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })(window.angular);
 
-
-/**
- * @file Time control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
-
-    thisModule.directive('pipTimeRange',
-        ['pipUtils', function (pipUtils) {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipStartDate: '=',
-                    pipEndDate: '='
-                },
-                templateUrl: 'time_range/time_range.html',
-                link: function ($scope, $element, $attrs) {
-
-                    function getDateJSON(value) {
-                        return value ? new Date(value) : null;
-                    }
-
-                    function defineStartDate() {
-                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
-                                : getDateJSON($scope.pipStartDate);
-                        }
-                    }
-
-                    function defineEndDate() {
-                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
-                                : getDateJSON($scope.pipEndDate);
-                        }
-                    }
-
-                    $scope.data = {};
-                    $scope.data.start = null;
-                    $scope.data.end = null;
-                    defineStartDate();
-                    defineEndDate();
-
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
-                        $scope.$watch('pipStartDate',
-                            function () {
-                                $scope.data.start = null;
-                                defineStartDate();
-                            }
-                        );
-                        $scope.$watch('pipEndDate',
-                            function () {
-                                $scope.data.end = null;
-                                defineEndDate();
-                            }
-                        );
-                    }
-
-                    // Add class
-                    $element.addClass('pip-time-range');
-                }
-            };
-        }]
-    );
-
-})(window.angular, window._);
 
 
 (function (angular, _) {
@@ -15002,6 +14933,75 @@ module.run(['$templateCache', function($templateCache) {
 
             // Add class
             $element.addClass('pip-time-range-edit');
+        }]
+    );
+
+})(window.angular, window._);
+
+/**
+ * @file Time control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
+
+    thisModule.directive('pipTimeRange',
+        ['pipUtils', function (pipUtils) {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipStartDate: '=',
+                    pipEndDate: '='
+                },
+                templateUrl: 'time_range/time_range.html',
+                link: function ($scope, $element, $attrs) {
+
+                    function getDateJSON(value) {
+                        return value ? new Date(value) : null;
+                    }
+
+                    function defineStartDate() {
+                        if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                            $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
+                                : getDateJSON($scope.pipStartDate);
+                        }
+                    }
+
+                    function defineEndDate() {
+                        if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                            $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
+                                : getDateJSON($scope.pipEndDate);
+                        }
+                    }
+
+                    $scope.data = {};
+                    $scope.data.start = null;
+                    $scope.data.end = null;
+                    defineStartDate();
+                    defineEndDate();
+
+                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                        $scope.$watch('pipStartDate',
+                            function () {
+                                $scope.data.start = null;
+                                defineStartDate();
+                            }
+                        );
+                        $scope.$watch('pipEndDate',
+                            function () {
+                                $scope.data.end = null;
+                                defineEndDate();
+                            }
+                        );
+                    }
+
+                    // Add class
+                    $element.addClass('pip-time-range');
+                }
+            };
         }]
     );
 
@@ -15369,6 +15369,25 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dropdown/dropdown.html',
+    '<md-content class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}">\n' +
+    '    <div class="pip-divider position-top m0"></div>\n' +
+    '        <md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple md-on-close="onSelect(selectedIndex)">\n' +
+    '            <md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">\n' +
+    '                {{ (action.title || action.name) | translate }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '</md-content>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('appbar/appbar.html',
     '<!--\n' +
     '@file App Bar component\n' +
@@ -15616,15 +15635,30 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dropdown/dropdown.html',
-    '<md-content class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}">\n' +
-    '    <div class="pip-divider position-top m0"></div>\n' +
-    '        <md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple md-on-close="onSelect(selectedIndex)">\n' +
-    '            <md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">\n' +
-    '                {{ (action.title || action.name) | translate }}\n' +
+  $templateCache.put('tabs/tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
+    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
+    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
+    '            <md-tab-label>\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
+    '            </md-tab-label>\n' +
+    '        </md-tab>\n' +
+    '    </md-tabs>\n' +
+    '    <md-content class="md-subhead color-primary-bg md-hue-1 " ng-if="$mdMedia(\'xs\')">\n' +
+    '        <div class="pip-divider position-top m0"></div>\n' +
+    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
+    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
+    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
+    '                {{ ::tab.nameLocal }}\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
+    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
     '            </md-option>\n' +
     '        </md-select>\n' +
-    '</md-content>');
+    '    </md-content>\n' +
+    '</md-toolbar>\n' +
+    '');
 }]);
 })();
 
@@ -15713,40 +15747,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </md-list>\n' +
     '\n' +
     '</md-sidenav>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}">\n' +
-    '    <md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true">\n' +
-    '        <md-tab ng-repeat="tab in tabs track by $index"  ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)">\n' +
-    '            <md-tab-label>\n' +
-    '                {{ ::tab.nameLocal }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-tab-label>\n' +
-    '        </md-tab>\n' +
-    '    </md-tabs>\n' +
-    '    <md-content class="md-subhead color-primary-bg md-hue-1 " ng-if="$mdMedia(\'xs\')">\n' +
-    '        <div class="pip-divider position-top m0"></div>\n' +
-    '        <md-select ng-model="activeIndex" ng-disabled="disabled()"\n' +
-    '                   md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple md-on-close="onSelect(activeIndex)">\n' +
-    '            <md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}" >\n' +
-    '                {{ ::tab.nameLocal }}\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div>\n' +
-    '                <div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div>\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '    </md-content>\n' +
-    '</md-toolbar>\n' +
     '');
 }]);
 })();
@@ -17945,6 +17945,72 @@ try {
   module = angular.module('pipDocuments.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('document_list_edit/document_list_edit.html',
+    '<!--\n' +
+    '@file Document list edit control content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '<div pip-focusable>\n' +
+    '	<div class="pip-document-upload pointer md-primary "\n' +
+    '		 ng-class="{\'pip-focusable\' : !ngDisabled(), \'pip-item-error\' : item.state == \'error\'}"\n' +
+    '		 ng-keydown="onKeyDown($event, item)"\n' +
+    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
+    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
+    '\n' +
+    '		<div class="pip-default-icon"\n' +
+    '			 ng-class="{ \'pip-document-new\': item.id == null }">\n' +
+    '			<md-icon pip-cancel-drag="true" class="md-primary" ng-if="item.state == \'original\' || item.state == \'added\'"\n' +
+    '					 md-svg-icon="icons:{{::documentList.icon}}">\n' +
+    '			</md-icon>\n' +
+    '			<md-icon pip-cancel-drag="true" class="md-warn" ng-if="item.state == \'error\'"\n' +
+    '					 md-svg-icon="icons:{{::documentList.iconError}}">\n' +
+    '			</md-icon>\n' +
+    '		</div>\n' +
+    '\n' +
+    '		<div class="pip-document-title" pip-cancel-drag="true">\n' +
+    '			{{::item.name}}\n' +
+    '		</div>\n' +
+    '		<md-button ng-click="onDelete(item)"\n' +
+    '				   ng-disabled="ngDisabled() || control.uploading"\n' +
+    '				   tabindex="-1"\n' +
+    '				   ng-hide="ngDisabled()"\n' +
+    '				   class="md-icon-button" aria-label="DELETE">\n' +
+    '\n' +
+    '			<md-icon md-svg-icon="icons:cross" pip-cancel-drag="true"></md-icon>\n' +
+    '		</md-button>\n' +
+    '		<md-progress-linear ng-show="item.uploading" ng-value="item.progress"></md-progress-linear>\n' +
+    '	</div>\n' +
+    '	\n' +
+    '	<button class="pip-document-upload pip-document-drop "\n' +
+    '			ng-class="{\'pip-focusable\' : !ngDisabled()}"\n' +
+    '			ng-keydown="onKeyDown($event)" tabindex="0"\n' +
+    '			ng-file-drop ng-file-select ng-file-change="onSelect($files)"\n' +
+    '			ng-multiple="true"\n' +
+    '			ng-disabled="ngDisabled() || control.uploading"\n' +
+    '			aria-label="UPLOAD">\n' +
+    '\n' +
+    '		<div class="pip-default-icon">\n' +
+    '			<md-icon pip-cancel-drag="true" md-svg-icon="icons:{{::documentList.icon}}"></md-icon>\n' +
+    '		</div>\n' +
+    '		<div class="pip-default-text">\n' +
+    '			<span>\n' +
+    '				{{documentList.text | translate}}\n' +
+    '			</span>\n' +
+    '		</div>\n' +
+    '	</button>\n' +
+    '	<div class="clearfix"></div>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDocuments.Templates');
+} catch (e) {
+  module = angular.module('pipDocuments.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('document_list/document_list.html',
     '<!--\n' +
     '@file Document list control content\n' +
@@ -18020,72 +18086,6 @@ module.run(['$templateCache', function($templateCache) {
     '            {{::document.file_name}}\n' +
     '        </div>\n' +
     '    </md-button>\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDocuments.Templates');
-} catch (e) {
-  module = angular.module('pipDocuments.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('document_list_edit/document_list_edit.html',
-    '<!--\n' +
-    '@file Document list edit control content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '<div pip-focusable>\n' +
-    '	<div class="pip-document-upload pointer md-primary "\n' +
-    '		 ng-class="{\'pip-focusable\' : !ngDisabled(), \'pip-item-error\' : item.state == \'error\'}"\n' +
-    '		 ng-keydown="onKeyDown($event, item)"\n' +
-    '		 tabindex="{{ ngDisabled() ? -1 : 0 }}"\n' +
-    '		 ng-repeat="item in control.items | filter: filterItem">\n' +
-    '\n' +
-    '		<div class="pip-default-icon"\n' +
-    '			 ng-class="{ \'pip-document-new\': item.id == null }">\n' +
-    '			<md-icon pip-cancel-drag="true" class="md-primary" ng-if="item.state == \'original\' || item.state == \'added\'"\n' +
-    '					 md-svg-icon="icons:{{::documentList.icon}}">\n' +
-    '			</md-icon>\n' +
-    '			<md-icon pip-cancel-drag="true" class="md-warn" ng-if="item.state == \'error\'"\n' +
-    '					 md-svg-icon="icons:{{::documentList.iconError}}">\n' +
-    '			</md-icon>\n' +
-    '		</div>\n' +
-    '\n' +
-    '		<div class="pip-document-title" pip-cancel-drag="true">\n' +
-    '			{{::item.name}}\n' +
-    '		</div>\n' +
-    '		<md-button ng-click="onDelete(item)"\n' +
-    '				   ng-disabled="ngDisabled() || control.uploading"\n' +
-    '				   tabindex="-1"\n' +
-    '				   ng-hide="ngDisabled()"\n' +
-    '				   class="md-icon-button" aria-label="DELETE">\n' +
-    '\n' +
-    '			<md-icon md-svg-icon="icons:cross" pip-cancel-drag="true"></md-icon>\n' +
-    '		</md-button>\n' +
-    '		<md-progress-linear ng-show="item.uploading" ng-value="item.progress"></md-progress-linear>\n' +
-    '	</div>\n' +
-    '	\n' +
-    '	<button class="pip-document-upload pip-document-drop "\n' +
-    '			ng-class="{\'pip-focusable\' : !ngDisabled()}"\n' +
-    '			ng-keydown="onKeyDown($event)" tabindex="0"\n' +
-    '			ng-file-drop ng-file-select ng-file-change="onSelect($files)"\n' +
-    '			ng-multiple="true"\n' +
-    '			ng-disabled="ngDisabled() || control.uploading"\n' +
-    '			aria-label="UPLOAD">\n' +
-    '\n' +
-    '		<div class="pip-default-icon">\n' +
-    '			<md-icon pip-cancel-drag="true" md-svg-icon="icons:{{::documentList.icon}}"></md-icon>\n' +
-    '		</div>\n' +
-    '		<div class="pip-default-text">\n' +
-    '			<span>\n' +
-    '				{{documentList.text | translate}}\n' +
-    '			</span>\n' +
-    '		</div>\n' +
-    '	</button>\n' +
-    '	<div class="clearfix"></div>\n' +
     '</div>\n' +
     '');
 }]);
@@ -19185,187 +19185,6 @@ module.run(['$templateCache', function($templateCache) {
  * @todo
  * - Improve samples in sampler app
  * - Replace placeholder with default image generated on server
- * - Fix resizing problem
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipData', 'pipImageUtils']);
-
-    thisModule.directive('pipAvatar',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: false,
-                template: '<md-icon></md-icon><img/>'
-                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
-                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
-                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
-                controller: 'pipAvatarController'
-            }
-        }
-    );
-
-    thisModule.controller('pipAvatarController',
-        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipDataAvatar', 'pipStrings', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipDataAvatar, pipStrings, $http, pipImageUtils) {
-            var
-                $svg = $element.children('md-icon'),
-                $image = $element.children('img'),
-                $defaultBlock = $element.children('div'),
-                $iconFilm = $element.find('#icon-film'),
-                $iconTask = $element.find('#icon-task'),
-                $iconFolder = $element.find('#icon-folder'),
-                image = null,
-
-                partyIdGetter = $parse($attrs.pipPartyId),
-                partyNameGetter = $parse($attrs.pipPartyName),
-                typeGetter = $parse($attrs.pipEntityType),
-                idGetter = $parse($attrs.pipId),
-                urlGetter = $parse($attrs.pipImageUrl),
-
-                colors = pipDataAvatar.getAvatarColors(),
-                colorClasses = pipDataAvatar.getColorClasses(),
-                entityTypes = pipDataAvatar.getEntityTypes();
-
-            // When image is loaded resize/reposition it
-            $image.load(function ($event) {
-                image = $($event.target);
-                pipImageUtils.setImageMarginCSS($element, image);
-            });
-
-            // Add class
-            $element.addClass('pip-avatar flex-fixed');
-
-            if ($attrs.ngClass) {
-                $scope.$watch($attrs.ngClass, function () {
-                    setTimeout(function () {
-                        pipImageUtils.setImageMarginCSS($element, image);
-                    }, 50);
-                });
-            }
-
-            // Optimization to avoid binding
-            bindControl();
-
-            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
-                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
-            }
-
-            // Also optimization to avoid watch if it is unnecessary
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-
-                $scope.$watch(idGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-
-                $scope.$watch(urlGetter, function (newValue, oldValue) {
-                    if (oldValue !== newValue)
-                        bindControl();
-                });
-            }
-
-            return;
-
-            function refreshAvatar() {
-                $iconTask.css('display', 'none');
-                $iconFilm.css('display', 'none');
-                $iconFolder.css('display', 'none');
-                $defaultBlock.css('display', 'none');
-                $image.attr('src', '');
-                $svg.css('display', 'none');
-                $image.css('display', 'inline-block');
-                bindControl();
-            };
-
-            function bindControl() {
-                var
-                    partyName = partyNameGetter($scope),
-                    partyId = partyIdGetter($scope),
-                    id = idGetter($scope),
-                    type = typeGetter($scope),
-                    transUrl = urlGetter($scope);
-
-                $iconTask.css('display', 'none');
-                $iconFilm.css('display', 'none');
-                $iconFolder.css('display', 'none');
-                $defaultBlock.css('display', 'none');
-
-                // Timestamp to avoid caching images for too long
-                var params = {
-                    partyId: partyId, 
-                    partyName: partyName, 
-                    id: id, 
-                    type: type, 
-                    noRedirect: false, 
-                    noDefault: false
-                },
-                    url = transUrl || pipDataAvatar.getAvatarUrl(params);
-
-// todo abstract this code!!!
-                if ((type && id && partyId) || (partyId && partyName) || transUrl) {
-                    if (type && id && partyId) {
-                        if (type == 'category') return;
-
-                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
-                            $image.attr('src', url);
-                            $svg.css('display', 'none');
-                            $image.css('display', 'inline-block');
-                        } else {
-                            $defaultBlock.css('display', 'block');
-                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
-                            $element.addClass(colorClasses[colorClassIndex]);
-                            switch(type) {
-                                case 'vision':
-                                    $svg.css('display', 'none');
-                                    $iconFilm.css('display', 'inline-block');
-                                    $iconTask.css('display', 'none');
-                                    $iconFolder.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                                case 'event':
-                                    $svg.css('display', 'none');
-                                    $iconTask.css('display', 'inline-block');
-                                    $iconFilm.css('display', 'none');
-                                    $iconFolder.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                                case 'note':
-                                    $svg.css('display', 'none');
-                                    $iconFolder.css('display', 'inline-block');
-                                    $iconTask.css('display', 'none');
-                                    $iconFilm.css('display', 'none');
-                                    $image.css('display', 'none');
-                                    break;
-                            }
-                        }
-                    } else {
-                        $image.attr('src', url);
-                        $svg.css('display', 'none');
-                        $image.css('display', 'inline-block');
-                    }
-                }
-            };
-
-        }]
-    );
-
-})();
-
-
-/**
- * @file Avatar control
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Improve samples in sampler app
- * - Replace placeholder with default image generated on server
  * - Generate file url based on entity type, do not set it as full url via pipSrc
  */
  
@@ -19493,8 +19312,14 @@ module.run(['$templateCache', function($templateCache) {
                 $scope.control.url = '';
 
                 if (!afterDeleting) {
-                    var url = pipDataAvatar.getAvatarUrl($scope.pipPartyId(), '',
-                        $scope.pipId(), $scope.pipEntityType(), false, true);
+                    var url = pipDataAvatar.getAvatarUrl({
+                        partyId: $scope.pipPartyId(), 
+                        partyName: '',
+                        id: $scope.pipId(), 
+                        type: $scope.pipEntityType(), 
+                        noRedirect: false, 
+                        noDefault: true
+                    });
 
                     if (!url) return;
 
@@ -19696,6 +19521,187 @@ module.run(['$templateCache', function($templateCache) {
         }]        
     );
     
+})();
+
+
+/**
+ * @file Avatar control
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Improve samples in sampler app
+ * - Replace placeholder with default image generated on server
+ * - Fix resizing problem
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipAvatar", ['pipCore', 'pipData', 'pipImageUtils']);
+
+    thisModule.directive('pipAvatar',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: '<md-icon></md-icon><img/>'
+                + '<div><md-icon class="default_icon" id="icon-film" md-svg-icon="icons:film"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-task" md-svg-icon="icons:task"></md-icon>'
+                + '<md-icon class="default_icon" id="icon-folder" md-svg-icon="icons:folder"></md-icon></div>',
+                controller: 'pipAvatarController'
+            }
+        }
+    );
+
+    thisModule.controller('pipAvatarController',
+        ['$scope', '$rootScope', '$element', '$attrs', '$parse', 'pipUtils', 'pipDataAvatar', 'pipStrings', '$http', 'pipImageUtils', function ($scope, $rootScope, $element, $attrs, $parse, pipUtils, pipDataAvatar, pipStrings, $http, pipImageUtils) {
+            var
+                $svg = $element.children('md-icon'),
+                $image = $element.children('img'),
+                $defaultBlock = $element.children('div'),
+                $iconFilm = $element.find('#icon-film'),
+                $iconTask = $element.find('#icon-task'),
+                $iconFolder = $element.find('#icon-folder'),
+                image = null,
+
+                partyIdGetter = $parse($attrs.pipPartyId),
+                partyNameGetter = $parse($attrs.pipPartyName),
+                typeGetter = $parse($attrs.pipEntityType),
+                idGetter = $parse($attrs.pipId),
+                urlGetter = $parse($attrs.pipImageUrl),
+
+                colors = pipDataAvatar.getAvatarColors(),
+                colorClasses = pipDataAvatar.getColorClasses(),
+                entityTypes = pipDataAvatar.getEntityTypes();
+
+            // When image is loaded resize/reposition it
+            $image.load(function ($event) {
+                image = $($event.target);
+                pipImageUtils.setImageMarginCSS($element, image);
+            });
+
+            // Add class
+            $element.addClass('pip-avatar flex-fixed');
+
+            if ($attrs.ngClass) {
+                $scope.$watch($attrs.ngClass, function () {
+                    setTimeout(function () {
+                        pipImageUtils.setImageMarginCSS($element, image);
+                    }, 50);
+                });
+            }
+
+            // Optimization to avoid binding
+            bindControl();
+
+            if (pipUtils.toBoolean($attrs.pipRebindAvatar)) {
+                $rootScope.$on('pipPartyAvatarUpdated', refreshAvatar);
+            }
+
+            // Also optimization to avoid watch if it is unnecessary
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watch(partyIdGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(idGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+
+                $scope.$watch(urlGetter, function (newValue, oldValue) {
+                    if (oldValue !== newValue)
+                        bindControl();
+                });
+            }
+
+            return;
+
+            function refreshAvatar() {
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+                $image.attr('src', '');
+                $svg.css('display', 'none');
+                $image.css('display', 'inline-block');
+                bindControl();
+            };
+
+            function bindControl() {
+                var
+                    partyName = partyNameGetter($scope),
+                    partyId = partyIdGetter($scope),
+                    id = idGetter($scope),
+                    type = typeGetter($scope),
+                    transUrl = urlGetter($scope);
+
+                $iconTask.css('display', 'none');
+                $iconFilm.css('display', 'none');
+                $iconFolder.css('display', 'none');
+                $defaultBlock.css('display', 'none');
+
+                // Timestamp to avoid caching images for too long
+                var params = {
+                    partyId: partyId, 
+                    partyName: partyName, 
+                    id: id, 
+                    type: type, 
+                    noRedirect: false, 
+                    noDefault: false
+                },
+                    url = transUrl || pipDataAvatar.getAvatarUrl(params);
+
+// todo abstract this code!!!
+                if ((type && id && partyId) || (partyId && partyName) || transUrl) {
+                    if (type && id && partyId) {
+                        if (type == 'category') return;
+
+                        if (entityTypes[type] == 'goals' || entityTypes[type] == 'areas' ) {
+                            $image.attr('src', url);
+                            $svg.css('display', 'none');
+                            $image.css('display', 'inline-block');
+                        } else {
+                            $defaultBlock.css('display', 'block');
+                            var colorClassIndex = pipStrings.hashCode(id) % colors.length;
+                            $element.addClass(colorClasses[colorClassIndex]);
+                            switch(type) {
+                                case 'vision':
+                                    $svg.css('display', 'none');
+                                    $iconFilm.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'event':
+                                    $svg.css('display', 'none');
+                                    $iconTask.css('display', 'inline-block');
+                                    $iconFilm.css('display', 'none');
+                                    $iconFolder.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                                case 'note':
+                                    $svg.css('display', 'none');
+                                    $iconFolder.css('display', 'inline-block');
+                                    $iconTask.css('display', 'none');
+                                    $iconFilm.css('display', 'none');
+                                    $image.css('display', 'none');
+                                    break;
+                            }
+                        }
+                    } else {
+                        $image.attr('src', url);
+                        $svg.css('display', 'none');
+                        $image.css('display', 'inline-block');
+                    }
+                }
+            };
+
+        }]
+    );
+
 })();
 
 
@@ -20747,6 +20753,102 @@ module.run(['$templateCache', function($templateCache) {
 
 
 /**
+ * @file Picture URL dialog
+ * @copyright Digital Living Software Corp. 2014-2016
+ * @todo
+ * - Add sample to sampler app
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipPictureUrlDialog',
+        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
+
+    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'PICTURE_FROM_WEBLINK': 'Add from web link',
+            'LINK_PICTURE': 'Link to the picture...'
+        });
+        pipTranslateProvider.translations('ru', {
+            'PICTURE_FROM_WEBLINK': 'Добавить из веб ссылки',
+            'LINK_PICTURE': 'Ссылка на изображение...'
+        });
+    }]);
+
+    thisModule.factory('pipPictureUrlDialog',
+        ['$mdDialog', function ($mdDialog) {
+            return {
+                show: function (successCallback) {
+                    $mdDialog.show({
+                        templateUrl: 'picture_url_dialog/picture_url_dialog.html',
+                        clickOutsideToClose: true,
+                        controller: 'pipPictureUrlDialogController'
+                    }).then(function (result) {
+                        if (successCallback) {
+                            successCallback(result);
+                        }
+                    });
+                }
+            };
+    }]);
+
+    thisModule.controller('pipPictureUrlDialogController', 
+        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipImageUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipImageUtils) {
+            $scope.url = '';
+            $scope.invalid = true;
+            $scope.theme = $rootScope.$theme;
+            $scope.checkUrl = checkUrl;
+            $scope.onCancelClick = onCancelClick;
+            $scope.onAddClick = onAddClick;
+
+            return;
+
+            function setImageSize(img) {
+                var imageWidth = img.width(),
+                    imageHeight = img.height();
+
+                var cssParams = {};
+
+                if ((imageWidth) > (imageHeight)) {
+                    cssParams['width'] = '250px';
+                    cssParams['height'] = 'auto';
+                } else {
+                    cssParams['width'] = 'auto';
+                    cssParams['height'] = '250px';
+                }
+
+                img.css(cssParams);
+            }
+
+            function checkUrl() {
+                var img = $("img#url_image")
+                    .on('error', function () {
+                        $scope.invalid = true;
+                        $scope.$apply();
+                    })
+                    .on('load', function () {
+                        $scope.invalid = false;
+                        setImageSize(img);
+                        $scope.$apply();
+                    })
+                    .attr("src", $scope.url);
+            };
+            
+            function onCancelClick() {
+                $mdDialog.cancel();
+            };
+            
+            function onAddClick() {
+                $mdDialog.hide($scope.url);
+            };
+        }]
+    );
+
+})();
+/**
  * @file Picture list edit control
  * @copyright Digital Living Software Corp. 2014-2015
  * @todo
@@ -21174,102 +21276,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
-/**
- * @file Picture URL dialog
- * @copyright Digital Living Software Corp. 2014-2016
- * @todo
- * - Add sample to sampler app
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipPictureUrlDialog',
-        ['ngMaterial', 'pipCore', 'pipPictures.Templates']);
-
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'PICTURE_FROM_WEBLINK': 'Add from web link',
-            'LINK_PICTURE': 'Link to the picture...'
-        });
-        pipTranslateProvider.translations('ru', {
-            'PICTURE_FROM_WEBLINK': 'Добавить из веб ссылки',
-            'LINK_PICTURE': 'Ссылка на изображение...'
-        });
-    }]);
-
-    thisModule.factory('pipPictureUrlDialog',
-        ['$mdDialog', function ($mdDialog) {
-            return {
-                show: function (successCallback) {
-                    $mdDialog.show({
-                        templateUrl: 'picture_url_dialog/picture_url_dialog.html',
-                        clickOutsideToClose: true,
-                        controller: 'pipPictureUrlDialogController'
-                    }).then(function (result) {
-                        if (successCallback) {
-                            successCallback(result);
-                        }
-                    });
-                }
-            };
-    }]);
-
-    thisModule.controller('pipPictureUrlDialogController', 
-        ['$scope', '$rootScope', '$timeout', '$mdMenu', '$mdDialog', 'pipImageUtils', function ($scope, $rootScope, $timeout, $mdMenu, $mdDialog, pipImageUtils) {
-            $scope.url = '';
-            $scope.invalid = true;
-            $scope.theme = $rootScope.$theme;
-            $scope.checkUrl = checkUrl;
-            $scope.onCancelClick = onCancelClick;
-            $scope.onAddClick = onAddClick;
-
-            return;
-
-            function setImageSize(img) {
-                var imageWidth = img.width(),
-                    imageHeight = img.height();
-
-                var cssParams = {};
-
-                if ((imageWidth) > (imageHeight)) {
-                    cssParams['width'] = '250px';
-                    cssParams['height'] = 'auto';
-                } else {
-                    cssParams['width'] = 'auto';
-                    cssParams['height'] = '250px';
-                }
-
-                img.css(cssParams);
-            }
-
-            function checkUrl() {
-                var img = $("img#url_image")
-                    .on('error', function () {
-                        $scope.invalid = true;
-                        $scope.$apply();
-                    })
-                    .on('load', function () {
-                        $scope.invalid = false;
-                        setImageSize(img);
-                        $scope.$apply();
-                    })
-                    .attr("src", $scope.url);
-            };
-            
-            function onCancelClick() {
-                $mdDialog.cancel();
-            };
-            
-            function onAddClick() {
-                $mdDialog.hide($scope.url);
-            };
-        }]
-    );
-
-})();
 /**
  * @file Picture paste service
  * @copyright Digital Living Software Corp. 2014-2015
@@ -22160,34 +22166,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of composite WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipComposite', [        
-        'pipContentSwitch',
-        'pipChecklistEdit',
-        'pipChecklistView',
-        'pipCompositeEdit',
-        'pipCompositeView',
-        'pipCompositeSummary',
-        'pipCompositeToolbar',
-        'pipCompositeFocused',
-
-        'pipMobileMouseup',
-        'pipMobileMousedown'
-    ]);
-    
-})();
-
-
-
 (function(module) {
 try {
   module = angular.module('pipComposite.Templates');
@@ -22765,6 +22743,34 @@ module.run(['$templateCache', function($templateCache) {
     '</md-button>');
 }]);
 })();
+
+/**
+ * @file Registration of composite WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipComposite', [        
+        'pipContentSwitch',
+        'pipChecklistEdit',
+        'pipChecklistView',
+        'pipCompositeEdit',
+        'pipCompositeView',
+        'pipCompositeSummary',
+        'pipCompositeToolbar',
+        'pipCompositeFocused',
+
+        'pipMobileMouseup',
+        'pipMobileMousedown'
+    ]);
+    
+})();
+
+
 
 /**
  * @file Checklist edit control
@@ -23379,6 +23385,115 @@ module.run(['$templateCache', function($templateCache) {
                 if ($scope.ngDisabled && $scope.ngDisabled()) return;
 
                 onChecklistChange();
+            };
+
+        }]
+    );
+
+})();
+
+/**
+ * @file Composite view control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipCompositeView", [
+        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
+
+    thisModule.directive('pipCompositeView',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: {
+                    ngDisabled: '&',
+                    pipDisabledChecklist: '&',
+                    pipChanged: '&',
+                    pipContents: '='
+                },
+                templateUrl: 'composite_view/composite_view.html',
+                controller: 'pipCompositeViewController'
+            }
+        }
+    );
+
+    thisModule.controller('pipCompositeViewController',
+        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+
+            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
+            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
+            $scope.disabledChecklist = pipUtils.toBoolean($scope.pipDisabledChecklist()) != false;
+            $scope.selected = {};
+            $scope.selected.isChanged = false;
+            generateList($scope.pipContents);
+
+            $scope.onContentChange = onContentChange;
+            $scope.isDisabled = isDisabled;
+
+            // Watch for options changes
+            if (pipUtils.toBoolean($attrs.pipRebind)) {
+                $scope.$watchCollection('pipContents', function (newValue) {
+                    if (!Array.isArray($scope.pipContents)) {
+                        // throw new Error('Error: Attribute pip-contents must be array!');
+                        return;
+                    }
+                    if (!$scope.selected.isChanged) {
+                        generateList($scope.pipContents);
+                    } else {
+                        $scope.selected.isChanged = false;
+                    }
+                });
+            }
+
+            // Add class
+            $element.addClass('pip-composite-view');
+
+            return;
+
+            function isDisabled() {
+                return pipUtils.toBoolean($scope.pipDisabledChecklist()) == true ||
+                    pipUtils.toBoolean($scope.ngDisabled()) == true;
+            };
+
+            function updateContents() {
+                $scope.selected.isChanged = true;
+                $scope.pipContents = $scope.compositeContent;
+            };
+
+            function onContentChange() {
+                onCompositeChange();
+            };
+
+            function onCompositeChange() {
+                updateContents();
+                if ($scope.pipChanged)
+                    $scope.pipChanged();
+            };
+
+            function generateList(content) {
+                if (!content ||  content.length < 1) {
+                    clearList();
+                    return;
+                } else {
+                    $scope.compositeContent = [];
+                    var id = 0;
+                    _.each(content, function(item){
+                        if (typeof(item) != 'object' || item == null) {
+                            throw new Error('Error: content error!');
+                        }
+                        item.id = id;
+                        id ++;
+                        $scope.compositeContent.push(item);
+                    });
+                }
+            };
+
+            function clearList() {
+                $scope.compositeContent = [];
             };
 
         }]
@@ -24102,115 +24217,6 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
- * @file Composite view control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipCompositeView", [
-        'pipCore', 'pipDocuments', 'pipLocations', 'pipPictures', 'pipComposite.Templates']);
-
-    thisModule.directive('pipCompositeView',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    ngDisabled: '&',
-                    pipDisabledChecklist: '&',
-                    pipChanged: '&',
-                    pipContents: '='
-                },
-                templateUrl: 'composite_view/composite_view.html',
-                controller: 'pipCompositeViewController'
-            }
-        }
-    );
-
-    thisModule.controller('pipCompositeViewController',
-        ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
-
-            $scope.rebind = pipUtils.toBoolean($attrs.pipRebind);
-            $scope.disableControl = pipUtils.toBoolean($scope.ngDisabled()) != false;
-            $scope.disabledChecklist = pipUtils.toBoolean($scope.pipDisabledChecklist()) != false;
-            $scope.selected = {};
-            $scope.selected.isChanged = false;
-            generateList($scope.pipContents);
-
-            $scope.onContentChange = onContentChange;
-            $scope.isDisabled = isDisabled;
-
-            // Watch for options changes
-            if (pipUtils.toBoolean($attrs.pipRebind)) {
-                $scope.$watchCollection('pipContents', function (newValue) {
-                    if (!Array.isArray($scope.pipContents)) {
-                        // throw new Error('Error: Attribute pip-contents must be array!');
-                        return;
-                    }
-                    if (!$scope.selected.isChanged) {
-                        generateList($scope.pipContents);
-                    } else {
-                        $scope.selected.isChanged = false;
-                    }
-                });
-            }
-
-            // Add class
-            $element.addClass('pip-composite-view');
-
-            return;
-
-            function isDisabled() {
-                return pipUtils.toBoolean($scope.pipDisabledChecklist()) == true ||
-                    pipUtils.toBoolean($scope.ngDisabled()) == true;
-            };
-
-            function updateContents() {
-                $scope.selected.isChanged = true;
-                $scope.pipContents = $scope.compositeContent;
-            };
-
-            function onContentChange() {
-                onCompositeChange();
-            };
-
-            function onCompositeChange() {
-                updateContents();
-                if ($scope.pipChanged)
-                    $scope.pipChanged();
-            };
-
-            function generateList(content) {
-                if (!content ||  content.length < 1) {
-                    clearList();
-                    return;
-                } else {
-                    $scope.compositeContent = [];
-                    var id = 0;
-                    _.each(content, function(item){
-                        if (typeof(item) != 'object' || item == null) {
-                            throw new Error('Error: content error!');
-                        }
-                        item.id = id;
-                        id ++;
-                        $scope.compositeContent.push(item);
-                    });
-                }
-            };
-
-            function clearList() {
-                $scope.compositeContent = [];
-            };
-
-        }]
-    );
-
-})();
-
-/**
  * @file Content switch control
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -24388,99 +24394,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Entry pages (signin, signup) logic
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry', 
-        [
-            'ui.router', 'ngMessages', 
-            
-            'pipCore', 'pipData', 'pipBasicControls', 'pipLocations', 'pipPictures', 'pipRest', 'pipRest.State',
-            'pipEntry.Strings', 'pipEntry.Common', 'pipEntry.Signin', 'pipEntry.Signup', 'pipEntry.PostSignup', 
-            'pipEntry.RecoverPassword', 'pipEntry.ResetPassword', 'pipEntry.VerifyEmail', 'pipEntry.Templates'
-        ]);
-
-    thisModule.config(
-        ['$stateProvider', '$locationProvider', '$httpProvider', 'pipAuthStateProvider', 'pipDataPartyProvider', function ($stateProvider, $locationProvider, $httpProvider, pipAuthStateProvider, pipDataPartyProvider) {
-
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-
-
-            // Configure module routes for all users
-            $stateProvider
-                .state('signin', {
-                    url: '/signin?email&server_url&redirect_to',
-                    auth: false,
-                    controller: 'pipSigninController',
-                    templateUrl: 'signin/signin.html'
-                })
-                .state('recover_password', {
-                    url: '/recover_password?server_url&email',
-                    auth: false,
-                    controller: 'pipRecoverPasswordController',
-                    templateUrl: 'recover_password/recover_password.html'
-                })
-                .state('reset_password', {
-                    url: '/reset_password?server_url&email&code',
-                    auth: false,
-                    controller: 'pipResetPasswordController',
-                    templateUrl: 'reset_password/reset_password.html'
-                })
-                .state('signout', { 
-                    url: '/signout',
-                    auth: false
-                })
-                .state('signup', {
-                    url: '/signup?name&email&server_url',
-                    auth: false,
-                    controller: 'pipSignupController',
-                    templateUrl: 'signup/signup.html'
-                })
-                .state('post_signup', {
-                    url: '/post_signup?party_id',
-                    auth: false,
-                    controller: 'pipPostSignupController',
-                    templateUrl: 'post_signup/post_signup.html',
-                    resolve: {
-                        $party: pipDataPartyProvider.readPartiesResolver() 
-                        // /* @ngInject */ function ($rootScope, $stateParams, pipRest, pipDataSession) {
-                        //     var userId = pipDataSession.userId();
-                        //     var partyId = $stateParams.party_id || userId;
-
-                        //     if (partyId != userId)
-                        //         throw('ERROR_NOT_ALLOWED');
-                        //     return pipRest.parties().get({ id: partyId }).$promise;
-                        // }
-                    }
-                })
-                .state('verify_email', {
-                    url: '/verify_email?server_url&email&code',
-                    auth: false,
-                    controller: 'pipVerifyEmailController',
-                    templateUrl: 'verify_email/verify_email.html'
-                })
-                .state('verify_email_success', {
-                    url: '/verify_email_success',
-                    auth: false,
-                    controller: 'pipVerifyEmailSuccessController',
-                    templateUrl: 'verify_email/verify_email_success.html'
-                });
-
-            // Set default paths and states
-            pipAuthStateProvider.signinState('signin');
-            pipAuthStateProvider.signoutState('signout');
-        }]
-    );
-    
-})();
 (function(module) {
 try {
   module = angular.module('pipEntry.Templates');
@@ -25590,6 +25503,99 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+/**
+ * @file Entry pages (signin, signup) logic
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry', 
+        [
+            'ui.router', 'ngMessages', 
+            
+            'pipCore', 'pipData', 'pipBasicControls', 'pipLocations', 'pipPictures', 'pipRest', 'pipRest.State',
+            'pipEntry.Strings', 'pipEntry.Common', 'pipEntry.Signin', 'pipEntry.Signup', 'pipEntry.PostSignup', 
+            'pipEntry.RecoverPassword', 'pipEntry.ResetPassword', 'pipEntry.VerifyEmail', 'pipEntry.Templates'
+        ]);
+
+    thisModule.config(
+        ['$stateProvider', '$locationProvider', '$httpProvider', 'pipAuthStateProvider', 'pipDataPartyProvider', function ($stateProvider, $locationProvider, $httpProvider, pipAuthStateProvider, pipDataPartyProvider) {
+
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+
+
+            // Configure module routes for all users
+            $stateProvider
+                .state('signin', {
+                    url: '/signin?email&server_url&redirect_to',
+                    auth: false,
+                    controller: 'pipSigninController',
+                    templateUrl: 'signin/signin.html'
+                })
+                .state('recover_password', {
+                    url: '/recover_password?server_url&email',
+                    auth: false,
+                    controller: 'pipRecoverPasswordController',
+                    templateUrl: 'recover_password/recover_password.html'
+                })
+                .state('reset_password', {
+                    url: '/reset_password?server_url&email&code',
+                    auth: false,
+                    controller: 'pipResetPasswordController',
+                    templateUrl: 'reset_password/reset_password.html'
+                })
+                .state('signout', { 
+                    url: '/signout',
+                    auth: false
+                })
+                .state('signup', {
+                    url: '/signup?name&email&server_url',
+                    auth: false,
+                    controller: 'pipSignupController',
+                    templateUrl: 'signup/signup.html'
+                })
+                .state('post_signup', {
+                    url: '/post_signup?party_id',
+                    auth: false,
+                    controller: 'pipPostSignupController',
+                    templateUrl: 'post_signup/post_signup.html',
+                    resolve: {
+                        $party: pipDataPartyProvider.readPartiesResolver() 
+                        // /* @ngInject */ function ($rootScope, $stateParams, pipRest, pipDataSession) {
+                        //     var userId = pipDataSession.userId();
+                        //     var partyId = $stateParams.party_id || userId;
+
+                        //     if (partyId != userId)
+                        //         throw('ERROR_NOT_ALLOWED');
+                        //     return pipRest.parties().get({ id: partyId }).$promise;
+                        // }
+                    }
+                })
+                .state('verify_email', {
+                    url: '/verify_email?server_url&email&code',
+                    auth: false,
+                    controller: 'pipVerifyEmailController',
+                    templateUrl: 'verify_email/verify_email.html'
+                })
+                .state('verify_email_success', {
+                    url: '/verify_email_success',
+                    auth: false,
+                    controller: 'pipVerifyEmailSuccessController',
+                    templateUrl: 'verify_email/verify_email_success.html'
+                });
+
+            // Set default paths and states
+            pipAuthStateProvider.signinState('signin');
+            pipAuthStateProvider.signoutState('signout');
+        }]
+    );
+    
+})();
 /**
  * @file Checking uniqueness of email in input control
  * @description
@@ -26944,6 +26950,129 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 /**
+ * @file Entry verify email controller
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipEntry.VerifyEmail', ['pipEntry.Common']);
+
+    thisModule.controller('pipVerifyEmailController',
+        ['$scope', '$rootScope', 'pipAuthState', 'pipTransaction', 'pipDataUser', 'pipFormErrors', 'pipEntryCommon', function ($scope, $rootScope, pipAuthState, pipTransaction, pipDataUser, 
+            pipFormErrors, pipEntryCommon) {
+
+            pipEntryCommon.configureAppBar();
+            pipEntryCommon.initScope($scope);
+
+            $scope.showServerError = true;
+            $scope.transaction = pipTransaction('entry.verify_email', $scope);
+
+            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
+            $scope.onVerify = onVerify;
+            $scope.onRecover = onRecover;
+
+            return;
+
+            //-----------------------------
+
+            function onVerify() {
+                if ($scope.form.$invalid) {
+                    pipFormErrors.resetFormErrors($scope.form, true);
+                    return;
+                }
+
+                var transactionId = $scope.transaction.begin('PROCESSING');
+                if (!transactionId) return;
+
+                pipDataUser.verifyEmail(
+                    {
+                        serverUrl: $scope.data.serverUrl,
+                        email: $scope.data.email,
+                        code: $scope.data.code
+                    },
+                    function (data) {
+                        pipFormErrors.resetFormErrors($scope.form, false);
+                        if ($scope.transaction.aborted(transactionId)) return;
+
+                        $scope.transaction.end();
+                        pipAuthState.go('verify_email_success', {});
+                    },
+                    function (error) {
+                        $scope.error = error;
+                        $scope.transaction.end($scope.error);
+                        pipFormErrors.resetFormErrors($scope.form, true);
+                        pipFormErrors.setFormError(
+                            $scope.form, $scope.error,
+                            {
+                                1100 : 'email', // Missing email
+                                1106 : 'email', // User was not found
+                                1104 : 'email', // Email is already registered
+                                1305 : 'email', // Email is already registered
+                                1108 : 'code', // Invalid password recovery code
+                                1000 : 'form', // Unknown error
+                                1110 : 'form', // Account is locked
+                                1111 : 'form', // Number of attempts exceeded. Account was locked
+                                1112 : 'form', // Account is not active
+                                '-1' : 'form' // server not response
+                            }
+                        );
+                    }
+                );
+            }
+
+            function onRecover() {
+                if (!$rootScope.$user || !$rootScope.$user.id) {
+                    return ;
+                }
+
+                var tid = $scope.transaction.begin('PROCESSING');
+                if (!tid) return;
+
+                pipDataUser.requestEmailVerification(
+                    {
+                        serverUrl: $scope.data.serverUrl,
+                        email: $scope.data.email
+                    },
+                    function (data) {
+                        if ($scope.transaction.aborted(tid)) return;
+
+                        $scope.transaction.end();
+                        pipAuthState.go('reset_password', {
+                            server_url: $scope.data.serverUrl,
+                            email: $scope.data.email
+                        });
+                    },
+                    function (error) {
+                        $scope.transaction.end(error);
+                    }
+                );
+            }
+        }]
+    );
+
+    thisModule.controller('pipVerifyEmailSuccessController',
+        ['$scope', 'pipAuthState', 'pipEntryCommon', function ($scope, pipAuthState, pipEntryCommon) {
+
+            pipEntryCommon.configureAppBar();
+
+            $scope.onContinue = onContinue;
+
+            return;
+            
+            //-----------------------------
+
+            function onContinue() {
+                pipAuthState.goToAuthorized({});
+            };
+        }]
+    );
+
+})();
+/**
  * @file Entry signup controller
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -27188,147 +27317,8 @@ module.run(['$templateCache', function($templateCache) {
         }])
 
 })();
-/**
- * @file Entry verify email controller
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipEntry.VerifyEmail', ['pipEntry.Common']);
-
-    thisModule.controller('pipVerifyEmailController',
-        ['$scope', '$rootScope', 'pipAuthState', 'pipTransaction', 'pipDataUser', 'pipFormErrors', 'pipEntryCommon', function ($scope, $rootScope, pipAuthState, pipTransaction, pipDataUser, 
-            pipFormErrors, pipEntryCommon) {
-
-            pipEntryCommon.configureAppBar();
-            pipEntryCommon.initScope($scope);
-
-            $scope.showServerError = true;
-            $scope.transaction = pipTransaction('entry.verify_email', $scope);
-
-            $scope.touchedErrorsWithHint = pipFormErrors.touchedErrorsWithHint;
-            $scope.onVerify = onVerify;
-            $scope.onRecover = onRecover;
-
-            return;
-
-            //-----------------------------
-
-            function onVerify() {
-                if ($scope.form.$invalid) {
-                    pipFormErrors.resetFormErrors($scope.form, true);
-                    return;
-                }
-
-                var transactionId = $scope.transaction.begin('PROCESSING');
-                if (!transactionId) return;
-
-                pipDataUser.verifyEmail(
-                    {
-                        serverUrl: $scope.data.serverUrl,
-                        email: $scope.data.email,
-                        code: $scope.data.code
-                    },
-                    function (data) {
-                        pipFormErrors.resetFormErrors($scope.form, false);
-                        if ($scope.transaction.aborted(transactionId)) return;
-
-                        $scope.transaction.end();
-                        pipAuthState.go('verify_email_success', {});
-                    },
-                    function (error) {
-                        $scope.error = error;
-                        $scope.transaction.end($scope.error);
-                        pipFormErrors.resetFormErrors($scope.form, true);
-                        pipFormErrors.setFormError(
-                            $scope.form, $scope.error,
-                            {
-                                1100 : 'email', // Missing email
-                                1106 : 'email', // User was not found
-                                1104 : 'email', // Email is already registered
-                                1305 : 'email', // Email is already registered
-                                1108 : 'code', // Invalid password recovery code
-                                1000 : 'form', // Unknown error
-                                1110 : 'form', // Account is locked
-                                1111 : 'form', // Number of attempts exceeded. Account was locked
-                                1112 : 'form', // Account is not active
-                                '-1' : 'form' // server not response
-                            }
-                        );
-                    }
-                );
-            }
-
-            function onRecover() {
-                if (!$rootScope.$user || !$rootScope.$user.id) {
-                    return ;
-                }
-
-                var tid = $scope.transaction.begin('PROCESSING');
-                if (!tid) return;
-
-                pipDataUser.requestEmailVerification(
-                    {
-                        serverUrl: $scope.data.serverUrl,
-                        email: $scope.data.email
-                    },
-                    function (data) {
-                        if ($scope.transaction.aborted(tid)) return;
-
-                        $scope.transaction.end();
-                        pipAuthState.go('reset_password', {
-                            server_url: $scope.data.serverUrl,
-                            email: $scope.data.email
-                        });
-                    },
-                    function (error) {
-                        $scope.transaction.end(error);
-                    }
-                );
-            }
-        }]
-    );
-
-    thisModule.controller('pipVerifyEmailSuccessController',
-        ['$scope', 'pipAuthState', 'pipEntryCommon', function ($scope, pipAuthState, pipEntryCommon) {
-
-            pipEntryCommon.configureAppBar();
-
-            $scope.onContinue = onContinue;
-
-            return;
-            
-            //-----------------------------
-
-            function onContinue() {
-                pipAuthState.goToAuthorized({});
-            };
-        }]
-    );
-
-})();
 
 
-/**
- * @file Registration of all error handling components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipErrorHandling', [
-        'pipErrors.Pages',
-        'pipNoConnectionPanel'
-    ]);
-    
-})();
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -27389,6 +27379,42 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
+    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
+    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
+    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
+    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
+    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
+    '        <div class="h48" ng-if="isCordova">\n' +
+    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '        <div class="h48">\n' +
+    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
+    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection/no_connection.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
     '    <div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div>\n' +
@@ -27424,42 +27450,6 @@ module.run(['$templateCache', function($templateCache) {
     '                </md-button>\n' +
     '            </div>\n' +
     '    </div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-subtext" ng-if="showError && error_details && error_details.status">\n' +
-    '        <div ng-if="error_details.code">Code: {{error_details.code}}</div>\n' +
-    '        <div ng-if="error_details.description">Description: {{error_details.description}}</div>\n' +
-    '        <div ng-if="error_details.status">HTTP status: {{error_details.status}}</div>\n' +
-    '        <div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div>\n' +
-    '        <div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-error-actions layout-column layout-align-center-center">\n' +
-    '        <div class="h48" ng-if="isCordova">\n' +
-    '            <md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_CLOSE\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '        <div class="h48">\n' +
-    '            <md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">\n' +
-    '                {{::\'ERROR_UNKNOWN_DETAILS\' | translate}}\n' +
-    '            </md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -27571,6 +27561,22 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+/**
+ * @file Registration of all error handling components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipErrorHandling', [
+        'pipErrors.Pages',
+        'pipNoConnectionPanel'
+    ]);
+    
+})();
 /* global angular */
 
 (function () {
@@ -27988,6 +27994,21 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+
+/**
+ * @file Registration of settings components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipSettings', [
+        'pipSettings.Service',
+        'pipSettings.Page'
+    ]);
+
+})(window.angular);
 
 (function(module) {
 try {
@@ -28423,21 +28444,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 /**
- * @file Registration of settings components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipSettings', [
-        'pipSettings.Service',
-        'pipSettings.Page'
-    ]);
-
-})(window.angular);
-
-/**
  * @file Define controller for a settings tab
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -28486,8 +28492,7 @@ module.run(['$templateCache', function($templateCache) {
             $scope.selected = {};
             if ($state.current.name !== 'settings') {
                 initSelect($state.current.name);
-            }
-            if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+            } else if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
                 initSelect(pipSettings.getDefaultTab().state);
             } else {
                 $timeout(function () {
@@ -28573,271 +28578,6 @@ module.run(['$templateCache', function($templateCache) {
                 $scope.selected.tabId = state;
             }
         }]);
-
-})(window.angular, window._);
-
-/**
- * @file Service for settings component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipSettings.Service', []);
-
-    /**
-     * @ngdoc service
-     * @name pipSettings.Service:pipSettingsProvider
-     *
-     * @description
-     * Service provides an interface to manage 'Settings' component behaviour.
-     * It is available on config and run phases.
-     */
-    thisModule.provider('pipSettings', ['pipAuthStateProvider', function (pipAuthStateProvider) {
-
-        var defaultTab,
-            tabs = [],
-            titleText = 'SETTINGS_TITLE',
-            titleLogo = null,
-            isNavIcon = true;
-
-        // Configure global parameters
-        this.showTitleText = showTitleText;
-        this.showTitleLogo = showTitleLogo;
-        this.showNavIcon = showNavIcon;
-
-        return {
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Service:pipSettingsProvider
-             * @name pipSettings.Service.pipSettingsProvider:addTab
-             *
-             * @description
-             * Register new tab in 'Settings' component. Before adding a tab this method validates passed object.
-             *
-             * @param {Object} tabObj  Configuration object for new tab.
-             */
-            addTab: addTab,
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Service:pipSettingsProvider
-             * @name pipSettings.Service.pipSettingsProvider:getTabs
-             *
-             * @description
-             * Method returns collection of registered tabs.
-             *
-             * @returns {Array<Object>} Collection of tabs.
-             */
-            getTabs: getTabs,
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Service:pipSettingsProvider
-             * @name pipSettings.Service.pipSettingsProvider:setDefaultTab
-             *
-             * @description
-             * Establish a tab which is available by default (after chose this component in menu).
-             *
-             * @param {string} name     Name of the default state for this component.
-             */
-            setDefaultTab: setDefaultTab,
-
-            /**
-             * @ngdoc method
-             * @methodOf pipSettings.Service:pipSettingsProvider
-             * @name pipSettings.Service.pipSettingsProvider:getDefaultTab
-             *
-             * @description
-             * Method returns an config object for tabs established as default (it will be opened when app transeferred to
-             * abstract state 'settings').
-             *
-             * @returns {Array<Object>} Collection of tabs.
-             */
-            getDefaultTab: getDefaultTab,
-                    
-            showTitleText: showTitleText,
-            showTitleLogo: showTitleLogo,
-            showNavIcon: showNavIcon,
-
-            $get: function () {
-                /**
-                 * @ngdoc service
-                 * @name pipSettings.Service:pipSettings
-                 *
-                 * @description
-                 * Service provides an interface to manage 'Settings' component behaviour.
-                 * It is available on config and run phases.
-                 */
-                return {
-                    /**
-                     * @ngdoc method
-                     * @methodOf pipSettings.Service:pipSettings
-                     * @name pipSettings.Service.pipSettings:getTabs
-                     *
-                     * @description
-                     * Method returns collection of registered tabs.
-                     *
-                     * @returns {Array<Object>} Collection of tabs.
-                     */
-                    getTabs: getTabs,
-
-                    /**
-                     * @ngdoc method
-                     * @methodOf pipSettings.Service:pipSettings
-                     * @name pipSettings.Service.pipSettings:addTab
-                     *
-                     * @description
-                     * Register new tab in 'Settings' component. Before adding a tab this method validates passed object.
-                     *
-                     * @param {Object} tabObj  Configuration object for new tab.
-                     */
-                    addTab: addTab,
-
-                    /**
-                     * @ngdoc method
-                     * @methodOf pipSettings.Service:pipSettings
-                     * @name pipSettings.Service.pipSettings:getDefaultTab
-                     *
-                     * @description
-                     * Method returns an config object for tabs established as default (it will be opened when app transeferred to
-                     * abstract state 'settings').
-                     *
-                     * @returns {Array<Object>} Collection of tabs.
-                     */
-                    getDefaultTab: getDefaultTab,
-
-                    /**
-                     * @ngdoc method
-                     * @methodOf pipSettings.Service:pipSettings
-                     * @name pipSettings.Service.pipSettings:setDefaultTab
-                     *
-                     * @description
-                     * Establish a tab which is available by default (after chose this component in menu).
-                     *
-                     * @param {string} name     Name of the default state for this component.
-                     */
-                    setDefaultTab: setDefaultTab,
-
-                    showTitleText: showTitleText,
-                    showTitleLogo: showTitleLogo,
-                    showNavIcon: showNavIcon
-                };
-            }
-        };
-
-        /**
-         * Appends component abstract state prefix to passed state
-         */
-        function getFullStateName(state) {
-            return 'settings.' + state;
-        }
-
-        function getTabs() {
-            return _.clone(tabs, true);
-        }
-
-        function getDefaultTab() {
-            var defaultTab;
-
-            defaultTab = _.find(tabs, function (p) {
-                return p.state === defaultTab;
-            });
-
-            return _.clone(defaultTab, true);
-        }
-
-        function addTab(tabObj) {
-            var existingTab;
-
-            validateTab(tabObj);
-            existingTab = _.find(tabs, function (p) {
-                return p.state === getFullStateName(tabObj.state);
-            });
-            if (existingTab) {
-                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
-            }
-
-            tabs.push({
-                state: getFullStateName(tabObj.state),
-                title: tabObj.title,
-                index: tabObj.index || 100000,
-                access: tabObj.access,
-                visible: tabObj.visible !== false,
-                stateConfig: _.clone(tabObj.stateConfig, true)
-            });
-
-            pipAuthStateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
-
-            // if we just added first state and no default state is specified
-            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
-                setDefaultTab(tabObj.state);
-            }
-        }
-
-        function setDefaultTab(name) {
-            // TODO [apidhirnyi] extract expression inside 'if' into variable. It isn't readable now.
-            if (!_.find(tabs, function (tab) {
-                return tab.state === getFullStateName(name);
-            })) {
-                throw new Error('Tab with state name "' + name + '" is not registered');
-            }
-
-            defaultTab = getFullStateName(name);
-
-            pipAuthStateProvider.redirect('settings', getFullStateName(name));
-        }
-
-        /**
-         * Validates passed tab config object
-         * If passed tab is not valid it will throw an error
-         */
-        function validateTab(tabObj) {
-            if (!tabObj || !_.isObject(tabObj)) {
-                throw new Error('Invalid object');
-            }
-
-            if (tabObj.state === null || tabObj.state === '') {
-                throw new Error('Tab should have valid Angular UI router state name');
-            }
-
-            if (tabObj.access && !_.isFunction(tabObj.access)) {
-                throw new Error('"access" should be a function');
-            }
-
-            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
-                throw new Error('Invalid state configuration object');
-            }
-        }
-
-        function showTitleText (newTitleText) {
-            if (newTitleText) {
-                titleText = newTitleText;
-                titleLogo = null;
-            }
-
-            return titleText;
-        }
-
-        function showTitleLogo(newTitleLogo) {
-            if (newTitleLogo) {
-                titleLogo = newTitleLogo;
-                titleText = null;
-            }
-
-            return titleLogo;
-        }
-
-        function showNavIcon(value) {
-            if (value !== null && value !== undefined) {
-                isNavIcon = !!value;
-            }
-
-            return isNavIcon;
-        }
-
-    }]);
 
 })(window.angular, window._);
 
@@ -29607,24 +29347,272 @@ module.run(['$templateCache', function($templateCache) {
 
 })(window.angular);
 
-
-
 /**
- * @file Registration of all guidance components
+ * @file Service for settings component
  * @copyright Digital Living Software Corp. 2014-2016
  */
 
-(function () {
+(function (angular, _) {
     'use strict';
 
-    angular.module('pipGuidance', [
-        'pipTips.Service',
-        'pipIntroGuidance.Service',
-        'pipGuidance.Dialog',
-        'pipReleaseIntroDialog'
-    ]);
+    var thisModule = angular.module('pipSettings.Service', []);
 
-})(window.angular);
+    /**
+     * @ngdoc service
+     * @name pipSettings.Service:pipSettingsProvider
+     *
+     * @description
+     * Service provides an interface to manage 'Settings' component behaviour.
+     * It is available on config and run phases.
+     */
+    thisModule.provider('pipSettings', ['pipAuthStateProvider', function (pipAuthStateProvider) {
+
+        var defaultTab,
+            tabs = [],
+            titleText = 'SETTINGS_TITLE',
+            titleLogo = null,
+            isNavIcon = true;
+
+        // Configure global parameters
+        this.showTitleText = showTitleText;
+        this.showTitleLogo = showTitleLogo;
+        this.showNavIcon = showNavIcon;
+
+        return {
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Service:pipSettingsProvider
+             * @name pipSettings.Service.pipSettingsProvider:addTab
+             *
+             * @description
+             * Register new tab in 'Settings' component. Before adding a tab this method validates passed object.
+             *
+             * @param {Object} tabObj  Configuration object for new tab.
+             */
+            addTab: addTab,
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Service:pipSettingsProvider
+             * @name pipSettings.Service.pipSettingsProvider:getTabs
+             *
+             * @description
+             * Method returns collection of registered tabs.
+             *
+             * @returns {Array<Object>} Collection of tabs.
+             */
+            getTabs: getTabs,
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Service:pipSettingsProvider
+             * @name pipSettings.Service.pipSettingsProvider:setDefaultTab
+             *
+             * @description
+             * Establish a tab which is available by default (after chose this component in menu).
+             *
+             * @param {string} name     Name of the default state for this component.
+             */
+            setDefaultTab: setDefaultTab,
+
+            /**
+             * @ngdoc method
+             * @methodOf pipSettings.Service:pipSettingsProvider
+             * @name pipSettings.Service.pipSettingsProvider:getDefaultTab
+             *
+             * @description
+             * Method returns an config object for tabs established as default (it will be opened when app transeferred to
+             * abstract state 'settings').
+             *
+             * @returns {Array<Object>} Collection of tabs.
+             */
+            getDefaultTab: getDefaultTab,
+                    
+            showTitleText: showTitleText,
+            showTitleLogo: showTitleLogo,
+            showNavIcon: showNavIcon,
+
+            $get: function () {
+                /**
+                 * @ngdoc service
+                 * @name pipSettings.Service:pipSettings
+                 *
+                 * @description
+                 * Service provides an interface to manage 'Settings' component behaviour.
+                 * It is available on config and run phases.
+                 */
+                return {
+                    /**
+                     * @ngdoc method
+                     * @methodOf pipSettings.Service:pipSettings
+                     * @name pipSettings.Service.pipSettings:getTabs
+                     *
+                     * @description
+                     * Method returns collection of registered tabs.
+                     *
+                     * @returns {Array<Object>} Collection of tabs.
+                     */
+                    getTabs: getTabs,
+
+                    /**
+                     * @ngdoc method
+                     * @methodOf pipSettings.Service:pipSettings
+                     * @name pipSettings.Service.pipSettings:addTab
+                     *
+                     * @description
+                     * Register new tab in 'Settings' component. Before adding a tab this method validates passed object.
+                     *
+                     * @param {Object} tabObj  Configuration object for new tab.
+                     */
+                    addTab: addTab,
+
+                    /**
+                     * @ngdoc method
+                     * @methodOf pipSettings.Service:pipSettings
+                     * @name pipSettings.Service.pipSettings:getDefaultTab
+                     *
+                     * @description
+                     * Method returns an config object for tabs established as default (it will be opened when app transeferred to
+                     * abstract state 'settings').
+                     *
+                     * @returns {Array<Object>} Collection of tabs.
+                     */
+                    getDefaultTab: getDefaultTab,
+
+                    /**
+                     * @ngdoc method
+                     * @methodOf pipSettings.Service:pipSettings
+                     * @name pipSettings.Service.pipSettings:setDefaultTab
+                     *
+                     * @description
+                     * Establish a tab which is available by default (after chose this component in menu).
+                     *
+                     * @param {string} name     Name of the default state for this component.
+                     */
+                    setDefaultTab: setDefaultTab,
+
+                    showTitleText: showTitleText,
+                    showTitleLogo: showTitleLogo,
+                    showNavIcon: showNavIcon
+                };
+            }
+        };
+
+        /**
+         * Appends component abstract state prefix to passed state
+         */
+        function getFullStateName(state) {
+            return 'settings.' + state;
+        }
+
+        function getTabs() {
+            return _.clone(tabs, true);
+        }
+
+        function getDefaultTab() {
+            var defaultTab;
+
+            defaultTab = _.find(tabs, function (p) {
+                return p.state === defaultTab;
+            });
+
+            return _.clone(defaultTab, true);
+        }
+
+        function addTab(tabObj) {
+            var existingTab;
+
+            validateTab(tabObj);
+            existingTab = _.find(tabs, function (p) {
+                return p.state === getFullStateName(tabObj.state);
+            });
+            if (existingTab) {
+                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
+            }
+
+            tabs.push({
+                state: getFullStateName(tabObj.state),
+                title: tabObj.title,
+                index: tabObj.index || 100000,
+                access: tabObj.access,
+                visible: tabObj.visible !== false,
+                stateConfig: _.clone(tabObj.stateConfig, true)
+            });
+
+            pipAuthStateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
+
+            // if we just added first state and no default state is specified
+            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
+                setDefaultTab(tabObj.state);
+            }
+        }
+
+        function setDefaultTab(name) {
+            // TODO [apidhirnyi] extract expression inside 'if' into variable. It isn't readable now.
+            if (!_.find(tabs, function (tab) {
+                return tab.state === getFullStateName(name);
+            })) {
+                throw new Error('Tab with state name "' + name + '" is not registered');
+            }
+
+            defaultTab = getFullStateName(name);
+
+            pipAuthStateProvider.redirect('settings', getFullStateName(name));
+        }
+
+        /**
+         * Validates passed tab config object
+         * If passed tab is not valid it will throw an error
+         */
+        function validateTab(tabObj) {
+            if (!tabObj || !_.isObject(tabObj)) {
+                throw new Error('Invalid object');
+            }
+
+            if (tabObj.state === null || tabObj.state === '') {
+                throw new Error('Tab should have valid Angular UI router state name');
+            }
+
+            if (tabObj.access && !_.isFunction(tabObj.access)) {
+                throw new Error('"access" should be a function');
+            }
+
+            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
+                throw new Error('Invalid state configuration object');
+            }
+        }
+
+        function showTitleText (newTitleText) {
+            if (newTitleText) {
+                titleText = newTitleText;
+                titleLogo = null;
+            }
+
+            return titleText;
+        }
+
+        function showTitleLogo(newTitleLogo) {
+            if (newTitleLogo) {
+                titleLogo = newTitleLogo;
+                titleText = null;
+            }
+
+            return titleLogo;
+        }
+
+        function showNavIcon(value) {
+            if (value !== null && value !== undefined) {
+                isNavIcon = !!value;
+            }
+
+            return isNavIcon;
+        }
+
+    }]);
+
+})(window.angular, window._);
+
+
 
 (function(module) {
 try {
@@ -29671,6 +29659,38 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipGuidance.Templates');
+} catch (e) {
+  module = angular.module('pipGuidance.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tips/tip.template.html',
+    '<div ng-if="title" class=\'pip-title p24-flex flex-fixed bp16\'>\n' +
+    '    {{ title | translate }}\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class=\'pip-content pip-popover-content lp24-flex rp24-flex text-body1 bm64 pip-scroll\'\n' +
+    '     ng-class="{\'tm24\' : !title }">\n' +
+    '    <div ng-if="image && $mdMedia(\'gt-xs\')" class="pip-pic"></div>\n' +
+    '    <pip-markdown pip-text="content" pip-rebind="true"></pip-markdown>\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class="pip-footer lm24-flex rm24-flex position-bottom layout-row layout-align-start-center">\n' +
+    '    <a ng-if="link" target="_blank" href="{{ link }}" class="text-body2 flex">\n' +
+    '        {{:: \'MORE_URL\' | translate }}\n' +
+    '    </a>\n' +
+    '    <div  ng-if="!link" class="flex"></div>\n' +
+    '\n' +
+    '    <md-button ng-click=\'onNextClick()\' class="rm0">\n' +
+    '        {{:: \'NEXT\' | translate }}\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '</div>');
 }]);
 })();
 
@@ -29756,37 +29776,22 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-(function(module) {
-try {
-  module = angular.module('pipGuidance.Templates');
-} catch (e) {
-  module = angular.module('pipGuidance.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tips/tip.template.html',
-    '<div ng-if="title" class=\'pip-title p24-flex flex-fixed bp16\'>\n' +
-    '    {{ title | translate }}\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class=\'pip-content pip-popover-content lp24-flex rp24-flex text-body1 bm64 pip-scroll\'\n' +
-    '     ng-class="{\'tm24\' : !title }">\n' +
-    '    <div ng-if="image && $mdMedia(\'gt-xs\')" class="pip-pic"></div>\n' +
-    '    <pip-markdown pip-text="content" pip-rebind="true"></pip-markdown>\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class="pip-footer lm24-flex rm24-flex position-bottom layout-row layout-align-start-center">\n' +
-    '    <a ng-if="link" target="_blank" href="{{ link }}" class="text-body2 flex">\n' +
-    '        {{:: \'MORE_URL\' | translate }}\n' +
-    '    </a>\n' +
-    '    <div  ng-if="!link" class="flex"></div>\n' +
-    '\n' +
-    '    <md-button ng-click=\'onNextClick()\' class="rm0">\n' +
-    '        {{:: \'NEXT\' | translate }}\n' +
-    '    </md-button>\n' +
-    '\n' +
-    '</div>');
-}]);
-})();
+/**
+ * @file Registration of all guidance components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function () {
+    'use strict';
+
+    angular.module('pipGuidance', [
+        'pipTips.Service',
+        'pipIntroGuidance.Service',
+        'pipGuidance.Dialog',
+        'pipReleaseIntroDialog'
+    ]);
+
+})(window.angular);
 
 /**
  * @file Guidance dialog
@@ -30421,21 +30426,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of all help components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipHelp', [
-        'pipHelp.Service',
-        'pipHelp.Page'
-    ]);
-
-})(window.angular);
-
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -30481,6 +30471,21 @@ module.run(['$templateCache', function($templateCache) {
     '</pip-document>');
 }]);
 })();
+
+/**
+ * @file Registration of all help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipHelp', [
+        'pipHelp.Service',
+        'pipHelp.Page'
+    ]);
+
+})(window.angular);
 
 /**
  * @file Page template for help components
@@ -30830,6 +30835,21 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of support all pages
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipSupport', [
+        'pipFeedback',
+        'pipAnalytics'
+    ]);
+})();
 (function(module) {
 try {
   module = angular.module('pipSupport.Templates');
@@ -31092,21 +31112,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of support all pages
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipSupport', [
-        'pipFeedback',
-        'pipAnalytics'
-    ]);
-})();
 /**
  * @file Web analytics service
  * @copyright Digital Living Software Corp. 2014-2016
