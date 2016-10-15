@@ -10,16 +10,144 @@
 
     angular.module('pipCore', [
         'pipUtils',
-        'pipErrors',
-	    'pipTransactions',
+        'pipScope',
 	    'pipTranslate',
         'pipState',
         'pipTimer',
         'pipAssert',
-        'pipDebug',
-        'pipTranslateFilters'
+        'pipDebug'
     ]);
     
+})();
+/**
+ * @file Application router extended from ui.router
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+    
+    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
+
+    thisModule.config(
+        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+            pipTranslateProvider.translations('en', {
+                'ERROR_SWITCHING': 'Error while switching route. Try again.'
+            });
+
+            pipTranslateProvider.translations('ru', {
+                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
+            });
+        }]
+    );
+
+    thisModule.run(
+        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
+            $rootScope.$on('$stateChangeSuccess',
+                function(event, toState, toParams, fromState, fromParams) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+                    // Record current and previous state
+                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
+                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
+                }
+            );
+
+            // Intercept route error
+            $rootScope.$on('$stateChangeError',
+                function(event, toState, toParams, fromState, fromParams, error) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+
+                    console.error('Error while switching route to ' + toState.name);
+                    console.error(error);
+                }
+            );
+
+
+            // Intercept route error
+            $rootScope.$on('$stateNotFound',
+                function(event, unfoundState, fromState, fromParams) {
+                    event.preventDefault();
+
+                    // todo make configured error state name
+                    $state.go('errors_missing_route',  {
+                            unfoundState: unfoundState,
+                            fromState : {
+                                to: fromState ? fromState.name : '',
+                                fromParams: fromParams
+                            }
+                        }
+                    );
+                    $rootScope.$routing = false;
+                }
+            );
+
+        }]
+    );
+
+    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
+        // Configuration of redirected states
+        var redirectedStates = {};
+
+        this.redirect = setRedirect;
+        this.state = $stateProvider.state;
+
+        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
+            $state.redirect = redirect;
+            
+            return $state;
+            
+			//------------------------
+            function redirect(event, state, params, $rootScope) {
+                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
+                pipAssert.isObject(params, "$state.redirect: params should be an object");
+
+                var toState;
+
+                $rootScope.$routing = true;
+                toState = redirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params, $rootScope);
+
+                    if (_.isNull(toState)) {
+                        $rootScope.$routing = false;
+                        throw new Error('Redirected toState cannot be null');
+                    }
+                }
+
+                if (!!toState) {
+                    $timeout(function() {
+                        event.preventDefault();
+                        $state.transitionTo(toState, params, {location: 'replace'});
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
+        }];
+
+        return;        
+        //------------------
+
+        // Specify automatic redirect from one state to another
+        function setRedirect(fromState, toState) {
+            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
+            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
+            
+            redirectedStates[fromState] = toState;  
+
+            return this;
+        };
+
+    }]);
+
 })();
 /**
  * @file Assertion utilities
@@ -251,206 +379,16 @@
 
 })();
 
-/**
- * @file Application router extended from ui.router
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
 
-    thisModule.config(
-        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-            pipTranslateProvider.translations('en', {
-                'ERROR_SWITCHING': 'Error while switching route. Try again.'
-            });
-
-            pipTranslateProvider.translations('ru', {
-                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
-            });
-        }]
-    );
-
-    thisModule.run(
-        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-                    // Record current and previous state
-                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
-                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
-                }
-            );
-
-            // Intercept route error
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-
-                    console.error('Error while switching route to ' + toState.name);
-                    console.error(error);
-                }
-            );
-
-
-            // Intercept route error
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    event.preventDefault();
-
-                    // todo make configured error state name
-                    $state.go('errors_missing_route',  {
-                            unfoundState: unfoundState,
-                            fromState : {
-                                to: fromState ? fromState.name : '',
-                                fromParams: fromParams
-                            }
-                        }
-                    );
-                    $rootScope.$routing = false;
-                }
-            );
-
-        }]
-    );
-
-    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
-        // Configuration of redirected states
-        var redirectedStates = {};
-
-        this.redirect = setRedirect;
-        this.state = $stateProvider.state;
-
-        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
-            $state.redirect = redirect;
-            
-            return $state;
-            
-			//------------------------
-            function redirect(event, state, params, $rootScope) {
-                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
-                pipAssert.isObject(params, "$state.redirect: params should be an object");
-
-                var toState;
-
-                $rootScope.$routing = true;
-                toState = redirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params, $rootScope);
-
-                    if (_.isNull(toState)) {
-                        $rootScope.$routing = false;
-                        throw new Error('Redirected toState cannot be null');
-                    }
-                }
-
-                if (!!toState) {
-                    $timeout(function() {
-                        event.preventDefault();
-                        $state.transitionTo(toState, params, {location: 'replace'});
-                    });
-
-                    return true;
-                }
-
-                return false;
-            }
-        }];
-
-        return;        
-        //------------------
-
-        // Specify automatic redirect from one state to another
-        function setRedirect(fromState, toState) {
-            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
-            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
-            
-            redirectedStates[fromState] = toState;  
-
-            return this;
-        };
-
-    }]);
-
-})();
-/**
- * @file Global application timer service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
  /* global angular */
 
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipTimer', []);
-
-    thisModule.service('pipTimer', 
-        ['$interval', '$rootScope', function ($interval, $rootScope) {
-            var 
-                AUTO_PULL_CHANGES_TIMEOUT = 60000, // 1 min
-                AUTO_UPDATE_PAGE_TIMEOUT = 15000,  // 15 sec
-                AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
-                started = false, 
-                autoPullChangesInterval, 
-                autoUpdatePageInterval,
-                autoUpdateCollectionInterval;
-
-            return {
-                isStarted: isStarted,
-                start: start,
-                stop: stop
-            };
-
-            //------------------------
-
-            function isStarted() {
-                return started;
-            };
-
-            function start() {
-                if (started) return;
-
-                autoPullChangesInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoPullChanges');
-                }, AUTO_PULL_CHANGES_TIMEOUT);
-
-                autoUpdatePageInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoUpdatePage');
-                }, AUTO_UPDATE_PAGE_TIMEOUT);
-
-                autoUpdateCollectionInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoUpdateCollection');
-                }, AUTO_UPDATE_COLLECTION_TIMEOUT);
-
-                started = true;
-            };
-
-            function stop() {
-                if (autoPullChangesInterval)
-                    $interval.cancel(autoPullChangesInterval);
-
-                if (autoUpdatePageInterval)
-                    $interval.cancel(autoUpdatePageInterval);
-
-                if (autoUpdateCollectionInterval)
-                    $interval.cancel(autoUpdatePageInterval);
-
-                started = false;
-            };
-        }]
-    );
+    angular.module('pipScope', ['pipScope.Error', 'pipScope.Transaction']);
+    angular.module('pipTransactions', ['pipScope']);
 
 })();
-
 /**
  * @file Error context
  * @description
@@ -464,7 +402,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipErrors', ['pipUtils', 'pipAssert']);
+    var thisModule = angular.module('pipScope.Error', ['pipAssert']);
 
     /*
      * Error is designed to assist with error handling
@@ -625,7 +563,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipTransactions', ['pipTranslate', 'pipErrors']);
+    var thisModule = angular.module('pipScope.Transaction', ['pipTranslate', 'pipScope.Error']);
 
 	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
         
@@ -760,6 +698,76 @@
 
                 return transaction;
             }
+        }]
+    );
+
+})();
+
+/**
+ * @file Global application timer service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipTimer', []);
+
+    thisModule.service('pipTimer', 
+        ['$interval', '$rootScope', function ($interval, $rootScope) {
+            var 
+                AUTO_PULL_CHANGES_TIMEOUT = 60000, // 1 min
+                AUTO_UPDATE_PAGE_TIMEOUT = 15000,  // 15 sec
+                AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
+                started = false, 
+                autoPullChangesInterval, 
+                autoUpdatePageInterval,
+                autoUpdateCollectionInterval;
+
+            return {
+                isStarted: isStarted,
+                start: start,
+                stop: stop
+            };
+
+            //------------------------
+
+            function isStarted() {
+                return started;
+            };
+
+            function start() {
+                if (started) return;
+
+                autoPullChangesInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoPullChanges');
+                }, AUTO_PULL_CHANGES_TIMEOUT);
+
+                autoUpdatePageInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoUpdatePage');
+                }, AUTO_UPDATE_PAGE_TIMEOUT);
+
+                autoUpdateCollectionInterval = $interval(function () {
+                    $rootScope.$broadcast('pipAutoUpdateCollection');
+                }, AUTO_UPDATE_COLLECTION_TIMEOUT);
+
+                started = true;
+            };
+
+            function stop() {
+                if (autoPullChangesInterval)
+                    $interval.cancel(autoPullChangesInterval);
+
+                if (autoUpdatePageInterval)
+                    $interval.cancel(autoUpdatePageInterval);
+
+                if (autoUpdateCollectionInterval)
+                    $interval.cancel(autoUpdatePageInterval);
+
+                started = false;
+            };
         }]
     );
 
@@ -3738,74 +3746,6 @@ module.run(['$templateCache', function($templateCache) {
     
 })();
 /**
- * @file Keyboard navigation over few focusable controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipFocused", []);
-
-    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', function($timeout, $mdConstant) {
-        return {
-            require: "?ngModel",
-            link: function ($scope, $element, $attrs) {
-                var controls, controlsLength,
-                    withHidden = $attrs.pipWithHidden;
-
-                $timeout(init);
-                $element.on('keydown', keydownListener);
-
-                $scope.$watch($attrs.ngModel, function () {
-                    $timeout(init);
-                }, true);
-
-                function init() {
-                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
-                    controls = $element.find(selector);
-                    controlsLength = controls.length;
-
-                    // add needed event listeners
-                    controls.on('focus', function () {
-                        $element.addClass('pip-focused-container');
-                        $(this).addClass('md-focused');
-                    }).on('focusout', function () {
-                        $element.removeClass('pip-focused-container');
-                    });
-                }
-
-                function keydownListener(e) {
-                    var keyCode = e.which || e.keyCode;
-
-                    // Check control keyCode
-                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
-
-                        e.preventDefault();
-
-                        var 
-                            increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1,
-                            moveToControl = controls.index(controls.filter(".md-focused")) + increment;
-
-                        // Move focus to next control
-                        if (moveToControl >= 0 && moveToControl < controlsLength) {
-                            controls[moveToControl].focus();
-                        }
-                    }
-                }
-            }
-        };
-    }]);
-
-})();
-
-
-/**
  * @file Drag & drop attachable behavior
  * @description
  * Based on https://github.com/fatlinesofcode/pipDraggable
@@ -4464,6 +4404,74 @@ module.run(['$templateCache', function($templateCache) {
             }
         };
     });
+})();
+
+
+/**
+ * @file Keyboard navigation over few focusable controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipFocused", []);
+
+    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', function($timeout, $mdConstant) {
+        return {
+            require: "?ngModel",
+            link: function ($scope, $element, $attrs) {
+                var controls, controlsLength,
+                    withHidden = $attrs.pipWithHidden;
+
+                $timeout(init);
+                $element.on('keydown', keydownListener);
+
+                $scope.$watch($attrs.ngModel, function () {
+                    $timeout(init);
+                }, true);
+
+                function init() {
+                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
+                    controls = $element.find(selector);
+                    controlsLength = controls.length;
+
+                    // add needed event listeners
+                    controls.on('focus', function () {
+                        $element.addClass('pip-focused-container');
+                        $(this).addClass('md-focused');
+                    }).on('focusout', function () {
+                        $element.removeClass('pip-focused-container');
+                    });
+                }
+
+                function keydownListener(e) {
+                    var keyCode = e.which || e.keyCode;
+
+                    // Check control keyCode
+                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
+
+                        e.preventDefault();
+
+                        var 
+                            increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1,
+                            moveToControl = controls.index(controls.filter(".md-focused")) + increment;
+
+                        // Move focus to next control
+                        if (moveToControl >= 0 && moveToControl < controlsLength) {
+                            controls[moveToControl].focus();
+                        }
+                    }
+                }
+            }
+        };
+    }]);
+
 })();
 
 
@@ -7675,25 +7683,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dropdown/dropdown.html',
-    '<md-content class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}">\n' +
-    '    <div class="pip-divider position-top m0"></div>\n' +
-    '        <md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple md-on-close="onSelect(selectedIndex)">\n' +
-    '            <md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">\n' +
-    '                {{ (action.title || action.name) | translate }}\n' +
-    '            </md-option>\n' +
-    '        </md-select>\n' +
-    '</md-content>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('appbar/appbar.html',
     '<!--\n' +
     '@file App Bar component\n' +
@@ -7931,6 +7920,25 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '</md-toolbar>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dropdown/dropdown.html',
+    '<md-content class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}">\n' +
+    '    <div class="pip-divider position-top m0"></div>\n' +
+    '        <md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple md-on-close="onSelect(selectedIndex)">\n' +
+    '            <md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">\n' +
+    '                {{ (action.title || action.name) | translate }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '</md-content>');
 }]);
 })();
 
@@ -9998,7 +10006,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipErrors.Pages',
         'pipNoConnectionPanel',
         'pipClearErrors',
-	'pipFormErrors'
+	    'pipFormErrors'
     ]);
     
 })();
