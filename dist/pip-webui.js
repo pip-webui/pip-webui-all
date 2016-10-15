@@ -833,7 +833,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipTranslate.Filters', ['pipTranslate.Service']);
+    var thisModule = angular.module('pipTranslate.Filter', ['pipTranslate.Service']);
 
     thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
         return function (key) {
