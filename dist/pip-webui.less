@@ -45,7 +45,107 @@
 @color-13:               #ff5722;
 @color-14:               #795548;
 @color-15:               #607d8b;
+.generate-theme(@name, @palette) {
+  .@{name} {
+    .color-primary        { color: extract(@palette, 1) !important;  }
+    .color-primary-bg     { background-color: extract(@palette, 1) !important; color: @color-content; }
+    .color-accent         { color: extract(@palette, 2) !important;  }
+    .color-accent-bg      { background-color: extract(@palette, 2) !important; color: @color-content; }
+    .color-accent-hue-bg  { background-color: extract(@palette, 12) !important; }
+    .color-hue            { color: extract(@palette, 3) !important;  }
+    .color-hue-bg         { background-color:  extract(@palette, 3) !important;  }
+    .color-primary-text   { color: extract(@palette, 4) !important;}
+    .color-secondary-text { color: extract(@palette, 5) !important;}
+    .color-divider        { border-color:  extract(@palette, 7) !important;}
+    .color-badge          { color: extract(@palette, 6) !important;}
+    .color-badge-bg       { background-color: extract(@palette, 6) !important;}
+    .color-error          { color: extract(@palette, 9) !important;}
+    .color-toast          { background-color:  extract(@palette, 8) !important; color: @color-content;  }
+    .color-content-bg     { background-color:  extract(@palette, 10) !important; color: extract(@palette, 4);}
+    .color-window-bg      { background-color:  extract(@palette, 11) !important; color: extract(@palette, 4);  }
+    .color-disabled       { color: @color-disabled; }
+    .color-disabled-bg    { background-color: @color-disabled; }
+    .color-warm-bg        { background-color:  extract(@palette, 12) !important; color: extract(@palette, 4);}
 
+  }
+}
+
+// @file Color themes for BootBarn
+// @copyright Digital Living Software Corp. 2016
+
+// Themes Pallette Colors
+//------------------------------
+
+@color-bootbarn-warm-primary:                   rgba(177, 55, 34, 1);
+@color-bootbarn-warm-accent:                    rgba(127, 148, 92, 1);
+@color-bootbarn-warm-hue:                       rgba(177, 55, 34, .54);
+@color-bootbarn-warm-accent-hue:                rgba(127, 148, 92, .54);
+@color-bootbarn-warm-error:                     rgba(255, 87, 34, 1);
+@color-bootbarn-warm-warm:                      rgba(255, 152, 2, 1);
+
+@color-bootbarn-cool-primary:                   rgba(69, 90, 100, 1);
+@color-bootbarn-cool-accent:                    rgba(76, 175, 80, 1);
+@color-bootbarn-cool-hue:                       rgba(69, 90, 100, .54);
+@color-bootbarn-cool-accent-hue:                rgba(76, 175, 80, .54);
+@color-bootbarn-cool-warm:                      rgba(255, 152, 2, 1);
+
+@color-bootbarn-monochrome-primary:             rgba(38, 50, 56, 1);
+@color-bootbarn-monochrome-accent:              rgba(76, 175, 80, 1);
+@color-bootbarn-monochrome-hue:                 rgba(38, 50, 56, .54);
+@color-bootbarn-monochrome-accent-hue:          rgba(76, 175, 80, .54);
+@color-bootbarn-monochrome-warm:                rgba(255, 152, 2, 1);
+
+@color-bootbarn-warm-theme:
+        @color-bootbarn-warm-primary // primary color
+        @color-bootbarn-warm-accent  // accent color
+        @color-bootbarn-warm-hue    // primary color wich some opacity
+        @color-primary    // text color
+        @color-secondary  // text color with some opacity
+        @color-bootbarn-warm-error // error color
+        @color-divider  // color for dividers
+        @color-toast    // background color for toasts
+        @color-bootbarn-warm-error // background color for badge
+        @color-content // background color for content window
+        @color-window // background color for window
+        @color-bootbarn-warm-accent-hue
+        @color-bootbarn-warm-warm; // accent color wich some opacity
+
+@color-bootbarn-cool-theme:
+        @color-bootbarn-cool-primary // 1
+        @color-bootbarn-cool-accent  // 2
+        @color-bootbarn-cool-hue     // 3
+        @color-primary      // 4
+        @color-secondary    // 5
+        @color-badge        // 6
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge       // 9
+        @color-content
+        @color-window
+        @color-bootbarn-cool-accent-hue
+        @color-bootbarn-cool-warm;
+
+@color-bootbarn-monochrome-theme:
+        @color-bootbarn-monochrome-primary // 1
+        @color-bootbarn-monochrome-accent  // 2
+        @color-bootbarn-monochrome-hue     // 3
+        @color-primary      // 4
+        @color-secondary    // 5
+        @color-badge        // 6
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge       // 9
+        @color-content
+        @color-window
+        @color-bootbarn-monochrome-accent-hue
+        @color-bootbarn-monochrome-warm;
+
+.generate-theme(bootbarn-warm, @color-bootbarn-warm-theme);
+.generate-theme(bootbarn-cool, @color-bootbarn-cool-theme);
+.generate-theme(bootbarn-monochrome, @color-bootbarn-monochrome-theme);
+
+// @file Composition of color styles
+// @copyright Digital Living Software Corp. 2014-2015
 
 // Themes Pallette Colors
 //------------------------------
@@ -105,130 +205,150 @@
 
 
 @color-blue-theme:
-  @color-blue-primary // 1
-  @color-blue-accent  // 2
-  @color-blue-hue     // 3
-  @color-primary      // 4
-  @color-secondary    // 5
-  @color-badge        // 6
-  @color-divider      // 7
-  @color-toast        // 8
-  @color-badge       // 9
-  @color-content
-  @color-window
-  @color-blue-accent-hue;
+        @color-blue-primary // 1
+        @color-blue-accent  // 2
+        @color-blue-hue     // 3
+        @color-primary      // 4
+        @color-secondary    // 5
+        @color-badge        // 6
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge       // 9
+        @color-content
+        @color-window
+        @color-blue-accent-hue
+        @color-badge;
 
 @color-pink-theme:
-  @color-pink-primary
-  @color-pink-accent
-  @color-pink-hue
-  @color-primary
-  @color-secondary
-  @color-badge
-  @color-divider
-  @color-toast        // 8
-  @color-badge
-  @color-content
-  @color-window
-  @color-pink-accent-hue;// 9
+        @color-pink-primary
+        @color-pink-accent
+        @color-pink-hue
+        @color-primary
+        @color-secondary
+        @color-badge
+        @color-divider
+        @color-toast        // 8
+        @color-badge
+        @color-content
+        @color-window
+        @color-pink-accent-hue
+        @color-badge;// 9
 
 @color-orange-theme:
-  @color-orange-primary
-  @color-orange-accent
-  @color-orange-hue
-  @color-primary
-  @color-secondary
-  @color-orange-badge
-  @color-divider      // 7
-  @color-toast        // 8
-  @color-badge
-  @color-content
-  @color-window
-  @color-orange-accent-hue;// 9
+        @color-orange-primary
+        @color-orange-accent
+        @color-orange-hue
+        @color-primary
+        @color-secondary
+        @color-orange-badge
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge
+        @color-content
+        @color-window
+        @color-orange-accent-hue
+        @color-badge;// 9
 
 @color-amber-theme:
-  @color-amber-primary
-  @color-amber-accent
-  @color-amber-hue
-  @color-primary
-  @color-secondary
-  @color-badge
-  @color-divider      // 7
-  @color-toast        // 8
-  @color-badge       // 9
-  @color-content
-  @color-window
-  @color-amber-accent-hue;
+        @color-amber-primary
+        @color-amber-accent
+        @color-amber-hue
+        @color-primary
+        @color-secondary
+        @color-badge
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge       // 9
+        @color-content
+        @color-window
+        @color-amber-accent-hue
+        @color-badge;
 
 @color-green-theme:
-  @color-green-primary
-  @color-green-accent
-  @color-green-hue
-  @color-primary
-  @color-secondary
-  @color-badge
-  @color-divider      // 7
-  @color-toast        // 8
-  @color-badge      // 9
-  @color-content
-  @color-window
-  @color-green-accent-hue;
+        @color-green-primary
+        @color-green-accent
+        @color-green-hue
+        @color-primary
+        @color-secondary
+        @color-badge
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge      // 9
+        @color-content
+        @color-window
+        @color-green-accent-hue
+        @color-badge;
 
 @color-navy-theme:
-  @color-navy-primary
-  @color-navy-accent
-  @color-navy-hue
-  @color-primary
-  @color-secondary
-  @color-badge
-  @color-divider      // 7
-  @color-toast        // 8
-  @color-badge
-  @color-content
-  @color-window
-  @color-navy-accent-hue;       // 9
+        @color-navy-primary
+        @color-navy-accent
+        @color-navy-hue
+        @color-primary
+        @color-secondary
+        @color-badge
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge
+        @color-content
+        @color-window
+        @color-navy-accent-hue
+        @color-badge;       // 9
 
 @color-grey-theme:
-  @color-grey-primary
-  @color-grey-accent
-  @color-grey-hue
-  @color-primary
-  @color-secondary
-  @color-badge
-  @color-divider      // 7
-  @color-toast        // 8
-  @color-badge       // 9
-  @color-content
-  @color-window
-  @color-grey-accent-hue;
+        @color-grey-primary
+        @color-grey-accent
+        @color-grey-hue
+        @color-primary
+        @color-secondary
+        @color-badge
+        @color-divider      // 7
+        @color-toast        // 8
+        @color-badge       // 9
+        @color-content
+        @color-window
+        @color-grey-accent-hue
+        @color-badge;
 
 @color-dark-theme:
-  @color-dark-primary
-  @color-dark-accent
-  @color-dark-hue
-  @color-primary-dark
-  @color-secondary-dark
-  @color-badge
-  @color-divider-dark// 7
-  @color-toast        // 8
-  @color-badge
-  @color-content-dark
-  @color-window-dark
-  @color-dark-accent-hue;// 9
+        @color-dark-primary
+        @color-dark-accent
+        @color-dark-hue
+        @color-primary-dark
+        @color-secondary-dark
+        @color-badge
+        @color-divider-dark// 7
+        @color-toast        // 8
+        @color-badge
+        @color-content-dark
+        @color-window-dark
+        @color-dark-accent-hue
+        @color-badge;// 9
 
 @color-black-theme:
-  @color-black-primary
-  @color-black-accent
-  @color-black-hue
-  @color-primary-dark
-  @color-secondary-dark
-  @color-badge
-  @color-divider-dark// 7
-  @color-toast        // 8
-  @color-badge
-  @color-content-dark
-  @color-window-dark
-  @color-black-accent-hue;
+        @color-black-primary
+        @color-black-accent
+        @color-black-hue
+        @color-primary-dark
+        @color-secondary-dark
+        @color-badge
+        @color-divider-dark// 7
+        @color-toast        // 8
+        @color-badge
+        @color-content-dark
+        @color-window-dark
+        @color-black-accent-hue
+        @color-badge;
+
+
+.generate-theme(blue,                @color-blue-theme);
+.generate-theme(pink,                @color-pink-theme);
+.generate-theme(orange,              @color-orange-theme);
+.generate-theme(amber,               @color-amber-theme);
+.generate-theme(green,               @color-green-theme);
+.generate-theme(navy,                @color-navy-theme);
+.generate-theme(grey,                @color-grey-theme);
+.generate-theme(dark,                @color-dark-theme);
+.generate-theme(black,               @color-black-theme);
 
 // @file Flexbox compatibility mixins
 // @copyright Digital Living Software Corp. 2014-2015
