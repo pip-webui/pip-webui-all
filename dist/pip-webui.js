@@ -22,136 +22,6 @@
     
 })();
 /**
- * @file Application router extended from ui.router
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
-
-    thisModule.config(
-        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-            pipTranslateProvider.translations('en', {
-                'ERROR_SWITCHING': 'Error while switching route. Try again.'
-            });
-
-            pipTranslateProvider.translations('ru', {
-                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
-            });
-        }]
-    );
-
-    thisModule.run(
-        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-                    // Record current and previous state
-                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
-                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
-                }
-            );
-
-            // Intercept route error
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-
-                    console.error('Error while switching route to ' + toState.name);
-                    console.error(error);
-                }
-            );
-
-
-            // Intercept route error
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    event.preventDefault();
-
-                    // todo make configured error state name
-                    $state.go('errors_missing_route',  {
-                            unfoundState: unfoundState,
-                            fromState : {
-                                to: fromState ? fromState.name : '',
-                                fromParams: fromParams
-                            }
-                        }
-                    );
-                    $rootScope.$routing = false;
-                }
-            );
-
-        }]
-    );
-
-    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
-        // Configuration of redirected states
-        var redirectedStates = {};
-
-        this.redirect = setRedirect;
-        this.state = $stateProvider.state;
-
-        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
-            $state.redirect = redirect;
-            
-            return $state;
-            
-			//------------------------
-            function redirect(event, state, params, $rootScope) {
-                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
-                pipAssert.isObject(params, "$state.redirect: params should be an object");
-
-                var toState;
-
-                $rootScope.$routing = true;
-                toState = redirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params, $rootScope);
-
-                    if (_.isNull(toState)) {
-                        $rootScope.$routing = false;
-                        throw new Error('Redirected toState cannot be null');
-                    }
-                }
-
-                if (!!toState) {
-                    $timeout(function() {
-                        event.preventDefault();
-                        $state.transitionTo(toState, params, {location: 'replace'});
-                    });
-
-                    return true;
-                }
-
-                return false;
-            }
-        }];
-
-        return;        
-        //------------------
-
-        // Specify automatic redirect from one state to another
-        function setRedirect(fromState, toState) {
-            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
-            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
-            
-            redirectedStates[fromState] = toState;  
-
-            return this;
-        };
-
-    }]);
-
-})();
-/**
  * @file Assertion utilities
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -381,6 +251,136 @@
 
 })();
 
+/**
+ * @file Application router extended from ui.router
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+    
+    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
+
+    thisModule.config(
+        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+            pipTranslateProvider.translations('en', {
+                'ERROR_SWITCHING': 'Error while switching route. Try again.'
+            });
+
+            pipTranslateProvider.translations('ru', {
+                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
+            });
+        }]
+    );
+
+    thisModule.run(
+        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
+            $rootScope.$on('$stateChangeSuccess',
+                function(event, toState, toParams, fromState, fromParams) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+                    // Record current and previous state
+                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
+                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
+                }
+            );
+
+            // Intercept route error
+            $rootScope.$on('$stateChangeError',
+                function(event, toState, toParams, fromState, fromParams, error) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+
+                    console.error('Error while switching route to ' + toState.name);
+                    console.error(error);
+                }
+            );
+
+
+            // Intercept route error
+            $rootScope.$on('$stateNotFound',
+                function(event, unfoundState, fromState, fromParams) {
+                    event.preventDefault();
+
+                    // todo make configured error state name
+                    $state.go('errors_missing_route',  {
+                            unfoundState: unfoundState,
+                            fromState : {
+                                to: fromState ? fromState.name : '',
+                                fromParams: fromParams
+                            }
+                        }
+                    );
+                    $rootScope.$routing = false;
+                }
+            );
+
+        }]
+    );
+
+    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
+        // Configuration of redirected states
+        var redirectedStates = {};
+
+        this.redirect = setRedirect;
+        this.state = $stateProvider.state;
+
+        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
+            $state.redirect = redirect;
+            
+            return $state;
+            
+			//------------------------
+            function redirect(event, state, params, $rootScope) {
+                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
+                pipAssert.isObject(params, "$state.redirect: params should be an object");
+
+                var toState;
+
+                $rootScope.$routing = true;
+                toState = redirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params, $rootScope);
+
+                    if (_.isNull(toState)) {
+                        $rootScope.$routing = false;
+                        throw new Error('Redirected toState cannot be null');
+                    }
+                }
+
+                if (!!toState) {
+                    $timeout(function() {
+                        event.preventDefault();
+                        $state.transitionTo(toState, params, {location: 'replace'});
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
+        }];
+
+        return;        
+        //------------------
+
+        // Specify automatic redirect from one state to another
+        function setRedirect(fromState, toState) {
+            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
+            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
+            
+            redirectedStates[fromState] = toState;  
+
+            return this;
+        };
+
+    }]);
+
+})();
 /**
  * @file Global application timer service
  * @copyright Digital Living Software Corp. 2014-2016
@@ -3738,6 +3738,74 @@ module.run(['$templateCache', function($templateCache) {
     
 })();
 /**
+ * @file Keyboard navigation over few focusable controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module("pipFocused", []);
+
+    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', function($timeout, $mdConstant) {
+        return {
+            require: "?ngModel",
+            link: function ($scope, $element, $attrs) {
+                var controls, controlsLength,
+                    withHidden = $attrs.pipWithHidden;
+
+                $timeout(init);
+                $element.on('keydown', keydownListener);
+
+                $scope.$watch($attrs.ngModel, function () {
+                    $timeout(init);
+                }, true);
+
+                function init() {
+                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
+                    controls = $element.find(selector);
+                    controlsLength = controls.length;
+
+                    // add needed event listeners
+                    controls.on('focus', function () {
+                        $element.addClass('pip-focused-container');
+                        $(this).addClass('md-focused');
+                    }).on('focusout', function () {
+                        $element.removeClass('pip-focused-container');
+                    });
+                }
+
+                function keydownListener(e) {
+                    var keyCode = e.which || e.keyCode;
+
+                    // Check control keyCode
+                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
+
+                        e.preventDefault();
+
+                        var 
+                            increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1,
+                            moveToControl = controls.index(controls.filter(".md-focused")) + increment;
+
+                        // Move focus to next control
+                        if (moveToControl >= 0 && moveToControl < controlsLength) {
+                            controls[moveToControl].focus();
+                        }
+                    }
+                }
+            }
+        };
+    }]);
+
+})();
+
+
+/**
  * @file Drag & drop attachable behavior
  * @description
  * Based on https://github.com/fatlinesofcode/pipDraggable
@@ -4396,74 +4464,6 @@ module.run(['$templateCache', function($templateCache) {
             }
         };
     });
-})();
-
-
-/**
- * @file Keyboard navigation over few focusable controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipFocused", []);
-
-    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', function($timeout, $mdConstant) {
-        return {
-            require: "?ngModel",
-            link: function ($scope, $element, $attrs) {
-                var controls, controlsLength,
-                    withHidden = $attrs.pipWithHidden;
-
-                $timeout(init);
-                $element.on('keydown', keydownListener);
-
-                $scope.$watch($attrs.ngModel, function () {
-                    $timeout(init);
-                }, true);
-
-                function init() {
-                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
-                    controls = $element.find(selector);
-                    controlsLength = controls.length;
-
-                    // add needed event listeners
-                    controls.on('focus', function () {
-                        $element.addClass('pip-focused-container');
-                        $(this).addClass('md-focused');
-                    }).on('focusout', function () {
-                        $element.removeClass('pip-focused-container');
-                    });
-                }
-
-                function keydownListener(e) {
-                    var keyCode = e.which || e.keyCode;
-
-                    // Check control keyCode
-                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
-
-                        e.preventDefault();
-
-                        var 
-                            increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1,
-                            moveToControl = controls.index(controls.filter(".md-focused")) + increment;
-
-                        // Move focus to next control
-                        if (moveToControl >= 0 && moveToControl < controlsLength) {
-                            controls[moveToControl].focus();
-                        }
-                    }
-                }
-            }
-        };
-    }]);
-
 })();
 
 
