@@ -67,7 +67,7 @@ To use less mixins from Pip.WebUI library include the following reference into y
 * <a href="https://github.com/pip-webui/pip-webui-lib">pip-webui-lib</a> - represented by **pip-webui-lib** and **pip-webui-lib-test** artifacts
 * <a href="https://github.com/pip-webui/pip-webui-css">pip-webui-css</a> - included into **pip-webui** artifact
 * <a href="https://github.com/pip-webui/pip-webui-csscomponents">pip-webui-csscomponents</a> - included into **pip-webui** artifact
-* <a href="https://github.com/pip-webui/pip-webui-core">pip-webui-core</a> - included into **pip-webui** artifact
+* <a href="https://github.com/pip-webui/pip-webui-services">pip-webui-services</a> - included into **pip-webui** artifact
 * <a href="https://github.com/pip-webui/pip-webui-themes">pip-webui-themes</a> - included into **pip-webui** artifact
 * <a href="https://github.com/pip-webui/pip-webui-nav">pip-webui-nav</a> - included into **pip-webui** artifact
 * <a href="https://github.com/pip-webui/pip-webui-layouts">pip-webui-layouts</a> - included into **pip-webui** artifact

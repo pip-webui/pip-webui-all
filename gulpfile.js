@@ -14,7 +14,7 @@ var
 
 gulp.task('build-js-dev', function () {
     return gulp.src([
-        '../pip-webui-core/dist/pip-webui-core.js',
+        '../pip-webui-services/dist/pip-webui-services.js',
         '../pip-webui-layouts/dist/pip-webui-layouts.js',
         '../pip-webui-split/dist/pip-webui-split.js',
         '../pip-webui-controls/dist/pip-webui-controls.js',
@@ -34,7 +34,7 @@ gulp.task('build-js-dev', function () {
 
 gulp.task('build-js-prod', function () {
     return gulp.src([
-        '../pip-webui-core/dist/pip-webui-core.min.js',
+        '../pip-webui-services/dist/pip-webui-services.min.js',
         '../pip-webui-layouts/dist/pip-webui-layouts.min.js',
         '../pip-webui-split/dist/pip-webui-split.min.js',
         '../pip-webui-controls/dist/pip-webui-controls.min.js',
@@ -56,8 +56,7 @@ gulp.task('build-js-prod', function () {
 gulp.task('build-css-dev', function () {
     return gulp.src([
         '../pip-webui-css/dist/pip-webui-css.css',
-        '../pip-webui-csscomponents/dist/pip-webui-csscomponents.css',
-        '../pip-webui-core/dist/pip-webui-core.css',
+        '../pip-webui-services/dist/pip-webui-services.css',
         '../pip-webui-layouts/dist/pip-webui-layouts.css',
         '../pip-webui-split/dist/pip-webui-split.css',
         '../pip-webui-controls/dist/pip-webui-controls.css',
@@ -77,8 +76,7 @@ gulp.task('build-css-dev', function () {
 gulp.task('build-css-prod', function () {
     return gulp.src([
         '../pip-webui-css/dist/pip-webui-css.min.css',
-        '../pip-webui-csscomponents/dist/pip-webui-csscomponents.min.css',
-        '../pip-webui-core/dist/pip-webui-core.min.css',
+        '../pip-webui-services/dist/pip-webui-services.min.css',
         '../pip-webui-layouts/dist/pip-webui-layouts.min.css',
         '../pip-webui-split/dist/pip-webui-split.min.css',
         '../pip-webui-controls/dist/pip-webui-controls.min.css',
@@ -115,8 +113,7 @@ gulp.task('copy-images', function () {
         '../pip-webui-themes/dist/images/*',
         '../pip-webui-nav/dist/images/*',
         '../pip-webui-errors/dist/images/*',
-        '../pip-webui-css/dist/images/*',
-        '../pip-webui-csscomponents/dist/images/*'
+        '../pip-webui-css/dist/images/*'
     ])
     .pipe(gulp.dest('./dist/images'));
 });
