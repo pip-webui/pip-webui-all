@@ -255,160 +255,6 @@
 
 })();
 
-/**
- * @file Application router extended from ui.router
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
-
-    thisModule.config(
-        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-            pipTranslateProvider.translations('en', {
-                'ERROR_SWITCHING': 'Error while switching route. Try again.'
-            });
-
-            pipTranslateProvider.translations('ru', {
-                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
-            });
-        }]
-    );
-
-    thisModule.run(
-        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-                    // Record current and previous state
-                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
-                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
-                }
-            );
-
-            // Intercept route error
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-
-                    console.error('Error while switching route to ' + toState.name);
-                    console.error(error);
-                }
-            );
-
-
-            // Intercept route error
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    event.preventDefault();
-
-                    // todo make configured error state name
-                    $state.go('errors_missing_route',  {
-                            unfoundState: unfoundState,
-                            fromState : {
-                                to: fromState ? fromState.name : '',
-                                fromParams: fromParams
-                            }
-                        }
-                    );
-                    $rootScope.$routing = false;
-                }
-            );
-
-        }]
-    );
-
-    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
-        // Configuration of redirected states
-        var redirectedStates = {};
-
-        this.redirect = setRedirect;
-        this.state = $stateProvider.state;
-
-        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
-            $state.redirect = redirect;
-            $state.goBack = goBack;
-            $state.goBackAndSelect = goBackAndSelect;
-            
-            return $state;
-            
-			//------------------------
-            
-            function redirect(event, state, params, $rootScope) {
-                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
-                pipAssert.isObject(params, "$state.redirect: params should be an object");
-
-                var toState;
-
-                $rootScope.$routing = true;
-                toState = redirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params, $rootScope);
-
-                    if (_.isNull(toState)) {
-                        $rootScope.$routing = false;
-                        throw new Error('Redirected toState cannot be null');
-                    }
-                }
-
-                if (!!toState) {
-                    $timeout(function() {
-                        event.preventDefault();
-                        $state.transitionTo(toState, params, {location: 'replace'});
-                    });
-
-                    return true;
-                }
-
-                return false;
-            }
-
-            function goBack() {
-                $window.history.back()
-            }
-
-            function goBackAndSelect(obj, objParamName, id, idParamName) {
-                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
-                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
-                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
-                    
-                if ($rootScope.$prevState && $rootScope.$prevState.name) {
-                    var state = _.cloneDeep($rootScope.$prevState);
-
-                    state.params[idParamName] = id;
-                    state.params[objParamName] = obj;
-
-                    $state.go(state.name, state.params);
-                } else {
-                    $window.history.back();
-                }
-            }
-        }];
-
-        return;        
-        //------------------
-
-        // Specify automatic redirect from one state to another
-        function setRedirect(fromState, toState) {
-            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
-            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
-            
-            redirectedStates[fromState] = toState;  
-
-            return this;
-        };
-
-    }]);
-
-})();
 
  /* global angular */
 
@@ -734,6 +580,160 @@
 })();
 
 /**
+ * @file Application router extended from ui.router
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+    
+    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
+
+    thisModule.config(
+        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+            pipTranslateProvider.translations('en', {
+                'ERROR_SWITCHING': 'Error while switching route. Try again.'
+            });
+
+            pipTranslateProvider.translations('ru', {
+                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
+            });
+        }]
+    );
+
+    thisModule.run(
+        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
+            $rootScope.$on('$stateChangeSuccess',
+                function(event, toState, toParams, fromState, fromParams) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+                    // Record current and previous state
+                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
+                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
+                }
+            );
+
+            // Intercept route error
+            $rootScope.$on('$stateChangeError',
+                function(event, toState, toParams, fromState, fromParams, error) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+
+                    console.error('Error while switching route to ' + toState.name);
+                    console.error(error);
+                }
+            );
+
+
+            // Intercept route error
+            $rootScope.$on('$stateNotFound',
+                function(event, unfoundState, fromState, fromParams) {
+                    event.preventDefault();
+
+                    // todo make configured error state name
+                    $state.go('errors_missing_route',  {
+                            unfoundState: unfoundState,
+                            fromState : {
+                                to: fromState ? fromState.name : '',
+                                fromParams: fromParams
+                            }
+                        }
+                    );
+                    $rootScope.$routing = false;
+                }
+            );
+
+        }]
+    );
+
+    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
+        // Configuration of redirected states
+        var redirectedStates = {};
+
+        this.redirect = setRedirect;
+        this.state = $stateProvider.state;
+
+        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
+            $state.redirect = redirect;
+            $state.goBack = goBack;
+            $state.goBackAndSelect = goBackAndSelect;
+            
+            return $state;
+            
+			//------------------------
+            
+            function redirect(event, state, params, $rootScope) {
+                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
+                pipAssert.isObject(params, "$state.redirect: params should be an object");
+
+                var toState;
+
+                $rootScope.$routing = true;
+                toState = redirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params, $rootScope);
+
+                    if (_.isNull(toState)) {
+                        $rootScope.$routing = false;
+                        throw new Error('Redirected toState cannot be null');
+                    }
+                }
+
+                if (!!toState) {
+                    $timeout(function() {
+                        event.preventDefault();
+                        $state.transitionTo(toState, params, {location: 'replace'});
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            function goBack() {
+                $window.history.back()
+            }
+
+            function goBackAndSelect(obj, objParamName, id, idParamName) {
+                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
+                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
+                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
+                    
+                if ($rootScope.$prevState && $rootScope.$prevState.name) {
+                    var state = _.cloneDeep($rootScope.$prevState);
+
+                    state.params[idParamName] = id;
+                    state.params[objParamName] = obj;
+
+                    $state.go(state.name, state.params);
+                } else {
+                    $window.history.back();
+                }
+            }
+        }];
+
+        return;        
+        //------------------
+
+        // Specify automatic redirect from one state to another
+        function setRedirect(fromState, toState) {
+            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
+            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
+            
+            redirectedStates[fromState] = toState;  
+
+            return this;
+        };
+
+    }]);
+
+})();
+/**
  * @file Identity service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -854,8 +854,8 @@
                 }, 0);
             }
 
-            function startSession(newSession, fullReset, partialReset) {
-                pipAssert.isObject(newSession || '', "pipSession.start: argument should be an object");
+            function openSession(newSession, fullReset, partialReset) {
+                pipAssert.isObject(newSession || '', "pipSession.open: argument should be an object");
 
                 session = newSession;
 
@@ -864,10 +864,10 @@
 
                 resetContent(fullReset, partialReset);
 
-                $rootScope.$broadcast('pipSessionStarted', session);
+                $rootScope.$broadcast('pipSessionOpened', session);
             }
 
-            function stopSession(fullReset, partialReset) {
+            function closeSession(fullReset, partialReset) {
                 var oldSession = session;
                 session = null;
 
@@ -876,7 +876,7 @@
 
                 resetContent(fullReset, partialReset);
 
-                $rootScope.$broadcast('pipSessionStopped', oldSession);
+                $rootScope.$broadcast('pipSessionClosed', oldSession);
             }
 
             function getSession() {
@@ -885,8 +885,8 @@
 
             return {
                 get: getSession,
-                start: startSession,
-                stop: stopSession
+                open: openSession,
+                close: closeSession
             }
         }];
 
@@ -1056,6 +1056,15 @@
             return pipTranslate.translate(key) || key;
         }
     }]);
+
+    // thisModule.filter('optionalTranslate', function ($injector) {
+    //     var pipTranslate = $injector.has('pipTranslate') 
+    //         ? $injector.get('pipTranslate') : null;
+
+    //     return function (key) {
+    //         return pipTranslate  ? pipTranslate.translate(key) || key : key;
+    //     }
+    // });
 
 })();
 
@@ -2662,9 +2671,9 @@
 
 (function(module) {
 try {
-  module = angular.module('pipBasicControls.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('color_picker/color_picker.html',
@@ -2682,12 +2691,12 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('pipBasicControls.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.template.html',
+  $templateCache.put('popover/popover.html',
     '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
     '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
     '</div>\n' +
@@ -2700,9 +2709,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('pipBasicControls.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('progress/routing_progress.html',
@@ -2727,9 +2736,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('pipBasicControls.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tags/tag_list.html',
@@ -2751,9 +2760,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('pipBasicControls.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toast/toast.html',
@@ -2765,7 +2774,7 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
     '    <div class="layout-row layout-align-end-start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
-    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error" ng-click="onDetails()">Details</md-button>\n' +
+    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button>\n' +
     '        <md-button class="flex-fixed m0 lm8"\n' +
     '                   ng-click="onAction(action)"\n' +
     '                   ng-repeat="action in actions"\n' +
@@ -2780,9 +2789,9 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(module) {
 try {
-  module = angular.module('pipBasicControls.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipBasicControls.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toggle_buttons/toggle_buttons.html',
@@ -2854,7 +2863,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module('pipColorPicker', ['pipUtils', 'pipFocused', 'pipBasicControls.Templates']);
+    var thisModule = angular.module('pipColorPicker', ['pipFocused', 'pipControls.Templates']);
 
     thisModule.directive('pipColorPicker',
         function () {
@@ -2919,6 +2928,29 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window._);
 
 /**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipControls.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
+
+/**
  * @file Image slider control
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -2926,7 +2958,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, _, $) {
     'use strict';
 
-    var thisModule = angular.module('pipImageSlider', []);
+    var thisModule = angular.module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service']);
 
     thisModule.directive('pipImageSlider',
         function () {
@@ -3037,46 +3069,17 @@ module.run(['$templateCache', function($templateCache) {
         }
     );
 
-    thisModule.directive('pipSliderButton',
-        function () {
-            return {
-                scope: {},
-                controller: ['$scope', '$element', '$parse', '$attrs', function ($scope, $element, $parse, $attrs) {
-                    var type = $parse($attrs.pipButtonType)($scope),
-                        sliderId = $parse($attrs.pipSliderId)($scope);
+})(window.angular, window._, window.jQuery);
 
-                    $element.on('click', function () {
-                        if (!sliderId || !type) {
-                            return;
-                        }
+/**
+ * @file Image slider service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
 
-                        angular.element(document.getElementById(sliderId)).scope()[type + 'Block']();
-                    });
-                }]
-            };
-        }
-    );
+(function (angular, _, $) {
+    'use strict';
 
-    thisModule.directive('pipSliderIndicator',
-        function () {
-            return {
-                scope: false,
-                controller: ['$scope', '$element', '$parse', '$attrs', function ($scope, $element, $parse, $attrs) {
-                    var sliderId = $parse($attrs.pipSliderId)($scope),
-                        slideTo = $parse($attrs.pipSlideTo)($scope);
-
-                    $element.css('cursor', 'pointer');
-                    $element.on('click', function () {
-                        if (!sliderId || slideTo && slideTo < 0) {
-                            return;
-                        }
-
-                        angular.element(document.getElementById(sliderId)).scope().slideTo(slideTo);
-                    });
-                }]
-            };
-        }
-    );
+    var thisModule = angular.module('pipImageSlider.Service', []);
 
     thisModule.service('$pipImageSlider',
         ['$timeout', function ($timeout) {
@@ -3142,6 +3145,71 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window._, window.jQuery);
 
 /**
+ * @file Image slider button
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _, $) {
+    'use strict';
+
+    var thisModule = angular.module('pipSliderButton', []);
+
+    thisModule.directive('pipSliderButton',
+        function () {
+            return {
+                scope: {},
+                controller: ['$scope', '$element', '$parse', '$attrs', function ($scope, $element, $parse, $attrs) {
+                    var type = $parse($attrs.pipButtonType)($scope),
+                        sliderId = $parse($attrs.pipSliderId)($scope);
+
+                    $element.on('click', function () {
+                        if (!sliderId || !type) {
+                            return;
+                        }
+
+                        angular.element(document.getElementById(sliderId)).scope()[type + 'Block']();
+                    });
+                }]
+            };
+        }
+    );
+
+})(window.angular, window._, window.jQuery);
+
+/**
+ * @file Slider indicator
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _, $) {
+    'use strict';
+
+    var thisModule = angular.module('pipSliderIndicator', []);
+
+    thisModule.directive('pipSliderIndicator',
+        function () {
+            return {
+                scope: false,
+                controller: ['$scope', '$element', '$parse', '$attrs', function ($scope, $element, $parse, $attrs) {
+                    var sliderId = $parse($attrs.pipSliderId)($scope),
+                        slideTo = $parse($attrs.pipSlideTo)($scope);
+
+                    $element.css('cursor', 'pointer');
+                    $element.on('click', function () {
+                        if (!sliderId || slideTo && slideTo < 0) {
+                            return;
+                        }
+
+                        angular.element(document.getElementById(sliderId)).scope().slideTo(slideTo);
+                    });
+                }]
+            };
+        }
+    );
+
+})(window.angular, window._, window.jQuery);
+
+/**
  * @file Markdown control
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -3152,31 +3220,33 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, marked, _) {
     'use strict';
 
-    var thisModule = angular.module('pipMarkdown', ['ngSanitize', 'pipUtils', 'pipTranslate']);
+    var thisModule = angular.module('pipMarkdown', ['ngSanitize']);
 
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'MARKDOWN_ATTACHMENTS': 'Attachments:',
-            'checklist': 'Checklist',
-            'documents': 'Documents',
-            'pictures': 'Pictures',
-            'location': 'Location',
-            'time': 'Time'
-        });
-        pipTranslateProvider.translations('ru', {
-            'MARKDOWN_ATTACHMENTS': 'Вложения:',
-            'checklist': 'Список',
-            'documents': 'Документы',
-            'pictures': 'Изображения',
-            'location': 'Местонахождение',
-            'time': 'Время'
-        });
-    }]);
-    /* eslint-enable quote-props */
+    // /* eslint-disable quote-props */
+    // thisModule.config(function (pipTranslateProvider) {
+    //     pipTranslateProvider.translations('en', {
+    //         'MARKDOWN_ATTACHMENTS': 'Attachments:',
+    //         'checklist': 'Checklist',
+    //         'documents': 'Documents',
+    //         'pictures': 'Pictures',
+    //         'location': 'Location',
+    //         'time': 'Time'
+    //     });
+    //     pipTranslateProvider.translations('ru', {
+    //         'MARKDOWN_ATTACHMENTS': 'Вложения:',
+    //         'checklist': 'Список',
+    //         'documents': 'Документы',
+    //         'pictures': 'Изображения',
+    //         'location': 'Местонахождение',
+    //         'time': 'Время'
+    //     });
+    // });
+    // /* eslint-enable quote-props */
 
     thisModule.directive('pipMarkdown',
-        ['$parse', 'pipUtils', 'pipTranslate', function ($parse, pipUtils, pipTranslate) {
+        ['$parse', '$injector', function ($parse, $injector) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+
             return {
                 restrict: 'EA',
                 scope: false,
@@ -3192,19 +3262,27 @@ module.run(['$templateCache', function($templateCache) {
 
                         _.each(array, function (attach) {
                             if (attach.type && attach.type !== 'text') {
-                                if (attachString.length === 0) {
+                                if (attachString.length === 0 && pipTranslate) {
                                     attachString = pipTranslate.translate('MARKDOWN_ATTACHMENTS');
                                 }
 
                                 if (attachTypes.indexOf(attach.type) < 0) {
                                     attachTypes.push(attach.type);
                                     attachString += attachTypes.length > 1 ? ', ' : ' ';
-                                    attachString += pipTranslate.translate(attach.type);
+                                    if (pipTranslate)
+                                        attachString += pipTranslate.translate(attach.type);
                                 }
                             }
                         });
 
                         return attachString;
+                    }
+
+                    function toBoolean(value) {
+                        if (value == null) return false;
+                        if (!value) return false;
+                        value = value.toString().toLowerCase();
+                        return value == '1' || value == 'true';
                     }
 
                     function bindText(value) {
@@ -3250,7 +3328,7 @@ module.run(['$templateCache', function($templateCache) {
                     bindText(textGetter($scope));
 
                     // Also optimization to avoid watch if it is unnecessary
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                    if (toBoolean($attrs.pipRebind)) {
                         $scope.$watch(textGetter, function (newValue) {
                             bindText(newValue);
                         });
@@ -3278,13 +3356,13 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, $, _) {
     'use strict';
 
-    var thisModule = angular.module('pipPopover', ['pipAssert']);
+    var thisModule = angular.module('pipPopover', ['pipPopover.Service']);
 
     thisModule.directive('pipPopover', function () {
         return {
             restrict: 'EA',
             scope: true,
-            templateUrl: 'popover/popover.template.html',
+            templateUrl: 'popover/popover.html',
             controller: ['$scope', '$rootScope', '$element', '$timeout', '$compile', function ($scope, $rootScope, $element, $timeout, $compile) {
                 var backdropElement, content;
 
@@ -3382,7 +3460,19 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 
-    thisModule.service('$pipPopover',
+})(window.angular, window.jQuery, window._);
+
+/**
+ * @file Popover service
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, $, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipPopover.Service', []);
+
+    thisModule.service('pipPopover',
         ['$compile', '$rootScope', '$timeout', function ($compile, $rootScope, $timeout) {
             var popoverTemplate;
 
@@ -3553,7 +3643,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular) {
     'use strict';
 
-    var thisModule = angular.module('pipTagList', ['pipServices']);
+    var thisModule = angular.module('pipTagList', []);
 
     /**
      * pipTags - set of tags
@@ -3570,7 +3660,7 @@ module.run(['$templateCache', function($templateCache) {
                     pipTypeLocal: '='
                 },
                 templateUrl: 'tags/tag_list.html',
-                controller: ['$scope', '$element', '$attrs', 'pipUtils', function ($scope, $element, $attrs, pipUtils) {
+                controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
                     var tagsGetter;
 
                     tagsGetter = $parse($attrs.pipTags);
@@ -3578,8 +3668,15 @@ module.run(['$templateCache', function($templateCache) {
                     // Set tags
                     $scope.tags = tagsGetter($scope);
 
+                    function toBoolean(value) {
+                        if (value == null) return false;
+                        if (!value) return false;
+                        value = value.toString().toLowerCase();
+                        return value == '1' || value == 'true';
+                    }
+
                     // Also optimization to avoid watch if it is unnecessary
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                    if (toBoolean($attrs.pipRebind)) {
                         $scope.$watch(tagsGetter, function () {
                             $scope.tags = tagsGetter($scope);
                         });
@@ -3612,10 +3709,13 @@ module.run(['$templateCache', function($templateCache) {
 
 (function (angular, _) {
     'use strict';
-    var thisModule = angular.module('pipToasts', ['pipTranslate', 'ngMaterial', 'pipAssert']);
+    var thisModule = angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
 
     thisModule.controller('pipToastController',
-        ['$scope', '$mdToast', 'toast', 'pipErrorDetailsDialog', function ($scope, $mdToast, toast, pipErrorDetailsDialog) {
+        ['$scope', '$mdToast', 'toast', '$injector', function ($scope, $mdToast, toast, $injector) {
+            var pipErrorDetailsDialog = $injector.has('pipErrorDetailsDialog') 
+                ? $injector.get('pipErrorDetailsDialog') : null;
+
             // if (toast.type && sounds['toast_' + toast.type]) {
             //     sounds['toast_' + toast.type].play();
             // }
@@ -3623,7 +3723,7 @@ module.run(['$templateCache', function($templateCache) {
             $scope.message = toast.message;
             $scope.actions = toast.actions;
             $scope.toast = toast;
-
+            
             if (toast.actions.length === 0) {
                 $scope.actionLenght = 0;
             } else if (toast.actions.length === 1) {
@@ -3632,16 +3732,20 @@ module.run(['$templateCache', function($templateCache) {
                 $scope.actionLenght = null;
             }
 
+            $scope.showDetails = pipErrorDetailsDialog != null;
             $scope.onDetails = function () {
                 $mdToast.hide();
-                pipErrorDetailsDialog.show(
-                    {
-                        error: $scope.toast.error,
-                        ok: 'Ok'
-                    },
-                    angular.noop,
-                    angular.noop
-                );
+
+                if (pipErrorDetailsDialog) {
+                    pipErrorDetailsDialog.show(
+                        {
+                            error: $scope.toast.error,
+                            ok: 'Ok'
+                        },
+                        angular.noop,
+                        angular.noop
+                    );
+                }
             };
 
             $scope.onAction = function (action) {
@@ -3656,7 +3760,7 @@ module.run(['$templateCache', function($templateCache) {
     );
 
     thisModule.service('pipToasts',
-        ['$rootScope', '$mdToast', 'pipAssert', function ($rootScope, $mdToast, pipAssert) {
+        ['$rootScope', '$mdToast', function ($rootScope, $mdToast) {
             var
                 SHOW_TIMEOUT = 20000,
                 SHOW_TIMEOUT_NOTIFICATIONS = 20000,
@@ -3672,6 +3776,7 @@ module.run(['$templateCache', function($templateCache) {
                 // Remove error toasts when page is changed
             $rootScope.$on('$stateChangeSuccess', onStateChangeSuccess);
             $rootScope.$on('pipSessionClosed', onClearToasts);
+            $rootScope.$on('pipIdentityChanged', onClearToasts);
 
             return {
                 showNotification: showNotification,
@@ -3727,7 +3832,6 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function addToast(toast) {
-
                 if (currentToast && toast.type !== 'error') {
                     toasts.push(toast);
                 } else {
@@ -3771,15 +3875,15 @@ module.run(['$templateCache', function($templateCache) {
 
             // Show new notification toast at the top right
             function showNotification(message, actions, successCallback, cancelCallback, id) {
-                pipAssert.isDef(message, 'pipToasts.showNotification: message should be defined');
-                pipAssert.isString(message, 'pipToasts.showNotification: message should be a string');
-                pipAssert.isArray(actions || [], 'pipToasts.showNotification: actions should be an array');
-                if (successCallback) {
-                    pipAssert.isFunction(successCallback, 'showNotification: successCallback should be a function');
-                }
-                if (cancelCallback) {
-                    pipAssert.isFunction(cancelCallback, 'showNotification: cancelCallback should be a function');
-                }
+                // pipAssert.isDef(message, 'pipToasts.showNotification: message should be defined');
+                // pipAssert.isString(message, 'pipToasts.showNotification: message should be a string');
+                // pipAssert.isArray(actions || [], 'pipToasts.showNotification: actions should be an array');
+                // if (successCallback) {
+                //     pipAssert.isFunction(successCallback, 'showNotification: successCallback should be a function');
+                // }
+                // if (cancelCallback) {
+                //     pipAssert.isFunction(cancelCallback, 'showNotification: cancelCallback should be a function');
+                // }
 
                 addToast({
                     id: id || null,
@@ -3794,14 +3898,14 @@ module.run(['$templateCache', function($templateCache) {
 
             // Show new message toast at the top right
             function showMessage(message, successCallback, cancelCallback, id) {
-                pipAssert.isDef(message, 'pipToasts.showMessage: message should be defined');
-                pipAssert.isString(message, 'pipToasts.showMessage: message should be a string');
-                if (successCallback) {
-                    pipAssert.isFunction(successCallback, 'pipToasts.showMessage:successCallback should be a function');
-                }
-                if (cancelCallback) {
-                    pipAssert.isFunction(cancelCallback, 'pipToasts.showMessage: cancelCallback should be a function');
-                }
+                // pipAssert.isDef(message, 'pipToasts.showMessage: message should be defined');
+                // pipAssert.isString(message, 'pipToasts.showMessage: message should be a string');
+                // if (successCallback) {
+                //     pipAssert.isFunction(successCallback, 'pipToasts.showMessage:successCallback should be a function');
+                // }
+                // if (cancelCallback) {
+                //     pipAssert.isFunction(cancelCallback, 'pipToasts.showMessage: cancelCallback should be a function');
+                // }
 
                 addToast({
                     id: id || null,
@@ -3815,14 +3919,14 @@ module.run(['$templateCache', function($templateCache) {
 
             // Show error toast at the bottom right after error occured
             function showError(message, successCallback, cancelCallback, id, error) {
-                pipAssert.isDef(message, 'pipToasts.showError: message should be defined');
-                pipAssert.isString(message, 'pipToasts.showError: message should be a string');
-                if (successCallback) {
-                    pipAssert.isFunction(successCallback, 'pipToasts.showError: successCallback should be a function');
-                }
-                if (cancelCallback) {
-                    pipAssert.isFunction(cancelCallback, 'pipToasts.showError: cancelCallback should be a function');
-                }
+                // pipAssert.isDef(message, 'pipToasts.showError: message should be defined');
+                // pipAssert.isString(message, 'pipToasts.showError: message should be a string');
+                // if (successCallback) {
+                //     pipAssert.isFunction(successCallback, 'pipToasts.showError: successCallback should be a function');
+                // }
+                // if (cancelCallback) {
+                //     pipAssert.isFunction(cancelCallback, 'pipToasts.showError: cancelCallback should be a function');
+                // }
 
                 addToast({
                     id: id || null,
@@ -3844,8 +3948,7 @@ module.run(['$templateCache', function($templateCache) {
             // Clear toasts by type
             function clearToasts(type) {
                 if (type) {
-                    pipAssert.isString(type, 'pipToasts.clearToasts: type should be a string');
-
+                    // pipAssert.isString(type, 'pipToasts.clearToasts: type should be a string');
                     removeToasts(type);
                 } else {
                     $mdToast.cancel();
@@ -3865,7 +3968,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module('pipToggleButtons', ['pipBasicControls.Templates']);
+    var thisModule = angular.module('pipToggleButtons', ['pipControls.Templates']);
 
     thisModule.directive('pipToggleButtons',
         function () {
@@ -5425,6 +5528,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     );
 
+    // Todo: Remove dependency on Translate. Use moment localization
     thisModule.controller('pipDateController',
         ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
             var value;
@@ -5602,6 +5706,7 @@ module.run(['$templateCache', function($templateCache) {
             };
         });
 
+    // Todo: Remove dependency on Translate. Use moment localization
     thisModule.controller('pipDateRangeController',
         ['$scope', '$element', 'pipTranslate', '$mdMedia', '$rootScope', function ($scope, $element, pipTranslate, $mdMedia, $rootScope) {
             var currentDate,
@@ -6160,6 +6265,7 @@ module.run(['$templateCache', function($templateCache) {
 
     var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
 
+    // Todo: Remove dependency on Translate. Use moment localization
 	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
 
         pipTranslateProvider.translations('en', {
@@ -6680,7 +6786,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module('pipTimeRange', ['pipUtils']);
+    var thisModule = angular.module('pipTimeRange', []);
 
     thisModule.directive('pipTimeRange',
         ['pipUtils', function (pipUtils) {
@@ -6711,13 +6817,20 @@ module.run(['$templateCache', function($templateCache) {
                         }
                     }
 
+                    function toBoolean(value) {
+                        if (value == null) return false;
+                        if (!value) return false;
+                        value = value.toString().toLowerCase();
+                        return value == '1' || value == 'true';
+                    }
+
                     $scope.data = {};
                     $scope.data.start = null;
                     $scope.data.end = null;
                     defineStartDate();
                     defineEndDate();
 
-                    if (pipUtils.toBoolean($attrs.pipRebind)) {
+                    if (toBoolean($attrs.pipRebind)) {
                         $scope.$watch('pipStartDate',
                             function () {
                                 $scope.data.start = null;
@@ -6745,7 +6858,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module('pipTimeRangeEdit', ['pipUtils', 'pipTranslate']);
+    var thisModule = angular.module('pipTimeRangeEdit', ['pipDateUtils', 'pipTranslate']);
 
     thisModule.directive('pipTimeRangeEdit',
         function () {
@@ -6766,6 +6879,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     );
 
+    // Todo: Remove dependency on Translate. Use moment localization
     thisModule.controller('pipTimeRangeEditController',
         ['$scope', '$element', '$attrs', 'pipDates', 'pipTranslate', function ($scope, $element, $attrs, pipDates, pipTranslate) {
 
@@ -7029,6 +7143,7 @@ module.run(['$templateCache', function($templateCache) {
 
     var thisModule = angular.module('pipDatesUtils', []);
 
+    // Todo: Use moment functions instead
     thisModule.factory('pipDates', function () {
         var dates = {};
 
@@ -7468,18 +7583,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipConfirmationDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipDialogs.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'CONFIRM_TITLE': 'Confirm'
-        });
-        pipTranslateProvider.translations('ru', {
-            'CONFIRM_TITLE': 'Подтвердите'
-        });
-    }]);
-    /* eslint-enable quote-props */
+        ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
 
     thisModule.factory('pipConfirmationDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -7507,12 +7611,27 @@ module.run(['$templateCache', function($templateCache) {
     );
 
     thisModule.controller('pipConfirmationDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
-            $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'CONFIRM_TITLE';
+        ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
 
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
+            if (pipTranslate) {
+                pipTranslate.translations('en', {
+                    'CONFIRM_TITLE': 'Confirm'
+                });
+                pipTranslate.translations('ru', {
+                    'CONFIRM_TITLE': 'Подтвердите'
+                });
+
+                $scope.title = params.title || 'CONFIRM_TITLE';
+                $scope.ok = params.ok || 'OK';
+                $scope.cancel = params.cancel || 'CANCEL';
+            } else {
+                $scope.title = params.title || 'Confirm';
+                $scope.ok = params.ok || 'OK';
+                $scope.cancel = params.cancel || 'Cancel';
+            }
+
+            $scope.theme = $rootScope.$theme;
 
             $scope.onCancel = function () {
                 $mdDialog.cancel();
@@ -7527,6 +7646,29 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular);
 
 /**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDialogs.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
+
+/**
  * @file Error details dialog
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo
@@ -7537,29 +7679,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipErrorDetailsDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipDialogs.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'ERROR_DETAILS': 'Error details',
-            'CODE': 'Code',
-            'PATH': 'Path',
-            'ERROR': 'Error code',
-            'METHOD': 'Method',
-            'MESSAGE': 'Message'
-
-        });
-        pipTranslateProvider.translations('ru', {
-            'ERROR_DETAILS': 'Детали ошибки',
-            'CODE': 'Код',
-            'PATH': 'Путь',
-            'ERROR': 'Код ошибки',
-            'METHOD': 'Метод',
-            'MESSAGE': 'Сообщение'
-        });
-    }]);
-    /* eslint-enable quote-props */
+        ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
 
     thisModule.factory('pipErrorDetailsDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -7587,11 +7707,35 @@ module.run(['$templateCache', function($templateCache) {
     );
 
     thisModule.controller('pipErrorDetailsDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', function ($scope, $rootScope, $mdDialog, pipTranslate, params) {
+        ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            if (pipTranslate) {
+                pipTranslate.translations('en', {
+                    'ERROR_DETAILS': 'Error details',
+                    'CODE': 'Code',
+                    'PATH': 'Path',
+                    'ERROR': 'Error code',
+                    'METHOD': 'Method',
+                    'MESSAGE': 'Message'
+
+                });
+                pipTranslate.translations('ru', {
+                    'ERROR_DETAILS': 'Детали ошибки',
+                    'CODE': 'Код',
+                    'PATH': 'Путь',
+                    'ERROR': 'Код ошибки',
+                    'METHOD': 'Метод',
+                    'MESSAGE': 'Сообщение'
+                });
+                $scope.ok = params.ok || 'OK';
+                $scope.cancel = params.cancel || 'CANCEL';
+            } else {
+                $scope.ok = params.ok || 'OK';
+                $scope.cancel = params.cancel || 'Cancel';
+            }
+
             $scope.theme = $rootScope.$theme
             $scope.error = params.error;
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
 
             $scope.onCancel = function () {
                 $mdDialog.cancel();
@@ -7616,18 +7760,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipInformationDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipDialogs.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'INFORMATION_TITLE': 'Information'
-        });
-        pipTranslateProvider.translations('ru', {
-            'INFORMATION_TITLE': 'Информация'
-        });
-    }]);
-    /* eslint-enable quote-props */
+        ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
 
     thisModule.factory('pipInformationDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -7651,18 +7784,34 @@ module.run(['$templateCache', function($templateCache) {
     );
 
     thisModule.controller('pipInformationDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'pipTranslate', 'params', 'pipUtils', function ($scope, $rootScope, $mdDialog, pipTranslate, params, pipUtils) {
-            var content, item;
+        ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+            var content = params.message, item;
+
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            if (pipTranslate) {
+                pipTranslate.translations('en', {
+                    'INFORMATION_TITLE': 'Information'
+                });
+                pipTranslate.translations('ru', {
+                    'INFORMATION_TITLE': 'Информация'
+                });
+
+                $scope.title = params.title || 'INFORMATION_TITLE';
+                $scope.ok = params.ok || 'OK';
+                content = pipTranslate.translate(content);
+            } else {
+                $scope.title = params.title || 'Information';
+                $scope.ok = params.ok || 'OK';
+            }
+
+            var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
 
             $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'INFORMATION_TITLE';
-            content = pipTranslate.translate(params.message);
-            if (params.item) {
+            if (params.item && pipFormat) {
                 item = _.truncate(params.item, 25);
-                content = pipUtils.sprintf(content, item);
+                content = pipFormat(content, item);
             }
             $scope.content = content;
-            $scope.ok = params.ok || 'OK';
 
             $scope.onOk = function () {
                 $mdDialog.hide();
@@ -7684,18 +7833,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipOptionsDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipDialogs.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'OPTIONS_TITLE': 'Choose Option'
-        });
-        pipTranslateProvider.translations('ru', {
-            'OPTIONS_TITLE': 'Выберите опцию'
-        });
-    }]);
-    /* eslint-enable quote-props */
+        ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
 
     thisModule.factory('pipOptionsDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -7719,36 +7857,51 @@ module.run(['$templateCache', function($templateCache) {
                         locals: {params: params},
                         clickOutsideToClose: true
                     })
-                        .then(function (option) {
-                            focusToggleControl();
+                    .then(function (option) {
+                        focusToggleControl();
 
-                            if (successCallback) {
-                                successCallback(option);
-                            }
-                        }, function () {
-                            focusToggleControl();
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
+                        if (successCallback) {
+                            successCallback(option);
+                        }
+                    }, function () {
+                        focusToggleControl();
+                        if (cancelCallback) {
+                            cancelCallback();
+                        }
+                    });
                 }
             };
         }]
     );
     thisModule.controller('pipOptionsDialogController',
-        ['$scope', '$rootScope', '$mdDialog', 'params', function ($scope, $rootScope, $mdDialog, params) {
+        ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            if (pipTranslate) {
+                pipTranslate.translations('en', {
+                    'OPTIONS_TITLE': 'Choose Option'
+                });
+                pipTranslate.translations('ru', {
+                    'OPTIONS_TITLE': 'Выберите опцию'
+                });
+
+                $scope.title = params.title || 'OPTIONS_TITLE';
+                $scope.applyButtonTitle = params.appleButtonTitle || 'SELECT';
+            } else {
+                $scope.title = params.title || 'Choose Option';
+                $scope.applyButtonTitle = params.appleButtonTitle || 'Select';
+            }
+
             $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'OPTIONS_TITLE';
             $scope.options = params.options;
             $scope.selectedOption = _.find(params.options, {active: true}) || {};
             $scope.selectedOptionName = $scope.selectedOption.name;
-            $scope.applyButtonTitle = params.appleButtonTitle || 'SELECT';
             $scope.deleted = params.deleted;
             $scope.deletedTitle = params.deletedTitle;
             $scope.onOptionSelect = function (event, option) {
                 event.stopPropagation();
                 $scope.selectedOptionName = option.name;
             };
+            
             $scope.onKeyPress = function (event) {
                 if (event.keyCode === 32 || event.keyCode === 13) {
                     event.stopPropagation();
@@ -7756,15 +7909,18 @@ module.run(['$templateCache', function($templateCache) {
                     $scope.onSelect();
                 }
             };
+
             $scope.onCancel = function () {
                 $mdDialog.cancel();
             };
+
             $scope.onSelect = function () {
                 var option;
 
                 option = _.find(params.options, {name: $scope.selectedOptionName});
                 $mdDialog.hide({option: option, deleted: $scope.deleted});
             };
+
             // Setting focus to input control
             function focusInput() {
                 var list;
@@ -7791,18 +7947,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipOptionsBigDialog',
-        ['ngMaterial', 'pipUtils', 'pipTranslate', 'pipDialogs.Templates']);
-
-    /* eslint-disable quote-props */
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'OPTIONS_TITLE': 'Choose Option'
-        });
-        pipTranslateProvider.translations('ru', {
-            'OPTIONS_TITLE': 'Выберите опцию'
-        });
-    }]);
-    /* eslint-enable quote-props */
+        ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
 
     thisModule.factory('pipOptionsBigDialog',
         ['$mdDialog', function ($mdDialog) {
@@ -7826,27 +7971,42 @@ module.run(['$templateCache', function($templateCache) {
                         locals: {params: params},
                         clickOutsideToClose: true
                     })
-                        .then(function (option) {
-                            focusToggleControl();
+                    .then(function (option) {
+                        focusToggleControl();
 
-                            if (successCallback) {
-                                successCallback(option);
-                            }
-                        }, function () {
-                            focusToggleControl();
-                            if (cancelCallback) {
-                                cancelCallback();
-                            }
-                        });
+                        if (successCallback) {
+                            successCallback(option);
+                        }
+                    }, function () {
+                        focusToggleControl();
+                        if (cancelCallback) {
+                            cancelCallback();
+                        }
+                    });
                 }
             };
         }]
     );
 
     thisModule.controller('pipOptionsDialogBigController',
-        ['$scope', '$rootScope', '$mdDialog', 'params', function ($scope, $rootScope, $mdDialog, params) {
+        ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            if (pipTranslate) {
+                pipTranslate.translations('en', {
+                    'OPTIONS_TITLE': 'Choose Option'
+                });
+                pipTranslate.translations('ru', {
+                    'OPTIONS_TITLE': 'Выберите опцию'
+                });
+
+                $scope.title = params.title || 'OPTIONS_TITLE';
+                $scope.applyButtonTitle = params.applyButtonTitle || 'SELECT';
+            } else {
+                $scope.title = params.title || 'Choose Option';
+                $scope.applyButtonTitle = params.applyButtonTitle || 'Select';
+            }
+
             $scope.theme = $rootScope.$theme;
-            $scope.title = params.title || 'OPTIONS_TITLE';
             $scope.options = params.options;
             $scope.noActions = params.noActions || false;
             $scope.noTitle = params.noTitle || false;
@@ -7854,7 +8014,6 @@ module.run(['$templateCache', function($templateCache) {
             $scope.selectedOption = _.find(params.options, {active: true}) || {};
             $scope.selectedOptionName = $scope.selectedOption.name;
             $scope.optionIndex = _.findIndex(params.options, $scope.selectedOption);
-            $scope.applyButtonTitle = params.applyButtonTitle || 'SELECT';
 
             $scope.deleted = params.deleted;
             $scope.deletedTitle = params.deletedTitle;
@@ -8718,7 +8877,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipPrimaryActions',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipActions.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
 
     // Main application header directive
     thisModule.directive('pipPrimaryActions', function () {
@@ -8730,14 +8889,14 @@ module.run(['$templateCache', function($templateCache) {
             },
             replace: false,
             templateUrl: function (element, attr) {
-                return 'primary_actions/primary_actions.html';
+                return 'actions/primary_actions.html';
             },
             controller: 'pipPrimaryActionsController'
         };
     });
 
     thisModule.controller('pipPrimaryActionsController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipActions) {
+        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
             // Apply class and call resize
             $element.addClass('pip-primary-actions');
 
@@ -8831,7 +8990,14 @@ module.run(['$templateCache', function($templateCache) {
                 }
 
                 if (action.state) {
-                    $state.go(action.state, action.stateParams);
+                    if ($injector.has('pipState')) {
+                        var pipState = $injector.get('pipState');
+                        $state.go(action.state, action.stateParams);
+                    }
+                    else if ($injector.has('$state')) {
+                        var $state = $injector.get('$state');
+                        $state.go(action.state, action.stateParams);
+                    }
                     return;
                 }
 
@@ -8857,7 +9023,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipSecondaryActions',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipActions.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
 
     // Main application header directive
     thisModule.directive('pipSecondaryActions', function () {
@@ -8872,14 +9038,14 @@ module.run(['$templateCache', function($templateCache) {
             },
             replace: false,
             templateUrl: function (element, attr) {
-                return 'secondary_actions/secondary_actions.html';
+                return 'actions/secondary_actions.html';
             },
             controller: 'pipSecondaryActionsController'
         };
     });
 
     thisModule.controller('pipSecondaryActionsController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate, pipActions) {
+        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
             // Apply class and call resize
             $element.addClass('pip-secondary-actions');
 
@@ -8982,7 +9148,14 @@ module.run(['$templateCache', function($templateCache) {
                 }
 
                 if (action.state) {
-                    $state.go(action.state, action.stateParams);
+                    if ($injector.has('pipState')) {
+                        var pipState = $injector.get('pipState');
+                        $state.go(action.state, action.stateParams);
+                    }
+                    else if ($injector.has('$state')) {
+                        var $state = $injector.get('$state');
+                        $state.go(action.state, action.stateParams);
+                    }
                     return;
                 }
 
@@ -9008,7 +9181,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipAppBar',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipAppBar.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipAppBar.Service']);
 
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
 
@@ -9042,7 +9215,9 @@ module.run(['$templateCache', function($templateCache) {
     });
 
     thisModule.controller('pipAppBarController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate, pipAppBar) {
+        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', '$injector', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, $injector, pipAppBar) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+
             // Initialize default application title
             if ($scope.title) {
                 pipAppBar.showTitleText($scope.title);
@@ -9134,7 +9309,7 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function getLanguage() {
-                return pipTranslate.use();
+                return pipTranslate ? pipTranslate.use() : null;
             }
 
             function actionHidden(action) {
@@ -9707,7 +9882,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipBreadcrumb',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipBreadcrumb.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipBreadcrumb.Service']);
 
     // Main application header directive
     thisModule.directive('pipBreadcrumb', function () {
@@ -9850,6 +10025,29 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window._);
 
 /**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipNav.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
+
+/**
  * @file Dropdown control
  * @copyright Digital Living Software Corp. 2014-2016
  *
@@ -9860,10 +10058,10 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipDropdown", ['pipAssert', 'pipNav.Templates']);
+    var thisModule = angular.module("pipDropdown", ['pipNav.Templates']);
 
     thisModule.directive('pipDropdown',
-        ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
+        ['$mdMedia', function ($mdMedia) {
             return {
                 restrict: 'E',
                 scope: {
@@ -9876,8 +10074,9 @@ module.run(['$templateCache', function($templateCache) {
                 templateUrl: 'dropdown/dropdown.html',
                 controller:
                     ['$scope', '$element', '$attrs', 'localStorageService', function ($scope, $element, $attrs, localStorageService) {
+                        // Todo: Remove dependency on local storage or make it optional
                         $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
-                        pipAssert.isArray($scope.actions, 'pipDropdown: pip-actions attribute should take an array, but take ' + typeof $scope.actions);
+                        //pipAssert.isArray($scope.actions, 'pipDropdown: pip-actions attribute should take an array, but take ' + typeof $scope.actions);
                         $scope.$mdMedia = $mdMedia;
                         $scope.actions = ($scope.actions && _.isArray($scope.actions)) ? $scope.actions : [];
                         $scope.activeIndex = $scope.activeIndex || 0;
@@ -9921,7 +10120,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipLanguagePicker',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 
     // Main application header directive
     thisModule.directive('pipLanguagePicker', function () {
@@ -9939,7 +10138,9 @@ module.run(['$templateCache', function($templateCache) {
     });
 
     thisModule.controller('pipLanguagePickerController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate) {
+        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', '$injector', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, $injector) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+
             // Initialize default application title
             if ($scope.title) {
                 pipLanguagePicker.showTitleText($scope.title);
@@ -9954,14 +10155,16 @@ module.run(['$templateCache', function($templateCache) {
             $scope.onLanguageClick = onLanguageClick;
 
             function getLanguage() {
-                return pipTranslate.use();
+                return pipTranslate ? pipTranslate.use() : null;
             }
 
             function onLanguageClick(language) {
-                setTimeout(function () {
-                    pipTranslate.use(language);
-                    $rootScope.$apply();
-                }, 0);
+                if (pipTranslate) {
+                    setTimeout(function () {
+                        pipTranslate.use(language);
+                        $rootScope.$apply();
+                    }, 0);
+                }
             }
 
         }]
@@ -10041,7 +10244,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipNavIcon',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipNavIcon.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavIcon.Service']);
 
     thisModule.directive('pipNavIcon', function () {
         return {
@@ -10059,7 +10262,7 @@ module.run(['$templateCache', function($templateCache) {
     });
 
     thisModule.controller('pipNavIconController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', 'pipNavIcon', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate, pipNavIcon) {
+        ['$scope', '$element', '$attrs', '$rootScope', '$window', 'pipNavIcon', function ($scope, $element, $attrs, $rootScope, $window, pipNavIcon) {
             // Apply class and call resize
             $element.addClass('pip-nav-icon');
 
@@ -10201,7 +10404,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipNavMenu', 
-        ['ngMaterial', 'pipTranslate', 'pipFocused', 'pipNav.Templates', 'pipNavMenu.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
 
     // Main application navmenu directive
     thisModule.directive('pipNavMenu', function() {
@@ -10217,7 +10420,7 @@ module.run(['$templateCache', function($templateCache) {
     });
 
     thisModule.controller('pipNavMenuController', 
-        ['$scope', '$element', '$state', '$rootScope', '$window', '$location', '$timeout', 'pipState', 'pipTranslate', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $state, $rootScope, $window, $location, $timeout, pipState, pipTranslate, pipSideNav, pipNavMenu) {
+        ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
 
             // Apply class and call resize
             $element.addClass('pip-nav-menu');
@@ -10293,7 +10496,14 @@ module.run(['$templateCache', function($templateCache) {
 
                     pipSideNav.close();
                     $timeout(function() {
-                        pipState.go(link.state, link.stateParams);
+                        if ($injector.has('pipState')) {
+                            var pipState = $injector.get('pipState');
+                            $state.go(link.state, link.stateParams);
+                        }
+                        else if ($injector.has('$state')) {
+                            var $state = $injector.get('$state');
+                            $state.go(link.state, link.stateParams);
+                        }
                     }, 300);
 
                     return;
@@ -10384,7 +10594,7 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     var thisModule = angular.module('pipSearchBar',
-        ['ngMaterial', 'pipTranslate', 'pipNav.Templates', 'pipSearch.Service']);
+        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
 
     thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
 
@@ -10412,7 +10622,7 @@ module.run(['$templateCache', function($templateCache) {
     });
 
     thisModule.controller('pipSearchBarController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipTranslate', 'pipSearch', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipTranslate, pipSearch) {
+        ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
             // Apply class and call resize
             $element.addClass('pip-search-bar');
 
@@ -10910,7 +11120,7 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipTabs", ['pipAssert', 'pipNav.Templates']);
+    var thisModule = angular.module("pipTabs", ['pipNav.Templates']);
 
     thisModule.directive('pipTabs',
         ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
@@ -10926,16 +11136,22 @@ module.run(['$templateCache', function($templateCache) {
                 },
                 templateUrl: 'tabs/tabs.html',
                 controller:
-                    ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', 'pipTranslate', function ($scope, $element, $attrs, $mdMedia, localStorageService, pipTranslate) {
+                    ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', '$inject', function ($scope, $element, $attrs, $mdMedia, localStorageService, $inject) {
+                        // Todo: Remove dependency on local storage or made it optional
                         $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
                         pipAssert.isArray($scope.tabs, 'pipTabs: pipTabs attribute should take an array');
                         $scope.$mdMedia = $mdMedia;
                         $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
-                        if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
-                            pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
-                        } else {
-                            pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+
+                        var pipTranslate = $inject.has('pipTranslate') ? $inject.get('pipTranslate') : null;
+                        if (pipTranslate) {
+                            if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
+                                pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
+                            } else {
+                                pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+                            }
                         }
+
                         $scope.activeIndex = $scope.activeIndex || 0;
                         $scope.activeTab = $scope.activeIndex;
 
@@ -10983,87 +11199,99 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-
-
 (function () {
     'use strict';
-    angular.module('pipTheme', [
-        'pipTheme.Run', 
-        'pipTheme.Factory'
-    ]);
-})();
-
-(function () {
-    'use strict';
-    ThemeFactory.$inject = ['localStorageService', '$mdTheming', '$rootScope', '$timeout', '$state', '$stateParams'];
-    var thisModule = angular.module('pipTheme.Factory', ['ngMaterial']);
+    var thisModule = angular.module('pipTheme', ['LocalStorageModule', 'ngMaterial']);
     
-    thisModule.factory('pipTheme', ThemeFactory);
-    
-    function ThemeFactory(localStorageService, $mdTheming, $rootScope, $timeout, $state, $stateParams) {
-        return {
-            /**
-             * Set current theme
-             * @param {String} theme - theme name
-             * @param {String}
-             * @throws {Error} 'Theme is not specified' in case if theme is not defined
-             * @throws {Error} 'Theme XXX is not registered. Please, register it first with $mdThemingProvider' if theme is not registered
-             */
-            setCurrentTheme: function (theme) {
-                if (theme == null || theme === '') {
-                    throw new Error('Theme is not specified');
-                }
+    thisModule.provider('pipTheme', function() {
+        var 
+            theme = 'blue',
+            persist = true,
+            setRoot = true;
 
-                if (localStorageService.get('theme') == theme && $rootScope.$theme == theme) {
-                    return;
-                }
+        this.use = initTheme;
+        this.init = initTheme;
+        this.persist = initPersist;
+        this.setRoot = initSetRoot;
 
-                if (!(theme in $mdTheming.THEMES)) {
-                    throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
-                }
-                localStorageService.set('theme', theme);
+        this.$get = ['$rootScope', '$timeout', 'localStorageService', '$mdTheming', function ($rootScope, $timeout, localStorageService, $mdTheming) {
+            // Read language from persistent storage
+            if (persist)
+                theme = localStorageService.get('theme') || theme;
+
+            // Set root variable
+            if (setRoot) 
                 $rootScope.$theme = theme;
-            },
 
-            /** 
-             *  Add attribute 'md-theme' with value current theme
-             *  Add current theme class
-             */
-            initializeTheme: function (theme) {
-                if (theme == null || theme === '') {
-                    throw new Error('Theme is not specified');
-                }
+            // Switch material theme
+            $('body').attr('md-theme', '{{ $theme }}').addClass('{{ $theme }}');
+            
+            // Resetting root scope to force update language on the screen
+            function resetContent(fullReset, partialReset) {
+                fullReset = fullReset !== undefined ? !!fullReset : true;
+                partialReset = partialReset !== undefined ? !!partialReset : true;
 
-                if (!(theme in $mdTheming.THEMES)) {
-                    throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
-                }
-
-                $rootScope.$theme = theme;
-                $('body').attr('md-theme', '{{ $theme }}').addClass('{{ $theme }}');
+                $rootScope.$reset = fullReset;
+                $rootScope.$partialReset = partialReset;
+                $timeout(function() {
+                    $rootScope.$reset = false;
+                    $rootScope.$partialReset = false;
+                }, 0);
             }
-        };
-    }
-})();
 
+            function getOrSetTheme(newTheme, fullReset, partialReset) {
+                if (newTheme != null && newTheme != theme) {
+                    if (!(theme in $mdTheming.THEMES))
+                        throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
 
+                    theme = newTheme;
+                    
+                    if (persist)
+                        localStorageService.set('theme', theme);
+                    if (setRoot)
+                        $rootScope.$language = theme;
+                    
+                    // Switch material theme
+                    $('body').attr('md-theme', '{{ $theme }}').addClass('{{ $theme }}');
 
-(function () {
-    'use strict';
-    run.$inject = ['localStorageService', 'pipTheme', '$rootScope'];
-    var thisModule = angular.module('pipTheme.Run', []);
+                    // Resetting content.
+                    resetContent(fullReset, partialReset);
 
-    thisModule.run(run);
-    
-    function run(localStorageService, pipTheme, $rootScope) {
-        try {
-            var currentTheme = ($rootScope.$user && $rootScope.$user.theme) ?
-                $rootScope.$user.theme : localStorageService.get('theme');
+                    // Sending notification
+                    $rootScope.$broadcast('pipThemeChanged', newTheme);
+                }
+                return theme;
+            }
 
-            pipTheme.initializeTheme(currentTheme);
-        } catch (ex) {
-            pipTheme.initializeTheme('blue');
+            return {
+                use: getOrSetTheme,
+                theme: getOrSetTheme
+            }
+        }];
+
+        // Initialize theme selection
+        function initTheme(newTheme) {
+            if (newTheme != null)
+                theme = newTheme;
+            return theme;
         }
-    }
+
+        // Initialize persistence flag
+        function initPersist(newPersist) {
+            if (newPersist != null)
+                persist = newPersist;
+            return persist;
+        }
+
+        // Initialize set root flag
+        function initSetRoot(newSetRoot) {
+            if (newSetRoot != null)
+                setRoot = newSetRoot;
+            return setRoot;  
+        }
+
+    });
+    
 })();
 
 (function () {
@@ -11077,21 +11305,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Bootbarn.Cool', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            'bootbarn-cool': 'Cool'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     'bootbarn-cool': 'Cool'
+        // });
 
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            'bootbarn-cool': ''
-        });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     'bootbarn-cool': ''
+        // });
         
         var coolBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
@@ -11137,21 +11365,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Bootbarn.Monochrome', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            'bootbarn-monochrome': 'Monochrome'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     'bootbarn-monochrome': 'Monochrome'
+        // });
 
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            'bootbarn-monochrome': ''
-        });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     'bootbarn-monochrome': ''
+        // });
         
         var monochromeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
@@ -11197,21 +11425,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Bootbarn.Warm', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            'bootbarn-warm': 'Warm'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     'bootbarn-warm': 'Warm'
+        // });
 
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            'bootbarn-warm': 'Коричневая'
-        });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     'bootbarn-warm': 'Коричневая'
+        // });
 
         $mdThemingProvider.alwaysWatchTheme(true);
 
@@ -11263,19 +11491,19 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Default', ['pipTheme.Blue', 'pipTheme.Pink',
         'pipTheme.Amber', 'pipTheme.Orange', 'pipTheme.Green', 'pipTheme.Navy', 'pipTheme.Grey']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme'
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme'
+        // });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема'
+        // });
 
         $mdThemingProvider.setDefaultTheme('default');
         $mdThemingProvider.alwaysWatchTheme(true);
@@ -11285,20 +11513,20 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Amber', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            amber: 'Amber'
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            amber: 'Янтарная'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     amber: 'Amber'
+        // });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     amber: 'Янтарная'
+        // });
 
         var orangeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
@@ -11335,18 +11563,18 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Black', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        // });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема'
+        // });
         
         registerDarkTheme('dark');
         registerBlackTheme('black');
@@ -11419,20 +11647,20 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Blue', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            blue: 'Blue',
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            blue: 'Голубая'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     blue: 'Blue',
+        // });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     blue: 'Голубая'
+        // });
 
         registerBlueTheme('default');
         registerBlueTheme('blue');
@@ -11480,21 +11708,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Green', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            green: 'Green'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     green: 'Green'
+        // });
 
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            green: 'Зеленая'
-        });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     green: 'Зеленая'
+        // });
 
         var greenBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
@@ -11536,21 +11764,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Grey', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            grey: 'Grey'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     grey: 'Grey'
+        // });
         
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            grey: 'Серая'
-        });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     grey: 'Серая'
+        // });
 
         var thirdPartyPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
@@ -11589,20 +11817,20 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Navy', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            navy: 'Navy'
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            navy: 'Сине-серая'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     navy: 'Navy'
+        // });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     navy: 'Сине-серая'
+        // });
 
         var greyPalette = $mdThemingProvider.extendPalette('grey', {
             '700': 'rgba(86, 97, 125, 1)',
@@ -11638,21 +11866,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Orange', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            orange: 'Orange'
-        });
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     orange: 'Orange'
+        // });
 
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            orange: 'Оранжевая'
-        });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     orange: 'Оранжевая'
+        // });
 
         var RedBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
@@ -11691,21 +11919,21 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$mdThemingProvider', 'pipTranslateProvider'];
+    config.$inject = ['$mdThemingProvider'];
     var thisModule = angular.module('pipTheme.Pink', ['ngMaterial']);
 
     thisModule.config(config);
 
-    function config($mdThemingProvider, pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            THEME: 'Theme',
-            pink: 'Pink'
-        });
-        pipTranslateProvider.translations('ru', {
-            THEME: 'Тема',
-            pink: 'Розовая',
+    function config($mdThemingProvider) {
+        // pipTranslateProvider.translations('en', {
+        //     THEME: 'Theme',
+        //     pink: 'Pink'
+        // });
+        // pipTranslateProvider.translations('ru', {
+        //     THEME: 'Тема',
+        //     pink: 'Розовая',
 
-        });
+        // });
 
         var PinkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
