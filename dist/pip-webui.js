@@ -255,6 +255,160 @@
 
 })();
 
+/**
+ * @file Application router extended from ui.router
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+ /* global angular */
+ 
+(function () {
+    'use strict';
+    
+    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
+
+    thisModule.config(
+        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
+            // Switch to HTML5 routing mode
+            //$locationProvider.html5Mode(true);
+            pipTranslateProvider.translations('en', {
+                'ERROR_SWITCHING': 'Error while switching route. Try again.'
+            });
+
+            pipTranslateProvider.translations('ru', {
+                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
+            });
+        }]
+    );
+
+    thisModule.run(
+        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
+            $rootScope.$on('$stateChangeSuccess',
+                function(event, toState, toParams, fromState, fromParams) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+                    // Record current and previous state
+                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
+                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
+                }
+            );
+
+            // Intercept route error
+            $rootScope.$on('$stateChangeError',
+                function(event, toState, toParams, fromState, fromParams, error) {
+                    // Unset routing variable to disable page transition
+                    $rootScope.$routing = false;
+
+                    console.error('Error while switching route to ' + toState.name);
+                    console.error(error);
+                }
+            );
+
+
+            // Intercept route error
+            $rootScope.$on('$stateNotFound',
+                function(event, unfoundState, fromState, fromParams) {
+                    event.preventDefault();
+
+                    // todo make configured error state name
+                    $state.go('errors_missing_route',  {
+                            unfoundState: unfoundState,
+                            fromState : {
+                                to: fromState ? fromState.name : '',
+                                fromParams: fromParams
+                            }
+                        }
+                    );
+                    $rootScope.$routing = false;
+                }
+            );
+
+        }]
+    );
+
+    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
+        // Configuration of redirected states
+        var redirectedStates = {};
+
+        this.redirect = setRedirect;
+        this.state = $stateProvider.state;
+
+        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
+            $state.redirect = redirect;
+            $state.goBack = goBack;
+            $state.goBackAndSelect = goBackAndSelect;
+            
+            return $state;
+            
+			//------------------------
+            
+            function redirect(event, state, params, $rootScope) {
+                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
+                pipAssert.isObject(params, "$state.redirect: params should be an object");
+
+                var toState;
+
+                $rootScope.$routing = true;
+                toState = redirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params, $rootScope);
+
+                    if (_.isNull(toState)) {
+                        $rootScope.$routing = false;
+                        throw new Error('Redirected toState cannot be null');
+                    }
+                }
+
+                if (!!toState) {
+                    $timeout(function() {
+                        event.preventDefault();
+                        $state.transitionTo(toState, params, {location: 'replace'});
+                    });
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            function goBack() {
+                $window.history.back()
+            }
+
+            function goBackAndSelect(obj, objParamName, id, idParamName) {
+                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
+                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
+                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
+                    
+                if ($rootScope.$prevState && $rootScope.$prevState.name) {
+                    var state = _.cloneDeep($rootScope.$prevState);
+
+                    state.params[idParamName] = id;
+                    state.params[objParamName] = obj;
+
+                    $state.go(state.name, state.params);
+                } else {
+                    $window.history.back();
+                }
+            }
+        }];
+
+        return;        
+        //------------------
+
+        // Specify automatic redirect from one state to another
+        function setRedirect(fromState, toState) {
+            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
+            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
+            
+            redirectedStates[fromState] = toState;  
+
+            return this;
+        };
+
+    }]);
+
+})();
 
  /* global angular */
 
@@ -579,160 +733,6 @@
 
 })();
 
-/**
- * @file Application router extended from ui.router
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
-
-    thisModule.config(
-        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-            pipTranslateProvider.translations('en', {
-                'ERROR_SWITCHING': 'Error while switching route. Try again.'
-            });
-
-            pipTranslateProvider.translations('ru', {
-                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
-            });
-        }]
-    );
-
-    thisModule.run(
-        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-                    // Record current and previous state
-                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
-                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
-                }
-            );
-
-            // Intercept route error
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-
-                    console.error('Error while switching route to ' + toState.name);
-                    console.error(error);
-                }
-            );
-
-
-            // Intercept route error
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    event.preventDefault();
-
-                    // todo make configured error state name
-                    $state.go('errors_missing_route',  {
-                            unfoundState: unfoundState,
-                            fromState : {
-                                to: fromState ? fromState.name : '',
-                                fromParams: fromParams
-                            }
-                        }
-                    );
-                    $rootScope.$routing = false;
-                }
-            );
-
-        }]
-    );
-
-    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
-        // Configuration of redirected states
-        var redirectedStates = {};
-
-        this.redirect = setRedirect;
-        this.state = $stateProvider.state;
-
-        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
-            $state.redirect = redirect;
-            $state.goBack = goBack;
-            $state.goBackAndSelect = goBackAndSelect;
-            
-            return $state;
-            
-			//------------------------
-            
-            function redirect(event, state, params, $rootScope) {
-                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
-                pipAssert.isObject(params, "$state.redirect: params should be an object");
-
-                var toState;
-
-                $rootScope.$routing = true;
-                toState = redirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params, $rootScope);
-
-                    if (_.isNull(toState)) {
-                        $rootScope.$routing = false;
-                        throw new Error('Redirected toState cannot be null');
-                    }
-                }
-
-                if (!!toState) {
-                    $timeout(function() {
-                        event.preventDefault();
-                        $state.transitionTo(toState, params, {location: 'replace'});
-                    });
-
-                    return true;
-                }
-
-                return false;
-            }
-
-            function goBack() {
-                $window.history.back()
-            }
-
-            function goBackAndSelect(obj, objParamName, id, idParamName) {
-                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
-                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
-                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
-                    
-                if ($rootScope.$prevState && $rootScope.$prevState.name) {
-                    var state = _.cloneDeep($rootScope.$prevState);
-
-                    state.params[idParamName] = id;
-                    state.params[objParamName] = obj;
-
-                    $state.go(state.name, state.params);
-                } else {
-                    $window.history.back();
-                }
-            }
-        }];
-
-        return;        
-        //------------------
-
-        // Specify automatic redirect from one state to another
-        function setRedirect(fromState, toState) {
-            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
-            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
-            
-            redirectedStates[fromState] = toState;  
-
-            return this;
-        };
-
-    }]);
-
-})();
 /**
  * @file Identity service
  * @copyright Digital Living Software Corp. 2014-2016
@@ -2092,6 +2092,283 @@
 
 
 /**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipButtons', [
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipFabTooltipVisibility'
+    ]);
+
+})(window.angular);
+
+
+(function(module) {
+try {
+  module = angular.module('pipButtons.Templates');
+} catch (e) {
+  module = angular.module('pipButtons.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toggle_buttons/toggle_buttons.html',
+    '<div class="pip-toggle-buttons flex layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)"\n' +
+    '     ng-if="$mdMedia(\'gt-xs\')">\n' +
+    '    <md-button tabindex="-1" ng-repeat="button in buttons"\n' +
+    '               ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}"\n' +
+    '               ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}"\n' +
+    '               class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)"\n' +
+    '               ng-disabled="button.disabled || disabled()">\n' +
+    '        {{button.name || button.title | translate}}\n' +
+    '        <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<md-input-container class="md-block" ng-if="$mdMedia(\'xs\')">\n' +
+    '    <md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)">\n' +
+    '        <md-option ng-repeat="action in buttons" value="{{ ::$index }}">\n' +
+    '            {{ (action.title || action.name) | translate }}\n' +
+    '            <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span>\n' +
+    '        </md-option>\n' +
+    '    </md-select>\n' +
+    '</md-input-container>\n' +
+    '');
+}]);
+})();
+
+/**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipButtons.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
+
+/**
+ * @file Directive to show confirmation dialog when user tries to leave page with unsaved changes.
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function(){
+    'use strict';
+
+    var thisModule = angular.module("pipFabTooltipVisibility", []);
+
+    thisModule.directive("pipFabTooltipVisibility", ['$parse', '$timeout', function ($parse, $timeout) {
+        return {
+            restrict: 'A',
+            scope: false,
+            controller: ['$scope', '$attrs', function($scope, $attrs) {
+                var trigGetter = $parse($attrs.pipFabTooltipVisibility),
+                    showGetter = $parse($attrs.pipFabShowTooltip),
+                    showSetter = showGetter.assign;
+
+                $scope.$watch(trigGetter, function(isOpen) {
+                    if (isOpen) {
+                        $timeout(function() {
+                            showSetter($scope, isOpen);
+                        }, 600);
+                    } else {
+                        showSetter($scope, isOpen);
+                    }
+                });
+            }]
+        };
+    }]);
+
+})();
+
+/**
+ * @file Refresh button control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
+
+    thisModule.directive('pipRefreshButton',
+        ['$parse', function ($parse) {
+            return {
+                restrict: 'EA',
+                scope: false,
+                template: String() +
+                '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">' +
+                '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
+                '<span class="pip-refresh-text"></span>' +
+                '</md-button>',
+                replace: false,
+                link: function ($scope, $element, $attrs) {
+                    var width, text, show,
+                        textGetter = $parse($attrs.pipText),
+                        visibleGetter = $parse($attrs.pipVisible),
+                        refreshGetter = $parse($attrs.pipRefresh),
+                        $button = $element.children('.md-button'),
+                        $text = $button.children('.pip-refresh-text');
+
+                    show = function () {
+                        // Set a new text
+                        text = textGetter($scope);
+                        $text.text(text);
+
+                        // Show button
+                        $button.show();
+
+                        // Adjust position
+                        width = $button.width();
+                        $button.css('margin-left', '-' + width / 2 + 'px');
+                    };
+
+                    function hide() {
+                        $button.hide();
+                    }
+
+                    $scope.onClick = function () {
+                        refreshGetter($scope);
+                    };
+
+                    $scope.$watch(visibleGetter, function (newValue) {
+                        if (newValue) {
+                            show();
+                        } else {
+                            hide();
+                        }
+                    });
+
+                    $scope.$watch(textGetter, function (newValue) {
+                        $text.text(newValue);
+                    });
+                }
+            };
+        }]
+    );
+
+})(window.angular);
+
+
+/**
+ * @file Toggle buttons control
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    var thisModule = angular.module('pipToggleButtons', ['pipButtons.Templates']);
+
+    thisModule.directive('pipToggleButtons',
+        function () {
+            return {
+                restrict: 'EA',
+                scope: {
+                    ngDisabled: '&',
+                    buttons: '=pipButtons',
+                    currentButtonValue: '=ngModel',
+                    currentButton: '=?pipButtonObject',
+                    change: '&ngChange'
+                },
+                templateUrl: 'toggle_buttons/toggle_buttons.html',
+                controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
+                    var index;
+
+                    $scope.$mdMedia = $mdMedia;
+                    $scope.class = $attrs.class || '';
+
+                    if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
+                        $scope.buttons = [];
+                    }
+
+                    index = _.indexOf($scope.buttons, _.find($scope.buttons, {id: $scope.currentButtonValue}));
+                    $scope.currentButtonIndex = index < 0 ? 0 : index;
+                    $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
+                        : $scope.currentButton;
+
+                    $scope.buttonSelected = function (index) {
+                        if ($scope.disabled()) {
+                            return;
+                        }
+
+                        $scope.currentButtonIndex = index;
+                        $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
+                        $scope.currentButtonValue = $scope.currentButton.id || index;
+
+                        $timeout(function () {
+                            if ($scope.change) {
+                                $scope.change();
+                            }
+                        });
+                    };
+
+                    $scope.enterSpacePress = function (event) {
+                        $scope.buttonSelected(event.index);
+                    };
+
+                    $scope.disabled = function () {
+                        if ($scope.ngDisabled) {
+                            return $scope.ngDisabled();
+                        }
+                    };
+                }],
+                link: function (scope, elem) {
+                    elem
+                        .on('focusin', function () {
+                            elem.addClass('focused-container');
+                        })
+                        .on('focusout', function () {
+                            elem.removeClass('focused-container');
+                        });
+                }
+            };
+        }
+    );
+
+})(window.angular, window._);
+
+
+
+/**
+ * @file Registration of landing WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipLanding', [
+    ]);
+
+})(window.angular);
+
+
+
+
+/**
  * @file Registration of all application layouts
  * @copyright Digital Living Software Corp. 2014-2015
  */
@@ -2654,16 +2931,12 @@
 
     angular.module('pipControls', [
         'pipMarkdown',
-        'pipToggleButtons',
-        'pipRefreshButton',
         'pipColorPicker',
         'pipRoutingProgress',
         'pipPopover',
         'pipImageSlider',
         'pipToasts',
-        'pipTagList',
-        'pipUnsavedChanges',
-        'pipFabTooltipVisibility'
+        'pipUnsavedChanges'
     ]);
 
 })(window.angular);
@@ -2741,30 +3014,6 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tags/tag_list.html',
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
-    '     ng-if="pipType && !pipTypeLocal">\n' +
-    '\n' +
-    '    <span>{{pipType.toUpperCase() | translate | uppercase}}</span>\n' +
-    '</div>\n' +
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
-    '     ng-if="pipType && pipTypeLocal">\n' +
-    '\n' +
-    '    <span>{{pipTypeLocal.toUpperCase() | translate | uppercase}}</span>\n' +
-    '</div>\n' +
-    '<div class="pip-chip rm4" ng-repeat="tag in pipTags">\n' +
-    '    <span>{{::tag}}</span>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toast/toast.html',
     '<md-toast class="md-action pip-toast"\n' +
     '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
@@ -2785,74 +3034,6 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '</md-toast>');
 }]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toggle_buttons/toggle_buttons.html',
-    '<div class="pip-toggle-buttons flex layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)"\n' +
-    '     ng-if="$mdMedia(\'gt-xs\')">\n' +
-    '    <md-button tabindex="-1" ng-repeat="button in buttons"\n' +
-    '               ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}"\n' +
-    '               ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}"\n' +
-    '               class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)"\n' +
-    '               ng-disabled="button.disabled || disabled()">\n' +
-    '        {{button.name || button.title | translate}}\n' +
-    '        <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '\n' +
-    '<md-input-container class="md-block" ng-if="$mdMedia(\'xs\')">\n' +
-    '    <md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)">\n' +
-    '        <md-option ng-repeat="action in buttons" value="{{ ::$index }}">\n' +
-    '            {{ (action.title || action.name) | translate }}\n' +
-    '            <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span>\n' +
-    '        </md-option>\n' +
-    '    </md-select>\n' +
-    '</md-input-container>\n' +
-    '');
-}]);
-})();
-
-/**
- * @file Directive to show confirmation dialog when user tries to leave page with unsaved changes.
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function(){
-    'use strict';
-
-    var thisModule = angular.module("pipFabTooltipVisibility", []);
-
-    thisModule.directive("pipFabTooltipVisibility", ['$parse', '$timeout', function ($parse, $timeout) {
-        return {
-            restrict: 'A',
-            scope: false,
-            controller: ['$scope', '$attrs', function($scope, $attrs) {
-                var trigGetter = $parse($attrs.pipFabTooltipVisibility),
-                    showGetter = $parse($attrs.pipFabShowTooltip),
-                    showSetter = showGetter.assign;
-
-                $scope.$watch(trigGetter, function(isOpen) {
-                    if (isOpen) {
-                        $timeout(function() {
-                            showSetter($scope, isOpen);
-                        }, 600);
-                    } else {
-                        showSetter($scope, isOpen);
-                    }
-                });
-            }]
-        };
-    }]);
-
 })();
 
 /**
@@ -3563,136 +3744,6 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular);
 
 /**
- * @file Refresh button control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
-
-    thisModule.directive('pipRefreshButton',
-        ['$parse', function ($parse) {
-            return {
-                restrict: 'EA',
-                scope: false,
-                template: String() +
-                '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">' +
-                '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
-                '<span class="pip-refresh-text"></span>' +
-                '</md-button>',
-                replace: false,
-                link: function ($scope, $element, $attrs) {
-                    var width, text, show,
-                        textGetter = $parse($attrs.pipText),
-                        visibleGetter = $parse($attrs.pipVisible),
-                        refreshGetter = $parse($attrs.pipRefresh),
-                        $button = $element.children('.md-button'),
-                        $text = $button.children('.pip-refresh-text');
-
-                    show = function () {
-                        // Set a new text
-                        text = textGetter($scope);
-                        $text.text(text);
-
-                        // Show button
-                        $button.show();
-
-                        // Adjust position
-                        width = $button.width();
-                        $button.css('margin-left', '-' + width / 2 + 'px');
-                    };
-
-                    function hide() {
-                        $button.hide();
-                    }
-
-                    $scope.onClick = function () {
-                        refreshGetter($scope);
-                    };
-
-                    $scope.$watch(visibleGetter, function (newValue) {
-                        if (newValue) {
-                            show();
-                        } else {
-                            hide();
-                        }
-                    });
-
-                    $scope.$watch(textGetter, function (newValue) {
-                        $text.text(newValue);
-                    });
-                }
-            };
-        }]
-    );
-
-})(window.angular);
-
-
-/**
- * @file Tag list control
- * @copyright Digital Living Software Corp. 2014-2015
- * @todo
- * - Improve samples in sampler app
- * - What's pipType and pipTypeLocal? Give better name
- * - Do not use ng-if, instead generate template statically
- */
-
-(function (angular) {
-    'use strict';
-
-    var thisModule = angular.module('pipTagList', []);
-
-    /**
-     * pipTags - set of tags
-     * pipType - additional type tag
-     * pipTypeLocal - additional translated type tag
-     */
-    thisModule.directive('pipTagList',
-        ['$parse', function ($parse) {
-            return {
-                restrict: 'EA',
-                scope: {
-                    pipTags: '=',
-                    pipType: '=',
-                    pipTypeLocal: '='
-                },
-                templateUrl: 'tags/tag_list.html',
-                controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-                    var tagsGetter;
-
-                    tagsGetter = $parse($attrs.pipTags);
-                    $element.css('display', 'block');
-                    // Set tags
-                    $scope.tags = tagsGetter($scope);
-
-                    function toBoolean(value) {
-                        if (value == null) return false;
-                        if (!value) return false;
-                        value = value.toString().toLowerCase();
-                        return value == '1' || value == 'true';
-                    }
-
-                    // Also optimization to avoid watch if it is unnecessary
-                    if (toBoolean($attrs.pipRebind)) {
-                        $scope.$watch(tagsGetter, function () {
-                            $scope.tags = tagsGetter($scope);
-                        });
-                    }
-
-                    // Add class
-                    $element.addClass('pip-tag-list');
-                }]
-            };
-        }]
-    );
-
-})(window.angular);
-
-
-/**
  * @file Toasts management service
  * @copyright Digital Living Software Corp. 2014-2016
  * @todo Replace ngAudio with alternative service
@@ -3961,84 +4012,6 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window._);
 
 /**
- * @file Toggle buttons control
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipToggleButtons', ['pipControls.Templates']);
-
-    thisModule.directive('pipToggleButtons',
-        function () {
-            return {
-                restrict: 'EA',
-                scope: {
-                    ngDisabled: '&',
-                    buttons: '=pipButtons',
-                    currentButtonValue: '=ngModel',
-                    currentButton: '=?pipButtonObject',
-                    change: '&ngChange'
-                },
-                templateUrl: 'toggle_buttons/toggle_buttons.html',
-                controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
-                    var index;
-
-                    $scope.$mdMedia = $mdMedia;
-                    $scope.class = $attrs.class || '';
-
-                    if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
-                        $scope.buttons = [];
-                    }
-
-                    index = _.indexOf($scope.buttons, _.find($scope.buttons, {id: $scope.currentButtonValue}));
-                    $scope.currentButtonIndex = index < 0 ? 0 : index;
-                    $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
-                        : $scope.currentButton;
-
-                    $scope.buttonSelected = function (index) {
-                        if ($scope.disabled()) {
-                            return;
-                        }
-
-                        $scope.currentButtonIndex = index;
-                        $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
-                        $scope.currentButtonValue = $scope.currentButton.id || index;
-
-                        $timeout(function () {
-                            if ($scope.change) {
-                                $scope.change();
-                            }
-                        });
-                    };
-
-                    $scope.enterSpacePress = function (event) {
-                        $scope.buttonSelected(event.index);
-                    };
-
-                    $scope.disabled = function () {
-                        if ($scope.ngDisabled) {
-                            return $scope.ngDisabled();
-                        }
-                    };
-                }],
-                link: function (scope, elem) {
-                    elem
-                        .on('focusin', function () {
-                            elem.addClass('focused-container');
-                        })
-                        .on('focusout', function () {
-                            elem.removeClass('focused-container');
-                        });
-                }
-            };
-        }
-    );
-
-})(window.angular, window._);
-
-/**
  * @file Directive to show confirmation dialog when user tries to leave page with unsaved changes.
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -4101,7 +4074,8 @@ module.run(['$templateCache', function($templateCache) {
         'pipFocused',
         'pipSelected',
         'pipInfiniteScroll',
-        'pipDraggable'
+        'pipDraggable',
+	'pipTagList'
     ]);
     
 })();
@@ -5244,6 +5218,66 @@ module.run(['$templateCache', function($templateCache) {
 
 })();
 
+
+/**
+ * @file Tag list control
+ * @copyright Digital Living Software Corp. 2014-2015
+ * @todo
+ * - Improve samples in sampler app
+ * - What's pipType and pipTypeLocal? Give better name
+ * - Do not use ng-if, instead generate template statically
+ */
+
+(function (angular) {
+    'use strict';
+
+    var thisModule = angular.module('pipTagList', []);
+
+    /**
+     * pipTags - set of tags
+     * pipType - additional type tag
+     * pipTypeLocal - additional translated type tag
+     */
+    thisModule.directive('pipTagList',
+        ['$parse', function ($parse) {
+            return {
+                restrict: 'EA',
+                scope: {
+                    pipTags: '=',
+                    pipType: '=',
+                    pipTypeLocal: '='
+                },
+                templateUrl: 'tags/tag_list.html',
+                controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
+                    var tagsGetter;
+
+                    tagsGetter = $parse($attrs.pipTags);
+                    $element.css('display', 'block');
+                    // Set tags
+                    $scope.tags = tagsGetter($scope);
+
+                    function toBoolean(value) {
+                        if (value == null) return false;
+                        if (!value) return false;
+                        value = value.toString().toLowerCase();
+                        return value == '1' || value == 'true';
+                    }
+
+                    // Also optimization to avoid watch if it is unnecessary
+                    if (toBoolean($attrs.pipRebind)) {
+                        $scope.$watch(tagsGetter, function () {
+                            $scope.tags = tagsGetter($scope);
+                        });
+                    }
+
+                    // Add class
+                    $element.addClass('pip-tag-list');
+                }]
+            };
+        }]
+    );
+
+})(window.angular);
 
 
 
@@ -12074,7 +12108,7 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/pip_no_connection_panel.html',
+  $templateCache.put('no_connection_panel/no_connection_panel.html',
     '    <div class="pip-empty pip-error layout-column layout-align-center-center flex">\n' +
     '        <img src="images/no_response.svg" class="pip-pic block" >\n' +
     '        \n' +
@@ -12234,70 +12268,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipErrors.Pages', [
-        'pipAppBar', 'pipState', 'pipTransactions', 'ngMaterial', 
-        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
-        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Templates'
-    ]);
-
-    thisModule.config(
-        ['pipAuthStateProvider', function (pipAuthStateProvider) {
-            // Configure module routes
-            pipAuthStateProvider
-                .state('errors_no_connection', {
-                    url: '/errors/no_connection',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorNoConnectionController',
-                    templateUrl: 'no_connection/no_connection.html'
-                })
-                .state('errors_maintenance', {
-                    url: '/errors/maintenance',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorMaintenanceController',
-                    templateUrl: 'maintenance/maintenance.html'
-                })
-                .state('errors_missing_route', {
-                    url: '/errors/missing_route',
-                    params: {
-                        unfoundState: null,
-                        fromState: null
-                    },
-                    auth: true,
-                    controller: 'pipErrorMissingRouteController',
-                    templateUrl: 'missing_route/missing_route.html'
-                })
-                .state('errors_unsupported', {
-                    url: '/errors/unsupported',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorUnsupportedController',
-                    templateUrl: 'unsupported/unsupported.html'
-                })
-                .state('errors_unknown', {
-                    url: '/errors/unknown',
-                    params: {
-                        error: null
-                    },
-                    auth: false,
-                    controller: 'pipErrorUnknownController',
-                    templateUrl: 'unknown/unknown.html'
-                });
-        }]);
-
-})();
 /**
  * @file Errors string resources
  * @copyright Digital Living Software Corp. 2014-2016
@@ -12310,10 +12280,12 @@ module.run(['$templateCache', function($templateCache) {
 
     var thisModule = angular.module('pipErrors.Strings', ['pipTranslate']);
 
-    thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+    thisModule.run(['$injector', function($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate == null) return;
 
         // Set translation strings for the module
-        pipTranslateProvider.translations('en', {
+        pipTranslate.translations('en', {
             'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
             'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
             'ERROR_ROUTE_CONTINUE': 'Continue',
@@ -12351,7 +12323,7 @@ module.run(['$templateCache', function($templateCache) {
 
         });
 
-        pipTranslateProvider.translations('ru', {
+        pipTranslate.translations('ru', {
             'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
             'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
             'ERROR_ROUTE_CONTINUE': 'Continue',
@@ -12377,7 +12349,7 @@ module.run(['$templateCache', function($templateCache) {
             'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
             'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
             'and easier to use. Unfortunately, your browser doesn\'t support those ' +
-            'technologies. Download on of these great browsers and you\'ll be on your way:',
+            'technologies. Download on of these great browsers and you\'ll be on your way:',            
             'ERROR_UNSUPPORTED_O': 'Opera',
             'ERROR_UNSUPPORTED_O_VER': 'Version 35+',
             'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
@@ -12389,6 +12361,88 @@ module.run(['$templateCache', function($templateCache) {
 
         });
     }]);
+
+})();
+/**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipErrors.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipErrors.Pages', [
+        'ngMaterial', 
+        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
+        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
+    ]);
+
+    thisModule.config(
+        ['$stateProvider', function ($stateProvider) {
+            // Configure module routes
+            $stateProvider
+                .state('errors_no_connection', {
+                    url: '/errors/no_connection',
+                    params: {
+                        error: null
+                    },
+                    controller: 'pipErrorNoConnectionController',
+                    templateUrl: 'no_connection/no_connection.html'
+                })
+                .state('errors_maintenance', {
+                    url: '/errors/maintenance',
+                    params: {
+                        error: null
+                    },
+                    controller: 'pipErrorMaintenanceController',
+                    templateUrl: 'maintenance/maintenance.html'
+                })
+                .state('errors_missing_route', {
+                    url: '/errors/missing_route',
+                    params: {
+                        unfoundState: null,
+                        fromState: null
+                    },
+                    controller: 'pipErrorMissingRouteController',
+                    templateUrl: 'missing_route/missing_route.html'
+                })
+                .state('errors_unsupported', {
+                    url: '/errors/unsupported',
+                    params: {
+                        error: null
+                    },
+                    controller: 'pipErrorUnsupportedController',
+                    templateUrl: 'unsupported/unsupported.html'
+                })
+                .state('errors_unknown', {
+                    url: '/errors/unknown',
+                    params: {
+                        error: null
+                    },
+                    controller: 'pipErrorUnknownController',
+                    templateUrl: 'unknown/unknown.html'
+                });
+        }]);
 
 })();
 /**
@@ -12639,6 +12693,7 @@ module.run(['$templateCache', function($templateCache) {
 
         return;
 
+        // Todo: Made dependencies optional
         function appHeader() {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showShadow();
@@ -12666,7 +12721,7 @@ module.run(['$templateCache', function($templateCache) {
 
     var thisModule = angular.module('pipErrors.MissingRoute', []);
 
-    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', 'pipAppBar', 'pipAuthState', function ($scope, $state, $rootScope, pipAppBar, pipAuthState) {
+    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
 
         appHeader();
         $rootScope.$routing = false;
@@ -12680,6 +12735,7 @@ module.run(['$templateCache', function($templateCache) {
 
         return;
 
+        // Todo: Made dependencies optional
         function appHeader() {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showShadow();
@@ -12688,7 +12744,8 @@ module.run(['$templateCache', function($templateCache) {
         };
 
         function onContinue() {
-            pipAuthState.goToAuthorized();
+            // Todo: Go to default state '/'
+            //pipAuthState.goToAuthorized();
         };
 
     }]);
@@ -12722,6 +12779,7 @@ module.run(['$templateCache', function($templateCache) {
             $window.history.back();
         };
 
+        // Todo: Made dependencies optional
         function appHeader() {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showShadow();
@@ -12744,7 +12802,7 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipNoConnectionPanel", []);
+    var thisModule = angular.module("pipNoConnectionPanel", ['pipErrors.Translate']);
 
     thisModule.directive('pipNoConnectionPanel',
         function () {
@@ -12754,7 +12812,7 @@ module.run(['$templateCache', function($templateCache) {
                     error: '=pipError',
                     retry: '=pipRetry'
                 },
-                templateUrl: 'no_connection/pip_no_connection_panel.html',
+                templateUrl: 'no_connection_panel/no_connection_panel.html',
                 controller: 'pipNoConnectionPanelController'
             };
         }
@@ -12805,6 +12863,7 @@ module.run(['$templateCache', function($templateCache) {
 
         return;
 
+        // Todo: Made dependencies optional
         function appHeader() {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showShadow();
@@ -12861,6 +12920,7 @@ module.run(['$templateCache', function($templateCache) {
 
         return;
 
+        // Todo: Made dependencies optional
         function appHeader() {
             pipAppBar.showMenuNavIcon();
             pipAppBar.showShadow();
