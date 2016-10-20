@@ -1,0 +1,968 @@
+// @file Color Variables
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Functional Colors
+//----------------------------
+
+@color-primary:                   rgba(0, 0, 0, 0.87);
+@color-secondary:                 rgba(0, 0, 0, 0.54);
+@color-disabled:                  rgba(0, 0, 0, 0.38);
+@color-error:                     rgb(244, 67, 54);
+@color-badge:                     rgba(255, 82, 82, 1);
+@color-toast:                     rgba(46, 46, 46, 1);
+@color-divider:                   rgba(0, 0, 0, 0.12);
+@color-window:                    rgb(238, 238, 238);
+@color-content:                   rgb(250, 250, 250);
+
+// Named Pallette Colors
+//------------------------------
+
+@color-purple:                    #AB47BC;
+@color-light-green:               #8BC34A;
+@color-green:                     #4CAF50;
+@color-dark-red:                  #B71C1C;
+@color-pink:                      #E91E63;
+@color-cyan:                      #00BCD4;
+@color-deep-orange:               #FF5722;
+@color-teal:                      #00796B;
+
+// Numeric Pallette Colors
+//------------------------------
+
+@color-0:                #ef5350;
+@color-1:                #ec407a;
+@color-2:                #ab47bc;
+@color-3:                #7e57c2;
+@color-4:                #5c6bc0;
+@color-5:                #03a9f4;
+@color-6:                #00bcd4;
+@color-7:                #009688;
+@color-8:                #4caf50;
+@color-9:                #8bc34a;
+@color-10:               #cddc39;
+@color-11:               #ffc107;
+@color-12:               #ff9800;
+@color-13:               #ff5722;
+@color-14:               #795548;
+@color-15:               #607d8b;
+// @file Flexbox compatibility mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+.flex() {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.flex-container() {
+   .flex();
+}
+
+.flex-direction(@direction) {
+    -webkit-box-flex-direction: @direction;
+    -moz-box-flex-direction:    @direction;
+    -webkit-flex-direction:     @direction;
+    -ms-flex-direction:         @direction;
+    flex-direction:             @direction;
+}
+
+.flex-direction-column() {
+    .flex-direction(column);
+}
+
+.flex-direction-row() {
+    .flex-direction(row);    
+}
+
+.flex-flow(@direction, @wrap) {
+    .flex-direction(@direction);
+    flex-wrap: @wrap;
+}
+
+.flex-flow-row-wrap() {
+    .flex();
+    .flex-flow(row, wrap);
+}
+
+.flex-element(@grow, @shrink, @initialSize: auto) {
+    -webkit-box-flex: @grow @shrink @initialSize;
+    -moz-box-flex: @grow @shrink @initialSize;        
+    -webkit-flex: @grow @shrink @initialSize;
+    -ms-flex: @grow @shrink @initialSize;
+    flex: @grow @shrink @initialSize;
+}
+
+.flex-fixed() {
+    .flex-element(0, 0, auto);
+}
+
+.flex-var() {
+    .flex-element(1, 1, auto);
+}
+
+.flex-grow() {
+    .flex-element(1, 0, auto);
+}
+
+.flex-shrink() {
+    .flex-element(0, 1, auto);
+}
+
+.flex-order(@index) {
+    -webkit-box-ordinal-group: @index;
+    -moz-box-ordinal-group:    @index;
+    -webkit-order:             @index;
+    -ms-flex-order:            @index;
+    order:                     @index;
+}
+
+.flex-vertical-content(@value) {
+    -webkit-box-align:   @value;
+    -moz-box-align:      @value;
+    -webkit-align-items: @value;
+    -ms-flex-align:      @value;
+    align-items:         @value;
+}
+
+.flex-vertical-center() {
+    .flex-vertical-content(center);
+}
+
+.flex-vertical-start() {
+    .flex-vertical-content(start);
+}
+
+.flex-justify-content(@value, @oldValue) {
+    -webkit-box-pack:        @value;
+    -moz-box-pack:           @value;
+    -webkit-justify-content: @oldValue;
+    -ms-flex-pack:           @value;
+    justify-content:         @oldValue;
+}
+
+.flex-horizontal-start() {
+    .flex-justify-content(start, flex-start);
+}
+
+.flex-horizontal-center() {
+    .flex-justify-content(center, center);
+}
+
+.flex-horizontal-end() {
+    .flex-justify-content(end, flex-end);
+}
+
+// @file Positions Variables
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Layout
+// -----------------------
+
+@baseline-grid:            8px;
+@layout-breakpoint-sm:     768px;
+@layout-breakpoint-md:     1200px;
+@layout-breakpoint-lg:     1400px;
+@layout-gutter-width:      (@baseline-grid * 2);
+
+
+// Z-indexes
+//--------------------------------------------
+
+@z-index-tooltip: 			100;
+@z-index-menu: 				99;
+@z-index-select: 			99;
+@z-index-dialog: 			80;
+@z-index-toast: 			90;
+@z-index-bottom-sheet: 		70;
+@z-index-scroll-mask: 		65;
+@z-index-sidenav: 			60;
+@z-index-backdrop: 			50;
+@z-index-fab: 				20;
+// @file Positions mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Clearfix
+//
+// For modern browsers
+// 1. The space content is one way to avoid an Opera bug when the
+//    contenteditable attribute is included anywhere else in the document.
+//    Otherwise it causes space to appear at the top and bottom of elements
+//    that are clearfixed.
+// 2. The use of `table` rather than `block` is only necessary if using
+//    `:before` to contain the top-margins of child elements.
+//
+// Source: http://nicolasgallagher.com/micro-clearfix-hack/
+
+.clearfix() {
+  &:before,
+  &:after {
+    content: " "; // 1
+    display: table; // 2
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+// Center-align a block level element
+.center-block() {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// CSS3 Content Columns
+.content-columns(@column-count; @column-gap: @grid-gutter-width) {
+  -webkit-column-count: @column-count;
+     -moz-column-count: @column-count;
+          column-count: @column-count;
+  -webkit-column-gap: @column-gap;
+     -moz-column-gap: @column-gap;
+          column-gap: @column-gap;
+}
+
+
+// Positioning
+//--------------
+
+.position-relative() {
+  position: relative !important;
+}
+
+.position-fixed() {
+  position: fixed;
+  top: 0;
+  left:  0;
+  right:  0;
+}
+
+.position-absolute(@top, @left, @right, @bottom) {
+  position: absolute;
+  top: @top;
+  left: @left;
+  right: @right;
+  bottom: @bottom;
+}
+
+.position-fill() {
+  .position-absolute(0, 0, 0, 0)
+}
+
+.position-top() {
+  .position-absolute(0, 0, 0, none)
+}
+
+.position-bottom() {
+    position: absolute;
+    bottom: 0;
+    left:  0;
+    right:  0;
+}
+
+// @file Sizing mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+.w(@size)     { width: @size !important; }
+.min-w(@size) { min-width: @size !important; }
+.max-w(@size) { max-width: @size !important; }
+
+.h(@size)     { height: @size !important; }
+.min-h(@size) { min-height: @size !important; }
+.max-h(@size) { max-height: @size !important; }
+
+.m(@size)  { margin: @size !important; }
+.tm(@size) { margin-top: @size !important; }
+.bm(@size) { margin-bottom: @size !important; }
+.lm(@size) { margin-left: @size !important; }
+.rm(@size) { margin-right: @size !important; }
+
+.p(@size) { padding: @size !important; }
+.tp(@size) { padding-top: @size !important; }
+.bp(@size) { padding-bottom: @size !important; }
+.lp(@size) { padding-left: @size !important; }
+.rp(@size) { padding-right: @size !important; }
+
+
+.size(@width; @height) {
+  width:  @width;
+  height: @height;
+}
+
+.square(@size) {
+  .size(@size; @size);
+}
+
+.circle(@size){
+  .size(@size; @size);
+  height: @size !important;
+  border-radius: @size / 2;
+}
+
+.resizable(@direction) {
+  resize: @direction; // Options: horizontal, vertical, both
+  overflow: auto; // Per CSS3 UI, `resize` only applies when `overflow` isn't `visible`
+}
+
+.box-sizing (@type: border-box) {
+	-webkit-box-sizing: @type;
+	-moz-box-sizing:    @type;
+  -ms-box-sizing:     @type;
+	box-sizing:         @type;
+}
+
+// @file Typography Variables
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Global font-family
+//---------------------
+
+@font-family:               Roboto, 'Helvetica Neue', sans-serif;
+@font-size:                 10px;
+
+// @font-family-light:               'robotolight';
+// @font-family-regular:             'robotoregular';
+// @font-family-medium:              'robotomedium';
+// @font-family-bold:                'robotobold';
+// @font-family-icon:                'icon-font';
+
+
+// Global fonts
+//---------------------
+
+@font-size-display4:              112px;
+@font-weight-display4:            300;
+@letter-spacing-display4:         -.01em;
+@line-height-display4:            112px;
+@font-display4:                   normal @font-weight-display4 @font-size-display4 @font-family; 
+
+@font-size-display3:              56px;
+@font-weight-display3:            400;
+@letter-spacing-display3:         -.005em;
+@line-height-display3:            56px;
+@font-display3:                   normal @font-weight-display3 @font-size-display3 @font-family; 
+
+@font-size-display2:              45px;
+@font-weight-display2:            400;
+@line-height-display2:            64px;
+@font-display2:                   normal @font-weight-display2 @font-size-display2 @font-family; 
+
+@font-size-display1:              34px;
+@font-weight-display1:            400;
+@line-height-display1:            40px;
+@font-display1:                   normal @font-weight-display1 @font-size-display1 @font-family; 
+
+@font-size-headline:              24px;
+@font-weight-headline:            400;
+@line-height-headline:            32px;
+@font-headline:                   normal @font-weight-headline @font-size-headline @font-family;
+
+@font-size-title:                 20px;
+@font-weight-title:               500;
+@letter-spacing-title:            .005em;
+@font-title:                      normal @font-weight-title @font-size-title @font-family;
+
+@font-size-subhead1:               16px;
+@font-weight-subhead1:             400;
+@letter-spacing-subhead1:          .01em;
+@line-height-subhead1:             24px;
+@font-subhead1:                    normal @font-weight-subhead1 @font-size-subhead1 @font-family;
+
+@font-size-subhead2:               16px;
+@font-weight-subhead2:             500;
+@letter-spacing-subhead2:          .01em;
+@line-height-subhead2:             24px;
+@font-subhead2:                    normal @font-weight-subhead2 @font-size-subhead2 @font-family;
+
+@font-size-body1:                 14px; 
+@font-weight-body1:               400;
+@letter-spacing-body1:            .01em;
+@line-height-body1:               20px;
+@font-body1:                      normal @font-weight-body1 @font-size-body1 @font-family; 
+
+@font-size-body2:                 14px;
+@font-weight-body2:               500;
+@letter-spacing-body2:            .01em;
+@line-height-body2:               24px;
+@font-body2:                      normal @font-weight-body2 @font-size-body2 @font-family; 
+
+@font-size-caption:               12px; 
+@font-weight-caption:             400;
+@letter-spacing-caption:          .02em;
+@font-caption:                    normal @font-weight-caption @font-size-caption @font-family; 
+
+@font-size-button:                14px; 
+@font-weight-button:              500;
+@font-button:                     normal @font-weight-button @font-size-button @font-family;
+// @file Typography mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+.text-hide() {
+  font: ~"0/0";
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+.text-overflow() {
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+// Optional hyphenation
+.hyphens(@mode: auto) {
+  word-wrap: break-word;
+  -webkit-hyphens: @mode;
+     -moz-hyphens: @mode;
+      -ms-hyphens: @mode; // IE10+
+       -o-hyphens: @mode;
+          hyphens: @mode;
+}
+
+// @file Animation mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Vendor Prefixes
+//
+// All vendor mixins are deprecated as of v3.2.0 due to the introduction of
+// Autoprefixer in our Gruntfile. They will be removed in v4.
+
+// - Animations
+// - Backface visibility
+// - Box shadow
+// - Box sizing
+// - Content columns
+// - Hyphens
+// - Placeholder text
+// - Transformations
+// - Transitions
+// - User Select
+
+// Animations
+// .animation(@animation) {
+//   -webkit-animation: @animation;
+//        -o-animation: @animation;
+//           animation: @animation;
+// }
+
+.animation (@name, @duration: 300ms, @delay: 0, @ease: ease) {
+  -webkit-animation: @name @duration @delay @ease;
+  -moz-animation: @name @duration @delay @ease;
+  -ms-animation: @name @duration @delay @ease;
+  -o-animation: @name @duration @delay @ease;
+  animation: @name @duration @delay @ease;
+}
+
+.animation-name(@name) {
+  -webkit-animation-name: @name;
+  animation-name: @name;
+}
+
+.animation-duration(@duration) {
+  -webkit-animation-duration: @duration;
+  animation-duration: @duration;
+}
+
+.animation-timing-function(@timing-function) {
+  -webkit-animation-timing-function: @timing-function;
+  animation-timing-function: @timing-function;
+}
+
+.animation-delay(@delay) {
+  -webkit-animation-delay: @delay;
+  animation-delay: @delay;
+}
+
+.animation-iteration-count(@iteration-count) {
+  -webkit-animation-iteration-count: @iteration-count;
+  animation-iteration-count: @iteration-count;
+}
+
+.animation-direction(@direction) {
+  -webkit-animation-direction: @direction;
+  animation-direction: @direction;
+}
+
+.animation-fill-mode(@fill-mode) {
+  -webkit-animation-fill-mode: @fill-mode;
+  animation-fill-mode: @fill-mode;
+}
+
+// Backface visibility
+// Prevent browsers from flickering when using CSS 3D transforms.
+// Default value is `visible`, but can be changed to `hidden`
+
+.backface-visibility(@visibility) {
+  -webkit-backface-visibility: @visibility;
+  -moz-backface-visibility: @visibility;
+  backface-visibility: @visibility;
+}
+
+
+@-webkit-keyframes blink-hint {
+  0%   { opacity: 0.38; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.38; }
+}
+@-moz-keyframes blink-hint {
+  0%   { opacity: 0.38; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.38; }
+}
+@-o-keyframes blink-hint {
+  0%   { opacity: 0.38; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.38; }
+}
+@keyframes blink-hint {
+  0%   { opacity: 0.38; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.38; }
+}
+
+.pip-blink(){
+  -webkit-animation: blink-hint 2s infinite; /* Safari 4+ */
+  -moz-animation:    blink-hint 2s infinite; /* Fx 5+ */
+  -o-animation:      blink-hint 2s infinite; /* Opera 12+ */
+  animation:         blink-hint 2s infinite; /* IE 10+, Fx 29+ */
+}
+
+// @file Transition mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+.transition(@transition) {
+  -webkit-transition: @transition;
+       -o-transition: @transition;
+          transition: @transition;
+}
+
+// .transition (@webkit-transition,@moz-transition, @ms-transition, @o-transition) {
+// 	-webkit-transition: @webkit-transition;
+// 	-moz-transition:    @moz-transition;
+// 	-ms-transition:     @ms-transition;
+// 	-o-transition:      @o-transition;
+// }
+
+.transition-property(@transition-property) {
+  -webkit-transition-property: @transition-property;
+          transition-property: @transition-property;
+}
+// .transition-property (@webkit-transition, @moz-transition, @ms-transition, @o-transition,@transition) {
+//   -webkit-transition-property: @webkit-transition;
+//   -moz-transition-property:    @moz-transition;
+//   -ms-transition-property:     @ms-transition;
+//   -o-transition-property:      @o-transition;
+//   transition-property:         @transition;
+// }
+
+.transition-delay(@transition-delay) {
+  -webkit-transition-delay: @transition-delay;
+          transition-delay: @transition-delay;
+}
+
+.transition-duration(@duration) {
+  -webkit-transition-duration: @duration;
+  -moz-transition-duration:    @duration;
+  -ms-transition-duration:     @duration;
+  -o-transition-duration:      @duration;
+  transition-duration:         @duration;
+}
+
+.transition-timing-function(@timing-function) {
+  -webkit-transition-timing-function: @timing-function;
+          transition-timing-function: @timing-function;
+}
+
+.transition-transform(@transition) {
+  -webkit-transition: -webkit-transform @transition;
+     -moz-transition: -moz-transform @transition;
+       -o-transition: -o-transform @transition;
+          transition: transform @transition;
+}
+
+// @file Transformation mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+.scale(@ratio) {
+  -webkit-transform: scale(@ratio);
+     -moz-transform: scale(@ratio);
+      -ms-transform: scale(@ratio); // IE9 only
+       -o-transform: scale(@ratio);
+          transform: scale(@ratio);
+}
+
+.scale(@ratioX; @ratioY) {
+  -webkit-transform: scale(@ratioX, @ratioY);
+      -ms-transform: scale(@ratioX, @ratioY); // IE9 only
+       -o-transform: scale(@ratioX, @ratioY);
+          transform: scale(@ratioX, @ratioY);
+}
+
+.scaleX(@ratio) {
+  -webkit-transform: scaleX(@ratio);
+      -ms-transform: scaleX(@ratio); // IE9 only
+       -o-transform: scaleX(@ratio);
+          transform: scaleX(@ratio);
+}
+
+.scaleY(@ratio) {
+  -webkit-transform: scaleY(@ratio);
+      -ms-transform: scaleY(@ratio); // IE9 only
+       -o-transform: scaleY(@ratio);
+          transform: scaleY(@ratio);
+}
+
+.skew(@x; @y) {
+  -webkit-transform: skewX(@x) skewY(@y);
+     -moz-transform: skewX(@x) skewY(@y);
+      -ms-transform: skewX(@x) skewY(@y); // See https://github.com/twbs/bootstrap/issues/4885; IE9+
+       -o-transform: skewX(@x) skewY(@y);
+          transform: skewX(@x) skewY(@y);
+}
+
+.translate(@x; @y: 0) {
+  -webkit-transform: translate(@x, @y);
+     -moz-transform: translate(@x, @y);
+      -ms-transform: translate(@x, @y); // IE9 only
+       -o-transform: translate(@x, @y);
+          transform: translate(@x, @y);
+}
+
+.translate3d(@x; @y: 0; @z: 0) {
+  -webkit-transform: translate3d(@x, @y, @z);
+     -moz-transform: translate3d(@x, @y, @z);
+      -ms-transform: translate3d(@x, @y, @z);
+       -o-transform: translate3d(@x, @y, @z);
+          transform: translate3d(@x, @y, @z);
+}
+
+.rotate(@degrees) {
+  -webkit-transform: rotate(@degrees);
+     -moz-transform: rotate(@degrees);
+      -ms-transform: rotate(@degrees); // IE9 only
+       -o-transform: rotate(@degrees);
+          transform: rotate(@degrees);
+}
+
+.rotateX(@degrees) {
+  -webkit-transform: rotateX(@degrees);
+      -ms-transform: rotateX(@degrees); // IE9 only
+       -o-transform: rotateX(@degrees);
+          transform: rotateX(@degrees);
+}
+
+.rotateY(@degrees) {
+  -webkit-transform: rotateY(@degrees);
+      -ms-transform: rotateY(@degrees); // IE9 only
+       -o-transform: rotateY(@degrees);
+          transform: rotateY(@degrees);
+}
+
+.perspective(@perspective: 1000) {
+  -webkit-perspective: @perspective;
+     -moz-perspective: @perspective;
+      -ms-perspective: @perspective;
+          perspective: @perspective;
+}
+
+.perspective-origin(@perspective) {
+  -webkit-perspective-origin: @perspective;
+     -moz-perspective-origin: @perspective;
+          perspective-origin: @perspective;
+}
+
+.transform-origin(@origin) {
+  -webkit-transform-origin: @origin;
+     -moz-transform-origin: @origin;
+      -ms-transform-origin: @origin; // IE9 only
+       -o-transform-origin: @origin;
+          transform-origin: @origin;
+}
+
+.transform(@webkit-string, @moz-string, @ms-string, @o-string, @string) {
+	-webkit-transform:   @webkit-string;
+	   -moz-transform: 	 @moz-string;
+	    -ms-transform: 	 @ms-string;
+	     -o-transform: 	 @o-string;
+          transform: 	 @string;
+}
+// @file Visual effects variables
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Global Z-Depth
+//---------------
+
+@z-depth-1: 0 1px 5px 0 rgba(0, 0, 0, 0.26);
+@z-depth-2: 0 8px 17px rgba(0, 0, 0, 0.2);
+@z-depth-3: 0 17px 50px rgba(0, 0, 0, 0.19);
+@z-depth-4: 0 16px 28px 0 rgba(0, 0, 0, 0.22);
+@z-depth-5: 0 27px 24px 0 rgba(0, 0, 0, 0.2);
+
+// Opacity
+//---------------------
+
+@opacity-primary:                  0.87;
+@opacity-secondary:                0.54;
+@opacity-disabled:                 0.38;
+
+// Dividers, Shadows and other graphical elements
+//--------------------------------------------------
+
+@divider-border:                   1px solid @color-divider;
+@box-shadow:                       0 2px 5px 0 rgba(0, 0, 0, 0.26);
+@border-radius:                    2px;
+
+// Whiteframes
+
+@shadow-key-umbra-opacity:      	0.2;
+@shadow-key-penumbra-opacity:   	0.14;
+@shadow-ambient-shadow-opacity: 	0.12;
+
+// NOTE(shyndman): gulp-sass seems to be failing if I split the shadow defs across
+//    multiple lines. Ugly. Sorry.
+@whiteframe-shadow-1dp: 0 1px 3px 0 rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 1px 1px 0 rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 2px 1px -1px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-2dp: 0 1px 5px 0 rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 2px 2px 0 rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 3px 1px -2px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-3dp: 0 1px 8px 0 rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 3px 4px 0 rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 3px 3px -2px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-4dp: 0 2px 4px -1px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 4px 5px 0 rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 1px 10px 0 rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-5dp: 0 3px 5px -1px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 5px 8px 0 rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 1px 14px 0 rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-6dp: 0 3px 5px -1px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 6px 10px 0 rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 1px 18px 0 rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-7dp: 0 4px 5px -2px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 7px 10px 1px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 2px 16px 1px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-8dp: 0 5px 5px -3px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 8px 10px 1px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 3px 14px 2px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-9dp: 0 5px 6px -3px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 9px 12px 1px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 3px 16px 2px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-10dp: 0 6px 6px -3px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 10px 14px 1px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 4px 18px 3px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-11dp: 0 6px 7px -4px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 11px 15px 1px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 4px 20px 3px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-12dp: 0 7px 8px -4px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 12px 17px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 5px 22px 4px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-13dp: 0 7px 8px -4px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 13px 19px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 5px 24px 4px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-14dp: 0 7px 9px -4px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 14px 21px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 5px 26px 4px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-15dp: 0 8px 9px -5px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 15px 22px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 6px 28px 5px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-16dp: 0 8px 10px -5px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 16px 24px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 6px 30px 5px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-17dp: 0 8px 11px -5px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 17px 26px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 6px 32px 5px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-18dp: 0 9px 11px -5px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 18px 28px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 7px 34px 6px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-19dp: 0 9px 12px -6px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 19px 29px 2px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 7px 36px 6px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-20dp: 0 10px 13px -6px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 20px 31px 3px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 8px 38px 7px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-21dp: 0 10px 13px -6px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 21px 33px 3px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 8px 40px 7px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-22dp: 0 10px 14px -6px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 22px 35px 3px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 8px 42px 7px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-23dp: 0 11px 14px -7px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 23px 36px 3px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 9px 44px 8px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+@whiteframe-shadow-24dp: 0 11px 15px -7px rgba(0, 0, 0, @shadow-key-umbra-opacity), 0 24px 38px 3px rgba(0, 0, 0, @shadow-key-penumbra-opacity), 0 9px 46px 8px rgba(0, 0, 0, @shadow-ambient-shadow-opacity);
+
+// @file Visual effects mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Drop shadows
+//
+// Note: Deprecated `.box-shadow()` as of v3.1.0 since all of Bootstrap's
+// supported browsers that have box shadow capabilities now support it.
+
+.shadow-card() {
+  background: rgb(250, 250, 250) !important;
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
+  background: -moz-linear-gradient(top,  rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%,  rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%,  rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0,rgba(254, 254, 254, 1)), color-stop(18%,rgba(250, 250, 250, 1)), color-stop(19%,rgba(250, 250, 250, 1)), color-stop(81%,rgba(250, 250, 250, 1)), color-stop(82%,rgba(250, 250, 250, 1)), color-stop(100%,rgba(242, 241, 241, 1))) !important;
+  background: -webkit-linear-gradient(top,  rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%,  rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%,  rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%) !important;
+  background: -o-linear-gradient(top,  rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%,  rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%,  rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%)!important;
+  background: -ms-linear-gradient(top,  rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%,  rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%,  rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%)!important;
+  background: linear-gradient(to bottom,  rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%,  rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%,  rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%)!important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
+}
+
+.shadow-text (@string: 0 1px 3px rgba(0, 0, 0, 0.25)) {
+	text-shadow: @string;
+}
+
+.shadow-box (@string: @box-shadow) {  //Kate добавила значение по умолчанию
+	-webkit-box-shadow: @string; // iOS <4.3 & Android <4.1
+	-moz-box-shadow:    @string;
+	box-shadow:         @string;
+}
+
+.shadow-drop (@x: 0, @y: 1px, @blur: 2px, @spread: 0, @alpha: 0.25) {
+	-webkit-box-shadow:	@x @y @blur @spread rgba(0, 0, 0, @alpha);
+	-moz-box-shadow:	@x @y @blur @spread rgba(0, 0, 0, @alpha);
+	box-shadow:		@x @y @blur @spread rgba(0, 0, 0, @alpha);
+}
+
+.shadow-inner (@x: 0, @y: 1px, @blur: 2px, @spread: 0, @alpha: 0.25) {
+	-webkit-box-shadow: inset @x @y @blur @spread rgba(0, 0, 0, @alpha);
+	-moz-box-shadow:    inset @x @y @blur @spread rgba(0, 0, 0, @alpha);
+	box-shadow:         inset @x @y @blur @spread rgba(0, 0, 0, @alpha);
+}
+
+
+// Opacity
+//-------------
+
+.opacity (@opacity: 0.5) {
+	-webkit-opacity: 	@opacity;
+	-moz-opacity: 		@opacity;
+	opacity: 		    @opacity;
+}
+
+
+// Gradients
+//-------------
+
+.gradient (@startColor: #eee, @endColor: white) {
+	background-color: @startColor;
+	background: -webkit-gradient(linear, left top, left bottom, from(@startColor), to(@endColor));
+	background: -webkit-linear-gradient(top, @startColor, @endColor);
+	background: -moz-linear-gradient(top, @startColor, @endColor);
+	background: -ms-linear-gradient(top, @startColor, @endColor);
+	background: -o-linear-gradient(top, @startColor, @endColor);
+}
+
+.gradient-horizontal (@startColor: #eee, @endColor: white) {
+ 	background-color: @startColor;
+	background-image: -webkit-gradient(linear, left top, right top, from(@startColor), to(@endColor));
+	background-image: -webkit-linear-gradient(left, @startColor, @endColor);
+	background-image: -moz-linear-gradient(left, @startColor, @endColor);
+	background-image: -ms-linear-gradient(left, @startColor, @endColor);
+	background-image: -o-linear-gradient(left, @startColor, @endColor);
+}
+
+.gradient-border() {
+  border-radius: @border-radius;
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top, rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%, rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%, rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(254, 254, 254, 1)), color-stop(18%, rgba(250, 250, 250, 1)), color-stop(19%, rgba(250, 250, 250, 1)), color-stop(81%, rgba(250, 250, 250, 1)), color-stop(82%, rgba(250, 250, 250, 1)), color-stop(100%, rgba(242, 241, 241, 1)));
+  background: -webkit-linear-gradient(top, rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%, rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%, rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%);
+  background: -o-linear-gradient(top, rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%, rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%, rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%);
+  background: -ms-linear-gradient(top, rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%, rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%, rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%);
+  background: linear-gradient(to bottom, rgba(254, 254, 254, 1) 0, rgba(250, 250, 250, 1) 18%, rgba(250, 250, 250, 1) 19%, rgba(250, 250, 250, 1) 81%, rgba(250, 250, 250, 1) 82%, rgba(242, 241, 241, 1) 100%);
+
+  position: relative;
+  z-index: 2;
+  box-shadow: @z-depth-1; //0px 1px 5px 0px rgba(0, 0, 0, 0.26);
+
+  &:before {
+    z-index: 1;
+    position: absolute;
+    border-radius: 1px;
+    left: 1px;
+    top: 1px;
+    right: 1px;
+    bottom: 1px;
+    .box-sizing(border-box);
+  }
+}
+
+// Border radiuses
+//-------------------
+
+.border-radius-top(@radius) {
+    border-top-right-radius: @radius;
+    border-top-left-radius: @radius;
+}
+
+.border-radius-right(@radius) {
+    border-bottom-right-radius: @radius;
+    border-top-right-radius: @radius;
+}
+
+.border-radius-bottom(@radius) {
+    border-bottom-right-radius: @radius;
+    border-bottom-left-radius: @radius;
+}
+
+.border-radius-left(@radius) {
+  border-bottom-left-radius: @radius;
+  border-top-left-radius: @radius;
+}
+
+.border-radius(@radius: @border-radius) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius:    @radius;
+	border-radius:         @radius;
+
+	-moz-background-clip:    padding;
+	-webkit-background-clip: padding-box;
+	background-clip:         padding-box;
+}
+
+.border-radiuses(@topright: 0, @bottomright: 0, @bottomleft: 0, @topleft: 0) {
+	-webkit-border-top-right-radius:    @topright;
+	-webkit-border-bottom-right-radius: @bottomright;
+	-webkit-border-bottom-left-radius:  @bottomleft;
+	-webkit-border-top-left-radius:     @topleft;
+
+	-moz-border-radius-topright:        @topright;
+	-moz-border-radius-bottomright:     @bottomright;
+	-moz-border-radius-bottomleft:      @bottomleft;
+	-moz-border-radius-topleft:         @topleft;
+
+	border-top-right-radius:            @topright;
+	border-bottom-right-radius:         @bottomright;
+	border-bottom-left-radius:          @bottomleft;
+	border-top-left-radius:             @topleft;
+
+	-moz-background-clip:    padding; 
+	-webkit-background-clip: padding-box; 
+	background-clip:         padding-box; 
+}
+
+
+// @file Controls mixins
+// @copyright Digital Living Software Corp. 2014-2015
+
+// Scrolling
+//------------
+
+.scroll() {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.no-scroll() {
+  overflow: hidden !important; // Alex D put !important here
+}
+
+.scroll-x() {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.scroll-y() {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+
+// Other control utilities
+//--------------------------
+
+// WebKit-style focus
+.tab-focus() {
+  // Default
+  outline: thin dotted;
+  // WebKit
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+// Placeholder text
+.placeholder(@color: @input-color-placeholder) {
+  // Firefox
+  &::-moz-placeholder {
+    color: @color;
+    opacity: 1; // See https://github.com/twbs/bootstrap/pull/11526
+  }
+  &:-ms-input-placeholder { color: @color; } // Internet Explorer 10+
+  &::-webkit-input-placeholder  { color: @color; } // Safari and Chrome
+}
+
+// User select
+// For selecting text on the page
+
+.user-select(@select) {
+  -webkit-user-select: @select;
+     -moz-user-select: @select;
+      -ms-user-select: @select; // IE10+
+          user-select: @select;
+}
