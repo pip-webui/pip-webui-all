@@ -9741,11 +9741,11 @@ module.run(['$templateCache', function($templateCache) {
                 if (_.isFunction($scope.config.callback)) {
                     // Execute nav icon callback
                     $scope.config.callback();
-                }
-                else if ($scope.config.event) {
+                } else if ($scope.config.event) {
                     $rootScope.$broadcast($scope.config.event);
-                }
-                else if ($scope.config.type == 'back') {
+                } else if ($scope.config.type == 'menu') {
+                    $rootScope.$broadcast('pipOpenSideNav');
+                } else if ($scope.config.type == 'back') {
                     $window.history.back();
                 } else {
                     $rootScope.$broadcast('pipNavIconClicked');
@@ -9770,7 +9770,7 @@ module.run(['$templateCache', function($templateCache) {
     thisModule.provider('pipNavIcon', function () {
         var config = {
             // Type of nav icon: 'back', 'menu', 'image' or 'none'
-            type: 'none',
+            type: 'menu',
             // Image url
             imageUrl: null,
             // Icon name
@@ -10398,8 +10398,8 @@ module.run(['$templateCache', function($templateCache) {
         this.parts = initParts;
 
         this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
-            $rootScope.$on('pipSideNavOpen', open);
-            $rootScope.$on('pipSideNavClose', close);
+            $rootScope.$on('pipOpenSideNav', open);
+            $rootScope.$on('pipCloseSideNav', close);
 
             return {
                 config: getConfig,
