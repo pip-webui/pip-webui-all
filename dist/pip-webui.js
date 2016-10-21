@@ -10015,7 +10015,7 @@ module.run(['$templateCache', function($templateCache) {
                     $timeout(function() {
                         if ($injector.has('pipState')) {
                             var pipState = $injector.get('pipState');
-                            $state.go(link.state, link.stateParams);
+                            pipState.go(link.state, link.stateParams);
                         }
                         else if ($injector.has('$state')) {
                             var $state = $injector.get('$state');
