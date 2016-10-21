@@ -6231,173 +6231,6 @@ module.run(['$templateCache', function($templateCache) {
 })(window.angular, window._);
 
 /**
- * @file Filter to format date and time
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
-
-    thisModule.filter('formatDate',  
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatDate(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatMonth(value, format);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDate', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDate(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateWithYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateWithYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongMonth',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongMonth(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatYear',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatYear(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortWeek',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortWeek(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value, format) {
-                return pipDateFormat.formatTime(value, format);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatLongDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatLongDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatShortDateTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatShortDateTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedInterval', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedInterval(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatElapsedTime', 
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatElapsedTime(value);  
-            };
-        }]
-    );
-
-    thisModule.filter('formatMillisecondsToSeconds',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value) {
-                return pipDateFormat.formatMillisecondsToSeconds(value);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateRange(value1, value2);
-            };
-        }]
-    );
-
-    thisModule.filter('formatDateTimeRange',
-        ['pipDateFormat', function (pipDateFormat) {
-            return function(value1, value2) {
-                return pipDateFormat.formatDateTimeRange(value1, value2);
-            };
-        }]
-    );
-
-
-})();
-
-/**
  * @file Date formatting service
  * @copyright Digital Living Software Corp. 2014-2016
  */
@@ -6920,6 +6753,173 @@ module.run(['$templateCache', function($templateCache) {
         }]
     );
     
+})();
+
+/**
+ * @file Filter to format date and time
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDateTimeFilters', ['pipDateFormat']);
+
+    thisModule.filter('formatDate',  
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatDate(value, format);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDate', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDate(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDateWithYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDateWithYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatMonth',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatMonth(value, format);
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDate', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDate(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDateWithYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDateWithYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongMonth',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongMonth(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatYear',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatYear(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortWeek',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortWeek(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value, format) {
+                return pipDateFormat.formatTime(value, format);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatLongDateTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatLongDateTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatShortDateTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatShortDateTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatElapsedInterval', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatElapsedInterval(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatElapsedTime', 
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatElapsedTime(value);  
+            };
+        }]
+    );
+
+    thisModule.filter('formatMillisecondsToSeconds',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value) {
+                return pipDateFormat.formatMillisecondsToSeconds(value);
+            };
+        }]
+    );
+
+    thisModule.filter('formatDateRange',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value1, value2) {
+                return pipDateFormat.formatDateRange(value1, value2);
+            };
+        }]
+    );
+
+    thisModule.filter('formatDateTimeRange',
+        ['pipDateFormat', function (pipDateFormat) {
+            return function(value1, value2) {
+                return pipDateFormat.formatDateTimeRange(value1, value2);
+            };
+        }]
+    );
+
+
 })();
 
 /**
@@ -8879,7 +8879,7 @@ module.run(['$templateCache', function($templateCache) {
                 if (action.state) {
                     if ($injector.has('pipState')) {
                         var pipState = $injector.get('pipState');
-                        $state.go(action.state, action.stateParams);
+                        pipState.go(action.state, action.stateParams);
                     }
                     else if ($injector.has('$state')) {
                         var $state = $injector.get('$state');
@@ -9037,7 +9037,7 @@ module.run(['$templateCache', function($templateCache) {
                 if (action.state) {
                     if ($injector.has('pipState')) {
                         var pipState = $injector.get('pipState');
-                        $state.go(action.state, action.stateParams);
+                        pipState.go(action.state, action.stateParams);
                     }
                     else if ($injector.has('$state')) {
                         var $state = $injector.get('$state');
@@ -10006,7 +10006,9 @@ module.run(['$templateCache', function($templateCache) {
                     return;
                 }
                 else if (link.state) {
-                    if ($state.current.name === link.state) {
+                    var $state = $injector.has('$state') ? $injector.get('$state') : null;
+                    
+                    if ($state != null && $state.current.name === link.state) {
                         pipSideNav.close();
                         return;
                     }
