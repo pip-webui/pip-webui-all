@@ -27,12 +27,14 @@ gulp.task('build-js-dev', function () {
         '../pip-webui-nav/dist/pip-webui-nav.js',
         '../pip-webui-themes/dist/pip-webui-themes.js',
         '../pip-webui-errors/dist/pip-webui-errors.js',
-        '../pip-webui-charts/dist/pip-webui-charts.js'
+        '../pip-webui-charts/dist/pip-webui-charts.js',
+        '../pip-webui-settings/dist/pip-webui-settings.js',
+        '../pip-webui-help/dist/pip-webui-help.js',
     ])
-        .pipe(sourceMaps.init({loadMaps: true}))
-        .pipe(concat('pip-webui.js'))
-        .pipe(sourceMaps.write('.'))
-        .pipe(gulp.dest('./dist'));
+    .pipe(sourceMaps.init({loadMaps: true}))
+    .pipe(concat('pip-webui.js'))
+    .pipe(sourceMaps.write('.'))
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-js-prod', function () {
@@ -50,7 +52,9 @@ gulp.task('build-js-prod', function () {
         '../pip-webui-nav/dist/pip-webui-nav.min.js',
         '../pip-webui-themes/dist/pip-webui-themes.min.js',
         '../pip-webui-errors/dist/pip-webui-errors.min.js',
-        '../pip-webui-charts/dist/pip-webui-charts.min.js'
+        '../pip-webui-charts/dist/pip-webui-charts.min.js',
+        '../pip-webui-settings/dist/pip-webui-settings.min.js',
+        '../pip-webui-help/dist/pip-webui-help.min.js',
     ])
     //.pipe(sourceMaps.init({ loadMaps: true }))
     .pipe(concat('pip-webui.min.js'))
@@ -75,11 +79,12 @@ gulp.task('build-css-dev', function () {
         '../pip-webui-nav/dist/pip-webui-nav.css',
         '../pip-webui-themes/dist/pip-webui-themes.css',
         '../pip-webui-errors/dist/pip-webui-errors.css',
-        '../pip-webui-charts/dist/pip-webui-charts.css'
-
+        '../pip-webui-charts/dist/pip-webui-charts.css',
+        '../pip-webui-settings/dist/pip-webui-settings.css',
+        '../pip-webui-help/dist/pip-webui-help.css',
     ])
-        .pipe(concat('pip-webui.css'))
-        .pipe(gulp.dest('./dist'));
+    .pipe(concat('pip-webui.css'))
+    .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('build-css-prod', function () {
@@ -98,7 +103,9 @@ gulp.task('build-css-prod', function () {
         '../pip-webui-nav/dist/pip-webui-nav.min.css',
         '../pip-webui-themes/dist/pip-webui-themes.min.css',
         '../pip-webui-errors/dist/pip-webui-errors.min.css',
-        '../pip-webui-charts/dist/pip-webui-charts.min.css'
+        '../pip-webui-charts/dist/pip-webui-charts.min.css',
+        '../pip-webui-settings/dist/pip-webui-settings.min.css',
+        '../pip-webui-help/dist/pip-webui-help.min.css',
     ])
     .pipe(concat('pip-webui.min.css'))
     .pipe(gulp.dest('./dist'));
@@ -128,6 +135,8 @@ gulp.task('copy-images', function () {
         '../pip-webui-headers/dist/images/*',
         '../pip-webui-buttons/dist/images/*',
         '../pip-webui-landing/dist/images/*',
+        '../pip-webui-settings/dist/images/*',
+        '../pip-webui-help/dist/images/*',
         '../pip-webui-css/dist/images/*'
     ])
     .pipe(gulp.dest('./dist/images'));
