@@ -6233,6 +6233,18 @@ button:focus {
 .divider {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus {
+  outline-width: 0 !important;
+}
 pip-dropdown md-toolbar {
   min-height: 48px;
 }

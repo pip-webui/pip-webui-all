@@ -93,7 +93,7 @@ var pip;
         }
         function addRedirectStateProviderDecorator($provide) {
             "ngInject";
-            $provide.decorator('$stateProvider', decorateRedirectStateProvider);
+            $provide.decorator('$state', decorateRedirectStateProvider);
         }
         function decorateRedirectStateService($delegate, $timeout) {
             "ngInject";
@@ -121,7 +121,7 @@ var pip;
             $provide.decorator('$state', decorateRedirectStateService);
         }
         angular
-            .module('pipRouting.Redirect', [])
+            .module('pipRouting.Redirect', ['ui.router'])
             .config(addRedirectStateProviderDecorator)
             .config(addRedirectStateDecorator);
     })(routing = pip.routing || (pip.routing = {}));
@@ -308,20 +308,23 @@ var pip;
     var scope;
     (function (scope_1) {
         'use strict';
-        var thisModule = angular.module('pipScope.Transaction', []);
-        thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-            pipTranslateProvider.translations('en', {
-                'ENTERING': 'Entering...',
-                'PROCESSING': 'Processing...',
-                'LOADING': 'Loading...',
-                'SAVING': 'Saving...'
-            });
-            pipTranslateProvider.translations('ru', {
-                'ENTERING': 'Вход в систему...',
-                'PROCESSING': 'Обрабатывается...',
-                'LOADING': 'Загружается...',
-                'SAVING': 'Сохраняется...'
-            });
+        var thisModule = angular.module('pipScope.Transaction', ['pipTranslate']);
+        thisModule.run(['$injector', function ($injector) {
+            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            if (pipTranslate) {
+                pipTranslate.setTranslations('en', {
+                    'ENTERING': 'Entering...',
+                    'PROCESSING': 'Processing...',
+                    'LOADING': 'Loading...',
+                    'SAVING': 'Saving...'
+                });
+                pipTranslate.setTranslations('ru', {
+                    'ENTERING': 'Вход в систему...',
+                    'PROCESSING': 'Обрабатывается...',
+                    'LOADING': 'Загружается...',
+                    'SAVING': 'Сохраняется...'
+                });
+            }
         }]);
         thisModule.factory('pipTransaction', ['$rootScope', 'pipError', function ($rootScope, pipError) {
             $rootScope.transactions = {};
@@ -1435,6 +1438,25 @@ var pip;
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipButtons', [
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipFabTooltipVisibility'
+    ]);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipButtons.Templates');
@@ -1466,25 +1488,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipButtons', [
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipFabTooltipVisibility'
-    ]);
-
-})(window.angular);
-
 
 /**
  * @file Optional filter to translate string resources
@@ -8547,12 +8550,10 @@ module.run(['$templateCache', function($templateCache) {
     });
 })();
 
-"use strict";
 var pip;
 (function (pip) {
     var nav;
     (function (nav) {
-        'use strict';
         var BreadcrumbController = (function () {
             BreadcrumbController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', 'pipBreadcrumb'];
             function BreadcrumbController($scope, $element, $attrs, $rootScope, $window, $state, pipBreadcrumb) {
@@ -8601,20 +8602,16 @@ var pip;
             };
         }
         angular
-            .module('pipBreadcrumb', [
-            'ngMaterial', 'pipNav.Translate', 'pipNav.Templates',
-            'pipBreadcrumb.Service'
+            .module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate',
         ])
             .directive('pipBreadcrumb', breadcrumbDirective);
     })(nav = pip.nav || (pip.nav = {}));
 })(pip || (pip = {}));
 
-"use strict";
 var pip;
 (function (pip) {
     var nav;
     (function (nav) {
-        'use strict';
         nav.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
         var BreadcrumbItem = (function () {
             function BreadcrumbItem() {
@@ -8710,7 +8707,7 @@ var pip;
             .module('pipBreadcrumb.Service', [])
             .provider('pipBreadcrumb', BreadcrumbProvider);
     })(nav = pip.nav || (pip.nav = {}));
-})(pip = exports.pip || (exports.pip = {}));
+})(pip || (pip = {}));
 
 (function () {
     'use strict';
@@ -8726,7 +8723,7 @@ var pip;
 
 (function () {
     'use strict';
-    var thisModule = angular.module("pipDropdown", ['pipNav.Templates']);
+    var thisModule = angular.module('pipDropdown', ['pipNav.Templates']);
     thisModule.directive('pipDropdown', ['$mdMedia', function ($mdMedia) {
         return {
             restrict: 'E',
@@ -9109,7 +9106,7 @@ var pip;
     var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
     thisModule.run(['$injector', function ($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
+        if (pipTranslate && pipTranslate.translations) {
             pipTranslate.translations('en', {
                 'APPBAR_SEARCH': 'Search'
             });
@@ -9383,7 +9380,7 @@ var pip;
 (function () {
     'use strict';
     var thisModule = angular.module("pipTabs", ['pipNav.Templates']);
-    thisModule.directive('pipTabs', ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
+    thisModule.directive('pipTabs', function () {
         return {
             restrict: 'E',
             scope: {
@@ -9445,7 +9442,7 @@ var pip;
                 };
             }]
         };
-    }]);
+    });
 })();
 
 
