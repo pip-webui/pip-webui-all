@@ -12,6 +12,29 @@ var
     es = require('event-stream'),
     del = require('del');
 
+gulp.task('build-ts', function () {
+    return gulp.src([
+        '../pip-webui-services/dist/pip-webui-services.d.ts',
+        '../pip-webui-buttons/dist/pip-webui-buttons.d.ts',
+        '../pip-webui-landing/dist/pip-webui-landing.d.ts',
+        '../pip-webui-headers/dist/pip-webui-headers.d.ts',
+        '../pip-webui-layouts/dist/pip-webui-layouts.d.ts',
+        '../pip-webui-split/dist/pip-webui-split.d.ts',
+        '../pip-webui-controls/dist/pip-webui-controls.d.ts',
+        '../pip-webui-lists/dist/pip-webui-lists.d.ts',
+        '../pip-webui-dates/dist/pip-webui-dates.d.ts',
+        '../pip-webui-dialogs/dist/pip-webui-dialogs.d.ts',
+        '../pip-webui-nav/dist/pip-webui-nav.d.ts',
+        '../pip-webui-themes/dist/pip-webui-themes.d.ts',
+        '../pip-webui-errors/dist/pip-webui-errors.d.ts',
+        '../pip-webui-charts/dist/pip-webui-charts.d.ts',
+        '../pip-webui-settings/dist/pip-webui-settings.d.ts',
+        '../pip-webui-help/dist/pip-webui-help.d.ts',
+    ])
+    .pipe(concat('pip-webui.d.ts'))
+    .pipe(gulp.dest('./dist'));
+});
+
 gulp.task('build-js-dev', function () {
     return gulp.src([
         '../pip-webui-services/dist/pip-webui-services.js',
@@ -155,5 +178,5 @@ gulp.task('clean', function () {
     del(['./build', './dist']);
 });
 
-gulp.task('build', ['build-dev', 'build-prod', 'copy']);
+gulp.task('build', ['build-dev', 'build-prod', 'build-ts', 'copy']);
 gulp.task('default', ['build']);

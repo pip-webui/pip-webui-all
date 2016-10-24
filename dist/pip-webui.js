@@ -1,1525 +1,964 @@
-/**
- * @file Registration of all WebUI services
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
 (function () {
     'use strict';
-
     angular.module('pipServices', [
-        'pipUtils',
-        'pipAssert',
-        'pipDebug',
         'pipScope',
-	    'pipTranslate',
-        'pipState',
+        'pipTranslate',
+        'pipRouting',
         'pipTimer',
         'pipSession',
         'pipIdentity',
         'pipSystemInfo',
         'pipFormat',
         'pipScroll',
+        'pipPageReset',
         'pipTags'
     ]);
-    
-})();
-/**
- * @file Assertion utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipAssert', ['pipDebug']);
-
-    thisModule.provider('pipAssert', ['pipDebugProvider', function (pipDebugProvider) {
-
-        return {
-            isEmpty: pipDebugProvider.enabled() ? isEmpty : noop,
-            isObjectId: pipDebugProvider.enabled() ? isObjectId : noop,
-            isDefined: pipDebugProvider.enabled() ? isDefined : noop,
-            isDef: pipDebugProvider.enabled() ? isDefined : noop,
-            contains: pipDebugProvider.enabled() ? contains : noop,
-            equal: pipDebugProvider.enabled() ? equal : noop,
-            notEqual: pipDebugProvider.enabled() ? notEqual : noop,
-            strictEqual: pipDebugProvider.enabled() ? strictEqual : noop,
-            notStrictEqual: pipDebugProvider.enabled() ? notStrictEqual : noop,
-            isArray: pipDebugProvider.enabled() ? isArray : noop,
-            isBoolean: pipDebugProvider.enabled() ? isBoolean : noop,
-            isNumber: pipDebugProvider.enabled() ? isNumber : noop,
-            isString: pipDebugProvider.enabled() ? isString : noop,
-            isObject: pipDebugProvider.enabled() ? isObject : noop,
-            isDate: pipDebugProvider.enabled() ? isDate : noop,
-            isError: pipDebugProvider.enabled() ? isError : noop,
-            isFunction: pipDebugProvider.enabled() ? isFunction : noop,
-            isNotNull: pipDebugProvider.enabled() ? isNotNull : noop,
-            
-            $get: ['pipDebug', function(pipDebug) {
-                return {
-                    isEmpty: pipDebug.enabled() ? isEmpty : noop,
-                    isObjectId: pipDebug.enabled() ? isObjectId : noop,
-                    isDefined: pipDebug.enabled() ? isDefined : noop,
-                    isDef: pipDebug.enabled() ? isDefined : noop,
-                    contains: pipDebug.enabled() ? contains : noop,
-                    equal: pipDebug.enabled() ? equal :  noop,
-                    notEqual: pipDebug.enabled() ? notEqual : noop,
-                    strictEqual: pipDebug.enabled() ? strictEqual : noop,
-                    notStrictEqual: pipDebug.enabled() ? notStrictEqual :  noop,
-                    isArray: pipDebug.enabled() ? isArray : noop,
-                    isBoolean: pipDebug.enabled() ? isBoolean : noop,
-                    isNumber: pipDebug.enabled() ? isNumber : noop,
-                    isString: pipDebug.enabled() ? isString : noop,
-                    isObject: pipDebug.enabled() ? isObject : noop,
-                    isDate: pipDebug.enabled() ? isDate : noop,
-                    isError: pipDebug.enabled() ? isError : noop,
-                    isFunction: pipDebug.enabled() ? isFunction : noop,
-                    isNotNull: pipDebug.enabled() ? isNotNull : noop
-                }
-            }]
-        };
-
-        function noop() {}
-
-        function objectToString(o) {
-            return Object.prototype.toString.call(o);
-        }
-
-        function isArray(arg, message) {
-            if (!Array.isArray(arg)) {
-                throw new Error(message || arg + ' should be array');
-            }
-        }
-
-        function isBoolean(arg, message) {
-            if (typeof arg !== 'boolean') {
-                throw new Error(message || arg + ' should be boolean');
-            }
-        }
-
-        function isNotNull(arg, message) {
-            if (arg === null) {
-                throw new Error(message || arg + ' should be not null');
-            }
-        }
-
-        function isNumber(arg, message) {
-            if (typeof arg !== 'number') {
-                throw new Error(message || arg + ' should be number');
-            }
-        }
-
-        function isString(arg, message) {
-            if (typeof arg !== 'string') {
-                throw new Error(message || arg + ' should be string');
-            }
-        }
-
-        function isObject(arg, message) {
-            if (typeof arg !== 'object') {
-                throw new Error(message || arg + ' should be an object');
-            }
-        }
-
-        function isDate(d, message) {
-            if (typeof d === 'object' && objectToString(d) !== '[object Date]') {
-                throw new Error(message || d + ' should be a date');
-            }
-        }
-
-        function isError(e, message) {
-            if (typeof e === 'object' && (objectToString(e) !== '[object Error]' || e instanceof Error)) {
-                throw new Error(message || e + ' should be an error');
-            }
-        }
-
-        function isFunction(arg, message) {
-            if (typeof arg !== 'function') {
-                throw new Error(message || arg + ' should be a function');
-            }
-        }
-
-        function isDefined(arg, message) {
-           if (typeof arg === "undefined") {
-               throw new Error(message || arg + ' should be defined');
-           }
-        }
-
-        function isEmpty(arg, message) {
-            if (arg === null || arg === undefined || arg === false) {
-                throw new Error(message || arg + ' should be not null or undefined or false');
-            }
-        }
-
-        function contains(obj, prop, message) {
-            if (typeof obj !== 'object') {
-                throw new Error(obj + ' should be an object');
-            }
-            if (obj[prop] === null || obj[prop] === undefined) {
-                throw new Error(message || prop + ' should be in object ' + obj);
-            }
-        }
-
-        // Compares args with ==
-        function equal(actual, expected, message) {
-            if (actual != expected) {
-                throw new Error(message || actual + ' should be not equal ' + expected);
-            }
-        }
-
-        // Compares args with !=
-        function notEqual(actual, expected, message) {
-            if (actual == expected) {
-                throw new Error(message || actual + ' should be equal ' + expected);
-            }
-        }
-
-        // Compares args with ===
-        function strictEqual(actual, expected, message) {
-            if (actual !== expected) {
-                throw new Error(message || actual + ' should not be strict equal ' + expected);
-            }
-        }
-
-        // Compares args with !==
-        function notStrictEqual(actual, expected, message) {
-            if (actual === expected) {
-                throw new Error(message || actual + ' should not strict equal ' + expected);
-            }
-        }
-
-        // Checks if value is a valid ObjectId
-        function isObjectId(value, message) {
-            var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-            if (!checkForHexRegExp.test(value)) {
-                throw new Error(message || value + ' should be an object id');
-            }
-        }
-
-    }]);
-
 })();
 
-/**
- * @file Debugging service
- * @copyright Digital Living Software Corp. 2014-2016
- */
 
-/* global _, angular */
 
-(function () {
-    'use strict';
 
-    var thisModule = angular.module('pipDebug', []);
 
-    thisModule.provider('pipDebug', ['$logProvider', function ($logProvider) {
-
-        this.enabled = true;
-
-        return {
-            enable: enable,
-            disable: disable,
-            enabled: enabled,
-            
-            $get: ['$log', function($log) {
-                return {
-                    enabled: enabled,
-                    log: $log.log,
-                    info: $log.info,
-                    warn: $log.warn,
-                    error: $log.error,
-                    debug: $log.debug
-                }
-            }]
-        };
-
-        function enabled() {
-            return this.enabled;
-        }
-
-        function enable() {
-            this.enabled = true;
-            $logProvider.debugEnabled(true);
-        }
-
-        function disable() {
-            this.enabled = false;
-            $logProvider.debugEnabled(false);
-        }
-
-    }]);
-
-})();
-
-/**
- * @file Application router extended from ui.router
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
- 
-(function () {
-    'use strict';
-    
-    var thisModule = angular.module('pipState', ['ui.router', 'pipTranslate', 'pipAssert']);
-
-    thisModule.config(
-        ['$locationProvider', '$httpProvider', 'pipTranslateProvider', function($locationProvider, $httpProvider, pipTranslateProvider) {
-            // Switch to HTML5 routing mode
-            //$locationProvider.html5Mode(true);
-            pipTranslateProvider.translations('en', {
-                'ERROR_SWITCHING': 'Error while switching route. Try again.'
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        captureStateTranslations.$inject = ['$rootScope'];
+        decorateBackStateService.$inject = ['$delegate', '$window'];
+        addBackStateDecorator.$inject = ['$provide'];
+        function captureStateTranslations($rootScope) {
+            "ngInject";
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                pip.routing.CurrentState = {
+                    name: toState.name,
+                    url: toState.url,
+                    params: toParams
+                };
+                pip.routing.PreviousState = {
+                    name: fromState.name,
+                    url: fromState.url,
+                    params: fromParams
+                };
             });
-
-            pipTranslateProvider.translations('ru', {
-                'ERROR_SWITCHING': 'Ошибка при переходе. Попробуйте ещё раз.'
-            });
-        }]
-    );
-
-    thisModule.run(
-        ['$rootScope', 'pipTranslate', '$state', function($rootScope, pipTranslate, $state) {
-            $rootScope.$on('$stateChangeSuccess',
-                function(event, toState, toParams, fromState, fromParams) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-                    // Record current and previous state
-                    $rootScope.$state = {name: toState.name, url: toState.url, params: toParams};
-                    $rootScope.$prevState = {name: fromState.name, url: fromState.url, params: fromParams};
-                }
-            );
-
-            // Intercept route error
-            $rootScope.$on('$stateChangeError',
-                function(event, toState, toParams, fromState, fromParams, error) {
-                    // Unset routing variable to disable page transition
-                    $rootScope.$routing = false;
-
-                    console.error('Error while switching route to ' + toState.name);
-                    console.error(error);
-                }
-            );
-
-
-            // Intercept route error
-            $rootScope.$on('$stateNotFound',
-                function(event, unfoundState, fromState, fromParams) {
-                    event.preventDefault();
-
-                    // todo make configured error state name
-                    $state.go('errors_missing_route',  {
-                            unfoundState: unfoundState,
-                            fromState : {
-                                to: fromState ? fromState.name : '',
-                                fromParams: fromParams
-                            }
-                        }
-                    );
-                    $rootScope.$routing = false;
-                }
-            );
-
-        }]
-    );
-
-    thisModule.provider('pipState', ['$stateProvider', 'pipAssertProvider', function($stateProvider, pipAssertProvider) {
-        // Configuration of redirected states
-        var redirectedStates = {};
-
-        this.redirect = setRedirect;
-        this.state = $stateProvider.state;
-
-        this.$get = ['$state', '$timeout', 'pipAssert', function ($state, $timeout, pipAssert) {
-            $state.redirect = redirect;
-            $state.goBack = goBack;
-            $state.goBackAndSelect = goBackAndSelect;
-            
-            return $state;
-            
-			//------------------------
-            
-            function redirect(event, state, params, $rootScope) {
-                pipAssert.contains(state, 'name', "$state.redirect: state should contains name prop");
-                pipAssert.isObject(params, "$state.redirect: params should be an object");
-
-                var toState;
-
-                $rootScope.$routing = true;
-                toState = redirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params, $rootScope);
-
-                    if (_.isNull(toState)) {
-                        $rootScope.$routing = false;
-                        throw new Error('Redirected toState cannot be null');
-                    }
-                }
-
-                if (!!toState) {
-                    $timeout(function() {
-                        event.preventDefault();
-                        $state.transitionTo(toState, params, {location: 'replace'});
-                    });
-
-                    return true;
-                }
-
-                return false;
-            }
-
+        }
+        function decorateBackStateService($delegate, $window) {
+            "ngInject";
+            $delegate.goBack = goBack;
+            $delegate.goBackAndSelect = goBackAndSelect;
+            return $delegate;
             function goBack() {
-                $window.history.back()
+                $window.history.back();
             }
-
-            function goBackAndSelect(obj, objParamName, id, idParamName) {
-                pipAssert.isObject(obj, 'pipUtils.goBack: first argument should be an object');
-                pipAssert.isString(idParamName, 'pipUtils.goBack: second argument should a string');
-                pipAssert.isString(objParamName, 'pipUtils.goBack: third argument should a string');
-                    
-                if ($rootScope.$prevState && $rootScope.$prevState.name) {
-                    var state = _.cloneDeep($rootScope.$prevState);
-
-                    state.params[idParamName] = id;
-                    state.params[objParamName] = obj;
-
-                    $state.go(state.name, state.params);
-                } else {
+            function goBackAndSelect(params) {
+                if (pip.routing.PreviousState != null
+                    && pip.routing.PreviousState.name != null) {
+                    var state = _.cloneDeep(pip.routing.PreviousState);
+                    state.params = _.extend(state.params, params);
+                    $delegate.go(state.name, state.params);
+                }
+                else {
                     $window.history.back();
                 }
             }
-        }];
+        }
+        function addBackStateDecorator($provide) {
+            $provide.decorator('$state', decorateBackStateService);
+        }
+        angular
+            .module('pipRouting')
+            .config(addBackStateDecorator)
+            .run(captureStateTranslations);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
 
-        return;        
-        //------------------
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        decorateRedirectStateProvider.$inject = ['$delegate'];
+        addRedirectStateProviderDecorator.$inject = ['$provide'];
+        decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
+        addRedirectStateDecorator.$inject = ['$provide'];
+        routing.RedirectedStates = {};
+        function decorateRedirectStateProvider($delegate) {
+            "ngInject";
+            $delegate.redirect = redirect;
+            return $delegate;
+            function redirect(fromState, toState) {
+                pip.routing.RedirectedStates[fromState] = toState;
+                return this;
+            }
+        }
+        function addRedirectStateProviderDecorator($provide) {
+            "ngInject";
+            $provide.decorator('$stateProvider', decorateRedirectStateProvider);
+        }
+        function decorateRedirectStateService($delegate, $timeout) {
+            "ngInject";
+            $delegate.redirect = redirect;
+            return $delegate;
+            function redirect(event, state, params) {
+                var toState = pip.routing.RedirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params);
+                    if (_.isNull(toState))
+                        throw new Error('Redirected toState cannot be null');
+                }
+                if (!!toState) {
+                    $timeout(function () {
+                        event.preventDefault();
+                        $delegate.transitionTo(toState, params, { location: 'replace' });
+                    });
+                    return true;
+                }
+                return false;
+            }
+        }
+        function addRedirectStateDecorator($provide) {
+            "ngInject";
+            $provide.decorator('$state', decorateRedirectStateService);
+        }
+        angular
+            .module('pipRouting')
+            .config(addRedirectStateProviderDecorator)
+            .config(addRedirectStateDecorator);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
 
-        // Specify automatic redirect from one state to another
-        function setRedirect(fromState, toState) {
-            pipAssertProvider.isNotNull(fromState, "pipState.redirect: fromState cannot be null");
-            pipAssertProvider.isNotNull(toState, "pipState.redirect: toState cannot be null");
-            
-            redirectedStates[fromState] = toState;  
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        angular.module('pipRouting', ['ui.router']);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
 
-            return this;
-        };
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        hookRoutingEvents.$inject = ['$log', '$rootScope', '$state'];
+        routing.RoutingVar = "$routing";
+        function hookRoutingEvents($log, $rootScope, $state) {
+            "ngInject";
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope[routing.RoutingVar] = true;
+            });
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope[routing.RoutingVar] = false;
+            });
+            $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+                $rootScope[routing.RoutingVar] = false;
+                $log.error('Error while switching route to ' + toState.name);
+                $log.error(error);
+                console.error('Error while switching route to ' + toState.name);
+                console.error(error);
+            });
+            $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
+                event.preventDefault();
+                $rootScope[routing.RoutingVar] = false;
+                $state.go('errors_missing_route', {
+                    unfoundState: unfoundState,
+                    fromState: {
+                        to: fromState ? fromState.name : '',
+                        fromParams: fromParams
+                    }
+                });
+            });
+        }
+        angular
+            .module('pipRouting')
+            .run(hookRoutingEvents);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
 
-    }]);
+var pip;
+(function (pip) {
+    var scope;
+    (function (scope) {
+        'use strict';
+        angular.module('pipScope', ['pipTranslate']);
+        angular.module('pipTransactions', ['pipScope']);
+    })(scope = pip.scope || (pip.scope = {}));
+})(pip || (pip = {}));
 
-})();
-
- /* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipScope', ['pipScope.Error', 'pipScope.Transaction']);
-    angular.module('pipTransactions', ['pipScope']);
-
-})();
-/**
- * @file Error context
- * @description
- * Error context decouples business components that throw errors
- * and visualization components that show them to users
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
- 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipScope.Error', ['pipAssert']);
-
-    /*
-     * Error is designed to assist with error handling
-     * within different application scopes & controllers without overlap.
-     *
-     * A unique identification of the scope/controller is passed to the service
-     * when it is initialized to identify the error for that scope.
-     * */
-    thisModule.factory('pipError',
-        ['$rootScope', 'pipAssert', function ($rootScope, pipAssert) {
-
-            // Initialize error scope
+var pip;
+(function (pip) {
+    var scope;
+    (function (scope_1) {
+        'use strict';
+        var thisModule = angular.module('pipScope');
+        thisModule.factory('pipError', ['$rootScope', function ($rootScope) {
             $rootScope.errors = {};
-
             return createError;
-
-            //----------------------------
-
             function initError(scope) {
                 $rootScope.errors[scope] = {
                     message: undefined,
                     code: undefined,
                     details: undefined
                 };
-            };
-
+            }
+            ;
             function errorMessage(error) {
                 if (_.isNull(error)) {
                     return null;
                 }
-
-                // Process regular messages
                 if (error.message) {
                     return error.message;
                 }
-
-                // Process server application errors
                 if (error.data) {
                     if (error.data.code) {
-                        // process server error codes here
                         return 'ERROR_' + error.data.code;
                     }
-
                     if (error.data.message) {
                         return error.data.message;
                     }
                 }
-
-                // Process standard HTTP errors
                 if (error.statusText) {
                     return error.statusText;
                 }
-
                 if (error.status) {
                     return 'ERROR_' + error.status;
                 }
-                
                 return error.data ? error.data : error;
-            };
-
+            }
+            ;
             function errorCode(error) {
                 if (_.isNull(error)) {
                     return null;
                 }
-
                 if (error.data && error.data.code) {
                     return error.data.code;
                 }
-
                 if (error.status) {
                     return error.status;
                 }
-                
                 return null;
-            };
-
+            }
+            ;
             function errorDetails(error) {
                 return error && error.data ? error.data : error;
-            };
-
+            }
+            ;
             function createError(scope, scopeObject) {
                 scope = scope || 'global';
-
                 var error = {
                     reset: function () {
                         initError(scope);
                     },
-
-                    empty: function() {
+                    empty: function () {
                         var error = $rootScope.errors[scope];
                         return _.isNull(error) || (_.isNull(error.message) && _.isNull(error.code));
                     },
-
                     get: function () {
                         if ($rootScope.errors[scope]) {
                             return $rootScope.errors[scope];
                         }
                         return '';
                     },
-
                     message: function () {
                         if ($rootScope.errors[scope]) {
                             return $rootScope.errors[scope].message;
                         }
                         return null;
                     },
-
                     code: function () {
                         if ($rootScope.errors[scope]) {
                             return $rootScope.errors[scope].code;
                         }
                         return null;
                     },
-
                     details: function () {
                         if ($rootScope.errors[scope]) {
                             return $rootScope.errors[scope].details;
                         }
                         return null;
                     },
-
                     set: function (error) {
                         if (error) {
-                            pipAssert.isObject(error, "Setting error: error should be an object");
-
                             $rootScope.errors[scope] = {
                                 message: errorMessage(error),
                                 code: errorCode(error),
                                 details: errorDetails(error)
                             };
                             console.error($rootScope.errors[scope]);
-                        } else {
+                        }
+                        else {
                             initError(scope);
                         }
                     }
                 };
-
-                // Assign error into scope
-                if (_.isObject(scopeObject)) scopeObject.error = error;
-
+                if (_.isObject(scopeObject))
+                    scopeObject.error = error;
                 return error;
-            };
-        }]
-    );
-    
-})();
-/**
- * @file Transaction context
- * @description
- * Transaction context helps to wrap multiple server requests
- * into one logical transaction. It decouples transaction
- * management and progress visualization to the user
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
+            }
+            ;
+        }]);
+    })(scope = pip.scope || (pip.scope = {}));
+})(pip || (pip = {}));
 
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipScope.Transaction', ['pipTranslate', 'pipScope.Error']);
-
-	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
-        
-        pipTranslateProvider.translations('en', {
-            'ENTERING': 'Entering...',
-            'PROCESSING': 'Processing...',
-            'LOADING': 'Loading...',
-            'SAVING': 'Saving...'
-        });
-
-        pipTranslateProvider.translations('ru', {
-            'ENTERING': 'Вход в систему...',
-            'PROCESSING': 'Обрабатывается...',
-            'LOADING': 'Загружается...',
-            'SAVING': 'Сохраняется...'
-        });
-		
-	}]);
-
-    /*
-     * Transaction is designed to assist with transaction processing
-     * within different application scopes & controllers without overlap.
-     *
-     * A unique identification of the scope/controller is passed to the service
-     * when it is initialized to identify the error for that scope.
-     * 
-     * Transaction is also integrated with Error service. So you don't need to double it
-     * */
-    thisModule.factory('pipTransaction',
-        ['$rootScope', 'pipError', function ($rootScope, pipError) {
-
-            // Initialize transaction scope
+var pip;
+(function (pip) {
+    var scope;
+    (function (scope_1) {
+        'use strict';
+        var thisModule = angular.module('pipScope');
+        thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+            pipTranslateProvider.translations('en', {
+                'ENTERING': 'Entering...',
+                'PROCESSING': 'Processing...',
+                'LOADING': 'Loading...',
+                'SAVING': 'Saving...'
+            });
+            pipTranslateProvider.translations('ru', {
+                'ENTERING': 'Вход в систему...',
+                'PROCESSING': 'Обрабатывается...',
+                'LOADING': 'Загружается...',
+                'SAVING': 'Сохраняется...'
+            });
+        }]);
+        thisModule.factory('pipTransaction', ['$rootScope', 'pipError', function ($rootScope, pipError) {
             $rootScope.transactions = {};
-
             return createTransaction;
-
-            //---------------------------------
-
             function initTransaction(scope) {
                 $rootScope.transactions[scope] = {
                     id: undefined,
                     operation: undefined
                 };
             }
-            
             function createTransaction(scope, scopeObject) {
                 scope = scope || 'global';
-
                 var error = pipError(scope);
                 var transaction = {
                     error: error,
-
                     reset: function () {
-                        initTransaction();
+                        initTransaction("");
                         error.reset();
                     },
-
-                    busy: function() {
+                    busy: function () {
                         var transaction = $rootScope.transactions[scope];
                         return transaction != null && transaction.id;
                     },
-
-                    failed: function() {
+                    failed: function () {
                         return !error.empty();
                     },
-
-                    aborted: function(id) {
+                    aborted: function (id) {
                         var transaction = $rootScope.transactions[scope];
                         return _.isNull(transaction) || transaction.id != id;
                     },
-
                     get: function () {
                         if (_.isNull($rootScope.transactions[scope])) {
                             initTransaction(scope);
                         }
                         return $rootScope.transactions[scope];
                     },
-
                     id: function () {
                         var transaction = $rootScope.transactions[scope];
                         return transaction ? transaction.id : null;
                     },
-
                     operation: function () {
                         var transaction = $rootScope.transactions[scope];
                         return transaction ? transaction.operation : null;
                     },
-
                     errorMessage: function () {
                         return error.message();
                     },
-
                     begin: function (operation) {
                         var transaction = $rootScope.transactions[scope];
-                        // Transaction already in progress
                         if (transaction != null && transaction.id) {
                             return null;
-                        }                      
-
+                        }
                         transaction = $rootScope.transactions[scope] = {
                             id: new Date().getTime(),
                             operation: operation || 'PROCESSING'
                         };
                         error.reset();
-
                         return transaction.id;
                     },
-
-                    abort: function() {
+                    abort: function () {
                         var transaction = $rootScope.transactions[scope];
                         if (transaction) {
                             transaction.id = null;
                         }
                         error.reset();
                     },
-
                     end: function (err) {
-                        if (err) error.set(err);
-                        else error.reset();
-
+                        if (err)
+                            error.set(err);
+                        else
+                            error.reset();
                         var transaction = $rootScope.transactions[scope];
                         if (transaction != null) {
                             transaction.id = null;
-                        }                      
+                        }
                     }
                 };
-
                 if (_.isObject(scopeObject)) {
                     scopeObject.error = error;
                     scopeObject.transaction = transaction;
                 }
-
                 return transaction;
             }
-        }]
-    );
+        }]);
+    })(scope = pip.scope || (pip.scope = {}));
+})(pip || (pip = {}));
 
-})();
-
-/**
- * @file Identity service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipIdentity', []);
-
-    thisModule.provider('pipIdentity', ['pipAssertProvider', function(pipAssertProvider) {
-        var 
-            setRoot = true,
-            identity = null;
-
-        this.setRoot = initSetRoot;
-        this.identity = initIdentity;
-
-        this.$get = ['$rootScope', '$timeout', 'pipAssert', function ($rootScope, $timeout, pipAssert) {
-            // Set root variable
-            if (setRoot)
-                $rootScope.$identity = identity;
-
-            function getIdentity() {
-                return identity;
+var pip;
+(function (pip) {
+    var session;
+    (function (session) {
+        'use strict';
+        session.IdentityRootVar = "$identity";
+        session.IdentityChangedEvent = "pipIdentityChanged";
+        var IdentityService = (function () {
+            function IdentityService(setRootVar, identity, $rootScope) {
+                this._setRootVar = setRootVar;
+                this._identity = identity;
+                this._rootScope = $rootScope;
+                this.setRootVar();
             }
-
-            // Resetting root scope to force update language on the screen
-            function resetContent(fullReset, partialReset) {
-                fullReset = fullReset !== undefined ? !!fullReset : true;
-                partialReset = partialReset !== undefined ? !!partialReset : true;
-
-                $rootScope.$reset = fullReset;
-                $rootScope.$partialReset = partialReset;
-                $timeout(function() {
-                    $rootScope.$reset = false;
-                    $rootScope.$partialReset = false;
-                }, 0);
-            }
-
-            function setIdentity(newIdentity, fullReset, partialReset) {
-                if (newIdentity != null)
-                    pipAssert.isObject(newIdentity || '', "pipIdentity.set: argument should be an object");
-
-                identity = newIdentity;
-
-                if (setRoot)
-                    $rootScope.$identity = identity;
-
-                resetContent(fullReset, partialReset);
-
-                $rootScope.$broadcast('pipIdentityChanged', identity);
-            }
-
-            return {
-                get: getIdentity,
-                set: setIdentity,
-            }
-        }];
-
-        // Initialize set root flag
-        function initSetRoot(newSetRoot) {
-            if (newSetRoot != null) {
-                pipAssertProvider.isBoolean(newSetRoot || '', "pipIdentityProvider.setRoot: argument should be a boolean");
-                setRoot = newSetRoot;
-            }
-            return setRoot;  
-        }
-
-        // Initialize identity
-        function initIdentity(newIdentity) {
-            if (newIdentity != null) {
-                pipAssertProvider.isObject(newIdentity || '', "pipIdentityProvider.identity: argument should be an object");
-                identity = newIdentity;
-            }
-            return identity;  
-        }
-
-    }]);
-
-})();
-/**
- * @file Session service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipSession', []);
-
-    thisModule.provider('pipSession', ['pipAssertProvider', function(pipAssertProvider) {
-        var 
-            setRoot = true,
-            session = null;
-
-        this.setRoot = initSetRoot;
-        this.session = initSession;
-
-        this.$get = ['$rootScope', '$timeout', 'pipAssert', function ($rootScope, $timeout, pipAssert) {
-            // Set root variable
-            if (setRoot)
-                $rootScope.$session = session;
-            
-            // Resetting root scope to force update language on the screen
-            function resetContent(fullReset, partialReset) {
-                fullReset = fullReset !== undefined ? !!fullReset : true;
-                partialReset = partialReset !== undefined ? !!partialReset : true;
-
-                $rootScope.$reset = fullReset;
-                $rootScope.$partialReset = partialReset;
-                $timeout(function() {
-                    $rootScope.$reset = false;
-                    $rootScope.$partialReset = false;
-                }, 0);
-            }
-
-            function openSession(newSession, fullReset, partialReset) {
-                pipAssert.isObject(newSession || '', "pipSession.open: argument should be an object");
-
-                session = newSession;
-
-                if (setRoot)
-                    $rootScope.$session = session;
-
-                resetContent(fullReset, partialReset);
-
-                $rootScope.$broadcast('pipSessionOpened', session);
-            }
-
-            function closeSession(fullReset, partialReset) {
-                var oldSession = session;
-                session = null;
-
-                if (setRoot)
-                    $rootScope.$session = session;
-
-                resetContent(fullReset, partialReset);
-
-                $rootScope.$broadcast('pipSessionClosed', oldSession);
-            }
-
-            function getSession() {
-                return session;
-            }
-
-            return {
-                get: getSession,
-                open: openSession,
-                close: closeSession
-            }
-        }];
-
-        // Initialize set root flag
-        function initSetRoot(newSetRoot) {
-            if (newSetRoot != null) {
-                pipAssertProvider.isBoolean(newSetRoot || '', "pipSessionProvider.setRoot: argument should be a boolean");
-                setRoot = newSetRoot;
-            }
-            return setRoot;  
-        }
-
-        // Initialize session
-        function initSession(newSession) {
-            if (newSession != null) {
-                pipAssertProvider.isObject(newSession || '', "pipSessionProvider.session: argument should be an object");
-                session = newSession;
-            }
-            return session;  
-        }
-
-    }]);
-
-})(window.angular, window._);
-/**
- * @file Global application timer service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTimer', []);
-
-    thisModule.service('pipTimer', 
-        ['$interval', '$rootScope', function ($interval, $rootScope) {
-            var 
-                AUTO_PULL_CHANGES_TIMEOUT = 60000, // 1 min
-                AUTO_UPDATE_PAGE_TIMEOUT = 15000,  // 15 sec
-                AUTO_UPDATE_COLLECTION_TIMEOUT = 300000, // 5 min
-                started = false, 
-                autoPullChangesInterval, 
-                autoUpdatePageInterval,
-                autoUpdateCollectionInterval;
-
-            return {
-                isStarted: isStarted,
-                start: start,
-                stop: stop
+            IdentityService.prototype.setRootVar = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.session.IdentityRootVar] = this._identity;
             };
-
-            //------------------------
-
-            function isStarted() {
-                return started;
-            };
-
-            function start() {
-                if (started) return;
-
-                autoPullChangesInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoPullChanges');
-                }, AUTO_PULL_CHANGES_TIMEOUT);
-
-                autoUpdatePageInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoUpdatePage');
-                }, AUTO_UPDATE_PAGE_TIMEOUT);
-
-                autoUpdateCollectionInterval = $interval(function () {
-                    $rootScope.$broadcast('pipAutoUpdateCollection');
-                }, AUTO_UPDATE_COLLECTION_TIMEOUT);
-
-                started = true;
-            };
-
-            function stop() {
-                if (autoPullChangesInterval)
-                    $interval.cancel(autoPullChangesInterval);
-
-                if (autoUpdatePageInterval)
-                    $interval.cancel(autoUpdatePageInterval);
-
-                if (autoUpdateCollectionInterval)
-                    $interval.cancel(autoUpdatePageInterval);
-
-                started = false;
-            };
-        }]
-    );
-
-})();
-
-/**
- * @file Translatation service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslate', ['pipTranslate.Service', 'pipTranslate.Directive', 'pipTranslate.Filter']);
-
-})();
-/**
- * @file Translatation directives
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslate.Directive', ['pipTranslate.Service']);
-
-    thisModule.directive('pipTranslate', ['pipTranslate', function(pipTranslate) {
-        return {
-            restrict: 'EA',
-            scope: {
-                key1: '@pipTranslate',
-                key2: '@key'
-            },
-            link: function (scope, element, attrs) {
-                var key = scope.key1 || scope.key2;
-                var value = pipTranslate.translate(key);
-                element.text(value);
-            }
-
-        };
-    }]);
-
-    thisModule.directive('pipTranslateHtml', ['pipTranslate', function(pipTranslate) {
-        return {
-            restrict: 'EA',
-            scope: {
-                key1: '@pipTranslateHtml',
-                key2: '@key'
-            },
-            link: function (scope, element, attrs) {
-                var key = scope.key1 || scope.key2;
-                var value = pipTranslate.translate(key);
-                element.html(value);
-            }
-
-        };
-    }]);
-
-})();
-/**
- * @file Filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslate.Filter', ['pipTranslate.Service']);
-
-    thisModule.filter('translate', ['pipTranslate', function (pipTranslate) {
-        return function (key) {
-            return pipTranslate.translate(key) || key;
-        }
-    }]);
-
-    // thisModule.filter('optionalTranslate', function ($injector) {
-    //     var pipTranslate = $injector.has('pipTranslate') 
-    //         ? $injector.get('pipTranslate') : null;
-
-    //     return function (key) {
-    //         return pipTranslate  ? pipTranslate.translate(key) || key : key;
-    //     }
-    // });
-
-})();
-
-/**
- * @file Translatation service
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
- /* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipTranslate.Service', ['LocalStorageModule', 'pipAssert']);
-
-    thisModule.provider('pipTranslate', ['pipAssertProvider', function(pipAssertProvider) {
-        var 
-            language = 'en',
-            persist = true,
-            setRoot = true,
-            translationMap = {
-                en: {
-                    'en': 'English',
-                    'ru': 'Russian',
-                    'es': 'Spanish',
-                    'pt': 'Portuguese',
-                    'de': 'German',
-                    'fr': 'French'
+            Object.defineProperty(IdentityService.prototype, "identity", {
+                get: function () {
+                    return this._identity;
                 },
-                ru: {
-                    'en': 'Английский',
-                    'ru': 'Русский',
-                    'es': 'Испанский',
-                    'pt': 'Португальский',
-                    'de': 'Немецкий',
-                    'fr': 'Французский'
+                set: function (value) {
+                    this._identity = value;
+                    this.setRootVar();
+                    this._rootScope.$broadcast(pip.session.IdentityChangedEvent, this._identity);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return IdentityService;
+        }());
+        var IdentityProvider = (function () {
+            function IdentityProvider() {
+                this._setRootVar = true;
+                this._identity = null;
+                this._service = null;
+            }
+            Object.defineProperty(IdentityProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(IdentityProvider.prototype, "identity", {
+                get: function () {
+                    return this._identity;
+                },
+                set: function (value) {
+                    this._identity = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            IdentityProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new IdentityService(this._setRootVar, this._identity, $rootScope);
+                return this._service;
+            }];
+            return IdentityProvider;
+        }());
+        angular
+            .module('pipIdentity', [])
+            .provider('pipIdentity', IdentityProvider);
+    })(session = pip.session || (pip.session = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var session;
+    (function (session_1) {
+        'use strict';
+        session_1.SessionRootVar = "$session";
+        session_1.SessionOpenedEvent = "pipSessionOpened";
+        session_1.SessionClosedEvent = "pipSessionClosed";
+        var SessionService = (function () {
+            function SessionService(setRootVar, session, $rootScope) {
+                this._setRootVar = setRootVar;
+                this._session = session;
+                this._rootScope = $rootScope;
+                this.setRootVar();
+            }
+            SessionService.prototype.setRootVar = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.session.SessionRootVar] = this._session;
+            };
+            Object.defineProperty(SessionService.prototype, "session", {
+                get: function () {
+                    return this._session;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(SessionService.prototype, "isOpened", {
+                get: function () {
+                    return this._session != null;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            SessionService.prototype.open = function (session, fullReset, partialReset) {
+                if (fullReset === void 0) { fullReset = false; }
+                if (partialReset === void 0) { partialReset = false; }
+                if (session == null)
+                    throw new Error("Session cannot be null");
+                this._session = session;
+                this.setRootVar();
+                this._rootScope.$broadcast(pip.session.SessionOpenedEvent, session);
+            };
+            SessionService.prototype.close = function (fullReset, partialReset) {
+                if (fullReset === void 0) { fullReset = false; }
+                if (partialReset === void 0) { partialReset = false; }
+                var oldSession = this._session;
+                this._session = null;
+                this.setRootVar();
+                this._rootScope.$broadcast(pip.session.SessionClosedEvent, oldSession);
+            };
+            return SessionService;
+        }());
+        var SessionProvider = (function () {
+            function SessionProvider() {
+                this._setRootVar = true;
+                this._session = null;
+                this._service = null;
+            }
+            Object.defineProperty(SessionProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(SessionProvider.prototype, "session", {
+                get: function () {
+                    return this._session;
+                },
+                set: function (value) {
+                    this._session = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            SessionProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new SessionService(this._setRootVar, this._session, $rootScope);
+                return this._service;
+            }];
+            return SessionProvider;
+        }());
+        angular.module('pipSession', ['pipPageReset'])
+            .provider('pipSession', SessionProvider);
+    })(session = pip.session || (pip.session = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        angular.module('pipTranslate', [
+            'LocalStorageModule'
+        ]);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        pipTranslateDirective.$inject = ['pipTranslate'];
+        pipTranslateHtmlDirective.$inject = ['pipTranslate'];
+        function pipTranslateDirective(pipTranslate) {
+            "ngInject";
+            return {
+                restrict: 'EA',
+                scope: {
+                    key1: '@pipTranslate',
+                    key2: '@key'
+                },
+                link: function (scope, element, attrs) {
+                    var key = scope.key1 || scope.key2;
+                    var value = pipTranslate.translate(key);
+                    element.text(value);
                 }
             };
-
-        this.translations = setTranslations;
-        this.language = initLanguage;
-        this.use = initLanguage;
-        this.persist = initPersist;
-        this.setRoot = initSetRoot;
-
-        this.$get = ['$rootScope', '$timeout', 'localStorageService', 'pipAssert', function ($rootScope, $timeout, localStorageService, pipAssert) {
-            // Read language from persistent storage
-            if (persist)
-                language = localStorageService.get('language') || language;
-
-            // Set root variable
-            if (setRoot) 
-                $rootScope.$language = language;
-            
-            // Resetting root scope to force update language on the screen
-            function resetContent(fullReset, partialReset) {
-                fullReset = fullReset !== undefined ? !!fullReset : true;
-                partialReset = partialReset !== undefined ? !!partialReset : true;
-
-                $rootScope.$reset = fullReset;
-                $rootScope.$partialReset = partialReset;
-                $timeout(function() {
-                    $rootScope.$reset = false;
-                    $rootScope.$partialReset = false;
-                }, 0);
-            }
-
-            function setLanguage(newLanguage, fullReset, partialReset) {
-                pipAssert.isString(newLanguage || '', "pipTranslate.use: argument should be a string");
-
-                if (newLanguage != null && newLanguage != language) {
-                    language = newLanguage;
-                    
-                    if (persist)
-                        localStorageService.set('language', language);
-                    if (setRoot)
-                        $rootScope.$language = language;
-                    
-                    // Resetting content.
-                    resetContent(fullReset, partialReset);
-
-                    // Sending notification
-                    $rootScope.$broadcast('pipLanguageChanged', newLanguage);
-                }
-                return language;
-            }
-
+        }
+        function pipTranslateHtmlDirective(pipTranslate) {
+            "ngInject";
             return {
-                use: setLanguage,
+                restrict: 'EA',
+                scope: {
+                    key1: '@pipTranslateHtml',
+                    key2: '@key'
+                },
+                link: function (scope, element, attrs) {
+                    var key = scope.key1 || scope.key2;
+                    var value = pipTranslate.translate(key);
+                    element.html(value);
+                }
+            };
+        }
+        angular
+            .module('pipTranslate')
+            .directive('pipTranslate', pipTranslateDirective)
+            .directive('pipTranslateHtml', pipTranslateHtmlDirective);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
 
-                translations: setTranslations,
-                translate: translate,
-                translateArray: translateArray,
-                translateSet: translateSet,
-                translateObjects: translateObjects,
-                translateById: translateById,
-                translateSetById: translateSetById,
-                translateStringsSet: translateStringsSet
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        translateFilter.$inject = ['pipTranslate'];
+        optionalTranslateFilter.$inject = ['$injector'];
+        function translateFilter(pipTranslate) {
+            "ngInject";
+            return function (key) {
+                return pipTranslate.translate(key) || key;
+            };
+        }
+        function optionalTranslateFilter($injector) {
+            "ngInject";
+            var pipTranslate = $injector.has('pipTranslate')
+                ? $injector.get('pipTranslate') : null;
+            return function (key) {
+                return pipTranslate ? pipTranslate.translate(key) || key : key;
+            };
+        }
+        angular
+            .module('pipTranslate')
+            .filter('translate', translateFilter);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        translate.LanguageRootVar = "$language";
+        translate.LanguageChangedEvent = "pipLanguageChanged";
+        var Translation = (function () {
+            function Translation() {
+                this._language = 'en';
+                this._translations = {
+                    en: {
+                        'en': 'English',
+                        'ru': 'Russian',
+                        'es': 'Spanish',
+                        'pt': 'Portuguese',
+                        'de': 'German',
+                        'fr': 'French'
+                    },
+                    ru: {
+                        'en': 'Английский',
+                        'ru': 'Русский',
+                        'es': 'Испанский',
+                        'pt': 'Португальский',
+                        'de': 'Немецкий',
+                        'fr': 'Французский'
+                    }
+                };
             }
-        }];
-
-        // Initialize language selection
-        function initLanguage(newLanguage) {
-            pipAssertProvider.isString(newLanguage || '', "pipTranslateProvider.use or pipTranslateProvider.language: argument should be a string");
-
-            if (newLanguage != null) {
-                language = newLanguage;
+            Object.defineProperty(Translation.prototype, "language", {
+                get: function () { return this._language; },
+                set: function (value) { this._language = value; },
+                enumerable: true,
+                configurable: true
+            });
+            Translation.prototype.use = function (language) {
+                if (language != null)
+                    this._language = language;
+                return this._language;
+            };
+            Translation.prototype.setTranslations = function (language, translations) {
+                var map = this._translations[language] || {};
+                this._translations[language] = _.extend(map, translations);
+            };
+            Translation.prototype.translate = function (key) {
+                if (_.isNull(key) || _.isUndefined(key))
+                    return '';
+                var translations = this._translations[this._language] || {};
+                return translations[key] || key;
+            };
+            Translation.prototype.translateArray = function (keys) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (k) {
+                    var key = k || '';
+                    values.push(translations[key] || key);
+                });
+                return values;
+            };
+            Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[key] || key;
+                    values.push(value);
+                });
+                return values;
+            };
+            Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
+                if (_.isNull(items) || items.length == 0)
+                    return [];
+                keyProp = keyProp || 'name';
+                valueProp = valueProp || 'nameLocal';
+                var translations = this._translations[this._language] || {};
+                _.each(items, function (item) {
+                    var key = item[keyProp] || '';
+                    item[valueProp] = translations[key] || key;
+                });
+                return items;
+            };
+            Translation.prototype.translateWithPrefix = function (prefix, key) {
+                prefix = prefix ? prefix + '_' : '';
+                key = (prefix + key).replace(/ /g, '_').toUpperCase();
+                if (key == null)
+                    return '';
+                var translations = this._translations[this._language] || {};
+                return translations[key] || key;
+            };
+            ;
+            Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[prefix + '_' + key] || key;
+                    values.push(value);
+                });
+                return values;
+            };
+            Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
+                        || (prefix + key.replace(/ /g, '_').toUpperCase());
+                    values.push(value);
+                });
+                return values;
+            };
+            return Translation;
+        }());
+        var TranslateService = (function () {
+            function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
+                this._setRootVar = setRootVar;
+                this._persist = persist;
+                this._translation = translation;
+                this._rootScope = $rootScope;
+                this._storage = localStorageService;
+                if (this._persist) {
+                    this._translation.language = localStorageService.get('language')
+                        || this._translation.language;
+                }
+                this.save();
             }
-            return language;
-        }
-
-        // Initialize persistence flag
-        function initPersist(newPersist) {
-            if (newPersist != null) {
-                pipAssertProvider.isBoolean(newPersist || '', "pipTranslateProvider.persist: argument should be a boolean");
-                persist = newPersist;
+            TranslateService.prototype.save = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.translate.LanguageRootVar] = this._translation.language;
+                if (this._persist)
+                    this._storage.set('language', this._translation.language);
+            };
+            Object.defineProperty(TranslateService.prototype, "language", {
+                get: function () {
+                    return this._translation.language;
+                },
+                set: function (value) {
+                    if (value != this._translation.language) {
+                        this._translation.language = value;
+                        this.save();
+                        this._rootScope.$broadcast(pip.translate.LanguageChangedEvent, value);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TranslateService.prototype.use = function (language) {
+                if (language != null)
+                    this.language = language;
+                return this.language;
+            };
+            TranslateService.prototype.setTranslations = function (language, translations) {
+                return this._translation.setTranslations(language, translations);
+            };
+            TranslateService.prototype.translate = function (key) {
+                return this._translation.translate(key);
+            };
+            TranslateService.prototype.translateArray = function (keys) {
+                return this._translation.translateArray(keys);
+            };
+            TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
+                return this._translation.translateSet(keys, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
+                return this._translation.translateObjects(items, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateWithPrefix = function (prefix, key) {
+                return this._translation.translateWithPrefix(prefix, key);
+            };
+            TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+                return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+                return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
+            };
+            return TranslateService;
+        }());
+        var TranslateProvider = (function (_super) {
+            __extends(TranslateProvider, _super);
+            function TranslateProvider() {
+                _super.call(this);
             }
-            return persist;
-        }
-
-        // Initialize set root flag
-        function initSetRoot(newSetRoot) {
-            if (newSetRoot != null) {
-                pipAssertProvider.isBoolean(newSetRoot || '', "pipTranslateProvider.setRoot: argument should be a boolean");
-                setRoot = newSetRoot;
-            }
-            return setRoot;  
-        }
-
-        // Set translation strings for specific language
-        function setTranslations(language, languageMap) {
-            pipAssertProvider.isString(language, "pipTranslate.setTranslations or pipTranslateProvider.translations: first argument should be a string");
-            pipAssertProvider.isObject(languageMap, "pipTranslate.setTranslations or pipTranslateProvider.translations: second argument should be an object");
-
-            var map = translationMap[language] || {};
-            translationMap[language] = _.extend(map, languageMap);
-        }
-
-        // Translate a string by key using set language
-        function translate(key) {
-            if (_.isNull(key) || _.isUndefined(key)) return '';
-
-            var map = translationMap[language] || {};
-            return map[key] || key;
-        }
-
-        // Translate an array of strings
-        function translateArray(keys) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateArray: argument should be an array");
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var key = k || '';
-                values.push(map[key] || key);
+            Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
             });
-
-            return values;
-        }
-
-        // Translate an array of strings into array of objects (set)
-        function translateSet(keys, key, value) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateSet: first argument should be an array");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateSet: second argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateSet: third argument should be a string");
-
-            key = key || 'id';
-            value = value || 'name';
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var obj = {}, mapKey = k || '';
-
-                obj[key] = mapKey;
-                obj[value] = map[mapKey] || mapKey;
-
-                values.push(obj);
+            Object.defineProperty(TranslateProvider.prototype, "persist", {
+                get: function () {
+                    return this._persist;
+                },
+                set: function (value) {
+                    this._persist = !!value;
+                },
+                enumerable: true,
+                configurable: true
             });
-
-            return values;
-        }
-
-        // Translate a collection of objects
-        function translateObjects(items, key, value) {
-            if (_.isNull(items) || items.length == 0) return [];
-
-            pipAssertProvider.isArray(items, "pipTranslate.translateObjects: first argument should be an array");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateObjects: second argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateObjects: third argument should be a string");
-
-            key = key || 'name';
-            value = value || 'nameLocal';
-
-            var map = translationMap[language] || {};
-
-            _.each(items, function (i) {
-                var item = i, mapKey = item[key] || '';
-
-                item[value] = map[mapKey] || mapKey;
-            });
-
-            return items;
-        }
-
-        // Translate a string by key  with prefix using set language todo
-        function translateById(prefix, key) {
-            pipAssertProvider.isString(key || '', "pipTranslate.translateById: second argument should be a string");
-            pipAssertProvider.isString(prefix || '', "pipTranslate.translateById: first argument should be a string");
-
-            prefix = prefix ? prefix + '_' : '';
-            key = (prefix + key).replace(/ /g, '_').toUpperCase();
-            if (key == null) return '';
-            var map = translationMap[language] || {};
-            return map[key] || key;
-        };
-
-        function translateSetById(keys, prefix, key, value) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateSetById: first argument should be an array");
-            pipAssertProvider.isString(prefix || '', "pipTranslate.translateSetById: second argument should be a string");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateSetById: third argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateSetById: forth argument should be a string");
-
-            prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
-            key = key || 'id';
-            value = value || 'name';
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var obj = {}, mapKey = k || '';
-
-                obj[key] = mapKey;
-                obj[value] = map[prefix + '_' + mapKey] || mapKey;
-
-                values.push(obj);
-            });
-
-            return values;
-        }
-
-        // Translate an array of strings, apply uppercase and replace ' ' => '_'
-        function translateStringsSet(keys, prefix, key, value) {
-            if (_.isNull(keys) || keys.length == 0) return [];
-
-            pipAssertProvider.isArray(keys, "pipTranslate.translateStringsSet: first argument should be an array");
-            pipAssertProvider.isString(prefix || '', "pipTranslate.translateStringsSet: second argument should be a string");
-            pipAssertProvider.isString(key || '', "pipTranslate.translateStringsSet: third argument should be a string");
-            pipAssertProvider.isString(value || '', "pipTranslate.translateStringsSet: forth argument should be a string");
-
-            key = key || 'id';
-            value = value || 'name';
-            prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_': '';
-
-            var values = [];
-            var map = translationMap[language] || {};
-
-            _.each(keys, function (k) {
-                var obj = {}, mapKey = k || '';
-                obj[key] = mapKey;
-                obj[value] = map[prefix + mapKey.replace(/ /g, '_').toUpperCase()]
-                    || (prefix + mapKey.replace(/ /g, '_').toUpperCase());
-
-                values.push(obj);
-            });
-
-            return values;
-        }
-    }]);
-
-})();
-/**
- * @file Code utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
+            TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
+                return this._service;
+            }];
+            return TranslateProvider;
+        }(Translation));
+        angular
+            .module('pipTranslate')
+            .provider('pipTranslate', TranslateProvider);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
 
 (function () {
     'use strict';
-
     var thisModule = angular.module('pipCodes', []);
-
     thisModule.factory('pipCodes', function () {
-        
         return {
             hash: hash,
             verification: verification
-        }
-    
-        // Simple version of string hashcode
+        };
         function hash(value) {
-            if (value == null) return 0;
+            if (value == null)
+                return 0;
             var result = 0;
             for (var i = 0; i < value.length; i++) {
                 result += value.charCodeAt(i);
             }
             return result;
         }
-
-        // Generates random big number for verification codes
         function verification() {
-            return Math.random().toString(36).substr(2, 10).toUpperCase(); // remove `0.`
+            return Math.random().toString(36).substr(2, 10).toUpperCase();
         }
-
     });
-
-})();
-/**
- * @file Collection utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
-
-// Todo: Deprecate
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.Collections', []);
-
-    thisModule.factory('pipCollections', function () {
-        var collections = {};
-
-        // Index of element in array by key
-        collections.indexBy = function (items, key, value) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    return i;
-                }
-            }
-            return null;
-        };
-    
-        // Find element in array by key
-        collections.findBy = function (items, key, value) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    return items[i];
-                }
-            }
-            return null;
-        };
-    
-        // Remove element from array by value
-        collections.remove = function (items, item) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i] == item) {
-                    items.splice(i, 1);
-                    i--;
-                }
-            }
-        };
-    
-        // Removes element from array by key
-        collections.removeBy = function (items, key, value) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    items.splice(i, 1);
-                    i--;
-                }
-            }
-        };
-    
-        // Replaced element by key
-        collections.replaceBy = function (items, key, value, data) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    items[i] = data;
-                    return;
-                }
-            }
-        };
-    
-        // Calculate difference between two collections
-        collections.difference = function (a1, a2, comparator) {
-            var result = [];
-    
-            _.each(a1, function (e1) {
-                var e2 = _.find(a2, function (e) {
-                    return comparator(e1, e);
-                });
-    
-                if (e2 == null) {
-                    result.push(e1);
-                }
-            })
-    
-            return result;
-        };
-
-        return collections;
-    });
-
 })();
 
-/**
- * @file String formatting service
- * @copyright Digital Living Software Corp. 2014-2016
- */
 
-/* global _, $, angular */
 
 (function () {
     'use strict';
-
     var thisModule = angular.module('pipFormat', []);
-
     thisModule.factory('pipFormat', function () {
-
-        // Creates a sample line from a text
         function sample(value, maxLength) {
-            if (!value || value == '') return '';
-
+            if (!value || value == '')
+                return '';
             var length = value.indexOf('\n');
             length = length >= 0 ? length : value.length;
             length = length < maxLength ? value.length : maxLength;
-
             return value.substring(0, length);
         }
-
-        function sprintf() {
+        function strRepeat(str, qty) {
+            if (qty < 1)
+                return '';
+            var result = '';
+            while (qty > 0) {
+                if (qty & 1)
+                    result += str;
+                qty >>= 1, str += str;
+            }
+            return result;
+        }
+        var sprintf = (function sprintf() {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
+            }
             function get_type(variable) {
                 return toString.call(variable).slice(8, -1).toLowerCase();
             }
-
             var str_repeat = strRepeat;
-
-            var str_format = function() {
+            var str_format = function () {
                 if (!str_format.cache.hasOwnProperty(arguments[0])) {
                     str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
                 }
                 return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
             };
-
-            str_format.format = function(parse_tree, argv) {
+            str_format.format = function (parse_tree, argv) {
                 var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
                 for (i = 0; i < tree_length; i++) {
                     node_type = get_type(parse_tree[i]);
@@ -1527,8 +966,8 @@
                         output.push(parse_tree[i]);
                     }
                     else if (node_type === 'array') {
-                        match = parse_tree[i]; // convenience purposes only
-                        if (match[2]) { // keyword argument
+                        match = parse_tree[i];
+                        if (match[2]) {
                             arg = argv[cursor];
                             for (k = 0; k < match[2].length; k++) {
                                 if (!arg.hasOwnProperty(match[2][k])) {
@@ -1536,29 +975,49 @@
                                 }
                                 arg = arg[match[2][k]];
                             }
-                        } else if (match[1]) { // positional argument (explicit)
+                        }
+                        else if (match[1]) {
                             arg = argv[match[1]];
                         }
-                        else { // positional argument (implicit)
+                        else {
                             arg = argv[cursor++];
                         }
-
                         if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
                             throw new Error(sprintf('[_.sprintf] expecting number but found %s', get_type(arg)));
                         }
                         switch (match[8]) {
-                            case 'b': arg = arg.toString(2); break;
-                            case 'c': arg = String.fromCharCode(arg); break;
-                            case 'd': arg = parseInt(arg, 10); break;
-                            case 'e': arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential(); break;
-                            case 'f': arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg); break;
-                            case 'o': arg = arg.toString(8); break;
-                            case 's': arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg); break;
-                            case 'u': arg = Math.abs(arg); break;
-                            case 'x': arg = arg.toString(16); break;
-                            case 'X': arg = arg.toString(16).toUpperCase(); break;
+                            case 'b':
+                                arg = arg.toString(2);
+                                break;
+                            case 'c':
+                                arg = String.fromCharCode(arg);
+                                break;
+                            case 'd':
+                                arg = parseInt(arg, 10);
+                                break;
+                            case 'e':
+                                arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential();
+                                break;
+                            case 'f':
+                                arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg);
+                                break;
+                            case 'o':
+                                arg = arg.toString(8);
+                                break;
+                            case 's':
+                                arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg);
+                                break;
+                            case 'u':
+                                arg = Math.abs(arg);
+                                break;
+                            case 'x':
+                                arg = arg.toString(16);
+                                break;
+                            case 'X':
+                                arg = arg.toString(16).toUpperCase();
+                                break;
                         }
-                        arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+'+ arg : arg);
+                        arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+' + arg : arg);
                         pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
                         pad_length = match[6] - String(arg).length;
                         pad = match[6] ? str_repeat(pad_character, pad_length) : '';
@@ -1567,10 +1026,8 @@
                 }
                 return output.join('');
             };
-
             str_format.cache = {};
-
-            str_format.parse = function(fmt) {
+            str_format.parse = function (fmt) {
                 var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
                 while (_fmt) {
                     if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
@@ -1617,211 +1074,71 @@
                 }
                 return parse_tree;
             };
-
             return str_format;
-        }
-
-        // Return function as the service
-        result = sprintf;
-        result.sample = sample;
-        result.format = sprintf;
-        result.sprintf = sprintf;
-
-        return result;
-    });
-
-})();
-
-/**
- * @file General purpose utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, $, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipUtils.General', ['pipState', 'pipAssert']);
-
-    thisModule.factory('pipUtils', ['$rootScope', '$window', '$state', 'pipAssert', function ($rootScope, $window, $state, pipAssert) {
-
-        function strRepeat(str, qty) {
-            if (qty < 1) return '';
-            var result = '';
-            while (qty > 0) {
-                if (qty & 1) result += str;
-                qty >>= 1, str += str;
-            }
-            return result;
-        }
-
-        var toString = Object.prototype.toString;
-
+        })();
         return {
-            copyProperty: copyProperty,
-            copy: copyProperty,
-            swapProperties: swapProperties,
-            swap: swapProperties,
-            convertToBoolean: convertToBoolean,
-            toBoolean: convertToBoolean,
-            toBool: convertToBoolean,
-            convertObjectIdsToString: convertObjectIdsToString,
-            OidToString: convertObjectIdsToString,
-            // generateVerificationCode: generateVerificationCode,
-            // vercode: generateVerificationCode,
-            equalObjectIds: equalObjectIds,
-            eqOid: equalObjectIds,
-            notEqualObjectIds: notEqualObjectIds,
-            neqOid: notEqualObjectIds,
-            containsObjectId: containsObjectId,
-            hasOid: containsObjectId,
-            isObjectId: isObjectId,
-            // Strings functions. No analogues in lodash.strings
-            // hashCode: hashCode,
-            makeString: makeString,
-            // Collection function. No analogues in lodash. It may be in lodash later. Look gitHub/lodash issue #1022
-            replaceBy: replaceBy
+            sprintf: sprintf,
+            format: sprintf,
+            sample: sample
         };
-        
-        //--------------------
-        function replaceBy(items, key, value, data) {
-            if (!items || !items.length)
-                return null;
-            for (var i = 0; i < items.length; i++) {
-                if (items[i][key] == value) {
-                    items[i] = data;
-                    return;
-                }
-            }
-        };
-
-        // Ensure some object is a coerced to a string
-        function makeString(object) {
-            if (object == null) return '';
-            return '' + object;
-        };
-
-        function isObjectId(value) {
-            var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-            return checkForHexRegExp.test(value);
-        }
-
-        // Compares two ObjectIds (they are not equal by '==')
-        function equalObjectIds(value1, value2) {
-            if (value1 == null && value2 == null)
-                return true;
-
-            if (value1 == null || value2 == null)
-                return false;
-
-            return value1.toString() == value2.toString();
-        };
-
-        // Compares two ObjectIds (they are always not equal by '!=')
-        function notEqualObjectIds(value1, value2) {
-            if (value1 == null && value2 == null)
-                return false;
-
-            if (value1 == null || value2 == null)
-                return true;
-
-            return value1.toString() != value2.toString();
-        };
-
-        // Checks if array contains concrete objectId
-        function containsObjectId(values, value) {
-            return _.some(values, function (value1) {
-                return equalObjectIds(value1, value);
-            });
-        };
-
-        // Copy property from one object to another if it exists (not null)
-        function copyProperty(dest, destProperty, orig, origProperty) {
-            // Shift if only 3 arguments set
-            if (_.isObject(destProperty)
-                && typeof (origProperty) == 'undefined') {
-                origProperty = orig;
-                orig = destProperty;
-                destProperty = origProperty;
-            }
-    
-            if (orig[origProperty] || (typeof (orig[origProperty]) === 'number' && orig[origProperty] % 1 == 0)) {
-                dest[destProperty] = orig[origProperty];
-                return true;
-            }
-    
-            return false;
-        };
-    
-        // Swaps values of two properties
-        function swapProperties(obj, prop1, prop2) {
-            var 
-                temp1 = obj[prop1],
-                temp2 = obj[prop2];
-    
-            if (temp1) {
-                obj[prop2] = temp1;
-            }
-            else {
-                delete obj[prop2];
-            }
-    
-            if (temp2) {
-                obj[prop1] = temp2;
-            }
-            else {
-                delete obj[prop1];
-            }
-        };
-    
-        // Converts value into boolean
-        function convertToBoolean(value) {
-            if (value == null) return false;
-            if (!value) return false;
-            value = value.toString().toLowerCase();
-            return value == '1' || value == 'true';
-        };
-    
-        // Converts array of object ids to strings (for comparison)
-        function convertObjectIdsToString(values) {
-            return _.map(values, function (value) {
-                return value ? value.toString() : 0;
-            });
-        };
-
-
-    }]);
-
+    });
 })();
 
-/**
- * @file Page scrolling functions
- * @copyright Digital Living Software Corp. 2014-2016
- */
 
-/* global _, $, angular */
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipPageReset', []);
+    thisModule.factory('pipPageReset', ['$rootScope', '$timeout', function ($rootScope, $timeout) {
+        $rootScope.$on('pipResetPage', resetAll);
+        return {
+            resetPartial: resetPartial,
+            resetFull: resetFull,
+            resetAll: resetAll,
+            reset: reset
+        };
+        function resetPartial() {
+            reset(false, true);
+        }
+        function resetFull() {
+            reset(true, false);
+        }
+        function resetAll() {
+            reset(true, true);
+        }
+        function reset(full, partial) {
+            full = full !== undefined ? !!full : true;
+            partial = partial !== undefined ? !!partial : true;
+            if (full || partial) {
+                $rootScope.$reset = full;
+                $rootScope.$partialReset = partial;
+                $timeout(function () {
+                    $rootScope.$reset = false;
+                    $rootScope.$partialReset = false;
+                }, 0);
+            }
+        }
+    }]);
+})();
 
+(function () {
+    'use strict';
     var thisModule = angular.module('pipScroll', []);
-
     thisModule.factory('pipScroll', function () {
         return {
             scrollTo: scrollTo
         };
-        
-        //-------------------------------------
-
         function scrollTo(parentElement, childElement, animationDuration) {
-            if(!parentElement || !childElement) return;
-            if (animationDuration == undefined) animationDuration = 300;
-
+            if (!parentElement || !childElement)
+                return;
+            if (animationDuration == undefined)
+                animationDuration = 300;
             setTimeout(function () {
-                if (!$(childElement).position()) return;
-                var modDiff= Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
-                if (modDiff < 20) return;
+                if (!$(childElement).position())
+                    return;
+                var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
+                if (modDiff < 20)
+                    return;
                 var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
                 if (animationDuration > 0)
                     $(parentElement).animate({
@@ -1829,25 +1146,13 @@
                     }, animationDuration);
             }, 100);
         }
-
     });
-
 })();
-
-/**
- * @file System Information services
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, $, angular */
 
 (function () {
     'use strict';
-
     var thisModule = angular.module('pipSystemInfo', []);
-
     thisModule.factory('pipSystemInfo', ['$rootScope', '$window', function ($rootScope, $window) {
-
         return {
             getBrowserName: getBrowserName,
             getBrowserVersion: getBrowserVersion,
@@ -1855,34 +1160,37 @@
             isDesktop: isDesktop,
             isMobile: isMobile,
             isCordova: isCordova,
-            getOS: getOS,            
+            getOS: getOS,
             isSupported: isSupported
         };
-
-        // todo add support for iPhone
         function getBrowserName() {
             var ua = $window.navigator.userAgent;
-
-            if (ua.search(/Edge/) > -1) return "edge";
-            if (ua.search(/MSIE/) > -1) return "ie";
-            if (ua.search(/Trident/) > -1) return "ie";
-            if (ua.search(/Firefox/) > -1) return "firefox";
-            if (ua.search(/Opera/) > -1) return "opera";
-            if (ua.search(/OPR/) > -1) return "opera";
-            if (ua.search(/YaBrowser/) > -1) return "yabrowser";
-            if (ua.search(/Chrome/) > -1) return "chrome";
-            if (ua.search(/Safari/) > -1) return "safari";
-            if (ua.search(/Maxthon/) > -1) return "maxthon";
-            
+            if (ua.search(/Edge/) > -1)
+                return "edge";
+            if (ua.search(/MSIE/) > -1)
+                return "ie";
+            if (ua.search(/Trident/) > -1)
+                return "ie";
+            if (ua.search(/Firefox/) > -1)
+                return "firefox";
+            if (ua.search(/Opera/) > -1)
+                return "opera";
+            if (ua.search(/OPR/) > -1)
+                return "opera";
+            if (ua.search(/YaBrowser/) > -1)
+                return "yabrowser";
+            if (ua.search(/Chrome/) > -1)
+                return "chrome";
+            if (ua.search(/Safari/) > -1)
+                return "safari";
+            if (ua.search(/Maxthon/) > -1)
+                return "maxthon";
             return "unknown";
         }
-
         function getBrowserVersion() {
             var browser, version;
             var ua = $window.navigator.userAgent;
-
             browser = getBrowserName();
-
             switch (browser) {
                 case "edge":
                     version = (ua.split("Edge")[1]).split("/")[1];
@@ -1916,82 +1224,57 @@
                     version = ua.split("Maxthon/")[1];
                     break;
             }
-
             return version;
         }
-        
         function getPlatform() {
             var ua = $window.navigator.userAgent;
-
-            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase())) 
+            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
                 return 'mobile';
-
             return 'desktop';
         }
-
         function isDesktop() {
             return getPlatform() == 'desktop';
         }
-
         function isMobile() {
             return getPlatform() == 'mobile';
         }
-
-        // Todo: complete implementation
         function isCordova() {
             return null;
         }
-
         function getOS() {
             var ua = $window.navigator.userAgent;
-
             try {
-                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [u])[0].replace('sunos', 'solaris'),
-                osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
+                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris'), osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
                 return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
-            } catch (err) {
-                return 'unknown'
+            }
+            catch (err) {
+                return 'unknown';
             }
         }
-
-        // Todo: Move to errors
         function isSupported(supported) {
-            if (!supported) supported = {
-                edge: 11,
-                ie: 11,
-                firefox: 43, //4, for testing
-                opera: 35,
-                chrome: 47
-            };
-
+            if (!supported)
+                supported = {
+                    edge: 11,
+                    ie: 11,
+                    firefox: 43,
+                    opera: 35,
+                    chrome: 47
+                };
             var browser = getBrowserName();
             var version = getBrowserVersion();
-            version = version.split(".")[0]
-
-            if (browser && supported[browser] && version >= supported[browser]) 
+            version = version.split(".")[0];
+            if (browser && supported[browser] && version >= supported[browser])
                 return true;
-
             return true;
-        };
-
+        }
+        ;
     }]);
-
 })();
-
-/**
- * @file Search tag utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global _, angular */
 
 (function () {
     'use strict';
-
     var thisModule = angular.module('pipTags', []);
-
     thisModule.factory('pipTags', function () {
-            
         return {
             equal: equal,
             normalizeOne: normalizeOne,
@@ -2002,21 +1285,16 @@
             compress: compressAll,
             extract: extract
         };
-
-        //------------------------------
-
         function normalizeOne(tag) {
-            return tag 
+            return tag
                 ? _.trim(tag.replace(/(_|#)+/g, ' '))
                 : null;
         }
-    
         function compressOne(tag) {
             return tag
                 ? tag.replace(/( |_|#)/g, '').toLowerCase()
                 : null;
         }
-    
         function equal(tag1, tag2) {
             if (tag1 == null && tag2 == null)
                 return true;
@@ -2024,61 +1302,134 @@
                 return false;
             return compressOne(tag1) == compressOne(tag2);
         }
-    
         function normalizeAll(tags) {
             if (_.isString(tags)) {
                 tags = tags.split(/( |,|;)+/);
             }
-    
             tags = _.map(tags, function (tag) {
                 return normalizeOne(tag);
             });
-    
             return tags;
         }
-    
         function compressAll(tags) {
             if (_.isString(tags))
                 tags = tags.split(/( |,|;)+/);
-    
             tags = _.map(tags, function (tag) {
                 return compressOne(tag);
             });
-    
             return tags;
-        };
-    
+        }
+        ;
         function extract(entity, searchFields) {
             var tags = normalizeAll(entity.tags);
-    
             _.each(searchFields, function (field) {
                 var text = entity[field] || '';
-    
                 if (text != '') {
                     var hashTags = text.match(/#\w+/g);
                     tags = tags.concat(normalizeAll(hashTags));
                 }
             });
-    
             return _.uniq(tags);
         }
     });
-
 })();
 
-/**
- * @file Collection of utilities
- * @copyright Digital Living Software Corp. 2014-2016
- */
+var pip;
+(function (pip) {
+    var utilities;
+    (function (utilities) {
+        'use strict';
+        var TimerEvent = (function () {
+            function TimerEvent() {
+            }
+            return TimerEvent;
+        }());
+        var DefaultEvents = [
+            { event: 'pipAutoPullChanges', timeout: 60000 },
+            { event: 'pipAutoUpdatePage', timeout: 15000 },
+            { event: 'pipAutoUpdateCollection', timeout: 300000 }
+        ];
+        var TimerService = (function () {
+            TimerService.$inject = ['$rootScope', '$interval'];
+            function TimerService($rootScope, $interval) {
+                this._started = false;
+                this._events = _.cloneDeep(DefaultEvents);
+                this._rootScope = $rootScope;
+                this._interval = $interval;
+            }
+            Object.defineProperty(TimerService.prototype, "isStarted", {
+                get: function () {
+                    return this._started;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TimerService.prototype.addEvent = function (event, timeout) {
+                var existingEvent = _.find(this._events, function (e) { return e.event == event; });
+                if (existingEvent != null)
+                    return;
+                var newEvent = {
+                    event: event,
+                    timeout: timeout
+                };
+                this._events.push(newEvent);
+                if (this._started)
+                    this.startEvent(newEvent);
+            };
+            TimerService.prototype.removeEvent = function (event) {
+                for (var i = this._events.length - 1; i >= 0; i--) {
+                    var existingEvent = this._events[i];
+                    if (existingEvent.event == event) {
+                        this.stopEvent(existingEvent);
+                        this._events.splice(i, 1);
+                    }
+                }
+            };
+            TimerService.prototype.clearEvents = function () {
+                this.stop();
+                this._events = [];
+            };
+            TimerService.prototype.startEvent = function (event) {
+                var _this = this;
+                event.interval = this._interval(function () { _this._rootScope.$broadcast(event.event); }, event.timeout);
+            };
+            TimerService.prototype.stopEvent = function (event) {
+                if (event.interval != null) {
+                    try {
+                        this._interval.cancel(event.interval);
+                    }
+                    catch (ex) {
+                    }
+                    event.interval = null;
+                }
+            };
+            TimerService.prototype.start = function () {
+                var _this = this;
+                if (this._started)
+                    return;
+                _.each(this._events, function (event) {
+                    _this.startEvent(event);
+                });
+                this._started = true;
+            };
+            TimerService.prototype.stop = function () {
+                var _this = this;
+                _.each(this._events, function (event) {
+                    _this.stopEvent(event);
+                });
+                this._started = false;
+            };
+            return TimerService;
+        }());
+        angular
+            .module('pipTimer', [])
+            .service('pipTimer', TimerService);
+    })(utilities = pip.utilities || (pip.utilities = {}));
+})(pip || (pip = {}));
 
-/* global angular */
 
-(function () {
-    'use strict';
 
-    angular.module('pipUtils', 
-		['pipUtils.General', 'pipUtils.Collections']);
-})();
+
 
 
 
@@ -2371,7 +1722,7 @@ module.run(['$templateCache', function($templateCache) {
 
     angular.module('pipLayout', [
         'pipLayout.Main', 'pipLayout.Simple', 'pipLayout.Card', 'pipLayout.Document',
-        'pipLayout.Tiles', 'pipLayout.Dialog'
+        'pipLayout.Tiles', 'pipLayout.Dialog', 'pipLayout.Media'
     ]);
 
 })();
@@ -2635,30 +1986,32 @@ module.run(['$templateCache', function($templateCache) {
     });
 
     thisModule.controller('pipMainController',
-        ['$scope', '$element', '$rootScope', function($scope, $element, $rootScope) {
+        ['$scope', '$element', '$rootScope', 'pipMedia', function($scope, $element, $rootScope, pipMedia) {
             var $window = $(window);
 
             // Add CSS class
             $element.addClass('pip-main');
 
+            pipMedia().addResizeListener($element[0], resize);
+
             // Handle window resize events
-            $window.bind('resize', resize);
+            //$window.bind('resize', resize);
 
             // Unbind when scope is removed
             $scope.$on('$destroy', function() {
-                $rootScope.$size = undefined;
-                $window.unbind('resize', resize);
+                pipMedia().removeResizeListener($element[0]);
+                //$window.unbind('resize', resize);
             });
 
             // Resize window from request
-            $rootScope.$on('pipResizeWindow', function(event) {
-                // Trigger a bit latter t allow full initialization
-                // Do not remove! Otherwise, sizes in layouts calculated incorrectly
-                setTimeout(resize, 0);
-            });
+            //$rootScope.$on('pipResizeWindow', function(event) {
+            //    // Trigger a bit latter t allow full initialization
+            //    // Do not remove! Otherwise, sizes in layouts calculated incorrectly
+            //    setTimeout(resize, 0);
+            //});
 
             // Allow to finish initialization of all controllers
-            setTimeout(resize, 0);
+            //setTimeout(resize, 0);
 
             return;
             
@@ -2671,6 +2024,139 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })();
+
+/**
+ * @file Media service to detect the width of pip-main container
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _, $) {
+    'use strict';
+
+    var thisModule = angular.module('pipLayout.Media', []);
+
+    thisModule.service('pipMedia',
+        ['$rootScope', '$timeout', function ($rootScope, $timeout) {
+
+            var elementWidth = null,
+                sizes = {
+                    'xs': false,
+                    'gt-xs': false,
+                    'sm': false,
+                    'gt-sm': false,
+                    'md': false,
+                    'gt-md': false,
+                    'lg': false,
+                    'gt-lg': false,
+                    'xl': false
+                },
+                attachEvent = document.attachEvent,
+                isIE = navigator.userAgent.match(/Trident/);
+            
+            return function (size) {
+                if (size) {
+                    return sizes[size];
+                } else {
+                    return {
+                        addResizeListener: addResizeListener,
+                        removeResizeListener: removeResizeListener
+                    };
+                }
+            };
+
+            function requestFrame(fn) {
+                var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
+                    function(fn){ return window.setTimeout(fn, 20); };
+
+                return raf(fn);
+            }
+
+            function cancelFrame() {
+                var cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame ||
+                    window.clearTimeout;
+                return function(id){ return cancel(id); };
+            }
+
+            function resizeListener(e) {
+                var win = e.target || e.srcElement;
+                if (win.__resizeRAF__) cancelFrame(win.__resizeRAF__);
+                win.__resizeRAF__ = requestFrame(function(){
+                    var trigger = win.__resizeTrigger__;
+                    trigger.__resizeListeners__.forEach(function(fn){
+                        fn.call(trigger, e);
+                    });
+                });
+            }
+
+            function objectLoad(e) {
+                this.contentDocument.defaultView.__resizeTrigger__ = this.__resizeElement__;
+                this.contentDocument.defaultView.addEventListener('resize', resizeListener);
+            }
+
+            function addResizeListener(element, fn) {
+                if (!element.__resizeListeners__) {
+                    element.__resizeListeners__ = [];
+                    if (attachEvent) {
+                        element.__resizeTrigger__ = element;
+                        element.attachEvent('onresize', resizeListener);
+                    }
+                    else {
+                        if (getComputedStyle(element).position == 'static') element.style.position = 'relative';
+                        var obj = element.__resizeTrigger__ = document.createElement('object');
+                        obj.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;');
+                        obj.__resizeElement__ = element;
+                        obj.onload = objectLoad;
+                        obj.type = 'text/html';
+                        if (isIE) element.appendChild(obj);
+                        obj.data = 'about:blank';
+                        if (!isIE) element.appendChild(obj);
+                    }
+                }
+                setSizes();
+                if (fn) element.__resizeListeners__.push(fn);
+                element.__resizeListeners__.push(setSizes);
+            }
+
+            function removeResizeListener(element, fn) {
+                if (fn) element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
+                if (!element.__resizeListeners__.length) {
+                    if (attachEvent) element.detachEvent('onresize', resizeListener);
+                    else {
+                        element.__resizeTrigger__.contentDocument.defaultView.removeEventListener('resize', resizeListener);
+                        element.__resizeTrigger__ = !element.removeChild(element.__resizeTrigger__);
+                    }
+                }
+            }
+
+            function updateClasses() {
+                $.each(sizes, function (name, size) {
+                    $('body')[size ? 'addClass': 'removeClass']('pip-' + name);
+                });
+            }
+
+            function setSizes() {
+                elementWidth = $('.pip-main').innerWidth();
+                sizes['xs'] = elementWidth <= 599;
+                sizes['gt-xs'] = elementWidth >= 600;
+                sizes['sm'] = elementWidth >= 600 && elementWidth <= 959;
+                sizes['gt-sm'] = elementWidth >= 960;
+                sizes['md'] = elementWidth >= 960 && elementWidth <= 1279;
+                sizes['gt-md'] = elementWidth >= 1280;
+                sizes['lg'] = elementWidth >= 1280 && elementWidth <= 1919;
+                sizes['gt-lg'] = elementWidth >= 1920;
+                sizes['xl'] = sizes['gt-lg'];
+
+                updateClasses();
+
+                $timeout(function () {
+                    $rootScope.$apply();
+                });
+            }
+
+        }]
+    );
+
+})(window.angular, window._, window.jQuery);
 
 /**
  * @file Simple layout
@@ -2758,13 +2244,14 @@ module.run(['$templateCache', function($templateCache) {
 
         // Resize every time window is resized
         $scope.$on('pipWindowResized', function () {
+            console.log('resize tiles');
             resize(false);
         });
 
         // Force layout by request
-        $scope.$on('pipResizeLayout', function () {
-            resize(true);
-        });
+        //$scope.$on('pipResizeLayout', function () {
+        //    resize(true);
+        //});
 
         // Resize the element right away
         resize();
@@ -3014,10 +2501,10 @@ module.run(['$templateCache', function($templateCache) {
     '          \'pip-no-action-toast\': actionLenght == 0}"\n' +
     '          style="height:initial; max-height: initial; ">\n' +
     '\n' +
-    '    <span class="flex-var m0 pip-text" ng-bind-html="message"></span>\n' +
+    '    <span class="flex-var pip-text" ng-bind-html="message"></span>\n' +
     '    <div class="layout-row layout-align-end-start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
-    '        <md-button class="flex-fixed m0 lm8" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button>\n' +
-    '        <md-button class="flex-fixed m0 lm8"\n' +
+    '        <md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button>\n' +
+    '        <md-button class="flex-fixed pip-toast-button"\n' +
     '                   ng-click="onAction(action)"\n' +
     '                   ng-repeat="action in actions"\n' +
     '                   aria-label="{{::action| translate}}">\n' +
@@ -3136,7 +2623,7 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module("pipDraggable", ['pipUtils']);
+    var thisModule = angular.module("pipDraggable", []);
 
     thisModule.service('pipDraggable', function () {
 
@@ -3154,7 +2641,8 @@ module.run(['$templateCache', function($templateCache) {
 
     });
 
-    thisModule.directive('pipDrag', ['$rootScope', '$parse', '$document', '$window', 'pipDraggable', 'pipUtils', function ($rootScope, $parse, $document, $window, pipDraggable, pipUtils) {
+    thisModule.directive('pipDrag',
+        ['$rootScope', '$parse', '$document', '$window', 'pipDraggable', function ($rootScope, $parse, $document, $window, pipDraggable) {
             return {
 
                 restrict: 'A',
@@ -3187,8 +2675,8 @@ module.run(['$templateCache', function($templateCache) {
 
                     var getDragData = $parse(attrs.pipDragData);
                     var
-                        verticalScroll = pipUtils.toBoolean(attrs.pipVerticalScroll) || true,
-                        horizontalScroll = pipUtils.toBoolean(attrs.pipHorizontalScroll) || true,
+                        verticalScroll = toBoolean(attrs.pipVerticalScroll) || true,
+                        horizontalScroll = toBoolean(attrs.pipHorizontalScroll) || true,
                         activationDistance = parseFloat(attrs.pipActivationDistance) || 75,
                         scrollDistance = parseFloat(attrs.pipScrollDistance) || 50,
                         scrollParent = false,
@@ -3199,7 +2687,13 @@ module.run(['$templateCache', function($templateCache) {
                     // deregistration function for mouse move events in $rootScope triggered by jqLite trigger handler
                     var _deregisterRootMoveListener = angular.noop;
 
-                    var initialize = function () {
+                    initialize();
+
+                    return;
+
+                    //-----------------------------------
+
+                    function initialize() {
                         element.attr('pip-draggable', 'false'); // prevent native drag
                         // check to see if drag handle(s) was specified
                         // if querySelectorAll is available, we use this instead of find
@@ -3222,9 +2716,16 @@ module.run(['$templateCache', function($templateCache) {
                         } else {
                             scrollContainer = angular.element(window);
                         }
-                    };
+                    }
 
-                    var toggleListeners = function (enable) {
+                    function toBoolean(value) {
+                        if (value == null) return false;
+                        if (!value) return false;
+                        value = value.toString().toLowerCase();
+                        return value == '1' || value == 'true';
+                    }
+
+                    function toggleListeners(enable) {
                         if (!enable)return;
                         // add listeners.
 
@@ -3244,28 +2745,32 @@ module.run(['$templateCache', function($templateCache) {
                                 return false;
                             }); // prevent native drag for images
                         }
-                    };
-                    var onDestroy = function (enable) {
+                    }
+                    
+                    function onDestroy(enable) {
                         toggleListeners(false);
-                    };
-                    var onEnableChange = function (newVal, oldVal) {
+                    }
+
+                    function onEnableChange(newVal, oldVal) {
                         _dragEnabled = (newVal);
-                    };
-                    var onCenterAnchor = function (newVal, oldVal) {
+                    }
+
+                    function onCenterAnchor(newVal, oldVal) {
                         if (angular.isDefined(newVal))
                             _centerAnchor = (newVal || 'true');
-                    };
+                    }
 
-                    var isClickableElement = function (evt) {
+                    function isClickableElement(evt) {
                         return (
                             angular.isDefined(angular.element(evt.target).attr("pip-cancel-drag"))
                         );
-                    };
+                    }
+
                     /*
                      * When the element is clicked start the drag behaviour
                      * On touch devices as a small delay so as not to prevent native window scrolling
                      */
-                    var onpress = function (evt) {
+                    function onpress(evt) {
                         if (!_dragEnabled)return;
 
                         if (isClickableElement(evt)) {
@@ -3291,22 +2796,22 @@ module.run(['$templateCache', function($templateCache) {
                             onlongpress(evt);
                         }
 
-                    };
-
-                    function saveElementStyles() {
-                        _elementStyle.left = element.css('css');
-                        _elementStyle.top = element.css('top');
-                        _elementStyle.position = element.css('position');
-                        _elementStyle.width = element.css('width');                        
                     }
 
-                    var cancelPress = function () {
+                    function saveElementStyles() {
+                        _elementStyle.left = element.css('css') || 0;
+                        _elementStyle.top = element.css('top') || 0;
+                        _elementStyle.position = element.css('position');
+                        _elementStyle.width = element.css('width');    
+                    }
+
+                    function cancelPress() {
                         clearTimeout(_pressTimer);
                         $document.off(_moveEvents, cancelPress);
                         $document.off(_releaseEvents, cancelPress);
-                    };
+                    }
 
-                    var onlongpress = function (evt) {
+                    function onlongpress(evt) {
                         if (!_dragEnabled)return;
                         evt.preventDefault();
 
@@ -3342,9 +2847,9 @@ module.run(['$templateCache', function($templateCache) {
                         _deregisterRootMoveListener = $rootScope.$on('draggable:_triggerHandlerMove', function (event, origEvent) {
                             onmove(origEvent);
                         });
-                    };
+                    }
 
-                    var onmove = function (evt) {
+                    function onmove(evt) {
                         if (!_dragEnabled)return;
                         evt.preventDefault();
 
@@ -3396,9 +2901,9 @@ module.run(['$templateCache', function($templateCache) {
                             uid: _myid,
                             dragOffset: _dragOffset
                         });
-                    };
+                    }
 
-                    var onrelease = function (evt) {
+                    function onrelease(evt) {
                         if (!_dragEnabled)
                             return;
                         evt.preventDefault();
@@ -3426,27 +2931,25 @@ module.run(['$templateCache', function($templateCache) {
                         }
 
                         _deregisterRootMoveListener();
-                    };
+                    }
 
-                    var onDragComplete = function (evt) {
-
-
+                    function onDragComplete(evt) {
                         if (!onDragSuccessCallback)return;
 
                         scope.$apply(function () {
                             onDragSuccessCallback(scope, {$data: _data, $event: evt});
                         });
-                    };
+                    }
 
-                    var reset = function () {
+                    function reset() {
                         if (allowTransform)
                             element.css({transform: '', 'z-index': '', '-webkit-transform': '', '-ms-transform': ''});
                         else {
                             element.css({'position': _elementStyle.position, top: _elementStyle.top, left: _elementStyle.left, 'z-index': '', width: _elementStyle.width});
                         }
-                    };
+                    }
 
-                    var moveElement = function (x, y) {
+                    function moveElement(x, y) {
                         var eWidth = element.css('width');
                         if (allowTransform) {
                             element.css({
@@ -3464,9 +2967,9 @@ module.run(['$templateCache', function($templateCache) {
                                 width: eWidth
                             });
                         }
-                    };
+                    }
 
-                    var dragToScroll = function () {
+                    function dragToScroll() {
                         var scrollX = 0, scrollY = 0,
                             offset = function (element) {
                                 return element.offset() || {left: 0, top: 0};
@@ -3508,14 +3011,13 @@ module.run(['$templateCache', function($templateCache) {
                             scrollContainer.scrollTop(containerScrollTop + scrollY);
                         }
 
-                    };
-
-                    initialize();
+                    }
                 }
-            };
+            }
         }]);
 
-    thisModule.directive('pipDrop', ['$parse', '$timeout', '$window', '$document', 'pipDraggable', function ($parse, $timeout, $window, $document, pipDraggable) {
+    thisModule.directive('pipDrop', 
+        ['$parse', '$timeout', '$window', '$document', 'pipDraggable', function ($parse, $timeout, $window, $document, pipDraggable) {
         return {
             restrict: 'A',
             link: function (scope, element, attrs) {
@@ -3523,24 +3025,26 @@ module.run(['$templateCache', function($templateCache) {
                 scope.isTouching = false;
 
                 var _lastDropTouch = null;
-
                 var _myid = scope.$id;
-
                 var _dropEnabled = false;
 
                 var onDropCallback = $parse(attrs.pipDropSuccess);// || function(){};
-
                 var onDragStartCallback = $parse(attrs.pipDragStart);
                 var onDragStopCallback = $parse(attrs.pipDragStop);
                 var onDragMoveCallback = $parse(attrs.pipDragMove);
 
-                var initialize = function () {
+                initialize();
+
+                return;
+
+                //----------------------
+
+                function initialize() {
                     toggleListeners(true);
-                };
+                }
 
-                var toggleListeners = function (enable) {
+                function toggleListeners(enable) {
                     // remove listeners
-
                     if (!enable)return;
                     // add listeners.
                     scope.$watch(attrs.pipDrop, onEnableChange);
@@ -3548,15 +3052,17 @@ module.run(['$templateCache', function($templateCache) {
                     scope.$on('draggable:start', onDragStart);
                     scope.$on('draggable:move', onDragMove);
                     scope.$on('draggable:end', onDragEnd);
-                };
+                }
 
-                var onDestroy = function (enable) {
+                function onDestroy(enable) {
                     toggleListeners(false);
-                };
-                var onEnableChange = function (newVal, oldVal) {
+                }
+
+                function onEnableChange(newVal, oldVal) {
                     _dropEnabled = newVal;
-                };
-                var onDragStart = function (evt, obj) {
+                }
+
+                function onDragStart(evt, obj) {
                     if (!_dropEnabled)return;
                     isTouching(obj.x, obj.y, obj.element);
 
@@ -3565,8 +3071,9 @@ module.run(['$templateCache', function($templateCache) {
                             onDragStartCallback(scope, {$data: obj.data, $event: obj});
                         });
                     }
-                };
-                var onDragMove = function (evt, obj) {
+                }
+
+                function onDragMove(evt, obj) {
                     if (!_dropEnabled)return;
                     isTouching(obj.x, obj.y, obj.element);
 
@@ -3575,16 +3082,16 @@ module.run(['$templateCache', function($templateCache) {
                             onDragMoveCallback(scope, {$data: obj.data, $event: obj});
                         });
                     }
-                };
+                }
 
-                var onDragEnd = function (evt, obj) {
-
+                function onDragEnd(evt, obj) {
                     // don't listen to drop events if this is the element being dragged
                     // only update the styles and return
                     if (!_dropEnabled || _myid === obj.uid) {
                         updateDragStyles(false, obj.element);
                         return;
                     }
+
                     if (isTouching(obj.x, obj.y, obj.element)) {
                         // call the pipDraggable pipDragSuccess element callback
                         if (obj.callback) {
@@ -3609,9 +3116,9 @@ module.run(['$templateCache', function($templateCache) {
                     }
 
                     updateDragStyles(false, obj.element);
-                };
+                }
 
-                var isTouching = function (mouseX, mouseY, dragElement) {
+                function isTouching(mouseX, mouseY, dragElement) {
                     var touching = hitTest(mouseX, mouseY);
                     scope.isTouching = touching;
                     if (touching) {
@@ -3619,9 +3126,9 @@ module.run(['$templateCache', function($templateCache) {
                     }
                     updateDragStyles(touching, dragElement);
                     return touching;
-                };
+                }
 
-                var updateDragStyles = function (touching, dragElement) {
+                function updateDragStyles(touching, dragElement) {
                     if (touching) {
                         element.addClass('pip-drag-enter');
                         dragElement.addClass('pip-drag-over');
@@ -3632,7 +3139,7 @@ module.run(['$templateCache', function($templateCache) {
                     }
                 };
 
-                var hitTest = function (x, y) {
+                function hitTest(x, y) {
                     var bounds = element[0].getBoundingClientRect();
                     x -= $document[0].body.scrollLeft + $document[0].documentElement.scrollLeft;
                     y -= $document[0].body.scrollTop + $document[0].documentElement.scrollTop;
@@ -3640,31 +3147,32 @@ module.run(['$templateCache', function($templateCache) {
                         && x <= bounds.right
                         && y <= bounds.bottom
                         && y >= bounds.top;
-                };
-
-                initialize();
+                }
             }
         };
     }]);
 
-    //thisModule.directive('pipDragClone', ['$parse', '$timeout', 'pipDraggable', function ($parse, $timeout, pipDraggable) {
+    //thisModule.directive('pipDragClone', function ($parse, $timeout, pipDraggable) {
     //    return {
     //        restrict: 'A',
     //        link: function (scope, element, attrs) {
     //            var img, _allowClone = true;
     //            var _dragOffset = null;
     //            scope.clonedData = {};
-    //            var initialize = function () {
+    //            initialize();
+    //            return;
+
+    //            function initialize() {
 //
     //                img = element.find('img');
     //                element.attr('pip-draggable', 'false');
     //                img.attr('draggable', 'false');
     //                reset();
     //                toggleListeners(true);
-    //            };
+    //            }
 //
 //
-    //            var toggleListeners = function (enable) {
+    //            function toggleListeners(enable) {
     //                // remove listeners
 //
     //                if (!enable)return;
@@ -3674,14 +3182,16 @@ module.run(['$templateCache', function($templateCache) {
     //                scope.$on('draggable:end', onDragEnd);
     //                preventContextMenu();
 //
-    //            };
-    //            var preventContextMenu = function () {
+    //            }
+
+    //            function preventContextMenu() {
     //                //  element.off('mousedown touchstart touchmove touchend touchcancel', absorbEvent_);
     //                img.off('mousedown touchstart touchmove touchend touchcancel', absorbEvent_);
     //                //  element.on('mousedown touchstart touchmove touchend touchcancel', absorbEvent_);
     //                img.on('mousedown touchstart touchmove touchend touchcancel', absorbEvent_);
-    //            };
-    //            var onDragStart = function (evt, obj, elm) {
+    //            }
+
+    //            function onDragStart(evt, obj, elm) {
     //                _allowClone = true;
     //                if (angular.isDefined(obj.data.allowClone)) {
     //                    _allowClone = obj.data.allowClone;
@@ -3696,8 +3206,9 @@ module.run(['$templateCache', function($templateCache) {
     //                    moveElement(obj.tx, obj.ty);
     //                }
 //
-    //            };
-    //            var onDragMove = function (evt, obj) {
+    //            }
+
+    //            function onDragMove(evt, obj) {
     //                if (_allowClone) {
 //
     //                    _tx = obj.tx + obj.dragOffset.left;
@@ -3705,18 +3216,20 @@ module.run(['$templateCache', function($templateCache) {
 //
     //                    moveElement(_tx, _ty);
     //                }
-    //            };
-    //            var onDragEnd = function (evt, obj) {
+    //            }
+
+    //            function onDragEnd(evt, obj) {
     //                //moveElement(obj.tx,obj.ty);
     //                if (_allowClone) {
     //                    reset();
     //                }
-    //            };
+    //            }
 //
-    //            var reset = function () {
+    //            function reset() {
     //                element.css({left: 0, top: 0, position: 'fixed', 'z-index': -1, visibility: 'hidden'});
-    //            };
-    //            var moveElement = function (x, y) {
+    //            }
+
+    //            function moveElement(x, y) {
     //                element.css({
     //                    transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
     //                    'z-index': 99999,
@@ -3725,52 +3238,50 @@ module.run(['$templateCache', function($templateCache) {
     //                    '-ms-transform': 'matrix(1, 0, 0, 1, ' + x + ', ' + y + ')'
     //                    //,margin: '0'  don't monkey with the margin,
     //                });
-    //            };
+    //            }
 //
-    //            var absorbEvent_ = function (event) {
+    //            function absorbEvent_(event) {
     //                var e = event;//.originalEvent;
     //                e.preventDefault && e.preventDefault();
     //                e.stopPropagation && e.stopPropagation();
     //                e.cancelBubble = true;
     //                e.returnValue = false;
     //                return false;
-    //            };
+    //            }
 //
-    //            initialize();
     //        }
     //    };
-    //}]);
+    //});
 
     thisModule.directive('pipPreventDrag', ['$parse', '$timeout', function ($parse, $timeout) {
         return {
             restrict: 'A',
             link: function (scope, element, attrs) {
-                var initialize = function () {
+                initialize();
 
+                return;
+                //---------------------
+
+                function initialize() {
                     element.attr('pip-draggable', 'false');
                     toggleListeners(true);
-                };
+                }
 
-
-                var toggleListeners = function (enable) {
+                function toggleListeners(enable) {
                     // remove listeners
-
                     if (!enable)return;
                     // add listeners.
                     element.on('mousedown touchstart touchmove touchend touchcancel', absorbEvent_);
-                };
+                }
 
-
-                var absorbEvent_ = function (event) {
+                function absorbEvent_(event) {
                     var e = event.originalEvent;
                     e.preventDefault && e.preventDefault();
                     e.stopPropagation && e.stopPropagation();
                     e.cancelBubble = true;
                     e.returnValue = false;
                     return false;
-                };
-
-                initialize();
+                }
             }
         };
     }]);
@@ -3799,10 +3310,11 @@ module.run(['$templateCache', function($templateCache) {
     thisModule.directive('pipImageSlider',
         function () {
             return {
-                scope: false,
+                scope: {
+                    sliderIndex: '=pipImageIndex'
+                },
                 controller: ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', '$pipImageSlider', function ($scope, $element, $attrs, $parse, $timeout, $interval, $pipImageSlider) {
                     var blocks,
-                        indexSetter = $parse($attrs.pipImageSliderIndex).assign,
                         index = 0, newIndex,
                         direction,
                         type = $parse($attrs.pipAnimationType)($scope),
@@ -3847,7 +3359,7 @@ module.run(['$templateCache', function($templateCache) {
                         $pipImageSlider.toBlock(type, blocks, index, newIndex, direction);
                         index = newIndex;
                         setIndex();
-                    }, 600);
+                    }, 700);
 
                     $scope.nextBlock = function () {
                         restartInterval();
@@ -3873,11 +3385,11 @@ module.run(['$templateCache', function($templateCache) {
                         direction = nextIndex > index ? 'next' : 'prev';
                         throttled();
                     };
+                    
+                    if ($attrs.id) $pipImageSlider.registerSlider($attrs.id, $scope);
 
                     function setIndex() {
-                        if (indexSetter) {
-                            indexSetter($scope, index);
-                        }
+                        if ($attrs.pipImageIndex) $scope.sliderIndex = index;
                     }
 
                     function startInterval() {
@@ -3894,6 +3406,7 @@ module.run(['$templateCache', function($templateCache) {
 
                     $element.on('$destroy', function () {
                         stopInterval();
+                        $pipImageSlider.removeSlider($attrs.id);
                     });
 
                     function restartInterval() {
@@ -3920,17 +3433,33 @@ module.run(['$templateCache', function($templateCache) {
     thisModule.service('$pipImageSlider',
         ['$timeout', function ($timeout) {
 
-            var ANIMATION_DURATION = 550;
+            var ANIMATION_DURATION = 550,
+                sliders = {};
 
             return {
                 nextCarousel: nextCarousel,
                 prevCarousel: prevCarousel,
-                toBlock: toBlock
+                toBlock: toBlock,
+                registerSlider: register,
+                removeSlider: remove,
+                getSliderScope: getSlider
             };
 
-            function nextCarousel(nextBlock, prevBlock) {
-                nextBlock.removeClass('animated').addClass('pip-next');
+            function register(sliderId, sliderScope) {
+                sliders[sliderId] = sliderScope;
+            }
+            
+            function remove(sliderId) {
+                delete sliders[sliderId];
+            }
 
+            function getSlider(sliderId) {
+                return sliders[sliderId];
+            }
+
+            function nextCarousel(nextBlock, prevBlock) {
+                nextBlock.addClass('pip-next');
+                
                 $timeout(function () {
                     nextBlock.addClass('animated').addClass('pip-show').removeClass('pip-next');
                     prevBlock.addClass('animated').removeClass('pip-show');
@@ -3938,15 +3467,9 @@ module.run(['$templateCache', function($templateCache) {
             }
 
             function prevCarousel(nextBlock, prevBlock) {
-                nextBlock.removeClass('animated');
-
                 $timeout(function () {
                     nextBlock.addClass('animated').addClass('pip-show');
                     prevBlock.addClass('animated').addClass('pip-next').removeClass('pip-show');
-
-                    $timeout(function () {
-                        prevBlock.removeClass('pip-next').removeClass('animated');
-                    }, ANIMATION_DURATION - 100);
                 }, 100);
             }
 
@@ -3956,19 +3479,20 @@ module.run(['$templateCache', function($templateCache) {
                     nextBlock = $(blocks[blockIndex]);
 
                 if (type === 'carousel') {
-                    $(blocks).removeClass('pip-next').removeClass('pip-prev');
+                    $(blocks).removeClass('pip-next').removeClass('pip-prev').removeClass('animated');
 
-                    if (direction && direction === 'prev') {
-                        prevCarousel(nextBlock, prevBlock);
-                    }
-                    if (direction && direction === 'next') {
-                        nextCarousel(nextBlock, prevBlock);
-                    }
-                    if ((!direction || direction !== 'next' && direction !== 'prev') &&
-                        nextIndex && nextIndex < oldIndex) {
-                        prevCarousel(nextBlock, prevBlock);
+                    if (direction && (direction === 'prev' || direction === 'next')) {
+                        if (direction === 'prev') {
+                            prevCarousel(nextBlock, prevBlock);
+                        } else {
+                            nextCarousel(nextBlock, prevBlock);
+                        }
                     } else {
-                        nextCarousel(nextBlock, prevBlock);
+                        if (nextIndex && nextIndex < oldIndex) {
+                            prevCarousel(nextBlock, prevBlock);
+                        } else {
+                            nextCarousel(nextBlock, prevBlock);
+                        }
                     }
                 } else {
                     prevBlock.addClass('animated').removeClass('pip-show');
@@ -3994,7 +3518,7 @@ module.run(['$templateCache', function($templateCache) {
         function () {
             return {
                 scope: {},
-                controller: ['$scope', '$element', '$parse', '$attrs', function ($scope, $element, $parse, $attrs) {
+                controller: ['$scope', '$element', '$parse', '$attrs', '$pipImageSlider', function ($scope, $element, $parse, $attrs, $pipImageSlider) {
                     var type = $parse($attrs.pipButtonType)($scope),
                         sliderId = $parse($attrs.pipSliderId)($scope);
 
@@ -4003,7 +3527,7 @@ module.run(['$templateCache', function($templateCache) {
                             return;
                         }
 
-                        angular.element(document.getElementById(sliderId)).scope()[type + 'Block']();
+                        $pipImageSlider.getSliderScope(sliderId)[type + 'Block']();
                     });
                 }]
             };
@@ -4026,7 +3550,7 @@ module.run(['$templateCache', function($templateCache) {
         function () {
             return {
                 scope: false,
-                controller: ['$scope', '$element', '$parse', '$attrs', function ($scope, $element, $parse, $attrs) {
+                controller: ['$scope', '$element', '$parse', '$attrs', '$pipImageSlider', function ($scope, $element, $parse, $attrs, $pipImageSlider) {
                     var sliderId = $parse($attrs.pipSliderId)($scope),
                         slideTo = $parse($attrs.pipSlideTo)($scope);
 
@@ -4036,7 +3560,7 @@ module.run(['$templateCache', function($templateCache) {
                             return;
                         }
 
-                        angular.element(document.getElementById(sliderId)).scope().slideTo(slideTo);
+                        $pipImageSlider.getSliderScope(sliderId).slideTo(slideTo);
                     });
                 }]
             };
@@ -4058,26 +3582,29 @@ module.run(['$templateCache', function($templateCache) {
 
     var thisModule = angular.module('pipMarkdown', ['ngSanitize']);
 
-    // /* eslint-disable quote-props */
-    // thisModule.config(function (pipTranslateProvider) {
-    //     pipTranslateProvider.translations('en', {
-    //         'MARKDOWN_ATTACHMENTS': 'Attachments:',
-    //         'checklist': 'Checklist',
-    //         'documents': 'Documents',
-    //         'pictures': 'Pictures',
-    //         'location': 'Location',
-    //         'time': 'Time'
-    //     });
-    //     pipTranslateProvider.translations('ru', {
-    //         'MARKDOWN_ATTACHMENTS': 'Вложения:',
-    //         'checklist': 'Список',
-    //         'documents': 'Документы',
-    //         'pictures': 'Изображения',
-    //         'location': 'Местонахождение',
-    //         'time': 'Время'
-    //     });
-    // });
-    // /* eslint-enable quote-props */
+    thisModule.run(['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+
+        if (pipTranslate) {
+            pipTranslate.translations('en', {
+                'MARKDOWN_ATTACHMENTS': 'Attachments:',
+                'checklist': 'Checklist',
+                'documents': 'Documents',
+                'pictures': 'Pictures',
+                'location': 'Location',
+                'time': 'Time'
+            });
+            pipTranslate.translations('ru', {
+                'MARKDOWN_ATTACHMENTS': 'Вложения:',
+                'checklist': 'Список',
+                'documents': 'Документы',
+                'pictures': 'Изображения',
+                'location': 'Местонахождение',
+                'time': 'Время'
+            });
+        }
+
+    }]);
 
     thisModule.directive('pipMarkdown',
         ['$parse', '$injector', function ($parse, $injector) {
@@ -5348,7 +4875,6 @@ module.run(['$templateCache', function($templateCache) {
         'pipDateTimeFilters'
     ]);
 
-    angular.module('pipDateTimesControls', ['pipDateTimes']);
 
 })(window.angular);
 
@@ -5611,7 +5137,7 @@ module.run(['$templateCache', function($templateCache) {
 
     // Todo: Remove dependency on Translate. Use moment localization
     thisModule.controller('pipDateController',
-        ['$scope', '$element', 'pipTranslate', function ($scope, $element, pipTranslate) {
+        ['$scope', '$element', function ($scope, $element) { //pipTranslate
             var value;
 
             function dayList(month, year) {
@@ -5641,7 +5167,7 @@ module.run(['$templateCache', function($templateCache) {
                 for (i = 1; i <= 12; i++) {
                     months.push({
                         id: i,
-                        name: pipTranslate.translate('MONTH_' + i)
+                        name: ''//pipTranslate.translate('MONTH_' + i)
                     });
                 }
 
@@ -5727,9 +5253,9 @@ module.run(['$templateCache', function($templateCache) {
             $scope.month = value ? value.getMonth() + 1 : null;
             $scope.year = value ? value.getFullYear() : null;
 
-            $scope.dayLabel = pipTranslate.translate('DAY');
-            $scope.monthLabel = pipTranslate.translate('MONTH');
-            $scope.yearLabel = pipTranslate.translate('YEAR');
+            $scope.dayLabel = 'day'; //pipTranslate.translate('DAY');
+            $scope.monthLabel = 'month'; //pipTranslate.translate('MONTH');
+            $scope.yearLabel = 'year'; //pipTranslate.translate('YEAR');
 
             $scope.days = dayList($scope.month, $scope.year);
             $scope.months = monthList();
@@ -5789,7 +5315,7 @@ module.run(['$templateCache', function($templateCache) {
 
     // Todo: Remove dependency on Translate. Use moment localization
     thisModule.controller('pipDateRangeController',
-        ['$scope', '$element', 'pipTranslate', '$mdMedia', '$rootScope', function ($scope, $element, pipTranslate, $mdMedia, $rootScope) {
+        ['$scope', '$element', '$mdMedia', '$rootScope', function ($scope, $element, $mdMedia, $rootScope) { //pipTranslate, 
             var currentDate,
                 currentYear,
                 currentMonth,
@@ -6048,7 +5574,7 @@ module.run(['$templateCache', function($templateCache) {
                 for (i = 1; i <= 12; i++) {
                     months.push({
                         id: i,
-                        name: pipTranslate.translate('MONTH_' + i)
+                        name: ''//pipTranslate.translate('MONTH_' + i)
                     });
                 }
 
@@ -6344,157 +5870,157 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
 
-    var thisModule = angular.module('pipDateFormat', ['pipUtils', 'pipTranslate']);
+    var thisModule = angular.module('pipDateFormat', []);
 
     // Todo: Remove dependency on Translate. Use moment localization
-	thisModule.config(['pipTranslateProvider', function(pipTranslateProvider) {
+	thisModule.config(function() {
 
-        pipTranslateProvider.translations('en', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'January',
-            'MONTH_2': 'February',
-            'MONTH_3': 'March',
-            'MONTH_4': 'April',
-            'MONTH_5': 'May',
-            'MONTH_6': 'June',
-            'MONTH_7': 'July',
-            'MONTH_8': 'August',
-            'MONTH_9': 'September',
-            'MONTH_10': 'October',
-            'MONTH_11': 'November',
-            'MONTH_12': 'December',
+        // pipTranslateProvider.translations('en', {
+        //     // Months - 'MONTH_' + monthIndex
+        //     // start at 0 to match JS date format
+        //     'MONTH_1': 'January',
+        //     'MONTH_2': 'February',
+        //     'MONTH_3': 'March',
+        //     'MONTH_4': 'April',
+        //     'MONTH_5': 'May',
+        //     'MONTH_6': 'June',
+        //     'MONTH_7': 'July',
+        //     'MONTH_8': 'August',
+        //     'MONTH_9': 'September',
+        //     'MONTH_10': 'October',
+        //     'MONTH_11': 'November',
+        //     'MONTH_12': 'December',
 
-            'MONTH_LONG_1': 'January',
-            'MONTH_LONG_2': 'February',
-            'MONTH_LONG_3': 'March',
-            'MONTH_LONG_4': 'April',
-            'MONTH_LONG_5': 'May',
-            'MONTH_LONG_6': 'June',
-            'MONTH_LONG_7': 'July',
-            'MONTH_LONG_8': 'August',
-            'MONTH_LONG_9': 'September',
-            'MONTH_LONG_10': 'October',
-            'MONTH_LONG_11': 'November',
-            'MONTH_LONG_12': 'December',
+        //     'MONTH_LONG_1': 'January',
+        //     'MONTH_LONG_2': 'February',
+        //     'MONTH_LONG_3': 'March',
+        //     'MONTH_LONG_4': 'April',
+        //     'MONTH_LONG_5': 'May',
+        //     'MONTH_LONG_6': 'June',
+        //     'MONTH_LONG_7': 'July',
+        //     'MONTH_LONG_8': 'August',
+        //     'MONTH_LONG_9': 'September',
+        //     'MONTH_LONG_10': 'October',
+        //     'MONTH_LONG_11': 'November',
+        //     'MONTH_LONG_12': 'December',
 
-            'MONTH_SHORT_1': 'Jan',
-            'MONTH_SHORT_2': 'Feb',
-            'MONTH_SHORT_3': 'Mar',
-            'MONTH_SHORT_4': 'Apr',
-            'MONTH_SHORT_5': 'May',
-            'MONTH_SHORT_6': 'Jun',
-            'MONTH_SHORT_7': 'Jul',
-            'MONTH_SHORT_8': 'Aug',
-            'MONTH_SHORT_9': 'Sep',
-            'MONTH_SHORT_10': 'Oct',
-            'MONTH_SHORT_11': 'Nov',
-            'MONTH_SHORT_12': 'Dec',
+        //     'MONTH_SHORT_1': 'Jan',
+        //     'MONTH_SHORT_2': 'Feb',
+        //     'MONTH_SHORT_3': 'Mar',
+        //     'MONTH_SHORT_4': 'Apr',
+        //     'MONTH_SHORT_5': 'May',
+        //     'MONTH_SHORT_6': 'Jun',
+        //     'MONTH_SHORT_7': 'Jul',
+        //     'MONTH_SHORT_8': 'Aug',
+        //     'MONTH_SHORT_9': 'Sep',
+        //     'MONTH_SHORT_10': 'Oct',
+        //     'MONTH_SHORT_11': 'Nov',
+        //     'MONTH_SHORT_12': 'Dec',
 
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'Monday',
-            'DAY_2': 'Tuesday',
-            'DAY_3': 'Wednesday',
-            'DAY_4': 'Thursday',
-            'DAY_5': 'Friday',
-            'DAY_6': 'Saturday',
-            'DAY_7': 'Sunday',
+        //     // Days of the week - 'DAY_' + dayIndex
+        //     // start at 1 to match JS date format
+        //     'DAY_1': 'Monday',
+        //     'DAY_2': 'Tuesday',
+        //     'DAY_3': 'Wednesday',
+        //     'DAY_4': 'Thursday',
+        //     'DAY_5': 'Friday',
+        //     'DAY_6': 'Saturday',
+        //     'DAY_7': 'Sunday',
 
-            'ELAPSED_TODAY': 'Today',
-            'ELAPSED_YESTERDAY': 'Yesterday',
-            'ELAPSED_YEARS': 'y',
-            'ELAPSED_MONTHS': 'mth',
-            'ELAPSED_WEEKS': 'w',
-            'ELAPSED_DAYS': 'd',
-            'ELAPSED_HOURS': 'h',
-            'ELAPSED_MINUTES': 'm',
-            'ELAPSED_SECONDS': 's',
-            'ELAPSED_AT': 'at',
-            'ELAPSED_AGO': 'ago',
-            'ELAPSED_JUST_NOW': 'Just now',
-            'ELAPSED_FEW_MIN_AGO': 'Few min ago',
-            'ELAPSED_MIN_AGO': 'min ago',
-            'ELAPSED_HOUR_AGO': 'hour ago',
-            'ELAPSED_HOURS_AGO': 'hours ago',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
-        });
+        //     'ELAPSED_TODAY': 'Today',
+        //     'ELAPSED_YESTERDAY': 'Yesterday',
+        //     'ELAPSED_YEARS': 'y',
+        //     'ELAPSED_MONTHS': 'mth',
+        //     'ELAPSED_WEEKS': 'w',
+        //     'ELAPSED_DAYS': 'd',
+        //     'ELAPSED_HOURS': 'h',
+        //     'ELAPSED_MINUTES': 'm',
+        //     'ELAPSED_SECONDS': 's',
+        //     'ELAPSED_AT': 'at',
+        //     'ELAPSED_AGO': 'ago',
+        //     'ELAPSED_JUST_NOW': 'Just now',
+        //     'ELAPSED_FEW_MIN_AGO': 'Few min ago',
+        //     'ELAPSED_MIN_AGO': 'min ago',
+        //     'ELAPSED_HOUR_AGO': 'hour ago',
+        //     'ELAPSED_HOURS_AGO': 'hours ago',
+        //     'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'hours ago'
+        // });
 
-        pipTranslateProvider.translations('ru', {
-            // Months - 'MONTH_' + monthIndex
-            // start at 0 to match JS date format
-            'MONTH_1': 'январь',
-            'MONTH_2': 'февраль',
-            'MONTH_3': 'март',
-            'MONTH_4': 'апрель',
-            'MONTH_5': 'май',
-            'MONTH_6': 'июнь',
-            'MONTH_7': 'июль',
-            'MONTH_8': 'август',
-            'MONTH_9': 'сентябрь',
-            'MONTH_10': 'октябрь',
-            'MONTH_11': 'ноябрь',
-            'MONTH_12': 'декабрь',
+        // pipTranslateProvider.translations('ru', {
+        //     // Months - 'MONTH_' + monthIndex
+        //     // start at 0 to match JS date format
+        //     'MONTH_1': 'январь',
+        //     'MONTH_2': 'февраль',
+        //     'MONTH_3': 'март',
+        //     'MONTH_4': 'апрель',
+        //     'MONTH_5': 'май',
+        //     'MONTH_6': 'июнь',
+        //     'MONTH_7': 'июль',
+        //     'MONTH_8': 'август',
+        //     'MONTH_9': 'сентябрь',
+        //     'MONTH_10': 'октябрь',
+        //     'MONTH_11': 'ноябрь',
+        //     'MONTH_12': 'декабрь',
 
-            'MONTH_LONG_1': 'января',
-            'MONTH_LONG_2': 'февраля',
-            'MONTH_LONG_3': 'марта',
-            'MONTH_LONG_4': 'апреля',
-            'MONTH_LONG_5': 'мая',
-            'MONTH_LONG_6': 'июня',
-            'MONTH_LONG_7': 'июля',
-            'MONTH_LONG_8': 'августа',
-            'MONTH_LONG_9': 'сентября',
-            'MONTH_LONG_10': 'октября',
-            'MONTH_LONG_11': 'ноября',
-            'MONTH_LONG_12': 'декабря',
+        //     'MONTH_LONG_1': 'января',
+        //     'MONTH_LONG_2': 'февраля',
+        //     'MONTH_LONG_3': 'марта',
+        //     'MONTH_LONG_4': 'апреля',
+        //     'MONTH_LONG_5': 'мая',
+        //     'MONTH_LONG_6': 'июня',
+        //     'MONTH_LONG_7': 'июля',
+        //     'MONTH_LONG_8': 'августа',
+        //     'MONTH_LONG_9': 'сентября',
+        //     'MONTH_LONG_10': 'октября',
+        //     'MONTH_LONG_11': 'ноября',
+        //     'MONTH_LONG_12': 'декабря',
 
-            'MONTH_SHORT_1': 'янв',
-            'MONTH_SHORT_2': 'фев',
-            'MONTH_SHORT_3': 'мар',
-            'MONTH_SHORT_4': 'апр',
-            'MONTH_SHORT_5': 'май',
-            'MONTH_SHORT_6': 'июн',
-            'MONTH_SHORT_7': 'июл',
-            'MONTH_SHORT_8': 'авг',
-            'MONTH_SHORT_9': 'сен',
-            'MONTH_SHORT_10': 'окт',
-            'MONTH_SHORT_11': 'ноя',
-            'MONTH_SHORT_12': 'дек',
+        //     'MONTH_SHORT_1': 'янв',
+        //     'MONTH_SHORT_2': 'фев',
+        //     'MONTH_SHORT_3': 'мар',
+        //     'MONTH_SHORT_4': 'апр',
+        //     'MONTH_SHORT_5': 'май',
+        //     'MONTH_SHORT_6': 'июн',
+        //     'MONTH_SHORT_7': 'июл',
+        //     'MONTH_SHORT_8': 'авг',
+        //     'MONTH_SHORT_9': 'сен',
+        //     'MONTH_SHORT_10': 'окт',
+        //     'MONTH_SHORT_11': 'ноя',
+        //     'MONTH_SHORT_12': 'дек',
 
-            // Days of the week - 'DAY_' + dayIndex
-            // start at 1 to match JS date format
-            'DAY_1': 'понедельник',
-            'DAY_2': 'вторник',
-            'DAY_3': 'среда',
-            'DAY_4': 'четверг',
-            'DAY_5': 'пятница',
-            'DAY_6': 'суббота',
-            'DAY_7': 'воскресенье',
+        //     // Days of the week - 'DAY_' + dayIndex
+        //     // start at 1 to match JS date format
+        //     'DAY_1': 'понедельник',
+        //     'DAY_2': 'вторник',
+        //     'DAY_3': 'среда',
+        //     'DAY_4': 'четверг',
+        //     'DAY_5': 'пятница',
+        //     'DAY_6': 'суббота',
+        //     'DAY_7': 'воскресенье',
 
-            'ELAPSED_TODAY': 'Сегодня',
-            'ELAPSED_YESTERDAY': 'Вчера',
-            'ELAPSED_YEARS': 'г',
-            'ELAPSED_MONTHS': 'мц',
-            'ELAPSED_WEEKS': 'н',
-            'ELAPSED_DAYS': 'д',
-            'ELAPSED_HOURS': 'ч',
-            'ELAPSED_MINUTES': 'м',
-            'ELAPSED_SECONDS': 'с',
-            'ELAPSED_AT': 'в',
-            'ELAPSED_AGO': 'тн',
-            'ELAPSED_JUST_NOW': 'Только что',
-            'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
-            'ELAPSED_MIN_AGO': 'мин тн',
-            'ELAPSED_HOUR_AGO': 'час тн',
-            'ELAPSED_HOURS_AGO': 'часа тн',
-            'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
-        });
+        //     'ELAPSED_TODAY': 'Сегодня',
+        //     'ELAPSED_YESTERDAY': 'Вчера',
+        //     'ELAPSED_YEARS': 'г',
+        //     'ELAPSED_MONTHS': 'мц',
+        //     'ELAPSED_WEEKS': 'н',
+        //     'ELAPSED_DAYS': 'д',
+        //     'ELAPSED_HOURS': 'ч',
+        //     'ELAPSED_MINUTES': 'м',
+        //     'ELAPSED_SECONDS': 'с',
+        //     'ELAPSED_AT': 'в',
+        //     'ELAPSED_AGO': 'тн',
+        //     'ELAPSED_JUST_NOW': 'Только что',
+        //     'ELAPSED_FEW_MIN_AGO': 'Несколько мин тн',
+        //     'ELAPSED_MIN_AGO': 'мин тн',
+        //     'ELAPSED_HOUR_AGO': 'час тн',
+        //     'ELAPSED_HOURS_AGO': 'часа тн',
+        //     'ELAPSED_HOURS_AGO_MORE_THAN_FIVE': 'часов тн'
+        // });
 		
-	}]);
+	});
 
     thisModule.factory('pipDateFormat',
-        ['pipDates', 'pipTranslate', '$rootScope', function (pipDates, pipTranslate, $rootScope) {
+        ['pipDates', '$rootScope', function (pipDates, $rootScope) { //pipTranslate
 
             return {
                 formatDate: formatDate,
@@ -6540,9 +6066,9 @@ module.run(['$templateCache', function($templateCache) {
                     thisYear = new Date().getUTCFullYear(),
                     year = value.getUTCFullYear(),
                     month = value.getUTCMonth(),
-                    longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
-                    shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
-                    monthName = pipTranslate.translate('MONTH_' + (month + 1)),
+                    // longMonthName = pipTranslate.translate('MONTH_LONG_' + (month + 1)),
+                    // shortMonthName = pipTranslate.translate('MONTH_SHORT_' + (month + 1)),
+                    // monthName = pipTranslate.translate('MONTH_' + (month + 1)),
                     day = value.getUTCDate(),
                     startWeek = pipDates.toStartWeek(value),
                     endWeek = pipDates.toEndWeek(value, -1);
@@ -6705,11 +6231,11 @@ module.run(['$templateCache', function($templateCache) {
                     secs = value.getSeconds(),
                     ampm = '';
 
-                if (pipTranslate.use() == 'en') {
-                    ampm = hours >= 12 ? ' PM' : ' AM';
-                    hours = hours % 12;
-                    if (hours == 0) hours = 12;
-                }
+                // if (pipTranslate && pipTranslate.use() == 'en') {
+                //     ampm = hours >= 12 ? ' PM' : ' AM';
+                //     hours = hours % 12;
+                //     if (hours == 0) hours = 12;
+                // }
 
                 if (format == 'hh:mm:ss')
                     return '' + twoDigits(hours) + ':' + twoDigits(mins) + ':' + twoDigits(secs) + ampm;
@@ -6721,7 +6247,7 @@ module.run(['$templateCache', function($templateCache) {
 
             function formatMonth(value, short) {
                 if (value == null) return '';
-                return short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
+                return 'MONTH_SHORT_' + value //short ? pipTranslate.translate('MONTH_SHORT_' + value) : pipTranslate.translate('MONTH_' + value);
             }
 
             function formatLongTime(value) {
@@ -6753,7 +6279,7 @@ module.run(['$templateCache', function($templateCache) {
                     current = new Date(),
                     diff = Math.floor(((current.getTime() + current.getTimezoneOffset()) - (value.getTime() + value.getTimezoneOffset())) / 1000);
 
-                if (diff < 1) return pipTranslate.translate('ELAPSED_JUST_NOW');
+                if (diff < 1) return 'ELAPSED_JUST_NOW' //pipTranslate.translate('ELAPSED_JUST_NOW');
 
                 var years, months, weeks, days, hours, mins, secs;
 
@@ -6779,71 +6305,71 @@ module.run(['$templateCache', function($templateCache) {
                     weeks = 0;
                 }
 
-                if (format == 'interval') {
-                    var result = '';
+                // if (format == 'interval') {
+                //     var result = '';
 
-                    if (years) {
-                        result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
-                        weeks = days = hours = mins = secs = null;
-                    }
-                    if (months) {
-                        result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
-                        days = hours = mins = secs = null;
-                    }
-                    if (weeks) {
-                        result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
-                        hours = mins = secs = null;
-                    }
-                    if (days) {
-                        result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
-                        mins = secs = null;
-                    }
-                    if (hours) {
-                        result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
-                        secs = null;
-                    }
-                    if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
-                    if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
+                //     if (years) {
+                //         result += ' ' + years + pipTranslate.translate('ELAPSED_YEARS');
+                //         weeks = days = hours = mins = secs = null;
+                //     }
+                //     if (months) {
+                //         result += ' ' + months + pipTranslate.translate('ELAPSED_MONTHS');
+                //         days = hours = mins = secs = null;
+                //     }
+                //     if (weeks) {
+                //         result += ' ' + weeks + pipTranslate.translate('ELAPSED_WEEKS');
+                //         hours = mins = secs = null;
+                //     }
+                //     if (days) {
+                //         result += ' ' + days + pipTranslate.translate('ELAPSED_DAYS');
+                //         mins = secs = null;
+                //     }
+                //     if (hours) {
+                //         result += ' ' + hours + pipTranslate.translate('ELAPSED_HOURS');
+                //         secs = null;
+                //     }
+                //     if (mins) result += ' ' + mins + pipTranslate.translate('ELAPSED_MINUTES');
+                //     if (secs) result += ' ' + secs + pipTranslate.translate('ELAPSED_SECONDS');
 
-                    return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
-                        : pipTranslate.translate('ELAPSED_JUST_NOW');
-                }
+                //     return result != '' ? result + ' ' + pipTranslate.translate('ELAPSED_AGO') 
+                //         : pipTranslate.translate('ELAPSED_JUST_NOW');
+                // }
 
                 // Default time format = 'default'
 
-                if (years > 0) {
-                    return formatDate(value, 'd MMM yyyy');
-                }
+                // if (years > 0) {
+                //     return formatDate(value, 'd MMM yyyy');
+                // }
 
-                if (months > 0 || weeks > 0 || days > 1) {
-                    return formatDate(value, 'MMM d') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
+                // if (months > 0 || weeks > 0 || days > 1) {
+                //     return formatDate(value, 'MMM d') 
+                //         + ', ' + formatTime(value, 'hh:mm');
+                // }
 
-                if (days == 1) {
-                    return pipTranslate.translate('ELAPSED_YESTERDAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
+                // if (days == 1) {
+                //     return pipTranslate.translate('ELAPSED_YESTERDAY') 
+                //         + ', ' + formatTime(value, 'hh:mm');
+                // }
 
-                if (hours > 10) {
-                    return pipTranslate.translate('ELAPSED_TODAY') 
-                        + ', ' + formatTime(value, 'hh:mm');
-                }
+                // if (hours > 10) {
+                //     return pipTranslate.translate('ELAPSED_TODAY') 
+                //         + ', ' + formatTime(value, 'hh:mm');
+                // }
 
-                if (hours > 0) {
-                    return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
-                        hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
-                }
+                // if (hours > 0) {
+                //     return '' + hours + ' ' + (hours < 2 ? pipTranslate.translate('ELAPSED_HOUR_AGO') :
+                //         hours < 5 ? pipTranslate.translate('ELAPSED_HOURS_AGO') : pipTranslate.translate('ELAPSED_HOURS_AGO_MORE_THAN_FIVE'));
+                // }
 
-                if (mins > 10) {
-                    return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
-                }
+                // if (mins > 10) {
+                //     return '' + mins + ' ' + pipTranslate.translate('ELAPSED_MIN_AGO');
+                // }
 
-                if (mins > 0) {
-                    return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
-                }
+                // if (mins > 0) {
+                //     return pipTranslate.translate('ELAPSED_FEW_MIN_AGO');
+                // }
 
-                return pipTranslate.translate('ELAPSED_JUST_NOW');
+                // return pipTranslate.translate('ELAPSED_JUST_NOW');
             }
 
             function formatElapsedInterval(value) {
@@ -6870,7 +6396,7 @@ module.run(['$templateCache', function($templateCache) {
     var thisModule = angular.module('pipTimeRange', []);
 
     thisModule.directive('pipTimeRange',
-        ['pipUtils', function (pipUtils) {
+        function () {
             return {
                 restrict: 'EA',
                 scope: {
@@ -6930,7 +6456,7 @@ module.run(['$templateCache', function($templateCache) {
                     $element.addClass('pip-time-range');
                 }
             };
-        }]
+        }
     );
 
 })(window.angular, window._);
@@ -6939,7 +6465,7 @@ module.run(['$templateCache', function($templateCache) {
 (function (angular, _) {
     'use strict';
 
-    var thisModule = angular.module('pipTimeRangeEdit', ['pipDateUtils', 'pipTranslate']);
+    var thisModule = angular.module('pipTimeRangeEdit', ['pipDatesUtils']);
 
     thisModule.directive('pipTimeRangeEdit',
         function () {
@@ -7382,13 +6908,13 @@ module.run(['$templateCache', function($templateCache) {
     '-->\n' +
     '\n' +
     '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{::theme}}">\n' +
-    '    <div class="pip-header text-subhead1">\n' +
-    '        <h3 class="m0">{{:: title | translate }}</h3>\n' +
+    '    <div class="pip-header">\n' +
+    '        <h3>{{:: title}}</h3>\n' +
     '    </div>\n' +
     '    <div class="pip-footer">\n' +
     '        <div>\n' +
-    '            <md-button ng-click="onCancel()">{{:: cancel | translate }}</md-button>\n' +
-    '            <md-button class="md-accent" ng-click="onOk()">{{:: ok | translate }}</md-button>\n' +
+    '            <md-button ng-click="onCancel()">{{:: cancel}}</md-button>\n' +
+    '            <md-button class="md-accent" ng-click="onOk()">{{:: ok}}</md-button>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '</md-dialog>\n' +
@@ -7409,54 +6935,55 @@ module.run(['$templateCache', function($templateCache) {
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
-    '<md-dialog class="pip-dialog pip-details-dialog layout-column" width="400" md-theme="{{theme}}">\n' +
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}">\n' +
     '    <div class="pip-body">\n' +
-    '\n' +
-    '        <div class="pip-header p0 bp8  text-subhead1">{{::\'ERROR_DETAILS\' | translate}}</div>\n' +
-    '        <div class="layout-row layout-align-start-center h48 text-body2 color-secondary-text"\n' +
-    '             ng-if="error.code || (error.data && error.data.code)">\n' +
-    '            {{::\'CODE\' | translate}}\n' +
+    '        <div class="pip-header">\n' +
+    '            <h3>{{::errorDetails | translate}}</h3>\n' +
     '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.code || (error.data && error.data.code)">\n' +
+    '        <div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text"\n' +
+    '             ng-if="error.code || (error.data && error.data.code)">\n' +
+    '            {{::errorCode | translate}}\n' +
+    '        </div>\n' +
+    '        <div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">\n' +
     '            {{error.code || error.data.code}}\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="layout-row layout-align-start-center h48 text-body2 color-secondary-text"\n' +
+    '        <div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text"\n' +
     '             ng-if="error.path || (error.data && error.data.path)">\n' +
-    '            {{::\'PATH\' | translate}}\n' +
+    '            {{::errorPath | translate}}\n' +
     '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.path || (error.data && error.data.path)">\n' +
+    '        <div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">\n' +
     '            {{error.path || error.data.path}}\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
+    '        <div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
     '             ng-if="error.error || (error.data && error.data.error)">\n' +
-    '            {{::\'ERROR\' | translate}}\n' +
+    '            {{::errorText | translate}}\n' +
     '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">\n' +
+    '        <div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">\n' +
     '            {{error.error || error.data.error}}\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
+    '        <div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
     '             ng-if="error.method || (error.data && error.data.method)">\n' +
-    '            {{::\'METHOD\' | translate}}\n' +
+    '            {{::errorMethod | translate}}\n' +
     '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">\n' +
+    '        <div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">\n' +
     '            {{error.method || error.data.method}}\n' +
     '        </div>\n' +
     '\n' +
-    '        <div class="h48 text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
+    '        <div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center"\n' +
     '             ng-if="error.message || (error.data && error.data.message)">\n' +
-    '            {{::\'MESSAGE\' | translate}}\n' +
+    '            {{::errorMessage | translate}}\n' +
     '        </div>\n' +
-    '        <div class="layout-row layout-align-start-center"\n' +
+    '        <div class="layout-row layout-align-start-center text-subhead1"\n' +
     '             ng-if="error.message || (error.data && error.data.message)">\n' +
     '            {{error.message || error.data.message}}\n' +
     '        </div>\n' +
     '    </div>\n' +
-    '    <div class="pip-footer rp16">\n' +
+    '    <div class="pip-footer">\n' +
     '        <div>\n' +
-    '            <md-button class="md-accent m0" ng-click="onOk()">{{::\'DISMISS\' | translate }}</md-button>\n' +
+    '            <md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button>\n' +
     '        </div>\n' +
     '    </div>\n' +
     '</md-dialog>\n' +
@@ -7480,7 +7007,7 @@ module.run(['$templateCache', function($templateCache) {
     '<md-dialog class="pip-dialog pip-information-dialog layout-column"\n' +
     '           width="400" md-theme="{{theme}}">\n' +
     '    <div class="pip-header">\n' +
-    '        <h3 class="m0">{{ title | translate }}</h3>\n' +
+    '        <h3 >{{ title | translate }}</h3>\n' +
     '    </div>\n' +
     '    <div class="pip-body">\n' +
     '        <div class="pip-content">\n' +
@@ -7514,19 +7041,19 @@ module.run(['$templateCache', function($templateCache) {
     '           min-width="400" md-theme="{{theme}}">\n' +
     '    <md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll">\n' +
     '        <div class="pip-header" >\n' +
-    '            <h3 class="m0 bm16 text-title">{{::title | translate}}</h3>\n' +
-    '            <div ng-show="deletedTitle" class="bp16 tp8 text-subhead1 divider-bottom">\n' +
-    '                <md-checkbox ng-model="deleted" aria-label="CHECKBOX" class="m0">{{::deletedTitle | translate}}</md-checkbox>\n' +
+    '            <h3>{{::title | translate}}</h3>\n' +
+    '            <div ng-show="deletedTitle" class="header-option text-subhead1 divider-bottom">\n' +
+    '                <md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::deletedTitle | translate}}</md-checkbox>\n' +
     '            </div>\n' +
     '        </div>\n' +
     '        <div class="pip-content">\n' +
     '            <md-radio-group ng-model="selectedOptionName" class="pip-list md-primary" md-no-ink="true"\n' +
     '                            ng-keypress="onKeyPress($event)" tabindex="0">\n' +
-    '                <div ng-repeat="option in options" class="pip-list-item p0" md-ink-ripple\n' +
+    '                <div ng-repeat="option in options" class="pip-list-item" md-ink-ripple\n' +
     '                     ui-event="{ click: \'onOptionSelect($event, option)\' }"\n' +
     '                     ng-class="{ selected: option.name == selectedOptionName }">\n' +
-    '                    <div class="pip-list-item">\n' +
-    '                        <md-icon class="pip-option-icon rm12" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon">\n' +
+    '                    <div class="pip-list-item item-padding">\n' +
+    '                        <md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon">\n' +
     '                        </md-icon>\n' +
     '                        <div class="pip-option-title">\n' +
     '                            {{::option.title | translate}}\n' +
@@ -7566,80 +7093,52 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '<md-dialog class="pip-dialog pip-options-dialog-big layout-column"\n' +
     '           min-width="400" md-theme="{{theme}}">\n' +
-    '    <md-dialog-content class="pip-body p0 pip-scroll" ng-class="{\'bp24\': !noActions}">\n' +
+    '    <md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !noActions}">\n' +
     '        <div class="pip-header" ng-class="{\'header-hint\': noTitle && hint}">\n' +
-    '            <h3 class="m0 text-title" ng-if="!noTitle">\n' +
+    '            <h3 class="m0" ng-if="!noTitle">\n' +
     '                {{::title | translate}}\n' +
     '            </h3>\n' +
     '            <div ng-show="noTitle && hint" class="dialog-hint layout-row layout-align-start-center">\n' +
-    '                <div class="w40" flex-fixed>\n' +
+    '                <div class="hint-icon-container flex-fixed" >\n' +
     '                    <md-icon md-svg-icon="icons:info-circle-outline"></md-icon>\n' +
     '                </div>\n' +
     '                <div>{{::hint | translate}}</div>\n' +
     '            </div>\n' +
     '        </div>\n' +
-    '        <div class="pip-divider" ng-if="!noTitle"></div>\n' +
+    '        <div class="content-divider" ng-if="!noTitle"></div>\n' +
     '        <div class="pip-content">\n' +
-    '            <div class="h8" ng-if="noTitle && hint"></div>\n' +
-    '            <md-list class="pip-menu  pip-ref-list w-stretch"\n' +
+    '            <div class="spacer8" ng-if="noTitle && hint"></div>\n' +
+    '            <md-list class="pip-menu  pip-ref-list"\n' +
     '                     pip-selected="optionIndex" index="{{optionIndex }}"\n' +
     '                     pip-select="onSelected($event)">\n' +
     '\n' +
     '                <md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center"\n' +
-    '                              ng-class="{\'selected\' : option.name == selectedOptionName,\n' +
+    '                              ng-class="{\'selected md-focused\' : option.name == selectedOptionName,\n' +
     '                              \'divider-bottom\': $index != options.length - 1}"\n' +
-    '                              md-ink-ripple xxxxng-keypress="onKeyPress($event)"\n' +
+    '                              md-ink-ripple\n' +
     '                              ng-keyup="onKeyUp($event, $index)"\n' +
     '                              ng-repeat="option in options" >\n' +
     '\n' +
-    '                    <div class="pip-content  line-height-string  max-w100-stretch" ng-click="onOptionSelect($event, option)">\n' +
-    '                        <p class="pip-title  rp24-flex" ng-if="option.title" style="margin-bottom: 4px !important;">\n' +
+    '                    <div class="pip-content  content-stretch" ng-click="onOptionSelect($event, option)">\n' +
+    '                        <p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">\n' +
     '                            {{::option.title | translate}}\n' +
     '                        </p>\n' +
-    '                        <div class="pip-subtitle  rp24-flex"\n' +
+    '                        <div class="pip-subtitle spacer-right"\n' +
     '                             style="height: inherit"\n' +
     '                             ng-if="option.subtitle">\n' +
     '                            {{::option.subtitle | translate}}\n' +
     '                        </div>\n' +
-    '                        <div class="pip-subtitle  rp24-flex"\n' +
+    '                        <div class="pip-subtitle spacer-right"\n' +
     '                             style="height: inherit" ng-if="option.text"\n' +
-    '                             pip-translate-html="{{::option.text | translate}}">\n' +
+    '                             ng-bind-html="option.text | translate">\n' +
     '                        </div>\n' +
     '                    </div>\n' +
     '\n' +
     '                </md-list-item>\n' +
     '\n' +
     '            </md-list>\n' +
-    '            <!--\n' +
-    '            <md-radio-group ng-model="selectedOptionName" class="pip-list md-primary" md-no-ink="true"\n' +
-    '                            ng-keypress="onKeyPress($event)" tabindex="0">\n' +
-    '                <div ng-repeat="option in options" class="pip-list-item p0" md-ink-ripple\n' +
-    '                     ui-event="{ click: \'onOptionSelect($event, option)\' }"\n' +
-    '                     ng-class="{ selected: option.name == selectedOptionName }">\n' +
-    '                    <div class="pip-list-item">\n' +
-    '\n' +
-    '                        <div class="pip-content lp24-flex rp24-flex" flex>\n' +
-    '                            <div class="pip-title" ng-if="option.title">\n' +
-    '                                {{::option.title | translate}}\n' +
-    '                            </div>\n' +
-    '                            <div class="pip-subtitle" ng-if="option.subtitle">\n' +
-    '                                {{::option.subtitle | translate}}\n' +
-    '                            </div>\n' +
-    '                            <div class="pip-text" ng-if="option.text">\n' +
-    '\n' +
-    '                                <span pip-translate-html="{{::option.text | translate}}"/>\n' +
-    '                            </div>\n' +
-    '                        </div>\n' +
-    '\n' +
-    '                        <md-radio-button ng-value="option.name" tabindex="-1" class="rm24-flex"\n' +
-    '                                         aria-label="{{::option.title | translate}}">\n' +
-    '                        </md-radio-button>\n' +
-    '                    </div>\n' +
-    '\n' +
-    '                </div>\n' +
-    '            </md-radio-group> -->\n' +
     '        </div>\n' +
-    '        <div class="h8" ng-if="noActions"></div>\n' +
+    '        <div class="spacer8" ng-if="noActions"></div>\n' +
     '    </md-dialog-content>\n' +
     '\n' +
     '    <div class="pip-footer" ng-if="!noActions">\n' +
@@ -7789,30 +7288,46 @@ module.run(['$templateCache', function($templateCache) {
 
     thisModule.controller('pipErrorDetailsDialogController',
         ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+            
             var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            
             if (pipTranslate) {
                 pipTranslate.translations('en', {
                     'ERROR_DETAILS': 'Error details',
-                    'CODE': 'Code',
+                    'CODE': 'Error code',
                     'PATH': 'Path',
-                    'ERROR': 'Error code',
+                    'ERROR': 'Error',
                     'METHOD': 'Method',
-                    'MESSAGE': 'Message'
-
+                    'MESSAGE': 'Message',
+                    'DISMISS': 'Dismiss'
                 });
                 pipTranslate.translations('ru', {
                     'ERROR_DETAILS': 'Детали ошибки',
-                    'CODE': 'Код',
+                    'CODE': 'Код ошибки',
                     'PATH': 'Путь',
-                    'ERROR': 'Код ошибки',
+                    'ERROR': 'Ошибка',
                     'METHOD': 'Метод',
                     'MESSAGE': 'Сообщение'
                 });
                 $scope.ok = params.ok || 'OK';
                 $scope.cancel = params.cancel || 'CANCEL';
+                $scope.errorDetails = 'ERROR_DETAILS';
+                $scope.dismissButton = 'DISMISS';
+                $scope.errorMessage = 'MESSAGE';
+                $scope.errorCode = 'CODE';
+                $scope.errorMethod = 'METHOD';
+                $scope.errorPath = 'PATH';
+                $scope.errorText = 'ERROR';                
             } else {
                 $scope.ok = params.ok || 'OK';
                 $scope.cancel = params.cancel || 'Cancel';
+                $scope.errorDetails = 'Error details';
+                $scope.dismissButton = 'Dismiss';
+                $scope.errorMessage = 'Message';
+                $scope.errorCode = 'Code';
+                $scope.errorMethod = 'Method';
+                $scope.errorPath = 'Path';
+                $scope.error = 'Error';
             }
 
             $scope.theme = $rootScope.$theme
@@ -7890,7 +7405,8 @@ module.run(['$templateCache', function($templateCache) {
             $scope.theme = $rootScope.$theme;
             if (params.item && pipFormat) {
                 item = _.truncate(params.item, 25);
-                content = pipFormat(content, item);
+                content = pipFormat.sprintf(content, item);
+                console.log('content2', content);
             }
             $scope.content = content;
 
@@ -8148,33 +7664,6 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window.jQuery, window._);
-
-
-
-/**
- * @file Registration of navigation WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipNav', [        
-        'pipDropdown',
-        'pipTabs',
-
-        'pipAppBar',
-        'pipSideNav',
-        'pipNavIcon',
-        'pipNavMenu',
-        'pipBreadcrumb',
-        'pipPrimaryActions', 
-        'pipSecondaryActions'
-    ]);
-    
-})();
 
 
 
@@ -8604,74 +8093,60 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Application Actions service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
+(function () {
     'use strict';
+    angular.module('pipNav', [
+        'pipDropdown',
+        'pipTabs',
+        'pipAppBar',
+        'pipSideNav',
+        'pipNavIcon',
+        'pipNavMenu',
+        'pipBreadcrumb',
+        'pipPrimaryActions',
+        'pipSecondaryActions'
+    ]);
+})();
 
+(function () {
+    'use strict';
     var thisModule = angular.module('pipActions.Service', []);
-
     thisModule.provider('pipActions', function () {
         var config = {
-            // Primary global actions visible on the screen
             primaryGlobalActions: [],
-            // Primary local actions visible on the screen
             primaryLocalActions: [],
-
-            // Secondary global actions available in popup
             secondaryGlobalActions: [],
-            // Secondary local actions available in popup
             secondaryLocalActions: []
         };
-
-        // Configure global parameters
         this.globalActions = globalActions;
         this.globalPrimaryActions = globalPrimaryActions;
         this.globalSecondaryActions = globalSecondaryActions;
-
-        // Get the service instance
         this.$get = ['$rootScope', function ($rootScope) {
             return {
                 config: getConfig,
-                
                 show: showLocalActions,
                 hide: hideLocalActions,
                 count: updateActionCount,
             };
-
-            // ----------------------
-
             function getConfig() {
                 return config;
             }
-
-            // Show actions
             function hideLocalActions() {
                 config.primaryLocalActions = [];
                 config.secondaryLocalActions = [];
-
                 sendConfigEvent();
             }
-
             function showLocalActions(primaryActions, secondaryActions) {
                 config.primaryLocalActions = primaryActions || [];
                 config.secondaryLocalActions = secondaryActions || [];
-
                 sendConfigEvent();
             }
-
-            // Todo: Why do we need that? it's needs for count badge 
             function updateActionCount(actionName, count) {
-                // Update global actions
                 _.each(config.primaryGlobalActions, function (action) {
                     if (action.name === actionName) {
                         action.count = count;
                     }
                 });
-                // Update local action
                 _.each(config.primaryLocalActions, function (action) {
                     if (action.name === actionName) {
                         action.count = count;
@@ -8679,41 +8154,26 @@ module.run(['$templateCache', function($templateCache) {
                 });
                 sendConfigEvent();
             }
-
             function sendConfigEvent() {
                 $rootScope.$broadcast('pipActionsChanged', config);
             }
         }];
-
         function globalActions(primaryActions, secondaryActions) {
             config.primaryGlobalActions = primaryActions || [];
             config.secondaryGlobalActions = secondaryActions || [];
         }
-
         function globalPrimaryActions(primaryActions) {
             config.primaryGlobalActions = primaryActions || [];
         }
-
         function globalSecondaryActions(secondaryActions) {
             config.secondaryGlobalActions = secondaryActions || [];
         }
-
     });
+})();
 
-})(window.angular, window._);
-
-/**
- * @file Application Primary Actions component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
-    var thisModule = angular.module('pipPrimaryActions',
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
-
-    // Main application header directive
+    var thisModule = angular.module('pipPrimaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
     thisModule.directive('pipPrimaryActions', function () {
         return {
             restrict: 'E',
@@ -8728,138 +8188,96 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipPrimaryActionsController'
         };
     });
-
-    thisModule.controller('pipPrimaryActionsController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
-            // Apply class and call resize
-            $element.addClass('pip-primary-actions');
-
-            $scope.config = pipActions.config();
-
-            if ($scope.localActions) {
-                pipActions.showLocalActions();
-                $scope.config.primaryLocalActions = $scope.localActions[0];
+    thisModule.controller('pipPrimaryActionsController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
+        $element.addClass('pip-primary-actions');
+        $scope.config = pipActions.config();
+        if ($scope.localActions) {
+            pipActions.showLocalActions();
+            $scope.config.primaryLocalActions = $scope.localActions[0];
+        }
+        if ($scope.globalActions) {
+            pipActions.showLocalActions();
+            $scope.config.primaryGlobalActions = $scope.globalActions[0];
+        }
+        $rootScope.$on('pipActionsChanged', onActionsChanged);
+        $scope.actionHidden = actionHidden;
+        $scope.actionCount = actionCount;
+        $scope.onActionClick = onActionClick;
+        function onActionsChanged(event, config) {
+            $scope.config = config;
+        }
+        function actionHidden(action) {
+            return action.access && !action.access(action);
+        }
+        function actionCount(action) {
+            if (action.count === null || action.count <= 0) {
+                return '';
             }
-
-            if ($scope.globalActions) {
-                pipActions.showLocalActions();
-                $scope.config.primaryGlobalActions = $scope.globalActions[0];
+            if (action.count > 99) {
+                return '!';
             }
-
-            $rootScope.$on('pipActionsChanged', onActionsChanged);
-
-            $scope.actionHidden = actionHidden;
-            $scope.actionCount = actionCount;
-
-            $scope.onActionClick = onActionClick;
-
-            function onActionsChanged(event, config) {
-                $scope.config = config;
+            return action.count;
+        }
+        function calcActions(actions) {
+            var count = 0;
+            _.each(actions, function (action) {
+                if (!actionHidden(action)) {
+                    count++;
+                }
+            });
+            return count;
+        }
+        function secondaryActionsVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function secondaryDividerVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function onActionClick(action, $mdOpenMenu) {
+            if (!action || action.divider) {
+                return;
             }
-
-            function actionHidden(action) {
-                return action.access && !action.access(action);
+            if (action.close) {
+                $scope.originatorEv = null;
             }
-
-            function actionCount(action) {
-                if (action.count === null || action.count <= 0) {
-                    return '';
-                }
-                if (action.count > 99) {
-                    return '!';
-                }
-
-                return action.count;
+            if (action.menu) {
+                $mdOpenMenu($scope.originatorEv);
+                return;
             }
-
-            function calcActions(actions) {
-                var count = 0;
-
-                _.each(actions, function (action) {
-                    if (!actionHidden(action)) {
-                        count++;
-                    }
-                });
-
-                return count;
+            if (action.callback) {
+                action.callback();
+                return;
             }
-
-            function secondaryActionsVisible() {
-                return calcActions($scope.config.secondaryGlobalActions) > 0 ||
-                    calcActions($scope.config.secondaryLocalActions) > 0;
+            if (action.href) {
+                $window.location.href = action.href;
+                return;
             }
-
-            function secondaryDividerVisible() {
-                return calcActions($scope.config.secondaryGlobalActions) > 0 &&
-                    calcActions($scope.config.secondaryLocalActions) > 0;
+            if (action.url) {
+                $location.url(action.url);
+                return;
             }
-
-            function onActionClick(action, $mdOpenMenu) {
-                if (!action || action.divider) {
-                    return;
+            if (action.state) {
+                if ($injector.has('$state')) {
+                    var $state = $injector.get('$state');
+                    $state.go(action.state, action.stateParams);
                 }
-
-                if (action.close) {
-                    $scope.originatorEv = null;
-                }
-
-                if (action.menu) {
-                    $mdOpenMenu($scope.originatorEv);
-                    return;
-                }
-
-                if (action.callback) {
-                    action.callback();
-                    return;
-                }
-
-                if (action.href) {
-                    $window.location.href = action.href;
-                    return;
-                }
-
-                if (action.url) {
-                    $location.url(action.url);
-                    return;
-                }
-
-                if (action.state) {
-                    if ($injector.has('pipState')) {
-                        var pipState = $injector.get('pipState');
-                        pipState.go(action.state, action.stateParams);
-                    }
-                    else if ($injector.has('$state')) {
-                        var $state = $injector.get('$state');
-                        $state.go(action.state, action.stateParams);
-                    }
-                    return;
-                }
-
-                if (action.event) {
-                    $rootScope.$broadcast(action.event);
-                } else {
-                    // Otherwise raise notification
-                    $rootScope.$broadcast('pipActionClicked', action.name);
-                }
+                return;
             }
+            if (action.event) {
+                $rootScope.$broadcast(action.event);
+            }
+            else {
+                $rootScope.$broadcast('pipActionClicked', action.name);
+            }
+        }
+    }]);
+})();
 
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Application Secondary Actions component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
-    var thisModule = angular.module('pipSecondaryActions',
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
-
-    // Main application header directive
+    var thisModule = angular.module('pipSecondaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
     thisModule.directive('pipSecondaryActions', function () {
         return {
             restrict: 'E',
@@ -8877,147 +8295,103 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipSecondaryActionsController'
         };
     });
-
-    thisModule.controller('pipSecondaryActionsController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
-            // Apply class and call resize
-            $element.addClass('pip-secondary-actions');
-
-            $scope.config = pipActions.config();
-
-            if ($scope.localActions) {
-                pipSecondaryActions.showLocalActions();
-                $scope.config.secondaryLocalActions = $scope.localActions[1];
+    thisModule.controller('pipSecondaryActionsController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
+        $element.addClass('pip-secondary-actions');
+        $scope.config = pipActions.config();
+        if ($scope.localActions) {
+            pipActions.showLocalActions();
+            $scope.config.secondaryLocalActions = $scope.localActions[1];
+        }
+        if ($scope.globalActions) {
+            pipActions.showLocalActions();
+            $scope.config.secondaryGlobalActions = $scope.globalActions[0];
+        }
+        $rootScope.$on('pipActionsChanged', onActionsChanged);
+        $scope.actionHidden = actionHidden;
+        $scope.actionCount = actionCount;
+        $scope.secondaryActionsVisible = secondaryActionsVisible;
+        $scope.secondaryDividerVisible = secondaryDividerVisible;
+        $scope.onActionClick = onActionClick;
+        $scope.openMenu = openMenu;
+        function openMenu($mdOpenMenu, ev) {
+            $scope.originatorEv = ev;
+            $mdOpenMenu(ev);
+        }
+        function onActionsChanged(event, config) {
+            $scope.config = config;
+        }
+        function actionHidden(action) {
+            return action.access && !action.access(action);
+        }
+        function actionCount(action) {
+            if (action.count === null || action.count <= 0) {
+                return '';
             }
-
-            if ($scope.globalActions) {
-                pipSecondaryActions.showLocalActions();
-                $scope.config.secondaryGlobalActions = $scope.globalActions[0];
+            if (action.count > 99) {
+                return '!';
             }
-
-            $rootScope.$on('pipActionsChanged', onActionsChanged);
-
-            $scope.actionHidden = actionHidden;
-            $scope.actionCount = actionCount;
-            $scope.secondaryActionsVisible = secondaryActionsVisible;
-            $scope.secondaryDividerVisible = secondaryDividerVisible;
-
-            $scope.onActionClick = onActionClick;
-
-            $scope.openMenu = openMenu;
-
-            function openMenu($mdOpenMenu, ev) {
-                $scope.originatorEv = ev;
-                $mdOpenMenu(ev);
+            return action.count;
+        }
+        function calcActions(actions) {
+            var count = 0;
+            _.each(actions, function (action) {
+                if (!actionHidden(action)) {
+                    count++;
+                }
+            });
+            return count;
+        }
+        function secondaryActionsVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function secondaryDividerVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function onActionClick(action, $mdOpenMenu) {
+            if (!action || action.divider) {
+                return;
             }
-
-            function onActionsChanged(event, config) {
-                $scope.config = config;
+            if (action.close) {
+                $scope.originatorEv = null;
             }
-
-            function actionHidden(action) {
-                return action.access && !action.access(action);
+            if (action.menu) {
+                $mdOpenMenu($scope.originatorEv);
+                return;
             }
-
-            function actionCount(action) {
-                if (action.count === null || action.count <= 0) {
-                    return '';
-                }
-                if (action.count > 99) {
-                    return '!';
-                }
-
-                return action.count;
+            if (action.callback) {
+                action.callback();
+                return;
             }
-
-            function calcActions(actions) {
-                var count = 0;
-
-                _.each(actions, function (action) {
-                    if (!actionHidden(action)) {
-                        count++;
-                    }
-                });
-
-                return count;
+            if (action.href) {
+                $window.location.href = action.href;
+                return;
             }
-
-            function secondaryActionsVisible() {
-                return calcActions($scope.config.secondaryGlobalActions) > 0 ||
-                    calcActions($scope.config.secondaryLocalActions) > 0;
+            if (action.url) {
+                $location.url(action.url);
+                return;
             }
-
-            function secondaryDividerVisible() {
-                return calcActions($scope.config.secondaryGlobalActions) > 0 &&
-                    calcActions($scope.config.secondaryLocalActions) > 0;
+            if (action.state) {
+                if ($injector.has('$state')) {
+                    var $state = $injector.get('$state');
+                    $state.go(action.state, action.stateParams);
+                }
+                return;
             }
-
-            function onActionClick(action, $mdOpenMenu) {
-                if (!action || action.divider) {
-                    return;
-                }
-
-                if (action.close) {
-                    $scope.originatorEv = null;
-                }
-
-                if (action.menu) {
-                    $mdOpenMenu($scope.originatorEv);
-                    return;
-                }
-
-                if (action.callback) {
-                    action.callback();
-                    return;
-                }
-
-                if (action.href) {
-                    $window.location.href = action.href;
-                    return;
-                }
-
-                if (action.url) {
-                    $location.url(action.url);
-                    return;
-                }
-
-                if (action.state) {
-                    if ($injector.has('pipState')) {
-                        var pipState = $injector.get('pipState');
-                        pipState.go(action.state, action.stateParams);
-                    }
-                    else if ($injector.has('$state')) {
-                        var $state = $injector.get('$state');
-                        $state.go(action.state, action.stateParams);
-                    }
-                    return;
-                }
-
-                if (action.event) {
-                    $rootScope.$broadcast(action.event);
-                } else {
-                    // Otherwise raise notification
-                    $rootScope.$broadcast('pipActionClicked', action.name);
-                }
+            if (action.event) {
+                $rootScope.$broadcast(action.event);
             }
+            else {
+                $rootScope.$broadcast('pipActionClicked', action.name);
+            }
+        }
+    }]);
+})();
 
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Application App Bar component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
-    var thisModule = angular.module('pipAppBar',
-        ['ngMaterial', 'pipNav.Templates', 'pipAppBar.Service']);
-
-    // Main application header directive
+    var thisModule = angular.module('pipAppBar', ['ngMaterial', 'pipNav.Templates', 'pipAppBar.Service']);
     thisModule.directive('pipAppbar', function () {
         return {
             restrict: 'E',
@@ -9027,41 +8401,23 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipAppBarController'
         };
     });
+    thisModule.controller('pipAppBarController', ['$scope', '$element', '$rootScope', 'pipAppBar', function ($scope, $element, $rootScope, pipAppBar) {
+        $element.addClass('pip-appbar');
+        $element.addClass('color-primary-bg');
+        $scope.$emit('pipResizeWindow');
+        $scope.config = pipAppBar.config();
+        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
+        function onAppBarChanged(event, config) {
+            $scope.config = config;
+        }
+    }]);
+})();
 
-    thisModule.controller('pipAppBarController',
-        ['$scope', '$element', '$rootScope', 'pipAppBar', function ($scope, $element, $rootScope, pipAppBar) {
-            // Apply class and call resize
-            $element.addClass('pip-appbar');
-            $element.addClass('color-primary-bg');
-            
-            $scope.$emit('pipResizeWindow');
-
-            $scope.config = pipAppBar.config();
-
-            $rootScope.$on('pipAppBarChanged', onAppBarChanged);
-
-            function onAppBarChanged(event, config) {
-                $scope.config = config;
-            }
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Application App Bar part component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
     var thisModule = angular.module('pipAppBar.Part', ['pipAppBar.Service']);
-
-    // Example is taken from here: http://stackoverflow.com/questions/20325480/angularjs-whats-the-best-practice-to-add-ngif-to-a-directive-programmatically
     thisModule.directive('pipAppbarPart', ['ngIfDirective', function (ngIfDirective) {
         var ngIf = ngIfDirective[0];
-
         return {
             transclude: ngIf.transclude,
             priority: ngIf.priority,
@@ -9069,7 +8425,6 @@ module.run(['$templateCache', function($templateCache) {
             restrict: ngIf.restrict,
             scope: true,
             link: function linkFunction($scope, $element, $attrs) {
-                // Visualize based on visible variable in scope
                 $attrs.ngIf = function () {
                     return $scope.visible;
                 };
@@ -9078,139 +8433,92 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipAppBarPartController'
         };
     }]);
+    thisModule.controller('pipAppBarPartController', ['$scope', '$element', '$attrs', '$rootScope', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, pipAppBar) {
+        var partName = '' + $attrs.pipAppbarPart;
+        var partValue = null;
+        var pos = partName.indexOf(':');
+        if (pos > 0) {
+            partValue = partName.substr(pos + 1);
+            partName = partName.substr(0, pos);
+        }
+        onAppBarChanged(null, pipAppBar.config());
+        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
+        function onAppBarChanged(event, config) {
+            var parts = config.parts || {};
+            var currentPartValue = parts[partName];
+            var visible = !!(partValue ? currentPartValue == partValue : currentPartValue);
+            if (visible != $scope.visible)
+                $scope.visible = visible;
+        }
+    }]);
+})();
 
-    thisModule.controller('pipAppBarPartController',
-        ['$scope', '$element', '$attrs', '$rootScope', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, pipAppBar) {
-            var partName = '' + $attrs.pipAppbarPart;
-            var partValue = null;
-
-            // Break part apart
-            var pos = partName.indexOf(':');
-            if (pos > 0) {
-                partValue = partName.substr(pos + 1);
-                partName = partName.substr(0, pos);
-            }
-
-            onAppBarChanged(null, pipAppBar.config());
-
-            $rootScope.$on('pipAppBarChanged', onAppBarChanged);
-
-            function onAppBarChanged(event, config) {
-                var parts = config.parts || {};
-                var currentPartValue = parts[partName];
-
-                // Set visible variable to switch ngIf
-                var visible = !!(partValue ? currentPartValue == partValue : currentPartValue);
-
-                if (visible != $scope.visible)
-                    $scope.visible = visible;
-            }
-
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Application App Bar service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
+(function () {
     'use strict';
-
     var thisModule = angular.module('pipAppBar.Service', []);
-
     thisModule.provider('pipAppBar', function () {
         var config = {
-            // Theme to be applied to the header
-            theme: 'blue',
+            theme: 'default',
             cssClass: '',
             ngClasses: {},
-            // Parts of the appbar
             parts: {}
         };
-
-        // Configure global parameters
         this.theme = theme;
         this.parts = initParts;
-
-        // Get the service instance
         this.$get = ['$rootScope', function ($rootScope) {
             return {
                 config: getConfig,
                 cssClass: cssClass,
-
                 part: getOrSetPart,
                 parts: getOrSetParts,
-                
                 showShadow: showShadow,
                 showShadowSm: showShadowSm,
                 showShadowSmXs: showShadowSmXs,
                 hideShadow: hideShadow
             };
-
-            // ----------------------
-
             function getConfig() {
                 return config;
             }
-
-            // Todo: Do we need that "hack"?
             function cssClass(newCssClass) {
                 if (newCssClass != undefined) {
                     config.cssClass = newCssClass;
                     sendConfigEvent();
                 }
-
                 return config.cssClass;
             }
-
-            // Show, hide appbar shadow
             function showShadowSm() {
                 config.ngClasses['pip-shadow'] = false;
                 config.ngClasses['pip-shadow-sm'] = true;
                 config.ngClasses['pip-shadow-xs'] = false;
                 sendConfigEvent();
             }
-
             function showShadowSmXs() {
                 config.ngClasses['pip-shadow'] = false;
                 config.ngClasses['pip-shadow-sm'] = true;
                 config.ngClasses['pip-shadow-xs'] = true;
                 sendConfigEvent();
             }
-
             function showShadow() {
                 config.ngClasses['pip-shadow'] = true;
                 sendConfigEvent();
             }
-
             function hideShadow() {
                 config.ngClasses['pip-shadow'] = false;
                 config.ngClasses['pip-shadow-sm'] = false;
                 config.ngClasses['pip-shadow-xs'] = false;
                 sendConfigEvent();
             }
-
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipAppBarChanged', config);
-            }
-
             function getOrSetPart(name, value) {
                 if (!_.isString(name))
-                    throw new Exception("Part name has to be a string");
-
+                    throw new Error("Part name has to be a string");
                 if (value != undefined) {
                     if (config.parts[name] != value) {
                         config.parts[name] = value;
                         sendConfigEvent();
                     }
                 }
-
                 return config.parts[name];
             }
-
             function getOrSetParts(parts) {
                 if (_.isObject(parts)) {
                     if (!_.isEqual(config.parts, parts)) {
@@ -9218,291 +8526,250 @@ module.run(['$templateCache', function($templateCache) {
                         sendConfigEvent();
                     }
                 }
-
                 return config.parts;
             }
-
             function sendConfigEvent() {
                 $rootScope.$broadcast('pipAppBarChanged', config);
             }
         }];
-
         function theme(theme) {
             config.theme = theme || config.theme;
-
             return config.theme;
         }
-
         function initParts(parts) {
             if (_.isObject(parts)) {
                 config.parts = parts;
             }
             return config.parts;
         }
-
     });
-
-})(window.angular, window._);
-
-/**
- * @file Breadcrumb component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
-    'use strict';
-
-    var thisModule = angular.module('pipBreadcrumb',
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipBreadcrumb.Service']);
-
-    // Main application header directive
-    thisModule.directive('pipBreadcrumb', function () {
-        return {
-            restrict: 'E',
-            scope: {},
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'breadcrumb/breadcrumb.html';
-            },
-            controller: 'pipBreadcrumbController'
-        };
-    });
-
-    thisModule.controller('pipBreadcrumbController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', 'pipBreadcrumb', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, pipBreadcrumb) {
-            // Apply class and call resize
-            $element.addClass('pip-breadcrumb');
-
-            $scope.config = pipBreadcrumb.config();
-
-            $rootScope.$on('pipBreadcrumbChanged', onBreadcrumbChanged);
-            $rootScope.$on('pipBreadcrumbBack', onBreadcrumbBack);
-
-            $scope.onBreadcrumbClick = onBreadcrumbClick;
-
-            function onBreadcrumbChanged(event, config) {
-                $scope.config = config;
-            }
-
-            function onBreadcrumbBack() {
-                var items, backCallback;
-
-                items = $scope.config.items;
-                // Go to the last breadcrumb item
-                if (_.isArray(items) && items.length > 0) {
-                    backCallback = items[items.length - 1].click;
-                    if (_.isFunction(backCallback)) {
-                        backCallback();
-                    } else {
-                        $window.history.back();
-                    }
-                } else {
-                    $window.history.back();
-                }
-            }
-
-            function onBreadcrumbClick(item) {
-                if (_.isFunction(item.click)) {
-                    item.click(item);
-                }
-            }
-
-            function onSearchEnable() {
-                $rootScope.$broadcast('pipSearchOpen');
-            }
-
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Breadcrumb service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
-    'use strict';
-
-    var thisModule = angular.module('pipBreadcrumb.Service', []);
-
-    thisModule.provider('pipBreadcrumb', function () {
-        var config = {
-            // Title text
-            text: null,
-            // Navigation items [{ title, click }],
-            items: null,
-            // Search criteria
-            criteria: '',
-        };
-
-        this.text = initText;
-
-        // Get the service instance
-        this.$get = ['$rootScope', function ($rootScope) {
-            return {
-                config: getConfig,
-
-                text: setText,
-                path: setItems,
-                items: setItems,
-
-                criteria: setCriteria
-            };
-
-            // ----------------------
-
-            function getConfig() {
-                return config;
-            }
-
-            function setText(text) {
-                config.text = text;
-                config.items = null;
-                
-                sendConfigEvent();
-            }
-
-            function setItems(text, items) {
-                if (_.isArray(text)) {
-                    items = text;
-                    text = items[items.length - 1].title;
-                    items.splice(items.length - 1, 1);
-                }
-                config.text = text;
-                config.items = items;
-
-                // if (items.length > 0) {
-                //     config.navIconType = config.navIconType === 'none' ? 'none' : config.navIconType;
-                //     config.navIconCallback = items[items.length - 1];
-                // } else {
-                //     config.navIconType = 'menu';
-                //     config.navIconCallback = null;
-                // }
-
-                sendConfigEvent();
-            }
-
-            function setCriteria(criteria) {
-                config.criteria = criteria;
-                sendConfigEvent();
-            }
-
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipBreadcrumbChanged', config);
-            }
-        }];
-        
-        function initText(text) {
-            if (text != undefined) {
-                config.text = text;
-            }
-            return config.text;
-        }
-
-    });
-
-})(window.angular, window._);
-
-/**
- * @file Optional filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipNav.Translate', []);
-
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') 
-            ? $injector.get('pipTranslate') : null;
-
-        return function (key) {
-            return pipTranslate  ? pipTranslate.translate(key) || key : key;
-        }
-    }]);
-
 })();
 
-/**
- * @file Dropdown control
- * @copyright Digital Living Software Corp. 2014-2016
- *
- */
-
-/* global _, angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module("pipDropdown", ['pipNav.Templates']);
-
-    thisModule.directive('pipDropdown',
-        ['$mdMedia', function ($mdMedia) {
+"use strict";
+var pip;
+(function (pip) {
+    var nav;
+    (function (nav) {
+        'use strict';
+        var BreadcrumbController = (function () {
+            BreadcrumbController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', 'pipBreadcrumb'];
+            function BreadcrumbController($scope, $element, $attrs, $rootScope, $window, $state, pipBreadcrumb) {
+                "ngInject";
+                this._rootScope = $rootScope;
+                this._window = $window;
+                $element.addClass('pip-breadcrumb');
+                this.config = pipBreadcrumb.config();
+                $rootScope.$on('pipBreadcrumbChanged', this.onBreadcrumbChanged);
+                $rootScope.$on('pipBreadcrumbBack', this.onBreadcrumbBack);
+            }
+            BreadcrumbController.prototype.onBreadcrumbChanged = function (event, config) {
+                this.config = config;
+            };
+            BreadcrumbController.prototype.onBreadcrumbBack = function () {
+                var items = this.config.items;
+                if (_.isArray(items) && items.length > 0) {
+                    var backCallback = items[items.length - 1].click;
+                    if (_.isFunction(backCallback))
+                        backCallback();
+                    else
+                        this._window.history.back();
+                }
+                else
+                    this._window.history.back();
+            };
+            BreadcrumbController.prototype.onBreadcrumbClick = function (item) {
+                if (_.isFunction(item.click))
+                    item.click(item);
+            };
+            BreadcrumbController.prototype.onSearchOpen = function () {
+                this._rootScope.$broadcast('pipSearchOpen');
+            };
+            return BreadcrumbController;
+        }());
+        function breadcrumbDirective() {
             return {
                 restrict: 'E',
-                scope: {
-                    ngDisabled: '&',
-                    actions: '=pipActions',
-                    showDropdown: '&pipShow',
-                    activeIndex: '=pipActiveIndex',
-                    select: '=pipDropdownSelect'
+                scope: {},
+                replace: false,
+                templateUrl: function (element, attr) {
+                    return 'breadcrumb/breadcrumb.html';
                 },
-                templateUrl: 'dropdown/dropdown.html',
-                controller:
-                    ['$scope', '$element', '$attrs', 'localStorageService', function ($scope, $element, $attrs, localStorageService) {
-                        // Todo: Remove dependency on local storage or make it optional
-                        $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
-                        //pipAssert.isArray($scope.actions, 'pipDropdown: pip-actions attribute should take an array, but take ' + typeof $scope.actions);
-                        $scope.$mdMedia = $mdMedia;
-                        $scope.actions = ($scope.actions && _.isArray($scope.actions)) ? $scope.actions : [];
-                        $scope.activeIndex = $scope.activeIndex || 0;
-
-                        $scope.disabled = function () {
-                            if ($scope.ngDisabled()) {
-                                return $scope.ngDisabled();
-                            } else {
-                                return false;
-                            }
-                        };
-
-                        $scope.onSelect = function (index) {
-                            $scope.activeIndex = index;
-                            if ($scope.select) {
-                                $scope.select($scope.actions[index], $scope.activeIndex);
-                            }
-                        };
-
-                        $scope.show = function () {
-                            if ($scope.showDropdown()) {
-                                return $scope.showDropdown();
-                            } else {
-                                return true;
-                            }
-                        };
-
-                    }]
+                controller: BreadcrumbController,
+                controllerAs: 'vm'
             };
-        }]
-    );
+        }
+        angular
+            .module('pipBreadcrumb', [
+            'ngMaterial', 'pipNav.Translate', 'pipNav.Templates'
+        ])
+            .directive('pipBreadcrumb', breadcrumbDirective);
+    })(nav = pip.nav || (pip.nav = {}));
+})(pip || (pip = {}));
 
+"use strict";
+var pip;
+(function (pip) {
+    var nav;
+    (function (nav) {
+        'use strict';
+        nav.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
+        var BreadcrumbItem = (function () {
+            function BreadcrumbItem() {
+            }
+            return BreadcrumbItem;
+        }());
+        nav.BreadcrumbItem = BreadcrumbItem;
+        var BreadcrumbConfig = (function () {
+            function BreadcrumbConfig() {
+            }
+            return BreadcrumbConfig;
+        }());
+        nav.BreadcrumbConfig = BreadcrumbConfig;
+        var BreadcrumbService = (function () {
+            function BreadcrumbService(config, $rootScope) {
+                this._config = config;
+                this._rootScope = $rootScope;
+            }
+            Object.defineProperty(BreadcrumbService.prototype, "config", {
+                get: function () {
+                    return this._config;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(BreadcrumbService.prototype, "text", {
+                get: function () {
+                    return this._config.text;
+                },
+                set: function (value) {
+                    this._config.text = value;
+                    this._config.items = null;
+                    this.sendEvent();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(BreadcrumbService.prototype, "items", {
+                get: function () {
+                    return this._config.items;
+                },
+                set: function (value) {
+                    this._config.text = null;
+                    this._config.items = value;
+                    this.sendEvent();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(BreadcrumbService.prototype, "criteria", {
+                get: function () {
+                    return this._config.criteria;
+                },
+                set: function (value) {
+                    this._config.criteria = value;
+                    this.sendEvent();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            BreadcrumbService.prototype.sendEvent = function () {
+                this._rootScope.$broadcast(pip.nav.BreadcrumbChangedEvent, this._config);
+            };
+            return BreadcrumbService;
+        }());
+        var BreadcrumbProvider = (function () {
+            function BreadcrumbProvider() {
+                this._config = {
+                    text: null,
+                    items: null,
+                    criteria: null
+                };
+            }
+            Object.defineProperty(BreadcrumbProvider.prototype, "text", {
+                get: function () {
+                    return this._config.text;
+                },
+                set: function (value) {
+                    this._config.text = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            BreadcrumbProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new BreadcrumbService(this._config, $rootScope);
+                return this._service;
+            }];
+            return BreadcrumbProvider;
+        }());
+        angular
+            .module('pipBreadcrumb')
+            .provider('pipBreadcrumb', BreadcrumbProvider);
+    })(nav = pip.nav || (pip.nav = {}));
+})(pip = exports.pip || (exports.pip = {}));
+
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNav.Translate', []);
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }]);
 })();
 
-/**
- * @file Application Language Picker component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
+    var thisModule = angular.module("pipDropdown", ['pipNav.Templates']);
+    thisModule.directive('pipDropdown', ['$mdMedia', function ($mdMedia) {
+        return {
+            restrict: 'E',
+            scope: {
+                ngDisabled: '&',
+                actions: '=pipActions',
+                showDropdown: '&pipShow',
+                activeIndex: '=pipActiveIndex',
+                select: '=pipDropdownSelect'
+            },
+            templateUrl: 'dropdown/dropdown.html',
+            controller: ['$scope', '$element', '$attrs', 'localStorageService', function ($scope, $element, $attrs, localStorageService) {
+                $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
+                $scope.$mdMedia = $mdMedia;
+                $scope.actions = ($scope.actions && _.isArray($scope.actions)) ? $scope.actions : [];
+                $scope.activeIndex = $scope.activeIndex || 0;
+                $scope.disabled = function () {
+                    if ($scope.ngDisabled()) {
+                        return $scope.ngDisabled();
+                    }
+                    else {
+                        return false;
+                    }
+                };
+                $scope.onSelect = function (index) {
+                    $scope.activeIndex = index;
+                    if ($scope.select) {
+                        $scope.select($scope.actions[index], $scope.activeIndex);
+                    }
+                };
+                $scope.show = function () {
+                    if ($scope.showDropdown()) {
+                        return $scope.showDropdown();
+                    }
+                    else {
+                        return true;
+                    }
+                };
+            }]
+        };
+    }]);
+})();
 
-    var thisModule = angular.module('pipLanguagePicker',
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-
-    // Main application header directive
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipLanguagePicker', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
     thisModule.directive('pipLanguagePicker', function () {
         return {
             restrict: 'E',
@@ -9516,121 +8783,67 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipLanguagePickerController'
         };
     });
-
-    thisModule.controller('pipLanguagePickerController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', '$injector', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, $injector) {
-            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-
-            // Initialize default application title
-            if ($scope.title) {
-                pipLanguagePicker.showTitleText($scope.title);
+    thisModule.controller('pipLanguagePickerController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', '$location', '$injector', function ($scope, $element, $attrs, $rootScope, $window, $state, $location, $injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        $element.addClass('pip-language-picker');
+        $scope.language = getLanguage;
+        $scope.onLanguageClick = onLanguageClick;
+        $rootScope.$on('pipSetLanguages', setLanguages);
+        function setLanguages(lang) {
+            $scope.languages = lang.length > 0 ? lang : ['en', 'ru'];
+        }
+        function getLanguage() {
+            return pipTranslate ? pipTranslate.use() : null;
+        }
+        function onLanguageClick(language) {
+            if (pipTranslate) {
+                setTimeout(function () {
+                    pipTranslate.use(language);
+                    $rootScope.$apply();
+                }, 0);
             }
-            if ($scope.showMenu) {
-                pipLanguagePicker.showMenuNavIcon();
-            }
-            // Apply class and call resize
-            $element.addClass('pip-language-picker');
-
-            $scope.language = getLanguage;
-            $scope.onLanguageClick = onLanguageClick;
-            $rootScope.$on('pipSetLanguages', setLanguages);
-
-            function setLanguages(lang) {
-                $scope.languages = lang.length > 0 ? lang : ['en', 'ru'];
-            }
-
-            function getLanguage() {
-                return pipTranslate ? pipTranslate.use() : null;
-            }
-
-            function onLanguageClick(language) {
-                if (pipTranslate) {
-                    setTimeout(function () {
-                        pipTranslate.use(language);
-                        $rootScope.$apply();
-                    }, 0);
-                }
-            }
-
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Application Nav Header component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
+        }
+    }]);
+})();
 
 (function () {
     'use strict';
-
-    var thisModule = angular.module('pipNavHeader', 
-        ['ngMaterial', 'pipNav.Templates']);
-
-    // Main application nav-header directive
-    thisModule.directive('pipNavHeader', function() {
-       return {
-           restrict: 'EA',
-           scope: {
-               user: '=pipUser',
-           },
-           replace: false,
-           templateUrl: 'nav_header/nav_header.html',
-           controller: 'pipNavHeaderController'
-       };
+    var thisModule = angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
+    thisModule.directive('pipNavHeader', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                user: '=pipUser',
+            },
+            replace: false,
+            templateUrl: 'nav_header/nav_header.html',
+            controller: 'pipNavHeaderController'
+        };
     });
-
-    thisModule.controller('pipNavHeaderController', 
-        ['$scope', '$element', '$rootScope', function ($scope, $element, $rootScope) {
-
-            // Apply class and call resize
-            $element.addClass('pip-nav-header');
-
-            $rootScope.$on('pipIdentityChanged', onIdentityChanged);
-
-            $scope.getUser = getUser;
-            $scope.onUserClick = onUserClick;
-
-            return;
-            
-            //------------------------
-
-            function getUser(prop) {
-                var value = $scope.user || $scope.identity || {};
-
-                if (prop) return value[prop];
-
-                return value;
-            }
-                        
-            function onIdentityChanged(event, identity) {
-                $scope.identity = identity;
-            }
-
-            function onUserClick() {
-                $rootScope.$broadcast('pipNavUserClicked');
-                //pipSideNav.close();
-            }
-
-        }]
-    );
-
+    thisModule.controller('pipNavHeaderController', ['$scope', '$element', '$rootScope', function ($scope, $element, $rootScope) {
+        $element.addClass('pip-nav-header');
+        $rootScope.$on('pipIdentityChanged', onIdentityChanged);
+        $scope.getUser = getUser;
+        $scope.onUserClick = onUserClick;
+        return;
+        function getUser(prop) {
+            var value = $scope.user || $scope.identity || {};
+            if (prop)
+                return value[prop];
+            return value;
+        }
+        function onIdentityChanged(event, identity) {
+            $scope.identity = identity;
+        }
+        function onUserClick() {
+            $rootScope.$broadcast('pipNavUserClicked');
+        }
+    }]);
 })();
 
-/**
- * @file Nav Icon component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
-    var thisModule = angular.module('pipNavIcon',
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavIcon.Service']);
-
+    var thisModule = angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavIcon.Service']);
     thisModule.directive('pipNavIcon', function () {
         return {
             restrict: 'E',
@@ -9645,76 +8858,52 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipNavIconController'
         };
     });
-
-    thisModule.controller('pipNavIconController',
-        ['$scope', '$element', '$attrs', '$rootScope', '$window', 'pipNavIcon', function ($scope, $element, $attrs, $rootScope, $window, pipNavIcon) {
-            // Apply class and call resize
-            $element.addClass('pip-nav-icon');
-
-            $scope.config = pipNavIcon.config();
-
-            $rootScope.$on('pipNavIconChanged', onNavIconChanged);
-
-            $scope.onNavIconClick = onNavIconClick;
-
-            function onNavIconChanged(event, config) {
-                $scope.config = config;
+    thisModule.controller('pipNavIconController', ['$scope', '$element', '$attrs', '$rootScope', '$window', 'pipNavIcon', function ($scope, $element, $attrs, $rootScope, $window, pipNavIcon) {
+        $element.addClass('pip-nav-icon');
+        $scope.config = pipNavIcon.config();
+        $rootScope.$on('pipNavIconChanged', onNavIconChanged);
+        $scope.onNavIconClick = onNavIconClick;
+        function onNavIconChanged(event, config) {
+            $scope.config = config;
+        }
+        function onNavIconClick() {
+            var breadcrumb, backCallback;
+            if (_.isFunction($scope.config.callback)) {
+                $scope.config.callback();
             }
-
-            function onNavIconClick() {
-                var breadcrumb, backCallback;
-
-                if (_.isFunction($scope.config.callback)) {
-                    // Execute nav icon callback
-                    $scope.config.callback();
-                } else if ($scope.config.event) {
-                    $rootScope.$broadcast($scope.config.event);
-                } else if ($scope.config.type == 'menu') {
-                    $rootScope.$broadcast('pipOpenSideNav');
-                } else if ($scope.config.type == 'back') {
-                    $window.history.back();
-                } else {
-                    $rootScope.$broadcast('pipNavIconClicked');
-                }
+            else if ($scope.config.event) {
+                $rootScope.$broadcast($scope.config.event);
             }
+            else if ($scope.config.type == 'menu') {
+                $rootScope.$broadcast('pipOpenSideNav');
+            }
+            else if ($scope.config.type == 'back') {
+                $window.history.back();
+            }
+            else {
+                $rootScope.$broadcast('pipNavIconClicked');
+            }
+        }
+    }]);
+})();
 
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Nav Icon service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
+(function () {
     'use strict';
-
     var thisModule = angular.module('pipNavIcon.Service', []);
-
     thisModule.provider('pipNavIcon', function () {
         var config = {
-            // Type of nav icon: 'back', 'menu', 'image' or 'none'
             type: 'menu',
-            // Image url
             imageUrl: null,
-            // Icon name
             iconName: 'back',
-            // Handle nav icon click event
             callback: null,
-            // Event name
             event: null
         };
-
         this.config = getConfig;
         this.clear = clear;
         this.menu = setMenu;
         this.back = setBack;
         this.icon = setIcon;
         this.image = setImage;
-
-        // Get the service instance
         this.$get = ['$rootScope', function ($rootScope) {
             return {
                 config: getConfig,
@@ -9724,320 +8913,208 @@ module.run(['$templateCache', function($templateCache) {
                 icon: showIcon,
                 image: showImage
             };
-
-            // ----------------------
-            
             function hide() {
                 clear();
                 sendConfigEvent();
             }
-
             function showMenu(callbackOrEvent) {
                 setMenu(callbackOrEvent);
                 sendConfigEvent();
             }
-
             function showIcon(iconName, callbackOrEvent) {
                 setIcon(iconName, callbackOrEvent);
                 sendConfigEvent();
             }
-
             function showBack(callbackOrEvent) {
                 setBack(callbackOrEvent);
                 sendConfigEvent();
             }
-
             function showImage(imageUrl, callbackOrEvent) {
                 setImage(imageUrl, callbackOrEvent);
                 sendConfigEvent();
             }
-
             function sendConfigEvent() {
                 $rootScope.$broadcast('pipNavIconChanged', config);
             }
-
         }];
-
         function getConfig() {
             return config;
         }
-
-        // Show navigation icon
         function clear() {
             config.type = 'none';
             config.callback = null;
             config.event = null;
         }
-
         function setMenu(callbackOrEvent) {
             config.type = 'menu';
             config.callback = null;
             config.event = null;
-
             if (_.isFunction(callbackOrEvent))
                 config.callback = callbackOrEvent;
             if (_.isString(callbackOrEvent))
                 config.event = callbackOrEvent;
         }
-
         function setIcon(iconName, callbackOrEvent) {
             config.type = 'icon';
             config.iconName = iconName;
             config.callback = null;
             config.event = null;
-
             if (_.isFunction(callbackOrEvent))
                 config.callback = callbackOrEvent;
             if (_.isString(callbackOrEvent))
                 config.event = callbackOrEvent;
         }
-
         function setBack(callbackOrEvent) {
             config.type = 'back';
             config.callback = null;
             config.event = null;
-
             if (_.isFunction(callbackOrEvent))
                 config.callback = callbackOrEvent;
             if (_.isString(callbackOrEvent))
                 config.event = callbackOrEvent;
         }
-
         function setImage(imageUrl, callbackOrEvent) {
             config.type = 'image';
             config.imageUrl = imageUrl;
             config.callback = null;
             config.event = null;
-
             if (_.isFunction(callbackOrEvent))
                 config.callback = callbackOrEvent;
             if (_.isString(callbackOrEvent))
                 config.event = callbackOrEvent;
         }
-
     });
-
-})(window.angular, window._);
-
-/**
- * @file Application Nav Menu component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    var thisModule = angular.module('pipNavMenu', 
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
-
-    // Main application navmenu directive
-    thisModule.directive('pipNavMenu', function() {
-       return {
-           restrict: 'EA',
-           scope: {
-               config: '=pipLinks'
-           },
-           replace: false,
-           templateUrl: 'nav_menu/nav_menu.html',
-           controller: 'pipNavMenuController'
-       };
-    });
-
-    thisModule.controller('pipNavMenuController', 
-        ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
-
-            // Apply class and call resize
-            $element.addClass('pip-nav-menu');
-
-            $scope.config = $scope.config || pipNavMenu.get();
-
-            $rootScope.$on('pipNavMenuChanged', onConfigChanged);
-
-            $scope.itemVisible = itemVisible;
-            $scope.onLinkClick = onLinkClick;
-            $scope.isSectionEmpty = isSectionEmpty;
-
-            return;
-            
-            //------------------------
-            
-            function itemVisible(item) {
-                return item && item.access && !item.access(item);
-            }
-
-            function isSectionEmpty(linkCollection) {
-                var result = true;
-                _.each(linkCollection, function(link){
-                    if (!itemVisible(link))
-                        result = false;
-                });
-                return result;
-            }
-
-            function onConfigChanged(event, config) {
-                $scope.config = config;
-            }
-
-            function onLinkClick(event, link) {
-                event.stopPropagation();
-
-                if (!link) {
-                    pipSideNav.close();
-                    return;
-                }
-
-                if (link.href) {
-                    if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
-                        pipSideNav.close();
-                        return;
-                    }
-
-                    pipSideNav.close();
-                    $timeout(function() {
-                        $window.location.href = link.href;
-                    }, 300);
-
-                    return;
-                }
-                else if (link.url) {
-                    if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
-                        pipSideNav.close();
-                        return;
-                    }
-
-                    pipSideNav.close();
-                    $timeout(function() {
-                        $location.url(link.url);
-                    }, 300);
-
-                    return;
-                }
-                else if (link.state) {
-                    var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                    
-                    if ($state != null && $state.current.name === link.state) {
-                        pipSideNav.close();
-                        return;
-                    }
-
-                    pipSideNav.close();
-                    $timeout(function() {
-                        if ($injector.has('pipState')) {
-                            var pipState = $injector.get('pipState');
-                            pipState.go(link.state, link.stateParams);
-                        }
-                        else if ($injector.has('$state')) {
-                            var $state = $injector.get('$state');
-                            $state.go(link.state, link.stateParams);
-                        }
-                    }, 300);
-
-                    return;
-                }
-                else if (link.event)
-                    $rootScope.$broadcast(link.event, link);
-
-                pipSideNav.close();
-            }
-        }]
-    );
-
 })();
 
-/**
- * @file Application Nav Menu service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
+    thisModule.directive('pipNavMenu', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                config: '=pipLinks'
+            },
+            replace: false,
+            templateUrl: 'nav_menu/nav_menu.html',
+            controller: 'pipNavMenuController'
+        };
+    });
+    thisModule.controller('pipNavMenuController', ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
+        $element.addClass('pip-nav-menu');
+        $scope.config = $scope.config || pipNavMenu.get();
+        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
+        $scope.itemVisible = itemVisible;
+        $scope.onLinkClick = onLinkClick;
+        $scope.isSectionEmpty = isSectionEmpty;
+        return;
+        function itemVisible(item) {
+            return item && item.access && !item.access(item);
+        }
+        function isSectionEmpty(linkCollection) {
+            var result = true;
+            _.each(linkCollection, function (link) {
+                if (!itemVisible(link))
+                    result = false;
+            });
+            return result;
+        }
+        function onConfigChanged(event, config) {
+            $scope.config = config;
+        }
+        function onLinkClick(event, link) {
+            event.stopPropagation();
+            if (!link) {
+                pipSideNav.close();
+                return;
+            }
+            if (link.href) {
+                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    $window.location.href = link.href;
+                }, 300);
+                return;
+            }
+            else if (link.url) {
+                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    $location.url(link.url);
+                }, 300);
+                return;
+            }
+            else if (link.state) {
+                var $state = $injector.has('$state') ? $injector.get('$state') : null;
+                if ($state != null && $state.current.name === link.state) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    if ($injector.has('$state')) {
+                        var $state = $injector.get('$state');
+                        $state.go(link.state, link.stateParams);
+                    }
+                }, 300);
+                return;
+            }
+            else if (link.event)
+                $rootScope.$broadcast(link.event, link);
+            pipSideNav.close();
+        }
+    }]);
+})();
 
 (function () {
     'use strict';
-
     var thisModule = angular.module('pipNavMenu.Service', []);
-
     thisModule.provider('pipNavMenu', function () {
         var config = [];
-
         this.sections = init;
-
         this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
             return {
                 get: getConfig,
                 set: setConfig
             };
-            
-            //---------------------
-
             function getConfig() {
-                return config;  
+                return config;
             }
-                                                        
             function setConfig(newConfig) {
                 init(newConfig);
                 $rootScope.$broadcast('pipNavMenuChanged', config);
-                return config;  
+                return config;
             }
         }];
-
-        // function validateConfig(sections) {
-        //     pipAssertProvider.isArray(sections, 'pipNavMenuProvider.config or pipNavMenu.config: sections should be an array');
-        //     _.each(sections, function (section, number) {
-        //         if (section.access) {
-        //             pipAssertProvider.isFunction(section.access, 'pipNavMenuProvider.config or pipNavMenu.config: in section number '
-        //                 + number + " with title " + section.title + ' access should be a function');
-        //         }
-        //         if (section.links) {
-        //             pipAssertProvider.isArray(section.links, 'pipNavMenuProvider.config or pipNavMenu.config: in section number '
-        //                 + number + " with title " + section.title + ' links should be an array');
-        //             _.each(section.links, function (link) {
-        //                 if (link.access) pipAssertProvider.isFunction(link.access, 'pipNavMenuProvider.config or pipNavMenu.config: in section number '
-        //                     + number + " with title " + section.title + ' in link with title ' + link.title + ' access should be a function');
-        //             });
-        //         }
-        //     });
-        // }
-
         function init(newConfig) {
-            // if (pipDebugProvider.enabled()) 
-            //     validateConfig(newConfig);
-
             if (_.isArray(newConfig))
                 config = newConfig;
-
             return config;
-        };
+        }
+        ;
     });
-
 })();
 
-/**
- * @file Search Bar component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
-    var thisModule = angular.module('pipSearchBar',
-        ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
-
+    var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
     thisModule.run(['$injector', function ($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', {
                 'APPBAR_SEARCH': 'Search'
             });
-
             pipTranslate.translations('ru', {
                 'APPBAR_SEARCH': 'Поиск'
             });
         }
     }]);
-
-    // Main application header directive
     thisModule.directive('pipSearchBar', function () {
         return {
             restrict: 'E',
@@ -10049,115 +9126,81 @@ module.run(['$templateCache', function($templateCache) {
             controller: 'pipSearchBarController'
         };
     });
-
-    thisModule.controller('pipSearchBarController',
-        ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
-            // Apply class and call resize
-            $element.addClass('pip-search-bar');
-
-            $scope.config = pipSearch.config();
-
+    thisModule.controller('pipSearchBarController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
+        $element.addClass('pip-search-bar');
+        $scope.config = pipSearch.config();
+        $scope.searchEnabled = false;
+        $scope.search = { text: '' };
+        $rootScope.$on('pipSearchChanged', onSearchBarChanged);
+        $scope.onSearchEnable = onSearchEnable;
+        $scope.onSearchClick = onSearchClick;
+        $scope.onSearchClear = onSearchClear;
+        $scope.onSearchKeyDown = onSearchKeyDown;
+        function onSearchBarChanged(event, config) {
+            $scope.config = config;
             $scope.searchEnabled = false;
-            $scope.search = {text: ''};
-
-            $rootScope.$on('pipSearchChanged', onSearchBarChanged);
-
-            $scope.onSearchEnable = onSearchEnable;
-            $scope.onSearchClick = onSearchClick;
-            $scope.onSearchClear = onSearchClear;
-            $scope.onSearchKeyDown = onSearchKeyDown;
-
-            function onSearchBarChanged(event, config) {
-                $scope.config = config;
-                $scope.searchEnabled = false;
+            $scope.search.text = '';
+        }
+        function focusSearchText() {
+            var element;
+            setTimeout(function () {
+                element = $('.pip-search-text');
+                if (element.length > 0) {
+                    element.focus();
+                }
+            }, 0);
+        }
+        function onSearchEnable() {
+            $scope.search.text = $scope.config.criteria;
+            $scope.searchEnabled = true;
+            focusSearchText();
+        }
+        function onSearchClick() {
+            var searchText = $scope.search.text;
+            $scope.search.text = '';
+            $scope.searchEnabled = false;
+            if ($scope.config.callback) {
+                $scope.config.callback(searchText);
+            }
+            else {
+                $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
+            }
+        }
+        function onSearchClear() {
+            if ($scope.search.text) {
                 $scope.search.text = '';
-            }
-
-            function focusSearchText() {
-                var element;
-
-                setTimeout(function () {
-                    element = $('.pip-search-text');
-                    if (element.length > 0) {
-                        element.focus();
-                    }
-                }, 0);
-            }
-
-            function onSearchEnable() {
-                $scope.search.text = $scope.config.criteria;
-                $scope.searchEnabled = true;
                 focusSearchText();
             }
-
-            function onSearchClick() {
-                var searchText = $scope.search.text;
-
-                $scope.search.text = '';
+            else {
                 $scope.searchEnabled = false;
-
-                if ($scope.config.callback) {
-                    $scope.config.callback(searchText);
-                } else {
-                    $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
-                }
+                onSearchClick();
             }
-
-            function onSearchClear() {
-                if ($scope.search.text) {
-                    $scope.search.text = '';
-
-                    focusSearchText();
-                } else {
-                    $scope.searchEnabled = false;
-                    onSearchClick();
-                }
+        }
+        function onSearchKeyDown(event) {
+            if (event.keyCode === 13) {
+                $scope.onSearchClick();
+                return;
             }
-
-            function onSearchKeyDown(event) {
-                // Enter pressed
-                if (event.keyCode === 13) {
-                    $scope.onSearchClick();
-
-                    return;
-                }
-                // ESC pressed
-                if (event.keyCode === 27) {
-                    $scope.searchEnabled = false;
-                }
+            if (event.keyCode === 27) {
+                $scope.searchEnabled = false;
             }
-        }]
-    );
+        }
+    }]);
+})();
 
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Search service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _) {
+(function () {
     'use strict';
-
     var thisModule = angular.module('pipSearch.Service', []);
-
     thisModule.provider('pipSearch', function () {
         var config = {
-            // Search visible
             visible: false,
-            // Search criteria
             criteria: '',
-            // History for search autocomplete
             history: [],
-            // Callback for search
             callback: null,
         };
-
-        // Get the service instance
         this.$get = ['$rootScope', function ($rootScope) {
             $rootScope.$on('pipSearchOpen', open);
             $rootScope.$on('pipSearchClose', close);
-
             return {
                 config: getConfig,
                 set: setSearch,
@@ -10165,222 +9208,140 @@ module.run(['$templateCache', function($templateCache) {
                 criteria: updateCriteria,
                 history: updateHistory,
             };
-
-            // ----------------------
-
             function getConfig() {
                 return config;
             }
-
             function setSearch(callback, criteria, history) {
                 config.callback = callback;
                 config.criteria = criteria;
                 config.history = history;
-
                 sendConfigEvent();
             }
-
             function clearSearch() {
                 config.callback = null;
                 config.criteria = null;
-
                 sendConfigEvent();
             }
-
             function open(event) {
                 config.visible = true;
-                sendConfigEvent();                
+                sendConfigEvent();
             }
-                 
             function close(event) {
                 config.visible = false;
-                sendConfigEvent();                
-            }                
-
+                sendConfigEvent();
+            }
             function toggle() {
                 config.visible = !config.visible;
-                sendConfigEvent();                
-            }                   
-
+                sendConfigEvent();
+            }
             function updateCriteria(criteria) {
                 config.criteria = criteria;
                 sendConfigEvent();
             }
-
             function updateHistory(history) {
                 config.history = history;
                 sendConfigEvent();
             }
-
             function sendConfigEvent() {
                 $rootScope.$broadcast('pipSearchChanged', config);
             }
         }];
-
     });
+})();
 
-})(window.angular, window._);
-
-/**
- * @file Application Side Nav component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular, moment */
-
-(function (angular, moment) {
+(function () {
     'use strict';
-
-    var thisModule = angular.module('pipSideNav', 
-        ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Service']);
-
-    // Main application sidenav directive
-    thisModule.directive('pipSidenav', function() {
-       return {
-           restrict: 'E',
-           transclude: true,
-           scope: true,
-           templateUrl: 'sidenav/sidenav.html',
-           controller: 'pipSideNavController'
-       };
+    var thisModule = angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Service']);
+    thisModule.directive('pipSidenav', function () {
+        return {
+            restrict: 'E',
+            transclude: true,
+            scope: true,
+            templateUrl: 'sidenav/sidenav.html',
+            controller: 'pipSideNavController'
+        };
     });
+    thisModule.controller('pipSideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', function ($scope, $element, $rootScope, pipSideNav) {
+        $element.addClass('pip-sidenav');
+        $rootScope.$on('pipNavIconClicked', onNavIconClick);
+        return;
+        function onNavIconClick(event) {
+            pipSideNav.open();
+        }
+    }]);
+})();
 
-    thisModule.controller('pipSideNavController', 
-        ['$scope', '$element', '$rootScope', 'pipSideNav', function ($scope, $element, $rootScope, pipSideNav) {
-
-            // Apply class and call resize
-            $element.addClass('pip-sidenav');
-
-            $rootScope.$on('pipNavIconClicked', onNavIconClick);
-            //$rootScope.$on('pipSideNavChanged', onConfigChanged);
-
-            return;
-            
-            //------------------------
-
-            function onNavIconClick(event) {
-                pipSideNav.open();
-            }
-
-        }]
-    );
-
-})(window.angular, window.moment);
-
-/**
- * @file Application Sid Nav part component
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular, _, $) {
+(function () {
     'use strict';
-
     var thisModule = angular.module('pipSideNav.Part', ['pipSideNav.Service']);
-
-    // Example is taken from here: http://stackoverflow.com/questions/20325480/angularjs-whats-the-best-practice-to-add-ngif-to-a-directive-programmatically
     thisModule.directive('pipSidenavPart', ['ngIfDirective', function (ngIfDirective) {
         var ngIf = ngIfDirective[0];
-
         return {
             transclude: ngIf.transclude,
             priority: ngIf.priority,
             terminal: ngIf.terminal,
             restrict: ngIf.restrict,
             scope: true,
-            link: function($scope, $element, $attrs) {
-                // Visualize based on visible variable in scope
-                $attrs.ngIf = function() { return $scope.visible };
+            link: function ($scope, $element, $attrs) {
+                $attrs.ngIf = function () { return $scope.visible; };
                 ngIf.link.apply(ngIf);
             },
             controller: 'pipSideNavPartController'
         };
     }]);
-
-    thisModule.controller('pipSideNavPartController',
-        ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav', function ($scope, $element, $attrs, $rootScope, pipSideNav) {
-            var partName = '' + $attrs.pipSidenavPart;
-            var partValue = null;
-
-            // Break part apart
-            var pos = part.indexOf(':');
-            if (pos > 0) {
-                partValue = partName.substr(pos + 1);
-                partName = partName.substr(0, pos);
-            }
-
-            onSideNavChanged(null, pipSideNav.config())
-
-            $rootScope.$on('pipSideNavChanged', onSideNavChanged);
-
-            function onSideNavChanged(event, config) {
-                var parts = config.parts || {};
-                var currentPartValue = config[partName];
-                // Set visible variable to switch ngIf
-                $scope.visible = partValue ? currentPartValue == partValue : currentPartValue;
-            }
-
-        }]
-    );
-
-})(window.angular, window._, window.jQuery);
-
-/**
- * @file Application Side Nav service
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
+    thisModule.controller('pipSideNavPartController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav', function ($scope, $element, $attrs, $rootScope, pipSideNav) {
+        var partName = '' + $attrs.pipSidenavPart;
+        var partValue = null;
+        var pos = partName.indexOf(':');
+        if (pos > 0) {
+            partValue = partName.substr(pos + 1);
+            partName = partName.substr(0, pos);
+        }
+        onSideNavChanged(null, pipSideNav.config());
+        $rootScope.$on('pipSideNavChanged', onSideNavChanged);
+        function onSideNavChanged(event, config) {
+            var parts = config.parts || {};
+            var currentPartValue = config[partName];
+            $scope.visible = partValue ? currentPartValue == partValue : currentPartValue;
+        }
+    }]);
+})();
 
 (function () {
     'use strict';
-
     var thisModule = angular.module('pipSideNav.Service', []);
-
     thisModule.provider('pipSideNav', function () {
         var config = {
-            // Theme to be applied to the header
-            theme: 'blue',
-            // Parts of the sidenav
+            theme: 'default',
             parts: []
         };
-
         this.theme = theme;
         this.parts = initParts;
-
         this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
             $rootScope.$on('pipOpenSideNav', open);
             $rootScope.$on('pipCloseSideNav', close);
-
             return {
                 config: getConfig,
-                //theme: setTheme,
                 part: getOrSetPart,
                 parts: getOrSetParts,
                 open: open,
                 close: close,
                 toggle: toggle
             };
-
-            //---------------------
-
             function getConfig() {
-                return config;  
+                return config;
             }
-                            
             function getOrSetPart(name, value) {
                 if (!_.isString(name))
-                    throw new Exception("Part name has to be a string");
-
+                    throw new Error("Part name has to be a string");
                 if (value != undefined) {
                     if (config.parts[name] != value) {
                         config.parts[name] = value;
                         sendConfigEvent();
                     }
                 }
-
                 return config.parts[name];
             }
-
             function getOrSetParts(parts) {
                 if (_.isObject(parts)) {
                     if (!_.isEqual(config.parts, parts)) {
@@ -10388,33 +9349,25 @@ module.run(['$templateCache', function($templateCache) {
                         sendConfigEvent();
                     }
                 }
-
                 return config.parts;
             }
-                            
             function sendConfigEvent() {
                 $rootScope.$broadcast('pipSideNavChanged', config);
             }
-
             function open(event) {
                 $mdSidenav('pip-sidenav').open();
             }
-                 
             function close(event) {
-                $mdSidenav('pip-sidenav').close();   
-            }                
-
+                $mdSidenav('pip-sidenav').close();
+            }
             function toggle() {
-                $mdSidenav('pip-sidenav').toggle();   
+                $mdSidenav('pip-sidenav').toggle();
             }
         }];
-
         function theme(theme) {
             config.theme = theme || config.theme;
-
             return config.theme;
         }
-
         function initParts(parts) {
             if (_.isObject(parts)) {
                 config.parts = parts;
@@ -10422,96 +9375,77 @@ module.run(['$templateCache', function($templateCache) {
             return config.parts;
         }
     });
-
 })();
-
-/**
- * @file Tabs control
- * @copyright Digital Living Software Corp. 2014-2016
- * 
- */
-
-/* global _, angular */
 
 (function () {
     'use strict';
-
     var thisModule = angular.module("pipTabs", ['pipNav.Templates']);
-
-    thisModule.directive('pipTabs',
-        ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
-            return {
-                restrict: 'E',
-                scope: {
-                    ngDisabled: '&',
-                    tabs: '=pipTabs',
-                    showTabs: '&pipShowTabs',
-                    showTabsShadow: '&pipTabsShadow',
-                    activeIndex: '=pipActiveIndex',
-                    select: '=pipTabsSelect'
-                },
-                templateUrl: 'tabs/tabs.html',
-                controller:
-                    ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', '$injector', function ($scope, $element, $attrs, $mdMedia, localStorageService, $injector) {
-                        // Todo: Remove dependency on local storage or made it optional
-                        $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
-                        pipAssert.isArray($scope.tabs, 'pipTabs: pipTabs attribute should take an array');
-                        $scope.$mdMedia = $mdMedia;
-                        $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
-
-                        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-                        if (pipTranslate) {
-                            if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
-                                pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
-                            } else {
-                                pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
-                            }
-                        }
-
-                        $scope.activeIndex = $scope.activeIndex || 0;
-                        $scope.activeTab = $scope.activeIndex;
-
-                        $scope.disabled = function () {
-                            if ($scope.ngDisabled) {
-                                return $scope.ngDisabled();
-                            }
-                        };
-
-                        $scope.tabDisabled = function (index) {
-                            return ($scope.disabled() && $scope.activeIndex != index);
-                        };
-
-                        $scope.onSelect = function (index) {
-                            if ($scope.disabled()) return;
-
-                            $scope.activeIndex = index;
-                            $scope.activeTab = $scope.activeIndex;
-                            if ($scope.select) {
-                                $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
-                            }
-                        };
-
-                        $scope.showShadow = function () {
-                            if ($scope.showTabsShadow) {
-                                return $scope.showTabsShadow();
-                            } else {
-                                return false;
-                            }
-                        };
-
-                        $scope.show = function () {
-                            if ($scope.showTabs) {
-                                return $scope.showTabs();
-                            } else {
-                                return true;
-                            }
-                        };
-                    }]
-            };
-        }]
-    );
-
+    thisModule.directive('pipTabs', ['$mdMedia', 'pipAssert', function ($mdMedia, pipAssert) {
+        return {
+            restrict: 'E',
+            scope: {
+                ngDisabled: '&',
+                tabs: '=pipTabs',
+                showTabs: '&pipShowTabs',
+                showTabsShadow: '&pipTabsShadow',
+                activeIndex: '=pipActiveIndex',
+                select: '=pipTabsSelect'
+            },
+            templateUrl: 'tabs/tabs.html',
+            controller: ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', '$injector', function ($scope, $element, $attrs, $mdMedia, localStorageService, $injector) {
+                $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
+                $scope.$mdMedia = $mdMedia;
+                $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
+                var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+                if (pipTranslate) {
+                    if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
+                        pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
+                    }
+                    else {
+                        pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+                    }
+                }
+                $scope.activeIndex = $scope.activeIndex || 0;
+                $scope.activeTab = $scope.activeIndex;
+                $scope.disabled = function () {
+                    if ($scope.ngDisabled) {
+                        return $scope.ngDisabled();
+                    }
+                };
+                $scope.tabDisabled = function (index) {
+                    return ($scope.disabled() && $scope.activeIndex != index);
+                };
+                $scope.onSelect = function (index) {
+                    if ($scope.disabled())
+                        return;
+                    $scope.activeIndex = index;
+                    $scope.activeTab = $scope.activeIndex;
+                    if ($scope.select) {
+                        $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
+                    }
+                };
+                $scope.showShadow = function () {
+                    if ($scope.showTabsShadow) {
+                        return $scope.showTabsShadow();
+                    }
+                    else {
+                        return false;
+                    }
+                };
+                $scope.show = function () {
+                    if ($scope.showTabs) {
+                        return $scope.showTabs();
+                    }
+                    else {
+                        return true;
+                    }
+                };
+            }]
+        };
+    }]);
 })();
+
+
 
 
 
@@ -12238,7 +11172,10 @@ module.run(['$templateCache', function($templateCache) {
     'use strict';
 
     angular.module('pipCharts', [
-        'pipStaticCharts'
+        'pipBarCharts',
+        'pipLineCharts',
+        'pipPieCharts',
+        'pipChartLegends'
     ]);
 
 })(window.angular);
@@ -12256,12 +11193,73 @@ module.run(['$templateCache', function($templateCache) {
     '    <svg class="flex-auto"></svg>\n' +
     '</div>\n' +
     '\n' +
-    '<div class="static-chart-legend">\n' +
-    '    <div class="legend-title" ng-repeat="item in barChart.legend">\n' +
-    '        <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '        <span>{{:: item.label}}</span>\n' +
+    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('legend/interactive_legend.html',
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
+    '        <md-checkbox class="lp16 m8"\n' +
+    '                     ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
+    '    </svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -12270,12 +11268,12 @@ module.run(['$templateCache', function($templateCache) {
 
     /**
      * @ngdoc module
-     * @name pipStaticCharts
+     * @name pipBarCharts
      *
      * @description
      * Bar chart on top of Rickshaw charts
      */
-    angular.module('pipStaticCharts', [])
+    angular.module('pipBarCharts', [])
         .directive('pipBarChart', pipBarChart);
 
     function pipBarChart() {
@@ -12291,12 +11289,9 @@ module.run(['$templateCache', function($templateCache) {
                 var vm = this;
                 var chart = null;
                 var chartElem = null;
-                var setLabelPosition = _.debounce(setLabelPositionUnwrap, 150);
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
-
-                console.log('colors', colors);
 
                 vm.data = vm.series || [];
 
@@ -12306,13 +11301,11 @@ module.run(['$templateCache', function($templateCache) {
 
                 //colors = _.sample(colors, colors.length);
 
+                // sets legend params
+                vm.legend = vm.data[0].values;
+                
                 // Sets colors of items
                 generateParameterColor();
-
-                console.log('vm.data', vm.data);
-
-                // sets legend params
-                vm.legend = vm.data;
 
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -12335,17 +11328,19 @@ module.run(['$templateCache', function($templateCache) {
                  * Instantiate chart
                  */
                 nv.addGraph(function () {
-                    console.log('here');
-
                     chart = nv.models.discreteBarChart()
-                        .margin({top: 10, right: 0, bottom: 30, left: 0})
+                        .margin({top: 10, right: 0, bottom: 0, left: -50})
                         .x(function (d) { return d.label; })
                         .y(function (d) { return d.value; })
                         .showValues(true)
-                        .showXAxis(true)
+                        .showXAxis(false)
                         .showYAxis(false)
                         .valueFormat(d3.format('d'))
-                        .color(d3.scale.paletteColors().range());
+                        .duration(0)
+                        .height(270)
+                        .color(function(d) {
+                            return d.color || d3.scale.paletteColors().range();
+                        });
 
                     chart.tooltip.enabled(false);
                     chart.noData('No data for this moment...');
@@ -12353,33 +11348,56 @@ module.run(['$templateCache', function($templateCache) {
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
+                        .style('height', 270)
                         .call(chart);
 
-                    nv.utils.windowResize(chart.update);
-
-                    intervalUpdate(chart.update, 10);
+                    //nv.utils.windowResize(chart.update);
 
                     return chart;
                 }, function () {
                     chart.dispatch.on('beforeUpdate', function () {
-                        $timeout(setLabelPosition, 100);    // dirty hack. Replace by callback
+                        $timeout(configBarWidthAndLabel, 0);
                     });
 
-                    $timeout(setLabelPosition, 100);        // dirty hack. Replace by callback
+                    $timeout(configBarWidthAndLabel, 0);
                 });
 
                 /**
                  * Aligns value label according to parent container size.
                  * @return {void}
                  */
-                function setLabelPositionUnwrap() {
-                    var labels = d3.selectAll('.nv-bar text')[0];
-                    var chartBars = d3.selectAll('.nv-bar')[0];
+                function configBarWidthAndLabel() {
+                    var labels = d3.selectAll('.nv-bar text')[0],
+                        chartBars = d3.selectAll('.nv-bar')[0],
+                        legendTitles = d3.selectAll('.legend-title')[0],
+                        parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
+
+                    d3.select('.bar-chart').classed('visible', true);
 
                     chartBars.forEach(function (item, index) {
-                        var barSize = item.getBBox();
+                        var barSize = item.getBBox(),
+                            element = d3.select(item),
+                            y = d3.transform(element.attr('transform')).translate[1];
+                        
+                        element
+                            .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
+                            .select('rect')
+                            .attr('width', 38);
 
-                        d3.select(labels[index]).attr('dy', barSize.height / 2 + 6);   // 6px = magic float to align text
+                        element
+                            .transition()
+                            .duration(1000)
+                            .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + y + ')');
+
+                        d3.select(labels[index])
+                            .attr('dy', barSize.height / 2)
+                            .attr('x', 19);
+                    });
+
+                    legendTitles.forEach(function (item, index) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
                     });
                 }
 
@@ -12398,20 +11416,222 @@ module.run(['$templateCache', function($templateCache) {
                 }
 
                 /**
-                 * Temp huck for demo
-                 * Dirty way to overcome async in charts
+                 * Helpful method
+                 * @private
                  */
-                function intervalUpdate(cb, times) {
-                    var counter = 0;
+                function generateParameterColor() {
+                    vm.legend.forEach(function (item, index) {
+                        item.color = item.color || materialColorToRgba(colors[index]);
+                    });
+                }
+            }]
+        };
+    }
+})();
+(function () {
+    'use strict';
 
-                    var intervalID = $interval(function () {
-                        if (counter <= times) {
-                            cb();
-                            counter++;
-                        } else {
-                            $interval.cancel(intervalID);
-                        }
-                    }, 200);
+    /**
+     * @ngdoc module
+     * @name pipLegends
+     *
+     * @description
+     * Legend of charts
+     */
+    angular.module('pipChartLegends', [])
+        .directive('pipChartLegend', pipChartLegend);
+
+    function pipChartLegend() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries',
+                interactive: '=pipInteractive'
+            },
+            templateUrl: 'legend/interactive_legend.html',
+            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
+                var colors = _.map($mdColorPalette, function (palette) {
+                    return palette[500].hex;
+                });
+
+                function colorCheckboxes() {
+                    var checkboxContainers = $($element).find('md-checkbox .md-container');
+                    
+                    checkboxContainers.each(function (index, item) {
+                        $(item)
+                            .css('color', $scope.series[index].color || colors[index])
+                            .find('.md-icon')
+                            .css('background-color', $scope.series[index].color || colors[index]);
+                    });
+                }
+
+                function animate() {
+                    var legendTitles = $($element).find('.chart-legend-item');
+
+                    legendTitles.each(function (index, item) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                }
+                
+                function prepareSeries() {
+                    $scope.series.forEach(function (item, index) {
+                        item.color = item.color || colors[index];
+                        item.disabled = item.disabled || false;
+                    });   
+                }
+
+                $scope.$watch('series', function () {
+                    $timeout(function () {
+                        animate();
+                        colorCheckboxes();
+                    }, 0);
+                    prepareSeries();
+                }, true);
+
+                $scope.$watch('interactive', function (newValue, oldValue) {
+                    if (newValue == true && newValue != oldValue) {
+                        $timeout(colorCheckboxes, 0);
+                    }
+                });
+
+                $timeout(function () {
+                    animate();
+                    colorCheckboxes();
+                }, 0);
+                prepareSeries();
+            }]
+        };
+    }
+})();
+(function () {
+    'use strict';
+
+    /**
+     * @ngdoc module
+     * @name pipLineCharts
+     *
+     * @description
+     * Line chart on top of Rickshaw charts
+     */
+    angular.module('pipLineCharts', [])
+        .directive('pipLineChart', pipLineChart);
+
+    function pipLineChart() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries',
+                showYAxis: '=pipYAxis',
+                showXAxis: '=pipXAxis'
+            },
+            bindToController: true,
+            controllerAs: 'lineChart',
+            templateUrl: 'line/line_chart.html',
+            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
+                var vm        = this;
+                var chart     = null;
+                var chartElem = null;
+                var colors    = _.map($mdColorPalette, function (palette, color) {
+                    return color;
+                });
+
+                vm.data = vm.series || [];
+                
+                vm.isVisibleX = function () {
+                    return vm.showXAxis == undefined ? true : vm.showXAxis; 
+                };
+
+                vm.isVisibleY = function () {
+                    return vm.showYAxis == undefined ? true : vm.showYAxis;
+                };
+                
+                if (vm.series.length > colors.length) {
+                    vm.data = vm.series.slice(0, 9);
+                }
+                
+                //colors = _.sample(colors, colors.length);
+
+                // Sets colors of items
+                generateParameterColor();
+
+                d3.scale.paletteColors = function () {
+                    return d3.scale.ordinal().range(colors.map(materialColorToRgba));
+                };
+
+                $scope.$watch('lineChart.series', function (updatedSeries) {
+                    vm.data = updatedSeries;
+
+                    generateParameterColor();
+
+                    if (chart) {
+                        chartElem.datum(vm.data).call(chart);
+                    }
+                }, true);
+
+                /**
+                 * Instantiate chart
+                 */
+                nv.addGraph(function () {
+                    chart = nv.models.lineChart()
+                        .margin({ top: 20, right: 20, bottom: 30, left: 30 })
+                        .x(function (d) {
+                            return d.x;
+                        })
+                        .y(function (d) {
+                            return d.value;
+                        })
+                        .height(270)
+                        .useInteractiveGuideline(true)
+                        .showXAxis(true)
+                        .showYAxis(true)
+                        .showLegend(false)
+                        .color(function(d) {
+                            return d.color || d3.scale.paletteColors().range();
+                        });
+
+                    chart.tooltip.enabled(false);
+                    chart.noData('No data for this moment...');
+
+                    chart.yAxis
+                        .tickFormat(function (d) {
+                            return d / 1000 + 'k';
+                        });
+
+                    chart.xAxis
+                        .tickFormat(function (d) {
+                            return d;
+                        });
+
+                    chartElem = d3.select($element.get(0)).select('.line-chart svg');
+                    chartElem.datum(vm.data).style('height', 270).call(chart);
+
+                    nv.utils.windowResize(chart.update);
+
+                    return chart;
+                }, function () {
+                    var legendTitles = d3.selectAll('.legend-title')[0];
+                    
+                    legendTitles.forEach(function (item, index) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                });
+
+                /**
+                 * Converts palette color name into RGBA color representation.
+                 * Should by replaced by palette for charts.
+                 *
+                 * @param {string} color    Name of color from AM palette
+                 * @returns {string} RGBa format
+                 */
+                function materialColorToRgba(color) {
+                    return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
+                        + $mdColorPalette[color][500].value[1] + ','
+                        + $mdColorPalette[color][500].value[2] + ','
+                        + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
 
                 /**
@@ -12420,7 +11640,175 @@ module.run(['$templateCache', function($templateCache) {
                  */
                 function generateParameterColor() {
                     vm.data.forEach(function (item, index) {
-                        item.color = materialColorToRgba(colors[index]);
+                        item.color = item.color || materialColorToRgba(colors[index]);
+                    });
+                }
+            }]
+        };
+    }
+})();
+(function () {
+    'use strict';
+
+    /**
+     * @ngdoc module
+     * @name pipPieCharts
+     *
+     * @description
+     * Line chart on top of Rickshaw charts
+     */
+    angular.module('pipPieCharts', [])
+        .directive('pipPieChart', pipPieChart);
+
+    function pipPieChart() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries'
+            },
+            bindToController: true,
+            controllerAs: 'pieChart',
+            templateUrl: 'pie/pie_chart.html',
+            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
+                var vm               = this;
+                var chart            = null;
+                var titleElem        = null;
+                var chartElem        = null;
+                var colors           = _.map($mdColorPalette, function (palette, color) {
+                    return color;
+                });
+                var resizeTitleLabel = resizeTitleLabelUnwrap;
+
+                vm.data = vm.data || [];
+
+                if (vm.series.length > colors.length) {
+                    vm.data = vm.series.slice(0, 9);
+                }
+
+                $scope.$watch('pieChart.series', function (newVal) {
+                    vm.data = newVal;
+
+                    generateParameterColor();
+
+                    if (chart) {
+                        chartElem.datum(vm.data).call(chart);
+                        $timeout(resizeTitleLabel);
+                    }
+                }, true);
+
+                // Sets colors of items
+                generateParameterColor();
+
+                d3.scale.paletteColors = function () {
+                    return d3.scale.ordinal().range(colors.map(materialColorToRgba));
+                };
+
+                /**
+                 * Instantiate chart
+                 */
+                nv.addGraph(function () {
+                    chart = nv.models.pieChart()
+                        .margin({ top: 0, right: 0, bottom: 0, left: 0 })
+                        .x(function (d) {
+                            return d.value;
+                        })
+                        .y(function (d) {
+                            return d.value;
+                        })
+                        .height(250)
+                        .width(250)
+                        .showLabels(true)
+                        .labelThreshold(.001)
+                        .growOnHover(false)
+                        .donut(true)
+                        .donutRatio(0.5)
+                        .color(function(d) {
+                            return d.color || d3.scale.paletteColors().range();
+                        });
+
+                    chart.tooltip.enabled(false);
+                    chart.noData('No data for this moment...');
+                    chart.showLegend(false);
+
+                    chartElem = d3.select($element.get(0))
+                        .select('.pie-chart svg')
+                        .attr('height', 250)
+                        .style('opacity', 0)
+                        .datum(vm.data)
+                        .call(chart);
+
+                    nv.utils.windowResize(function () {
+                        chart.update();
+                        $timeout(resizeTitleLabel);
+                    });
+
+                    return chart;
+                }, function () {
+                    $timeout(renderTotalLabel);
+                });
+
+                function renderTotalLabel() {
+                    var legendTitles = d3.selectAll('.legend-title')[0];
+                    var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                    var totalVal = vm.data.reduce(function (sum, curr) {
+                        return sum + curr.value;
+                    }, 0);
+
+                    d3.select(svgElem)
+                        .select('.nv-pie:not(.nvd3)')
+                        .append('text')
+                        .classed('label-total', true)
+                        .attr('text-anchor', 'middle')
+                        .style('dominant-baseline', 'central')
+                        .text(totalVal);
+                    
+                    d3.select(svgElem)
+                        .transition()
+                        .duration(1000)
+                        .style('opacity', 1);
+
+                    titleElem = d3.select($element.find('text.label-total').get(0));
+                    resizeTitleLabel();
+
+                    legendTitles.forEach(function (item, index) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                }
+
+                function resizeTitleLabelUnwrap() {
+                    var boxSize = $element.find('.nv-pieLabels').get(0).getBBox();
+
+                    if (!boxSize.width || !boxSize.height) {
+                        return;
+                    }
+
+                    titleElem.style('font-size', ~~boxSize.width / 2);
+                }
+
+                /**
+                 * Converts palette color name into RGBA color representation.
+                 * Should by replaced by palette for charts.
+                 *
+                 * @param {string} color    Name of color from AM palette
+                 * @returns {string} RGBa format
+                 */
+                function materialColorToRgba(color) {
+                    return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
+                        + $mdColorPalette[color][500].value[1] + ','
+                        + $mdColorPalette[color][500].value[2] + ','
+                        + ($mdColorPalette[color][500].value[3] || 1) + ')';
+                }
+
+
+                /**
+                 * Helpful method
+                 * @private
+                 */
+                function generateParameterColor() {
+                    vm.data.forEach(function (item, index) {
+                        item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
             }]
@@ -14069,6 +13457,413 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular);
+
+
+
+/**
+ * @file Registration of all help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipHelp', [
+        'pipHelp.Service',
+        'pipHelp.Page'
+    ]);
+
+})(window.angular);
+
+(function(module) {
+try {
+  module = angular.module('pipHelp.Templates');
+} catch (e) {
+  module = angular.module('pipHelp.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('help_page/help_page.html',
+    '<!--\n' +
+    '@file Help page\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar>\n' +
+    '\n' +
+    '<pip-document width="800" min-height="400">\n' +
+    '    <div class="pip-menu-container pip-help"\n' +
+    '         ng-if="manager !== false">\n' +
+    '        <md-list class="pip-menu pip-simple-list hide-xs"\n' +
+    '                 pip-selected="selected.tabIndex"\n' +
+    '                 pip-selected-watch="selected.navId"\n' +
+    '                 pip-select="onNavigationSelect($event.id)">\n' +
+    '            <md-list-item class="pip-simple-list-item pip-selectable"\n' +
+    '                          ng-repeat="tab in tabs track by tab.state"\n' +
+    '                          md-ink-ripple\n' +
+    '                          pip-id="{{::tab.state }}">\n' +
+    '                <p> {{::tab.title | translate}} </p>\n' +
+    '            </md-list-item>\n' +
+    '        </md-list>\n' +
+    '\n' +
+    '        <div class="pip-content-container">\n' +
+    '            <pip-dropdown class="hide-gt-xs"\n' +
+    '                          pip-actions="tabs"\n' +
+    '                          pip-dropdown-select="onDropdownSelect"\n' +
+    '                          pip-active-index="selected.tabIndex"></pip-dropdown>\n' +
+    '            <div class="pip-body layout-column flex" ui-view></div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="layout-column layout-align-center-center flex"\n' +
+    '         ng-if="manager === false">\n' +
+    '        {{::\'ERROR_400\' | translate}}\n' +
+    '    </div>\n' +
+    '</pip-document>');
+}]);
+})();
+
+/**
+ * @file Page template for help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    config.$inject = ['$stateProvider'];
+    HelpPageController.$inject = ['$rootScope', '$scope', '$state', 'pipAppBar', 'pipHelp'];
+    angular.module('pipHelp.Page', ['ui.router', 'pipHelp.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipHelp.Templates'])
+        .config(config)
+        .controller('pipHelpPageController', HelpPageController);
+
+    function config($stateProvider) {
+        $stateProvider.state('help', {
+            url: '/help',
+            auth: false,
+            controller: 'pipHelpPageController',
+            templateUrl: 'help_page/help_page.html'
+        });
+    }
+
+    /**
+     * @ngdoc controller
+     * @name pipHelp.Page.pipHelpPageController
+     *
+     * @description
+     * The controller is used for the root Help component.
+     * It manages available tabs provide navigation through those ones.
+     *
+     * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_page/help_page.js#L40 View source}
+     *
+     *
+     * @param {Object} $rootScope   Root scope object
+     * @param {Object} $scope       Scope for the current controller
+     * @param {Object} $state       UI Router service
+     * @param {Object} pipAppBar    Service provides an interface to manage on application bar header.
+     * @param {Object} pipHelp      Service to manage this component behaviour
+     */
+    function HelpPageController($rootScope, $scope, $state, pipAppBar, pipHelp) {
+
+        $scope.tabs = _.filter(pipHelp.getTabs(), function (tab) {
+            if (tab.visible && (tab.access !== angular.noop ? tab.access($rootScope.$user, tab) : true)) {
+                return tab;
+            }
+        });
+        $scope.selected = {};
+
+        if ($state.current.name !== 'help') {
+            initSelect($state.current.name);
+        } else {
+            initSelect(pipHelp.getDefaultTab().state);
+        }
+
+        appHeader();
+
+        $scope.onNavigationSelect = onNavigationSelect;
+        $scope.onDropdownSelect = onDropdownSelect;
+
+        /**
+         * @ngdoc method
+         * @name pipHelp.Page.pipHelpPageController#onDropdownSelect
+         * @methodOf pipHelp.Page.pipHelpPageController
+         *
+         * @description
+         * It redirects to a passed state.
+         *
+         * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_page/help_page.js#L72 View source}
+         *
+         * @param {Object} state    State configuration object
+         */
+        function onDropdownSelect(state) {
+            onNavigationSelect(state.state);
+        }
+
+        /**
+         * Config appBar due to this page
+         */
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showTitleText('Help');
+            pipAppBar.showShadowSm();
+            pipAppBar.showLocalActions(null, []);
+        }
+
+        /**
+         * @ngdoc method
+         * @name pipHelp.Page.pipHelpPageController#onNavigationSelect
+         * @methodOf pipHelp.Page.pipHelpPageController
+         *
+         * @description
+         * It redirects to a passed state.
+         *
+         * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_page/help_page.js#L98 View source}
+         *
+         * @param {string} state    Name of the target state.
+         */
+        function onNavigationSelect(state) {
+            initSelect(state);
+
+            if ($scope.selected.tab) {
+                $state.go(state);
+            }
+        }
+
+        /**
+         * Set selected item for highlighting in the nav menu
+         */
+        function initSelect(state) {
+            $scope.selected.tab = _.find($scope.tabs, function (tab) {
+                return tab.state === state;
+            });
+
+            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
+            $scope.selected.tabId = state;
+        }
+    }
+})(window.angular, window._);
+
+/**
+ * @file Service for help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular, _) {
+    'use strict';
+
+    /**
+     * @ngdoc service
+     * @name pipHelp.Service.pipHelp
+     *
+     * @description
+     * This service is provided an interface to manage the Help component.
+     * It is available on the config and run application phases. On the both phases the interface is the same.
+     * This module requires the '$state' module.
+     */
+    angular.module('pipHelp.Service', ['ui.router'])
+        .provider('pipHelp',
+            ['$stateProvider', function ($stateProvider) {
+                var defaultTab,
+                    tabs = [];
+
+                /** @see addTab */
+                this.addTab = addTab;
+
+                /** @see setDefaultTab */
+                this.setDefaultTab = setDefaultTab;
+
+                /** @see getTabs */
+                this.getTabs = getTabs;
+
+                /** @see getDefaultTab */
+                this.getDefaultTab = getDefaultTab;
+
+                this.$get = function () {
+                    return {
+                        /** @see getTabs */
+                        getTabs: getTabs,
+
+                        /** @see getDefaultTab */
+                        getDefaultTab: getDefaultTab,
+
+                        /** @see addTab */
+                        addTab: addTab,
+
+                        /** @see setDefaultTab */
+                        setDefaultTab: setDefaultTab
+                    };
+                };
+
+                /**
+                 * This method build the full name of state within the abstract 'help' state
+                 */
+                function getFullStateName(state) {
+                    return 'help.' + state;
+                }
+
+                /**
+                 * @ngdoc method
+                 * @name pipHelp.Service.pipHelp#getTabs
+                 * @methodOf pipHelp.Service.pipHelp
+                 *
+                 * @description
+                 * This method returns asset of all tabs registered in the Help component.
+                 *
+                 * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_service/help_service.js#L79 View source}
+                 *
+                 * @returns {Array<Object>} List of registered states
+                 *
+                 * @example
+                 * <pre>
+                 * // on the config phase
+                 * pipHelpProvider.getTabs();
+                 * </pre>
+                 */
+                function getTabs() {
+                    return _.clone(tabs, true);
+                }
+
+                /**
+                 * @ngdoc method
+                 * @name pipHelp.Service.pipHelp#getDefaultTab
+                 * @methodOf pipHelp.Service.pipHelp
+                 *
+                 * @description
+                 * This method return name of the default state.
+                 *
+                 * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_service/help_service.js#L101 View source}
+                 *
+                 * @returns {string} Name of the state
+                 *
+                 * @example
+                 * <pre>
+                 * // on the config phase
+                 * pipHelpProvider.getDefaultTab();
+                 * </pre>
+                 */
+                function getDefaultTab() {
+                    return _.clone(_.find(tabs, function (tab) {
+                        return tab.state === defaultTab;
+                    }), true);
+                }
+
+                /**
+                 * @ngdoc method
+                 * @name pipHelp.Service.pipHelp#addTab
+                 * @methodOf pipHelp.Service.pipHelp
+                 *
+                 * @description
+                 * This method allows add new tab into navigation menu. It accepts config object to define new state
+                 * with needed params.
+                 *
+                 * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_service/help_service.js#L139 View source}
+                 *
+                 * @param {Object} tabObj Configuration object contains settings for another tab
+                 * @param {Object.<string>} tabObj.state   Name of tab state which is available via UI router
+                 * @param {Object.<string>} tabObj.title   Tab title in the navigation menu.
+                 * @param {Object.<boolean>} tabObj.access If it is true it will be available only for logged in users
+                 * @param {Object.<boolean>} tabObj.visible If it is true the tab will be visible
+                 * @param {Object.<Object>} tabObj.stateConfig  Configuration object in format like UI Router state
+                 *
+                 * @example
+                 * <pre>
+                 *  // on the config phase
+                 *  pipHelpProvider.addTab({
+                 *      state: 'test',
+                 *      title: 'Test help tab',
+                 *      auth: true,
+                 *      stateConfig: {
+                 *          url: '/test',
+                 *          templateUrl: 'help/help_test1.html'
+                 *      }
+                 *  });
+                 * </pre>
+                 */
+                function addTab(tabObj) {
+                    var tab;
+
+                    validateTab(tabObj);
+
+                    tab = _.find(tabs, function (tab) {
+                        return tab.state === getFullStateName(tabObj.state);
+                    });
+                    if (tab) {
+                        throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
+                    }
+
+                    tabs.push({
+                        state: getFullStateName(tabObj.state),
+                        title: tabObj.title,
+                        access: tabObj.access || angular.noop,
+                        visible: tabObj.visible || true,
+                        stateConfig: _.clone(tabObj.stateConfig, true)
+                    });
+
+                    $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
+
+                    // if we just added first state and no default state is specified
+                    if (_.isUndefined(defaultTab) && tabs.length === 1) {
+                        setDefaultTab(tabObj.state);
+                    }
+                }
+
+                /**
+                 * @ngdoc method
+                 * @name pipHelp.Service.pipHelp#setDefaultTab
+                 * @methodOf pipHelp.Service.pipHelp
+                 *
+                 * @description
+                 * This method establishes passed state as default which is redirected at after transfer on abstract
+                 * state
+                 *
+                 * {@link https://github.com/pip-webui/pip-webui-help/blob/master/src/help_service/help_service.js#L185 View source}
+                 *
+                 * @param {Object} name     Name of the state
+                 *
+                 * @example
+                 * <pre>
+                 * pipHelpProvider.setDefaultTab('test');
+                 * </pre>
+                 */
+                function setDefaultTab(name) {
+                    var tab, error;
+
+                    tab = _.find(tabs, function (tab) {
+                        return tab.state === getFullStateName(name);
+                    });
+                    if (!tab) {
+                        error = new Error('Tab with state name "' + name + '" is not registered');
+                        throw error;
+                    }
+
+                    defaultTab = getFullStateName(name);
+
+                    $stateProvider.redirect('help', getFullStateName(name));
+                }
+
+                /**
+                 * This method validates passed state.
+                 * If it is incorrect it will throw an error.
+                 */
+                function validateTab(tabObj) {
+                    if (!tabObj || !_.isObject(tabObj)) {
+                        throw new Error('Invalid object');
+                    }
+
+                    if (!tabObj.state || tabObj.state === '') {
+                        throw new Error('Tab should have valid Angular UI router state name');
+                    }
+
+                    if (tabObj.access && !_.isFunction(tabObj.access)) {
+                        throw new Error('"access" should be a function');
+                    }
+
+                    if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
+                        throw new Error('Invalid state configuration object');
+                    }
+                }
+            }]);
+
+})(window.angular, window._);
 
 
 
