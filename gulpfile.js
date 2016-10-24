@@ -20,6 +20,7 @@ gulp.task('build-ts', function () {
         '../pip-webui-headers/dist/pip-webui-headers.d.ts',
         '../pip-webui-layouts/dist/pip-webui-layouts.d.ts',
         '../pip-webui-split/dist/pip-webui-split.d.ts',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.d.ts',
         '../pip-webui-controls/dist/pip-webui-controls.d.ts',
         '../pip-webui-lists/dist/pip-webui-lists.d.ts',
         '../pip-webui-dates/dist/pip-webui-dates.d.ts',
@@ -43,6 +44,7 @@ gulp.task('build-js-dev', function () {
         '../pip-webui-headers/dist/pip-webui-headers.js',
         '../pip-webui-layouts/dist/pip-webui-layouts.js',
         '../pip-webui-split/dist/pip-webui-split.js',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.js',
         '../pip-webui-controls/dist/pip-webui-controls.js',
         '../pip-webui-lists/dist/pip-webui-lists.js',
         '../pip-webui-dates/dist/pip-webui-dates.js',
@@ -68,6 +70,7 @@ gulp.task('build-js-prod', function () {
         '../pip-webui-headers/dist/pip-webui-headers.min.js',
         '../pip-webui-layouts/dist/pip-webui-layouts.min.js',
         '../pip-webui-split/dist/pip-webui-split.min.js',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.min.js',
         '../pip-webui-controls/dist/pip-webui-controls.min.js',
         '../pip-webui-lists/dist/pip-webui-lists.min.js',
         '../pip-webui-dates/dist/pip-webui-dates.min.js',
@@ -95,6 +98,7 @@ gulp.task('build-css-dev', function () {
         '../pip-webui-services/dist/pip-webui-services.css',
         '../pip-webui-layouts/dist/pip-webui-layouts.css',
         '../pip-webui-split/dist/pip-webui-split.css',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.css',
         '../pip-webui-controls/dist/pip-webui-controls.css',
         '../pip-webui-lists/dist/pip-webui-lists.css',
         '../pip-webui-dates/dist/pip-webui-dates.css',
@@ -119,6 +123,7 @@ gulp.task('build-css-prod', function () {
         '../pip-webui-services/dist/pip-webui-services.min.css',
         '../pip-webui-layouts/dist/pip-webui-layouts.min.css',
         '../pip-webui-split/dist/pip-webui-split.min.css',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.min.css',
         '../pip-webui-controls/dist/pip-webui-controls.min.css',
         '../pip-webui-lists/dist/pip-webui-lists.min.css',
         '../pip-webui-dates/dist/pip-webui-dates.min.css',
@@ -147,6 +152,7 @@ gulp.task('build-prod', ['build-js-prod', 'build-css-prod']);
 
 gulp.task('copy-images', function () {
     return gulp.src([
+        '../pip-webui-behaviors/dist/images/*',
         '../pip-webui-lists/dist/images/*',
         '../pip-webui-controls/dist/images/*',
         '../pip-webui-charts/dist/images/*',
