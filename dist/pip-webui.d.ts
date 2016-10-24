@@ -124,7 +124,6 @@ declare module pip.translate {
 /// <reference path="../../typings/tsd.d.ts" />
 declare module pip.utilities {
     interface ITimerService {
-        isStarted: boolean;
         addEvent(event: string, timeout: number): void;
         removeEvent(event: string): void;
         clearEvents(): void;
