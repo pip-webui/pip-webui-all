@@ -7778,6 +7778,289 @@ md-select md-select-value .md-text .pip-tabs-badge {
   border-left: 5px solid rgba(38, 50, 56, 0.54) !important;
 }
 
+.text-hide {
+  font: 0/0;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-display4 {
+  font: normal 300 112px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-display3 {
+  font: normal 400 56px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-display2 {
+  font: normal 400 45px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-display1 {
+  font: normal 400 34px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-headline {
+  font: normal 400 24px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-title {
+  font: normal 500 20px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-subhead1 {
+  font: normal 400 16px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-subhead2 {
+  font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-body1 {
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-body2 {
+  font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-caption {
+  font: normal 400 12px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-button {
+  font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.flex-fixed {
+  -webkit-box-flex: 0 0 auto;
+  -moz-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+.flex-var {
+  -webkit-box-flex: 1 1 auto;
+  -moz-box-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+.flex-grow {
+  -webkit-box-flex: 1 0 auto;
+  -moz-box-flex: 1 0 auto;
+  -webkit-flex: 1 0 auto;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+.flex-shrink {
+  -webkit-box-flex: 0 1 auto;
+  -moz-box-flex: 0 1 auto;
+  -webkit-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+}
+.opacity-secondary {
+  opacity: 0.54;
+}
+.opacity-primary {
+  opacity: 0.87;
+}
+.opacity-disabled {
+  opacity: 0.38;
+}
+.no-divider {
+  border: none !important;
+}
+.divider {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus {
+  outline-width: 0 !important;
+}
+.pip-error .pip-error-text,
+.pip-error .pip-error-subtext,
+.pip-error .pip-error-actions,
+.pip-error .pip-error-details {
+  max-width: 440px!important;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+.pip-error .pip-error-text {
+  margin-top: 32px;
+  font: normal 500 20px Roboto, 'Helvetica Neue', sans-serif;
+  opacity: 0.87;
+  text-align: center;
+}
+.pip-error .pip-error-subtext {
+  margin-top: 16px;
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  margin-bottom: 16px;
+  opacity: 0.54;
+  text-align: center;
+}
+.pip-error .pip-error-details {
+  padding-top: 8px;
+}
+.pip-error .pip-error-details .pip-error-details-item .text-body2 {
+  color: #0288D1;
+  text-align: center;
+}
+.pip-error .pip-error-details .pip-error-details-item .text-body1 {
+  opacity: 0.54;
+  text-align: center;
+}
+.pip-error .pip-error-details .pip-error-details-item div.pip-pic {
+  height: 88px!important;
+  width: 88px!important;
+  min-height: 0px!important;
+  margin: 0px 24px;
+}
+@media (min-width: 768px) and (max-width: 1200px) {
+  .pip-error div.pip-pic {
+    margin: 0px 16px;
+  }
+}
+@media (max-width: 768px) {
+  .pip-error .pip-error-text,
+  .pip-error .pip-error-subtext,
+  .pip-error .pip-error-actions,
+  .pip-error .pip-error-details {
+    padding-right: 16px;
+    padding-left: 16px;
+    min-height: 0px!important;
+  }
+  .pip-error .pip-error-text {
+    margin-top: 0px;
+  }
+  .pip-error div.pip-pic {
+    height: 64px!important;
+    width: 64px!important;
+    min-height: 0px!important;
+    margin: 0px 8px;
+  }
+}
+/*
+ *
+ */
+.pip-page-errors {
+  background-color: rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  z-index: 30;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex-direction: row;
+  -moz-box-flex-direction: row;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  padding: 16px 24px!important;
+}
+.pip-page-errors.no-transparent-background {
+  background-color: #eeeeee !important;
+}
+.pip-page-errors .pip-error-text {
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  line-height: 17px;
+}
+.pip-page-errors .pip-error-details {
+  font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex-direction: row;
+  -moz-box-flex-direction: row;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: start;
+  -moz-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  margin-left: 24px;
+}
+.pip-page-errors .pip-error-details md-icon {
+  height: 20px;
+  width: 20px;
+  margin-right: 8px!important;
+}
+@media (max-width: 1200px) {
+  .pip-page-errors {
+    padding-left: 16px!important;
+    padding-right: 16px!important;
+    padding-bottom: 0px!important;
+    -webkit-box-flex-direction: column;
+    -moz-box-flex-direction: column;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+  }
+  .pip-page-errors .pip-error-details {
+    height: 48px;
+    width: 100%;
+    margin-left: 0px!important;
+  }
+}
+.blue .pip-page-errors .pip-error-details,
+.blue .pip-page-errors .pip-error-text,
+.blue .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.pink .pip-page-errors .pip-error-details,
+.pink .pip-page-errors .pip-error-text,
+.pink .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.orange .pip-page-errors .pip-error-details,
+.orange .pip-page-errors .pip-error-text,
+.orange .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.amber .pip-page-errors .pip-error-details,
+.amber .pip-page-errors .pip-error-text,
+.amber .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.green .pip-page-errors .pip-error-details,
+.green .pip-page-errors .pip-error-text,
+.green .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.navy .pip-page-errors .pip-error-details,
+.navy .pip-page-errors .pip-error-text,
+.navy .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.grey .pip-page-errors .pip-error-details,
+.grey .pip-page-errors .pip-error-text,
+.grey .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.dark .pip-page-errors .pip-error-details,
+.dark .pip-page-errors .pip-error-text,
+.dark .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+.black .pip-page-errors .pip-error-details,
+.black .pip-page-errors .pip-error-text,
+.black .pip-page-errors .pip-error-details md-icon {
+  color: #ff5252;
+}
+
 @-webkit-keyframes blink-hint {
   0% {
     opacity: 0.38;

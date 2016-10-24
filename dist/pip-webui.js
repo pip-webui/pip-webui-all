@@ -2402,6 +2402,31 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipUnsavedChanges',
+        'pipControls.Translate',
+        'pipDraggable'
+    ]);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipControls.Templates');
@@ -2495,31 +2520,6 @@ module.run(['$templateCache', function($templateCache) {
     '</md-toast>');
 }]);
 })();
-
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipUnsavedChanges',
-        'pipControls.Translate',
-        'pipDraggable'
-    ]);
-
-})(window.angular);
-
 
 /**
  * @file Color picker control
@@ -4247,6 +4247,24 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+/**
+ * @file Registration of all WebUI list controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipLists', [
+        'pipFocused',
+        'pipSelected',
+        'pipInfiniteScroll',
+	'pipTagList'
+    ]);
+    
+})();
 (function(module) {
 try {
   module = angular.module('pipLists.Templates');
@@ -4271,24 +4289,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of all WebUI list controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipLists', [
-        'pipFocused',
-        'pipSelected',
-        'pipInfiniteScroll',
-	'pipTagList'
-    ]);
-    
-})();
 /**
  * @file Optional filter to translate string resources
  * @copyright Digital Living Software Corp. 2014-2016
@@ -4877,7 +4877,8 @@ module.run(['$templateCache', function($templateCache) {
         'pipTimeRange',
         'pipDatesUtils',
         'pipDateFormat',
-        'pipDateTimeFilters'
+        'pipDateTimeFilters',
+        'pipDates.Translate'
     ]);
 
 
@@ -5697,6 +5698,29 @@ module.run(['$templateCache', function($templateCache) {
     );
 
 })(window.angular, window._);
+
+/**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
+
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDates.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
 
 /**
  * @file Filter to format date and time
@@ -6878,6 +6902,27 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of dialogs
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipDialogs', [
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipDialogs.Templates');
@@ -7137,27 +7182,6 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
-
-/**
- * @file Registration of dialogs
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipDialogs', [
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-})(window.angular);
-
 
 /**
  * @file Confirmation dialog
@@ -7813,19 +7837,19 @@ module.run(['$templateCache', function($templateCache) {
     '<div>\n' +
     '    <div class="hide-xs text-overflow">\n' +
     '        <!-- Search criteria -->\n' +
-    '        <span ng-if="config.criteria"\n' +
-    '            ng-click="onSearchEnable()">{{config.criteria}} -</span>\n' +
+    '        <span ng-if="vm.config.criteria"\n' +
+    '            ng-click="vm.onSearchOpen()">{{vm.config.criteria}} -</span>\n' +
     '        <!-- Breadcrumb navigation -->\n' +
     '        <span class="pip-breadcrumb-item"\n' +
-    '            ng-repeat-start="item in config.items"\n' +
-    '            ng-click="onBreadcrumbClick(item)"\n' +
-    '            ng-init="stepWidth = 100/(config.items.length + 1)"\n' +
+    '            ng-repeat-start="item in vm.config.items"\n' +
+    '            ng-click="vm.onBreadcrumbClick(item)"\n' +
+    '            ng-init="stepWidth = 100/(vm.config.items.length + 1)"\n' +
     '            ng-style="{\'max-width\': stepWidth + \'%\'}">\n' +
     '            {{item.title | translate}}\n' +
     '        </span>\n' +
     '        <md-icon ng-repeat-end md-svg-icon="icons:chevron-right"></md-icon>\n' +
     '        <!-- Text title -->\n' +
-    '        <span class="pip-title">{{config.text | translate}}</span>\n' +
+    '        <span class="pip-title">{{vm.config.text | translate}}</span>\n' +
     '    </div>\n' +
     '\n' +
     '    <!-- Mobile breadcrumb dropdown -->\n' +
@@ -7836,18 +7860,18 @@ module.run(['$templateCache', function($templateCache) {
     '            aria-label="open breadcrumb">\n' +
     '            <span class="text-overflow">\n' +
     '                <!-- Search criteria -->\n' +
-    '                <span ng-if="config.criteria"\n' +
-    '                    ng-click="onSearchEnable()">{{config.criteria}} -</span>\n' +
-    '                {{config.text | translate}}\n' +
+    '                <span ng-if="vm.config.criteria"\n' +
+    '                    ng-click="vm.onSearchOpen()">{{vm.config.criteria}} -</span>\n' +
+    '                {{vm.config.text | translate}}\n' +
     '            </span>\n' +
     '            <md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon>\n' +
     '        </span>\n' +
     '        <md-menu-content width="3">\n' +
-    '            <md-menu-item  ng-repeat="item in config.items" >\n' +
-    '                <md-button ng-click="onBreadcrumbClick(item)"><span>{{item.title | translate}}</span></md-button>\n' +
+    '            <md-menu-item  ng-repeat="item in vm.config.items" >\n' +
+    '                <md-button ng-click="vm.onBreadcrumbClick(item)"><span>{{item.title | translate}}</span></md-button>\n' +
     '            </md-menu-item>\n' +
     '            <md-menu-item  >\n' +
-    '                <md-button><span class="text-grey">{{config.text | translate}}</span></md-button>\n' +
+    '                <md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button>\n' +
     '            </md-menu-item>\n' +
     '        </md-menu-content>\n' +
     '    </md-menu>\n' +
@@ -8561,7 +8585,7 @@ var pip;
                 this._rootScope = $rootScope;
                 this._window = $window;
                 $element.addClass('pip-breadcrumb');
-                this.config = pipBreadcrumb.config();
+                this.config = pipBreadcrumb.config;
                 $rootScope.$on('pipBreadcrumbChanged', this.onBreadcrumbChanged);
                 $rootScope.$on('pipBreadcrumbBack', this.onBreadcrumbBack);
             }
@@ -8602,7 +8626,11 @@ var pip;
             };
         }
         angular
-            .module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate',
+            .module('pipBreadcrumb', [
+            'ngMaterial',
+            'pipNav.Templates',
+            'pipNav.Translate',
+            'pipBreadcrumb.Service'
         ])
             .directive('pipBreadcrumb', breadcrumbDirective);
     })(nav = pip.nav || (pip.nav = {}));
@@ -9106,11 +9134,11 @@ var pip;
     var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
     thisModule.run(['$injector', function ($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate && pipTranslate.translations) {
-            pipTranslate.translations('en', {
+        if (pipTranslate && pipTranslate.setTranslations) {
+            pipTranslate.setTranslations('en', {
                 'APPBAR_SEARCH': 'Search'
             });
-            pipTranslate.translations('ru', {
+            pipTranslate.setTranslations('ru', {
                 'APPBAR_SEARCH': 'Поиск'
             });
         }
@@ -10235,6 +10263,24 @@ var pip;
 
 
 
+/**
+ * @file Registration of all error handling components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipErrors', [
+        'pipErrors.Pages',
+        'pipNoConnectionPanel',
+        'pipClearErrors',
+	    'pipFormErrors'
+    ]);
+    
+})();
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -10477,24 +10523,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of all error handling components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipErrors', [
-        'pipErrors.Pages',
-        'pipNoConnectionPanel',
-        'pipClearErrors',
-	    'pipFormErrors'
-    ]);
-    
-})();
 /**
  * @file Errors string resources
  * @copyright Digital Living Software Corp. 2014-2016
@@ -11161,6 +11189,26 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of chart WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipCharts', [
+        'pipBarCharts',
+        'pipLineCharts',
+        'pipPieCharts',
+        'pipChartLegends'
+    ]);
+
+})(window.angular);
+
+
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -11242,26 +11290,6 @@ module.run(['$templateCache', function($templateCache) {
     '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
-
-/**
- * @file Registration of chart WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipCharts', [
-        'pipBarCharts',
-        'pipLineCharts',
-        'pipPieCharts',
-        'pipChartLegends'
-    ]);
-
-})(window.angular);
-
 
 (function () {
     'use strict';
@@ -13460,6 +13488,21 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+/**
+ * @file Registration of all help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipHelp', [
+        'pipHelp.Service',
+        'pipHelp.Page'
+    ]);
+
+})(window.angular);
+
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -13505,21 +13548,6 @@ module.run(['$templateCache', function($templateCache) {
     '</pip-document>');
 }]);
 })();
-
-/**
- * @file Registration of all help components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipHelp', [
-        'pipHelp.Service',
-        'pipHelp.Page'
-    ]);
-
-})(window.angular);
 
 /**
  * @file Page template for help components
