@@ -66,7 +66,7 @@ var pip;
             $provide.decorator('$state', decorateBackStateService);
         }
         angular
-            .module('pipRouting')
+            .module('pipRouting.Back', [])
             .config(addBackStateDecorator)
             .run(captureStateTranslations);
     })(routing = pip.routing || (pip.routing = {}));
@@ -121,7 +121,7 @@ var pip;
             $provide.decorator('$state', decorateRedirectStateService);
         }
         angular
-            .module('pipRouting')
+            .module('pipRouting.Redirect', [])
             .config(addRedirectStateProviderDecorator)
             .config(addRedirectStateDecorator);
     })(routing = pip.routing || (pip.routing = {}));
@@ -132,7 +132,9 @@ var pip;
     var routing;
     (function (routing) {
         'use strict';
-        angular.module('pipRouting', ['ui.router']);
+        angular.module('pipRouting', [
+            'ui.router', 'pipRouting.Events', 'pipRouting.Back', 'pipRouting.Redirect'
+        ]);
     })(routing = pip.routing || (pip.routing = {}));
 })(pip || (pip = {}));
 
@@ -171,7 +173,7 @@ var pip;
             });
         }
         angular
-            .module('pipRouting')
+            .module('pipRouting.Events', [])
             .run(hookRoutingEvents);
     })(routing = pip.routing || (pip.routing = {}));
 })(pip || (pip = {}));
@@ -181,7 +183,7 @@ var pip;
     var scope;
     (function (scope) {
         'use strict';
-        angular.module('pipScope', ['pipTranslate']);
+        angular.module('pipScope', ['pipTranslate', 'pipScope.Error', 'pipScope.Transaction']);
         angular.module('pipTransactions', ['pipScope']);
     })(scope = pip.scope || (pip.scope = {}));
 })(pip || (pip = {}));
@@ -191,7 +193,7 @@ var pip;
     var scope;
     (function (scope_1) {
         'use strict';
-        var thisModule = angular.module('pipScope');
+        var thisModule = angular.module('pipScope.Error', []);
         thisModule.factory('pipError', ['$rootScope', function ($rootScope) {
             $rootScope.errors = {};
             return createError;
@@ -306,7 +308,7 @@ var pip;
     var scope;
     (function (scope_1) {
         'use strict';
-        var thisModule = angular.module('pipScope');
+        var thisModule = angular.module('pipScope.Transaction', []);
         thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
             pipTranslateProvider.translations('en', {
                 'ENTERING': 'Entering...',
@@ -576,7 +578,7 @@ var pip;
     (function (translate) {
         'use strict';
         angular.module('pipTranslate', [
-            'LocalStorageModule'
+            'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
         ]);
     })(translate = pip.translate || (pip.translate = {}));
 })(pip || (pip = {}));
@@ -619,7 +621,7 @@ var pip;
             };
         }
         angular
-            .module('pipTranslate')
+            .module('pipTranslate.Directive', [])
             .directive('pipTranslate', pipTranslateDirective)
             .directive('pipTranslateHtml', pipTranslateHtmlDirective);
     })(translate = pip.translate || (pip.translate = {}));
@@ -647,7 +649,7 @@ var pip;
             };
         }
         angular
-            .module('pipTranslate')
+            .module('pipTranslate.Filter', [])
             .filter('translate', translateFilter);
     })(translate = pip.translate || (pip.translate = {}));
 })(pip || (pip = {}));
@@ -890,7 +892,7 @@ var pip;
             return TranslateProvider;
         }(Translation));
         angular
-            .module('pipTranslate')
+            .module('pipTranslate.Service', [])
             .provider('pipTranslate', TranslateProvider);
     })(translate = pip.translate || (pip.translate = {}));
 })(pip || (pip = {}));
@@ -1433,25 +1435,6 @@ var pip;
 
 
 
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipButtons', [
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipFabTooltipVisibility'
-    ]);
-
-})(window.angular);
-
-
 (function(module) {
 try {
   module = angular.module('pipButtons.Templates');
@@ -1483,6 +1466,25 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipButtons', [
+        'pipToggleButtons',
+        'pipRefreshButton',
+        'pipFabTooltipVisibility'
+    ]);
+
+})(window.angular);
+
 
 /**
  * @file Optional filter to translate string resources
@@ -2397,31 +2399,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of basic WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipUnsavedChanges',
-        'pipControls.Translate',
-        'pipDraggable'
-    ]);
-
-})(window.angular);
-
-
 (function(module) {
 try {
   module = angular.module('pipControls.Templates');
@@ -2515,6 +2492,31 @@ module.run(['$templateCache', function($templateCache) {
     '</md-toast>');
 }]);
 })();
+
+/**
+ * @file Registration of basic WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipUnsavedChanges',
+        'pipControls.Translate',
+        'pipDraggable'
+    ]);
+
+})(window.angular);
+
 
 /**
  * @file Color picker control
@@ -4242,24 +4244,6 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
-/**
- * @file Registration of all WebUI list controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipLists', [
-        'pipFocused',
-        'pipSelected',
-        'pipInfiniteScroll',
-	'pipTagList'
-    ]);
-    
-})();
 (function(module) {
 try {
   module = angular.module('pipLists.Templates');
@@ -4284,6 +4268,24 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+/**
+ * @file Registration of all WebUI list controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipLists', [
+        'pipFocused',
+        'pipSelected',
+        'pipInfiniteScroll',
+	'pipTagList'
+    ]);
+    
+})();
 /**
  * @file Optional filter to translate string resources
  * @copyright Digital Living Software Corp. 2014-2016
@@ -6873,27 +6875,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of dialogs
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipDialogs', [
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-
-})(window.angular);
-
-
 (function(module) {
 try {
   module = angular.module('pipDialogs.Templates');
@@ -7153,6 +7134,27 @@ module.run(['$templateCache', function($templateCache) {
     '');
 }]);
 })();
+
+/**
+ * @file Registration of dialogs
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipDialogs', [
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
+    ]);
+
+})(window.angular);
+
 
 /**
  * @file Confirmation dialog
@@ -8600,7 +8602,8 @@ var pip;
         }
         angular
             .module('pipBreadcrumb', [
-            'ngMaterial', 'pipNav.Translate', 'pipNav.Templates'
+            'ngMaterial', 'pipNav.Translate', 'pipNav.Templates',
+            'pipBreadcrumb.Service'
         ])
             .directive('pipBreadcrumb', breadcrumbDirective);
     })(nav = pip.nav || (pip.nav = {}));
@@ -8704,7 +8707,7 @@ var pip;
             return BreadcrumbProvider;
         }());
         angular
-            .module('pipBreadcrumb')
+            .module('pipBreadcrumb.Service', [])
             .provider('pipBreadcrumb', BreadcrumbProvider);
     })(nav = pip.nav || (pip.nav = {}));
 })(pip = exports.pip || (exports.pip = {}));
@@ -10235,24 +10238,6 @@ var pip;
 
 
 
-/**
- * @file Registration of all error handling components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function () {
-    'use strict';
-
-    angular.module('pipErrors', [
-        'pipErrors.Pages',
-        'pipNoConnectionPanel',
-        'pipClearErrors',
-	    'pipFormErrors'
-    ]);
-    
-})();
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -10495,6 +10480,24 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+/**
+ * @file Registration of all error handling components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function () {
+    'use strict';
+
+    angular.module('pipErrors', [
+        'pipErrors.Pages',
+        'pipNoConnectionPanel',
+        'pipClearErrors',
+	    'pipFormErrors'
+    ]);
+    
+})();
 /**
  * @file Errors string resources
  * @copyright Digital Living Software Corp. 2014-2016
@@ -11161,26 +11164,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of chart WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipCharts', [
-        'pipBarCharts',
-        'pipLineCharts',
-        'pipPieCharts',
-        'pipChartLegends'
-    ]);
-
-})(window.angular);
-
-
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -11262,6 +11245,26 @@ module.run(['$templateCache', function($templateCache) {
     '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
+
+/**
+ * @file Registration of chart WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipCharts', [
+        'pipBarCharts',
+        'pipLineCharts',
+        'pipPieCharts',
+        'pipChartLegends'
+    ]);
+
+})(window.angular);
+
 
 (function () {
     'use strict';
@@ -13460,21 +13463,6 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Registration of all help components
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipHelp', [
-        'pipHelp.Service',
-        'pipHelp.Page'
-    ]);
-
-})(window.angular);
-
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -13520,6 +13508,21 @@ module.run(['$templateCache', function($templateCache) {
     '</pip-document>');
 }]);
 })();
+
+/**
+ * @file Registration of all help components
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipHelp', [
+        'pipHelp.Service',
+        'pipHelp.Page'
+    ]);
+
+})(window.angular);
 
 /**
  * @file Page template for help components
