@@ -5,6 +5,18 @@
 /// <reference path="../../typings/tsd.d.ts" />
 
 /// <reference path="../../typings/tsd.d.ts" />
+declare module pip.scope {
+}
+
+/// <reference path="../../typings/tsd.d.ts" />
+declare module pip.scope {
+}
+
+/// <reference path="../../typings/tsd.d.ts" />
+declare module pip.scope {
+}
+
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.routing {
     let CurrentState: any;
     let PreviousState: any;
@@ -22,18 +34,6 @@ declare module pip.routing {
 /// <reference path="../../typings/tsd.d.ts" />
 declare module pip.routing {
     let RoutingVar: string;
-}
-
-/// <reference path="../../typings/tsd.d.ts" />
-declare module pip.scope {
-}
-
-/// <reference path="../../typings/tsd.d.ts" />
-declare module pip.scope {
-}
-
-/// <reference path="../../typings/tsd.d.ts" />
-declare module pip.scope {
 }
 
 /// <reference path="../../typings/tsd.d.ts" />
@@ -152,7 +152,17 @@ declare module pip.utilities {
 
 
 
+
 declare var Masonry: any;
+
+
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+
+
+
+/// <reference path="../../typings/tsd.d.ts" />
 
 /// <reference path="../typings/tsd.d.ts" />
 
@@ -322,6 +332,44 @@ declare module pip.nav {
 /// <reference path="../../typings/tsd.d.ts" />
 
 /// <reference path="../../typings/tsd.d.ts" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
