@@ -180,169 +180,6 @@ var pip;
 
 var pip;
 (function (pip) {
-    var session;
-    (function (session) {
-        'use strict';
-        session.IdentityRootVar = "$identity";
-        session.IdentityChangedEvent = "pipIdentityChanged";
-        var IdentityService = (function () {
-            function IdentityService(setRootVar, identity, $rootScope) {
-                this._setRootVar = setRootVar;
-                this._identity = identity;
-                this._rootScope = $rootScope;
-                this.setRootVar();
-            }
-            IdentityService.prototype.setRootVar = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.session.IdentityRootVar] = this._identity;
-            };
-            Object.defineProperty(IdentityService.prototype, "identity", {
-                get: function () {
-                    return this._identity;
-                },
-                set: function (value) {
-                    this._identity = value;
-                    this.setRootVar();
-                    this._rootScope.$broadcast(pip.session.IdentityChangedEvent, this._identity);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return IdentityService;
-        }());
-        var IdentityProvider = (function () {
-            function IdentityProvider() {
-                this._setRootVar = true;
-                this._identity = null;
-                this._service = null;
-            }
-            Object.defineProperty(IdentityProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(IdentityProvider.prototype, "identity", {
-                get: function () {
-                    return this._identity;
-                },
-                set: function (value) {
-                    this._identity = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            IdentityProvider.prototype.$get = ['$rootScope', function ($rootScope) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new IdentityService(this._setRootVar, this._identity, $rootScope);
-                return this._service;
-            }];
-            return IdentityProvider;
-        }());
-        angular
-            .module('pipIdentity', [])
-            .provider('pipIdentity', IdentityProvider);
-    })(session = pip.session || (pip.session = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var session;
-    (function (session_1) {
-        'use strict';
-        session_1.SessionRootVar = "$session";
-        session_1.SessionOpenedEvent = "pipSessionOpened";
-        session_1.SessionClosedEvent = "pipSessionClosed";
-        var SessionService = (function () {
-            function SessionService(setRootVar, session, $rootScope) {
-                this._setRootVar = setRootVar;
-                this._session = session;
-                this._rootScope = $rootScope;
-                this.setRootVar();
-            }
-            SessionService.prototype.setRootVar = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.session.SessionRootVar] = this._session;
-            };
-            Object.defineProperty(SessionService.prototype, "session", {
-                get: function () {
-                    return this._session;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(SessionService.prototype, "isOpened", {
-                get: function () {
-                    return this._session != null;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            SessionService.prototype.open = function (session, fullReset, partialReset) {
-                if (fullReset === void 0) { fullReset = false; }
-                if (partialReset === void 0) { partialReset = false; }
-                if (session == null)
-                    throw new Error("Session cannot be null");
-                this._session = session;
-                this.setRootVar();
-                this._rootScope.$broadcast(pip.session.SessionOpenedEvent, session);
-            };
-            SessionService.prototype.close = function (fullReset, partialReset) {
-                if (fullReset === void 0) { fullReset = false; }
-                if (partialReset === void 0) { partialReset = false; }
-                var oldSession = this._session;
-                this._session = null;
-                this.setRootVar();
-                this._rootScope.$broadcast(pip.session.SessionClosedEvent, oldSession);
-            };
-            return SessionService;
-        }());
-        var SessionProvider = (function () {
-            function SessionProvider() {
-                this._setRootVar = true;
-                this._session = null;
-                this._service = null;
-            }
-            Object.defineProperty(SessionProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(SessionProvider.prototype, "session", {
-                get: function () {
-                    return this._session;
-                },
-                set: function (value) {
-                    this._session = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            SessionProvider.prototype.$get = ['$rootScope', function ($rootScope) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new SessionService(this._setRootVar, this._session, $rootScope);
-                return this._service;
-            }];
-            return SessionProvider;
-        }());
-        angular.module('pipSession', ['pipPageReset'])
-            .provider('pipSession', SessionProvider);
-    })(session = pip.session || (pip.session = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
     var scope;
     (function (scope) {
         'use strict';
@@ -573,6 +410,494 @@ var pip;
             }
         }]);
     })(scope = pip.scope || (pip.scope = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var session;
+    (function (session) {
+        'use strict';
+        session.IdentityRootVar = "$identity";
+        session.IdentityChangedEvent = "pipIdentityChanged";
+        var IdentityService = (function () {
+            function IdentityService(setRootVar, identity, $rootScope) {
+                this._setRootVar = setRootVar;
+                this._identity = identity;
+                this._rootScope = $rootScope;
+                this.setRootVar();
+            }
+            IdentityService.prototype.setRootVar = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.session.IdentityRootVar] = this._identity;
+            };
+            Object.defineProperty(IdentityService.prototype, "identity", {
+                get: function () {
+                    return this._identity;
+                },
+                set: function (value) {
+                    this._identity = value;
+                    this.setRootVar();
+                    this._rootScope.$broadcast(pip.session.IdentityChangedEvent, this._identity);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return IdentityService;
+        }());
+        var IdentityProvider = (function () {
+            function IdentityProvider() {
+                this._setRootVar = true;
+                this._identity = null;
+                this._service = null;
+            }
+            Object.defineProperty(IdentityProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(IdentityProvider.prototype, "identity", {
+                get: function () {
+                    return this._identity;
+                },
+                set: function (value) {
+                    this._identity = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            IdentityProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new IdentityService(this._setRootVar, this._identity, $rootScope);
+                return this._service;
+            }];
+            return IdentityProvider;
+        }());
+        angular
+            .module('pipIdentity', [])
+            .provider('pipIdentity', IdentityProvider);
+    })(session = pip.session || (pip.session = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var session;
+    (function (session_1) {
+        'use strict';
+        session_1.SessionRootVar = "$session";
+        session_1.SessionOpenedEvent = "pipSessionOpened";
+        session_1.SessionClosedEvent = "pipSessionClosed";
+        var SessionService = (function () {
+            function SessionService(setRootVar, session, $rootScope) {
+                this._setRootVar = setRootVar;
+                this._session = session;
+                this._rootScope = $rootScope;
+                this.setRootVar();
+            }
+            SessionService.prototype.setRootVar = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.session.SessionRootVar] = this._session;
+            };
+            Object.defineProperty(SessionService.prototype, "session", {
+                get: function () {
+                    return this._session;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(SessionService.prototype, "isOpened", {
+                get: function () {
+                    return this._session != null;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            SessionService.prototype.open = function (session, fullReset, partialReset) {
+                if (fullReset === void 0) { fullReset = false; }
+                if (partialReset === void 0) { partialReset = false; }
+                if (session == null)
+                    throw new Error("Session cannot be null");
+                this._session = session;
+                this.setRootVar();
+                this._rootScope.$broadcast(pip.session.SessionOpenedEvent, session);
+            };
+            SessionService.prototype.close = function (fullReset, partialReset) {
+                if (fullReset === void 0) { fullReset = false; }
+                if (partialReset === void 0) { partialReset = false; }
+                var oldSession = this._session;
+                this._session = null;
+                this.setRootVar();
+                this._rootScope.$broadcast(pip.session.SessionClosedEvent, oldSession);
+            };
+            return SessionService;
+        }());
+        var SessionProvider = (function () {
+            function SessionProvider() {
+                this._setRootVar = true;
+                this._session = null;
+                this._service = null;
+            }
+            Object.defineProperty(SessionProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(SessionProvider.prototype, "session", {
+                get: function () {
+                    return this._session;
+                },
+                set: function (value) {
+                    this._session = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            SessionProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new SessionService(this._setRootVar, this._session, $rootScope);
+                return this._service;
+            }];
+            return SessionProvider;
+        }());
+        angular.module('pipSession', ['pipPageReset'])
+            .provider('pipSession', SessionProvider);
+    })(session = pip.session || (pip.session = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        angular.module('pipTranslate', [
+            'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
+        ]);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        pipTranslateDirective.$inject = ['pipTranslate'];
+        pipTranslateHtmlDirective.$inject = ['pipTranslate'];
+        function pipTranslateDirective(pipTranslate) {
+            "ngInject";
+            return {
+                restrict: 'EA',
+                scope: {
+                    key1: '@pipTranslate',
+                    key2: '@key'
+                },
+                link: function (scope, element, attrs) {
+                    var key = scope.key1 || scope.key2;
+                    var value = pipTranslate.translate(key);
+                    element.text(value);
+                }
+            };
+        }
+        function pipTranslateHtmlDirective(pipTranslate) {
+            "ngInject";
+            return {
+                restrict: 'EA',
+                scope: {
+                    key1: '@pipTranslateHtml',
+                    key2: '@key'
+                },
+                link: function (scope, element, attrs) {
+                    var key = scope.key1 || scope.key2;
+                    var value = pipTranslate.translate(key);
+                    element.html(value);
+                }
+            };
+        }
+        angular
+            .module('pipTranslate.Directive', [])
+            .directive('pipTranslate', pipTranslateDirective)
+            .directive('pipTranslateHtml', pipTranslateHtmlDirective);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        translateFilter.$inject = ['pipTranslate'];
+        optionalTranslateFilter.$inject = ['$injector'];
+        function translateFilter(pipTranslate) {
+            "ngInject";
+            return function (key) {
+                return pipTranslate.translate(key) || key;
+            };
+        }
+        function optionalTranslateFilter($injector) {
+            "ngInject";
+            var pipTranslate = $injector.has('pipTranslate')
+                ? $injector.get('pipTranslate') : null;
+            return function (key) {
+                return pipTranslate ? pipTranslate.translate(key) || key : key;
+            };
+        }
+        angular
+            .module('pipTranslate.Filter', [])
+            .filter('translate', translateFilter);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        translate.LanguageRootVar = "$language";
+        translate.LanguageChangedEvent = "pipLanguageChanged";
+        var Translation = (function () {
+            function Translation() {
+                this._language = 'en';
+                this._translations = {
+                    en: {
+                        'en': 'English',
+                        'ru': 'Russian',
+                        'es': 'Spanish',
+                        'pt': 'Portuguese',
+                        'de': 'German',
+                        'fr': 'French'
+                    },
+                    ru: {
+                        'en': 'Английский',
+                        'ru': 'Русский',
+                        'es': 'Испанский',
+                        'pt': 'Португальский',
+                        'de': 'Немецкий',
+                        'fr': 'Французский'
+                    }
+                };
+            }
+            Object.defineProperty(Translation.prototype, "language", {
+                get: function () { return this._language; },
+                set: function (value) { this._language = value; },
+                enumerable: true,
+                configurable: true
+            });
+            Translation.prototype.use = function (language) {
+                if (language != null)
+                    this._language = language;
+                return this._language;
+            };
+            Translation.prototype.setTranslations = function (language, translations) {
+                var map = this._translations[language] || {};
+                this._translations[language] = _.extend(map, translations);
+            };
+            Translation.prototype.translate = function (key) {
+                if (_.isNull(key) || _.isUndefined(key))
+                    return '';
+                var translations = this._translations[this._language] || {};
+                return translations[key] || key;
+            };
+            Translation.prototype.translateArray = function (keys) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (k) {
+                    var key = k || '';
+                    values.push(translations[key] || key);
+                });
+                return values;
+            };
+            Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[key] || key;
+                    values.push(value);
+                });
+                return values;
+            };
+            Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
+                if (_.isNull(items) || items.length == 0)
+                    return [];
+                keyProp = keyProp || 'name';
+                valueProp = valueProp || 'nameLocal';
+                var translations = this._translations[this._language] || {};
+                _.each(items, function (item) {
+                    var key = item[keyProp] || '';
+                    item[valueProp] = translations[key] || key;
+                });
+                return items;
+            };
+            Translation.prototype.translateWithPrefix = function (prefix, key) {
+                prefix = prefix ? prefix + '_' : '';
+                key = (prefix + key).replace(/ /g, '_').toUpperCase();
+                if (key == null)
+                    return '';
+                var translations = this._translations[this._language] || {};
+                return translations[key] || key;
+            };
+            ;
+            Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[prefix + '_' + key] || key;
+                    values.push(value);
+                });
+                return values;
+            };
+            Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
+                        || (prefix + key.replace(/ /g, '_').toUpperCase());
+                    values.push(value);
+                });
+                return values;
+            };
+            return Translation;
+        }());
+        var TranslateService = (function () {
+            function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
+                this._setRootVar = setRootVar;
+                this._persist = persist;
+                this._translation = translation;
+                this._rootScope = $rootScope;
+                this._storage = localStorageService;
+                if (this._persist) {
+                    this._translation.language = localStorageService.get('language')
+                        || this._translation.language;
+                }
+                this.save();
+            }
+            TranslateService.prototype.save = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.translate.LanguageRootVar] = this._translation.language;
+                if (this._persist)
+                    this._storage.set('language', this._translation.language);
+            };
+            Object.defineProperty(TranslateService.prototype, "language", {
+                get: function () {
+                    return this._translation.language;
+                },
+                set: function (value) {
+                    if (value != this._translation.language) {
+                        this._translation.language = value;
+                        this.save();
+                        this._rootScope.$broadcast(pip.translate.LanguageChangedEvent, value);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TranslateService.prototype.use = function (language) {
+                if (language != null)
+                    this.language = language;
+                return this.language;
+            };
+            TranslateService.prototype.setTranslations = function (language, translations) {
+                return this._translation.setTranslations(language, translations);
+            };
+            TranslateService.prototype.translate = function (key) {
+                return this._translation.translate(key);
+            };
+            TranslateService.prototype.translateArray = function (keys) {
+                return this._translation.translateArray(keys);
+            };
+            TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
+                return this._translation.translateSet(keys, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
+                return this._translation.translateObjects(items, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateWithPrefix = function (prefix, key) {
+                return this._translation.translateWithPrefix(prefix, key);
+            };
+            TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+                return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+                return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
+            };
+            return TranslateService;
+        }());
+        var TranslateProvider = (function (_super) {
+            __extends(TranslateProvider, _super);
+            function TranslateProvider() {
+                _super.call(this);
+            }
+            Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TranslateProvider.prototype, "persist", {
+                get: function () {
+                    return this._persist;
+                },
+                set: function (value) {
+                    this._persist = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
+                return this._service;
+            }];
+            return TranslateProvider;
+        }(Translation));
+        angular
+            .module('pipTranslate.Service', [])
+            .provider('pipTranslate', TranslateProvider);
+    })(translate = pip.translate || (pip.translate = {}));
 })(pip || (pip = {}));
 
 (function () {
@@ -1108,331 +1433,6 @@ var pip;
 })(pip || (pip = {}));
 
 
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        angular.module('pipTranslate', [
-            'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
-        ]);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        pipTranslateDirective.$inject = ['pipTranslate'];
-        pipTranslateHtmlDirective.$inject = ['pipTranslate'];
-        function pipTranslateDirective(pipTranslate) {
-            "ngInject";
-            return {
-                restrict: 'EA',
-                scope: {
-                    key1: '@pipTranslate',
-                    key2: '@key'
-                },
-                link: function (scope, element, attrs) {
-                    var key = scope.key1 || scope.key2;
-                    var value = pipTranslate.translate(key);
-                    element.text(value);
-                }
-            };
-        }
-        function pipTranslateHtmlDirective(pipTranslate) {
-            "ngInject";
-            return {
-                restrict: 'EA',
-                scope: {
-                    key1: '@pipTranslateHtml',
-                    key2: '@key'
-                },
-                link: function (scope, element, attrs) {
-                    var key = scope.key1 || scope.key2;
-                    var value = pipTranslate.translate(key);
-                    element.html(value);
-                }
-            };
-        }
-        angular
-            .module('pipTranslate.Directive', [])
-            .directive('pipTranslate', pipTranslateDirective)
-            .directive('pipTranslateHtml', pipTranslateHtmlDirective);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        translateFilter.$inject = ['pipTranslate'];
-        optionalTranslateFilter.$inject = ['$injector'];
-        function translateFilter(pipTranslate) {
-            "ngInject";
-            return function (key) {
-                return pipTranslate.translate(key) || key;
-            };
-        }
-        function optionalTranslateFilter($injector) {
-            "ngInject";
-            var pipTranslate = $injector.has('pipTranslate')
-                ? $injector.get('pipTranslate') : null;
-            return function (key) {
-                return pipTranslate ? pipTranslate.translate(key) || key : key;
-            };
-        }
-        angular
-            .module('pipTranslate.Filter', [])
-            .filter('translate', translateFilter);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        translate.LanguageRootVar = "$language";
-        translate.LanguageChangedEvent = "pipLanguageChanged";
-        var Translation = (function () {
-            function Translation() {
-                this._language = 'en';
-                this._translations = {
-                    en: {
-                        'en': 'English',
-                        'ru': 'Russian',
-                        'es': 'Spanish',
-                        'pt': 'Portuguese',
-                        'de': 'German',
-                        'fr': 'French'
-                    },
-                    ru: {
-                        'en': 'Английский',
-                        'ru': 'Русский',
-                        'es': 'Испанский',
-                        'pt': 'Португальский',
-                        'de': 'Немецкий',
-                        'fr': 'Французский'
-                    }
-                };
-            }
-            Object.defineProperty(Translation.prototype, "language", {
-                get: function () { return this._language; },
-                set: function (value) { this._language = value; },
-                enumerable: true,
-                configurable: true
-            });
-            Translation.prototype.use = function (language) {
-                if (language != null)
-                    this._language = language;
-                return this._language;
-            };
-            Translation.prototype.setTranslations = function (language, translations) {
-                var map = this._translations[language] || {};
-                this._translations[language] = _.extend(map, translations);
-            };
-            Translation.prototype.translate = function (key) {
-                if (_.isNull(key) || _.isUndefined(key))
-                    return '';
-                var translations = this._translations[this._language] || {};
-                return translations[key] || key;
-            };
-            Translation.prototype.translateArray = function (keys) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (k) {
-                    var key = k || '';
-                    values.push(translations[key] || key);
-                });
-                return values;
-            };
-            Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[key] || key;
-                    values.push(value);
-                });
-                return values;
-            };
-            Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
-                if (_.isNull(items) || items.length == 0)
-                    return [];
-                keyProp = keyProp || 'name';
-                valueProp = valueProp || 'nameLocal';
-                var translations = this._translations[this._language] || {};
-                _.each(items, function (item) {
-                    var key = item[keyProp] || '';
-                    item[valueProp] = translations[key] || key;
-                });
-                return items;
-            };
-            Translation.prototype.translateWithPrefix = function (prefix, key) {
-                prefix = prefix ? prefix + '_' : '';
-                key = (prefix + key).replace(/ /g, '_').toUpperCase();
-                if (key == null)
-                    return '';
-                var translations = this._translations[this._language] || {};
-                return translations[key] || key;
-            };
-            ;
-            Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[prefix + '_' + key] || key;
-                    values.push(value);
-                });
-                return values;
-            };
-            Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
-                        || (prefix + key.replace(/ /g, '_').toUpperCase());
-                    values.push(value);
-                });
-                return values;
-            };
-            return Translation;
-        }());
-        var TranslateService = (function () {
-            function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
-                this._setRootVar = setRootVar;
-                this._persist = persist;
-                this._translation = translation;
-                this._rootScope = $rootScope;
-                this._storage = localStorageService;
-                if (this._persist) {
-                    this._translation.language = localStorageService.get('language')
-                        || this._translation.language;
-                }
-                this.save();
-            }
-            TranslateService.prototype.save = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.translate.LanguageRootVar] = this._translation.language;
-                if (this._persist)
-                    this._storage.set('language', this._translation.language);
-            };
-            Object.defineProperty(TranslateService.prototype, "language", {
-                get: function () {
-                    return this._translation.language;
-                },
-                set: function (value) {
-                    if (value != this._translation.language) {
-                        this._translation.language = value;
-                        this.save();
-                        this._rootScope.$broadcast(pip.translate.LanguageChangedEvent, value);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TranslateService.prototype.use = function (language) {
-                if (language != null)
-                    this.language = language;
-                return this.language;
-            };
-            TranslateService.prototype.setTranslations = function (language, translations) {
-                return this._translation.setTranslations(language, translations);
-            };
-            TranslateService.prototype.translate = function (key) {
-                return this._translation.translate(key);
-            };
-            TranslateService.prototype.translateArray = function (keys) {
-                return this._translation.translateArray(keys);
-            };
-            TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
-                return this._translation.translateSet(keys, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
-                return this._translation.translateObjects(items, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateWithPrefix = function (prefix, key) {
-                return this._translation.translateWithPrefix(prefix, key);
-            };
-            TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-                return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-                return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
-            };
-            return TranslateService;
-        }());
-        var TranslateProvider = (function (_super) {
-            __extends(TranslateProvider, _super);
-            function TranslateProvider() {
-                _super.call(this);
-            }
-            Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(TranslateProvider.prototype, "persist", {
-                get: function () {
-                    return this._persist;
-                },
-                set: function (value) {
-                    this._persist = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
-                return this._service;
-            }];
-            return TranslateProvider;
-        }(Translation));
-        angular
-            .module('pipTranslate.Service', [])
-            .provider('pipTranslate', TranslateProvider);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
 
 
 
@@ -2979,6 +2979,33 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center"\n' +
+    '        ng-show="showProgress()">\n' +
+    '     <!--ng-show="$routing || $reset || toolInitialized">-->\n' +
+    '    <div class="loader">\n' +
+    '        <svg class="circular" viewBox="25 25 50 50">\n' +
+    '            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>\n' +
+    '        </svg>\n' +
+    '    </div>\n' +
+    '\n' +
+    '    <img src=""  height="40" width="40" class="pip-img">\n' +
+    '\n' +
+    '    <md-progress-circular md-diameter="96"\n' +
+    '                          class="fix-ie"></md-progress-circular>\n' +
+    '\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipControls.Templates');
+} catch (e) {
+  module = angular.module('pipControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toast/toast.html',
     '<md-toast class="md-action pip-toast"\n' +
     '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
@@ -2998,33 +3025,6 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '\n' +
     '</md-toast>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center"\n' +
-    '        ng-show="showProgress()">\n' +
-    '     <!--ng-show="$routing || $reset || toolInitialized">-->\n' +
-    '    <div class="loader">\n' +
-    '        <svg class="circular" viewBox="25 25 50 50">\n' +
-    '            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>\n' +
-    '        </svg>\n' +
-    '    </div>\n' +
-    '\n' +
-    '    <img src=""  height="40" width="40" class="pip-img">\n' +
-    '\n' +
-    '    <md-progress-circular md-diameter="96"\n' +
-    '                          class="fix-ie"></md-progress-circular>\n' +
-    '\n' +
-    '</div>\n' +
-    '');
 }]);
 })();
 
@@ -3287,7 +3287,7 @@ module.run(['$templateCache', function($templateCache) {
     thisModule.run(['$injector', function ($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.translations('en', {
+            pipTranslate.setTranslations('en', {
                 'MARKDOWN_ATTACHMENTS': 'Attachments:',
                 'checklist': 'Checklist',
                 'documents': 'Documents',
@@ -3295,7 +3295,7 @@ module.run(['$templateCache', function($templateCache) {
                 'location': 'Location',
                 'time': 'Time'
             });
-            pipTranslate.translations('ru', {
+            pipTranslate.setTranslations('ru', {
                 'MARKDOWN_ATTACHMENTS': 'Вложения:',
                 'checklist': 'Список',
                 'documents': 'Документы',
@@ -3509,6 +3509,33 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
+    thisModule.directive('pipRoutingProgress', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            scope: {
+                showProgress: '&',
+                logoUrl: '@'
+            },
+            templateUrl: 'progress/routing_progress.html',
+            controller: 'pipRoutingProgressController'
+        };
+    });
+    thisModule.controller('pipRoutingProgressController', ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
+        var image = $element.children('img');
+        loadProgressImage();
+        return;
+        function loadProgressImage() {
+            if ($scope.logoUrl) {
+                image.attr('src', $scope.logoUrl);
+            }
+        }
+    }]);
+})();
+
+(function () {
+    'use strict';
     var thisModule = angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
     thisModule.controller('pipToastController', ['$scope', '$mdToast', 'toast', '$injector', function ($scope, $mdToast, toast, $injector) {
         var pipErrorDetailsDialog = $injector.has('pipErrorDetailsDialog')
@@ -3669,33 +3696,6 @@ module.run(['$templateCache', function($templateCache) {
             else {
                 $mdToast.cancel();
                 toasts = [];
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
-    thisModule.directive('pipRoutingProgress', function () {
-        return {
-            restrict: 'EA',
-            replace: true,
-            scope: {
-                showProgress: '&',
-                logoUrl: '@'
-            },
-            templateUrl: 'progress/routing_progress.html',
-            controller: 'pipRoutingProgressController'
-        };
-    });
-    thisModule.controller('pipRoutingProgressController', ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-        var image = $element.children('img');
-        loadProgressImage();
-        return;
-        function loadProgressImage() {
-            if ($scope.logoUrl) {
-                image.attr('src', $scope.logoUrl);
             }
         }
     }]);
@@ -5584,39 +5584,6 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/information.html',
-    '<!--\n' +
-    '@file Information dialog content\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column"\n' +
-    '           width="400" md-theme="{{theme}}">\n' +
-    '    <div class="pip-header">\n' +
-    '        <h3 >{{ title | translate }}</h3>\n' +
-    '    </div>\n' +
-    '    <div class="pip-body">\n' +
-    '        <div class="pip-content">\n' +
-    '            {{ content }}\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '    <div class="pip-footer">\n' +
-    '        <div>\n' +
-    '            <md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</md-dialog>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDialogs.Templates');
-} catch (e) {
-  module = angular.module('pipDialogs.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('error_details/error_details.html',
     '<!--\n' +
     '@file Confirmation dialog template\n' +
@@ -5809,6 +5776,39 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('information/information.html',
+    '<!--\n' +
+    '@file Information dialog content\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column"\n' +
+    '           width="400" md-theme="{{theme}}">\n' +
+    '    <div class="pip-header">\n' +
+    '        <h3 >{{ title | translate }}</h3>\n' +
+    '    </div>\n' +
+    '    <div class="pip-body">\n' +
+    '        <div class="pip-content">\n' +
+    '            {{ content }}\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-footer">\n' +
+    '        <div>\n' +
+    '            <md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</md-dialog>\n' +
+    '');
+}]);
+})();
+
 (function () {
     'use strict';
     angular.module('pipDialogs', [
@@ -5881,59 +5881,6 @@ module.run(['$templateCache', function($templateCache) {
             ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipInformationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipInformationDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, callback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'information/information.html',
-                    controller: 'pipInformationDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (callback) {
-                        callback();
-                    }
-                });
-            }
-        };
-    }]);
-    thisModule.controller('pipInformationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
-        var content = params.message, item;
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'INFORMATION_TITLE': 'Information'
-            });
-            pipTranslate.translations('ru', {
-                'INFORMATION_TITLE': 'Информация'
-            });
-            $scope.title = params.title || 'INFORMATION_TITLE';
-            $scope.ok = params.ok || 'OK';
-            content = pipTranslate.translate(content);
-        }
-        else {
-            $scope.title = params.title || 'Information';
-            $scope.ok = params.ok || 'OK';
-        }
-        var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
-        $scope.theme = $rootScope.$theme;
-        if (params.item && pipFormat) {
-            item = _.truncate(params.item, 25);
-            content = pipFormat.sprintf(content, item);
-            console.log('content2', content);
-        }
-        $scope.content = content;
-        $scope.onOk = function () {
-            $mdDialog.hide();
         };
     }]);
 })();
@@ -6202,6 +6149,59 @@ module.run(['$templateCache', function($templateCache) {
     }]);
 })();
 
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipInformationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
+    thisModule.factory('pipInformationDialog', ['$mdDialog', function ($mdDialog) {
+        return {
+            show: function (params, callback) {
+                $mdDialog.show({
+                    targetEvent: params.event,
+                    templateUrl: 'information/information.html',
+                    controller: 'pipInformationDialogController',
+                    locals: { params: params },
+                    clickOutsideToClose: true
+                })
+                    .then(function () {
+                    if (callback) {
+                        callback();
+                    }
+                });
+            }
+        };
+    }]);
+    thisModule.controller('pipInformationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        var content = params.message, item;
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.translations('en', {
+                'INFORMATION_TITLE': 'Information'
+            });
+            pipTranslate.translations('ru', {
+                'INFORMATION_TITLE': 'Информация'
+            });
+            $scope.title = params.title || 'INFORMATION_TITLE';
+            $scope.ok = params.ok || 'OK';
+            content = pipTranslate.translate(content);
+        }
+        else {
+            $scope.title = params.title || 'Information';
+            $scope.ok = params.ok || 'OK';
+        }
+        var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
+        $scope.theme = $rootScope.$theme;
+        if (params.item && pipFormat) {
+            item = _.truncate(params.item, 25);
+            content = pipFormat.sprintf(content, item);
+            console.log('content2', content);
+        }
+        $scope.content = content;
+        $scope.onOk = function () {
+            $mdDialog.hide();
+        };
+    }]);
+})();
+
 
 
 
@@ -6357,7 +6357,7 @@ module.run(['$templateCache', function($templateCache) {
     '            ng-style="{\'max-width\': stepWidth + \'%\'}">\n' +
     '            {{item.title | translate}}\n' +
     '        </span>\n' +
-    '        <md-icon ng-repeat-end md-svg-icon="icons:chevron-right"></md-icon>\n' +
+    '        <md-icon ng-repeat-end md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon>\n' +
     '        <!-- Text title -->\n' +
     '        <span class="pip-title">{{vm.config.text | translate}}</span>\n' +
     '    </div>\n' +
@@ -6543,6 +6543,41 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search_bar/search_bar.html',
+    '<div class="md-toolbar-tools layout-row" ng-if="searchEnabled">\n' +
+    '    <md-button class="md-icon-button" \n' +
+    '        aria-label="start search" \n' +
+    '        ng-click="onSearchClick()">\n' +
+    '        <md-icon md-svg-icon="icons:search"></md-icon>\n' +
+    '    </md-button>\n' +
+    '    <input class="pip-search-text flex"\n' +
+    '        type="search"\n' +
+    '        ng-model="search.text" \n' +
+    '        ng-keydown="onSearchKeyDown($event)" />\n' +
+    '    <md-button class="md-icon-button" \n' +
+    '        aria-label="clear search" \n' +
+    '        ng-click="onSearchClear()">\n' +
+    '        <md-icon md-svg-icon="icons:cross-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '<div class="md-toolbar-tools layout-row layout-align-end-center"  ng-if="!searchEnabled">\n' +
+    '    <md-button class="md-icon-button"\n' +
+    '               aria-label="start search"\n' +
+    '               ng-click="onSearchEnable()">\n' +
+    '        <md-icon md-svg-icon="icons:search"></md-icon>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/sidenav.html',
     '<!--\n' +
     '@file Side Nav component\n' +
@@ -6593,41 +6628,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </md-select>\n' +
     '    </div>\n' +
     '</md-toolbar>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search_bar/search_bar.html',
-    '<div class="md-toolbar-tools layout-row" ng-if="searchEnabled">\n' +
-    '    <md-button class="md-icon-button" \n' +
-    '        aria-label="start search" \n' +
-    '        ng-click="onSearchClick()">\n' +
-    '        <md-icon md-svg-icon="icons:search"></md-icon>\n' +
-    '    </md-button>\n' +
-    '    <input class="pip-search-text flex"\n' +
-    '        type="search"\n' +
-    '        ng-model="search.text" \n' +
-    '        ng-keydown="onSearchKeyDown($event)" />\n' +
-    '    <md-button class="md-icon-button" \n' +
-    '        aria-label="clear search" \n' +
-    '        ng-click="onSearchClear()">\n' +
-    '        <md-icon md-svg-icon="icons:cross-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '<div class="md-toolbar-tools layout-row layout-align-end-center"  ng-if="!searchEnabled">\n' +
-    '    <md-button class="md-icon-button"\n' +
-    '               aria-label="start search"\n' +
-    '               ng-click="onSearchEnable()">\n' +
-    '        <md-icon md-svg-icon="icons:search"></md-icon>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
     '');
 }]);
 })();
@@ -7084,18 +7084,6 @@ module.run(['$templateCache', function($templateCache) {
     }]);
 })();
 
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNav.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
-        return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }]);
-})();
-
 var pip;
 (function (pip) {
     var nav;
@@ -7259,6 +7247,18 @@ var pip;
             .provider('pipBreadcrumb', BreadcrumbProvider);
     })(nav = pip.nav || (pip.nav = {}));
 })(pip || (pip = {}));
+
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNav.Translate', []);
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }]);
+})();
 
 (function () {
     'use strict';
@@ -7661,6 +7661,154 @@ var pip;
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
+    thisModule.run(['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate && pipTranslate.setTranslations) {
+            pipTranslate.setTranslations('en', {
+                'APPBAR_SEARCH': 'Search'
+            });
+            pipTranslate.setTranslations('ru', {
+                'APPBAR_SEARCH': 'Поиск'
+            });
+        }
+    }]);
+    thisModule.directive('pipSearchBar', function () {
+        return {
+            restrict: 'E',
+            scope: {},
+            replace: false,
+            templateUrl: function (element, attr) {
+                return 'search_bar/search_bar.html';
+            },
+            controller: 'pipSearchBarController'
+        };
+    });
+    thisModule.controller('pipSearchBarController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
+        $element.addClass('pip-search-bar');
+        $scope.config = pipSearch.config();
+        $scope.searchEnabled = false;
+        $scope.search = { text: '' };
+        $rootScope.$on('pipSearchChanged', onSearchBarChanged);
+        $scope.onSearchEnable = onSearchEnable;
+        $scope.onSearchClick = onSearchClick;
+        $scope.onSearchClear = onSearchClear;
+        $scope.onSearchKeyDown = onSearchKeyDown;
+        function onSearchBarChanged(event, config) {
+            $scope.config = config;
+            $scope.searchEnabled = false;
+            $scope.search.text = '';
+        }
+        function focusSearchText() {
+            var element;
+            setTimeout(function () {
+                element = $('.pip-search-text');
+                if (element.length > 0) {
+                    element.focus();
+                }
+            }, 0);
+        }
+        function onSearchEnable() {
+            $scope.search.text = $scope.config.criteria;
+            $scope.searchEnabled = true;
+            focusSearchText();
+        }
+        function onSearchClick() {
+            var searchText = $scope.search.text;
+            $scope.search.text = '';
+            $scope.searchEnabled = false;
+            if ($scope.config.callback) {
+                $scope.config.callback(searchText);
+            }
+            else {
+                $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
+            }
+        }
+        function onSearchClear() {
+            if ($scope.search.text) {
+                $scope.search.text = '';
+                focusSearchText();
+            }
+            else {
+                $scope.searchEnabled = false;
+                onSearchClick();
+            }
+        }
+        function onSearchKeyDown(event) {
+            if (event.keyCode === 13) {
+                $scope.onSearchClick();
+                return;
+            }
+            if (event.keyCode === 27) {
+                $scope.searchEnabled = false;
+            }
+        }
+    }]);
+})();
+
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSearch.Service', []);
+    thisModule.provider('pipSearch', function () {
+        var config = {
+            visible: false,
+            criteria: '',
+            history: [],
+            callback: null,
+        };
+        this.$get = ['$rootScope', function ($rootScope) {
+            $rootScope.$on('pipSearchOpen', open);
+            $rootScope.$on('pipSearchClose', close);
+            return {
+                config: getConfig,
+                set: setSearch,
+                clear: clearSearch,
+                criteria: updateCriteria,
+                history: updateHistory,
+            };
+            function getConfig() {
+                return config;
+            }
+            function setSearch(callback, criteria, history) {
+                config.callback = callback;
+                config.criteria = criteria;
+                config.history = history;
+                sendConfigEvent();
+            }
+            function clearSearch() {
+                config.callback = null;
+                config.criteria = null;
+                sendConfigEvent();
+            }
+            function open(event) {
+                config.visible = true;
+                sendConfigEvent();
+            }
+            function close(event) {
+                config.visible = false;
+                sendConfigEvent();
+            }
+            function toggle() {
+                config.visible = !config.visible;
+                sendConfigEvent();
+            }
+            function updateCriteria(criteria) {
+                config.criteria = criteria;
+                sendConfigEvent();
+            }
+            function updateHistory(history) {
+                config.history = history;
+                sendConfigEvent();
+            }
+            function sendConfigEvent() {
+                $rootScope.$broadcast('pipSearchChanged', config);
+            }
+        }];
+    });
+})();
+
+(function () {
+    'use strict';
     var thisModule = angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Service']);
     thisModule.directive('pipSidenav', function () {
         return {
@@ -7852,154 +8000,6 @@ var pip;
                 };
             }]
         };
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
-    thisModule.run(['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate && pipTranslate.setTranslations) {
-            pipTranslate.setTranslations('en', {
-                'APPBAR_SEARCH': 'Search'
-            });
-            pipTranslate.setTranslations('ru', {
-                'APPBAR_SEARCH': 'Поиск'
-            });
-        }
-    }]);
-    thisModule.directive('pipSearchBar', function () {
-        return {
-            restrict: 'E',
-            scope: {},
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'search_bar/search_bar.html';
-            },
-            controller: 'pipSearchBarController'
-        };
-    });
-    thisModule.controller('pipSearchBarController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
-        $element.addClass('pip-search-bar');
-        $scope.config = pipSearch.config();
-        $scope.searchEnabled = false;
-        $scope.search = { text: '' };
-        $rootScope.$on('pipSearchChanged', onSearchBarChanged);
-        $scope.onSearchEnable = onSearchEnable;
-        $scope.onSearchClick = onSearchClick;
-        $scope.onSearchClear = onSearchClear;
-        $scope.onSearchKeyDown = onSearchKeyDown;
-        function onSearchBarChanged(event, config) {
-            $scope.config = config;
-            $scope.searchEnabled = false;
-            $scope.search.text = '';
-        }
-        function focusSearchText() {
-            var element;
-            setTimeout(function () {
-                element = $('.pip-search-text');
-                if (element.length > 0) {
-                    element.focus();
-                }
-            }, 0);
-        }
-        function onSearchEnable() {
-            $scope.search.text = $scope.config.criteria;
-            $scope.searchEnabled = true;
-            focusSearchText();
-        }
-        function onSearchClick() {
-            var searchText = $scope.search.text;
-            $scope.search.text = '';
-            $scope.searchEnabled = false;
-            if ($scope.config.callback) {
-                $scope.config.callback(searchText);
-            }
-            else {
-                $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
-            }
-        }
-        function onSearchClear() {
-            if ($scope.search.text) {
-                $scope.search.text = '';
-                focusSearchText();
-            }
-            else {
-                $scope.searchEnabled = false;
-                onSearchClick();
-            }
-        }
-        function onSearchKeyDown(event) {
-            if (event.keyCode === 13) {
-                $scope.onSearchClick();
-                return;
-            }
-            if (event.keyCode === 27) {
-                $scope.searchEnabled = false;
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSearch.Service', []);
-    thisModule.provider('pipSearch', function () {
-        var config = {
-            visible: false,
-            criteria: '',
-            history: [],
-            callback: null,
-        };
-        this.$get = ['$rootScope', function ($rootScope) {
-            $rootScope.$on('pipSearchOpen', open);
-            $rootScope.$on('pipSearchClose', close);
-            return {
-                config: getConfig,
-                set: setSearch,
-                clear: clearSearch,
-                criteria: updateCriteria,
-                history: updateHistory,
-            };
-            function getConfig() {
-                return config;
-            }
-            function setSearch(callback, criteria, history) {
-                config.callback = callback;
-                config.criteria = criteria;
-                config.history = history;
-                sendConfigEvent();
-            }
-            function clearSearch() {
-                config.callback = null;
-                config.criteria = null;
-                sendConfigEvent();
-            }
-            function open(event) {
-                config.visible = true;
-                sendConfigEvent();
-            }
-            function close(event) {
-                config.visible = false;
-                sendConfigEvent();
-            }
-            function toggle() {
-                config.visible = !config.visible;
-                sendConfigEvent();
-            }
-            function updateCriteria(criteria) {
-                config.criteria = criteria;
-                sendConfigEvent();
-            }
-            function updateHistory(history) {
-                config.history = history;
-                sendConfigEvent();
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipSearchChanged', config);
-            }
-        }];
     });
 })();
 
@@ -8634,6 +8634,28 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection/no_connection.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
+    '    <div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div>\n' +
+    '    <div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div>\n' +
+    '    <div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div>\n' +
+    '\n' +
+    '    <div class="pip-error-actions h48 layout-column layout-align-center-center">\n' +
+    '        <md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">\n' +
+    '            {{::\'ERROR_RESPONDING_RETRY\' | translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection_panel/no_connection_panel.html',
     '    <div class="pip-empty pip-error layout-column layout-align-center-center flex">\n' +
     '        <img src="images/no_response.svg" class="pip-pic block" >\n' +
@@ -8647,28 +8669,6 @@ module.run(['$templateCache', function($templateCache) {
     '                </md-button>\n' +
     '            </div>\n' +
     '    </div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center">\n' +
-    '    <div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div>\n' +
-    '    <div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div>\n' +
-    '    <div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div>\n' +
-    '\n' +
-    '    <div class="pip-error-actions h48 layout-column layout-align-center-center">\n' +
-    '        <md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">\n' +
-    '            {{::\'ERROR_RESPONDING_RETRY\' | translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -8914,6 +8914,59 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipErrors.Pages', [
+        'ngMaterial',
+        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
+        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
+    ]);
+    thisModule.config(['$stateProvider', function ($stateProvider) {
+        $stateProvider
+            .state('errors_no_connection', {
+            url: '/errors/no_connection',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorNoConnectionController',
+            templateUrl: 'no_connection/no_connection.html'
+        })
+            .state('errors_maintenance', {
+            url: '/errors/maintenance',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorMaintenanceController',
+            templateUrl: 'maintenance/maintenance.html'
+        })
+            .state('errors_missing_route', {
+            url: '/errors/missing_route',
+            params: {
+                unfoundState: null,
+                fromState: null
+            },
+            controller: 'pipErrorMissingRouteController',
+            templateUrl: 'missing_route/missing_route.html'
+        })
+            .state('errors_unsupported', {
+            url: '/errors/unsupported',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorUnsupportedController',
+            templateUrl: 'unsupported/unsupported.html'
+        })
+            .state('errors_unknown', {
+            url: '/errors/unknown',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorUnknownController',
+            templateUrl: 'unknown/unknown.html'
+        });
+    }]);
+})();
+
+(function () {
+    'use strict';
     var thisModule = angular.module('pipClearErrors', []);
     thisModule.directive('pipClearErrors', function () {
         return {
@@ -9048,59 +9101,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    var thisModule = angular.module('pipErrors.Pages', [
-        'ngMaterial',
-        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
-        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
-    ]);
-    thisModule.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider
-            .state('errors_no_connection', {
-            url: '/errors/no_connection',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorNoConnectionController',
-            templateUrl: 'no_connection/no_connection.html'
-        })
-            .state('errors_maintenance', {
-            url: '/errors/maintenance',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorMaintenanceController',
-            templateUrl: 'maintenance/maintenance.html'
-        })
-            .state('errors_missing_route', {
-            url: '/errors/missing_route',
-            params: {
-                unfoundState: null,
-                fromState: null
-            },
-            controller: 'pipErrorMissingRouteController',
-            templateUrl: 'missing_route/missing_route.html'
-        })
-            .state('errors_unsupported', {
-            url: '/errors/unsupported',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorUnsupportedController',
-            templateUrl: 'unsupported/unsupported.html'
-        })
-            .state('errors_unknown', {
-            url: '/errors/unknown',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorUnknownController',
-            templateUrl: 'unknown/unknown.html'
-        });
-    }]);
-})();
-
-(function () {
-    'use strict';
     var thisModule = angular.module('pipErrors.Maintenance', []);
     thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
         $rootScope.$routing = false;
@@ -9151,6 +9151,29 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipErrors.NoConnection', []);
+    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', 'pipAppBar', function ($scope, $state, $rootScope, $window, pipAppBar) {
+        $rootScope.$routing = false;
+        appHeader();
+        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
+        $scope.onRetry = onRetry;
+        return;
+        function onRetry() {
+            $window.history.back();
+        }
+        ;
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        }
+        ;
+    }]);
+})();
+
+(function () {
+    'use strict';
     var thisModule = angular.module("pipNoConnectionPanel", ['pipErrors.Translate']);
     thisModule.directive('pipNoConnectionPanel', function () {
         return {
@@ -9169,29 +9192,6 @@ module.run(['$templateCache', function($templateCache) {
         function onRetry() {
             if ($scope.retry && angular.isFunction($scope.retry))
                 $scope.retry();
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.NoConnection', []);
-    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', 'pipAppBar', function ($scope, $state, $rootScope, $window, pipAppBar) {
-        $rootScope.$routing = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.onRetry = onRetry;
-        return;
-        function onRetry() {
-            $window.history.back();
-        }
-        ;
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
         }
         ;
     }]);
@@ -9284,6 +9284,38 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('legend/interactive_legend.html',
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
+    '        <md-checkbox class="lp16 m8"\n' +
+    '                     ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
@@ -9308,38 +9340,6 @@ module.run(['$templateCache', function($templateCache) {
     '</div>\n' +
     '\n' +
     '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('legend/interactive_legend.html',
-    '<div >\n' +
-    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
-    '        <md-checkbox class="lp16 m8"\n' +
-    '                     ng-model="item.disabled"\n' +
-    '                     ng-true-value="false"\n' +
-    '                     ng-false-value="true"\n' +
-    '                     ng-if="interactive"\n' +
-    '                     aria-label="{{ item.label }}">\n' +
-    '            <p class="legend-item-value"\n' +
-    '               ng-style="{\'background-color\': item.color}">\n' +
-    '                {{ item.value }}\n' +
-    '            </p>\n' +
-    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
-    '        </md-checkbox>\n' +
-    '\n' +
-    '        <div ng-if="!interactive">\n' +
-    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '            <span>{{:: item.label || item.key}}</span>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -9452,6 +9452,67 @@ module.run(['$templateCache', function($templateCache) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
+            }]
+        };
+    }
+})();
+
+(function () {
+    'use strict';
+    angular.module('pipChartLegends', [])
+        .directive('pipChartLegend', pipChartLegend);
+    function pipChartLegend() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries',
+                interactive: '=pipInteractive'
+            },
+            templateUrl: 'legend/interactive_legend.html',
+            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
+                var colors = _.map($mdColorPalette, function (palette) {
+                    return palette[500].hex;
+                });
+                function colorCheckboxes() {
+                    var checkboxContainers = $($element).find('md-checkbox .md-container');
+                    checkboxContainers.each(function (index, item) {
+                        $(item)
+                            .css('color', $scope.series[index].color || colors[index])
+                            .find('.md-icon')
+                            .css('background-color', $scope.series[index].color || colors[index]);
+                    });
+                }
+                function animate() {
+                    var legendTitles = $($element).find('.chart-legend-item');
+                    legendTitles.each(function (index, item) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                }
+                function prepareSeries() {
+                    $scope.series.forEach(function (item, index) {
+                        item.color = item.color || colors[index];
+                        item.disabled = item.disabled || false;
+                    });
+                }
+                $scope.$watch('series', function () {
+                    $timeout(function () {
+                        animate();
+                        colorCheckboxes();
+                    }, 0);
+                    prepareSeries();
+                }, true);
+                $scope.$watch('interactive', function (newValue, oldValue) {
+                    if (newValue == true && newValue != oldValue) {
+                        $timeout(colorCheckboxes, 0);
+                    }
+                });
+                $timeout(function () {
+                    animate();
+                    colorCheckboxes();
+                }, 0);
+                prepareSeries();
             }]
         };
     }
@@ -9734,67 +9795,6 @@ module.run(['$templateCache', function($templateCache) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
-            }]
-        };
-    }
-})();
-
-(function () {
-    'use strict';
-    angular.module('pipChartLegends', [])
-        .directive('pipChartLegend', pipChartLegend);
-    function pipChartLegend() {
-        return {
-            restrict: 'E',
-            scope: {
-                series: '=pipSeries',
-                interactive: '=pipInteractive'
-            },
-            templateUrl: 'legend/interactive_legend.html',
-            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
-                var colors = _.map($mdColorPalette, function (palette) {
-                    return palette[500].hex;
-                });
-                function colorCheckboxes() {
-                    var checkboxContainers = $($element).find('md-checkbox .md-container');
-                    checkboxContainers.each(function (index, item) {
-                        $(item)
-                            .css('color', $scope.series[index].color || colors[index])
-                            .find('.md-icon')
-                            .css('background-color', $scope.series[index].color || colors[index]);
-                    });
-                }
-                function animate() {
-                    var legendTitles = $($element).find('.chart-legend-item');
-                    legendTitles.each(function (index, item) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
-                    });
-                }
-                function prepareSeries() {
-                    $scope.series.forEach(function (item, index) {
-                        item.color = item.color || colors[index];
-                        item.disabled = item.disabled || false;
-                    });
-                }
-                $scope.$watch('series', function () {
-                    $timeout(function () {
-                        animate();
-                        colorCheckboxes();
-                    }, 0);
-                    prepareSeries();
-                }, true);
-                $scope.$watch('interactive', function (newValue, oldValue) {
-                    if (newValue == true && newValue != oldValue) {
-                        $timeout(colorCheckboxes, 0);
-                    }
-                });
-                $timeout(function () {
-                    animate();
-                    colorCheckboxes();
-                }, 0);
-                prepareSeries();
             }]
         };
     }
@@ -10247,6 +10247,76 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipSettings.Page', [
+        'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipSettings.Templates', 'pipNavIcon', 'pipActions.Service'
+    ]);
+    thisModule.config(['$stateProvider', function ($stateProvider) {
+        $stateProvider.state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controller: 'pipSettingsPageController',
+            templateUrl: 'settings_page/settings_page.html'
+        });
+    }]);
+    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', 'pipActions', 'pipBreadcrumb', 'pipNavIcon', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings, pipActions, pipBreadcrumb, pipNavIcon) {
+        $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+            if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
+                return tab;
+            }
+        });
+        $scope.tabs = _.sortBy($scope.tabs, 'index');
+        $scope.selected = {};
+        if ($state.current.name !== 'settings') {
+            initSelect($state.current.name);
+        }
+        else if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+            initSelect(pipSettings.getDefaultTab().state);
+        }
+        else {
+            $timeout(function () {
+                if (pipSettings.getDefaultTab()) {
+                    initSelect(pipSettings.getDefaultTab().state);
+                }
+                if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
+                    initSelect($scope.tabs[0].state);
+                }
+            });
+        }
+        appHeader();
+        $scope.onNavigationSelect = onNavigationSelect;
+        $scope.onDropdownSelect = onDropdownSelect;
+        function appHeader() {
+            pipActions.hide();
+            pipAppBar.part('menu', true);
+            pipAppBar.part('actions', 'primary');
+            pipAppBar.part('icon', true);
+            pipAppBar.part('title', 'breadcrumb');
+            pipAppBar.hideShadow();
+            pipBreadcrumb.text = 'Settings';
+            pipNavIcon.menu();
+        }
+        function onDropdownSelect(state) {
+            onNavigationSelect(state.state);
+        }
+        function onNavigationSelect(state) {
+            initSelect(state);
+            if ($scope.selected.tab) {
+                $state.go(state);
+            }
+        }
+        function initSelect(state) {
+            $scope.selected.tab = _.find($scope.tabs, function (tab) {
+                return tab.state === state;
+            });
+            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
+            $scope.selected.tabId = state;
+        }
+    }]);
+})();
+
+(function () {
+    'use strict';
     var thisModule = angular.module('pipSettings.Service', []);
     thisModule.provider('pipSettings', ['$stateProvider', function ($stateProvider) {
         var defaultTab, tabs = [], titleText = 'SETTINGS_TITLE', titleLogo = null, isNavIcon = true;
@@ -10349,76 +10419,6 @@ module.run(['$templateCache', function($templateCache) {
                 isNavIcon = !!value;
             }
             return isNavIcon;
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSettings.Page', [
-        'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates', 'pipNavIcon', 'pipActions.Service'
-    ]);
-    thisModule.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('settings', {
-            url: '/settings?party_id',
-            auth: true,
-            controller: 'pipSettingsPageController',
-            templateUrl: 'settings_page/settings_page.html'
-        });
-    }]);
-    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', 'pipActions', 'pipBreadcrumb', 'pipNavIcon', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings, pipActions, pipBreadcrumb, pipNavIcon) {
-        $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-            if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
-                return tab;
-            }
-        });
-        $scope.tabs = _.sortBy($scope.tabs, 'index');
-        $scope.selected = {};
-        if ($state.current.name !== 'settings') {
-            initSelect($state.current.name);
-        }
-        else if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-            initSelect(pipSettings.getDefaultTab().state);
-        }
-        else {
-            $timeout(function () {
-                if (pipSettings.getDefaultTab()) {
-                    initSelect(pipSettings.getDefaultTab().state);
-                }
-                if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
-                    initSelect($scope.tabs[0].state);
-                }
-            });
-        }
-        appHeader();
-        $scope.onNavigationSelect = onNavigationSelect;
-        $scope.onDropdownSelect = onDropdownSelect;
-        function appHeader() {
-            pipActions.hide();
-            pipAppBar.part('menu', true);
-            pipAppBar.part('actions', 'primary');
-            pipAppBar.part('icon', true);
-            pipAppBar.part('title', 'breadcrumb');
-            pipAppBar.hideShadow();
-            pipBreadcrumb.text = 'Settings';
-            pipNavIcon.menu();
-        }
-        function onDropdownSelect(state) {
-            onNavigationSelect(state.state);
-        }
-        function onNavigationSelect(state) {
-            initSelect(state);
-            if ($scope.selected.tab) {
-                $state.go(state);
-            }
-        }
-        function initSelect(state) {
-            $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                return tab.state === state;
-            });
-            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-            $scope.selected.tabId = state;
         }
     }]);
 })();
@@ -10946,63 +10946,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    config.$inject = ['$stateProvider'];
-    HelpPageController.$inject = ['$rootScope', '$scope', '$state', 'pipAppBar', 'pipHelp'];
-    angular.module('pipHelp.Page', ['ui.router', 'pipHelp.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipHelp.Templates'])
-        .config(config)
-        .controller('pipHelpPageController', HelpPageController);
-    function config($stateProvider) {
-        $stateProvider.state('help', {
-            url: '/help',
-            auth: false,
-            controller: 'pipHelpPageController',
-            templateUrl: 'help_page/help_page.html'
-        });
-    }
-    function HelpPageController($rootScope, $scope, $state, pipAppBar, pipHelp) {
-        $scope.tabs = _.filter(pipHelp.getTabs(), function (tab) {
-            if (tab.visible && (tab.access !== angular.noop ? tab.access($rootScope.$user, tab) : true)) {
-                return tab;
-            }
-        });
-        $scope.selected = {};
-        if ($state.current.name !== 'help') {
-            initSelect($state.current.name);
-        }
-        else {
-            initSelect(pipHelp.getDefaultTab().state);
-        }
-        appHeader();
-        $scope.onNavigationSelect = onNavigationSelect;
-        $scope.onDropdownSelect = onDropdownSelect;
-        function onDropdownSelect(state) {
-            onNavigationSelect(state.state);
-        }
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showTitleText('Help');
-            pipAppBar.showShadowSm();
-            pipAppBar.showLocalActions(null, []);
-        }
-        function onNavigationSelect(state) {
-            initSelect(state);
-            if ($scope.selected.tab) {
-                $state.go(state);
-            }
-        }
-        function initSelect(state) {
-            $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                return tab.state === state;
-            });
-            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-            $scope.selected.tabId = state;
-        }
-    }
-})();
-
-(function () {
-    'use strict';
     angular.module('pipHelp.Service', ['ui.router'])
         .provider('pipHelp', ['$stateProvider', function ($stateProvider) {
         var defaultTab, tabs = [];
@@ -11077,6 +11020,63 @@ module.run(['$templateCache', function($templateCache) {
             }
         }
     }]);
+})();
+
+(function () {
+    'use strict';
+    config.$inject = ['$stateProvider'];
+    HelpPageController.$inject = ['$rootScope', '$scope', '$state', 'pipAppBar', 'pipHelp'];
+    angular.module('pipHelp.Page', ['ui.router', 'pipHelp.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipHelp.Templates'])
+        .config(config)
+        .controller('pipHelpPageController', HelpPageController);
+    function config($stateProvider) {
+        $stateProvider.state('help', {
+            url: '/help',
+            auth: false,
+            controller: 'pipHelpPageController',
+            templateUrl: 'help_page/help_page.html'
+        });
+    }
+    function HelpPageController($rootScope, $scope, $state, pipAppBar, pipHelp) {
+        $scope.tabs = _.filter(pipHelp.getTabs(), function (tab) {
+            if (tab.visible && (tab.access !== angular.noop ? tab.access($rootScope.$user, tab) : true)) {
+                return tab;
+            }
+        });
+        $scope.selected = {};
+        if ($state.current.name !== 'help') {
+            initSelect($state.current.name);
+        }
+        else {
+            initSelect(pipHelp.getDefaultTab().state);
+        }
+        appHeader();
+        $scope.onNavigationSelect = onNavigationSelect;
+        $scope.onDropdownSelect = onDropdownSelect;
+        function onDropdownSelect(state) {
+            onNavigationSelect(state.state);
+        }
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showTitleText('Help');
+            pipAppBar.showShadowSm();
+            pipAppBar.showLocalActions(null, []);
+        }
+        function onNavigationSelect(state) {
+            initSelect(state);
+            if ($scope.selected.tab) {
+                $state.go(state);
+            }
+        }
+        function initSelect(state) {
+            $scope.selected.tab = _.find($scope.tabs, function (tab) {
+                return tab.state === state;
+            });
+            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
+            $scope.selected.tabId = state;
+        }
+    }
 })();
 
 
