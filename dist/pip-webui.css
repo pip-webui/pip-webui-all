@@ -6466,6 +6466,53 @@ md-select md-select-value .md-text .pip-tabs-badge {
   flex: 0 0 auto;
   padding: 0;
 }
+.pip-breadcrumb {
+  outline: none;
+  vertical-align: middle;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pip-breadcrumb .pip-triangle-down {
+  margin: 0;
+}
+.pip-breadcrumb .cursor-pointer {
+  cursor: pointer !important;
+}
+.pip-nav-menu md-list-item .md-button .md-list-item-inner {
+  line-height: 48px;
+}
+.pip-nav-menu .md-subheader {
+  line-height: 48px;
+}
+.pip-nav-menu .md-subheader .md-subheader-inner {
+  padding: 24px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.pip-nav-menu .pip-section {
+  padding-bottom: 8px;
+}
+.pip-nav-menu .pip-section md-divider {
+  margin-bottom: 8px;
+}
+.pip-nav-menu md-list-item .md-button {
+  padding-left: 24px;
+  padding-right: 24px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+@media (max-width: 768px) {
+  .pip-nav-menu md-list-item .md-button {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
 .pip-search-bar {
   width: 100%;
 }
@@ -6521,6 +6568,9 @@ md-select md-select-value .md-text .pip-tabs-badge {
   border-radius: 50%;
   width: 80px;
   height: 80px;
+}
+.pip-nav-header .pip-nav-header-user .pip-nav-header-user-pri {
+  cursor: pointer !important;
 }
 .pip-nav-header .pip-nav-header-party-text .pip-nav-header-party-pri {
   display: block;
