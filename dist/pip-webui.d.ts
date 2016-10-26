@@ -1,42 +1,42 @@
+/// <reference path="../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.routing {
     let CurrentState: any;
     let PreviousState: any;
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.routing {
     let RedirectedStates: any;
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.routing {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.routing {
     let RoutingVar: string;
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.scope {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.scope {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.scope {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.session {
     const IdentityRootVar: string;
     const IdentityChangedEvent: string;
@@ -56,7 +56,7 @@ declare module pip.session {
     }
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.session {
     const SessionRootVar: string;
     const SessionOpenedEvent: string;
@@ -73,19 +73,19 @@ declare module pip.session {
     }
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.translate {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.translate {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.translate {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.translate {
     const LanguageRootVar: string;
     const LanguageChangedEvent: string;
@@ -105,23 +105,23 @@ declare module pip.translate {
     }
 }
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-
-
-
-
-
-
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.utilities {
     interface ITimerService {
         isStarted: boolean;
@@ -133,6 +133,17 @@ declare module pip.utilities {
     }
 }
 
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
 
 
 
@@ -142,67 +153,60 @@ declare module pip.utilities {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @file Tiles layout
+ * @copyright Digital Living Software Corp. 2014-2015
+ */
 declare var Masonry: any;
 
 
 
+/// <reference path="../../typings/tsd.d.ts" />
 
 
 
+/// <reference path="../../typings/tsd.d.ts" />
 
 
+/// <reference path="../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-
-
-
-
-
-
-
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare var marked: any;
 
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
 
 
 
 
+/// <reference path="../typings/tsd.d.ts" />
 
-
-
-
-
-
-
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.datetime {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.datetime {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.datetime {
     interface IDateTimeService {
         formatTime(value: any, format: string): string;
@@ -253,6 +257,13 @@ declare module pip.datetime {
     }
 }
 
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
+
+/// <reference path="../../typings/tsd.d.ts" />
 
 
 
@@ -261,33 +272,26 @@ declare module pip.datetime {
 
 
 
+/// <reference path="../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
+/// <reference path="breadcrumb_service.d.ts" />
 declare module pip.nav {
 }
 
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.nav {
     let BreadcrumbChangedEvent: string;
     let BreadcrumbBackEvent: string;
@@ -311,35 +315,37 @@ declare module pip.nav {
     }
 }
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
 declare module pip.nav {
 }
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
+/// <reference path="../../typings/tsd.d.ts" />
 
-
-
-
-
-
-
-
-
-
-
+/// <reference path="../../typings/tsd.d.ts" />
 
 
 

@@ -3494,6 +3494,18 @@ pip-document.pip-document-small {
 .divider {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus {
+  outline-width: 0 !important;
+}
 .pip-split {
   -webkit-backface-visibility: hidden;
 }
@@ -6258,7 +6270,6 @@ md-select md-select-value .md-text .pip-tabs-badge {
   -webkit-flex: 0 0 auto;
   -ms-flex: 0 0 auto;
   flex: 0 0 auto;
-  min-height: 56px;
   z-index: 11;
 }
 .pip-appbar md-toolbar {
@@ -6301,10 +6312,6 @@ md-select md-select-value .md-text .pip-tabs-badge {
   }
 }
 @media (max-width: 1200px) {
-  .pip-appbar {
-    height: 56px !important;
-    max-height: 56px !important;
-  }
 }
 @media (max-width: 1200px) and (min-width: 768px) {
   .pip-appbar .pip-shadow-sm {
@@ -6479,18 +6486,17 @@ md-select md-select-value .md-text .pip-tabs-badge {
 }
 .pip-nav-header md-toolbar {
   position: relative;
-  padding-top: 102px;
-  min-height: 164px !important;
+  padding-top: 16px;
+  min-height: 82px !important;
   padding-bottom: 16px;
   padding-left: 24px;
   padding-right: 24px;
 }
 .pip-nav-header md-toolbar.pip-nav-header-owner {
-  min-height: 144px !important;
+  min-height: 82px !important;
 }
 .pip-nav-header .pip-nav-header-party {
   display: inline-block;
-  position: absolute;
   top: 16px;
   left: 24px;
   min-width: initial;
@@ -6499,16 +6505,22 @@ md-select md-select-value .md-text .pip-tabs-badge {
   margin: 0px;
   padding: 0px;
 }
+.pip-nav-header .pip-nav-header-party .pip-nav-header-user-image {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+}
 .pip-nav-header .pip-nav-header-user {
-  display: inline-block;
-  position: absolute;
-  top: 16px;
-  right: 24px;
-  width: 50px;
+  width: 80px;
   min-width: initial;
-  height: 50px;
-  margin: 0px;
+  height: 80px;
+  margin: 0px 16px 0px 0px;
   padding: 0px;
+}
+.pip-nav-header .pip-nav-header-user .pip-nav-header-user-image {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
 }
 .pip-nav-header .pip-nav-header-party-text .pip-nav-header-party-pri {
   display: block;
