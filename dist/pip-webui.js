@@ -21,6 +21,165 @@
 
 var pip;
 (function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        captureStateTranslations.$inject = ['$rootScope'];
+        decorateBackStateService.$inject = ['$delegate', '$window'];
+        addBackStateDecorator.$inject = ['$provide'];
+        function captureStateTranslations($rootScope) {
+            "ngInject";
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                pip.routing.CurrentState = {
+                    name: toState.name,
+                    url: toState.url,
+                    params: toParams
+                };
+                pip.routing.PreviousState = {
+                    name: fromState.name,
+                    url: fromState.url,
+                    params: fromParams
+                };
+            });
+        }
+        function decorateBackStateService($delegate, $window) {
+            "ngInject";
+            $delegate.goBack = goBack;
+            $delegate.goBackAndSelect = goBackAndSelect;
+            return $delegate;
+            function goBack() {
+                $window.history.back();
+            }
+            function goBackAndSelect(params) {
+                if (pip.routing.PreviousState != null
+                    && pip.routing.PreviousState.name != null) {
+                    var state = _.cloneDeep(pip.routing.PreviousState);
+                    state.params = _.extend(state.params, params);
+                    $delegate.go(state.name, state.params);
+                }
+                else {
+                    $window.history.back();
+                }
+            }
+        }
+        function addBackStateDecorator($provide) {
+            $provide.decorator('$state', decorateBackStateService);
+        }
+        angular
+            .module('pipRouting.Back', [])
+            .config(addBackStateDecorator)
+            .run(captureStateTranslations);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        decorateRedirectStateProvider.$inject = ['$delegate'];
+        addRedirectStateProviderDecorator.$inject = ['$provide'];
+        decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
+        addRedirectStateDecorator.$inject = ['$provide'];
+        routing.RedirectedStates = {};
+        function decorateRedirectStateProvider($delegate) {
+            "ngInject";
+            $delegate.redirect = redirect;
+            return $delegate;
+            function redirect(fromState, toState) {
+                pip.routing.RedirectedStates[fromState] = toState;
+                return this;
+            }
+        }
+        function addRedirectStateProviderDecorator($provide) {
+            "ngInject";
+            $provide.decorator('$state', decorateRedirectStateProvider);
+        }
+        function decorateRedirectStateService($delegate, $timeout) {
+            "ngInject";
+            $delegate.redirect = redirect;
+            return $delegate;
+            function redirect(event, state, params) {
+                var toState = pip.routing.RedirectedStates[state.name];
+                if (_.isFunction(toState)) {
+                    toState = toState(state.name, params);
+                    if (_.isNull(toState))
+                        throw new Error('Redirected toState cannot be null');
+                }
+                if (!!toState) {
+                    $timeout(function () {
+                        event.preventDefault();
+                        $delegate.transitionTo(toState, params, { location: 'replace' });
+                    });
+                    return true;
+                }
+                return false;
+            }
+        }
+        function addRedirectStateDecorator($provide) {
+            "ngInject";
+            $provide.decorator('$state', decorateRedirectStateService);
+        }
+        angular
+            .module('pipRouting.Redirect', ['ui.router'])
+            .config(addRedirectStateProviderDecorator)
+            .config(addRedirectStateDecorator);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        angular.module('pipRouting', [
+            'ui.router', 'pipRouting.Events', 'pipRouting.Back', 'pipRouting.Redirect'
+        ]);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var routing;
+    (function (routing) {
+        'use strict';
+        hookRoutingEvents.$inject = ['$log', '$rootScope', '$state'];
+        routing.RoutingVar = "$routing";
+        function hookRoutingEvents($log, $rootScope, $state) {
+            "ngInject";
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope[routing.RoutingVar] = true;
+            });
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope[routing.RoutingVar] = false;
+            });
+            $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+                $rootScope[routing.RoutingVar] = false;
+                $log.error('Error while switching route to ' + toState.name);
+                $log.error(error);
+                console.error('Error while switching route to ' + toState.name);
+                console.error(error);
+            });
+            $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
+                event.preventDefault();
+                $rootScope[routing.RoutingVar] = false;
+                $state.go('errors_missing_route', {
+                    unfoundState: unfoundState,
+                    fromState: {
+                        to: fromState ? fromState.name : '',
+                        fromParams: fromParams
+                    }
+                });
+            });
+        }
+        angular
+            .module('pipRouting.Events', [])
+            .run(hookRoutingEvents);
+    })(routing = pip.routing || (pip.routing = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
     var scope;
     (function (scope) {
         'use strict';
@@ -255,165 +414,6 @@ var pip;
 
 var pip;
 (function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        captureStateTranslations.$inject = ['$rootScope'];
-        decorateBackStateService.$inject = ['$delegate', '$window'];
-        addBackStateDecorator.$inject = ['$provide'];
-        function captureStateTranslations($rootScope) {
-            "ngInject";
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                pip.routing.CurrentState = {
-                    name: toState.name,
-                    url: toState.url,
-                    params: toParams
-                };
-                pip.routing.PreviousState = {
-                    name: fromState.name,
-                    url: fromState.url,
-                    params: fromParams
-                };
-            });
-        }
-        function decorateBackStateService($delegate, $window) {
-            "ngInject";
-            $delegate.goBack = goBack;
-            $delegate.goBackAndSelect = goBackAndSelect;
-            return $delegate;
-            function goBack() {
-                $window.history.back();
-            }
-            function goBackAndSelect(params) {
-                if (pip.routing.PreviousState != null
-                    && pip.routing.PreviousState.name != null) {
-                    var state = _.cloneDeep(pip.routing.PreviousState);
-                    state.params = _.extend(state.params, params);
-                    $delegate.go(state.name, state.params);
-                }
-                else {
-                    $window.history.back();
-                }
-            }
-        }
-        function addBackStateDecorator($provide) {
-            $provide.decorator('$state', decorateBackStateService);
-        }
-        angular
-            .module('pipRouting.Back', [])
-            .config(addBackStateDecorator)
-            .run(captureStateTranslations);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        decorateRedirectStateProvider.$inject = ['$delegate'];
-        addRedirectStateProviderDecorator.$inject = ['$provide'];
-        decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
-        addRedirectStateDecorator.$inject = ['$provide'];
-        routing.RedirectedStates = {};
-        function decorateRedirectStateProvider($delegate) {
-            "ngInject";
-            $delegate.redirect = redirect;
-            return $delegate;
-            function redirect(fromState, toState) {
-                pip.routing.RedirectedStates[fromState] = toState;
-                return this;
-            }
-        }
-        function addRedirectStateProviderDecorator($provide) {
-            "ngInject";
-            $provide.decorator('$state', decorateRedirectStateProvider);
-        }
-        function decorateRedirectStateService($delegate, $timeout) {
-            "ngInject";
-            $delegate.redirect = redirect;
-            return $delegate;
-            function redirect(event, state, params) {
-                var toState = pip.routing.RedirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params);
-                    if (_.isNull(toState))
-                        throw new Error('Redirected toState cannot be null');
-                }
-                if (!!toState) {
-                    $timeout(function () {
-                        event.preventDefault();
-                        $delegate.transitionTo(toState, params, { location: 'replace' });
-                    });
-                    return true;
-                }
-                return false;
-            }
-        }
-        function addRedirectStateDecorator($provide) {
-            "ngInject";
-            $provide.decorator('$state', decorateRedirectStateService);
-        }
-        angular
-            .module('pipRouting.Redirect', ['ui.router'])
-            .config(addRedirectStateProviderDecorator)
-            .config(addRedirectStateDecorator);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        angular.module('pipRouting', [
-            'ui.router', 'pipRouting.Events', 'pipRouting.Back', 'pipRouting.Redirect'
-        ]);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        hookRoutingEvents.$inject = ['$log', '$rootScope', '$state'];
-        routing.RoutingVar = "$routing";
-        function hookRoutingEvents($log, $rootScope, $state) {
-            "ngInject";
-            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope[routing.RoutingVar] = true;
-            });
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope[routing.RoutingVar] = false;
-            });
-            $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
-                $rootScope[routing.RoutingVar] = false;
-                $log.error('Error while switching route to ' + toState.name);
-                $log.error(error);
-                console.error('Error while switching route to ' + toState.name);
-                console.error(error);
-            });
-            $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
-                event.preventDefault();
-                $rootScope[routing.RoutingVar] = false;
-                $state.go('errors_missing_route', {
-                    unfoundState: unfoundState,
-                    fromState: {
-                        to: fromState ? fromState.name : '',
-                        fromParams: fromParams
-                    }
-                });
-            });
-        }
-        angular
-            .module('pipRouting.Events', [])
-            .run(hookRoutingEvents);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
     var session;
     (function (session) {
         'use strict';
@@ -573,6 +573,331 @@ var pip;
         angular.module('pipSession', ['pipPageReset'])
             .provider('pipSession', SessionProvider);
     })(session = pip.session || (pip.session = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        angular.module('pipTranslate', [
+            'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
+        ]);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        pipTranslateDirective.$inject = ['pipTranslate'];
+        pipTranslateHtmlDirective.$inject = ['pipTranslate'];
+        function pipTranslateDirective(pipTranslate) {
+            "ngInject";
+            return {
+                restrict: 'EA',
+                scope: {
+                    key1: '@pipTranslate',
+                    key2: '@key'
+                },
+                link: function (scope, element, attrs) {
+                    var key = scope.key1 || scope.key2;
+                    var value = pipTranslate.translate(key);
+                    element.text(value);
+                }
+            };
+        }
+        function pipTranslateHtmlDirective(pipTranslate) {
+            "ngInject";
+            return {
+                restrict: 'EA',
+                scope: {
+                    key1: '@pipTranslateHtml',
+                    key2: '@key'
+                },
+                link: function (scope, element, attrs) {
+                    var key = scope.key1 || scope.key2;
+                    var value = pipTranslate.translate(key);
+                    element.html(value);
+                }
+            };
+        }
+        angular
+            .module('pipTranslate.Directive', [])
+            .directive('pipTranslate', pipTranslateDirective)
+            .directive('pipTranslateHtml', pipTranslateHtmlDirective);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        translateFilter.$inject = ['pipTranslate'];
+        optionalTranslateFilter.$inject = ['$injector'];
+        function translateFilter(pipTranslate) {
+            "ngInject";
+            return function (key) {
+                return pipTranslate.translate(key) || key;
+            };
+        }
+        function optionalTranslateFilter($injector) {
+            "ngInject";
+            var pipTranslate = $injector.has('pipTranslate')
+                ? $injector.get('pipTranslate') : null;
+            return function (key) {
+                return pipTranslate ? pipTranslate.translate(key) || key : key;
+            };
+        }
+        angular
+            .module('pipTranslate.Filter', [])
+            .filter('translate', translateFilter);
+    })(translate = pip.translate || (pip.translate = {}));
+})(pip || (pip = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var pip;
+(function (pip) {
+    var translate;
+    (function (translate) {
+        'use strict';
+        translate.LanguageRootVar = "$language";
+        translate.LanguageChangedEvent = "pipLanguageChanged";
+        var Translation = (function () {
+            function Translation() {
+                this._language = 'en';
+                this._translations = {
+                    en: {
+                        'en': 'English',
+                        'ru': 'Russian',
+                        'es': 'Spanish',
+                        'pt': 'Portuguese',
+                        'de': 'German',
+                        'fr': 'French'
+                    },
+                    ru: {
+                        'en': 'Английский',
+                        'ru': 'Русский',
+                        'es': 'Испанский',
+                        'pt': 'Португальский',
+                        'de': 'Немецкий',
+                        'fr': 'Французский'
+                    }
+                };
+            }
+            Object.defineProperty(Translation.prototype, "language", {
+                get: function () { return this._language; },
+                set: function (value) { this._language = value; },
+                enumerable: true,
+                configurable: true
+            });
+            Translation.prototype.use = function (language) {
+                if (language != null)
+                    this._language = language;
+                return this._language;
+            };
+            Translation.prototype.setTranslations = function (language, translations) {
+                var map = this._translations[language] || {};
+                this._translations[language] = _.extend(map, translations);
+            };
+            Translation.prototype.translate = function (key) {
+                if (_.isNull(key) || _.isUndefined(key))
+                    return '';
+                var translations = this._translations[this._language] || {};
+                return translations[key] || key;
+            };
+            Translation.prototype.translateArray = function (keys) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (k) {
+                    var key = k || '';
+                    values.push(translations[key] || key);
+                });
+                return values;
+            };
+            Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[key] || key;
+                    values.push(value);
+                });
+                return values;
+            };
+            Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
+                if (_.isNull(items) || items.length == 0)
+                    return [];
+                keyProp = keyProp || 'name';
+                valueProp = valueProp || 'nameLocal';
+                var translations = this._translations[this._language] || {};
+                _.each(items, function (item) {
+                    var key = item[keyProp] || '';
+                    item[valueProp] = translations[key] || key;
+                });
+                return items;
+            };
+            Translation.prototype.translateWithPrefix = function (prefix, key) {
+                prefix = prefix ? prefix + '_' : '';
+                key = (prefix + key).replace(/ /g, '_').toUpperCase();
+                if (key == null)
+                    return '';
+                var translations = this._translations[this._language] || {};
+                return translations[key] || key;
+            };
+            ;
+            Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[prefix + '_' + key] || key;
+                    values.push(value);
+                });
+                return values;
+            };
+            Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+                if (_.isNull(keys) || keys.length == 0)
+                    return [];
+                keyProp = keyProp || 'id';
+                valueProp = valueProp || 'name';
+                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
+                var values = [];
+                var translations = this._translations[this._language] || {};
+                _.each(keys, function (key) {
+                    var value = {};
+                    key = key || '';
+                    value[keyProp] = key;
+                    value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
+                        || (prefix + key.replace(/ /g, '_').toUpperCase());
+                    values.push(value);
+                });
+                return values;
+            };
+            return Translation;
+        }());
+        var TranslateService = (function () {
+            function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
+                this._setRootVar = setRootVar;
+                this._persist = persist;
+                this._translation = translation;
+                this._rootScope = $rootScope;
+                this._storage = localStorageService;
+                if (this._persist) {
+                    this._translation.language = localStorageService.get('language')
+                        || this._translation.language;
+                }
+                this.save();
+            }
+            TranslateService.prototype.save = function () {
+                if (this._setRootVar)
+                    this._rootScope[pip.translate.LanguageRootVar] = this._translation.language;
+                if (this._persist)
+                    this._storage.set('language', this._translation.language);
+            };
+            Object.defineProperty(TranslateService.prototype, "language", {
+                get: function () {
+                    return this._translation.language;
+                },
+                set: function (value) {
+                    if (value != this._translation.language) {
+                        this._translation.language = value;
+                        this.save();
+                        this._rootScope.$broadcast(pip.translate.LanguageChangedEvent, value);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TranslateService.prototype.use = function (language) {
+                if (language != null)
+                    this.language = language;
+                return this.language;
+            };
+            TranslateService.prototype.setTranslations = function (language, translations) {
+                return this._translation.setTranslations(language, translations);
+            };
+            TranslateService.prototype.translate = function (key) {
+                return this._translation.translate(key);
+            };
+            TranslateService.prototype.translateArray = function (keys) {
+                return this._translation.translateArray(keys);
+            };
+            TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
+                return this._translation.translateSet(keys, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
+                return this._translation.translateObjects(items, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateWithPrefix = function (prefix, key) {
+                return this._translation.translateWithPrefix(prefix, key);
+            };
+            TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+                return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
+            };
+            TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+                return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
+            };
+            return TranslateService;
+        }());
+        var TranslateProvider = (function (_super) {
+            __extends(TranslateProvider, _super);
+            function TranslateProvider() {
+                _super.call(this);
+            }
+            Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
+                get: function () {
+                    return this._setRootVar;
+                },
+                set: function (value) {
+                    this._setRootVar = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TranslateProvider.prototype, "persist", {
+                get: function () {
+                    return this._persist;
+                },
+                set: function (value) {
+                    this._persist = !!value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
+                "ngInject";
+                if (this._service == null)
+                    this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
+                return this._service;
+            }];
+            return TranslateProvider;
+        }(Translation));
+        angular
+            .module('pipTranslate.Service', [])
+            .provider('pipTranslate', TranslateProvider);
+    })(translate = pip.translate || (pip.translate = {}));
 })(pip || (pip = {}));
 
 (function () {
@@ -1109,331 +1434,6 @@ var pip;
 
 
 
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        angular.module('pipTranslate', [
-            'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
-        ]);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        pipTranslateDirective.$inject = ['pipTranslate'];
-        pipTranslateHtmlDirective.$inject = ['pipTranslate'];
-        function pipTranslateDirective(pipTranslate) {
-            "ngInject";
-            return {
-                restrict: 'EA',
-                scope: {
-                    key1: '@pipTranslate',
-                    key2: '@key'
-                },
-                link: function (scope, element, attrs) {
-                    var key = scope.key1 || scope.key2;
-                    var value = pipTranslate.translate(key);
-                    element.text(value);
-                }
-            };
-        }
-        function pipTranslateHtmlDirective(pipTranslate) {
-            "ngInject";
-            return {
-                restrict: 'EA',
-                scope: {
-                    key1: '@pipTranslateHtml',
-                    key2: '@key'
-                },
-                link: function (scope, element, attrs) {
-                    var key = scope.key1 || scope.key2;
-                    var value = pipTranslate.translate(key);
-                    element.html(value);
-                }
-            };
-        }
-        angular
-            .module('pipTranslate.Directive', [])
-            .directive('pipTranslate', pipTranslateDirective)
-            .directive('pipTranslateHtml', pipTranslateHtmlDirective);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        translateFilter.$inject = ['pipTranslate'];
-        optionalTranslateFilter.$inject = ['$injector'];
-        function translateFilter(pipTranslate) {
-            "ngInject";
-            return function (key) {
-                return pipTranslate.translate(key) || key;
-            };
-        }
-        function optionalTranslateFilter($injector) {
-            "ngInject";
-            var pipTranslate = $injector.has('pipTranslate')
-                ? $injector.get('pipTranslate') : null;
-            return function (key) {
-                return pipTranslate ? pipTranslate.translate(key) || key : key;
-            };
-        }
-        angular
-            .module('pipTranslate.Filter', [])
-            .filter('translate', translateFilter);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        translate.LanguageRootVar = "$language";
-        translate.LanguageChangedEvent = "pipLanguageChanged";
-        var Translation = (function () {
-            function Translation() {
-                this._language = 'en';
-                this._translations = {
-                    en: {
-                        'en': 'English',
-                        'ru': 'Russian',
-                        'es': 'Spanish',
-                        'pt': 'Portuguese',
-                        'de': 'German',
-                        'fr': 'French'
-                    },
-                    ru: {
-                        'en': 'Английский',
-                        'ru': 'Русский',
-                        'es': 'Испанский',
-                        'pt': 'Португальский',
-                        'de': 'Немецкий',
-                        'fr': 'Французский'
-                    }
-                };
-            }
-            Object.defineProperty(Translation.prototype, "language", {
-                get: function () { return this._language; },
-                set: function (value) { this._language = value; },
-                enumerable: true,
-                configurable: true
-            });
-            Translation.prototype.use = function (language) {
-                if (language != null)
-                    this._language = language;
-                return this._language;
-            };
-            Translation.prototype.setTranslations = function (language, translations) {
-                var map = this._translations[language] || {};
-                this._translations[language] = _.extend(map, translations);
-            };
-            Translation.prototype.translate = function (key) {
-                if (_.isNull(key) || _.isUndefined(key))
-                    return '';
-                var translations = this._translations[this._language] || {};
-                return translations[key] || key;
-            };
-            Translation.prototype.translateArray = function (keys) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (k) {
-                    var key = k || '';
-                    values.push(translations[key] || key);
-                });
-                return values;
-            };
-            Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[key] || key;
-                    values.push(value);
-                });
-                return values;
-            };
-            Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
-                if (_.isNull(items) || items.length == 0)
-                    return [];
-                keyProp = keyProp || 'name';
-                valueProp = valueProp || 'nameLocal';
-                var translations = this._translations[this._language] || {};
-                _.each(items, function (item) {
-                    var key = item[keyProp] || '';
-                    item[valueProp] = translations[key] || key;
-                });
-                return items;
-            };
-            Translation.prototype.translateWithPrefix = function (prefix, key) {
-                prefix = prefix ? prefix + '_' : '';
-                key = (prefix + key).replace(/ /g, '_').toUpperCase();
-                if (key == null)
-                    return '';
-                var translations = this._translations[this._language] || {};
-                return translations[key] || key;
-            };
-            ;
-            Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[prefix + '_' + key] || key;
-                    values.push(value);
-                });
-                return values;
-            };
-            Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
-                        || (prefix + key.replace(/ /g, '_').toUpperCase());
-                    values.push(value);
-                });
-                return values;
-            };
-            return Translation;
-        }());
-        var TranslateService = (function () {
-            function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
-                this._setRootVar = setRootVar;
-                this._persist = persist;
-                this._translation = translation;
-                this._rootScope = $rootScope;
-                this._storage = localStorageService;
-                if (this._persist) {
-                    this._translation.language = localStorageService.get('language')
-                        || this._translation.language;
-                }
-                this.save();
-            }
-            TranslateService.prototype.save = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.translate.LanguageRootVar] = this._translation.language;
-                if (this._persist)
-                    this._storage.set('language', this._translation.language);
-            };
-            Object.defineProperty(TranslateService.prototype, "language", {
-                get: function () {
-                    return this._translation.language;
-                },
-                set: function (value) {
-                    if (value != this._translation.language) {
-                        this._translation.language = value;
-                        this.save();
-                        this._rootScope.$broadcast(pip.translate.LanguageChangedEvent, value);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TranslateService.prototype.use = function (language) {
-                if (language != null)
-                    this.language = language;
-                return this.language;
-            };
-            TranslateService.prototype.setTranslations = function (language, translations) {
-                return this._translation.setTranslations(language, translations);
-            };
-            TranslateService.prototype.translate = function (key) {
-                return this._translation.translate(key);
-            };
-            TranslateService.prototype.translateArray = function (keys) {
-                return this._translation.translateArray(keys);
-            };
-            TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
-                return this._translation.translateSet(keys, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
-                return this._translation.translateObjects(items, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateWithPrefix = function (prefix, key) {
-                return this._translation.translateWithPrefix(prefix, key);
-            };
-            TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-                return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-                return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
-            };
-            return TranslateService;
-        }());
-        var TranslateProvider = (function (_super) {
-            __extends(TranslateProvider, _super);
-            function TranslateProvider() {
-                _super.call(this);
-            }
-            Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(TranslateProvider.prototype, "persist", {
-                get: function () {
-                    return this._persist;
-                },
-                set: function (value) {
-                    this._persist = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
-                return this._service;
-            }];
-            return TranslateProvider;
-        }(Translation));
-        angular
-            .module('pipTranslate.Service', [])
-            .provider('pipTranslate', TranslateProvider);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
 
 
 
@@ -1866,13 +1866,13 @@ module.run(['$templateCache', function($templateCache) {
         }
         function setSizes() {
             elementWidth = $('.pip-main').innerWidth();
-            sizes['xs'] = elementWidth <= 599;
-            sizes['gt-xs'] = elementWidth >= 600;
-            sizes['sm'] = elementWidth >= 600 && elementWidth <= 959;
-            sizes['gt-sm'] = elementWidth >= 960;
-            sizes['md'] = elementWidth >= 960 && elementWidth <= 1279;
-            sizes['gt-md'] = elementWidth >= 1280;
-            sizes['lg'] = elementWidth >= 1280 && elementWidth <= 1919;
+            sizes['xs'] = elementWidth <= 768;
+            sizes['gt-xs'] = elementWidth >= 769;
+            sizes['sm'] = elementWidth >= 769 && elementWidth <= 1199;
+            sizes['gt-sm'] = elementWidth >= 1200;
+            sizes['md'] = elementWidth >= 1200 && elementWidth <= 1399;
+            sizes['gt-md'] = elementWidth >= 1400;
+            sizes['lg'] = elementWidth >= 1400 && elementWidth <= 1919;
             sizes['gt-lg'] = elementWidth >= 1920;
             sizes['xl'] = sizes['gt-lg'];
             updateClasses();
@@ -6434,7 +6434,7 @@ module.run(['$templateCache', function($templateCache) {
     '                ng-click="onUserClick()"\n' +
     '                aria-label="current user">\n' +
     '\n' +
-    '        <img  src="" class="pip-nav-header-user-image" ng-class="imageCss flex-fixed"></img>\n' +
+    '        <img  src="" class="pip-nav-header-user-image flex-fixed" ng-class="imageCss"></img>\n' +
     '    </md-button>\n' +
     '    \n' +
     '    <div class="pip-nav-header-user-text">\n' +
@@ -6497,9 +6497,13 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('nav_menu/nav_menu.html',
     '<md-list>\n' +
+    '    <md-list-item class="pip-focusable no-border pip-nav-menu-item pip-nav-expanded-button" ng-click="onExpand()">\n' +
+    '        <md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-nav-menu-icon"></md-icon>\n' +
+    '        <md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-nav-menu-icon"></md-icon>\n' +
+    '    </md-list-item>    \n' +
     '    <div class="pip-section" ng-repeat="section in config"\n' +
     '        ng-hide="section.access && !section.access(section)">\n' +
-    '        \n' +
+    '\n' +
     '        <md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider>\n' +
     '        <md-subheader ng-show="section.title">{{::section.title | translate}}</md-subheader>\n' +
     '        \n' +
@@ -6570,9 +6574,11 @@ module.run(['$templateCache', function($templateCache) {
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
-    '<md-sidenav class="md-sidenav-left md-whiteframe-z2 pip-sidenav color-content-bg"\n' +
+    '<!--<md-sidenav class="md-sidenav-left md-whiteframe-z2 pip-sidenav color-content-bg"-->\n' +
+    '<md-sidenav class="md-sidenav-left color-content-bg" md-is-locked-open="$mdMedia(\'gt-xs\')" xxxng-class="{\'flex-fixed\': $mdMedia(\'gt-xs\')}"\n' +
     '    md-component-id="pip-sidenav" ng-if="!$partialReset" pip-focused ng-transclude>\n' +
     '</md-sidenav>\n' +
+    '\n' +
     '');
 }]);
 })();
@@ -6618,21 +6624,51 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-(function () {
-    'use strict';
-    angular.module('pipNav', [
-        'pipDropdown',
-        'pipTabs',
-        'pipAppBar',
-        'pipSideNav',
-        'pipNavIcon',
-        'pipNavMenu',
-        'pipNavHeader',
-        'pipBreadcrumb',
-        'pipPrimaryActions',
-        'pipSecondaryActions'
-    ]);
-})();
+var pip;
+(function (pip) {
+    var nav;
+    (function (nav) {
+        'use strict';
+        angular.module('pipNav', [
+            'pipNav.Service',
+            'pipDropdown',
+            'pipTabs',
+            'pipAppBar',
+            'pipSideNav',
+            'pipNavIcon',
+            'pipNavMenu',
+            'pipNavHeader',
+            'pipBreadcrumb',
+            'pipPrimaryActions',
+            'pipSecondaryActions'
+        ]);
+    })(nav = pip.nav || (pip.nav = {}));
+})(pip || (pip = {}));
+
+var pip;
+(function (pip) {
+    var nav;
+    (function (nav) {
+        'use strict';
+        var NavService = (function () {
+            NavService.$inject = ['$injector'];
+            function NavService($injector) {
+                "ngInject";
+                this.appBar = $injector.has('pipAppBar') ? $injector.get('pipAppBar') : null;
+                this.sideNav = $injector.has('pipSideNav') ? $injector.get('pipSideNav') : null;
+                this.navIcon = $injector.has('pipNavIcon') ? $injector.get('pipNavIcon') : null;
+                this.breadcrumb = $injector.has('pipBreadcrumb') ? $injector.get('pipBreadcrumb') : null;
+                this.actions = $injector.has('pipActions') ? $injector.get('pipActions') : null;
+                this.navHeader = $injector.has('pipNavHeader') ? $injector.get('pipNavHeader') : null;
+                this.navMenu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
+                this.search = $injector.has('pipSearch') ? $injector.get('pipSearch') : null;
+            }
+            return NavService;
+        }());
+        angular.module('pipNav.Service', [])
+            .service('pipNavService', NavService);
+    })(nav = pip.nav || (pip.nav = {}));
+})(pip || (pip = {}));
 
 (function () {
     'use strict';
@@ -7384,6 +7420,7 @@ var pip;
         $element.addClass('pip-nav-header');
         $rootScope.$on('pipIdentityChanged', onIdentityChanged);
         $rootScope.$on('pipNavHeaderImageChanged', onIdentityChanged);
+        $rootScope.$on('pipNavExpanded', resizeImage);
         $scope.onUserClick = onUserClick;
         $timeout(function () {
             $image = $element.find('.pip-nav-header-user-image');
@@ -7394,6 +7431,13 @@ var pip;
             });
         }, 10);
         return;
+        function resizeImage() {
+            console.log('resize');
+            if (!image) {
+                image = $element.find('.pip-nav-header-user-image');
+            }
+            setImageMarginCSS(imageBlock, image);
+        }
         function setImageMarginCSS(container, image) {
             var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
             if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
@@ -7617,6 +7661,7 @@ var pip;
             restrict: 'EA',
             scope: {
                 config: '=pipLinks',
+                collapsed: '=pipCollapsed'
             },
             replace: false,
             templateUrl: 'nav_menu/nav_menu.html',
@@ -7624,14 +7669,39 @@ var pip;
         };
     });
     thisModule.controller('pipNavMenuController', ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
+        var pipSdeNavElement = $element.parent().parent();
         $element.addClass('pip-nav-menu');
         $scope.config = $scope.config || pipNavMenu.get();
+        setCollapsible();
+        $scope.expanded = true;
         pipNavMenu.set($scope.config);
         $rootScope.$on('pipNavMenuChanged', onConfigChanged);
         $scope.itemVisible = itemVisible;
         $scope.onLinkClick = onLinkClick;
         $scope.isSectionEmpty = isSectionEmpty;
+        $scope.onExpand = onExpand;
         return;
+        function setCollapsible() {
+            var collapsed;
+            if (angular.isFunction($scope.collapsed)) {
+                collapsed = $scope.collapsed();
+            }
+            else {
+                collapsed = $scope.collapsed !== false && $scope.collapsed !== 'false';
+            }
+            $scope.collapsibled = collapsed;
+            pipNavMenu.collapsed(collapsed);
+        }
+        function onExpand() {
+            $scope.expanded = !$scope.expanded;
+            if ($scope.expanded) {
+                pipSdeNavElement.removeClass('pip-nav-small');
+            }
+            else {
+                pipSdeNavElement.addClass('pip-nav-small');
+            }
+            $rootScope.$broadcast('pipNavExpanded', $scope.expanded);
+        }
         function itemVisible(item) {
             return item && item.access && !item.access(item);
         }
@@ -7644,6 +7714,7 @@ var pip;
             return result;
         }
         function onConfigChanged(event, config) {
+            $scope.isCollapsed = pipNavMenu.collapsed();
             $scope.config = config;
         }
         function onLinkClick(event, link) {
@@ -7701,15 +7772,23 @@ var pip;
     var thisModule = angular.module('pipNavMenu.Service', []);
     thisModule.provider('pipNavMenu', function () {
         var config = [];
+        var collapsed = true;
         this.sections = init;
         this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
             return {
                 get: getConfig,
                 set: setConfig,
-                setCounter: setCounter
+                setCounter: setCounter,
+                collapsed: setCollapsed
             };
             function getConfig() {
                 return config;
+            }
+            function setCollapsed(value) {
+                if (value !== undefined) {
+                    collapsed = value;
+                }
+                return collapsed;
             }
             function setConfig(newConfig) {
                 init(newConfig);
@@ -7737,8 +7816,9 @@ var pip;
             }
         }];
         function init(newConfig) {
-            if (_.isArray(newConfig))
+            if (_.isArray(newConfig)) {
                 config = newConfig;
+            }
             return config;
         }
         ;
@@ -7905,8 +7985,9 @@ var pip;
             controller: 'pipSideNavController'
         };
     });
-    thisModule.controller('pipSideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', function ($scope, $element, $rootScope, pipSideNav) {
+    thisModule.controller('pipSideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', '$mdMedia', function ($scope, $element, $rootScope, pipSideNav, $mdMedia) {
         $element.addClass('pip-sidenav');
+        $scope.$mdMedia = $mdMedia;
         $rootScope.$on('pipNavIconClicked', onNavIconClick);
         return;
         function onNavIconClick(event) {
@@ -7999,7 +8080,7 @@ var pip;
                 $rootScope.$broadcast('pipSideNavChanged', config);
             }
             function open(event) {
-                $mdSidenav('pip-sidenav').open();
+                $mdSidenav('pip-sidenav md-is-locked-open').open();
             }
             function close(event) {
                 $mdSidenav('pip-sidenav').close();
@@ -8095,18 +8176,14 @@ var pip;
 
 (function () {
     'use strict';
-    run.$inject = ['localStorageService', '$rootScope'];
+    run.$inject = ['pipTheme'];
     var thisModule = angular.module('pipTheme', ['LocalStorageModule', 'ngMaterial']);
     thisModule.run(run);
-    function run(localStorageService, $rootScope) {
-        try {
-            $rootScope.$theme = localStorageService.get('theme') || 'blue';
-        }
-        catch (ex) {
-        }
+    function run(pipTheme) {
+        pipTheme.theme();
     }
     thisModule.provider('pipTheme', function () {
-        var theme = 'blue', persist = true, setRoot = true;
+        var theme = 'default', persist = true, setRoot = true;
         this.use = initTheme;
         this.init = initTheme;
         this.persist = initPersist;
@@ -8161,146 +8238,6 @@ var pip;
             return setRoot;
         }
     });
-})();
-
-(function () {
-    'use strict';
-    angular.module('pipTheme.Bootbarn', [
-        'pipTheme.Bootbarn.Warm',
-        'pipTheme.Bootbarn.Cool',
-        'pipTheme.Bootbarn.Monochrome'
-    ]);
-})();
-
-(function () {
-    'use strict';
-    config.$inject = ['$mdThemingProvider'];
-    var thisModule = angular.module('pipTheme.Bootbarn.Cool', ['ngMaterial']);
-    thisModule.config(config);
-    function config($mdThemingProvider) {
-        var coolBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-            'A100': 'rgba(250, 250, 250, 1)',
-            'A200': 'rgba(69, 90, 100, 1)'
-        });
-        $mdThemingProvider.definePalette('bootbarn-cool-background', coolBackgroundPalette);
-        var coolPrimaryPalette = $mdThemingProvider.extendPalette('grey', {
-            '300': 'rgba(69, 90, 100, .54)',
-            '500': 'rgba(69, 90, 100, 1)',
-            'contrastLightColors': ['500', '300']
-        });
-        $mdThemingProvider.definePalette('bootbarn-cool-primary', coolPrimaryPalette);
-        var coolAccentPalette = $mdThemingProvider.extendPalette('green', {
-            'A700': 'rgba(76, 175, 80, 1)',
-            'contrastLightColors': ['A700']
-        });
-        $mdThemingProvider.definePalette('bootbarn-cool-accent', coolAccentPalette);
-        $mdThemingProvider.theme('bootbarn-cool')
-            .primaryPalette('bootbarn-cool-primary', {
-            'default': '500',
-            'hue-1': '300'
-        })
-            .backgroundPalette('bootbarn-cool-background', {
-            'default': '50',
-            'hue-1': 'A200',
-            'hue-2': 'A700'
-        })
-            .warnPalette('red', {
-            'default': 'A200'
-        })
-            .accentPalette('bootbarn-cool-accent', {
-            'default': 'A700'
-        });
-        $mdThemingProvider.alwaysWatchTheme(true);
-    }
-})();
-
-(function () {
-    'use strict';
-    config.$inject = ['$mdThemingProvider'];
-    var thisModule = angular.module('pipTheme.Bootbarn.Monochrome', ['ngMaterial']);
-    thisModule.config(config);
-    function config($mdThemingProvider) {
-        var monochromeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-            'A100': 'rgba(250, 250, 250, 1)',
-            'A200': 'rgba(38, 50, 56, 1)'
-        });
-        $mdThemingProvider.definePalette('bootbarn-monochrome-background', monochromeBackgroundPalette);
-        var monochromePrimaryPalette = $mdThemingProvider.extendPalette('grey', {
-            '300': 'rgba(38, 50, 56, .54)',
-            '500': 'rgba(38, 50, 56, 1)',
-            'contrastLightColors': ['500', '300']
-        });
-        $mdThemingProvider.definePalette('bootbarn-monochrome-primary', monochromePrimaryPalette);
-        var monochromeAccentPalette = $mdThemingProvider.extendPalette('green', {
-            'A700': 'rgba(76, 175, 80, 1)',
-            'contrastLightColors': ['A700']
-        });
-        $mdThemingProvider.definePalette('bootbarn-monochrome-accent', monochromeAccentPalette);
-        $mdThemingProvider.theme('bootbarn-monochrome')
-            .primaryPalette('bootbarn-monochrome-primary', {
-            'default': '500',
-            'hue-1': '300'
-        })
-            .backgroundPalette('bootbarn-monochrome-background', {
-            'default': '50',
-            'hue-1': 'A200',
-            'hue-2': 'A700'
-        })
-            .warnPalette('red', {
-            'default': 'A200'
-        })
-            .accentPalette('bootbarn-monochrome-accent', {
-            'default': 'A700'
-        });
-        $mdThemingProvider.alwaysWatchTheme(true);
-    }
-})();
-
-(function () {
-    'use strict';
-    config.$inject = ['$mdThemingProvider'];
-    var thisModule = angular.module('pipTheme.Bootbarn.Warm', ['ngMaterial']);
-    thisModule.config(config);
-    function config($mdThemingProvider) {
-        $mdThemingProvider.alwaysWatchTheme(true);
-        var warmBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-            'A100': 'rgba(250, 250, 250, 1)',
-            'A200': 'rgba(177, 55, 34, 1)'
-        });
-        $mdThemingProvider.definePalette('bootbarn-warm-background', warmBackgroundPalette);
-        var warmPrimaryPalette = $mdThemingProvider.extendPalette('brown', {
-            '300': 'rgba(177, 55, 34, .54)',
-            '500': 'rgba(177, 55, 34, 1)',
-            'contrastLightColors': ['500', '300']
-        });
-        $mdThemingProvider.definePalette('bootbarn-warm-primary', warmPrimaryPalette);
-        var warmAccentPalette = $mdThemingProvider.extendPalette('amber', {
-            'A700': 'rgba(127, 148, 92, 1)',
-            'contrastLightColors': ['A700']
-        });
-        $mdThemingProvider.definePalette('bootbarn-warm-accent', warmAccentPalette);
-        var warmErrorPalette = $mdThemingProvider.extendPalette('red', {
-            'A200': 'rgba(255, 87, 34, 1)',
-            'contrastLightColors': ['A200']
-        });
-        $mdThemingProvider.definePalette('bootbarn-warm-error', warmErrorPalette);
-        $mdThemingProvider.theme('bootbarn-warm')
-            .primaryPalette('bootbarn-warm-primary', {
-            'default': '500',
-            'hue-1': '300'
-        })
-            .backgroundPalette('bootbarn-warm-background', {
-            'default': '50',
-            'hue-1': 'A200',
-            'hue-2': 'A700'
-        })
-            .warnPalette('bootbarn-warm-error', {
-            'default': 'A200'
-        })
-            .accentPalette('bootbarn-warm-accent', {
-            'default': 'A700'
-        });
-    }
 })();
 
 (function () {
@@ -8653,6 +8590,146 @@ var pip;
             'default': '600'
         });
         $mdThemingProvider.alwaysWatchTheme(true);
+    }
+})();
+
+(function () {
+    'use strict';
+    angular.module('pipTheme.Bootbarn', [
+        'pipTheme.Bootbarn.Warm',
+        'pipTheme.Bootbarn.Cool',
+        'pipTheme.Bootbarn.Monochrome'
+    ]);
+})();
+
+(function () {
+    'use strict';
+    config.$inject = ['$mdThemingProvider'];
+    var thisModule = angular.module('pipTheme.Bootbarn.Cool', ['ngMaterial']);
+    thisModule.config(config);
+    function config($mdThemingProvider) {
+        var coolBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(69, 90, 100, 1)'
+        });
+        $mdThemingProvider.definePalette('bootbarn-cool-background', coolBackgroundPalette);
+        var coolPrimaryPalette = $mdThemingProvider.extendPalette('grey', {
+            '300': 'rgba(69, 90, 100, .54)',
+            '500': 'rgba(69, 90, 100, 1)',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('bootbarn-cool-primary', coolPrimaryPalette);
+        var coolAccentPalette = $mdThemingProvider.extendPalette('green', {
+            'A700': 'rgba(76, 175, 80, 1)',
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('bootbarn-cool-accent', coolAccentPalette);
+        $mdThemingProvider.theme('bootbarn-cool')
+            .primaryPalette('bootbarn-cool-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('bootbarn-cool-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('bootbarn-cool-accent', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+})();
+
+(function () {
+    'use strict';
+    config.$inject = ['$mdThemingProvider'];
+    var thisModule = angular.module('pipTheme.Bootbarn.Monochrome', ['ngMaterial']);
+    thisModule.config(config);
+    function config($mdThemingProvider) {
+        var monochromeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(38, 50, 56, 1)'
+        });
+        $mdThemingProvider.definePalette('bootbarn-monochrome-background', monochromeBackgroundPalette);
+        var monochromePrimaryPalette = $mdThemingProvider.extendPalette('grey', {
+            '300': 'rgba(38, 50, 56, .54)',
+            '500': 'rgba(38, 50, 56, 1)',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('bootbarn-monochrome-primary', monochromePrimaryPalette);
+        var monochromeAccentPalette = $mdThemingProvider.extendPalette('green', {
+            'A700': 'rgba(76, 175, 80, 1)',
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('bootbarn-monochrome-accent', monochromeAccentPalette);
+        $mdThemingProvider.theme('bootbarn-monochrome')
+            .primaryPalette('bootbarn-monochrome-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('bootbarn-monochrome-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('bootbarn-monochrome-accent', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+})();
+
+(function () {
+    'use strict';
+    config.$inject = ['$mdThemingProvider'];
+    var thisModule = angular.module('pipTheme.Bootbarn.Warm', ['ngMaterial']);
+    thisModule.config(config);
+    function config($mdThemingProvider) {
+        $mdThemingProvider.alwaysWatchTheme(true);
+        var warmBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(177, 55, 34, 1)'
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-background', warmBackgroundPalette);
+        var warmPrimaryPalette = $mdThemingProvider.extendPalette('brown', {
+            '300': 'rgba(177, 55, 34, .54)',
+            '500': 'rgba(177, 55, 34, 1)',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-primary', warmPrimaryPalette);
+        var warmAccentPalette = $mdThemingProvider.extendPalette('amber', {
+            'A700': 'rgba(127, 148, 92, 1)',
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-accent', warmAccentPalette);
+        var warmErrorPalette = $mdThemingProvider.extendPalette('red', {
+            'A200': 'rgba(255, 87, 34, 1)',
+            'contrastLightColors': ['A200']
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-error', warmErrorPalette);
+        $mdThemingProvider.theme('bootbarn-warm')
+            .primaryPalette('bootbarn-warm-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('bootbarn-warm-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('bootbarn-warm-error', {
+            'default': 'A200'
+        })
+            .accentPalette('bootbarn-warm-accent', {
+            'default': 'A700'
+        });
     }
 })();
 
@@ -10448,6 +10525,114 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    var thisModule = angular.module('pipSettings.Service', []);
+    thisModule.provider('pipSettings', ['$stateProvider', function ($stateProvider) {
+        var defaultTab, tabs = [], titleText = 'SETTINGS_TITLE', titleLogo = null, isNavIcon = true;
+        this.showTitleText = showTitleText;
+        this.showTitleLogo = showTitleLogo;
+        this.showNavIcon = showNavIcon;
+        return {
+            addTab: addTab,
+            getTabs: getTabs,
+            setDefaultTab: setDefaultTab,
+            getDefaultTab: getDefaultTab,
+            showTitleText: showTitleText,
+            showTitleLogo: showTitleLogo,
+            showNavIcon: showNavIcon,
+            $get: function () {
+                return {
+                    getTabs: getTabs,
+                    addTab: addTab,
+                    getDefaultTab: getDefaultTab,
+                    setDefaultTab: setDefaultTab,
+                    showTitleText: showTitleText,
+                    showTitleLogo: showTitleLogo,
+                    showNavIcon: showNavIcon
+                };
+            }
+        };
+        function getFullStateName(state) {
+            return 'settings.' + state;
+        }
+        function getTabs() {
+            return _.cloneDeep(tabs);
+        }
+        function getDefaultTab() {
+            var defaultTab;
+            defaultTab = _.find(tabs, function (p) {
+                return p.state === defaultTab;
+            });
+            return _.cloneDeep(defaultTab);
+        }
+        function addTab(tabObj) {
+            var existingTab;
+            validateTab(tabObj);
+            existingTab = _.find(tabs, function (p) {
+                return p.state === getFullStateName(tabObj.state);
+            });
+            if (existingTab) {
+                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
+            }
+            tabs.push({
+                state: getFullStateName(tabObj.state),
+                title: tabObj.title,
+                index: tabObj.index || 100000,
+                access: tabObj.access,
+                visible: tabObj.visible !== false,
+                stateConfig: _.cloneDeep(tabObj.stateConfig)
+            });
+            $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
+            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
+                setDefaultTab(tabObj.state);
+            }
+        }
+        function setDefaultTab(name) {
+            if (!_.find(tabs, function (tab) {
+                return tab.state === getFullStateName(name);
+            })) {
+                throw new Error('Tab with state name "' + name + '" is not registered');
+            }
+            defaultTab = getFullStateName(name);
+        }
+        function validateTab(tabObj) {
+            if (!tabObj || !_.isObject(tabObj)) {
+                throw new Error('Invalid object');
+            }
+            if (tabObj.state === null || tabObj.state === '') {
+                throw new Error('Tab should have valid Angular UI router state name');
+            }
+            if (tabObj.access && !_.isFunction(tabObj.access)) {
+                throw new Error('"access" should be a function');
+            }
+            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
+                throw new Error('Invalid state configuration object');
+            }
+        }
+        function showTitleText(newTitleText) {
+            if (newTitleText) {
+                titleText = newTitleText;
+                titleLogo = null;
+            }
+            return titleText;
+        }
+        function showTitleLogo(newTitleLogo) {
+            if (newTitleLogo) {
+                titleLogo = newTitleLogo;
+                titleText = null;
+            }
+            return titleLogo;
+        }
+        function showNavIcon(value) {
+            if (value !== null && value !== undefined) {
+                isNavIcon = !!value;
+            }
+            return isNavIcon;
+        }
+    }]);
+})();
+
+(function () {
+    'use strict';
     angular.module('pipUserSettings', [
         'ngMaterial', 'pipData',
         'pipSettings.Service',
@@ -10905,114 +11090,6 @@ module.run(['$templateCache', function($templateCache) {
                     1103: 'code'
                 });
             });
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSettings.Service', []);
-    thisModule.provider('pipSettings', ['$stateProvider', function ($stateProvider) {
-        var defaultTab, tabs = [], titleText = 'SETTINGS_TITLE', titleLogo = null, isNavIcon = true;
-        this.showTitleText = showTitleText;
-        this.showTitleLogo = showTitleLogo;
-        this.showNavIcon = showNavIcon;
-        return {
-            addTab: addTab,
-            getTabs: getTabs,
-            setDefaultTab: setDefaultTab,
-            getDefaultTab: getDefaultTab,
-            showTitleText: showTitleText,
-            showTitleLogo: showTitleLogo,
-            showNavIcon: showNavIcon,
-            $get: function () {
-                return {
-                    getTabs: getTabs,
-                    addTab: addTab,
-                    getDefaultTab: getDefaultTab,
-                    setDefaultTab: setDefaultTab,
-                    showTitleText: showTitleText,
-                    showTitleLogo: showTitleLogo,
-                    showNavIcon: showNavIcon
-                };
-            }
-        };
-        function getFullStateName(state) {
-            return 'settings.' + state;
-        }
-        function getTabs() {
-            return _.cloneDeep(tabs);
-        }
-        function getDefaultTab() {
-            var defaultTab;
-            defaultTab = _.find(tabs, function (p) {
-                return p.state === defaultTab;
-            });
-            return _.cloneDeep(defaultTab);
-        }
-        function addTab(tabObj) {
-            var existingTab;
-            validateTab(tabObj);
-            existingTab = _.find(tabs, function (p) {
-                return p.state === getFullStateName(tabObj.state);
-            });
-            if (existingTab) {
-                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
-            }
-            tabs.push({
-                state: getFullStateName(tabObj.state),
-                title: tabObj.title,
-                index: tabObj.index || 100000,
-                access: tabObj.access,
-                visible: tabObj.visible !== false,
-                stateConfig: _.cloneDeep(tabObj.stateConfig)
-            });
-            $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
-            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
-                setDefaultTab(tabObj.state);
-            }
-        }
-        function setDefaultTab(name) {
-            if (!_.find(tabs, function (tab) {
-                return tab.state === getFullStateName(name);
-            })) {
-                throw new Error('Tab with state name "' + name + '" is not registered');
-            }
-            defaultTab = getFullStateName(name);
-        }
-        function validateTab(tabObj) {
-            if (!tabObj || !_.isObject(tabObj)) {
-                throw new Error('Invalid object');
-            }
-            if (tabObj.state === null || tabObj.state === '') {
-                throw new Error('Tab should have valid Angular UI router state name');
-            }
-            if (tabObj.access && !_.isFunction(tabObj.access)) {
-                throw new Error('"access" should be a function');
-            }
-            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
-                throw new Error('Invalid state configuration object');
-            }
-        }
-        function showTitleText(newTitleText) {
-            if (newTitleText) {
-                titleText = newTitleText;
-                titleLogo = null;
-            }
-            return titleText;
-        }
-        function showTitleLogo(newTitleLogo) {
-            if (newTitleLogo) {
-                titleLogo = newTitleLogo;
-                titleText = null;
-            }
-            return titleLogo;
-        }
-        function showNavIcon(value) {
-            if (value !== null && value !== undefined) {
-                isNavIcon = !!value;
-            }
-            return isNavIcon;
         }
     }]);
 })();

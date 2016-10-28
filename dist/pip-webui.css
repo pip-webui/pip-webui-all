@@ -2966,9 +2966,77 @@ pip-document {
   width: 1100px;
   max-width: 100%;
 }
+pip-document .pip-content-container {
+  position: absolute !important;
+  left: 300px;
+  height: 100%;
+  width: calc(100% - 300px);
+}
 pip-document.pip-document-small {
   left: calc(50% - 450px);
   width: 900px;
+}
+pip-document.pip-single-content .pip-menu {
+  opacity: 0;
+  z-index: -100;
+}
+pip-document.pip-single-content .pip-content-container {
+  width: 100%;
+  left: 0;
+}
+pip-document.pip-multi-document-stretched {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+pip-document.pip-multi-document-stretched .pip-menu-container {
+  background-color: #eeeeee !important;
+  background: none !important;
+}
+pip-document.pip-multi-document-stretched .pip-menu {
+  transition: all 0.5s ease;
+  border-right: none;
+  width: 388px;
+  opacity: 1;
+}
+pip-document.pip-multi-document-stretched .pip-content-container {
+  transition: all 0.5s ease;
+  position: absolute;
+  left: 388px;
+  height: calc(100% - 16px);
+  width: calc(100% - 404px);
+  max-width: 800px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  background: #fafafa !important;
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzM0NWQ3ZCIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMTM1NWQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+) !important;
+  background: -moz-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fefefe), color-stop(18%, #fafafa), color-stop(19%, #fafafa), color-stop(81%, #fafafa), color-stop(82%, #fafafa), color-stop(100%, #f2f1f1)) !important;
+  background: -webkit-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -o-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: -ms-linear-gradient(top, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  background: linear-gradient(to bottom, #fefefe 0, #fafafa 18%, #fafafa 19%, #fafafa 81%, #fafafa 82%, #f2f1f1 100%) !important;
+  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.26) !important;
+}
+pip-document.pip-multi-document-stretched.pip-single-content .pip-menu {
+  opacity: 0;
+  z-index: -100;
+}
+pip-document.pip-multi-document-stretched.pip-single-content .pip-content-container {
+  width: 800px;
+  left: calc(50% - 400px);
 }
 .pip-document-container {
   /*min-height: 100%;*/
@@ -3009,9 +3077,8 @@ pip-document.pip-document-small {
   height: 95px;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
-.pip-md .pip-document:not(.pip-document-small),
-.pip-sm .pip-document:not(.pip-document-small),
-.pip-xs .pip-document:not(.pip-document-small) {
+.pip-xs .pip-document,
+.pip-sm .pip-document {
   position: absolute;
   top: 0;
   left: 0;
@@ -3022,20 +3089,6 @@ pip-document.pip-document-small {
   border-radius: 0;
   width: 100%;
   height: 100%;
-}
-.pip-sm .pip-document.pip-document-small,
-.pip-xs .pip-document.pip-document-small {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 0px;
-  border: none;
-  border-radius: 0;
-  width: 100%;
-  height: 100%;
-  left: 0px;
 }
 /*
  * <md-dialog class="pip-dialog" width="600">
@@ -3191,9 +3244,7 @@ pip-document.pip-document-small {
 .pip-simple .pip-tiles .pip-tiles-container {
   margin: auto;
 }
-.pip-xs .pip-tiles .pip-tile,
-.pip-sm .pip-tiles .pip-tile,
-.pip-md .pip-tiles .pip-tile {
+.pip-xs .pip-tiles .pip-tile {
   min-width: 180px;
 }
 .pip-xs .pip-tiles,
@@ -6493,6 +6544,67 @@ md-select md-select-value .md-text .pip-tabs-badge {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
+.pip-sidenav.pip-nav-small {
+  width: 72px !important;
+  overflow-x: hidden;
+}
+.pip-sidenav.pip-nav-small md-sidenav {
+  width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+}
+.pip-sidenav {
+  -webkit-transition: width .2s ease;
+  -moz-transition: width .2s ease;
+  -o-transition: width .2s ease;
+  transition: width .2s ease;
+  width: 320px;
+  overflow-x: hidden;
+}
+.pip-sidenav md-sidenav {
+  background: #e0e0e0;
+  border-right: solid 1px #ffffff;
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  overflow-x: hidden;
+}
+@media (max-width: 456px) {
+  .pip-sidenav.pip-nav-small {
+    overflow-x: hidden;
+  }
+  .pip-sidenav.pip-nav-small md-sidenav {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+  }
+  .pip-sidenav {
+    overflow-x: hidden;
+  }
+  .pip-sidenav md-sidenav {
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+  }
+}
+@media (max-width: 768px) {
+  .pip-sidenav.pip-nav-small {
+    overflow-x: hidden;
+  }
+  .pip-sidenav.pip-nav-small md-sidenav {
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+  }
+  .pip-sidenav {
+    overflow-x: hidden;
+  }
+  .pip-sidenav md-sidenav {
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+  }
+}
 .pip-primary-actions .pip-primary-actions-badge {
   position: absolute;
   right: 6px;
@@ -6560,8 +6672,22 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-breadcrumb .cursor-pointer {
   cursor: pointer !important;
 }
-.pip-nav-menu md-list-item .md-button .md-list-item-inner {
-  line-height: 48px;
+.pip-nav-expanded-button .md-button .pip-nav-menu-icon {
+  margin-left: 0px;
+}
+.pip-nav-menu {
+  width: 320px;
+  overflow-x: hidden;
+}
+.pip-nav-menu .pip-nav-menu-expander {
+  opacity: 1px;
+  transition-delay: 0.4s;
+  transition: opacity 0.2s linear;
+}
+.pip-nav-menu .pip-nav-menu-title {
+  opacity: 1px;
+  transition-delay: 0.4s;
+  transition: opacity 0.2s linear;
 }
 .pip-nav-menu .md-subheader {
   line-height: 48px;
@@ -6577,10 +6703,10 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-nav-menu .pip-section md-divider {
   margin-bottom: 8px;
 }
-.pip-nav-menu .pip-section md-list-item.pip-nav-menu-item .md-list-item-inner .pip-nav-menu-icon {
+.pip-nav-menu .pip-nav-menu-item .md-list-item-inner .pip-nav-menu-icon {
   margin-top: 12px;
   margin-bottom: 12px;
-  margin-right: 32px;
+  margin-right: 24px;
 }
 .pip-nav-menu .pip-nav-menu-item .md-button {
   padding-left: 24px !important;
@@ -6591,6 +6717,9 @@ md-select md-select-value .md-text .pip-tabs-badge {
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
+}
+.pip-nav-menu .pip-nav-menu-item .md-button .md-list-item-inner {
+  line-height: 48px;
 }
 .pip-nav-menu .pip-nav-menu-badge {
   font-size: 12px !important;
@@ -6604,6 +6733,9 @@ md-select md-select-value .md-text .pip-tabs-badge {
   background: red;
 }
 @media (max-width: 768px) {
+  .pip-nav-expanded-button {
+    height: 48px;
+  }
   .pip-nav-menu .pip-nav-menu-item .md-button {
     padding-left: 16px;
     padding-right: 16px;
@@ -6622,7 +6754,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
     max-width: 56px !important;
   }
 }
-.pip-nav-small md-sidenav {
+.pip-nav-small .pip-nav-menu {
   width: 72px !important;
 }
 .pip-nav-small .pip-nav-menu .pip-nav-menu-badge {
@@ -6632,9 +6764,15 @@ md-select md-select-value .md-text .pip-tabs-badge {
 }
 .pip-nav-small .pip-nav-menu .pip-nav-menu-expander {
   display: none;
+  opacity: 0px;
+  transition-delay: 0.4s;
+  transition: opacity 0.2s linear;
 }
 .pip-nav-small .pip-nav-menu .pip-nav-menu-title {
   display: none;
+  opacity: 0px;
+  transition-delay: 0.4s;
+  transition: opacity 0.2s linear;
 }
 .pip-nav-small .pip-nav-menu .pip-nav-menu-item .md-button {
   width: 72px !important;
@@ -6667,10 +6805,15 @@ md-select md-select-value .md-text .pip-tabs-badge {
   -webkit-appearance: none;
   /* без сброса оформление не применится */
 }
+.pip-nav-header {
+  height: 112px;
+  overflow-x: hidden;
+  width: 320px;
+}
 .pip-nav-header md-toolbar {
   position: relative;
   padding-top: 16px;
-  min-height: 82px !important;
+  height: 112px;
   padding-bottom: 16px;
   padding-left: 24px;
   padding-right: 24px;
@@ -6690,6 +6833,11 @@ md-select md-select-value .md-text .pip-tabs-badge {
   width: 80px;
   height: 80px;
 }
+.pip-nav-header .pip-nav-header-user-text {
+  opacity: 1px;
+  transition-delay: 0.4s;
+  transition: opacity 0.2s linear;
+}
 .pip-nav-header .pip-nav-header-user-text .pip-nav-header-user-pri {
   cursor: pointer !important;
   font-size: 22px;
@@ -6707,15 +6855,16 @@ md-select md-select-value .md-text .pip-tabs-badge {
 }
 @media (max-width: 768px) {
   .pip-nav-header {
+    height: 112px;
+  }
+  .pip-nav-header md-toolbar {
     padding-left: 16px;
     padding-right: 16px;
-  }
-  .pip-nav-header .pip-nav-header-user {
-    right: 16px;
   }
 }
 .pip-nav-small .pip-nav-header {
   width: 72px !important;
+  height: 112px;
 }
 .pip-nav-small .pip-nav-header md-toolbar {
   position: relative;
@@ -6730,6 +6879,9 @@ md-select md-select-value .md-text .pip-tabs-badge {
 }
 .pip-nav-small .pip-nav-header .pip-nav-header-user-text {
   display: none;
+  opacity: 0px;
+  transition-delay: 0.4s;
+  transition: opacity 0.2s linear;
 }
 .pip-nav-small .pip-nav-header .pip-nav-header-user {
   width: 40px;

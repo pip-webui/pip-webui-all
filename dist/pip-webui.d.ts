@@ -5,18 +5,6 @@
 
 
 
-declare module pip.scope {
-}
-
-
-declare module pip.scope {
-}
-
-
-declare module pip.scope {
-}
-
-
 declare module pip.routing {
     let CurrentState: any;
     let PreviousState: any;
@@ -34,6 +22,18 @@ declare module pip.routing {
 
 declare module pip.routing {
     let RoutingVar: string;
+}
+
+
+declare module pip.scope {
+}
+
+
+declare module pip.scope {
+}
+
+
+declare module pip.scope {
 }
 
 
@@ -74,36 +74,6 @@ declare module pip.session {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-declare module pip.utilities {
-    interface ITimerService {
-        isStarted: boolean;
-        addEvent(event: string, timeout: number): void;
-        removeEvent(event: string): void;
-        clearEvents(): void;
-        start(): void;
-        stop(): void;
-    }
-}
-
-
-
-
 declare module pip.translate {
 }
 
@@ -134,6 +104,36 @@ declare module pip.translate {
     interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+declare module pip.utilities {
+    interface ITimerService {
+        isStarted: boolean;
+        addEvent(event: string, timeout: number): void;
+        removeEvent(event: string): void;
+        clearEvents(): void;
+        start(): void;
+        stop(): void;
+    }
+}
+
+
 
 
 
@@ -269,6 +269,23 @@ declare module pip.datetime {
 
 
 
+declare module pip.nav {
+}
+
+
+
+declare module pip.nav {
+    interface INavService {
+        appBar: any;
+        sideNav: any;
+        navIcon: any;
+        breadcrumb: IBreadcrumbService;
+        actions: any;
+        navHeader: any;
+        navMenu: any;
+        search: any;
+    }
+}
 
 
 
