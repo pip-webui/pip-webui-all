@@ -36,33 +36,33 @@ gulp.task('build-ts', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-// gulp.task('build-js-dev', function () {
-//     return gulp.src([
-//         '../pip-webui-services/dist/pip-webui-services.js',
-//         '../pip-webui-buttons/dist/pip-webui-buttons.js',
-//         '../pip-webui-landing/dist/pip-webui-landing.js',
-//         '../pip-webui-headers/dist/pip-webui-headers.js',
-//         '../pip-webui-layouts/dist/pip-webui-layouts.js',
-//         '../pip-webui-split/dist/pip-webui-split.js',
-//         '../pip-webui-behaviors/dist/pip-webui-behaviors.js',
-//         '../pip-webui-controls/dist/pip-webui-controls.js',
-//         '../pip-webui-lists/dist/pip-webui-lists.js',
-//         '../pip-webui-dates/dist/pip-webui-dates.js',
-//         '../pip-webui-dialogs/dist/pip-webui-dialogs.js',
-//         '../pip-webui-nav/dist/pip-webui-nav.js',
-//         '../pip-webui-themes/dist/pip-webui-themes.js',
-//         '../pip-webui-errors/dist/pip-webui-errors.js',
-//         '../pip-webui-charts/dist/pip-webui-charts.js',
-//         '../pip-webui-settings/dist/pip-webui-settings.js',
-//         '../pip-webui-help/dist/pip-webui-help.js',
-//     ])
-//     .pipe(sourceMaps.init({loadMaps: true}))
-//     .pipe(concat('pip-webui.js'))
-//     .pipe(sourceMaps.write('.'))
-//     .pipe(gulp.dest('./dist'));
-// });
+gulp.task('build-js-dev', function () {
+    return gulp.src([
+        '../pip-webui-services/dist/pip-webui-services.js',
+        '../pip-webui-buttons/dist/pip-webui-buttons.js',
+        '../pip-webui-landing/dist/pip-webui-landing.js',
+        '../pip-webui-headers/dist/pip-webui-headers.js',
+        '../pip-webui-layouts/dist/pip-webui-layouts.js',
+        '../pip-webui-split/dist/pip-webui-split.js',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.js',
+        '../pip-webui-controls/dist/pip-webui-controls.js',
+        '../pip-webui-lists/dist/pip-webui-lists.js',
+        '../pip-webui-dates/dist/pip-webui-dates.js',
+        '../pip-webui-dialogs/dist/pip-webui-dialogs.js',
+        '../pip-webui-nav/dist/pip-webui-nav.js',
+        '../pip-webui-themes/dist/pip-webui-themes.js',
+        '../pip-webui-errors/dist/pip-webui-errors.js',
+        '../pip-webui-charts/dist/pip-webui-charts.js',
+        '../pip-webui-settings/dist/pip-webui-settings.js',
+        '../pip-webui-help/dist/pip-webui-help.js',
+    ])
+    .pipe(sourceMaps.init({loadMaps: true}))
+    .pipe(concat('pip-webui.js'))
+    .pipe(sourceMaps.write('.'))
+    .pipe(gulp.dest('./dist'));
+});
 
-gulp.task('build-js', function () {
+gulp.task('build-js-prod', function () {
     return gulp.src([
         '../pip-webui-services/dist/pip-webui-services.min.js',
         '../pip-webui-buttons/dist/pip-webui-buttons.min.js',
@@ -89,32 +89,32 @@ gulp.task('build-js', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-// gulp.task('build-css-dev', function () {
-//     return gulp.src([
-//         '../pip-webui-css/dist/pip-webui-css.css',
-//         '../pip-webui-landing/dist/pip-webui-landing.css',
-//         '../pip-webui-headers/dist/pip-webui-headers.css',
-//         '../pip-webui-buttons/dist/pip-webui-buttons.css',
-//         '../pip-webui-services/dist/pip-webui-services.css',
-//         '../pip-webui-layouts/dist/pip-webui-layouts.css',
-//         '../pip-webui-split/dist/pip-webui-split.css',
-//         '../pip-webui-behaviors/dist/pip-webui-behaviors.css',
-//         '../pip-webui-controls/dist/pip-webui-controls.css',
-//         '../pip-webui-lists/dist/pip-webui-lists.css',
-//         '../pip-webui-dates/dist/pip-webui-dates.css',
-//         '../pip-webui-dialogs/dist/pip-webui-dialogs.css',
-//         '../pip-webui-nav/dist/pip-webui-nav.css',
-//         '../pip-webui-themes/dist/pip-webui-themes.css',
-//         '../pip-webui-errors/dist/pip-webui-errors.css',
-//         '../pip-webui-charts/dist/pip-webui-charts.css',
-//         '../pip-webui-settings/dist/pip-webui-settings.css',
-//         '../pip-webui-help/dist/pip-webui-help.css',
-//     ])
-//     .pipe(concat('pip-webui.css'))
-//     .pipe(gulp.dest('./dist'));
-// });
+gulp.task('build-css-dev', function () {
+    return gulp.src([
+        '../pip-webui-css/dist/pip-webui-css.css',
+        '../pip-webui-landing/dist/pip-webui-landing.css',
+        '../pip-webui-headers/dist/pip-webui-headers.css',
+        '../pip-webui-buttons/dist/pip-webui-buttons.css',
+        '../pip-webui-services/dist/pip-webui-services.css',
+        '../pip-webui-layouts/dist/pip-webui-layouts.css',
+        '../pip-webui-split/dist/pip-webui-split.css',
+        '../pip-webui-behaviors/dist/pip-webui-behaviors.css',
+        '../pip-webui-controls/dist/pip-webui-controls.css',
+        '../pip-webui-lists/dist/pip-webui-lists.css',
+        '../pip-webui-dates/dist/pip-webui-dates.css',
+        '../pip-webui-dialogs/dist/pip-webui-dialogs.css',
+        '../pip-webui-nav/dist/pip-webui-nav.css',
+        '../pip-webui-themes/dist/pip-webui-themes.css',
+        '../pip-webui-errors/dist/pip-webui-errors.css',
+        '../pip-webui-charts/dist/pip-webui-charts.css',
+        '../pip-webui-settings/dist/pip-webui-settings.css',
+        '../pip-webui-help/dist/pip-webui-help.css',
+    ])
+    .pipe(concat('pip-webui.css'))
+    .pipe(gulp.dest('./dist'));
+});
 
-gulp.task('build-css', function () {
+gulp.task('build-css-prod', function () {
     return gulp.src([
         '../pip-webui-css/dist/pip-webui-css.min.css',
         '../pip-webui-landing/dist/pip-webui-landing.min.css',
@@ -149,8 +149,8 @@ gulp.task('build-less', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-// gulp.task('build-dev', ['build-js-dev', 'build-css-dev', 'build-less']);
-// gulp.task('build-prod', ['build-js-prod', 'build-css-prod']);
+gulp.task('build-dev', ['build-js-dev', 'build-css-dev', 'build-less']);
+gulp.task('build-prod', ['build-js-prod', 'build-css-prod']);
 
 gulp.task('copy-images', function () {
     return gulp.src([
@@ -186,6 +186,5 @@ gulp.task('clean', function () {
     del(['./build', './dist']);
 });
 
-//gulp.task('build', ['build-dev', 'build-prod', 'build-ts', 'copy']);
-gulp.task('build', ['build-js', 'build-css', 'build-less', 'build-ts', 'copy']);
+gulp.task('build', ['build-dev', 'build-prod', 'build-ts', 'copy']);
 gulp.task('default', ['build']);
