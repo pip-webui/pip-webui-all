@@ -5,6 +5,18 @@
 
 
 
+declare module pip.scope {
+}
+
+
+declare module pip.scope {
+}
+
+
+declare module pip.scope {
+}
+
+
 declare module pip.routing {
     let CurrentState: any;
     let PreviousState: any;
@@ -22,18 +34,6 @@ declare module pip.routing {
 
 declare module pip.routing {
     let RoutingVar: string;
-}
-
-
-declare module pip.scope {
-}
-
-
-declare module pip.scope {
-}
-
-
-declare module pip.scope {
 }
 
 
@@ -277,13 +277,13 @@ declare module pip.nav {
 declare module pip.nav {
     interface INavService {
         appBar: any;
-        sideNav: any;
         navIcon: any;
         breadcrumb: IBreadcrumbService;
         actions: any;
+        search: any;
+        sideNav: any;
         navHeader: any;
         navMenu: any;
-        search: any;
     }
 }
 
@@ -335,6 +335,12 @@ declare module pip.nav {
 
 declare module pip.nav {
 }
+
+
+
+
+
+
 
 
 
