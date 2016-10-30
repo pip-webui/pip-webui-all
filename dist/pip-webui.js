@@ -1,1477 +1,1347 @@
-(function () {
-    'use strict';
-    angular.module('pipServices', [
-        'pipScope',
-        'pipTranslate',
-        'pipRouting',
-        'pipTimer',
-        'pipSession',
-        'pipIdentity',
-        'pipSystemInfo',
-        'pipFormat',
-        'pipScroll',
-        'pipPageReset',
-        'pipTags'
-    ]);
-})();
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
+},{}],2:[function(require,module,exports){
 
-
-
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        captureStateTranslations.$inject = ['$rootScope'];
-        decorateBackStateService.$inject = ['$delegate', '$window'];
-        addBackStateDecorator.$inject = ['$provide'];
-        function captureStateTranslations($rootScope) {
-            "ngInject";
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                pip.routing.CurrentState = {
-                    name: toState.name,
-                    url: toState.url,
-                    params: toParams
-                };
-                pip.routing.PreviousState = {
-                    name: fromState.name,
-                    url: fromState.url,
-                    params: fromParams
-                };
-            });
+},{}],3:[function(require,module,exports){
+'use strict';
+captureStateTranslations.$inject = ['$rootScope'];
+decorateBackStateService.$inject = ['$delegate', '$window'];
+addBackStateDecorator.$inject = ['$provide'];
+function captureStateTranslations($rootScope) {
+    "ngInject";
+    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+        exports.CurrentState = {
+            name: toState.name,
+            url: toState.url,
+            params: toParams
+        };
+        exports.PreviousState = {
+            name: fromState.name,
+            url: fromState.url,
+            params: fromParams
+        };
+    });
+}
+function decorateBackStateService($delegate, $window) {
+    "ngInject";
+    $delegate.goBack = goBack;
+    $delegate.goBackAndSelect = goBackAndSelect;
+    return $delegate;
+    function goBack() {
+        $window.history.back();
+    }
+    function goBackAndSelect(params) {
+        if (exports.PreviousState != null
+            && exports.PreviousState.name != null) {
+            var state = _.cloneDeep(exports.PreviousState);
+            state.params = _.extend(state.params, params);
+            $delegate.go(state.name, state.params);
         }
-        function decorateBackStateService($delegate, $window) {
-            "ngInject";
-            $delegate.goBack = goBack;
-            $delegate.goBackAndSelect = goBackAndSelect;
-            return $delegate;
-            function goBack() {
-                $window.history.back();
-            }
-            function goBackAndSelect(params) {
-                if (pip.routing.PreviousState != null
-                    && pip.routing.PreviousState.name != null) {
-                    var state = _.cloneDeep(pip.routing.PreviousState);
-                    state.params = _.extend(state.params, params);
-                    $delegate.go(state.name, state.params);
-                }
-                else {
-                    $window.history.back();
-                }
-            }
+        else {
+            $window.history.back();
         }
-        function addBackStateDecorator($provide) {
-            $provide.decorator('$state', decorateBackStateService);
+    }
+}
+function addBackStateDecorator($provide) {
+    $provide.decorator('$state', decorateBackStateService);
+}
+angular
+    .module('pipRouting.Back', [])
+    .config(addBackStateDecorator)
+    .run(captureStateTranslations);
+},{}],4:[function(require,module,exports){
+'use strict';
+decorateRedirectStateProvider.$inject = ['$delegate'];
+addRedirectStateProviderDecorator.$inject = ['$provide'];
+decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
+addRedirectStateDecorator.$inject = ['$provide'];
+exports.RedirectedStates = {};
+function decorateRedirectStateProvider($delegate) {
+    "ngInject";
+    $delegate.redirect = redirect;
+    return $delegate;
+    function redirect(fromState, toState) {
+        exports.RedirectedStates[fromState] = toState;
+        return this;
+    }
+}
+function addRedirectStateProviderDecorator($provide) {
+    "ngInject";
+    $provide.decorator('$state', decorateRedirectStateProvider);
+}
+function decorateRedirectStateService($delegate, $timeout) {
+    "ngInject";
+    $delegate.redirect = redirect;
+    return $delegate;
+    function redirect(event, state, params) {
+        var toState = exports.RedirectedStates[state.name];
+        if (_.isFunction(toState)) {
+            toState = toState(state.name, params);
+            if (_.isNull(toState))
+                throw new Error('Redirected toState cannot be null');
         }
-        angular
-            .module('pipRouting.Back', [])
-            .config(addBackStateDecorator)
-            .run(captureStateTranslations);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        decorateRedirectStateProvider.$inject = ['$delegate'];
-        addRedirectStateProviderDecorator.$inject = ['$provide'];
-        decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
-        addRedirectStateDecorator.$inject = ['$provide'];
-        routing.RedirectedStates = {};
-        function decorateRedirectStateProvider($delegate) {
-            "ngInject";
-            $delegate.redirect = redirect;
-            return $delegate;
-            function redirect(fromState, toState) {
-                pip.routing.RedirectedStates[fromState] = toState;
-                return this;
-            }
-        }
-        function addRedirectStateProviderDecorator($provide) {
-            "ngInject";
-            $provide.decorator('$state', decorateRedirectStateProvider);
-        }
-        function decorateRedirectStateService($delegate, $timeout) {
-            "ngInject";
-            $delegate.redirect = redirect;
-            return $delegate;
-            function redirect(event, state, params) {
-                var toState = pip.routing.RedirectedStates[state.name];
-                if (_.isFunction(toState)) {
-                    toState = toState(state.name, params);
-                    if (_.isNull(toState))
-                        throw new Error('Redirected toState cannot be null');
-                }
-                if (!!toState) {
-                    $timeout(function () {
-                        event.preventDefault();
-                        $delegate.transitionTo(toState, params, { location: 'replace' });
-                    });
-                    return true;
-                }
-                return false;
-            }
-        }
-        function addRedirectStateDecorator($provide) {
-            "ngInject";
-            $provide.decorator('$state', decorateRedirectStateService);
-        }
-        angular
-            .module('pipRouting.Redirect', ['ui.router'])
-            .config(addRedirectStateProviderDecorator)
-            .config(addRedirectStateDecorator);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        angular.module('pipRouting', [
-            'ui.router', 'pipRouting.Events', 'pipRouting.Back', 'pipRouting.Redirect'
-        ]);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var routing;
-    (function (routing) {
-        'use strict';
-        hookRoutingEvents.$inject = ['$log', '$rootScope', '$state'];
-        routing.RoutingVar = "$routing";
-        function hookRoutingEvents($log, $rootScope, $state) {
-            "ngInject";
-            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope[routing.RoutingVar] = true;
-            });
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope[routing.RoutingVar] = false;
-            });
-            $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
-                $rootScope[routing.RoutingVar] = false;
-                $log.error('Error while switching route to ' + toState.name);
-                $log.error(error);
-                console.error('Error while switching route to ' + toState.name);
-                console.error(error);
-            });
-            $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
+        if (!!toState) {
+            $timeout(function () {
                 event.preventDefault();
-                $rootScope[routing.RoutingVar] = false;
-                $state.go('errors_missing_route', {
-                    unfoundState: unfoundState,
-                    fromState: {
-                        to: fromState ? fromState.name : '',
-                        fromParams: fromParams
-                    }
-                });
+                $delegate.transitionTo(toState, params, { location: 'replace' });
             });
+            return true;
         }
-        angular
-            .module('pipRouting.Events', [])
-            .run(hookRoutingEvents);
-    })(routing = pip.routing || (pip.routing = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var scope;
-    (function (scope) {
-        'use strict';
-        angular.module('pipScope', ['pipTranslate', 'pipScope.Error', 'pipScope.Transaction']);
-        angular.module('pipTransactions', ['pipScope']);
-    })(scope = pip.scope || (pip.scope = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var scope;
-    (function (scope_1) {
-        'use strict';
-        var thisModule = angular.module('pipScope.Error', []);
-        thisModule.factory('pipError', ['$rootScope', function ($rootScope) {
-            $rootScope.errors = {};
-            return createError;
-            function initError(scope) {
-                $rootScope.errors[scope] = {
-                    message: undefined,
-                    code: undefined,
-                    details: undefined
-                };
+        return false;
+    }
+}
+function addRedirectStateDecorator($provide) {
+    "ngInject";
+    $provide.decorator('$state', decorateRedirectStateService);
+}
+angular
+    .module('pipRouting.Redirect', ['ui.router'])
+    .config(addRedirectStateProviderDecorator)
+    .config(addRedirectStateDecorator);
+},{}],5:[function(require,module,exports){
+'use strict';
+angular.module('pipRouting', [
+    'ui.router', 'pipRouting.Events', 'pipRouting.Back', 'pipRouting.Redirect'
+]);
+},{}],6:[function(require,module,exports){
+'use strict';
+hookRoutingEvents.$inject = ['$log', '$rootScope', '$state'];
+exports.RoutingVar = "$routing";
+function hookRoutingEvents($log, $rootScope, $state) {
+    "ngInject";
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+        $rootScope[exports.RoutingVar] = true;
+    });
+    $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+        $rootScope[exports.RoutingVar] = false;
+    });
+    $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+        $rootScope[exports.RoutingVar] = false;
+        $log.error('Error while switching route to ' + toState.name);
+        $log.error(error);
+        console.error('Error while switching route to ' + toState.name);
+        console.error(error);
+    });
+    $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
+        event.preventDefault();
+        $rootScope[exports.RoutingVar] = false;
+        $state.go('errors_missing_route', {
+            unfoundState: unfoundState,
+            fromState: {
+                to: fromState ? fromState.name : '',
+                fromParams: fromParams
             }
-            ;
-            function errorMessage(error) {
-                if (_.isNull(error)) {
-                    return null;
-                }
-                if (error.message) {
-                    return error.message;
-                }
-                if (error.data) {
-                    if (error.data.code) {
-                        return 'ERROR_' + error.data.code;
-                    }
-                    if (error.data.message) {
-                        return error.data.message;
-                    }
-                }
-                if (error.statusText) {
-                    return error.statusText;
-                }
-                if (error.status) {
-                    return 'ERROR_' + error.status;
-                }
-                return error.data ? error.data : error;
+        });
+    });
+}
+angular
+    .module('pipRouting.Events', [])
+    .run(hookRoutingEvents);
+},{}],7:[function(require,module,exports){
+'use strict';
+angular.module('pipScope', ['pipTranslate', 'pipScope.Error', 'pipScope.Transaction']);
+angular.module('pipTransactions', ['pipScope']);
+},{}],8:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipScope.Error', []);
+thisModule.factory('pipError', ['$rootScope', function ($rootScope) {
+    $rootScope.errors = {};
+    return createError;
+    function initError(scope) {
+        $rootScope.errors[scope] = {
+            message: undefined,
+            code: undefined,
+            details: undefined
+        };
+    }
+    ;
+    function errorMessage(error) {
+        if (_.isNull(error)) {
+            return null;
+        }
+        if (error.message) {
+            return error.message;
+        }
+        if (error.data) {
+            if (error.data.code) {
+                return 'ERROR_' + error.data.code;
             }
-            ;
-            function errorCode(error) {
-                if (_.isNull(error)) {
-                    return null;
+            if (error.data.message) {
+                return error.data.message;
+            }
+        }
+        if (error.statusText) {
+            return error.statusText;
+        }
+        if (error.status) {
+            return 'ERROR_' + error.status;
+        }
+        return error.data ? error.data : error;
+    }
+    ;
+    function errorCode(error) {
+        if (_.isNull(error)) {
+            return null;
+        }
+        if (error.data && error.data.code) {
+            return error.data.code;
+        }
+        if (error.status) {
+            return error.status;
+        }
+        return null;
+    }
+    ;
+    function errorDetails(error) {
+        return error && error.data ? error.data : error;
+    }
+    ;
+    function createError(scope, scopeObject) {
+        scope = scope || 'global';
+        var error = {
+            reset: function () {
+                initError(scope);
+            },
+            empty: function () {
+                var error = $rootScope.errors[scope];
+                return _.isNull(error) || (_.isNull(error.message) && _.isNull(error.code));
+            },
+            get: function () {
+                if ($rootScope.errors[scope]) {
+                    return $rootScope.errors[scope];
                 }
-                if (error.data && error.data.code) {
-                    return error.data.code;
-                }
-                if (error.status) {
-                    return error.status;
+                return '';
+            },
+            message: function () {
+                if ($rootScope.errors[scope]) {
+                    return $rootScope.errors[scope].message;
                 }
                 return null;
-            }
-            ;
-            function errorDetails(error) {
-                return error && error.data ? error.data : error;
-            }
-            ;
-            function createError(scope, scopeObject) {
-                scope = scope || 'global';
-                var error = {
-                    reset: function () {
-                        initError(scope);
-                    },
-                    empty: function () {
-                        var error = $rootScope.errors[scope];
-                        return _.isNull(error) || (_.isNull(error.message) && _.isNull(error.code));
-                    },
-                    get: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope];
-                        }
-                        return '';
-                    },
-                    message: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope].message;
-                        }
-                        return null;
-                    },
-                    code: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope].code;
-                        }
-                        return null;
-                    },
-                    details: function () {
-                        if ($rootScope.errors[scope]) {
-                            return $rootScope.errors[scope].details;
-                        }
-                        return null;
-                    },
-                    set: function (error) {
-                        if (error) {
-                            $rootScope.errors[scope] = {
-                                message: errorMessage(error),
-                                code: errorCode(error),
-                                details: errorDetails(error)
-                            };
-                            console.error($rootScope.errors[scope]);
-                        }
-                        else {
-                            initError(scope);
-                        }
-                    }
-                };
-                if (_.isObject(scopeObject))
-                    scopeObject.error = error;
-                return error;
-            }
-            ;
-        }]);
-    })(scope = pip.scope || (pip.scope = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var scope;
-    (function (scope_1) {
-        'use strict';
-        var thisModule = angular.module('pipScope.Transaction', ['pipTranslate']);
-        thisModule.run(['$injector', function ($injector) {
-            var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-            if (pipTranslate) {
-                pipTranslate.setTranslations('en', {
-                    'ENTERING': 'Entering...',
-                    'PROCESSING': 'Processing...',
-                    'LOADING': 'Loading...',
-                    'SAVING': 'Saving...'
-                });
-                pipTranslate.setTranslations('ru', {
-                    'ENTERING': 'Вход в систему...',
-                    'PROCESSING': 'Обрабатывается...',
-                    'LOADING': 'Загружается...',
-                    'SAVING': 'Сохраняется...'
-                });
-            }
-        }]);
-        thisModule.factory('pipTransaction', ['$rootScope', 'pipError', function ($rootScope, pipError) {
-            $rootScope.transactions = {};
-            return createTransaction;
-            function initTransaction(scope) {
-                $rootScope.transactions[scope] = {
-                    id: undefined,
-                    operation: undefined
-                };
-            }
-            function createTransaction(scope, scopeObject) {
-                scope = scope || 'global';
-                var error = pipError(scope);
-                var transaction = {
-                    error: error,
-                    reset: function () {
-                        initTransaction("");
-                        error.reset();
-                    },
-                    busy: function () {
-                        var transaction = $rootScope.transactions[scope];
-                        return transaction != null && transaction.id;
-                    },
-                    failed: function () {
-                        return !error.empty();
-                    },
-                    aborted: function (id) {
-                        var transaction = $rootScope.transactions[scope];
-                        return _.isNull(transaction) || transaction.id != id;
-                    },
-                    get: function () {
-                        if (_.isNull($rootScope.transactions[scope])) {
-                            initTransaction(scope);
-                        }
-                        return $rootScope.transactions[scope];
-                    },
-                    id: function () {
-                        var transaction = $rootScope.transactions[scope];
-                        return transaction ? transaction.id : null;
-                    },
-                    operation: function () {
-                        var transaction = $rootScope.transactions[scope];
-                        return transaction ? transaction.operation : null;
-                    },
-                    errorMessage: function () {
-                        return error.message();
-                    },
-                    begin: function (operation) {
-                        var transaction = $rootScope.transactions[scope];
-                        if (transaction != null && transaction.id) {
-                            return null;
-                        }
-                        transaction = $rootScope.transactions[scope] = {
-                            id: new Date().getTime(),
-                            operation: operation || 'PROCESSING'
-                        };
-                        error.reset();
-                        return transaction.id;
-                    },
-                    abort: function () {
-                        var transaction = $rootScope.transactions[scope];
-                        if (transaction) {
-                            transaction.id = null;
-                        }
-                        error.reset();
-                    },
-                    end: function (err) {
-                        if (err)
-                            error.set(err);
-                        else
-                            error.reset();
-                        var transaction = $rootScope.transactions[scope];
-                        if (transaction != null) {
-                            transaction.id = null;
-                        }
-                    }
-                };
-                if (_.isObject(scopeObject)) {
-                    scopeObject.error = error;
-                    scopeObject.transaction = transaction;
+            },
+            code: function () {
+                if ($rootScope.errors[scope]) {
+                    return $rootScope.errors[scope].code;
                 }
-                return transaction;
-            }
-        }]);
-    })(scope = pip.scope || (pip.scope = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var session;
-    (function (session) {
-        'use strict';
-        session.IdentityRootVar = "$identity";
-        session.IdentityChangedEvent = "pipIdentityChanged";
-        var IdentityService = (function () {
-            function IdentityService(setRootVar, identity, $rootScope) {
-                this._setRootVar = setRootVar;
-                this._identity = identity;
-                this._rootScope = $rootScope;
-                this.setRootVar();
-            }
-            IdentityService.prototype.setRootVar = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.session.IdentityRootVar] = this._identity;
-            };
-            Object.defineProperty(IdentityService.prototype, "identity", {
-                get: function () {
-                    return this._identity;
-                },
-                set: function (value) {
-                    this._identity = value;
-                    this.setRootVar();
-                    this._rootScope.$broadcast(pip.session.IdentityChangedEvent, this._identity);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return IdentityService;
-        }());
-        var IdentityProvider = (function () {
-            function IdentityProvider() {
-                this._setRootVar = true;
-                this._identity = null;
-                this._service = null;
-            }
-            Object.defineProperty(IdentityProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(IdentityProvider.prototype, "identity", {
-                get: function () {
-                    return this._identity;
-                },
-                set: function (value) {
-                    this._identity = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            IdentityProvider.prototype.$get = ['$rootScope', function ($rootScope) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new IdentityService(this._setRootVar, this._identity, $rootScope);
-                return this._service;
-            }];
-            return IdentityProvider;
-        }());
-        angular
-            .module('pipIdentity', [])
-            .provider('pipIdentity', IdentityProvider);
-    })(session = pip.session || (pip.session = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var session;
-    (function (session_1) {
-        'use strict';
-        session_1.SessionRootVar = "$session";
-        session_1.SessionOpenedEvent = "pipSessionOpened";
-        session_1.SessionClosedEvent = "pipSessionClosed";
-        var SessionService = (function () {
-            function SessionService(setRootVar, session, $rootScope) {
-                this._setRootVar = setRootVar;
-                this._session = session;
-                this._rootScope = $rootScope;
-                this.setRootVar();
-            }
-            SessionService.prototype.setRootVar = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.session.SessionRootVar] = this._session;
-            };
-            Object.defineProperty(SessionService.prototype, "session", {
-                get: function () {
-                    return this._session;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(SessionService.prototype, "isOpened", {
-                get: function () {
-                    return this._session != null;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            SessionService.prototype.open = function (session, fullReset, partialReset) {
-                if (fullReset === void 0) { fullReset = false; }
-                if (partialReset === void 0) { partialReset = false; }
-                if (session == null)
-                    throw new Error("Session cannot be null");
-                this._session = session;
-                this.setRootVar();
-                this._rootScope.$broadcast(pip.session.SessionOpenedEvent, session);
-            };
-            SessionService.prototype.close = function (fullReset, partialReset) {
-                if (fullReset === void 0) { fullReset = false; }
-                if (partialReset === void 0) { partialReset = false; }
-                var oldSession = this._session;
-                this._session = null;
-                this.setRootVar();
-                this._rootScope.$broadcast(pip.session.SessionClosedEvent, oldSession);
-            };
-            return SessionService;
-        }());
-        var SessionProvider = (function () {
-            function SessionProvider() {
-                this._setRootVar = true;
-                this._session = null;
-                this._service = null;
-            }
-            Object.defineProperty(SessionProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(SessionProvider.prototype, "session", {
-                get: function () {
-                    return this._session;
-                },
-                set: function (value) {
-                    this._session = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            SessionProvider.prototype.$get = ['$rootScope', function ($rootScope) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new SessionService(this._setRootVar, this._session, $rootScope);
-                return this._service;
-            }];
-            return SessionProvider;
-        }());
-        angular.module('pipSession', ['pipPageReset'])
-            .provider('pipSession', SessionProvider);
-    })(session = pip.session || (pip.session = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        angular.module('pipTranslate', [
-            'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
-        ]);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        pipTranslateDirective.$inject = ['pipTranslate'];
-        pipTranslateHtmlDirective.$inject = ['pipTranslate'];
-        function pipTranslateDirective(pipTranslate) {
-            "ngInject";
-            return {
-                restrict: 'EA',
-                scope: {
-                    key1: '@pipTranslate',
-                    key2: '@key'
-                },
-                link: function (scope, element, attrs) {
-                    var key = scope.key1 || scope.key2;
-                    var value = pipTranslate.translate(key);
-                    element.text(value);
+                return null;
+            },
+            details: function () {
+                if ($rootScope.errors[scope]) {
+                    return $rootScope.errors[scope].details;
                 }
-            };
-        }
-        function pipTranslateHtmlDirective(pipTranslate) {
-            "ngInject";
-            return {
-                restrict: 'EA',
-                scope: {
-                    key1: '@pipTranslateHtml',
-                    key2: '@key'
-                },
-                link: function (scope, element, attrs) {
-                    var key = scope.key1 || scope.key2;
-                    var value = pipTranslate.translate(key);
-                    element.html(value);
+                return null;
+            },
+            set: function (error) {
+                if (error) {
+                    $rootScope.errors[scope] = {
+                        message: errorMessage(error),
+                        code: errorCode(error),
+                        details: errorDetails(error)
+                    };
+                    console.error($rootScope.errors[scope]);
                 }
-            };
+                else {
+                    initError(scope);
+                }
+            }
+        };
+        if (_.isObject(scopeObject))
+            scopeObject.error = error;
+        return error;
+    }
+    ;
+}]);
+},{}],9:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipScope.Transaction', ['pipTranslate']);
+thisModule.run(['$injector', function ($injector) {
+    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+    if (pipTranslate) {
+        pipTranslate.setTranslations('en', {
+            'ENTERING': 'Entering...',
+            'PROCESSING': 'Processing...',
+            'LOADING': 'Loading...',
+            'SAVING': 'Saving...'
+        });
+        pipTranslate.setTranslations('ru', {
+            'ENTERING': 'Вход в систему...',
+            'PROCESSING': 'Обрабатывается...',
+            'LOADING': 'Загружается...',
+            'SAVING': 'Сохраняется...'
+        });
+    }
+}]);
+thisModule.factory('pipTransaction', ['$rootScope', 'pipError', function ($rootScope, pipError) {
+    $rootScope.transactions = {};
+    return createTransaction;
+    function initTransaction(scope) {
+        $rootScope.transactions[scope] = {
+            id: undefined,
+            operation: undefined
+        };
+    }
+    function createTransaction(scope, scopeObject) {
+        scope = scope || 'global';
+        var error = pipError(scope);
+        var transaction = {
+            error: error,
+            reset: function () {
+                initTransaction("");
+                error.reset();
+            },
+            busy: function () {
+                var transaction = $rootScope.transactions[scope];
+                return transaction != null && transaction.id;
+            },
+            failed: function () {
+                return !error.empty();
+            },
+            aborted: function (id) {
+                var transaction = $rootScope.transactions[scope];
+                return _.isNull(transaction) || transaction.id != id;
+            },
+            get: function () {
+                if (_.isNull($rootScope.transactions[scope])) {
+                    initTransaction(scope);
+                }
+                return $rootScope.transactions[scope];
+            },
+            id: function () {
+                var transaction = $rootScope.transactions[scope];
+                return transaction ? transaction.id : null;
+            },
+            operation: function () {
+                var transaction = $rootScope.transactions[scope];
+                return transaction ? transaction.operation : null;
+            },
+            errorMessage: function () {
+                return error.message();
+            },
+            begin: function (operation) {
+                var transaction = $rootScope.transactions[scope];
+                if (transaction != null && transaction.id) {
+                    return null;
+                }
+                transaction = $rootScope.transactions[scope] = {
+                    id: new Date().getTime(),
+                    operation: operation || 'PROCESSING'
+                };
+                error.reset();
+                return transaction.id;
+            },
+            abort: function () {
+                var transaction = $rootScope.transactions[scope];
+                if (transaction) {
+                    transaction.id = null;
+                }
+                error.reset();
+            },
+            end: function (err) {
+                if (err)
+                    error.set(err);
+                else
+                    error.reset();
+                var transaction = $rootScope.transactions[scope];
+                if (transaction != null) {
+                    transaction.id = null;
+                }
+            }
+        };
+        if (_.isObject(scopeObject)) {
+            scopeObject.error = error;
+            scopeObject.transaction = transaction;
         }
-        angular
-            .module('pipTranslate.Directive', [])
-            .directive('pipTranslate', pipTranslateDirective)
-            .directive('pipTranslateHtml', pipTranslateHtmlDirective);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        translateFilter.$inject = ['pipTranslate'];
-        optionalTranslateFilter.$inject = ['$injector'];
-        function translateFilter(pipTranslate) {
-            "ngInject";
-            return function (key) {
-                return pipTranslate.translate(key) || key;
-            };
+        return transaction;
+    }
+}]);
+},{}],10:[function(require,module,exports){
+'use strict';
+angular.module('pipServices', [
+    'pipScope',
+    'pipTranslate',
+    'pipRouting',
+    'pipTimer',
+    'pipSession',
+    'pipIdentity',
+    'pipSystemInfo',
+    'pipFormat',
+    'pipScroll',
+    'pipPageReset',
+    'pipTags'
+]);
+},{}],11:[function(require,module,exports){
+'use strict';
+exports.IdentityRootVar = "$identity";
+exports.IdentityChangedEvent = "pipIdentityChanged";
+var IdentityService = (function () {
+    function IdentityService(setRootVar, identity, $rootScope) {
+        this._setRootVar = setRootVar;
+        this._identity = identity;
+        this._rootScope = $rootScope;
+        this.setRootVar();
+    }
+    IdentityService.prototype.setRootVar = function () {
+        if (this._setRootVar)
+            this._rootScope[exports.IdentityRootVar] = this._identity;
+    };
+    Object.defineProperty(IdentityService.prototype, "identity", {
+        get: function () {
+            return this._identity;
+        },
+        set: function (value) {
+            this._identity = value;
+            this.setRootVar();
+            this._rootScope.$broadcast(exports.IdentityChangedEvent, this._identity);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return IdentityService;
+}());
+var IdentityProvider = (function () {
+    function IdentityProvider() {
+        this._setRootVar = true;
+        this._identity = null;
+        this._service = null;
+    }
+    Object.defineProperty(IdentityProvider.prototype, "setRootVar", {
+        get: function () {
+            return this._setRootVar;
+        },
+        set: function (value) {
+            this._setRootVar = !!value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(IdentityProvider.prototype, "identity", {
+        get: function () {
+            return this._identity;
+        },
+        set: function (value) {
+            this._identity = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    IdentityProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new IdentityService(this._setRootVar, this._identity, $rootScope);
+        return this._service;
+    }];
+    return IdentityProvider;
+}());
+angular
+    .module('pipIdentity', [])
+    .provider('pipIdentity', IdentityProvider);
+},{}],12:[function(require,module,exports){
+'use strict';
+exports.SessionRootVar = "$session";
+exports.SessionOpenedEvent = "pipSessionOpened";
+exports.SessionClosedEvent = "pipSessionClosed";
+var SessionService = (function () {
+    function SessionService(setRootVar, session, $rootScope) {
+        this._setRootVar = setRootVar;
+        this._session = session;
+        this._rootScope = $rootScope;
+        this.setRootVar();
+    }
+    SessionService.prototype.setRootVar = function () {
+        if (this._setRootVar)
+            this._rootScope[exports.SessionRootVar] = this._session;
+    };
+    Object.defineProperty(SessionService.prototype, "session", {
+        get: function () {
+            return this._session;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SessionService.prototype, "isOpened", {
+        get: function () {
+            return this._session != null;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SessionService.prototype.open = function (session, fullReset, partialReset) {
+        if (fullReset === void 0) { fullReset = false; }
+        if (partialReset === void 0) { partialReset = false; }
+        if (session == null)
+            throw new Error("Session cannot be null");
+        this._session = session;
+        this.setRootVar();
+        this._rootScope.$broadcast(exports.SessionOpenedEvent, session);
+    };
+    SessionService.prototype.close = function (fullReset, partialReset) {
+        if (fullReset === void 0) { fullReset = false; }
+        if (partialReset === void 0) { partialReset = false; }
+        var oldSession = this._session;
+        this._session = null;
+        this.setRootVar();
+        this._rootScope.$broadcast(exports.SessionClosedEvent, oldSession);
+    };
+    return SessionService;
+}());
+var SessionProvider = (function () {
+    function SessionProvider() {
+        this._setRootVar = true;
+        this._session = null;
+        this._service = null;
+    }
+    Object.defineProperty(SessionProvider.prototype, "setRootVar", {
+        get: function () {
+            return this._setRootVar;
+        },
+        set: function (value) {
+            this._setRootVar = !!value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SessionProvider.prototype, "session", {
+        get: function () {
+            return this._session;
+        },
+        set: function (value) {
+            this._session = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SessionProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new SessionService(this._setRootVar, this._session, $rootScope);
+        return this._service;
+    }];
+    return SessionProvider;
+}());
+angular.module('pipSession', ['pipPageReset'])
+    .provider('pipSession', SessionProvider);
+},{}],13:[function(require,module,exports){
+'use strict';
+angular.module('pipTranslate', [
+    'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
+]);
+},{}],14:[function(require,module,exports){
+'use strict';
+pipTranslateDirective.$inject = ['pipTranslate'];
+pipTranslateHtmlDirective.$inject = ['pipTranslate'];
+function pipTranslateDirective(pipTranslate) {
+    "ngInject";
+    return {
+        restrict: 'EA',
+        scope: {
+            key1: '@pipTranslate',
+            key2: '@key'
+        },
+        link: function (scope, element, attrs) {
+            var key = scope.key1 || scope.key2;
+            var value = pipTranslate.translate(key);
+            element.text(value);
         }
-        function optionalTranslateFilter($injector) {
-            "ngInject";
-            var pipTranslate = $injector.has('pipTranslate')
-                ? $injector.get('pipTranslate') : null;
-            return function (key) {
-                return pipTranslate ? pipTranslate.translate(key) || key : key;
-            };
+    };
+}
+function pipTranslateHtmlDirective(pipTranslate) {
+    "ngInject";
+    return {
+        restrict: 'EA',
+        scope: {
+            key1: '@pipTranslateHtml',
+            key2: '@key'
+        },
+        link: function (scope, element, attrs) {
+            var key = scope.key1 || scope.key2;
+            var value = pipTranslate.translate(key);
+            element.html(value);
         }
-        angular
-            .module('pipTranslate.Filter', [])
-            .filter('translate', translateFilter);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
+    };
+}
+angular
+    .module('pipTranslate.Directive', [])
+    .directive('pipTranslate', pipTranslateDirective)
+    .directive('pipTranslateHtml', pipTranslateHtmlDirective);
+},{}],15:[function(require,module,exports){
+'use strict';
+translateFilter.$inject = ['pipTranslate'];
+optionalTranslateFilter.$inject = ['$injector'];
+function translateFilter(pipTranslate) {
+    "ngInject";
+    return function (key) {
+        return pipTranslate.translate(key) || key;
+    };
+}
+function optionalTranslateFilter($injector) {
+    "ngInject";
+    var pipTranslate = $injector.has('pipTranslate')
+        ? $injector.get('pipTranslate') : null;
+    return function (key) {
+        return pipTranslate ? pipTranslate.translate(key) || key : key;
+    };
+}
+angular
+    .module('pipTranslate.Filter', [])
+    .filter('translate', translateFilter);
+},{}],16:[function(require,module,exports){
+'use strict';
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var pip;
-(function (pip) {
-    var translate;
-    (function (translate) {
-        'use strict';
-        translate.LanguageRootVar = "$language";
-        translate.LanguageChangedEvent = "pipLanguageChanged";
-        var Translation = (function () {
-            function Translation() {
-                this._language = 'en';
-                this._translations = {
-                    en: {
-                        'en': 'English',
-                        'ru': 'Russian',
-                        'es': 'Spanish',
-                        'pt': 'Portuguese',
-                        'de': 'German',
-                        'fr': 'French'
-                    },
-                    ru: {
-                        'en': 'Английский',
-                        'ru': 'Русский',
-                        'es': 'Испанский',
-                        'pt': 'Португальский',
-                        'de': 'Немецкий',
-                        'fr': 'Французский'
-                    }
-                };
+exports.LanguageRootVar = "$language";
+exports.LanguageChangedEvent = "pipLanguageChanged";
+var Translation = (function () {
+    function Translation() {
+        this._language = 'en';
+        this._translations = {
+            en: {
+                'en': 'English',
+                'ru': 'Russian',
+                'es': 'Spanish',
+                'pt': 'Portuguese',
+                'de': 'German',
+                'fr': 'French'
+            },
+            ru: {
+                'en': 'Английский',
+                'ru': 'Русский',
+                'es': 'Испанский',
+                'pt': 'Португальский',
+                'de': 'Немецкий',
+                'fr': 'Французский'
             }
-            Object.defineProperty(Translation.prototype, "language", {
-                get: function () { return this._language; },
-                set: function (value) { this._language = value; },
-                enumerable: true,
-                configurable: true
-            });
-            Translation.prototype.use = function (language) {
-                if (language != null)
-                    this._language = language;
-                return this._language;
-            };
-            Translation.prototype.setTranslations = function (language, translations) {
-                var map = this._translations[language] || {};
-                this._translations[language] = _.extend(map, translations);
-            };
-            Translation.prototype.translate = function (key) {
-                if (_.isNull(key) || _.isUndefined(key))
-                    return '';
-                var translations = this._translations[this._language] || {};
-                return translations[key] || key;
-            };
-            Translation.prototype.translateArray = function (keys) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (k) {
-                    var key = k || '';
-                    values.push(translations[key] || key);
-                });
-                return values;
-            };
-            Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[key] || key;
-                    values.push(value);
-                });
-                return values;
-            };
-            Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
-                if (_.isNull(items) || items.length == 0)
-                    return [];
-                keyProp = keyProp || 'name';
-                valueProp = valueProp || 'nameLocal';
-                var translations = this._translations[this._language] || {};
-                _.each(items, function (item) {
-                    var key = item[keyProp] || '';
-                    item[valueProp] = translations[key] || key;
-                });
-                return items;
-            };
-            Translation.prototype.translateWithPrefix = function (prefix, key) {
-                prefix = prefix ? prefix + '_' : '';
-                key = (prefix + key).replace(/ /g, '_').toUpperCase();
-                if (key == null)
-                    return '';
-                var translations = this._translations[this._language] || {};
-                return translations[key] || key;
-            };
-            ;
-            Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[prefix + '_' + key] || key;
-                    values.push(value);
-                });
-                return values;
-            };
-            Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-                if (_.isNull(keys) || keys.length == 0)
-                    return [];
-                keyProp = keyProp || 'id';
-                valueProp = valueProp || 'name';
-                prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
-                var values = [];
-                var translations = this._translations[this._language] || {};
-                _.each(keys, function (key) {
-                    var value = {};
-                    key = key || '';
-                    value[keyProp] = key;
-                    value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
-                        || (prefix + key.replace(/ /g, '_').toUpperCase());
-                    values.push(value);
-                });
-                return values;
-            };
-            return Translation;
-        }());
-        var TranslateService = (function () {
-            function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
-                this._setRootVar = setRootVar;
-                this._persist = persist;
-                this._translation = translation;
-                this._rootScope = $rootScope;
-                this._storage = localStorageService;
-                if (this._persist) {
-                    this._translation.language = localStorageService.get('language')
-                        || this._translation.language;
-                }
-                this.save();
-            }
-            TranslateService.prototype.save = function () {
-                if (this._setRootVar)
-                    this._rootScope[pip.translate.LanguageRootVar] = this._translation.language;
-                if (this._persist)
-                    this._storage.set('language', this._translation.language);
-            };
-            Object.defineProperty(TranslateService.prototype, "language", {
-                get: function () {
-                    return this._translation.language;
-                },
-                set: function (value) {
-                    if (value != this._translation.language) {
-                        this._translation.language = value;
-                        this.save();
-                        this._rootScope.$broadcast(pip.translate.LanguageChangedEvent, value);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TranslateService.prototype.use = function (language) {
-                if (language != null)
-                    this.language = language;
-                return this.language;
-            };
-            TranslateService.prototype.setTranslations = function (language, translations) {
-                return this._translation.setTranslations(language, translations);
-            };
-            TranslateService.prototype.translate = function (key) {
-                return this._translation.translate(key);
-            };
-            TranslateService.prototype.translateArray = function (keys) {
-                return this._translation.translateArray(keys);
-            };
-            TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
-                return this._translation.translateSet(keys, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
-                return this._translation.translateObjects(items, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateWithPrefix = function (prefix, key) {
-                return this._translation.translateWithPrefix(prefix, key);
-            };
-            TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-                return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
-            };
-            TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-                return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
-            };
-            return TranslateService;
-        }());
-        var TranslateProvider = (function (_super) {
-            __extends(TranslateProvider, _super);
-            function TranslateProvider() {
-                _super.call(this);
-            }
-            Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
-                get: function () {
-                    return this._setRootVar;
-                },
-                set: function (value) {
-                    this._setRootVar = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(TranslateProvider.prototype, "persist", {
-                get: function () {
-                    return this._persist;
-                },
-                set: function (value) {
-                    this._persist = !!value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
-                return this._service;
-            }];
-            return TranslateProvider;
-        }(Translation));
-        angular
-            .module('pipTranslate.Service', [])
-            .provider('pipTranslate', TranslateProvider);
-    })(translate = pip.translate || (pip.translate = {}));
-})(pip || (pip = {}));
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipCodes', []);
-    thisModule.factory('pipCodes', function () {
-        return {
-            hash: hash,
-            verification: verification
         };
-        function hash(value) {
-            if (value == null)
-                return 0;
-            var result = 0;
-            for (var i = 0; i < value.length; i++) {
-                result += value.charCodeAt(i);
-            }
-            return result;
-        }
-        function verification() {
-            return Math.random().toString(36).substr(2, 10).toUpperCase();
-        }
+    }
+    Object.defineProperty(Translation.prototype, "language", {
+        get: function () { return this._language; },
+        set: function (value) { this._language = value; },
+        enumerable: true,
+        configurable: true
     });
-})();
-
-
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipFormat', []);
-    thisModule.factory('pipFormat', function () {
-        function sample(value, maxLength) {
-            if (!value || value == '')
-                return '';
-            var length = value.indexOf('\n');
-            length = length >= 0 ? length : value.length;
-            length = length < maxLength ? value.length : maxLength;
-            return value.substring(0, length);
+    Translation.prototype.use = function (language) {
+        if (language != null)
+            this._language = language;
+        return this._language;
+    };
+    Translation.prototype.setTranslations = function (language, translations) {
+        var map = this._translations[language] || {};
+        this._translations[language] = _.extend(map, translations);
+    };
+    Translation.prototype.translate = function (key) {
+        if (_.isNull(key) || _.isUndefined(key))
+            return '';
+        var translations = this._translations[this._language] || {};
+        return translations[key] || key;
+    };
+    Translation.prototype.translateArray = function (keys) {
+        if (_.isNull(keys) || keys.length == 0)
+            return [];
+        var values = [];
+        var translations = this._translations[this._language] || {};
+        _.each(keys, function (k) {
+            var key = k || '';
+            values.push(translations[key] || key);
+        });
+        return values;
+    };
+    Translation.prototype.translateSet = function (keys, keyProp, valueProp) {
+        if (_.isNull(keys) || keys.length == 0)
+            return [];
+        keyProp = keyProp || 'id';
+        valueProp = valueProp || 'name';
+        var values = [];
+        var translations = this._translations[this._language] || {};
+        _.each(keys, function (key) {
+            var value = {};
+            key = key || '';
+            value[keyProp] = key;
+            value[valueProp] = translations[key] || key;
+            values.push(value);
+        });
+        return values;
+    };
+    Translation.prototype.translateObjects = function (items, keyProp, valueProp) {
+        if (_.isNull(items) || items.length == 0)
+            return [];
+        keyProp = keyProp || 'name';
+        valueProp = valueProp || 'nameLocal';
+        var translations = this._translations[this._language] || {};
+        _.each(items, function (item) {
+            var key = item[keyProp] || '';
+            item[valueProp] = translations[key] || key;
+        });
+        return items;
+    };
+    Translation.prototype.translateWithPrefix = function (prefix, key) {
+        prefix = prefix ? prefix + '_' : '';
+        key = (prefix + key).replace(/ /g, '_').toUpperCase();
+        if (key == null)
+            return '';
+        var translations = this._translations[this._language] || {};
+        return translations[key] || key;
+    };
+    ;
+    Translation.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+        if (_.isNull(keys) || keys.length == 0)
+            return [];
+        prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() : '';
+        keyProp = keyProp || 'id';
+        valueProp = valueProp || 'name';
+        var values = [];
+        var translations = this._translations[this._language] || {};
+        _.each(keys, function (key) {
+            var value = {};
+            key = key || '';
+            value[keyProp] = key;
+            value[valueProp] = translations[prefix + '_' + key] || key;
+            values.push(value);
+        });
+        return values;
+    };
+    Translation.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+        if (_.isNull(keys) || keys.length == 0)
+            return [];
+        keyProp = keyProp || 'id';
+        valueProp = valueProp || 'name';
+        prefix = prefix ? prefix.replace(/ /g, '_').toUpperCase() + '_' : '';
+        var values = [];
+        var translations = this._translations[this._language] || {};
+        _.each(keys, function (key) {
+            var value = {};
+            key = key || '';
+            value[keyProp] = key;
+            value[valueProp] = translations[prefix + key.replace(/ /g, '_').toUpperCase()]
+                || (prefix + key.replace(/ /g, '_').toUpperCase());
+            values.push(value);
+        });
+        return values;
+    };
+    return Translation;
+}());
+var TranslateService = (function () {
+    function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
+        this._setRootVar = setRootVar;
+        this._persist = persist;
+        this._translation = translation;
+        this._rootScope = $rootScope;
+        this._storage = localStorageService;
+        if (this._persist) {
+            this._translation.language = localStorageService.get('language')
+                || this._translation.language;
         }
-        function strRepeat(str, qty) {
-            if (qty < 1)
-                return '';
-            var result = '';
-            while (qty > 0) {
-                if (qty & 1)
-                    result += str;
-                qty >>= 1, str += str;
+        this.save();
+    }
+    TranslateService.prototype.save = function () {
+        if (this._setRootVar)
+            this._rootScope[exports.LanguageRootVar] = this._translation.language;
+        if (this._persist)
+            this._storage.set('language', this._translation.language);
+    };
+    Object.defineProperty(TranslateService.prototype, "language", {
+        get: function () {
+            return this._translation.language;
+        },
+        set: function (value) {
+            if (value != this._translation.language) {
+                this._translation.language = value;
+                this.save();
+                this._rootScope.$broadcast(exports.LanguageChangedEvent, value);
             }
-            return result;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TranslateService.prototype.use = function (language) {
+        if (language != null)
+            this.language = language;
+        return this.language;
+    };
+    TranslateService.prototype.setTranslations = function (language, translations) {
+        return this._translation.setTranslations(language, translations);
+    };
+    TranslateService.prototype.translate = function (key) {
+        return this._translation.translate(key);
+    };
+    TranslateService.prototype.translateArray = function (keys) {
+        return this._translation.translateArray(keys);
+    };
+    TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
+        return this._translation.translateSet(keys, keyProp, valueProp);
+    };
+    TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
+        return this._translation.translateObjects(items, keyProp, valueProp);
+    };
+    TranslateService.prototype.translateWithPrefix = function (prefix, key) {
+        return this._translation.translateWithPrefix(prefix, key);
+    };
+    TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+        return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
+    };
+    TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+        return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
+    };
+    return TranslateService;
+}());
+var TranslateProvider = (function (_super) {
+    __extends(TranslateProvider, _super);
+    function TranslateProvider() {
+        _super.call(this);
+    }
+    Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
+        get: function () {
+            return this._setRootVar;
+        },
+        set: function (value) {
+            this._setRootVar = !!value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TranslateProvider.prototype, "persist", {
+        get: function () {
+            return this._persist;
+        },
+        set: function (value) {
+            this._persist = !!value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
+        return this._service;
+    }];
+    return TranslateProvider;
+}(Translation));
+angular
+    .module('pipTranslate.Service', [])
+    .provider('pipTranslate', TranslateProvider);
+},{}],17:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipCodes', []);
+thisModule.factory('pipCodes', function () {
+    return {
+        hash: hash,
+        verification: verification
+    };
+    function hash(value) {
+        if (value == null)
+            return 0;
+        var result = 0;
+        for (var i = 0; i < value.length; i++) {
+            result += value.charCodeAt(i);
         }
-        var sprintf = (function sprintf() {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i - 0] = arguments[_i];
+        return result;
+    }
+    function verification() {
+        return Math.random().toString(36).substr(2, 10).toUpperCase();
+    }
+});
+},{}],18:[function(require,module,exports){
+
+},{}],19:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipFormat', []);
+thisModule.factory('pipFormat', function () {
+    function sample(value, maxLength) {
+        if (!value || value == '')
+            return '';
+        var length = value.indexOf('\n');
+        length = length >= 0 ? length : value.length;
+        length = length < maxLength ? value.length : maxLength;
+        return value.substring(0, length);
+    }
+    function strRepeat(str, qty) {
+        if (qty < 1)
+            return '';
+        var result = '';
+        while (qty > 0) {
+            if (qty & 1)
+                result += str;
+            qty >>= 1, str += str;
+        }
+        return result;
+    }
+    var sprintf = (function sprintf() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i - 0] = arguments[_i];
+        }
+        function get_type(variable) {
+            return toString.call(variable).slice(8, -1).toLowerCase();
+        }
+        var str_repeat = strRepeat;
+        var str_format = function () {
+            if (!str_format.cache.hasOwnProperty(arguments[0])) {
+                str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
             }
-            function get_type(variable) {
-                return toString.call(variable).slice(8, -1).toLowerCase();
-            }
-            var str_repeat = strRepeat;
-            var str_format = function () {
-                if (!str_format.cache.hasOwnProperty(arguments[0])) {
-                    str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
+            return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
+        };
+        str_format.format = function (parse_tree, argv) {
+            var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
+            for (i = 0; i < tree_length; i++) {
+                node_type = get_type(parse_tree[i]);
+                if (node_type === 'string') {
+                    output.push(parse_tree[i]);
                 }
-                return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
-            };
-            str_format.format = function (parse_tree, argv) {
-                var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
-                for (i = 0; i < tree_length; i++) {
-                    node_type = get_type(parse_tree[i]);
-                    if (node_type === 'string') {
-                        output.push(parse_tree[i]);
-                    }
-                    else if (node_type === 'array') {
-                        match = parse_tree[i];
-                        if (match[2]) {
-                            arg = argv[cursor];
-                            for (k = 0; k < match[2].length; k++) {
-                                if (!arg.hasOwnProperty(match[2][k])) {
-                                    throw new Error(sprintf('[_.sprintf] property "%s" does not exist', match[2][k]));
-                                }
-                                arg = arg[match[2][k]];
+                else if (node_type === 'array') {
+                    match = parse_tree[i];
+                    if (match[2]) {
+                        arg = argv[cursor];
+                        for (k = 0; k < match[2].length; k++) {
+                            if (!arg.hasOwnProperty(match[2][k])) {
+                                throw new Error(sprintf('[_.sprintf] property "%s" does not exist', match[2][k]));
                             }
+                            arg = arg[match[2][k]];
                         }
-                        else if (match[1]) {
-                            arg = argv[match[1]];
-                        }
-                        else {
-                            arg = argv[cursor++];
-                        }
-                        if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
-                            throw new Error(sprintf('[_.sprintf] expecting number but found %s', get_type(arg)));
-                        }
-                        switch (match[8]) {
-                            case 'b':
-                                arg = arg.toString(2);
-                                break;
-                            case 'c':
-                                arg = String.fromCharCode(arg);
-                                break;
-                            case 'd':
-                                arg = parseInt(arg, 10);
-                                break;
-                            case 'e':
-                                arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential();
-                                break;
-                            case 'f':
-                                arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg);
-                                break;
-                            case 'o':
-                                arg = arg.toString(8);
-                                break;
-                            case 's':
-                                arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg);
-                                break;
-                            case 'u':
-                                arg = Math.abs(arg);
-                                break;
-                            case 'x':
-                                arg = arg.toString(16);
-                                break;
-                            case 'X':
-                                arg = arg.toString(16).toUpperCase();
-                                break;
-                        }
-                        arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+' + arg : arg);
-                        pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
-                        pad_length = match[6] - String(arg).length;
-                        pad = match[6] ? str_repeat(pad_character, pad_length) : '';
-                        output.push(match[5] ? arg + pad : pad + arg);
                     }
-                }
-                return output.join('');
-            };
-            str_format.cache = {};
-            str_format.parse = function (fmt) {
-                var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
-                while (_fmt) {
-                    if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
-                        parse_tree.push(match[0]);
-                    }
-                    else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
-                        parse_tree.push('%');
-                    }
-                    else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
-                        if (match[2]) {
-                            arg_names |= 1;
-                            var field_list = [], replacement_field = match[2], field_match = [];
-                            if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-                                field_list.push(field_match[1]);
-                                while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
-                                    if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-                                        field_list.push(field_match[1]);
-                                    }
-                                    else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
-                                        field_list.push(field_match[1]);
-                                    }
-                                    else {
-                                        throw new Error('[_.sprintf] huh?');
-                                    }
-                                }
-                            }
-                            else {
-                                throw new Error('[_.sprintf] huh?');
-                            }
-                            match[2] = field_list;
-                        }
-                        else {
-                            arg_names |= 2;
-                        }
-                        if (arg_names === 3) {
-                            throw new Error('[_.sprintf] mixing positional and named placeholders is not (yet) supported');
-                        }
-                        parse_tree.push(match);
+                    else if (match[1]) {
+                        arg = argv[match[1]];
                     }
                     else {
-                        throw new Error('[_.sprintf] huh?');
+                        arg = argv[cursor++];
                     }
-                    _fmt = _fmt.substring(match[0].length);
-                }
-                return parse_tree;
-            };
-            return str_format;
-        })();
-        return {
-            sprintf: sprintf,
-            format: sprintf,
-            sample: sample
-        };
-    });
-})();
-
-
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipPageReset', []);
-    thisModule.factory('pipPageReset', ['$rootScope', '$timeout', function ($rootScope, $timeout) {
-        $rootScope.$on('pipResetPage', resetAll);
-        return {
-            resetPartial: resetPartial,
-            resetFull: resetFull,
-            resetAll: resetAll,
-            reset: reset
-        };
-        function resetPartial() {
-            reset(false, true);
-        }
-        function resetFull() {
-            reset(true, false);
-        }
-        function resetAll() {
-            reset(true, true);
-        }
-        function reset(full, partial) {
-            full = full !== undefined ? !!full : true;
-            partial = partial !== undefined ? !!partial : true;
-            if (full || partial) {
-                $rootScope.$reset = full;
-                $rootScope.$partialReset = partial;
-                $timeout(function () {
-                    $rootScope.$reset = false;
-                    $rootScope.$partialReset = false;
-                }, 0);
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipScroll', []);
-    thisModule.factory('pipScroll', function () {
-        return {
-            scrollTo: scrollTo
-        };
-        function scrollTo(parentElement, childElement, animationDuration) {
-            if (!parentElement || !childElement)
-                return;
-            if (animationDuration == undefined)
-                animationDuration = 300;
-            setTimeout(function () {
-                if (!$(childElement).position())
-                    return;
-                var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
-                if (modDiff < 20)
-                    return;
-                var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
-                if (animationDuration > 0)
-                    $(parentElement).animate({
-                        scrollTop: scrollTo + 'px'
-                    }, animationDuration);
-            }, 100);
-        }
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSystemInfo', []);
-    thisModule.factory('pipSystemInfo', ['$rootScope', '$window', function ($rootScope, $window) {
-        return {
-            getBrowserName: getBrowserName,
-            getBrowserVersion: getBrowserVersion,
-            getPlatform: getPlatform,
-            isDesktop: isDesktop,
-            isMobile: isMobile,
-            isCordova: isCordova,
-            getOS: getOS,
-            isSupported: isSupported
-        };
-        function getBrowserName() {
-            var ua = $window.navigator.userAgent;
-            if (ua.search(/Edge/) > -1)
-                return "edge";
-            if (ua.search(/MSIE/) > -1)
-                return "ie";
-            if (ua.search(/Trident/) > -1)
-                return "ie";
-            if (ua.search(/Firefox/) > -1)
-                return "firefox";
-            if (ua.search(/Opera/) > -1)
-                return "opera";
-            if (ua.search(/OPR/) > -1)
-                return "opera";
-            if (ua.search(/YaBrowser/) > -1)
-                return "yabrowser";
-            if (ua.search(/Chrome/) > -1)
-                return "chrome";
-            if (ua.search(/Safari/) > -1)
-                return "safari";
-            if (ua.search(/Maxthon/) > -1)
-                return "maxthon";
-            return "unknown";
-        }
-        function getBrowserVersion() {
-            var browser, version;
-            var ua = $window.navigator.userAgent;
-            browser = getBrowserName();
-            switch (browser) {
-                case "edge":
-                    version = (ua.split("Edge")[1]).split("/")[1];
-                    break;
-                case "ie":
-                    version = (ua.split("MSIE ")[1]).split(";")[0];
-                    break;
-                case "ie11":
-                    browser = "ie";
-                    version = (ua.split("; rv:")[1]).split(")")[0];
-                    break;
-                case "firefox":
-                    version = ua.split("Firefox/")[1];
-                    break;
-                case "opera":
-                    version = ua.split("Version/")[1];
-                    break;
-                case "operaWebkit":
-                    version = ua.split("OPR/")[1];
-                    break;
-                case "yabrowser":
-                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
-                    break;
-                case "chrome":
-                    version = (ua.split("Chrome/")[1]).split(" ")[0];
-                    break;
-                case "safari":
-                    version = (ua.split("Version/")[1]).split(" ")[0];
-                    break;
-                case "maxthon":
-                    version = ua.split("Maxthon/")[1];
-                    break;
-            }
-            return version;
-        }
-        function getPlatform() {
-            var ua = $window.navigator.userAgent;
-            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
-                return 'mobile';
-            return 'desktop';
-        }
-        function isDesktop() {
-            return getPlatform() == 'desktop';
-        }
-        function isMobile() {
-            return getPlatform() == 'mobile';
-        }
-        function isCordova() {
-            return null;
-        }
-        function getOS() {
-            var ua = $window.navigator.userAgent;
-            try {
-                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris'), osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
-                return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
-            }
-            catch (err) {
-                return 'unknown';
-            }
-        }
-        function isSupported(supported) {
-            if (!supported)
-                supported = {
-                    edge: 11,
-                    ie: 11,
-                    firefox: 43,
-                    opera: 35,
-                    chrome: 47
-                };
-            var browser = getBrowserName();
-            var version = getBrowserVersion();
-            version = version.split(".")[0];
-            if (browser && supported[browser] && version >= supported[browser])
-                return true;
-            return true;
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipTags', []);
-    thisModule.factory('pipTags', function () {
-        return {
-            equal: equal,
-            normalizeOne: normalizeOne,
-            normalizeAll: normalizeAll,
-            normalize: normalizeAll,
-            compressOne: compressOne,
-            compressAll: compressAll,
-            compress: compressAll,
-            extract: extract
-        };
-        function normalizeOne(tag) {
-            return tag
-                ? _.trim(tag.replace(/(_|#)+/g, ' '))
-                : null;
-        }
-        function compressOne(tag) {
-            return tag
-                ? tag.replace(/( |_|#)/g, '').toLowerCase()
-                : null;
-        }
-        function equal(tag1, tag2) {
-            if (tag1 == null && tag2 == null)
-                return true;
-            if (tag1 == null || tag2 == null)
-                return false;
-            return compressOne(tag1) == compressOne(tag2);
-        }
-        function normalizeAll(tags) {
-            if (_.isString(tags)) {
-                tags = tags.split(/( |,|;)+/);
-            }
-            tags = _.map(tags, function (tag) {
-                return normalizeOne(tag);
-            });
-            return tags;
-        }
-        function compressAll(tags) {
-            if (_.isString(tags))
-                tags = tags.split(/( |,|;)+/);
-            tags = _.map(tags, function (tag) {
-                return compressOne(tag);
-            });
-            return tags;
-        }
-        ;
-        function extract(entity, searchFields) {
-            var tags = normalizeAll(entity.tags);
-            _.each(searchFields, function (field) {
-                var text = entity[field] || '';
-                if (text != '') {
-                    var hashTags = text.match(/#\w+/g);
-                    tags = tags.concat(normalizeAll(hashTags));
-                }
-            });
-            return _.uniq(tags);
-        }
-    });
-})();
-
-var pip;
-(function (pip) {
-    var utilities;
-    (function (utilities) {
-        'use strict';
-        var TimerEvent = (function () {
-            function TimerEvent() {
-            }
-            return TimerEvent;
-        }());
-        var DefaultEvents = [
-            { event: 'pipAutoPullChanges', timeout: 60000 },
-            { event: 'pipAutoUpdatePage', timeout: 15000 },
-            { event: 'pipAutoUpdateCollection', timeout: 300000 }
-        ];
-        var TimerService = (function () {
-            TimerService.$inject = ['$rootScope', '$interval'];
-            function TimerService($rootScope, $interval) {
-                this._started = false;
-                this._events = _.cloneDeep(DefaultEvents);
-                this._rootScope = $rootScope;
-                this._interval = $interval;
-            }
-            Object.defineProperty(TimerService.prototype, "isStarted", {
-                get: function () {
-                    return this._started;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            TimerService.prototype.addEvent = function (event, timeout) {
-                var existingEvent = _.find(this._events, function (e) { return e.event == event; });
-                if (existingEvent != null)
-                    return;
-                var newEvent = {
-                    event: event,
-                    timeout: timeout
-                };
-                this._events.push(newEvent);
-                if (this._started)
-                    this.startEvent(newEvent);
-            };
-            TimerService.prototype.removeEvent = function (event) {
-                for (var i = this._events.length - 1; i >= 0; i--) {
-                    var existingEvent = this._events[i];
-                    if (existingEvent.event == event) {
-                        this.stopEvent(existingEvent);
-                        this._events.splice(i, 1);
+                    if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
+                        throw new Error(sprintf('[_.sprintf] expecting number but found %s', get_type(arg)));
                     }
-                }
-            };
-            TimerService.prototype.clearEvents = function () {
-                this.stop();
-                this._events = [];
-            };
-            TimerService.prototype.startEvent = function (event) {
-                var _this = this;
-                event.interval = this._interval(function () { _this._rootScope.$broadcast(event.event); }, event.timeout);
-            };
-            TimerService.prototype.stopEvent = function (event) {
-                if (event.interval != null) {
-                    try {
-                        this._interval.cancel(event.interval);
+                    switch (match[8]) {
+                        case 'b':
+                            arg = arg.toString(2);
+                            break;
+                        case 'c':
+                            arg = String.fromCharCode(arg);
+                            break;
+                        case 'd':
+                            arg = parseInt(arg, 10);
+                            break;
+                        case 'e':
+                            arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential();
+                            break;
+                        case 'f':
+                            arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg);
+                            break;
+                        case 'o':
+                            arg = arg.toString(8);
+                            break;
+                        case 's':
+                            arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg);
+                            break;
+                        case 'u':
+                            arg = Math.abs(arg);
+                            break;
+                        case 'x':
+                            arg = arg.toString(16);
+                            break;
+                        case 'X':
+                            arg = arg.toString(16).toUpperCase();
+                            break;
                     }
-                    catch (ex) {
-                    }
-                    event.interval = null;
+                    arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+' + arg : arg);
+                    pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
+                    pad_length = match[6] - String(arg).length;
+                    pad = match[6] ? str_repeat(pad_character, pad_length) : '';
+                    output.push(match[5] ? arg + pad : pad + arg);
                 }
-            };
-            TimerService.prototype.start = function () {
-                var _this = this;
-                if (this._started)
-                    return;
-                _.each(this._events, function (event) {
-                    _this.startEvent(event);
-                });
-                this._started = true;
-            };
-            TimerService.prototype.stop = function () {
-                var _this = this;
-                _.each(this._events, function (event) {
-                    _this.stopEvent(event);
-                });
-                this._started = false;
-            };
-            return TimerService;
-        }());
-        angular
-            .module('pipTimer', [])
-            .service('pipTimer', TimerService);
-    })(utilities = pip.utilities || (pip.utilities = {}));
-})(pip || (pip = {}));
+            }
+            return output.join('');
+        };
+        str_format.cache = {};
+        str_format.parse = function (fmt) {
+            var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
+            while (_fmt) {
+                if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
+                    parse_tree.push(match[0]);
+                }
+                else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
+                    parse_tree.push('%');
+                }
+                else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
+                    if (match[2]) {
+                        arg_names |= 1;
+                        var field_list = [], replacement_field = match[2], field_match = [];
+                        if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+                            field_list.push(field_match[1]);
+                            while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+                                if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+                                    field_list.push(field_match[1]);
+                                }
+                                else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
+                                    field_list.push(field_match[1]);
+                                }
+                                else {
+                                    throw new Error('[_.sprintf] huh?');
+                                }
+                            }
+                        }
+                        else {
+                            throw new Error('[_.sprintf] huh?');
+                        }
+                        match[2] = field_list;
+                    }
+                    else {
+                        arg_names |= 2;
+                    }
+                    if (arg_names === 3) {
+                        throw new Error('[_.sprintf] mixing positional and named placeholders is not (yet) supported');
+                    }
+                    parse_tree.push(match);
+                }
+                else {
+                    throw new Error('[_.sprintf] huh?');
+                }
+                _fmt = _fmt.substring(match[0].length);
+            }
+            return parse_tree;
+        };
+        return str_format;
+    })();
+    return {
+        sprintf: sprintf,
+        format: sprintf,
+        sample: sample
+    };
+});
+},{}],20:[function(require,module,exports){
 
-
-
-
-
-
-
-(function(module) {
-try {
-  module = angular.module('pipButtons.Templates');
-} catch (e) {
-  module = angular.module('pipButtons.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toggle_buttons/toggle_buttons.html',
-    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)"\n' +
-    '     ng-if="$mdMedia(\'gt-xs\')">\n' +
-    '    <md-button tabindex="-1" ng-repeat="button in buttons"\n' +
-    '               ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}"\n' +
-    '               ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}"\n' +
-    '               class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)"\n' +
-    '               ng-disabled="button.disabled || disabled()">\n' +
-    '        {{button.name || button.title | translate}}\n' +
-    '        <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '\n' +
-    '<md-input-container class="md-block" ng-if="$mdMedia(\'xs\')">\n' +
-    '    <md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)">\n' +
-    '        <md-option ng-repeat="action in buttons" value="{{ ::$index }}">\n' +
-    '            {{ (action.title || action.name) | translate }}\n' +
-    '            <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span>\n' +
-    '        </md-option>\n' +
-    '    </md-select>\n' +
-    '</md-input-container>\n' +
-    '');
+},{}],21:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipPageReset', []);
+thisModule.factory('pipPageReset', ['$rootScope', '$timeout', function ($rootScope, $timeout) {
+    $rootScope.$on('pipResetPage', resetAll);
+    return {
+        resetPartial: resetPartial,
+        resetFull: resetFull,
+        resetAll: resetAll,
+        reset: reset
+    };
+    function resetPartial() {
+        reset(false, true);
+    }
+    function resetFull() {
+        reset(true, false);
+    }
+    function resetAll() {
+        reset(true, true);
+    }
+    function reset(full, partial) {
+        full = full !== undefined ? !!full : true;
+        partial = partial !== undefined ? !!partial : true;
+        if (full || partial) {
+            $rootScope.$reset = full;
+            $rootScope.$partialReset = partial;
+            $timeout(function () {
+                $rootScope.$reset = false;
+                $rootScope.$partialReset = false;
+            }, 0);
+        }
+    }
 }]);
-})();
+},{}],22:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipScroll', []);
+thisModule.factory('pipScroll', function () {
+    return {
+        scrollTo: scrollTo
+    };
+    function scrollTo(parentElement, childElement, animationDuration) {
+        if (!parentElement || !childElement)
+            return;
+        if (animationDuration == undefined)
+            animationDuration = 300;
+        setTimeout(function () {
+            if (!$(childElement).position())
+                return;
+            var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
+            if (modDiff < 20)
+                return;
+            var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
+            if (animationDuration > 0)
+                $(parentElement).animate({
+                    scrollTop: scrollTo + 'px'
+                }, animationDuration);
+        }, 100);
+    }
+});
+},{}],23:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipSystemInfo', []);
+thisModule.factory('pipSystemInfo', ['$rootScope', '$window', function ($rootScope, $window) {
+    return {
+        getBrowserName: getBrowserName,
+        getBrowserVersion: getBrowserVersion,
+        getPlatform: getPlatform,
+        isDesktop: isDesktop,
+        isMobile: isMobile,
+        isCordova: isCordova,
+        getOS: getOS,
+        isSupported: isSupported
+    };
+    function getBrowserName() {
+        var ua = $window.navigator.userAgent;
+        if (ua.search(/Edge/) > -1)
+            return "edge";
+        if (ua.search(/MSIE/) > -1)
+            return "ie";
+        if (ua.search(/Trident/) > -1)
+            return "ie";
+        if (ua.search(/Firefox/) > -1)
+            return "firefox";
+        if (ua.search(/Opera/) > -1)
+            return "opera";
+        if (ua.search(/OPR/) > -1)
+            return "opera";
+        if (ua.search(/YaBrowser/) > -1)
+            return "yabrowser";
+        if (ua.search(/Chrome/) > -1)
+            return "chrome";
+        if (ua.search(/Safari/) > -1)
+            return "safari";
+        if (ua.search(/Maxthon/) > -1)
+            return "maxthon";
+        return "unknown";
+    }
+    function getBrowserVersion() {
+        var browser, version;
+        var ua = $window.navigator.userAgent;
+        browser = getBrowserName();
+        switch (browser) {
+            case "edge":
+                version = (ua.split("Edge")[1]).split("/")[1];
+                break;
+            case "ie":
+                version = (ua.split("MSIE ")[1]).split(";")[0];
+                break;
+            case "ie11":
+                browser = "ie";
+                version = (ua.split("; rv:")[1]).split(")")[0];
+                break;
+            case "firefox":
+                version = ua.split("Firefox/")[1];
+                break;
+            case "opera":
+                version = ua.split("Version/")[1];
+                break;
+            case "operaWebkit":
+                version = ua.split("OPR/")[1];
+                break;
+            case "yabrowser":
+                version = (ua.split("YaBrowser/")[1]).split(" ")[0];
+                break;
+            case "chrome":
+                version = (ua.split("Chrome/")[1]).split(" ")[0];
+                break;
+            case "safari":
+                version = (ua.split("Version/")[1]).split(" ")[0];
+                break;
+            case "maxthon":
+                version = ua.split("Maxthon/")[1];
+                break;
+        }
+        return version;
+    }
+    function getPlatform() {
+        var ua = $window.navigator.userAgent;
+        if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
+            return 'mobile';
+        return 'desktop';
+    }
+    function isDesktop() {
+        return getPlatform() == 'desktop';
+    }
+    function isMobile() {
+        return getPlatform() == 'mobile';
+    }
+    function isCordova() {
+        return null;
+    }
+    function getOS() {
+        var ua = $window.navigator.userAgent;
+        try {
+            var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris'), osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
+            return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
+        }
+        catch (err) {
+            return 'unknown';
+        }
+    }
+    function isSupported(supported) {
+        if (!supported)
+            supported = {
+                edge: 11,
+                ie: 11,
+                firefox: 43,
+                opera: 35,
+                chrome: 47
+            };
+        var browser = getBrowserName();
+        var version = getBrowserVersion();
+        version = version.split(".")[0];
+        if (browser && supported[browser] && version >= supported[browser])
+            return true;
+        return true;
+    }
+    ;
+}]);
+},{}],24:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipTags', []);
+thisModule.factory('pipTags', function () {
+    return {
+        equal: equal,
+        normalizeOne: normalizeOne,
+        normalizeAll: normalizeAll,
+        normalize: normalizeAll,
+        compressOne: compressOne,
+        compressAll: compressAll,
+        compress: compressAll,
+        extract: extract
+    };
+    function normalizeOne(tag) {
+        return tag
+            ? _.trim(tag.replace(/(_|#)+/g, ' '))
+            : null;
+    }
+    function compressOne(tag) {
+        return tag
+            ? tag.replace(/( |_|#)/g, '').toLowerCase()
+            : null;
+    }
+    function equal(tag1, tag2) {
+        if (tag1 == null && tag2 == null)
+            return true;
+        if (tag1 == null || tag2 == null)
+            return false;
+        return compressOne(tag1) == compressOne(tag2);
+    }
+    function normalizeAll(tags) {
+        if (_.isString(tags)) {
+            tags = tags.split(/( |,|;)+/);
+        }
+        tags = _.map(tags, function (tag) {
+            return normalizeOne(tag);
+        });
+        return tags;
+    }
+    function compressAll(tags) {
+        if (_.isString(tags))
+            tags = tags.split(/( |,|;)+/);
+        tags = _.map(tags, function (tag) {
+            return compressOne(tag);
+        });
+        return tags;
+    }
+    ;
+    function extract(entity, searchFields) {
+        var tags = normalizeAll(entity.tags);
+        _.each(searchFields, function (field) {
+            var text = entity[field] || '';
+            if (text != '') {
+                var hashTags = text.match(/#\w+/g);
+                tags = tags.concat(normalizeAll(hashTags));
+            }
+        });
+        return _.uniq(tags);
+    }
+});
+},{}],25:[function(require,module,exports){
+'use strict';
+var TimerEvent = (function () {
+    function TimerEvent() {
+    }
+    return TimerEvent;
+}());
+var DefaultEvents = [
+    { event: 'pipAutoPullChanges', timeout: 60000 },
+    { event: 'pipAutoUpdatePage', timeout: 15000 },
+    { event: 'pipAutoUpdateCollection', timeout: 300000 }
+];
+var TimerService = (function () {
+    TimerService.$inject = ['$rootScope', '$interval'];
+    function TimerService($rootScope, $interval) {
+        this._started = false;
+        this._events = _.cloneDeep(DefaultEvents);
+        this._rootScope = $rootScope;
+        this._interval = $interval;
+    }
+    Object.defineProperty(TimerService.prototype, "isStarted", {
+        get: function () {
+            return this._started;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TimerService.prototype.addEvent = function (event, timeout) {
+        var existingEvent = _.find(this._events, function (e) { return e.event == event; });
+        if (existingEvent != null)
+            return;
+        var newEvent = {
+            event: event,
+            timeout: timeout
+        };
+        this._events.push(newEvent);
+        if (this._started)
+            this.startEvent(newEvent);
+    };
+    TimerService.prototype.removeEvent = function (event) {
+        for (var i = this._events.length - 1; i >= 0; i--) {
+            var existingEvent = this._events[i];
+            if (existingEvent.event == event) {
+                this.stopEvent(existingEvent);
+                this._events.splice(i, 1);
+            }
+        }
+    };
+    TimerService.prototype.clearEvents = function () {
+        this.stop();
+        this._events = [];
+    };
+    TimerService.prototype.startEvent = function (event) {
+        var _this = this;
+        event.interval = this._interval(function () { _this._rootScope.$broadcast(event.event); }, event.timeout);
+    };
+    TimerService.prototype.stopEvent = function (event) {
+        if (event.interval != null) {
+            try {
+                this._interval.cancel(event.interval);
+            }
+            catch (ex) {
+            }
+            event.interval = null;
+        }
+    };
+    TimerService.prototype.start = function () {
+        var _this = this;
+        if (this._started)
+            return;
+        _.each(this._events, function (event) {
+            _this.startEvent(event);
+        });
+        this._started = true;
+    };
+    TimerService.prototype.stop = function () {
+        var _this = this;
+        _.each(this._events, function (event) {
+            _this.stopEvent(event);
+        });
+        this._started = false;
+    };
+    return TimerService;
+}());
+angular
+    .module('pipTimer', [])
+    .service('pipTimer', TimerService);
+},{}],26:[function(require,module,exports){
+
+},{}]},{},[1,2,3,4,6,5,8,9,7,10,11,12,14,15,16,13,17,18,19,20,21,22,23,24,25,26])
 
 
 
+
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipButtons', [
@@ -1480,7 +1350,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipFabTooltipVisibility'
     ]);
 })();
-
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipButtons.Translate', []);
@@ -1492,7 +1362,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipFabTooltipVisibility", []);
@@ -1516,7 +1386,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
@@ -1560,7 +1430,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipToggleButtons', ['pipButtons.Templates']);
@@ -1620,28 +1490,47 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
-
-
-
-
-(function (angular) {
-    'use strict';
-    angular.module('pipLanding', []);
-})(window.angular);
-
-
-
-
-
-(function () {
-    'use strict';
-    angular.module('pipLayout', [
-        'pipLayout.Main', 'pipLayout.Simple', 'pipLayout.Card', 'pipLayout.Document',
-        'pipLayout.Tiles', 'pipLayout.Dialog', 'pipLayout.Media'
-    ]);
+},{}],6:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipButtons.Templates');
+} catch (e) {
+  module = angular.module('pipButtons.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toggle_buttons/toggle_buttons.html',
+    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)"\n' +
+    '     ng-if="$mdMedia(\'gt-xs\')">\n' +
+    '    <md-button tabindex="-1" ng-repeat="button in buttons"\n' +
+    '               ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}"\n' +
+    '               ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}"\n' +
+    '               class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)"\n' +
+    '               ng-disabled="button.disabled || disabled()">\n' +
+    '        {{button.name || button.title | translate}}\n' +
+    '        <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<md-input-container class="md-block" ng-if="$mdMedia(\'xs\')">\n' +
+    '    <md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)">\n' +
+    '        <md-option ng-repeat="action in buttons" value="{{ ::$index }}">\n' +
+    '            {{ (action.title || action.name) | translate }}\n' +
+    '            <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span>\n' +
+    '        </md-option>\n' +
+    '    </md-select>\n' +
+    '</md-input-container>\n' +
+    '');
+}]);
 })();
 
+
+
+},{}]},{},[1,2,3,4,5,6])
+
+
+
+
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipLayout.Card', []);
@@ -1709,7 +1598,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipLayout.Dialog', []);
@@ -1725,7 +1614,7 @@ module.run(['$templateCache', function($templateCache) {
         return;
     }]);
 })();
-
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipLayout.Document', []);
@@ -1739,7 +1628,15 @@ module.run(['$templateCache', function($templateCache) {
         $element.addClass('pip-document');
     }]);
 })();
-
+},{}],4:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipLayout', [
+        'pipLayout.Main', 'pipLayout.Simple', 'pipLayout.Card', 'pipLayout.Document',
+        'pipLayout.Tiles', 'pipLayout.Dialog', 'pipLayout.Media'
+    ]);
+})();
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipLayout.Main', []);
@@ -1770,7 +1667,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-
+},{}],6:[function(require,module,exports){
 "use strict";
 (function () {
     'use strict';
@@ -1895,7 +1792,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-
+},{}],7:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipLayout.Simple', []);
@@ -1908,7 +1805,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],8:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipLayout.Tiles', ['wu.masonry']);
@@ -2000,11 +1897,12 @@ module.run(['$templateCache', function($templateCache) {
     }
     ;
 })();
+},{}]},{},[1,2,3,4,5,6,7,8])
 
 
 
 
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSplit', []);
@@ -2053,11 +1951,12 @@ module.run(['$templateCache', function($templateCache) {
         }
     });
 })();
+},{}]},{},[1])
 
 
 
 
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipBehaviors', [
@@ -2068,49 +1967,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipDraggable'
     ]);
 })();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipFocused", []);
-    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', function ($timeout, $mdConstant) {
-        return {
-            require: "?ngModel",
-            link: function ($scope, $element, $attrs) {
-                var controls, controlsLength, withHidden = $attrs.pipWithHidden;
-                $timeout(init);
-                $element.on('keydown', keydownListener);
-                $scope.$watch($attrs.ngModel, function () {
-                    $timeout(init);
-                }, true);
-                function init() {
-                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
-                    controls = $element.find(selector);
-                    controlsLength = controls.length;
-                    controls.on('focus', function () {
-                        $element.addClass('pip-focused-container');
-                        $(this).addClass('md-focused');
-                    }).on('focusout', function () {
-                        $element.removeClass('pip-focused-container');
-                    });
-                }
-                function keydownListener(e) {
-                    var keyCode = e.which || e.keyCode;
-                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
-                        e.preventDefault();
-                        var increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1, moveToControl = controls.index(controls.filter(".md-focused")) + increment;
-                        if (moveToControl >= 0 && moveToControl < controlsLength) {
-                            controls[moveToControl].focus();
-                        }
-                    }
-                }
-            }
-        };
-    }]);
-})();
-
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipDraggable", []);
@@ -2566,7 +2423,49 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],3:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module("pipFocused", []);
+    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', function ($timeout, $mdConstant) {
+        return {
+            require: "?ngModel",
+            link: function ($scope, $element, $attrs) {
+                var controls, controlsLength, withHidden = $attrs.pipWithHidden;
+                $timeout(init);
+                $element.on('keydown', keydownListener);
+                $scope.$watch($attrs.ngModel, function () {
+                    $timeout(init);
+                }, true);
+                function init() {
+                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
+                    controls = $element.find(selector);
+                    controlsLength = controls.length;
+                    controls.on('focus', function () {
+                        $element.addClass('pip-focused-container');
+                        $(this).addClass('md-focused');
+                    }).on('focusout', function () {
+                        $element.removeClass('pip-focused-container');
+                    });
+                }
+                function keydownListener(e) {
+                    var keyCode = e.which || e.keyCode;
+                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
+                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
+                        e.preventDefault();
+                        var increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1, moveToControl = controls.index(controls.filter(".md-focused")) + increment;
+                        if (moveToControl >= 0 && moveToControl < controlsLength) {
+                            controls[moveToControl].focus();
+                        }
+                    }
+                }
+            }
+        };
+    }]);
+})();
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipInfiniteScroll", []);
@@ -2732,7 +2631,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipSelected", []);
@@ -2891,7 +2790,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],6:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipUnsavedChanges", []);
@@ -2927,120 +2826,12 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+},{}]},{},[1,2,3,4,5,6])
 
 
 
 
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('color_picker/color_picker.html',
-    '<ul class="pip-color-picker {{class}}" pip-selected="currentColorIndex" pip-enter-space-press="enterSpacePress($event)">\n' +
-    '    <li tabindex="-1" ng-repeat="color in colors track by color">\n' +
-    '        <md-button  tabindex="-1" class="md-icon-button pip-selectable" ng-click="selectColor($index)" aria-label="color" ng-disabled="disabled()">\n' +
-    '            <md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == currentColor ? \'circle\' : \'radio-off\' }}">\n' +
-    '            </md-icon>\n' +
-    '        </md-button>\n' +
-    '    </li>\n' +
-    '</ul>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.html',
-    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
-    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
-    '</div>\n' +
-    '\n' +
-    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center"\n' +
-    '        ng-show="showProgress()">\n' +
-    '     <!--ng-show="$routing || $reset || toolInitialized">-->\n' +
-    '    <div class="loader">\n' +
-    '        <svg class="circular" viewBox="25 25 50 50">\n' +
-    '            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>\n' +
-    '        </svg>\n' +
-    '    </div>\n' +
-    '\n' +
-    '    <img src=""  height="40" width="40" class="pip-img">\n' +
-    '\n' +
-    '    <md-progress-circular md-diameter="96"\n' +
-    '                          class="fix-ie"></md-progress-circular>\n' +
-    '\n' +
-    '</div>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast"\n' +
-    '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
-    '          \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || actionLenght > 4,\n' +
-    '          \'pip-no-action-toast\': actionLenght == 0}"\n' +
-    '          style="height:initial; max-height: initial; ">\n' +
-    '\n' +
-    '    <span class="flex-var pip-text" ng-bind-html="message"></span>\n' +
-    '    <div class="layout-row layout-align-end-start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
-    '        <md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button>\n' +
-    '        <md-button class="flex-fixed pip-toast-button"\n' +
-    '                   ng-click="onAction(action)"\n' +
-    '                   ng-repeat="action in actions"\n' +
-    '                   aria-label="{{::action| translate}}">\n' +
-    '            {{::action| translate}}\n' +
-    '        </md-button>\n' +
-    '    </div>\n' +
-    '\n' +
-    '</md-toast>');
-}]);
-})();
-
-
-
-(function () {
-    'use strict';
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipControls.Translate'
-    ]);
-})();
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipColorPicker', ['pipControls.Templates']);
@@ -3089,7 +2880,20 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],2:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipControls', [
+        'pipMarkdown',
+        'pipColorPicker',
+        'pipRoutingProgress',
+        'pipPopover',
+        'pipImageSlider',
+        'pipToasts',
+        'pipControls.Translate'
+    ]);
+})();
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipControls.Translate', []);
@@ -3101,7 +2905,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service']);
@@ -3177,7 +2981,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipImageSlider.Service', []);
@@ -3241,7 +3045,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-
+},{}],6:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSliderButton', []);
@@ -3260,7 +3064,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],7:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSliderIndicator', []);
@@ -3280,7 +3084,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],8:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipMarkdown', ['ngSanitize']);
@@ -3386,7 +3190,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],9:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipPopover', ['pipPopover.Service']);
@@ -3467,7 +3271,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
 })();
-
+},{}],10:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipPopover.Service', []);
@@ -3506,7 +3310,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-
+},{}],11:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipRoutingProgress', ['ngMaterial']);
@@ -3533,7 +3337,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-
+},{}],12:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
@@ -3700,44 +3504,109 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-
-
-
-
+},{}],13:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipControls.Templates');
+} catch (e) {
+  module = angular.module('pipControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('color_picker/color_picker.html',
+    '<ul class="pip-color-picker {{class}}" pip-selected="currentColorIndex" pip-enter-space-press="enterSpacePress($event)">\n' +
+    '    <li tabindex="-1" ng-repeat="color in colors track by color">\n' +
+    '        <md-button  tabindex="-1" class="md-icon-button pip-selectable" ng-click="selectColor($index)" aria-label="color" ng-disabled="disabled()">\n' +
+    '            <md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == currentColor ? \'circle\' : \'radio-off\' }}">\n' +
+    '            </md-icon>\n' +
+    '        </md-button>\n' +
+    '    </li>\n' +
+    '</ul>\n' +
+    '');
+}]);
+})();
 
 (function(module) {
 try {
-  module = angular.module('pipLists.Templates');
+  module = angular.module('pipControls.Templates');
 } catch (e) {
-  module = angular.module('pipLists.Templates', []);
+  module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tag_list/tag_list.html',
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
-    '     ng-if="pipType && !pipTypeLocal">\n' +
-    '\n' +
-    '    <span>{{pipType.toUpperCase() | translate | uppercase}}</span>\n' +
+  $templateCache.put('popover/popover.html',
+    '<div ng-if="params.templateUrl" class=\'pip-popover flex layout-column\'\n' +
+    '     ng-click="onPopoverClick($event)" ng-include="params.templateUrl">\n' +
     '</div>\n' +
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
-    '     ng-if="pipType && pipTypeLocal">\n' +
     '\n' +
-    '    <span>{{pipTypeLocal.toUpperCase() | translate | uppercase}}</span>\n' +
+    '<div ng-if="params.template" class=\'pip-popover\' ng-click="onPopoverClick($event)">\n' +
     '</div>\n' +
-    '<div class="pip-chip rm4" ng-repeat="tag in pipTags">\n' +
-    '    <span>{{::tag}}</span>\n' +
-    '</div>');
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipControls.Templates');
+} catch (e) {
+  module = angular.module('pipControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center"\n' +
+    '        ng-show="showProgress()">\n' +
+    '     <!--ng-show="$routing || $reset || toolInitialized">-->\n' +
+    '    <div class="loader">\n' +
+    '        <svg class="circular" viewBox="25 25 50 50">\n' +
+    '            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>\n' +
+    '        </svg>\n' +
+    '    </div>\n' +
+    '\n' +
+    '    <img src=""  height="40" width="40" class="pip-img">\n' +
+    '\n' +
+    '    <md-progress-circular md-diameter="96"\n' +
+    '                          class="fix-ie"></md-progress-circular>\n' +
+    '\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipControls.Templates');
+} catch (e) {
+  module = angular.module('pipControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast"\n' +
+    '          ng-class="{\'pip-error\': toast.type==\'error\',\n' +
+    '          \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || actionLenght > 4,\n' +
+    '          \'pip-no-action-toast\': actionLenght == 0}"\n' +
+    '          style="height:initial; max-height: initial; ">\n' +
+    '\n' +
+    '    <span class="flex-var pip-text" ng-bind-html="message"></span>\n' +
+    '    <div class="layout-row layout-align-end-start" class="pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)">\n' +
+    '        <md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button>\n' +
+    '        <md-button class="flex-fixed pip-toast-button"\n' +
+    '                   ng-click="onAction(action)"\n' +
+    '                   ng-repeat="action in actions"\n' +
+    '                   aria-label="{{::action| translate}}">\n' +
+    '            {{::action| translate}}\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '\n' +
+    '</md-toast>');
 }]);
 })();
 
 
 
-(function () {
-    'use strict';
-    angular.module('pipLists', [
-        'pipTagList'
-    ]);
-})();
+},{}]},{},[1,2,3,5,4,6,7,8,10,9,11,12,13])
 
+
+
+
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipList.Translate', []);
@@ -3749,7 +3618,14 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],2:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipLists', [
+        'pipTagList'
+    ]);
+})();
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipTagList', ['pipList.Translate']);
@@ -3785,11 +3661,1551 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+},{}],4:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipLists.Templates');
+} catch (e) {
+  module = angular.module('pipLists.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tag_list/tag_list.html',
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
+    '     ng-if="pipType && !pipTypeLocal">\n' +
+    '\n' +
+    '    <span>{{pipType.toUpperCase() | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}"\n' +
+    '     ng-if="pipType && pipTypeLocal">\n' +
+    '\n' +
+    '    <span>{{pipTypeLocal.toUpperCase() | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4" ng-repeat="tag in pipTags">\n' +
+    '    <span>{{::tag}}</span>\n' +
+    '</div>');
+}]);
+})();
+
+
+
+},{}]},{},[1,2,3,4])
 
 
 
 
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+angular.module('pipDateTime', [
+    'pipDateTime.Service', 'pipDateTime.Filter'
+]);
+},{}],2:[function(require,module,exports){
+'use strict';
+formatTimeFilter.$inject = ['pipDateTime'];
+formatDateOptionalFilter.$inject = ['pipDateTime'];
+formatLongDateFilter.$inject = ['pipDateTime'];
+formatShortDateFilter.$inject = ['pipDateTime'];
+formatMonthFilter.$inject = ['pipDateTime'];
+formatLongMonthFilter.$inject = ['pipDateTime'];
+formatYearFilter.$inject = ['pipDateTime'];
+formatWeekFilter.$inject = ['pipDateTime'];
+formatShortWeekFilter.$inject = ['pipDateTime'];
+formatShortDateTimeFilter.$inject = ['pipDateTime'];
+formatLongDateTimeFilter.$inject = ['pipDateTime'];
+formatShortTimeFilter.$inject = ['pipDateTime'];
+formatLongTimeFilter.$inject = ['pipDateTime'];
+formatShortDayOfWeekFilter.$inject = ['pipDateTime'];
+formatLongDayOfWeekFilter.$inject = ['pipDateTime'];
+formatDateNumberFilter.$inject = ['pipDateTime'];
+formatLongDateNumberFilter.$inject = ['pipDateTime'];
+formatTimeNumberFilter.$inject = ['pipDateTime'];
+formatLongTimeNumberFilter.$inject = ['pipDateTime'];
+formatLongMonthDayFilter.$inject = ['pipDateTime'];
+formatShortMonthDayFilter.$inject = ['pipDateTime'];
+formatDateRangeFilter.$inject = ['pipDateTime'];
+formatDateTimeRangeFilter.$inject = ['pipDateTime'];
+formatISOWeekFilter.$inject = ['pipDateTime'];
+formatShortISOWeekFilter.$inject = ['pipDateTime'];
+formatISOWeekOrdinalFilter.$inject = ['pipDateTime'];
+formatDateYFilter.$inject = ['pipDateTime'];
+formatLongDateYFilter.$inject = ['pipDateTime'];
+formatMillisecondsToSecondsFilter.$inject = ['pipDateTime'];
+formatElapsedIntervalFilter.$inject = ['pipDateTime'];
+getDateJSONFilter.$inject = ['pipDateTime'];
+function formatTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value, format) {
+        return pipDateTime.formatTime(value, format);
+    };
+}
+function formatDateOptionalFilter(pipDateTime) {
+    "ngInject";
+    return function (value, format) {
+        return pipDateTime.formatDateOptional(value, format);
+    };
+}
+function formatLongDateFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongDate(value);
+    };
+}
+function formatShortDateFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortDate(value);
+    };
+}
+function formatMonthFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatMonth(value);
+    };
+}
+function formatLongMonthFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongMonth(value);
+    };
+}
+function formatYearFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatYear(value);
+    };
+}
+function formatWeekFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatWeek(value);
+    };
+}
+function formatShortWeekFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortWeek(value);
+    };
+}
+function formatShortDateTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortDateTime(value);
+    };
+}
+function formatLongDateTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongDateTime(value);
+    };
+}
+function formatShortTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortTime(value);
+    };
+}
+function formatLongTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongTime(value);
+    };
+}
+function formatShortDayOfWeekFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortDayOfWeek(value);
+    };
+}
+function formatLongDayOfWeekFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongDayOfWeek(value);
+    };
+}
+function formatDateNumberFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatDateNumber(value);
+    };
+}
+function formatLongDateNumberFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongDateNumber(value);
+    };
+}
+function formatTimeNumberFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatTimeNumber(value);
+    };
+}
+function formatLongTimeNumberFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongTimeNumber(value);
+    };
+}
+function formatLongMonthDayFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongMonthDay(value);
+    };
+}
+function formatShortMonthDayFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortMonthDay(value);
+    };
+}
+function formatDateRangeFilter(pipDateTime) {
+    "ngInject";
+    return function (value1, value2) {
+        return pipDateTime.formatDateRange(value1, value2);
+    };
+}
+function formatDateTimeRangeFilter(pipDateTime) {
+    "ngInject";
+    return function (value1, value2) {
+        return pipDateTime.formatDateTimeRange(value1, value2);
+    };
+}
+function formatISOWeekFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatISOWeek(value);
+    };
+}
+function formatShortISOWeekFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatShortISOWeek(value);
+    };
+}
+function formatISOWeekOrdinalFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatISOWeekOrdinal(value);
+    };
+}
+function formatDateYFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatDateY(value);
+    };
+}
+function formatLongDateYFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatLongDateY(value);
+    };
+}
+function formatMillisecondsToSecondsFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatMillisecondsToSeconds(value);
+    };
+}
+function formatElapsedIntervalFilter(pipDateTime) {
+    "ngInject";
+    return function (value, start) {
+        return pipDateTime.formatElapsedInterval(value, start);
+    };
+}
+function getDateJSONFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.getDateJSON(value);
+    };
+}
+angular
+    .module('pipDateTime.Filter', [])
+    .filter('formatTime', formatTimeFilter)
+    .filter('formatDateOptional', formatDateOptionalFilter)
+    .filter('formatShortDate', formatShortDateFilter)
+    .filter('formatLongDate', formatLongDateFilter)
+    .filter('formatMonth', formatMonthFilter)
+    .filter('formatLongMonth', formatLongMonthFilter)
+    .filter('formatYear', formatYearFilter)
+    .filter('formatWeek', formatWeekFilter)
+    .filter('formatShortWeek', formatShortWeekFilter)
+    .filter('formatShortDateTime', formatShortDateTimeFilter)
+    .filter('formatLongDateTime', formatLongDateTimeFilter)
+    .filter('formatShortTime', formatShortTimeFilter)
+    .filter('formatLongTime', formatLongTimeFilter)
+    .filter('formatShortDayOfWeek', formatShortDayOfWeekFilter)
+    .filter('formatLongDayOfWeek', formatLongDayOfWeekFilter)
+    .filter('formatDateNumber', formatDateNumberFilter)
+    .filter('formatLongDateNumber', formatLongDateNumberFilter)
+    .filter('formatTimeNumber', formatTimeNumberFilter)
+    .filter('formatLongTimeNumber', formatLongTimeNumberFilter)
+    .filter('formatLongMonthDay', formatLongMonthDayFilter)
+    .filter('formatShortMonthDay', formatShortMonthDayFilter)
+    .filter('formatDateRange', formatDateRangeFilter)
+    .filter('formatDateTimeRange', formatDateTimeRangeFilter)
+    .filter('formatISOWeek', formatISOWeekFilter)
+    .filter('formatShortISOWeek', formatShortISOWeekFilter)
+    .filter('formatISOWeekOrdinal', formatISOWeekOrdinalFilter)
+    .filter('formatDateY', formatDateYFilter)
+    .filter('formatLongDateY', formatLongDateYFilter)
+    .filter('formatMillisecondsToSeconds', formatMillisecondsToSecondsFilter)
+    .filter('formatElapsedInterval', formatElapsedIntervalFilter);
+},{}],3:[function(require,module,exports){
+'use strict';
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var DateTime = (function () {
+    function DateTime() {
+        this._momentRanged = new Array('year', 'month', 'week', 'isoweek', 'day');
+        this._defaultFormat = 'LL';
+    }
+    DateTime.prototype.isUndefinedOrNull = function (value) {
+        return angular.isUndefined(value) || value === null;
+    };
+    DateTime.prototype.getRange = function (value) {
+        if (this.isUndefinedOrNull(value)) {
+            return 'day';
+        }
+        var index = this._momentRanged.indexOf(value);
+        if (index < 0) {
+            return 'day';
+        }
+        else {
+            return this._momentRanged[index];
+        }
+    };
+    DateTime.prototype.getOperationRange = function (value) {
+        if (this.isUndefinedOrNull(value)) {
+            return 'day';
+        }
+        var range = value == 'isoweek' ? 'week' : value, index = this._momentRanged.indexOf(range);
+        if (index < 0) {
+            return 'day';
+        }
+        else {
+            return this._momentRanged[index];
+        }
+    };
+    DateTime.prototype.formatDateTime = function (value, basicFormat) {
+        var date, formatTpl;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        formatTpl = basicFormat ? basicFormat : this._defaultFormat;
+        return date.format(formatTpl);
+    };
+    DateTime.prototype.formatDateTimeY = function (value, basicFormat) {
+        var date, nowDate, formatMoment;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        nowDate = moment();
+        formatMoment = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat);
+        if (nowDate.year() == date.year()) {
+            formatMoment = formatMoment.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
+        }
+        return date.format(formatMoment);
+    };
+    DateTime.prototype.formatDay = function (value, basicFormat) {
+        var date, format = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat), formatMonthYearless = format.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '').replace(/M/g, '');
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        return date.format(formatMonthYearless);
+    };
+    DateTime.prototype.formatMonthDay = function (value, basicFormat) {
+        var date, format = basicFormat ? basicFormat : this._defaultFormat, formatLL = moment.localeData().longDateFormat(format), formatYearlessLL = formatLL.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        return date.format(formatYearlessLL);
+    };
+    DateTime.prototype.formatRange = function (value1, value2, basicFormat) {
+        var dateStart, dateEnd, format = basicFormat ? basicFormat : this._defaultFormat;
+        if (this.isUndefinedOrNull(value1)) {
+            dateStart = null;
+        }
+        else {
+            dateStart = moment(value1);
+        }
+        if (this.isUndefinedOrNull(value2)) {
+            dateEnd = null;
+        }
+        else {
+            dateEnd = moment(value2);
+        }
+        if (dateStart === null && dateEnd === null)
+            return '';
+        if (dateStart === null) {
+            return dateEnd.format(basicFormat);
+        }
+        else if (dateEnd === null || dateStart.isSame(dateEnd)) {
+            return dateStart.format(basicFormat);
+            ;
+        }
+        if (dateStart.isAfter(dateEnd)) {
+            throw new Error('Date range error. Start date is more than end date.');
+        }
+        if (dateStart.year() == dateEnd.year()) {
+            if (dateStart.month() == dateEnd.month()) {
+                return this.formatDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
+            }
+            else {
+                return this.formatMonthDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
+            }
+        }
+        else {
+            return dateStart.format(basicFormat) + '-' + dateEnd.format(basicFormat);
+        }
+    };
+    DateTime.prototype.toStartRange = function (value, range) {
+        var date;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        return date.startOf(range).toDate();
+    };
+    DateTime.prototype.toEndRange = function (value, range, offset) {
+        var date, result, mssOffset;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        if (!angular.isNumber(offset)) {
+            mssOffset = 0;
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        if (mssOffset) {
+            result = date.startOf(range).add(mssOffset, 'milliseconds');
+        }
+        else {
+            result = date.startOf(range);
+        }
+        return date.startOf(range).toDate();
+    };
+    ;
+    DateTime.prototype.formatTime = function (value, format) {
+        return this.formatDateTime(value, 'LLL');
+    };
+    DateTime.prototype.formatDateOptional = function (value, format) {
+        return this.formatDateTime(value, 'L');
+    };
+    DateTime.prototype.formatShortDate = function (value) {
+        return this.formatDateTime(value, 'L');
+    };
+    DateTime.prototype.formatLongDate = function (value) {
+        return this.formatDateTime(value, 'LL');
+    };
+    DateTime.prototype.formatMonth = function (value) {
+        return this.formatDateTime(value, 'MM');
+    };
+    DateTime.prototype.formatLongMonth = function (value) {
+        return this.formatDateTime(value, 'MMMM');
+    };
+    DateTime.prototype.formatYear = function (value) {
+        return this.formatDateTime(value, 'YYYY');
+    };
+    DateTime.prototype.formatWeek = function (value) {
+        return this.formatDateTime(value, 'ww');
+    };
+    DateTime.prototype.formatShortWeek = function (value) {
+        return this.formatDateTime(value, 'w');
+    };
+    DateTime.prototype.formatShortDateTime = function (value) {
+        return this.formatDateTime(value, 'LLL');
+    };
+    DateTime.prototype.formatLongDateTime = function (value) {
+        return this.formatDateTime(value, 'LLLL');
+    };
+    DateTime.prototype.formatShortTime = function (value) {
+        return this.formatDateTime(value, 'LT');
+    };
+    DateTime.prototype.formatLongTime = function (value) {
+        return this.formatDateTime(value, 'LTS');
+    };
+    DateTime.prototype.formatShortDayOfWeek = function (value) {
+        return this.formatDateTime(value, 'dd');
+    };
+    DateTime.prototype.formatLongDayOfWeek = function (value) {
+        return this.formatDateTime(value, 'dddd');
+    };
+    DateTime.prototype.formatDateNumber = function (value) {
+        return this.formatDateTime(value, 'l');
+    };
+    DateTime.prototype.formatLongDateNumber = function (value) {
+        return this.formatDateTime(value, 'll');
+    };
+    DateTime.prototype.formatTimeNumber = function (value) {
+        return this.formatDateTime(value, 'LLL');
+    };
+    DateTime.prototype.formatLongTimeNumber = function (value) {
+        return this.formatDateTime(value, 'LLLL');
+    };
+    DateTime.prototype.formatLongMonthDay = function (value) {
+        return this.formatMonthDay(value, 'LL');
+    };
+    DateTime.prototype.formatShortMonthDay = function (value) {
+        return this.formatMonthDay(value, 'L');
+    };
+    DateTime.prototype.formatDateRange = function (value1, value2) {
+        return this.formatRange(value1, value2, 'LL');
+    };
+    DateTime.prototype.formatDateTimeRange = function (value1, value2) {
+        return this.formatRange(value1, value2, 'LLL');
+    };
+    DateTime.prototype.formatISOWeek = function (value) {
+        return this.formatDateTime(value, 'WW');
+    };
+    DateTime.prototype.formatShortISOWeek = function (value) {
+        return this.formatDateTime(value, 'W');
+    };
+    DateTime.prototype.formatISOWeekOrdinal = function (value) {
+        return this.formatDateTime(value, 'Wo');
+    };
+    DateTime.prototype.formatDateY = function (value) {
+        return this.formatDateTimeY(value, 'L');
+    };
+    DateTime.prototype.formatLongDateY = function (value) {
+        return this.formatDateTimeY(value, 'LL');
+    };
+    DateTime.prototype.formatMillisecondsToSeconds = function (value) {
+        return '';
+    };
+    DateTime.prototype.formatElapsedInterval = function (value, start) {
+        var date, nowDate;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        if (this.isUndefinedOrNull(start)) {
+            nowDate = moment();
+        }
+        else {
+            nowDate = moment(start);
+        }
+        date = moment(value);
+        if (!date.isValid() || !nowDate.isValid()) {
+            return '';
+        }
+        return moment(date).fromNow(nowDate);
+    };
+    DateTime.prototype.getDateJSON = function (date) {
+        return JSON.stringify(moment(date));
+    };
+    DateTime.prototype.getNextStart = function (value, category) {
+        var date, range, result;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        range = this.getRange(category);
+        result = moment(date).startOf(range).add(this.getOperationRange(range));
+        return result.toDate();
+    };
+    DateTime.prototype.getPrevStart = function (value, category) {
+        var date, range, result;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        range = this.getRange(category);
+        result = moment(date).startOf(range).add(-1, this.getOperationRange(range));
+        return result.toDate();
+    };
+    DateTime.prototype.getNowStart = function (category) {
+        var date, range, result;
+        date = moment();
+        if (!date.isValid()) {
+            return '';
+        }
+        range = this.getRange(category);
+        result = moment(date).startOf(range);
+        return result.toDate();
+    };
+    DateTime.prototype.addHours = function (value, hours) {
+        var date;
+        if (this.isUndefinedOrNull(value) || !angular.isNumber(hours)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        return date.add(hours, 'hours').toDate();
+    };
+    DateTime.prototype.toStartDay = function (value) {
+        return this.toStartRange(value, 'day');
+    };
+    DateTime.prototype.toEndDay = function (value, offset) {
+        return this.toEndRange(value, 'day', offset);
+    };
+    DateTime.prototype.toStartWeek = function (value) {
+        return this.toStartRange(value, 'week');
+    };
+    DateTime.prototype.toEndWeek = function (value, offset) {
+        return this.toEndRange(value, 'week', offset);
+    };
+    DateTime.prototype.toStartMonth = function (value) {
+        return this.toStartRange(value, 'month');
+    };
+    DateTime.prototype.toEndMonth = function (value, offset) {
+        return this.toEndRange(value, 'month', offset);
+    };
+    DateTime.prototype.toStartYear = function (value) {
+        return this.toStartRange(value, 'year');
+    };
+    DateTime.prototype.toEndYear = function (value, offset) {
+        return this.toEndRange(value, 'year', offset);
+    };
+    return DateTime;
+}());
+var DateTimeService = (function () {
+    function DateTimeService(datetime) {
+        this._datetime = datetime;
+    }
+    DateTimeService.prototype.formatTime = function (value, format) {
+        return this._datetime.formatTime(value, format);
+    };
+    DateTimeService.prototype.formatDateOptional = function (value, format) {
+        return this._datetime.formatDateOptional(value, format);
+    };
+    DateTimeService.prototype.formatShortDate = function (value) {
+        return this._datetime.formatShortDate(value);
+    };
+    DateTimeService.prototype.formatLongDate = function (value) {
+        return this._datetime.formatLongDate(value);
+    };
+    DateTimeService.prototype.formatMonth = function (value) {
+        return this._datetime.formatMonth(value);
+    };
+    DateTimeService.prototype.formatLongMonth = function (value) {
+        return this._datetime.formatLongMonth(value);
+    };
+    DateTimeService.prototype.formatYear = function (value) {
+        return this._datetime.formatYear(value);
+    };
+    DateTimeService.prototype.formatWeek = function (value) {
+        return this._datetime.formatWeek(value);
+    };
+    DateTimeService.prototype.formatShortWeek = function (value) {
+        return this._datetime.formatShortWeek(value);
+    };
+    DateTimeService.prototype.formatShortDateTime = function (value) {
+        return this._datetime.formatShortDateTime(value);
+    };
+    DateTimeService.prototype.formatLongDateTime = function (value) {
+        return this._datetime.formatLongDateTime(value);
+    };
+    DateTimeService.prototype.formatShortTime = function (value) {
+        return this._datetime.formatShortTime(value);
+    };
+    DateTimeService.prototype.formatLongTime = function (value) {
+        return this._datetime.formatLongTime(value);
+    };
+    DateTimeService.prototype.formatShortDayOfWeek = function (value) {
+        return this._datetime.formatShortDayOfWeek(value);
+    };
+    DateTimeService.prototype.formatLongDayOfWeek = function (value) {
+        return this._datetime.formatLongDayOfWeek(value);
+    };
+    DateTimeService.prototype.formatDateNumber = function (value) {
+        return this._datetime.formatDateNumber(value);
+    };
+    DateTimeService.prototype.formatLongDateNumber = function (value) {
+        return this._datetime.formatLongDateNumber(value);
+    };
+    DateTimeService.prototype.formatTimeNumber = function (value) {
+        return this._datetime.formatTimeNumber(value);
+    };
+    DateTimeService.prototype.formatLongTimeNumber = function (value) {
+        return this._datetime.formatLongTimeNumber(value);
+    };
+    DateTimeService.prototype.formatLongMonthDay = function (value) {
+        return this._datetime.formatLongMonthDay(value);
+    };
+    DateTimeService.prototype.formatShortMonthDay = function (value) {
+        return this._datetime.formatShortMonthDay(value);
+    };
+    DateTimeService.prototype.formatDateRange = function (value1, value2) {
+        return this._datetime.formatDateRange(value1, value2);
+    };
+    DateTimeService.prototype.formatDateTimeRange = function (value1, value2) {
+        return this._datetime.formatDateTimeRange(value1, value2);
+    };
+    DateTimeService.prototype.formatISOWeek = function (value) {
+        return this._datetime.formatISOWeek(value);
+    };
+    DateTimeService.prototype.formatShortISOWeek = function (value) {
+        return this._datetime.formatShortISOWeek(value);
+    };
+    DateTimeService.prototype.formatISOWeekOrdinal = function (value) {
+        return this._datetime.formatISOWeekOrdinal(value);
+    };
+    DateTimeService.prototype.formatDateY = function (value) {
+        return this._datetime.formatDateY(value);
+    };
+    DateTimeService.prototype.formatLongDateY = function (value) {
+        return this._datetime.formatLongDateY(value);
+    };
+    DateTimeService.prototype.formatMillisecondsToSeconds = function (value) {
+        return this._datetime.formatMillisecondsToSeconds(value);
+    };
+    DateTimeService.prototype.formatElapsedInterval = function (value, start) {
+        return this._datetime.formatElapsedInterval(value, start);
+    };
+    DateTimeService.prototype.getDateJSON = function (date) {
+        return this._datetime.getDateJSON(date);
+    };
+    DateTimeService.prototype.getNextStart = function (value, category) {
+        return this._datetime.getNextStart(value, category);
+    };
+    DateTimeService.prototype.getPrevStart = function (value, category) {
+        return this._datetime.getPrevStart(value, category);
+    };
+    DateTimeService.prototype.getNowStart = function (category) {
+        return this._datetime.getNowStart(category);
+    };
+    DateTimeService.prototype.addHours = function (value, hours) {
+        return this._datetime.addHours(value, hours);
+    };
+    DateTimeService.prototype.toStartDay = function (value) {
+        return this._datetime.toStartDay(value);
+    };
+    DateTimeService.prototype.toEndDay = function (value, offset) {
+        return this._datetime.toEndDay(value, offset);
+    };
+    DateTimeService.prototype.toStartWeek = function (value) {
+        return this._datetime.toStartWeek(value);
+    };
+    DateTimeService.prototype.toEndWeek = function (value, offset) {
+        return this._datetime.toEndWeek(value, offset);
+    };
+    DateTimeService.prototype.toStartMonth = function (value) {
+        return this._datetime.toStartMonth(value);
+    };
+    DateTimeService.prototype.toEndMonth = function (value, offset) {
+        return this._datetime.toEndMonth(value, offset);
+    };
+    DateTimeService.prototype.toStartYear = function (value) {
+        return this._datetime.toStartYear(value);
+    };
+    DateTimeService.prototype.toEndYear = function (value, offset) {
+        return this._datetime.toEndYear(value, offset);
+    };
+    return DateTimeService;
+}());
+var DateTimeProvider = (function (_super) {
+    __extends(DateTimeProvider, _super);
+    function DateTimeProvider() {
+        _super.call(this);
+    }
+    DateTimeProvider.prototype.$get = function () {
+        "ngInject";
+        if (this._service == null)
+            this._service = new DateTimeService(this);
+        return this._service;
+    };
+    return DateTimeProvider;
+}(DateTime));
+angular
+    .module('pipDateTime.Service', [])
+    .provider('pipDateTime', DateTimeProvider);
+},{}],4:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipDate', ['pipDates.Templates']);
+    thisModule.directive('pipDate', function () {
+        return {
+            restrict: 'EA',
+            require: 'ngModel',
+            scope: {
+                timeMode: '@pipTimeMode',
+                disabled: '&ngDisabled',
+                model: '=ngModel',
+                ngChange: '&'
+            },
+            templateUrl: 'date_directive/date.html',
+            controller: 'pipDateController'
+        };
+    });
+    thisModule.controller('pipDateController', ['$scope', '$element', '$injector', function ($scope, $element, $injector) {
+        var value, localeDate = moment.localeData(), momentMonths = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format, momentDays = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format, momentShortDays = localeDate._weekdaysMin, momentFirstDayOfWeek = localeDate._week.dow;
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.setTranslations('en', {
+                DAY: 'Day',
+                MONTH: 'Month',
+                YEAR: 'Year'
+            });
+            pipTranslate.setTranslations('ru', {
+                DAY: 'День',
+                MONTH: 'Месяц',
+                YEAR: 'Год'
+            });
+            $scope.dayLabel = pipTranslate.translate('DAY');
+            $scope.monthLabel = pipTranslate.translate('MONTH');
+            $scope.yearLabel = pipTranslate.translate('YEAR');
+        }
+        else {
+            $scope.dayLabel = 'Day';
+            $scope.monthLabel = 'Month';
+            $scope.yearLabel = 'Year';
+        }
+        function dayList(month, year) {
+            var count = 31, days = [], i;
+            if (month === 4 || month === 6 || month === 9 || month === 11) {
+                count = 30;
+            }
+            else if (month === 2) {
+                if (year) {
+                    count = year % 4 === 0 ? 29 : 28;
+                }
+                else {
+                    count = 28;
+                }
+            }
+            for (i = 1; i <= count; i++) {
+                days.push(i);
+            }
+            return days;
+        }
+        function monthList() {
+            var months = [], i;
+            for (i = 1; i <= 12; i++) {
+                months.push({
+                    id: i,
+                    name: momentMonths[i - 1]
+                });
+            }
+            return months;
+        }
+        function yearList() {
+            var i, currentYear = new Date().getFullYear(), startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100, endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100, years = [];
+            if ($scope.timeMode === 'past') {
+                for (i = endYear; i >= startYear; i--) {
+                    years.push(i);
+                }
+            }
+            else {
+                for (i = startYear; i <= endYear; i++) {
+                    years.push(i);
+                }
+            }
+            return years;
+        }
+        function adjustDay() {
+            var days = dayList($scope.month, $scope.year);
+            if ($scope.days.length !== days.length) {
+                if ($scope.day > days.length) {
+                    $scope.day = days.length;
+                }
+                $scope.days = days;
+            }
+        }
+        function getValue(v) {
+            var value = v ? _.isDate(v) ? v : new Date(v) : null, day = value ? value.getDate() : null, month = value ? value.getMonth() + 1 : null, year = value ? value.getFullYear() : null;
+            if ($scope.month !== month && $scope.year !== year) {
+                $scope.days = dayList($scope.month, $scope.year);
+            }
+            $scope.day = day;
+            $scope.month = month;
+            $scope.year = year;
+        }
+        function setValue() {
+            var value;
+            if ($scope.day && $scope.month && $scope.year) {
+                value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                $scope.model = value;
+                $scope.ngChange();
+            }
+        }
+        $scope.onDayChanged = function () {
+            setValue();
+        };
+        $scope.onMonthChanged = function () {
+            adjustDay();
+            setValue();
+        };
+        $scope.onYearChanged = function () {
+            adjustDay();
+            setValue();
+        };
+        value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
+        $scope.day = value ? value.getDate() : null;
+        $scope.month = value ? value.getMonth() + 1 : null;
+        $scope.year = value ? value.getFullYear() : null;
+        $scope.days = dayList($scope.month, $scope.year);
+        $scope.months = monthList();
+        $scope.years = yearList();
+        $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
+        $scope.$watch('model', function (newValue) {
+            getValue(newValue);
+        });
+        $scope.$watch($scope.disabled, function (newValue) {
+            $scope.disableControls = newValue;
+        });
+    }]);
+})();
+},{}],5:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipDateRange', ['pipDates.Templates']);
+    thisModule.directive('pipDateRange', function () {
+        return {
+            restrict: 'EA',
+            require: 'ngModel',
+            scope: {
+                timeMode: '@pipTimeMode',
+                disabled: '&ngDisabled',
+                model: '=ngModel',
+                pipChanged: '&',
+                pipDateRangeType: '@',
+                pipDateFormat: '@',
+                pipNoLine: '@'
+            },
+            templateUrl: 'date_range_directive/date_range.html',
+            controller: 'pipDateRangeController'
+        };
+    });
+    thisModule.controller('pipDateRangeController', ['$scope', '$element', '$mdMedia', '$rootScope', '$injector', function ($scope, $element, $mdMedia, $rootScope, $injector) {
+        var currentDate, currentYear, currentMonth, currentDay, prevState = {}, currentState = {}, localeDate = moment.localeData(), momentMonths = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format, momentDays = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format, momentShortDays = localeDate._weekdaysMin, momentFirstDayOfWeek = localeDate._week.dow;
+        currentDate = new Date();
+        currentYear = currentDate.getUTCFullYear();
+        currentMonth = currentDate.getUTCMonth() + 1;
+        currentDay = currentDate.getUTCDate();
+        $scope.onDayChanged = function () {
+            setValue();
+        };
+        $scope.onMonthChanged = function () {
+            if ($scope.pipDateRangeType === 'weekly') {
+                var date, dayOfWeek;
+                date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
+                dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+                $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
+                correctWeek();
+                adjustWeek();
+            }
+            else {
+                adjustDay();
+            }
+            setValue();
+        };
+        $scope.onYearChanged = function () {
+            var date, dayOfWeek;
+            date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
+            dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+            if ($scope.pipDateRangeType === 'weekly') {
+                $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
+                adjustWeek();
+                correctWeek();
+            }
+            else {
+                adjustDay();
+            }
+            setValue();
+        };
+        $scope.onWeekChange = function () {
+            if ($scope.pipDateRangeType === 'weekly') {
+                adjustWeek();
+                correctWeek();
+            }
+            else {
+                adjustDay();
+            }
+            setValue();
+        };
+        $scope.isDay = function () {
+            return $scope.pipDateRangeType === 'daily';
+        };
+        $scope.isWeek = function () {
+            return $scope.pipDateRangeType === 'weekly';
+        };
+        $scope.isMonth = function () {
+            return $scope.pipDateRangeType === 'daily' ||
+                $scope.pipDateRangeType === 'weekly' ||
+                $scope.pipDateRangeType === 'monthly';
+        };
+        $scope.onChange = function () {
+            if ($scope.pipChanged) {
+                $scope.pipChanged();
+            }
+        };
+        function setCurrent() {
+            currentState.day = $scope.day;
+            currentState.month = $scope.month;
+            currentState.year = $scope.year;
+            currentState.week = $scope.week;
+            currentState.dateRangeType = $scope.pipDateRangeType;
+            currentState.model = $scope.model;
+        }
+        function fillLists() {
+            $scope.days = dayList($scope.month, $scope.year);
+            $scope.weeks = weekList($scope.month, $scope.year);
+            $scope.months = monthList();
+            $scope.shortMonths = monthList();
+            $scope.years = yearList();
+        }
+        function correctWeek() {
+            if (!prevState.model || prevState.model && prevState.model.getTime() >= $scope.model.getTime()) {
+                if ($scope.weeks && $scope.weeks[$scope.week] && $scope.weeks[$scope.week].id <= 0) {
+                    if ($scope.month < 12) {
+                        $scope.month += 1;
+                    }
+                    else {
+                        $scope.month = 1;
+                        $scope.year += 1;
+                    }
+                    fillLists();
+                }
+            }
+        }
+        function init() {
+            var value;
+            value = $scope.model ? new Date($scope.model) : null;
+            $scope.day = value ? value.getUTCDate() : null;
+            $scope.month = value ? value.getUTCMonth() + 1 : null;
+            $scope.year = value ? value.getUTCFullYear() : null;
+            $scope.week = value ? getWeekByDate($scope.day, $scope.month - 1, $scope.year) : null;
+            fillLists();
+            if ($scope.pipDateRangeType === 'weekly') {
+                correctWeek();
+                adjustWeek();
+            }
+            else {
+                adjustDay();
+            }
+            setValue();
+        }
+        $scope.$mdMedia = $mdMedia;
+        init();
+        $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
+        $scope.$watch('model', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+                getValue(newValue);
+            }
+        });
+        $scope.$watch($scope.disabled, function (newValue) {
+            $scope.disableControls = newValue;
+        });
+        $scope.$watch('pipDateRangeType', function (newValue, oldValue) {
+            if (newValue !== oldValue && oldValue) {
+                init();
+            }
+        });
+        $scope.onYearClick = function () {
+            if (!$scope.year) {
+                $scope.year = currentYear;
+            }
+        };
+        $scope.onMonthClick = function () {
+            if (!$scope.month) {
+                $scope.month = currentMonth;
+            }
+        };
+        $scope.onDayClick = function () {
+            if (!$scope.year) {
+                $scope.day = currentDay;
+            }
+        };
+        function getCountDay(month, year) {
+            var count = 31;
+            if (month === 4 || month === 6 || month === 9 || month === 11) {
+                count = 30;
+            }
+            else if (month === 2) {
+                if (year) {
+                    count = year % 4 === 0 ? 29 : 28;
+                }
+                else {
+                    count = 28;
+                }
+            }
+            return count;
+        }
+        function dayList(month, year) {
+            var count, days, i, ln;
+            count = getCountDay(month, year);
+            $scope.nameDays = [];
+            days = [];
+            for (i = 1; i <= count; i++) {
+                days.push(i);
+                $scope.nameDays.push(momentShortDays[moment([year, month - 1, i]).weekday()]);
+            }
+            return days;
+        }
+        function getWeekByDate(day, month, year) {
+            var date, dayOfWeek, startWeek;
+            date = new Date(Date.UTC(year, month, day));
+            dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
+            if (dayOfWeek === 1) {
+                startWeek = day;
+            }
+            else {
+                startWeek = day + 1 - dayOfWeek;
+            }
+            return startWeek;
+        }
+        function getWeek(day, countDay, countPrevMonthDay) {
+            var endDay, startDay;
+            endDay = day + 6 > countDay ? countDay - day - 6 : day + 6;
+            startDay = day > 0 ? day : countPrevMonthDay + day;
+            return startDay.toString() + ' - ' + (Math.abs(endDay)).toString();
+        }
+        function weekList(month, year) {
+            var weeks, countDay, countPrevMonthDay, startWeek;
+            weeks = [];
+            countDay = getCountDay(month, year);
+            startWeek = getWeekByDate(1, month - 1, year);
+            countPrevMonthDay = month - 1 ? getCountDay(month - 1, year) : getCountDay(12, year - 1);
+            while (startWeek < countDay + 1) {
+                weeks.push({
+                    id: startWeek,
+                    name: getWeek(startWeek, countDay, countPrevMonthDay)
+                });
+                startWeek = startWeek + 7;
+            }
+            return weeks;
+        }
+        function monthList() {
+            var months = [], i;
+            for (i = 1; i <= 12; i++) {
+                months.push({
+                    id: i,
+                    name: momentMonths[i - 1]
+                });
+            }
+            return months;
+        }
+        function yearList() {
+            var startYear, i, endYear, years = [];
+            switch ($scope.timeMode) {
+                case 'future':
+                    startYear = currentYear;
+                    endYear = currentYear + 100;
+                    break;
+                case 'past':
+                    startYear = currentYear - 100;
+                    endYear = currentYear;
+                    break;
+                case 'now':
+                    startYear = currentYear - 50;
+                    endYear = currentYear + 100;
+                    break;
+                default:
+                    startYear = currentYear - 50;
+                    endYear = currentYear + 50;
+                    break;
+            }
+            if ($scope.timeMode === 'future') {
+                for (i = startYear; i <= endYear; i++) {
+                    years.push(i);
+                }
+            }
+            else {
+                for (i = endYear; i >= startYear; i--) {
+                    years.push(i);
+                }
+            }
+            return years;
+        }
+        function adjustDay() {
+            var days = dayList($scope.month, $scope.year);
+            switch ($scope.pipDateRangeType) {
+                case 'monthly':
+                    $scope.day = 1;
+                    break;
+                case 'yearly':
+                    $scope.month = 1;
+                    $scope.day = 1;
+                    break;
+                default:
+                    if ($scope.days.length !== days.length) {
+                        if ($scope.day > days.length) {
+                            $scope.day = days.length;
+                        }
+                    }
+                    break;
+            }
+            $scope.days = days;
+        }
+        function adjustWeek() {
+            var weeks;
+            weeks = weekList($scope.month, $scope.year);
+            $scope.week = getWeekByDate($scope.week, $scope.month - 1, $scope.year);
+            $scope.weeks = weeks;
+        }
+        function getValue(v) {
+            var value, day, month, year, week;
+            value = v ? new Date(v) : null;
+            day = value ? value.getUTCDate() : null;
+            month = value ? value.getUTCMonth() + 1 : null;
+            year = value ? value.getUTCFullYear() : null;
+            week = value ? getWeekByDate(day, month - 1, year) : null;
+            if ($scope.day === day && $scope.month === month && $scope.year === year && $scope.week === week) {
+                return;
+            }
+            $scope.day = day;
+            $scope.month = month;
+            $scope.year = year;
+            $scope.week = week;
+            $scope.days = dayList($scope.month, $scope.year);
+            $scope.weeks = weekList($scope.month, $scope.year);
+        }
+        function setValue() {
+            var value;
+            if ($scope.pipDateRangeType === 'weekly') {
+                value = new Date($scope.year, $scope.month - 1, $scope.week, 0, 0, 0, 0);
+                value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
+                $scope.model = value;
+            }
+            else {
+                value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
+                $scope.model = value;
+            }
+            prevState = _.cloneDeep(currentState);
+            setCurrent();
+            $scope.onChange();
+        }
+    }]);
+})();
+},{}],6:[function(require,module,exports){
+'use strict';
+angular.module('pipDates', [
+    'pipDate',
+    'pipTimeRange',
+    'pipDateTime',
+    'pipTimeRangeEdit',
+    'pipDateRange',
+    'pipDates.Translate'
+]);
+},{}],7:[function(require,module,exports){
+/**
+ * @file Optional filter to translate string resources
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+ 
+/* global angular */
 
+(function () {
+    'use strict';
+
+    var thisModule = angular.module('pipDates.Translate', []);
+
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') 
+            ? $injector.get('pipTranslate') : null;
+
+        return function (key) {
+            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+        }
+    }]);
+
+})();
+
+},{}],8:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipTimeRange', []);
+    thisModule.directive('pipTimeRange', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                pipStartDate: '=',
+                pipEndDate: '='
+            },
+            templateUrl: 'time_range_directive/time_range.html',
+            link: function ($scope, $element, $attrs) {
+                function getDateJSON(value) {
+                    return value ? new Date(value) : null;
+                }
+                function defineStartDate() {
+                    if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                        $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
+                            : getDateJSON($scope.pipStartDate);
+                    }
+                }
+                function defineEndDate() {
+                    if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                        $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
+                            : getDateJSON($scope.pipEndDate);
+                    }
+                }
+                function toBoolean(value) {
+                    if (value == null)
+                        return false;
+                    if (!value)
+                        return false;
+                    value = value.toString().toLowerCase();
+                    return value == '1' || value == 'true';
+                }
+                $scope.data = {};
+                $scope.data.start = null;
+                $scope.data.end = null;
+                defineStartDate();
+                defineEndDate();
+                if (toBoolean($attrs.pipRebind)) {
+                    $scope.$watch('pipStartDate', function () {
+                        $scope.data.start = null;
+                        defineStartDate();
+                    });
+                    $scope.$watch('pipEndDate', function () {
+                        $scope.data.end = null;
+                        defineEndDate();
+                    });
+                }
+                $element.addClass('pip-time-range');
+            }
+        };
+    });
+})();
+},{}],9:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipTimeRangeEdit', []);
+    thisModule.directive('pipTimeRangeEdit', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                pipStartDate: '=',
+                pipChanged: '&',
+                pipEndDate: '=',
+                pipStartLabel: '@',
+                pipEndLabel: '@',
+                disabled: '&ngDisabled',
+                pipSize: '='
+            },
+            templateUrl: 'time_range_edit_directive/time_range_edit.html',
+            controller: 'pipTimeRangeEditController'
+        };
+    });
+    thisModule.controller('pipTimeRangeEditController', ['$scope', '$element', '$attrs', '$injector', 'pipDateTime', function ($scope, $element, $attrs, $injector, pipDateTime) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.setTranslations('en', {
+                EVENT_NEW_START_TIME: 'Start time',
+                EVENT_NEW_END_TIME: 'End time'
+            });
+            pipTranslate.setTranslations('ru', {
+                EVENT_NEW_START_TIME: 'Начало',
+                EVENT_NEW_END_TIME: 'Конец'
+            });
+            $scope.startLabel = $scope.pipStartLabel ? pipTranslate.translate($scope.pipStartLabel)
+                : pipTranslate.translate('EVENT_NEW_START_TIME');
+            $scope.endLabel = $scope.pipEndLabel ? pipTranslate.translate($scope.pipEndLabel)
+                : pipTranslate.translate('EVENT_NEW_END_TIME');
+        }
+        else {
+            $scope.startLabel = $scope.pipStartLabel ? $scope.pipStartLabel : 'Start time';
+            $scope.endLabel = $scope.pipEndLabel ? $scope.pipEndLabel : 'End time';
+        }
+        function getDateJSON(value) {
+            return value ? new Date(value) : null;
+        }
+        function setDuration() {
+            var start, end;
+            if (!$scope.data.startDate || !$scope.data.endDate) {
+                return null;
+            }
+            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+            end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+            return end - start;
+        }
+        function validateStartDate() {
+            var date, start, end;
+            if (!$scope.data.startDate) {
+                $scope.data.startTime = null;
+                return;
+            }
+            if (!$scope.data.startTime) {
+                if (!$scope.data.endTime) {
+                    date = new Date();
+                    date = date.getTime() - pipDateTime.toStartDay(date);
+                    $scope.data.startTime = Math.floor(date / (30 * 60 * 1000)) * 30;
+                }
+                else {
+                    $scope.data.startTime = $scope.data.endTime === 0 ? 0 : $scope.data.endTime - 30;
+                }
+            }
+            if (!$scope.data.endDate) {
+                $scope.data.endTime = null;
+                return;
+            }
+            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+            if ($scope.data.duration) {
+                end = new Date(start.getTime() + $scope.data.duration);
+                $scope.data.endDate = pipDateTime.toStartDay(end);
+                end = end.getTime() - $scope.data.endDate.getTime();
+                $scope.data.endTime = Math.floor(end / (30 * 60 * 1000)) * 30;
+            }
+            else {
+                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+                if (start >= end) {
+                    $scope.data.endDate = pipDateTime.toStartDay(new Date(start.getTime() + 30 * 60000));
+                    $scope.data.endTime = ($scope.data.startTime + 30) % 1440;
+                }
+            }
+        }
+        function validateEndDate() {
+            var date, start, end;
+            if (!$scope.data.endDate) {
+                $scope.data.endTime = null;
+                return;
+            }
+            if (!$scope.data.endTime) {
+                if (!$scope.data.startTime) {
+                    date = new Date();
+                    date = date.getTime() - pipDateTime.toStartDay(date);
+                    $scope.data.endTime = Math.floor(date / (30 * 60 * 1000)) * 30;
+                }
+                else {
+                    $scope.data.endTime = $scope.data.startTime === 1410 ? 1410 : $scope.data.startTime + 30;
+                }
+            }
+            if (!$scope.data.startDate) {
+                $scope.data.startTime = null;
+                return;
+            }
+            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
+            end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
+            if (start >= end) {
+                $scope.data.startDate = pipDateTime.toStartDay(new Date(end.getTime() - 30 * 60000));
+                $scope.data.startTime = $scope.data.endTime % 1440 === 0 ? 1410 : $scope.data.endTime - 30;
+            }
+            $scope.data.duration = setDuration();
+        }
+        function setDate() {
+            var time;
+            $scope.data.bind = false;
+            if ($scope.data.startDate) {
+                time = $scope.data.startTime ? $scope.data.startTime * 60 * 1000 : 0;
+                $scope.pipStartDate = new Date($scope.data.startDate.getTime() + time);
+            }
+            if ($scope.data.endDate) {
+                time = $scope.data.endTime ? $scope.data.endTime * 60 * 1000 : 0;
+                $scope.pipEndDate = new Date($scope.data.endDate.getTime() + time);
+            }
+            $scope.data.bind = true;
+        }
+        function defineDate() {
+            var start, end;
+            if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
+                start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate : null;
+                if (!start) {
+                    start = getDateJSON($scope.pipStartDate);
+                }
+                $scope.data.startDate = pipDateTime.toStartDay(start);
+                $scope.data.startTime = (new Date(start) - $scope.data.startDate) / (60 * 1000);
+            }
+            if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
+                end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate : null;
+                if (!start) {
+                    end = getDateJSON($scope.pipEndDate);
+                }
+                $scope.data.endDate = pipDateTime.toStartDay(end);
+                $scope.data.endTime = (new Date(end) - $scope.data.endDate) / (60 * 1000);
+            }
+            validateStartDate();
+            $scope.data.duration = setDuration();
+            setDate();
+        }
+        function getTimeInterval() {
+            var result, i, j, minutes;
+            result = [];
+            for (i = 0; i < 24; i++) {
+                for (j = 0; j < 2; j++) {
+                    minutes = j * 30;
+                    result.push({
+                        id: i * 60 + minutes,
+                        time: _.pad(i.toString(), 3, '0').substr(0, 2) + ':' + _.pad(minutes.toString(), 2, '0')
+                    });
+                }
+            }
+            return result;
+        }
+        function initDate() {
+            $scope.data.startDate = null;
+            $scope.data.startTime = null;
+            $scope.data.endDate = null;
+            $scope.data.endTime = null;
+            $scope.data.duration = null;
+        }
+        $scope.intervalTimeCollection = getTimeInterval();
+        $scope.data = {};
+        initDate();
+        defineDate();
+        $scope.onChangeStartDate = function () {
+            validateStartDate();
+            $scope.data.duration = setDuration();
+            setDate();
+            $scope.pipChanged();
+        };
+        $scope.onChangeEndDate = function () {
+            validateEndDate();
+            $scope.data.duration = setDuration();
+            setDate();
+            $scope.pipChanged();
+        };
+        $scope.onChangeStartTime = function () {
+            if (!$scope.data.startDate) {
+                $scope.data.startDate = pipDateTime.toStartDay(new Date());
+            }
+            validateStartDate();
+            $scope.data.duration = setDuration();
+            setDate();
+            $scope.pipChanged();
+        };
+        $scope.onChangeEndTime = function () {
+            if (!$scope.data.endDate) {
+                $scope.data.endDate = pipDateTime.toStartDay(new Date());
+            }
+            validateEndDate();
+            $scope.data.duration = setDuration();
+            setDate();
+            $scope.pipChanged();
+        };
+        $scope.isDisabled = function () {
+            if ($scope.disabled) {
+                return $scope.disabled();
+            }
+            return false;
+        };
+        $scope.$watchGroup([$scope.pipStartDate, $scope.pipEndDate], function () {
+            if ($scope.data.bind) {
+                initDate();
+                defineDate();
+            }
+        });
+        $scope.$watch($scope.disabled, function (newValue) {
+            $scope.disableControls = newValue;
+        });
+        $element.addClass('pip-time-range-edit');
+    }]);
+})();
+},{}],10:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipDates.Templates');
@@ -4018,1541 +5434,405 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-/**
- * @file Optional filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
+},{}]},{},[7,4,5,2,3,1,6,8,9,10])
 
+
+
+
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
-
-    var thisModule = angular.module('pipDates.Translate', []);
-
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') 
-            ? $injector.get('pipTranslate') : null;
-
-        return function (key) {
-            return pipTranslate  ? pipTranslate.translate(key) || key : key;
-        }
+    var thisModule = angular.module('pipConfirmationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
+    thisModule.factory('pipConfirmationDialog', ['$mdDialog', function ($mdDialog) {
+        return {
+            show: function (params, successCallback, cancelCallback) {
+                $mdDialog.show({
+                    targetEvent: params.event,
+                    templateUrl: 'confirmation/confirmation.html',
+                    controller: 'pipConfirmationDialogController',
+                    locals: { params: params },
+                    clickOutsideToClose: true
+                })
+                    .then(function () {
+                    if (successCallback) {
+                        successCallback();
+                    }
+                }, function () {
+                    if (cancelCallback) {
+                        cancelCallback();
+                    }
+                });
+            }
+        };
     }]);
-
+    thisModule.controller('pipConfirmationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.translations('en', {
+                'CONFIRM_TITLE': 'Confirm'
+            });
+            pipTranslate.translations('ru', {
+                'CONFIRM_TITLE': 'Подтвердите'
+            });
+            $scope.title = params.title || 'CONFIRM_TITLE';
+            $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'CANCEL';
+        }
+        else {
+            $scope.title = params.title || 'Confirm';
+            $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'Cancel';
+        }
+        $scope.theme = $rootScope.$theme;
+        $scope.onCancel = function () {
+            $mdDialog.cancel();
+        };
+        $scope.onOk = function () {
+            $mdDialog.hide();
+        };
+    }]);
 })();
-
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('pipDates', [
-        'pipDate',
-        'pipTimeRange',
-        'pipDateTime',
-        'pipTimeRangeEdit',
-        'pipDateRange',
-        'pipDates.Translate'
+    var thisModule = angular.module('pipDialogs.Translate', []);
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }]);
+})();
+},{}],3:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipDialogs', [
+        'pipInformationDialog',
+        'pipConfirmationDialog',
+        'pipOptionsDialog',
+        'pipOptionsBigDialog',
+        'pipErrorDetailsDialog'
     ]);
 })();
-
-var pip;
-(function (pip) {
-    var datetime;
-    (function (datetime) {
-        'use strict';
-        angular.module('pipDateTime', [
-            'pipDateTime.Service', 'pipDateTime.Filter'
-        ]);
-    })(datetime = pip.datetime || (pip.datetime = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var datetime;
-    (function (datetime) {
-        'use strict';
-        formatTimeFilter.$inject = ['pipDateTime'];
-        formatDateOptionalFilter.$inject = ['pipDateTime'];
-        formatLongDateFilter.$inject = ['pipDateTime'];
-        formatShortDateFilter.$inject = ['pipDateTime'];
-        formatMonthFilter.$inject = ['pipDateTime'];
-        formatLongMonthFilter.$inject = ['pipDateTime'];
-        formatYearFilter.$inject = ['pipDateTime'];
-        formatWeekFilter.$inject = ['pipDateTime'];
-        formatShortWeekFilter.$inject = ['pipDateTime'];
-        formatShortDateTimeFilter.$inject = ['pipDateTime'];
-        formatLongDateTimeFilter.$inject = ['pipDateTime'];
-        formatShortTimeFilter.$inject = ['pipDateTime'];
-        formatLongTimeFilter.$inject = ['pipDateTime'];
-        formatShortDayOfWeekFilter.$inject = ['pipDateTime'];
-        formatLongDayOfWeekFilter.$inject = ['pipDateTime'];
-        formatDateNumberFilter.$inject = ['pipDateTime'];
-        formatLongDateNumberFilter.$inject = ['pipDateTime'];
-        formatTimeNumberFilter.$inject = ['pipDateTime'];
-        formatLongTimeNumberFilter.$inject = ['pipDateTime'];
-        formatLongMonthDayFilter.$inject = ['pipDateTime'];
-        formatShortMonthDayFilter.$inject = ['pipDateTime'];
-        formatDateRangeFilter.$inject = ['pipDateTime'];
-        formatDateTimeRangeFilter.$inject = ['pipDateTime'];
-        formatISOWeekFilter.$inject = ['pipDateTime'];
-        formatShortISOWeekFilter.$inject = ['pipDateTime'];
-        formatISOWeekOrdinalFilter.$inject = ['pipDateTime'];
-        formatDateYFilter.$inject = ['pipDateTime'];
-        formatLongDateYFilter.$inject = ['pipDateTime'];
-        formatMillisecondsToSecondsFilter.$inject = ['pipDateTime'];
-        formatElapsedIntervalFilter.$inject = ['pipDateTime'];
-        getDateJSONFilter.$inject = ['pipDateTime'];
-        function formatTimeFilter(pipDateTime) {
-            "ngInject";
-            return function (value, format) {
-                return pipDateTime.formatTime(value, format);
-            };
-        }
-        function formatDateOptionalFilter(pipDateTime) {
-            "ngInject";
-            return function (value, format) {
-                return pipDateTime.formatDateOptional(value, format);
-            };
-        }
-        function formatLongDateFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongDate(value);
-            };
-        }
-        function formatShortDateFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortDate(value);
-            };
-        }
-        function formatMonthFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatMonth(value);
-            };
-        }
-        function formatLongMonthFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongMonth(value);
-            };
-        }
-        function formatYearFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatYear(value);
-            };
-        }
-        function formatWeekFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatWeek(value);
-            };
-        }
-        function formatShortWeekFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortWeek(value);
-            };
-        }
-        function formatShortDateTimeFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortDateTime(value);
-            };
-        }
-        function formatLongDateTimeFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongDateTime(value);
-            };
-        }
-        function formatShortTimeFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortTime(value);
-            };
-        }
-        function formatLongTimeFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongTime(value);
-            };
-        }
-        function formatShortDayOfWeekFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortDayOfWeek(value);
-            };
-        }
-        function formatLongDayOfWeekFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongDayOfWeek(value);
-            };
-        }
-        function formatDateNumberFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatDateNumber(value);
-            };
-        }
-        function formatLongDateNumberFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongDateNumber(value);
-            };
-        }
-        function formatTimeNumberFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatTimeNumber(value);
-            };
-        }
-        function formatLongTimeNumberFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongTimeNumber(value);
-            };
-        }
-        function formatLongMonthDayFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongMonthDay(value);
-            };
-        }
-        function formatShortMonthDayFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortMonthDay(value);
-            };
-        }
-        function formatDateRangeFilter(pipDateTime) {
-            "ngInject";
-            return function (value1, value2) {
-                return pipDateTime.formatDateRange(value1, value2);
-            };
-        }
-        function formatDateTimeRangeFilter(pipDateTime) {
-            "ngInject";
-            return function (value1, value2) {
-                return pipDateTime.formatDateTimeRange(value1, value2);
-            };
-        }
-        function formatISOWeekFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatISOWeek(value);
-            };
-        }
-        function formatShortISOWeekFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatShortISOWeek(value);
-            };
-        }
-        function formatISOWeekOrdinalFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatISOWeekOrdinal(value);
-            };
-        }
-        function formatDateYFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatDateY(value);
-            };
-        }
-        function formatLongDateYFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatLongDateY(value);
-            };
-        }
-        function formatMillisecondsToSecondsFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.formatMillisecondsToSeconds(value);
-            };
-        }
-        function formatElapsedIntervalFilter(pipDateTime) {
-            "ngInject";
-            return function (value, start) {
-                return pipDateTime.formatElapsedInterval(value, start);
-            };
-        }
-        function getDateJSONFilter(pipDateTime) {
-            "ngInject";
-            return function (value) {
-                return pipDateTime.getDateJSON(value);
-            };
-        }
-        angular
-            .module('pipDateTime.Filter', [])
-            .filter('formatTime', formatTimeFilter)
-            .filter('formatDateOptional', formatDateOptionalFilter)
-            .filter('formatShortDate', formatShortDateFilter)
-            .filter('formatLongDate', formatLongDateFilter)
-            .filter('formatMonth', formatMonthFilter)
-            .filter('formatLongMonth', formatLongMonthFilter)
-            .filter('formatYear', formatYearFilter)
-            .filter('formatWeek', formatWeekFilter)
-            .filter('formatShortWeek', formatShortWeekFilter)
-            .filter('formatShortDateTime', formatShortDateTimeFilter)
-            .filter('formatLongDateTime', formatLongDateTimeFilter)
-            .filter('formatShortTime', formatShortTimeFilter)
-            .filter('formatLongTime', formatLongTimeFilter)
-            .filter('formatShortDayOfWeek', formatShortDayOfWeekFilter)
-            .filter('formatLongDayOfWeek', formatLongDayOfWeekFilter)
-            .filter('formatDateNumber', formatDateNumberFilter)
-            .filter('formatLongDateNumber', formatLongDateNumberFilter)
-            .filter('formatTimeNumber', formatTimeNumberFilter)
-            .filter('formatLongTimeNumber', formatLongTimeNumberFilter)
-            .filter('formatLongMonthDay', formatLongMonthDayFilter)
-            .filter('formatShortMonthDay', formatShortMonthDayFilter)
-            .filter('formatDateRange', formatDateRangeFilter)
-            .filter('formatDateTimeRange', formatDateTimeRangeFilter)
-            .filter('formatISOWeek', formatISOWeekFilter)
-            .filter('formatShortISOWeek', formatShortISOWeekFilter)
-            .filter('formatISOWeekOrdinal', formatISOWeekOrdinalFilter)
-            .filter('formatDateY', formatDateYFilter)
-            .filter('formatLongDateY', formatLongDateYFilter)
-            .filter('formatMillisecondsToSeconds', formatMillisecondsToSecondsFilter)
-            .filter('formatElapsedInterval', formatElapsedIntervalFilter);
-    })(datetime = pip.datetime || (pip.datetime = {}));
-})(pip || (pip = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var pip;
-(function (pip) {
-    var datetime;
-    (function (datetime_1) {
-        'use strict';
-        var DateTime = (function () {
-            function DateTime() {
-                this._momentRanged = new Array('year', 'month', 'week', 'isoweek', 'day');
-                this._defaultFormat = 'LL';
-            }
-            DateTime.prototype.isUndefinedOrNull = function (value) {
-                return angular.isUndefined(value) || value === null;
-            };
-            DateTime.prototype.getRange = function (value) {
-                if (this.isUndefinedOrNull(value)) {
-                    return 'day';
-                }
-                var index = this._momentRanged.indexOf(value);
-                if (index < 0) {
-                    return 'day';
-                }
-                else {
-                    return this._momentRanged[index];
-                }
-            };
-            DateTime.prototype.getOperationRange = function (value) {
-                if (this.isUndefinedOrNull(value)) {
-                    return 'day';
-                }
-                var range = value == 'isoweek' ? 'week' : value, index = this._momentRanged.indexOf(range);
-                if (index < 0) {
-                    return 'day';
-                }
-                else {
-                    return this._momentRanged[index];
-                }
-            };
-            DateTime.prototype.formatDateTime = function (value, basicFormat) {
-                var date, formatTpl;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                formatTpl = basicFormat ? basicFormat : this._defaultFormat;
-                return date.format(formatTpl);
-            };
-            DateTime.prototype.formatDateTimeY = function (value, basicFormat) {
-                var date, nowDate, formatMoment;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                nowDate = moment();
-                formatMoment = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat);
-                if (nowDate.year() == date.year()) {
-                    formatMoment = formatMoment.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
-                }
-                return date.format(formatMoment);
-            };
-            DateTime.prototype.formatDay = function (value, basicFormat) {
-                var date, format = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat), formatMonthYearless = format.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '').replace(/M/g, '');
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                return date.format(formatMonthYearless);
-            };
-            DateTime.prototype.formatMonthDay = function (value, basicFormat) {
-                var date, format = basicFormat ? basicFormat : this._defaultFormat, formatLL = moment.localeData().longDateFormat(format), formatYearlessLL = formatLL.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                return date.format(formatYearlessLL);
-            };
-            DateTime.prototype.formatRange = function (value1, value2, basicFormat) {
-                var dateStart, dateEnd, format = basicFormat ? basicFormat : this._defaultFormat;
-                if (this.isUndefinedOrNull(value1)) {
-                    dateStart = null;
-                }
-                else {
-                    dateStart = moment(value1);
-                }
-                if (this.isUndefinedOrNull(value2)) {
-                    dateEnd = null;
-                }
-                else {
-                    dateEnd = moment(value2);
-                }
-                if (dateStart === null && dateEnd === null)
-                    return '';
-                if (dateStart === null) {
-                    return dateEnd.format(basicFormat);
-                }
-                else if (dateEnd === null || dateStart.isSame(dateEnd)) {
-                    return dateStart.format(basicFormat);
-                    ;
-                }
-                if (dateStart.isAfter(dateEnd)) {
-                    throw new Error('Date range error. Start date is more than end date.');
-                }
-                if (dateStart.year() == dateEnd.year()) {
-                    if (dateStart.month() == dateEnd.month()) {
-                        return this.formatDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
-                    }
-                    else {
-                        return this.formatMonthDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
-                    }
-                }
-                else {
-                    return dateStart.format(basicFormat) + '-' + dateEnd.format(basicFormat);
-                }
-            };
-            DateTime.prototype.toStartRange = function (value, range) {
-                var date;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                return date.startOf(range).toDate();
-            };
-            DateTime.prototype.toEndRange = function (value, range, offset) {
-                var date, result, mssOffset;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                if (!angular.isNumber(offset)) {
-                    mssOffset = 0;
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                if (mssOffset) {
-                    result = date.startOf(range).add(mssOffset, 'milliseconds');
-                }
-                else {
-                    result = date.startOf(range);
-                }
-                return date.startOf(range).toDate();
-            };
-            ;
-            DateTime.prototype.formatTime = function (value, format) {
-                return this.formatDateTime(value, 'LLL');
-            };
-            DateTime.prototype.formatDateOptional = function (value, format) {
-                return this.formatDateTime(value, 'L');
-            };
-            DateTime.prototype.formatShortDate = function (value) {
-                return this.formatDateTime(value, 'L');
-            };
-            DateTime.prototype.formatLongDate = function (value) {
-                return this.formatDateTime(value, 'LL');
-            };
-            DateTime.prototype.formatMonth = function (value) {
-                return this.formatDateTime(value, 'MM');
-            };
-            DateTime.prototype.formatLongMonth = function (value) {
-                return this.formatDateTime(value, 'MMMM');
-            };
-            DateTime.prototype.formatYear = function (value) {
-                return this.formatDateTime(value, 'YYYY');
-            };
-            DateTime.prototype.formatWeek = function (value) {
-                return this.formatDateTime(value, 'ww');
-            };
-            DateTime.prototype.formatShortWeek = function (value) {
-                return this.formatDateTime(value, 'w');
-            };
-            DateTime.prototype.formatShortDateTime = function (value) {
-                return this.formatDateTime(value, 'LLL');
-            };
-            DateTime.prototype.formatLongDateTime = function (value) {
-                return this.formatDateTime(value, 'LLLL');
-            };
-            DateTime.prototype.formatShortTime = function (value) {
-                return this.formatDateTime(value, 'LT');
-            };
-            DateTime.prototype.formatLongTime = function (value) {
-                return this.formatDateTime(value, 'LTS');
-            };
-            DateTime.prototype.formatShortDayOfWeek = function (value) {
-                return this.formatDateTime(value, 'dd');
-            };
-            DateTime.prototype.formatLongDayOfWeek = function (value) {
-                return this.formatDateTime(value, 'dddd');
-            };
-            DateTime.prototype.formatDateNumber = function (value) {
-                return this.formatDateTime(value, 'l');
-            };
-            DateTime.prototype.formatLongDateNumber = function (value) {
-                return this.formatDateTime(value, 'll');
-            };
-            DateTime.prototype.formatTimeNumber = function (value) {
-                return this.formatDateTime(value, 'LLL');
-            };
-            DateTime.prototype.formatLongTimeNumber = function (value) {
-                return this.formatDateTime(value, 'LLLL');
-            };
-            DateTime.prototype.formatLongMonthDay = function (value) {
-                return this.formatMonthDay(value, 'LL');
-            };
-            DateTime.prototype.formatShortMonthDay = function (value) {
-                return this.formatMonthDay(value, 'L');
-            };
-            DateTime.prototype.formatDateRange = function (value1, value2) {
-                return this.formatRange(value1, value2, 'LL');
-            };
-            DateTime.prototype.formatDateTimeRange = function (value1, value2) {
-                return this.formatRange(value1, value2, 'LLL');
-            };
-            DateTime.prototype.formatISOWeek = function (value) {
-                return this.formatDateTime(value, 'WW');
-            };
-            DateTime.prototype.formatShortISOWeek = function (value) {
-                return this.formatDateTime(value, 'W');
-            };
-            DateTime.prototype.formatISOWeekOrdinal = function (value) {
-                return this.formatDateTime(value, 'Wo');
-            };
-            DateTime.prototype.formatDateY = function (value) {
-                return this.formatDateTimeY(value, 'L');
-            };
-            DateTime.prototype.formatLongDateY = function (value) {
-                return this.formatDateTimeY(value, 'LL');
-            };
-            DateTime.prototype.formatMillisecondsToSeconds = function (value) {
-                return '';
-            };
-            DateTime.prototype.formatElapsedInterval = function (value, start) {
-                var date, nowDate;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                if (this.isUndefinedOrNull(start)) {
-                    nowDate = moment();
-                }
-                else {
-                    nowDate = moment(start);
-                }
-                date = moment(value);
-                if (!date.isValid() || !nowDate.isValid()) {
-                    return '';
-                }
-                return moment(date).fromNow(nowDate);
-            };
-            DateTime.prototype.getDateJSON = function (date) {
-                return JSON.stringify(moment(date));
-            };
-            DateTime.prototype.getNextStart = function (value, category) {
-                var date, range, result;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                range = this.getRange(category);
-                result = moment(date).startOf(range).add(this.getOperationRange(range));
-                return result.toDate();
-            };
-            DateTime.prototype.getPrevStart = function (value, category) {
-                var date, range, result;
-                if (this.isUndefinedOrNull(value)) {
-                    return '';
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                range = this.getRange(category);
-                result = moment(date).startOf(range).add(-1, this.getOperationRange(range));
-                return result.toDate();
-            };
-            DateTime.prototype.getNowStart = function (category) {
-                var date, range, result;
-                date = moment();
-                if (!date.isValid()) {
-                    return '';
-                }
-                range = this.getRange(category);
-                result = moment(date).startOf(range);
-                return result.toDate();
-            };
-            DateTime.prototype.addHours = function (value, hours) {
-                var date;
-                if (this.isUndefinedOrNull(value) || !angular.isNumber(hours)) {
-                    return '';
-                }
-                date = moment(value);
-                if (!date.isValid()) {
-                    return '';
-                }
-                return date.add(hours, 'hours').toDate();
-            };
-            DateTime.prototype.toStartDay = function (value) {
-                return this.toStartRange(value, 'day');
-            };
-            DateTime.prototype.toEndDay = function (value, offset) {
-                return this.toEndRange(value, 'day', offset);
-            };
-            DateTime.prototype.toStartWeek = function (value) {
-                return this.toStartRange(value, 'week');
-            };
-            DateTime.prototype.toEndWeek = function (value, offset) {
-                return this.toEndRange(value, 'week', offset);
-            };
-            DateTime.prototype.toStartMonth = function (value) {
-                return this.toStartRange(value, 'month');
-            };
-            DateTime.prototype.toEndMonth = function (value, offset) {
-                return this.toEndRange(value, 'month', offset);
-            };
-            DateTime.prototype.toStartYear = function (value) {
-                return this.toStartRange(value, 'year');
-            };
-            DateTime.prototype.toEndYear = function (value, offset) {
-                return this.toEndRange(value, 'year', offset);
-            };
-            return DateTime;
-        }());
-        var DateTimeService = (function () {
-            function DateTimeService(datetime) {
-                this._datetime = datetime;
-            }
-            DateTimeService.prototype.formatTime = function (value, format) {
-                return this._datetime.formatTime(value, format);
-            };
-            DateTimeService.prototype.formatDateOptional = function (value, format) {
-                return this._datetime.formatDateOptional(value, format);
-            };
-            DateTimeService.prototype.formatShortDate = function (value) {
-                return this._datetime.formatShortDate(value);
-            };
-            DateTimeService.prototype.formatLongDate = function (value) {
-                return this._datetime.formatLongDate(value);
-            };
-            DateTimeService.prototype.formatMonth = function (value) {
-                return this._datetime.formatMonth(value);
-            };
-            DateTimeService.prototype.formatLongMonth = function (value) {
-                return this._datetime.formatLongMonth(value);
-            };
-            DateTimeService.prototype.formatYear = function (value) {
-                return this._datetime.formatYear(value);
-            };
-            DateTimeService.prototype.formatWeek = function (value) {
-                return this._datetime.formatWeek(value);
-            };
-            DateTimeService.prototype.formatShortWeek = function (value) {
-                return this._datetime.formatShortWeek(value);
-            };
-            DateTimeService.prototype.formatShortDateTime = function (value) {
-                return this._datetime.formatShortDateTime(value);
-            };
-            DateTimeService.prototype.formatLongDateTime = function (value) {
-                return this._datetime.formatLongDateTime(value);
-            };
-            DateTimeService.prototype.formatShortTime = function (value) {
-                return this._datetime.formatShortTime(value);
-            };
-            DateTimeService.prototype.formatLongTime = function (value) {
-                return this._datetime.formatLongTime(value);
-            };
-            DateTimeService.prototype.formatShortDayOfWeek = function (value) {
-                return this._datetime.formatShortDayOfWeek(value);
-            };
-            DateTimeService.prototype.formatLongDayOfWeek = function (value) {
-                return this._datetime.formatLongDayOfWeek(value);
-            };
-            DateTimeService.prototype.formatDateNumber = function (value) {
-                return this._datetime.formatDateNumber(value);
-            };
-            DateTimeService.prototype.formatLongDateNumber = function (value) {
-                return this._datetime.formatLongDateNumber(value);
-            };
-            DateTimeService.prototype.formatTimeNumber = function (value) {
-                return this._datetime.formatTimeNumber(value);
-            };
-            DateTimeService.prototype.formatLongTimeNumber = function (value) {
-                return this._datetime.formatLongTimeNumber(value);
-            };
-            DateTimeService.prototype.formatLongMonthDay = function (value) {
-                return this._datetime.formatLongMonthDay(value);
-            };
-            DateTimeService.prototype.formatShortMonthDay = function (value) {
-                return this._datetime.formatShortMonthDay(value);
-            };
-            DateTimeService.prototype.formatDateRange = function (value1, value2) {
-                return this._datetime.formatDateRange(value1, value2);
-            };
-            DateTimeService.prototype.formatDateTimeRange = function (value1, value2) {
-                return this._datetime.formatDateTimeRange(value1, value2);
-            };
-            DateTimeService.prototype.formatISOWeek = function (value) {
-                return this._datetime.formatISOWeek(value);
-            };
-            DateTimeService.prototype.formatShortISOWeek = function (value) {
-                return this._datetime.formatShortISOWeek(value);
-            };
-            DateTimeService.prototype.formatISOWeekOrdinal = function (value) {
-                return this._datetime.formatISOWeekOrdinal(value);
-            };
-            DateTimeService.prototype.formatDateY = function (value) {
-                return this._datetime.formatDateY(value);
-            };
-            DateTimeService.prototype.formatLongDateY = function (value) {
-                return this._datetime.formatLongDateY(value);
-            };
-            DateTimeService.prototype.formatMillisecondsToSeconds = function (value) {
-                return this._datetime.formatMillisecondsToSeconds(value);
-            };
-            DateTimeService.prototype.formatElapsedInterval = function (value, start) {
-                return this._datetime.formatElapsedInterval(value, start);
-            };
-            DateTimeService.prototype.getDateJSON = function (date) {
-                return this._datetime.getDateJSON(date);
-            };
-            DateTimeService.prototype.getNextStart = function (value, category) {
-                return this._datetime.getNextStart(value, category);
-            };
-            DateTimeService.prototype.getPrevStart = function (value, category) {
-                return this._datetime.getPrevStart(value, category);
-            };
-            DateTimeService.prototype.getNowStart = function (category) {
-                return this._datetime.getNowStart(category);
-            };
-            DateTimeService.prototype.addHours = function (value, hours) {
-                return this._datetime.addHours(value, hours);
-            };
-            DateTimeService.prototype.toStartDay = function (value) {
-                return this._datetime.toStartDay(value);
-            };
-            DateTimeService.prototype.toEndDay = function (value, offset) {
-                return this._datetime.toEndDay(value, offset);
-            };
-            DateTimeService.prototype.toStartWeek = function (value) {
-                return this._datetime.toStartWeek(value);
-            };
-            DateTimeService.prototype.toEndWeek = function (value, offset) {
-                return this._datetime.toEndWeek(value, offset);
-            };
-            DateTimeService.prototype.toStartMonth = function (value) {
-                return this._datetime.toStartMonth(value);
-            };
-            DateTimeService.prototype.toEndMonth = function (value, offset) {
-                return this._datetime.toEndMonth(value, offset);
-            };
-            DateTimeService.prototype.toStartYear = function (value) {
-                return this._datetime.toStartYear(value);
-            };
-            DateTimeService.prototype.toEndYear = function (value, offset) {
-                return this._datetime.toEndYear(value, offset);
-            };
-            return DateTimeService;
-        }());
-        var DateTimeProvider = (function (_super) {
-            __extends(DateTimeProvider, _super);
-            function DateTimeProvider() {
-                _super.call(this);
-            }
-            DateTimeProvider.prototype.$get = function () {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new DateTimeService(this);
-                return this._service;
-            };
-            return DateTimeProvider;
-        }(DateTime));
-        angular
-            .module('pipDateTime.Service', [])
-            .provider('pipDateTime', DateTimeProvider);
-    })(datetime = pip.datetime || (pip.datetime = {}));
-})(pip || (pip = {}));
-
-(function (angular, _) {
+},{}],4:[function(require,module,exports){
+(function () {
     'use strict';
-    var thisModule = angular.module('pipDate', ['pipDates.Templates']);
-    thisModule.directive('pipDate', function () {
+    var thisModule = angular.module('pipErrorDetailsDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
+    thisModule.factory('pipErrorDetailsDialog', ['$mdDialog', function ($mdDialog) {
         return {
-            restrict: 'EA',
-            require: 'ngModel',
-            scope: {
-                timeMode: '@pipTimeMode',
-                disabled: '&ngDisabled',
-                model: '=ngModel',
-                ngChange: '&'
-            },
-            templateUrl: 'date_directive/date.html',
-            controller: 'pipDateController'
+            show: function (params, successCallback, cancelCallback) {
+                $mdDialog.show({
+                    targetEvent: params.event,
+                    templateUrl: 'error_details/error_details.html',
+                    controller: 'pipErrorDetailsDialogController',
+                    locals: { params: params },
+                    clickOutsideToClose: true
+                })
+                    .then(function () {
+                    if (successCallback) {
+                        successCallback();
+                    }
+                }, function () {
+                    if (cancelCallback) {
+                        cancelCallback();
+                    }
+                });
+            }
         };
-    });
-    thisModule.controller('pipDateController', ['$scope', '$element', '$injector', function ($scope, $element, $injector) {
-        var value, localeDate = moment.localeData(), momentMonths = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format, momentDays = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format, momentShortDays = localeDate._weekdaysMin, momentFirstDayOfWeek = localeDate._week.dow;
+    }]);
+    thisModule.controller('pipErrorDetailsDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                DAY: 'Day',
-                MONTH: 'Month',
-                YEAR: 'Year'
+            pipTranslate.translations('en', {
+                'ERROR_DETAILS': 'Error details',
+                'CODE': 'Error code',
+                'PATH': 'Path',
+                'ERROR': 'Error',
+                'METHOD': 'Method',
+                'MESSAGE': 'Message',
+                'DISMISS': 'Dismiss'
             });
-            pipTranslate.setTranslations('ru', {
-                DAY: 'День',
-                MONTH: 'Месяц',
-                YEAR: 'Год'
+            pipTranslate.translations('ru', {
+                'ERROR_DETAILS': 'Детали ошибки',
+                'CODE': 'Код ошибки',
+                'PATH': 'Путь',
+                'ERROR': 'Ошибка',
+                'METHOD': 'Метод',
+                'MESSAGE': 'Сообщение'
             });
-            $scope.dayLabel = pipTranslate.translate('DAY');
-            $scope.monthLabel = pipTranslate.translate('MONTH');
-            $scope.yearLabel = pipTranslate.translate('YEAR');
+            $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'CANCEL';
+            $scope.errorDetails = 'ERROR_DETAILS';
+            $scope.dismissButton = 'DISMISS';
+            $scope.errorMessage = 'MESSAGE';
+            $scope.errorCode = 'CODE';
+            $scope.errorMethod = 'METHOD';
+            $scope.errorPath = 'PATH';
+            $scope.errorText = 'ERROR';
         }
         else {
-            $scope.dayLabel = 'Day';
-            $scope.monthLabel = 'Month';
-            $scope.yearLabel = 'Year';
+            $scope.ok = params.ok || 'OK';
+            $scope.cancel = params.cancel || 'Cancel';
+            $scope.errorDetails = 'Error details';
+            $scope.dismissButton = 'Dismiss';
+            $scope.errorMessage = 'Message';
+            $scope.errorCode = 'Code';
+            $scope.errorMethod = 'Method';
+            $scope.errorPath = 'Path';
+            $scope.error = 'Error';
         }
-        function dayList(month, year) {
-            var count = 31, days = [], i;
-            if (month === 4 || month === 6 || month === 9 || month === 11) {
-                count = 30;
-            }
-            else if (month === 2) {
-                if (year) {
-                    count = year % 4 === 0 ? 29 : 28;
-                }
-                else {
-                    count = 28;
-                }
-            }
-            for (i = 1; i <= count; i++) {
-                days.push(i);
-            }
-            return days;
-        }
-        function monthList() {
-            var months = [], i;
-            for (i = 1; i <= 12; i++) {
-                months.push({
-                    id: i,
-                    name: momentMonths[i - 1]
-                });
-            }
-            return months;
-        }
-        function yearList() {
-            var i, currentYear = new Date().getFullYear(), startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100, endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100, years = [];
-            if ($scope.timeMode === 'past') {
-                for (i = endYear; i >= startYear; i--) {
-                    years.push(i);
-                }
-            }
-            else {
-                for (i = startYear; i <= endYear; i++) {
-                    years.push(i);
-                }
-            }
-            return years;
-        }
-        function adjustDay() {
-            var days = dayList($scope.month, $scope.year);
-            if ($scope.days.length !== days.length) {
-                if ($scope.day > days.length) {
-                    $scope.day = days.length;
-                }
-                $scope.days = days;
-            }
-        }
-        function getValue(v) {
-            var value = v ? _.isDate(v) ? v : new Date(v) : null, day = value ? value.getDate() : null, month = value ? value.getMonth() + 1 : null, year = value ? value.getFullYear() : null;
-            if ($scope.month !== month && $scope.year !== year) {
-                $scope.days = dayList($scope.month, $scope.year);
-            }
-            $scope.day = day;
-            $scope.month = month;
-            $scope.year = year;
-        }
-        function setValue() {
-            var value;
-            if ($scope.day && $scope.month && $scope.year) {
-                value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
-                $scope.model = value;
-                $scope.ngChange();
-            }
-        }
-        $scope.onDayChanged = function () {
-            setValue();
+        $scope.theme = $rootScope.$theme;
+        $scope.error = params.error;
+        $scope.onCancel = function () {
+            $mdDialog.cancel();
         };
-        $scope.onMonthChanged = function () {
-            adjustDay();
-            setValue();
+        $scope.onOk = function () {
+            $mdDialog.hide();
         };
-        $scope.onYearChanged = function () {
-            adjustDay();
-            setValue();
-        };
-        value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
-        $scope.day = value ? value.getDate() : null;
-        $scope.month = value ? value.getMonth() + 1 : null;
-        $scope.year = value ? value.getFullYear() : null;
-        $scope.days = dayList($scope.month, $scope.year);
-        $scope.months = monthList();
-        $scope.years = yearList();
-        $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-        $scope.$watch('model', function (newValue) {
-            getValue(newValue);
-        });
-        $scope.$watch($scope.disabled, function (newValue) {
-            $scope.disableControls = newValue;
-        });
     }]);
-})(window.angular, window._);
-
-(function (angular, _) {
+})();
+},{}],5:[function(require,module,exports){
+(function () {
     'use strict';
-    var thisModule = angular.module('pipDateRange', ['pipDates.Templates']);
-    thisModule.directive('pipDateRange', function () {
+    var thisModule = angular.module('pipInformationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
+    thisModule.factory('pipInformationDialog', ['$mdDialog', function ($mdDialog) {
         return {
-            restrict: 'EA',
-            require: 'ngModel',
-            scope: {
-                timeMode: '@pipTimeMode',
-                disabled: '&ngDisabled',
-                model: '=ngModel',
-                pipChanged: '&',
-                pipDateRangeType: '@',
-                pipDateFormat: '@',
-                pipNoLine: '@'
-            },
-            templateUrl: 'date_range_directive/date_range.html',
-            controller: 'pipDateRangeController'
-        };
-    });
-    thisModule.controller('pipDateRangeController', ['$scope', '$element', '$mdMedia', '$rootScope', '$injector', function ($scope, $element, $mdMedia, $rootScope, $injector) {
-        var currentDate, currentYear, currentMonth, currentDay, prevState = {}, currentState = {}, localeDate = moment.localeData(), momentMonths = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format, momentDays = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format, momentShortDays = localeDate._weekdaysMin, momentFirstDayOfWeek = localeDate._week.dow;
-        currentDate = new Date();
-        currentYear = currentDate.getUTCFullYear();
-        currentMonth = currentDate.getUTCMonth() + 1;
-        currentDay = currentDate.getUTCDate();
-        $scope.onDayChanged = function () {
-            setValue();
-        };
-        $scope.onMonthChanged = function () {
-            if ($scope.pipDateRangeType === 'weekly') {
-                var date, dayOfWeek;
-                date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
-                dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
-                $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
-                correctWeek();
-                adjustWeek();
-            }
-            else {
-                adjustDay();
-            }
-            setValue();
-        };
-        $scope.onYearChanged = function () {
-            var date, dayOfWeek;
-            date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
-            dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
-            if ($scope.pipDateRangeType === 'weekly') {
-                $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
-                adjustWeek();
-                correctWeek();
-            }
-            else {
-                adjustDay();
-            }
-            setValue();
-        };
-        $scope.onWeekChange = function () {
-            if ($scope.pipDateRangeType === 'weekly') {
-                adjustWeek();
-                correctWeek();
-            }
-            else {
-                adjustDay();
-            }
-            setValue();
-        };
-        $scope.isDay = function () {
-            return $scope.pipDateRangeType === 'daily';
-        };
-        $scope.isWeek = function () {
-            return $scope.pipDateRangeType === 'weekly';
-        };
-        $scope.isMonth = function () {
-            return $scope.pipDateRangeType === 'daily' ||
-                $scope.pipDateRangeType === 'weekly' ||
-                $scope.pipDateRangeType === 'monthly';
-        };
-        $scope.onChange = function () {
-            if ($scope.pipChanged) {
-                $scope.pipChanged();
-            }
-        };
-        function setCurrent() {
-            currentState.day = $scope.day;
-            currentState.month = $scope.month;
-            currentState.year = $scope.year;
-            currentState.week = $scope.week;
-            currentState.dateRangeType = $scope.pipDateRangeType;
-            currentState.model = $scope.model;
-        }
-        function fillLists() {
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.weeks = weekList($scope.month, $scope.year);
-            $scope.months = monthList();
-            $scope.shortMonths = monthList(true);
-            $scope.years = yearList();
-        }
-        function correctWeek() {
-            if (!prevState.model || prevState.model && prevState.model.getTime() >= $scope.model.getTime()) {
-                if ($scope.weeks && $scope.weeks[$scope.week] && $scope.weeks[$scope.week].id <= 0) {
-                    if ($scope.month < 12) {
-                        $scope.month += 1;
+            show: function (params, callback) {
+                $mdDialog.show({
+                    targetEvent: params.event,
+                    templateUrl: 'information/information.html',
+                    controller: 'pipInformationDialogController',
+                    locals: { params: params },
+                    clickOutsideToClose: true
+                })
+                    .then(function () {
+                    if (callback) {
+                        callback();
                     }
-                    else {
-                        $scope.month = 1;
-                        $scope.year += 1;
-                    }
-                    fillLists();
-                }
-            }
-        }
-        function init() {
-            var value;
-            value = $scope.model ? new Date($scope.model) : null;
-            $scope.day = value ? value.getUTCDate() : null;
-            $scope.month = value ? value.getUTCMonth() + 1 : null;
-            $scope.year = value ? value.getUTCFullYear() : null;
-            $scope.week = value ? getWeekByDate($scope.day, $scope.month - 1, $scope.year) : null;
-            fillLists();
-            if ($scope.pipDateRangeType === 'weekly') {
-                correctWeek();
-                adjustWeek();
-            }
-            else {
-                adjustDay();
-            }
-            setValue();
-        }
-        $scope.$mdMedia = $mdMedia;
-        init();
-        $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-        $scope.$watch('model', function (newValue, oldValue) {
-            if (newValue !== oldValue) {
-                getValue(newValue);
-            }
-        });
-        $scope.$watch($scope.disabled, function (newValue) {
-            $scope.disableControls = newValue;
-        });
-        $scope.$watch('pipDateRangeType', function (newValue, oldValue) {
-            if (newValue !== oldValue && oldValue) {
-                init();
-            }
-        });
-        $scope.onYearClick = function () {
-            if (!$scope.year) {
-                $scope.year = currentYear;
-            }
-        };
-        $scope.onMonthClick = function () {
-            if (!$scope.month) {
-                $scope.month = currentMonth;
-            }
-        };
-        $scope.onDayClick = function () {
-            if (!$scope.year) {
-                $scope.day = currentDay;
-            }
-        };
-        function getCountDay(month, year) {
-            var count = 31;
-            if (month === 4 || month === 6 || month === 9 || month === 11) {
-                count = 30;
-            }
-            else if (month === 2) {
-                if (year) {
-                    count = year % 4 === 0 ? 29 : 28;
-                }
-                else {
-                    count = 28;
-                }
-            }
-            return count;
-        }
-        function dayList(month, year) {
-            var count, days, i, ln;
-            count = getCountDay(month, year);
-            $scope.nameDays = [];
-            days = [];
-            for (i = 1; i <= count; i++) {
-                days.push(i);
-                $scope.nameDays.push(momentShortDays[moment([year, month - 1, i]).weekday()]);
-            }
-            return days;
-        }
-        function getWeekByDate(day, month, year) {
-            var date, dayOfWeek, startWeek;
-            date = new Date(Date.UTC(year, month, day));
-            dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
-            if (dayOfWeek === 1) {
-                startWeek = day;
-            }
-            else {
-                startWeek = day + 1 - dayOfWeek;
-            }
-            return startWeek;
-        }
-        function getWeek(day, countDay, countPrevMonthDay) {
-            var endDay, startDay;
-            endDay = day + 6 > countDay ? countDay - day - 6 : day + 6;
-            startDay = day > 0 ? day : countPrevMonthDay + day;
-            return startDay.toString() + ' - ' + (Math.abs(endDay)).toString();
-        }
-        function weekList(month, year) {
-            var weeks, countDay, countPrevMonthDay, startWeek;
-            weeks = [];
-            countDay = getCountDay(month, year);
-            startWeek = getWeekByDate(1, month - 1, year);
-            countPrevMonthDay = month - 1 ? getCountDay(month - 1, year) : getCountDay(12, year - 1);
-            while (startWeek < countDay + 1) {
-                weeks.push({
-                    id: startWeek,
-                    name: getWeek(startWeek, countDay, countPrevMonthDay)
-                });
-                startWeek = startWeek + 7;
-            }
-            return weeks;
-        }
-        function monthList() {
-            var months = [], i;
-            for (i = 1; i <= 12; i++) {
-                months.push({
-                    id: i,
-                    name: momentMonths[i - 1]
                 });
             }
-            return months;
-        }
-        function yearList() {
-            var startYear, i, endYear, years = [];
-            switch ($scope.timeMode) {
-                case 'future':
-                    startYear = currentYear;
-                    endYear = currentYear + 100;
-                    break;
-                case 'past':
-                    startYear = currentYear - 100;
-                    endYear = currentYear;
-                    break;
-                case 'now':
-                    startYear = currentYear - 50;
-                    endYear = currentYear + 100;
-                    break;
-                default:
-                    startYear = currentYear - 50;
-                    endYear = currentYear + 50;
-                    break;
-            }
-            if ($scope.timeMode === 'future') {
-                for (i = startYear; i <= endYear; i++) {
-                    years.push(i);
-                }
-            }
-            else {
-                for (i = endYear; i >= startYear; i--) {
-                    years.push(i);
-                }
-            }
-            return years;
-        }
-        function adjustDay() {
-            var days = dayList($scope.month, $scope.year);
-            switch ($scope.pipDateRangeType) {
-                case 'monthly':
-                    $scope.day = 1;
-                    break;
-                case 'yearly':
-                    $scope.month = 1;
-                    $scope.day = 1;
-                    break;
-                default:
-                    if ($scope.days.length !== days.length) {
-                        if ($scope.day > days.length) {
-                            $scope.day = days.length;
-                        }
-                    }
-                    break;
-            }
-            $scope.days = days;
-        }
-        function adjustWeek() {
-            var weeks;
-            weeks = weekList($scope.month, $scope.year);
-            $scope.week = getWeekByDate($scope.week, $scope.month - 1, $scope.year);
-            $scope.weeks = weeks;
-        }
-        function getValue(v) {
-            var value, day, month, year, week;
-            value = v ? new Date(v) : null;
-            day = value ? value.getUTCDate() : null;
-            month = value ? value.getUTCMonth() + 1 : null;
-            year = value ? value.getUTCFullYear() : null;
-            week = value ? getWeekByDate(day, month - 1, year) : null;
-            if ($scope.day === day && $scope.month === month && $scope.year === year && $scope.week === week) {
-                return;
-            }
-            $scope.day = day;
-            $scope.month = month;
-            $scope.year = year;
-            $scope.week = week;
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.weeks = weekList($scope.month, $scope.year);
-        }
-        function setValue() {
-            var value;
-            if ($scope.pipDateRangeType === 'weekly') {
-                value = new Date($scope.year, $scope.month - 1, $scope.week, 0, 0, 0, 0);
-                value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
-                $scope.model = value;
-            }
-            else {
-                value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
-                value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
-                $scope.model = value;
-            }
-            prevState = _.cloneDeep(currentState);
-            setCurrent();
-            $scope.onChange();
-        }
+        };
     }]);
-})(window.angular, window._);
-
-(function (angular, _) {
-    'use strict';
-    var thisModule = angular.module('pipTimeRange', []);
-    thisModule.directive('pipTimeRange', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipStartDate: '=',
-                pipEndDate: '='
-            },
-            templateUrl: 'time_range_directive/time_range.html',
-            link: function ($scope, $element, $attrs) {
-                function getDateJSON(value) {
-                    return value ? new Date(value) : null;
-                }
-                function defineStartDate() {
-                    if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                        $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
-                            : getDateJSON($scope.pipStartDate);
-                    }
-                }
-                function defineEndDate() {
-                    if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                        $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
-                            : getDateJSON($scope.pipEndDate);
-                    }
-                }
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                $scope.data = {};
-                $scope.data.start = null;
-                $scope.data.end = null;
-                defineStartDate();
-                defineEndDate();
-                if (toBoolean($attrs.pipRebind)) {
-                    $scope.$watch('pipStartDate', function () {
-                        $scope.data.start = null;
-                        defineStartDate();
-                    });
-                    $scope.$watch('pipEndDate', function () {
-                        $scope.data.end = null;
-                        defineEndDate();
-                    });
-                }
-                $element.addClass('pip-time-range');
-            }
-        };
-    });
-})(window.angular, window._);
-
-(function (angular, _) {
-    'use strict';
-    var thisModule = angular.module('pipTimeRangeEdit', []);
-    thisModule.directive('pipTimeRangeEdit', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipStartDate: '=',
-                pipChanged: '&',
-                pipEndDate: '=',
-                pipStartLabel: '@',
-                pipEndLabel: '@',
-                disabled: '&ngDisabled',
-                pipSize: '='
-            },
-            templateUrl: 'time_range_edit_directive/time_range_edit.html',
-            controller: 'pipTimeRangeEditController'
-        };
-    });
-    thisModule.controller('pipTimeRangeEditController', ['$scope', '$element', '$attrs', '$injector', 'pipDateTime', function ($scope, $element, $attrs, $injector, pipDateTime) {
+    thisModule.controller('pipInformationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        var content = params.message, item;
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                EVENT_NEW_START_TIME: 'Start time',
-                EVENT_NEW_END_TIME: 'End time'
+            pipTranslate.translations('en', {
+                'INFORMATION_TITLE': 'Information'
             });
-            pipTranslate.setTranslations('ru', {
-                EVENT_NEW_START_TIME: 'Начало',
-                EVENT_NEW_END_TIME: 'Конец'
+            pipTranslate.translations('ru', {
+                'INFORMATION_TITLE': 'Информация'
             });
-            $scope.startLabel = $scope.pipStartLabel ? pipTranslate.translate($scope.pipStartLabel)
-                : pipTranslate.translate('EVENT_NEW_START_TIME');
-            $scope.endLabel = $scope.pipEndLabel ? pipTranslate.translate($scope.pipEndLabel)
-                : pipTranslate.translate('EVENT_NEW_END_TIME');
+            $scope.title = params.title || 'INFORMATION_TITLE';
+            $scope.ok = params.ok || 'OK';
+            content = pipTranslate.translate(content);
         }
         else {
-            $scope.startLabel = $scope.pipStartLabel ? $scope.pipStartLabel : 'Start time';
-            $scope.endLabel = $scope.pipEndLabel ? $scope.pipEndLabel : 'End time';
+            $scope.title = params.title || 'Information';
+            $scope.ok = params.ok || 'OK';
         }
-        function getDateJSON(value) {
-            return value ? new Date(value) : null;
+        var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
+        $scope.theme = $rootScope.$theme;
+        if (params.item && pipFormat) {
+            item = _.truncate(params.item, 25);
+            content = pipFormat.sprintf(content, item);
+            console.log('content2', content);
         }
-        function setDuration() {
-            var start, end;
-            if (!$scope.data.startDate || !$scope.data.endDate) {
-                return null;
-            }
-            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-            end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-            return end - start;
-        }
-        function validateStartDate() {
-            var date, start, end;
-            if (!$scope.data.startDate) {
-                $scope.data.startTime = null;
-                return;
-            }
-            if (!$scope.data.startTime) {
-                if (!$scope.data.endTime) {
-                    date = new Date();
-                    date = date.getTime() - pipDateTime.toStartDay(date);
-                    $scope.data.startTime = Math.floor(date / (30 * 60 * 1000)) * 30;
-                }
-                else {
-                    $scope.data.startTime = $scope.data.endTime === 0 ? 0 : $scope.data.endTime - 30;
-                }
-            }
-            if (!$scope.data.endDate) {
-                $scope.data.endTime = null;
-                return;
-            }
-            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-            if ($scope.data.duration) {
-                end = new Date(start.getTime() + $scope.data.duration);
-                $scope.data.endDate = pipDateTime.toStartDay(end);
-                end = end.getTime() - $scope.data.endDate.getTime();
-                $scope.data.endTime = Math.floor(end / (30 * 60 * 1000)) * 30;
-            }
-            else {
-                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-                if (start >= end) {
-                    $scope.data.endDate = pipDateTime.toStartDay(new Date(start.getTime() + 30 * 60000));
-                    $scope.data.endTime = ($scope.data.startTime + 30) % 1440;
-                }
-            }
-        }
-        function validateEndDate() {
-            var date, start, end;
-            if (!$scope.data.endDate) {
-                $scope.data.endTime = null;
-                return;
-            }
-            if (!$scope.data.endTime) {
-                if (!$scope.data.startTime) {
-                    date = new Date();
-                    date = date.getTime() - pipDateTime.toStartDay(date);
-                    $scope.data.endTime = Math.floor(date / (30 * 60 * 1000)) * 30;
-                }
-                else {
-                    $scope.data.endTime = $scope.data.startTime === 1410 ? 1410 : $scope.data.startTime + 30;
-                }
-            }
-            if (!$scope.data.startDate) {
-                $scope.data.startTime = null;
-                return;
-            }
-            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-            end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-            if (start >= end) {
-                $scope.data.startDate = pipDateTime.toStartDay(new Date(end.getTime() - 30 * 60000));
-                $scope.data.startTime = $scope.data.endTime % 1440 === 0 ? 1410 : $scope.data.endTime - 30;
-            }
-            $scope.data.duration = setDuration();
-        }
-        function setDate() {
-            var time;
-            $scope.data.bind = false;
-            if ($scope.data.startDate) {
-                time = $scope.data.startTime ? $scope.data.startTime * 60 * 1000 : 0;
-                $scope.pipStartDate = new Date($scope.data.startDate.getTime() + time);
-            }
-            if ($scope.data.endDate) {
-                time = $scope.data.endTime ? $scope.data.endTime * 60 * 1000 : 0;
-                $scope.pipEndDate = new Date($scope.data.endDate.getTime() + time);
-            }
-            $scope.data.bind = true;
-        }
-        function defineDate() {
-            var start, end;
-            if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate : null;
-                if (!start) {
-                    start = getDateJSON($scope.pipStartDate);
-                }
-                $scope.data.startDate = pipDateTime.toStartDay(start);
-                $scope.data.startTime = (new Date(start) - $scope.data.startDate) / (60 * 1000);
-            }
-            if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate : null;
-                if (!start) {
-                    end = getDateJSON($scope.pipEndDate);
-                }
-                $scope.data.endDate = pipDateTime.toStartDay(end);
-                $scope.data.endTime = (new Date(end) - $scope.data.endDate) / (60 * 1000);
-            }
-            validateStartDate();
-            $scope.data.duration = setDuration();
-            setDate();
-        }
-        function getTimeInterval() {
-            var result, i, j, minutes;
-            result = [];
-            for (i = 0; i < 24; i++) {
-                for (j = 0; j < 2; j++) {
-                    minutes = j * 30;
-                    result.push({
-                        id: i * 60 + minutes,
-                        time: _.pad(i.toString(), 3, '0').substr(0, 2) + ':' + _.pad(minutes.toString(), 2, '0')
-                    });
-                }
-            }
-            return result;
-        }
-        function initDate() {
-            $scope.data.startDate = null;
-            $scope.data.startTime = null;
-            $scope.data.endDate = null;
-            $scope.data.endTime = null;
-            $scope.data.duration = null;
-        }
-        $scope.intervalTimeCollection = getTimeInterval();
-        $scope.data = {};
-        initDate();
-        defineDate();
-        $scope.onChangeStartDate = function () {
-            validateStartDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
+        $scope.content = content;
+        $scope.onOk = function () {
+            $mdDialog.hide();
         };
-        $scope.onChangeEndDate = function () {
-            validateEndDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
-        };
-        $scope.onChangeStartTime = function () {
-            if (!$scope.data.startDate) {
-                $scope.data.startDate = pipDateTime.toStartDay(new Date());
-            }
-            validateStartDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
-        };
-        $scope.onChangeEndTime = function () {
-            if (!$scope.data.endDate) {
-                $scope.data.endDate = pipDateTime.toStartDay(new Date());
-            }
-            validateEndDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
-        };
-        $scope.isDisabled = function () {
-            if ($scope.disabled) {
-                return $scope.disabled();
-            }
-            return false;
-        };
-        $scope.$watchGroup([$scope.pipStartDate, $scope.pipEndDate], function () {
-            if ($scope.data.bind) {
-                initDate();
-                defineDate();
-            }
-        });
-        $scope.$watch($scope.disabled, function (newValue) {
-            $scope.disableControls = newValue;
-        });
-        $element.addClass('pip-time-range-edit');
     }]);
-})(window.angular, window._);
-
-
-
-
-
+})();
+},{}],6:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipOptionsDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
+    thisModule.factory('pipOptionsDialog', ['$mdDialog', function ($mdDialog) {
+        return {
+            show: function (params, successCallback, cancelCallback) {
+                if (params.event) {
+                    params.event.stopPropagation();
+                    params.event.preventDefault();
+                }
+                function focusToggleControl() {
+                    if (params.event && params.event.currentTarget) {
+                        params.event.currentTarget.focus();
+                    }
+                }
+                $mdDialog.show({
+                    targetEvent: params.event,
+                    templateUrl: 'options/options.html',
+                    controller: 'pipOptionsDialogController',
+                    locals: { params: params },
+                    clickOutsideToClose: true
+                })
+                    .then(function (option) {
+                    focusToggleControl();
+                    if (successCallback) {
+                        successCallback(option);
+                    }
+                }, function () {
+                    focusToggleControl();
+                    if (cancelCallback) {
+                        cancelCallback();
+                    }
+                });
+            }
+        };
+    }]);
+    thisModule.controller('pipOptionsDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.translations('en', {
+                'OPTIONS_TITLE': 'Choose Option'
+            });
+            pipTranslate.translations('ru', {
+                'OPTIONS_TITLE': 'Выберите опцию'
+            });
+            $scope.title = params.title || 'OPTIONS_TITLE';
+            $scope.applyButtonTitle = params.appleButtonTitle || 'SELECT';
+        }
+        else {
+            $scope.title = params.title || 'Choose Option';
+            $scope.applyButtonTitle = params.appleButtonTitle || 'Select';
+        }
+        $scope.theme = $rootScope.$theme;
+        $scope.options = params.options;
+        $scope.selectedOption = _.find(params.options, { active: true }) || {};
+        $scope.selectedOptionName = $scope.selectedOption.name;
+        $scope.deleted = params.deleted;
+        $scope.deletedTitle = params.deletedTitle;
+        $scope.onOptionSelect = function (event, option) {
+            event.stopPropagation();
+            $scope.selectedOptionName = option.name;
+        };
+        $scope.onKeyPress = function (event) {
+            if (event.keyCode === 32 || event.keyCode === 13) {
+                event.stopPropagation();
+                event.preventDefault();
+                $scope.onSelect();
+            }
+        };
+        $scope.onCancel = function () {
+            $mdDialog.cancel();
+        };
+        $scope.onSelect = function () {
+            var option;
+            option = _.find(params.options, { name: $scope.selectedOptionName });
+            $mdDialog.hide({ option: option, deleted: $scope.deleted });
+        };
+        function focusInput() {
+            var list;
+            list = $('.pip-options-dialog .pip-list');
+            list.focus();
+        }
+        setTimeout(focusInput, 500);
+    }]);
+})();
+},{}],7:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipOptionsBigDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
+    thisModule.factory('pipOptionsBigDialog', ['$mdDialog', function ($mdDialog) {
+        return {
+            show: function (params, successCallback, cancelCallback) {
+                if (params.event) {
+                    params.event.stopPropagation();
+                    params.event.preventDefault();
+                }
+                function focusToggleControl() {
+                    if (params.event && params.event.currentTarget) {
+                        params.event.currentTarget.focus();
+                    }
+                }
+                $mdDialog.show({
+                    targetEvent: params.event,
+                    templateUrl: 'options/options_big.html',
+                    controller: 'pipOptionsDialogBigController',
+                    locals: { params: params },
+                    clickOutsideToClose: true
+                })
+                    .then(function (option) {
+                    focusToggleControl();
+                    if (successCallback) {
+                        successCallback(option);
+                    }
+                }, function () {
+                    focusToggleControl();
+                    if (cancelCallback) {
+                        cancelCallback();
+                    }
+                });
+            }
+        };
+    }]);
+    thisModule.controller('pipOptionsDialogBigController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.translations('en', {
+                'OPTIONS_TITLE': 'Choose Option'
+            });
+            pipTranslate.translations('ru', {
+                'OPTIONS_TITLE': 'Выберите опцию'
+            });
+            $scope.title = params.title || 'OPTIONS_TITLE';
+            $scope.applyButtonTitle = params.applyButtonTitle || 'SELECT';
+        }
+        else {
+            $scope.title = params.title || 'Choose Option';
+            $scope.applyButtonTitle = params.applyButtonTitle || 'Select';
+        }
+        $scope.theme = $rootScope.$theme;
+        $scope.options = params.options;
+        $scope.noActions = params.noActions || false;
+        $scope.noTitle = params.noTitle || false;
+        $scope.hint = params.hint || '';
+        $scope.selectedOption = _.find(params.options, { active: true }) || {};
+        $scope.selectedOptionName = $scope.selectedOption.name;
+        $scope.optionIndex = _.findIndex(params.options, $scope.selectedOption);
+        $scope.deleted = params.deleted;
+        $scope.deletedTitle = params.deletedTitle;
+        $scope.onOptionSelect = function (event, option) {
+            event.stopPropagation();
+            $scope.selectedOptionName = option.name;
+            if ($scope.noActions) {
+                $scope.onSelect();
+            }
+        };
+        $scope.onSelected = function () {
+            $scope.selectedOptionName = $scope.options[$scope.optionIndex].name;
+            if ($scope.noActions) {
+            }
+        };
+        $scope.onKeyUp = function (event, index) {
+            if (event.keyCode === 32 || event.keyCode === 13) {
+                event.stopPropagation();
+                event.preventDefault();
+                if (index !== undefined && index > -1 && index < $scope.options.length) {
+                    $scope.selectedOptionName = $scope.options[index].name;
+                    $scope.onSelect();
+                }
+            }
+        };
+        $scope.onCancel = function () {
+            $mdDialog.cancel();
+        };
+        $scope.onSelect = function () {
+            var option;
+            option = _.find($scope.options, { name: $scope.selectedOptionName });
+            $mdDialog.hide({ option: option, deleted: $scope.deleted });
+        };
+        function focusInput() {
+            var list;
+            list = $('.pip-options-dialog .pip-list');
+            list.focus();
+        }
+        setTimeout(focusInput, 500);
+    }]);
+})();
+},{}],8:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipDialogs.Templates');
@@ -5815,73 +6095,617 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-(function () {
-    'use strict';
-    angular.module('pipDialogs', [
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-})();
+},{}]},{},[1,2,3,4,5,7,6,8])
 
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipConfirmationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipConfirmationDialog', ['$mdDialog', function ($mdDialog) {
+
+
+
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+var thisModule = angular.module('pipActions.Service', []);
+thisModule.provider('pipActions', function () {
+    var config = {
+        primaryGlobalActions: [],
+        primaryLocalActions: [],
+        secondaryGlobalActions: [],
+        secondaryLocalActions: []
+    };
+    this.globalActions = globalActions;
+    this.globalPrimaryActions = globalPrimaryActions;
+    this.globalSecondaryActions = globalSecondaryActions;
+    this.$get = ['$rootScope', function ($rootScope) {
         return {
-            show: function (params, successCallback, cancelCallback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'confirmation/confirmation.html',
-                    controller: 'pipConfirmationDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (successCallback) {
-                        successCallback();
-                    }
-                }, function () {
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
-            }
+            config: getConfig,
+            show: showLocalActions,
+            hide: hideLocalActions,
+            count: updateActionCount,
         };
-    }]);
-    thisModule.controller('pipConfirmationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'CONFIRM_TITLE': 'Confirm'
-            });
-            pipTranslate.translations('ru', {
-                'CONFIRM_TITLE': 'Подтвердите'
-            });
-            $scope.title = params.title || 'CONFIRM_TITLE';
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
+        function getConfig() {
+            return config;
         }
-        else {
-            $scope.title = params.title || 'Confirm';
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'Cancel';
+        function hideLocalActions() {
+            config.primaryLocalActions = [];
+            config.secondaryLocalActions = [];
+            sendConfigEvent();
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onOk = function () {
-            $mdDialog.hide();
-        };
-    }]);
-})();
-
+        function showLocalActions(primaryActions, secondaryActions) {
+            config.primaryLocalActions = primaryActions || [];
+            config.secondaryLocalActions = secondaryActions || [];
+            sendConfigEvent();
+        }
+        function updateActionCount(actionName, count) {
+            _.each(config.primaryGlobalActions, function (action) {
+                if (action.name === actionName) {
+                    action.count = count;
+                }
+            });
+            _.each(config.primaryLocalActions, function (action) {
+                if (action.name === actionName) {
+                    action.count = count;
+                }
+            });
+            sendConfigEvent();
+        }
+        function sendConfigEvent() {
+            $rootScope.$broadcast('pipActionsChanged', config);
+        }
+    }];
+    function globalActions(primaryActions, secondaryActions) {
+        config.primaryGlobalActions = primaryActions || [];
+        config.secondaryGlobalActions = secondaryActions || [];
+    }
+    function globalPrimaryActions(primaryActions) {
+        config.primaryGlobalActions = primaryActions || [];
+    }
+    function globalSecondaryActions(secondaryActions) {
+        config.secondaryGlobalActions = secondaryActions || [];
+    }
+});
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
-    var thisModule = angular.module('pipDialogs.Translate', []);
+    var thisModule = angular.module('pipPrimaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
+    thisModule.directive('pipPrimaryActions', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                localActions: '=pipLocalActions',
+                globalActions: '=pipGlobalActions'
+            },
+            replace: false,
+            templateUrl: function (element, attr) {
+                return 'actions/primary_actions.html';
+            },
+            controller: 'pipPrimaryActionsController'
+        };
+    });
+    thisModule.controller('pipPrimaryActionsController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
+        $element.addClass('pip-primary-actions');
+        $scope.config = pipActions.config();
+        if ($scope.localActions) {
+            pipActions.showLocalActions();
+            $scope.config.primaryLocalActions = $scope.localActions[0];
+        }
+        if ($scope.globalActions) {
+            pipActions.showLocalActions();
+            $scope.config.primaryGlobalActions = $scope.globalActions[0];
+        }
+        $rootScope.$on('pipActionsChanged', onActionsChanged);
+        $scope.actionHidden = actionHidden;
+        $scope.actionCount = actionCount;
+        $scope.onActionClick = onActionClick;
+        function onActionsChanged(event, config) {
+            $scope.config = config;
+        }
+        function actionHidden(action) {
+            return action.access && !action.access(action);
+        }
+        function actionCount(action) {
+            if (action.count === null || action.count <= 0) {
+                return '';
+            }
+            if (action.count > 99) {
+                return '!';
+            }
+            return action.count;
+        }
+        function calcActions(actions) {
+            var count = 0;
+            _.each(actions, function (action) {
+                if (!actionHidden(action)) {
+                    count++;
+                }
+            });
+            return count;
+        }
+        function secondaryActionsVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function secondaryDividerVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function onActionClick(action, $mdOpenMenu) {
+            if (!action || action.divider) {
+                return;
+            }
+            if (action.close) {
+                $scope.originatorEv = null;
+            }
+            if (action.menu) {
+                $mdOpenMenu($scope.originatorEv);
+                return;
+            }
+            if (action.callback) {
+                action.callback();
+                return;
+            }
+            if (action.href) {
+                $window.location.href = action.href;
+                return;
+            }
+            if (action.url) {
+                $location.url(action.url);
+                return;
+            }
+            if (action.state) {
+                if ($injector.has('$state')) {
+                    var $state = $injector.get('$state');
+                    $state.go(action.state, action.stateParams);
+                }
+                return;
+            }
+            if (action.event) {
+                $rootScope.$broadcast(action.event);
+            }
+            else {
+                $rootScope.$broadcast('pipActionClicked', action.name);
+            }
+        }
+    }]);
+})();
+},{}],3:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSecondaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
+    thisModule.directive('pipSecondaryActions', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                title: '=pipTitle',
+                showMenu: '=pipShowMenu',
+                localActions: '=pipLocalActions',
+                globalActions: '=pipGlobalActions',
+                partyAvatarUrl: '=pipPartyAvatarUrl'
+            },
+            replace: false,
+            templateUrl: function (element, attr) {
+                return 'actions/secondary_actions.html';
+            },
+            controller: 'pipSecondaryActionsController'
+        };
+    });
+    thisModule.controller('pipSecondaryActionsController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
+        $element.addClass('pip-secondary-actions');
+        $scope.config = pipActions.config();
+        if ($scope.localActions) {
+            pipActions.showLocalActions();
+            $scope.config.secondaryLocalActions = $scope.localActions[1];
+        }
+        if ($scope.globalActions) {
+            pipActions.showLocalActions();
+            $scope.config.secondaryGlobalActions = $scope.globalActions[0];
+        }
+        $rootScope.$on('pipActionsChanged', onActionsChanged);
+        $scope.actionHidden = actionHidden;
+        $scope.actionCount = actionCount;
+        $scope.secondaryActionsVisible = secondaryActionsVisible;
+        $scope.secondaryDividerVisible = secondaryDividerVisible;
+        $scope.onActionClick = onActionClick;
+        $scope.openMenu = openMenu;
+        function openMenu($mdOpenMenu, ev) {
+            $scope.originatorEv = ev;
+            $mdOpenMenu(ev);
+        }
+        function onActionsChanged(event, config) {
+            $scope.config = config;
+        }
+        function actionHidden(action) {
+            return action.access && !action.access(action);
+        }
+        function actionCount(action) {
+            if (action.count === null || action.count <= 0) {
+                return '';
+            }
+            if (action.count > 99) {
+                return '!';
+            }
+            return action.count;
+        }
+        function calcActions(actions) {
+            var count = 0;
+            _.each(actions, function (action) {
+                if (!actionHidden(action)) {
+                    count++;
+                }
+            });
+            return count;
+        }
+        function secondaryActionsVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function secondaryDividerVisible() {
+            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
+                calcActions($scope.config.secondaryLocalActions) > 0;
+        }
+        function onActionClick(action, $mdOpenMenu) {
+            if (!action || action.divider) {
+                return;
+            }
+            if (action.close) {
+                $scope.originatorEv = null;
+            }
+            if (action.menu) {
+                $mdOpenMenu($scope.originatorEv);
+                return;
+            }
+            if (action.callback) {
+                action.callback();
+                return;
+            }
+            if (action.href) {
+                $window.location.href = action.href;
+                return;
+            }
+            if (action.url) {
+                $location.url(action.url);
+                return;
+            }
+            if (action.state) {
+                if ($injector.has('$state')) {
+                    var $state = $injector.get('$state');
+                    $state.go(action.state, action.stateParams);
+                }
+                return;
+            }
+            if (action.event) {
+                $rootScope.$broadcast(action.event);
+            }
+            else {
+                $rootScope.$broadcast('pipActionClicked', action.name);
+            }
+        }
+    }]);
+})();
+},{}],4:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipAppBar', ['ngMaterial', 'pipNav.Templates', 'pipAppBar.Service']);
+    thisModule.directive('pipAppbar', function () {
+        return {
+            restrict: 'E',
+            transclude: true,
+            scope: true,
+            templateUrl: 'appbar/appbar.html',
+            controller: 'pipAppBarController'
+        };
+    });
+    thisModule.controller('pipAppBarController', ['$scope', '$element', '$rootScope', 'pipAppBar', function ($scope, $element, $rootScope, pipAppBar) {
+        $element.addClass('pip-appbar');
+        $element.addClass('color-primary-bg');
+        $scope.$emit('pipResizeWindow');
+        $scope.config = pipAppBar.config();
+        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
+        function onAppBarChanged(event, config) {
+            $scope.config = config;
+        }
+    }]);
+})();
+},{}],5:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipAppBar.Part', ['pipAppBar.Service']);
+    thisModule.directive('pipAppbarPart', ['ngIfDirective', function (ngIfDirective) {
+        var ngIf = ngIfDirective[0];
+        return {
+            transclude: ngIf.transclude,
+            priority: ngIf.priority,
+            terminal: ngIf.terminal,
+            restrict: ngIf.restrict,
+            scope: true,
+            link: function linkFunction($scope, $element, $attrs) {
+                $attrs.ngIf = function () {
+                    return $scope.visible;
+                };
+                ngIf.link.apply(ngIf, arguments);
+            },
+            controller: 'pipAppBarPartController'
+        };
+    }]);
+    thisModule.controller('pipAppBarPartController', ['$scope', '$element', '$attrs', '$rootScope', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, pipAppBar) {
+        var partName = '' + $attrs.pipAppbarPart;
+        var partValue = null;
+        var pos = partName.indexOf(':');
+        if (pos > 0) {
+            partValue = partName.substr(pos + 1);
+            partName = partName.substr(0, pos);
+        }
+        onAppBarChanged(null, pipAppBar.config());
+        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
+        function onAppBarChanged(event, config) {
+            var parts = config.parts || {};
+            var currentPartValue = parts[partName];
+            var visible = !!(partValue ? currentPartValue == partValue : currentPartValue);
+            if (visible != $scope.visible)
+                $scope.visible = visible;
+        }
+    }]);
+})();
+},{}],6:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipAppBar.Service', []);
+    thisModule.provider('pipAppBar', function () {
+        var config = {
+            theme: 'default',
+            cssClass: '',
+            ngClasses: {},
+            parts: {},
+            showAppBar: true
+        };
+        this.theme = theme;
+        this.parts = initParts;
+        this.$get = ['$rootScope', function ($rootScope) {
+            return {
+                config: getConfig,
+                cssClass: cssClass,
+                part: getOrSetPart,
+                parts: getOrSetParts,
+                show: showAppBar,
+                hide: hideAppBar,
+                showShadow: showShadow,
+                showShadowSm: showShadowSm,
+                showShadowSmXs: showShadowSmXs,
+                hideShadow: hideShadow
+            };
+            function getConfig() {
+                return config;
+            }
+            function cssClass(newCssClass) {
+                if (newCssClass != undefined) {
+                    config.cssClass = newCssClass;
+                    sendConfigEvent();
+                }
+                return config.cssClass;
+            }
+            function showAppBar() {
+                config.showAppBar = true;
+                sendConfigEvent();
+            }
+            function hideAppBar() {
+                config.showAppBar = false;
+                sendConfigEvent();
+            }
+            function showShadowSm() {
+                config.ngClasses['pip-shadow'] = false;
+                config.ngClasses['pip-shadow-sm'] = true;
+                config.ngClasses['pip-shadow-xs'] = false;
+                sendConfigEvent();
+            }
+            function showShadowSmXs() {
+                config.ngClasses['pip-shadow'] = false;
+                config.ngClasses['pip-shadow-sm'] = true;
+                config.ngClasses['pip-shadow-xs'] = true;
+                sendConfigEvent();
+            }
+            function showShadow() {
+                config.ngClasses['pip-shadow'] = true;
+                sendConfigEvent();
+            }
+            function hideShadow() {
+                config.ngClasses['pip-shadow'] = false;
+                config.ngClasses['pip-shadow-sm'] = false;
+                config.ngClasses['pip-shadow-xs'] = false;
+                sendConfigEvent();
+            }
+            function getOrSetPart(name, value) {
+                if (!_.isString(name))
+                    throw new Error("Part name has to be a string");
+                if (value != undefined) {
+                    if (config.parts[name] != value) {
+                        config.parts[name] = value;
+                        sendConfigEvent();
+                    }
+                }
+                return config.parts[name];
+            }
+            function getOrSetParts(parts) {
+                if (_.isObject(parts)) {
+                    if (!_.isEqual(config.parts, parts)) {
+                        config.parts = parts;
+                        sendConfigEvent();
+                    }
+                }
+                return config.parts;
+            }
+            function sendConfigEvent() {
+                $rootScope.$broadcast('pipAppBarChanged', config);
+            }
+        }];
+        function theme(theme) {
+            config.theme = theme || config.theme;
+            return config.theme;
+        }
+        function initParts(parts) {
+            if (_.isObject(parts)) {
+                config.parts = parts;
+            }
+            return config.parts;
+        }
+    });
+})();
+},{}],7:[function(require,module,exports){
+"use strict";
+var breadcrumb_service_1 = require('./breadcrumb_service');
+var breadcrumb_service_2 = require('./breadcrumb_service');
+var BreadcrumbController = (function () {
+    BreadcrumbController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', 'pipBreadcrumb'];
+    function BreadcrumbController($scope, $element, $attrs, $rootScope, $window, $state, pipBreadcrumb) {
+        "ngInject";
+        this._rootScope = $rootScope;
+        this._window = $window;
+        $element.addClass('pip-breadcrumb');
+        this.config = pipBreadcrumb.config;
+        $rootScope.$on(breadcrumb_service_1.BreadcrumbChangedEvent, this.onBreadcrumbChanged);
+        $rootScope.$on(breadcrumb_service_2.BreadcrumbBackEvent, this.onBreadcrumbBack);
+    }
+    BreadcrumbController.prototype.onBreadcrumbChanged = function (event, config) {
+        this.config = config;
+    };
+    BreadcrumbController.prototype.onBreadcrumbBack = function () {
+        var items = this.config.items;
+        if (_.isArray(items) && items.length > 0) {
+            var backCallback = items[items.length - 1].click;
+            if (_.isFunction(backCallback))
+                backCallback();
+            else
+                this._window.history.back();
+        }
+        else
+            this._window.history.back();
+    };
+    BreadcrumbController.prototype.onBreadcrumbClick = function (item) {
+        if (_.isFunction(item.click))
+            item.click(item);
+    };
+    BreadcrumbController.prototype.onSearchOpen = function () {
+        this._rootScope.$broadcast('pipSearchOpen');
+    };
+    return BreadcrumbController;
+}());
+function breadcrumbDirective() {
+    return {
+        restrict: 'E',
+        scope: {},
+        replace: false,
+        templateUrl: function (element, attr) {
+            return 'breadcrumb/breadcrumb.html';
+        },
+        controller: BreadcrumbController,
+        controllerAs: 'vm'
+    };
+}
+angular
+    .module('pipBreadcrumb', [
+    'ngMaterial',
+    'pipNav.Templates',
+    'pipNav.Translate',
+    'pipBreadcrumb.Service'
+])
+    .directive('pipBreadcrumb', breadcrumbDirective);
+},{"./breadcrumb_service":8}],8:[function(require,module,exports){
+"use strict";
+exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
+exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
+var BreadcrumbItem = (function () {
+    function BreadcrumbItem() {
+    }
+    return BreadcrumbItem;
+}());
+exports.BreadcrumbItem = BreadcrumbItem;
+var BreadcrumbConfig = (function () {
+    function BreadcrumbConfig() {
+    }
+    return BreadcrumbConfig;
+}());
+exports.BreadcrumbConfig = BreadcrumbConfig;
+var BreadcrumbService = (function () {
+    function BreadcrumbService(config, $rootScope) {
+        this._config = config;
+        this._rootScope = $rootScope;
+    }
+    Object.defineProperty(BreadcrumbService.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BreadcrumbService.prototype, "text", {
+        get: function () {
+            return this._config.text;
+        },
+        set: function (value) {
+            this._config.text = value;
+            this._config.items = null;
+            this.sendEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BreadcrumbService.prototype, "items", {
+        get: function () {
+            return this._config.items;
+        },
+        set: function (value) {
+            this._config.text = null;
+            this._config.items = value;
+            this.sendEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BreadcrumbService.prototype, "criteria", {
+        get: function () {
+            return this._config.criteria;
+        },
+        set: function (value) {
+            this._config.criteria = value;
+            this.sendEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    BreadcrumbService.prototype.sendEvent = function () {
+        this._rootScope.$broadcast(exports.BreadcrumbChangedEvent, this._config);
+    };
+    return BreadcrumbService;
+}());
+var BreadcrumbProvider = (function () {
+    function BreadcrumbProvider() {
+        this._config = {
+            text: null,
+            items: null,
+            criteria: null
+        };
+    }
+    Object.defineProperty(BreadcrumbProvider.prototype, "text", {
+        get: function () {
+            return this._config.text;
+        },
+        set: function (value) {
+            this._config.text = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    BreadcrumbProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new BreadcrumbService(this._config, $rootScope);
+        return this._service;
+    }];
+    return BreadcrumbProvider;
+}());
+angular
+    .module('pipBreadcrumb.Service', [])
+    .provider('pipBreadcrumb', BreadcrumbProvider);
+},{}],9:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNav.Translate', []);
     thisModule.filter('translate', ['$injector', function ($injector) {
         var pipTranslate = $injector.has('pipTranslate')
             ? $injector.get('pipTranslate') : null;
@@ -5890,328 +6714,1138 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-
+},{}],10:[function(require,module,exports){
 (function () {
     'use strict';
-    var thisModule = angular.module('pipErrorDetailsDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipErrorDetailsDialog', ['$mdDialog', function ($mdDialog) {
+    var thisModule = angular.module('pipDropdown', ['pipNav.Templates']);
+    thisModule.directive('pipDropdown', ['$mdMedia', function ($mdMedia) {
         return {
-            show: function (params, successCallback, cancelCallback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'error_details/error_details.html',
-                    controller: 'pipErrorDetailsDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (successCallback) {
-                        successCallback();
+            restrict: 'E',
+            scope: {
+                ngDisabled: '&',
+                actions: '=pipActions',
+                showDropdown: '&pipShow',
+                activeIndex: '=pipActiveIndex',
+                select: '=pipDropdownSelect'
+            },
+            templateUrl: 'dropdown/dropdown.html',
+            controller: ['$scope', '$element', '$attrs', 'localStorageService', function ($scope, $element, $attrs, localStorageService) {
+                $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
+                $scope.$mdMedia = $mdMedia;
+                $scope.actions = ($scope.actions && _.isArray($scope.actions)) ? $scope.actions : [];
+                $scope.activeIndex = $scope.activeIndex || 0;
+                $scope.disabled = function () {
+                    if ($scope.ngDisabled()) {
+                        return $scope.ngDisabled();
                     }
-                }, function () {
-                    if (cancelCallback) {
-                        cancelCallback();
+                    else {
+                        return false;
                     }
-                });
-            }
-        };
-    }]);
-    thisModule.controller('pipErrorDetailsDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'ERROR_DETAILS': 'Error details',
-                'CODE': 'Error code',
-                'PATH': 'Path',
-                'ERROR': 'Error',
-                'METHOD': 'Method',
-                'MESSAGE': 'Message',
-                'DISMISS': 'Dismiss'
-            });
-            pipTranslate.translations('ru', {
-                'ERROR_DETAILS': 'Детали ошибки',
-                'CODE': 'Код ошибки',
-                'PATH': 'Путь',
-                'ERROR': 'Ошибка',
-                'METHOD': 'Метод',
-                'MESSAGE': 'Сообщение'
-            });
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
-            $scope.errorDetails = 'ERROR_DETAILS';
-            $scope.dismissButton = 'DISMISS';
-            $scope.errorMessage = 'MESSAGE';
-            $scope.errorCode = 'CODE';
-            $scope.errorMethod = 'METHOD';
-            $scope.errorPath = 'PATH';
-            $scope.errorText = 'ERROR';
-        }
-        else {
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'Cancel';
-            $scope.errorDetails = 'Error details';
-            $scope.dismissButton = 'Dismiss';
-            $scope.errorMessage = 'Message';
-            $scope.errorCode = 'Code';
-            $scope.errorMethod = 'Method';
-            $scope.errorPath = 'Path';
-            $scope.error = 'Error';
-        }
-        $scope.theme = $rootScope.$theme;
-        $scope.error = params.error;
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onOk = function () {
-            $mdDialog.hide();
+                };
+                $scope.onSelect = function (index) {
+                    $scope.activeIndex = index;
+                    if ($scope.select) {
+                        $scope.select($scope.actions[index], $scope.activeIndex);
+                    }
+                };
+                $scope.show = function () {
+                    if ($scope.showDropdown()) {
+                        return $scope.showDropdown();
+                    }
+                    else {
+                        return true;
+                    }
+                };
+            }]
         };
     }]);
 })();
-
+},{}],11:[function(require,module,exports){
+var pip;
+(function (pip) {
+    var nav;
+    (function (nav) {
+        'use strict';
+        var LanguagePickerController = (function () {
+            LanguagePickerController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$timeout', '$injector'];
+            function LanguagePickerController($scope, $element, $attrs, $rootScope, $timeout, $injector) {
+                "ngInject";
+                this.languages = ['en', 'ru'];
+                this._timeout = $timeout;
+                this._translate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+                $element.addClass('pip-language-picker');
+                this.languages = $scope.languages;
+                $rootScope.$on('pipSetLanguages', this.setLanguages);
+            }
+            Object.defineProperty(LanguagePickerController.prototype, "language", {
+                get: function () {
+                    return this._translate ? this._translate.language : null;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            LanguagePickerController.prototype.setLanguages = function (lang) {
+                this.languages = lang.length > 0 ? lang : ['en', 'ru'];
+            };
+            LanguagePickerController.prototype.onLanguageClick = function (language) {
+                var _this = this;
+                if (this._translate != null) {
+                    this._timeout(function () {
+                        _this._translate.language = _this.language;
+                    }, 0);
+                }
+            };
+            return LanguagePickerController;
+        }());
+        function languagePickerDirective() {
+            return {
+                restrict: 'E',
+                scope: {
+                    languages: '=languages',
+                },
+                replace: false,
+                templateUrl: function (element, attr) {
+                    return 'language_picker/language_picker.html';
+                },
+                controller: LanguagePickerController,
+                controllerAs: 'vm'
+            };
+        }
+        angular
+            .module('pipLanguagePicker', [
+            'ngMaterial', 'pipNav.Translate', 'pipNav.Templates'
+        ])
+            .directive('pipLanguagePicker', languagePickerDirective);
+    })(nav = pip.nav || (pip.nav = {}));
+})(pip || (pip = {}));
+},{}],12:[function(require,module,exports){
+var pip;
+(function (pip) {
+    var nav;
+    (function (nav) {
+        'use strict';
+        angular.module('pipNav', [
+            'pipNav.Service',
+            'pipDropdown',
+            'pipTabs',
+            'pipAppBar',
+            'pipNavIcon',
+            'pipBreadcrumb',
+            'pipPrimaryActions',
+            'pipSecondaryActions',
+            'pipSideNav',
+            'pipNavMenu',
+            'pipNavHeader',
+            'pipStickySideNav',
+            'pipStickyNavMenu',
+            'pipStickyNavHeader'
+        ]);
+    })(nav = pip.nav || (pip.nav = {}));
+})(pip || (pip = {}));
+},{}],13:[function(require,module,exports){
 (function () {
     'use strict';
-    var thisModule = angular.module('pipInformationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipInformationDialog', ['$mdDialog', function ($mdDialog) {
+    var thisModule = angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates', 'pipNavHeader.Service']);
+    thisModule.directive('pipNavHeader', function () {
         return {
-            show: function (params, callback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'information/information.html',
-                    controller: 'pipInformationDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (callback) {
-                        callback();
-                    }
-                });
+            restrict: 'EA',
+            scope: {
+                title: '=pipTitle',
+                subtitle: '=pipSubTitle',
+                imageUrl: '=pipImage',
+                imageCss: '=pipImageCss'
+            },
+            replace: false,
+            templateUrl: 'nav_header/nav_header.html',
+            controller: 'pipNavHeaderController'
+        };
+    });
+    thisModule.controller('pipNavHeaderController', ['$scope', '$element', '$rootScope', '$timeout', 'pipNavHeader', function ($scope, $element, $rootScope, $timeout, pipNavHeader) {
+        var image = null, imageBlock = $element.find('.pip-nav-header-user'), $image;
+        $element.addClass('pip-nav-header');
+        $rootScope.$on('pipIdentityChanged', onIdentityChanged);
+        $rootScope.$on('pipNavHeaderImageChanged', onIdentityChanged);
+        $scope.onUserClick = onUserClick;
+        $timeout(function () {
+            $image = $element.find('.pip-nav-header-user-image');
+            onIdentityChanged();
+            $image.load(function ($event) {
+                image = $($event.target);
+                setImageMarginCSS(imageBlock, image);
+            });
+        }, 10);
+        return;
+        function setImageMarginCSS(container, image) {
+            var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
+            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
+                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
+                cssParams['margin-left'] = '' + margin + 'px';
+                cssParams['height'] = '' + containerHeight + 'px';
+                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
+                cssParams['margin-top'] = '';
             }
-        };
-    }]);
-    thisModule.controller('pipInformationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
-        var content = params.message, item;
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'INFORMATION_TITLE': 'Information'
-            });
-            pipTranslate.translations('ru', {
-                'INFORMATION_TITLE': 'Информация'
-            });
-            $scope.title = params.title || 'INFORMATION_TITLE';
-            $scope.ok = params.ok || 'OK';
-            content = pipTranslate.translate(content);
+            else {
+                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
+                cssParams['margin-top'] = '' + margin + 'px';
+                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
+                cssParams['width'] = '' + containerWidth + 'px';
+                cssParams['margin-left'] = '';
+            }
+            image.css(cssParams);
         }
-        else {
-            $scope.title = params.title || 'Information';
-            $scope.ok = params.ok || 'OK';
+        ;
+        function onIdentityChanged() {
+            var url, config = pipNavHeader.config();
+            url = $scope.imageUrl ? $scope.imageUrl : config.defaultImageUrl;
+            if (url) {
+                console.log('url', url);
+                $image.attr('src', url);
+            }
+            else {
+                console.log('display none');
+                imageBlock.css('display', 'none');
+            }
         }
-        var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
-        $scope.theme = $rootScope.$theme;
-        if (params.item && pipFormat) {
-            item = _.truncate(params.item, 25);
-            content = pipFormat.sprintf(content, item);
-            console.log('content2', content);
+        function onUserClick() {
+            $rootScope.$broadcast('pipNavUserClicked');
         }
-        $scope.content = content;
-        $scope.onOk = function () {
-            $mdDialog.hide();
-        };
     }]);
 })();
-
+},{}],14:[function(require,module,exports){
 (function () {
     'use strict';
-    var thisModule = angular.module('pipOptionsDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipOptionsDialog', ['$mdDialog', function ($mdDialog) {
+    var thisModule = angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavIcon.Service']);
+    thisModule.directive('pipNavIcon', function () {
         return {
-            show: function (params, successCallback, cancelCallback) {
-                if (params.event) {
-                    params.event.stopPropagation();
-                    params.event.preventDefault();
-                }
-                function focusToggleControl() {
-                    if (params.event && params.event.currentTarget) {
-                        params.event.currentTarget.focus();
-                    }
-                }
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'options/options.html',
-                    controller: 'pipOptionsDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function (option) {
-                    focusToggleControl();
-                    if (successCallback) {
-                        successCallback(option);
-                    }
-                }, function () {
-                    focusToggleControl();
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
-            }
+            restrict: 'E',
+            scope: {
+                type: '=pipType',
+                imageUrl: '=pipImageUrl'
+            },
+            replace: false,
+            templateUrl: function (element, attr) {
+                return 'nav_icon/nav_icon.html';
+            },
+            controller: 'pipNavIconController'
         };
+    });
+    thisModule.controller('pipNavIconController', ['$scope', '$element', '$attrs', '$rootScope', '$window', 'pipNavIcon', function ($scope, $element, $attrs, $rootScope, $window, pipNavIcon) {
+        $element.addClass('pip-nav-icon');
+        $scope.config = pipNavIcon.config();
+        $rootScope.$on('pipNavIconChanged', onNavIconChanged);
+        $scope.onNavIconClick = onNavIconClick;
+        function onNavIconChanged(event, config) {
+            $scope.config = config;
+        }
+        function onNavIconClick() {
+            var breadcrumb, backCallback;
+            if (_.isFunction($scope.config.callback)) {
+                $scope.config.callback();
+            }
+            else if ($scope.config.event) {
+                $rootScope.$broadcast($scope.config.event);
+            }
+            else if ($scope.config.type == 'menu') {
+                $rootScope.$broadcast('pipOpenSideNav');
+            }
+            else if ($scope.config.type == 'back') {
+                $window.history.back();
+            }
+            else {
+                $rootScope.$broadcast('pipNavIconClicked');
+            }
+        }
     }]);
-    thisModule.controller('pipOptionsDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'OPTIONS_TITLE': 'Choose Option'
-            });
-            pipTranslate.translations('ru', {
-                'OPTIONS_TITLE': 'Выберите опцию'
-            });
-            $scope.title = params.title || 'OPTIONS_TITLE';
-            $scope.applyButtonTitle = params.appleButtonTitle || 'SELECT';
+})();
+},{}],15:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNavIcon.Service', []);
+    thisModule.provider('pipNavIcon', function () {
+        var config = {
+            type: 'menu',
+            imageUrl: null,
+            iconName: 'back',
+            callback: null,
+            event: null
+        };
+        this.config = getConfig;
+        this.clear = clear;
+        this.menu = setMenu;
+        this.back = setBack;
+        this.icon = setIcon;
+        this.image = setImage;
+        this.$get = ['$rootScope', function ($rootScope) {
+            return {
+                config: getConfig,
+                hide: hide,
+                menu: showMenu,
+                back: showBack,
+                icon: showIcon,
+                image: showImage
+            };
+            function hide() {
+                clear();
+                sendConfigEvent();
+            }
+            function showMenu(callbackOrEvent) {
+                setMenu(callbackOrEvent);
+                sendConfigEvent();
+            }
+            function showIcon(iconName, callbackOrEvent) {
+                setIcon(iconName, callbackOrEvent);
+                sendConfigEvent();
+            }
+            function showBack(callbackOrEvent) {
+                setBack(callbackOrEvent);
+                sendConfigEvent();
+            }
+            function showImage(imageUrl, callbackOrEvent) {
+                setImage(imageUrl, callbackOrEvent);
+                sendConfigEvent();
+            }
+            function sendConfigEvent() {
+                $rootScope.$broadcast('pipNavIconChanged', config);
+            }
+        }];
+        function getConfig() {
+            return config;
         }
-        else {
-            $scope.title = params.title || 'Choose Option';
-            $scope.applyButtonTitle = params.appleButtonTitle || 'Select';
+        function clear() {
+            config.type = 'none';
+            config.callback = null;
+            config.event = null;
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.options = params.options;
-        $scope.selectedOption = _.find(params.options, { active: true }) || {};
-        $scope.selectedOptionName = $scope.selectedOption.name;
-        $scope.deleted = params.deleted;
-        $scope.deletedTitle = params.deletedTitle;
-        $scope.onOptionSelect = function (event, option) {
+        function setMenu(callbackOrEvent) {
+            config.type = 'menu';
+            config.callback = null;
+            config.event = null;
+            if (_.isFunction(callbackOrEvent))
+                config.callback = callbackOrEvent;
+            if (_.isString(callbackOrEvent))
+                config.event = callbackOrEvent;
+        }
+        function setIcon(iconName, callbackOrEvent) {
+            config.type = 'icon';
+            config.iconName = iconName;
+            config.callback = null;
+            config.event = null;
+            if (_.isFunction(callbackOrEvent))
+                config.callback = callbackOrEvent;
+            if (_.isString(callbackOrEvent))
+                config.event = callbackOrEvent;
+        }
+        function setBack(callbackOrEvent) {
+            config.type = 'back';
+            config.callback = null;
+            config.event = null;
+            if (_.isFunction(callbackOrEvent))
+                config.callback = callbackOrEvent;
+            if (_.isString(callbackOrEvent))
+                config.event = callbackOrEvent;
+        }
+        function setImage(imageUrl, callbackOrEvent) {
+            config.type = 'image';
+            config.imageUrl = imageUrl;
+            config.callback = null;
+            config.event = null;
+            if (_.isFunction(callbackOrEvent))
+                config.callback = callbackOrEvent;
+            if (_.isString(callbackOrEvent))
+                config.event = callbackOrEvent;
+        }
+    });
+})();
+},{}],16:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
+    thisModule.directive('pipNavMenu', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                config: '=pipLinks'
+            },
+            replace: false,
+            templateUrl: 'nav_menu/nav_menu.html',
+            controller: 'pipNavMenuController'
+        };
+    });
+    thisModule.controller('pipNavMenuController', ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
+        $element.addClass('pip-nav-menu');
+        $scope.config = $scope.config || pipNavMenu.get();
+        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
+        $scope.itemVisible = itemVisible;
+        $scope.onLinkClick = onLinkClick;
+        $scope.isSectionEmpty = isSectionEmpty;
+        return;
+        function itemVisible(item) {
+            return item && item.access && !item.access(item);
+        }
+        function isSectionEmpty(linkCollection) {
+            var result = true;
+            _.each(linkCollection, function (link) {
+                if (!itemVisible(link))
+                    result = false;
+            });
+            return result;
+        }
+        function onConfigChanged(event, config) {
+            $scope.config = config;
+        }
+        function onLinkClick(event, link) {
             event.stopPropagation();
-            $scope.selectedOptionName = option.name;
-        };
-        $scope.onKeyPress = function (event) {
-            if (event.keyCode === 32 || event.keyCode === 13) {
-                event.stopPropagation();
-                event.preventDefault();
-                $scope.onSelect();
+            if (!link) {
+                pipSideNav.close();
+                return;
             }
-        };
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onSelect = function () {
-            var option;
-            option = _.find(params.options, { name: $scope.selectedOptionName });
-            $mdDialog.hide({ option: option, deleted: $scope.deleted });
-        };
-        function focusInput() {
-            var list;
-            list = $('.pip-options-dialog .pip-list');
-            list.focus();
+            if (link.href) {
+                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    $window.location.href = link.href;
+                }, 300);
+                return;
+            }
+            else if (link.url) {
+                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    $location.url(link.url);
+                }, 300);
+                return;
+            }
+            else if (link.state) {
+                var $state = $injector.has('$state') ? $injector.get('$state') : null;
+                if ($state != null && $state.current.name === link.state) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    if ($injector.has('$state')) {
+                        var $state = $injector.get('$state');
+                        $state.go(link.state, link.stateParams);
+                    }
+                }, 300);
+                return;
+            }
+            else if (link.event)
+                $rootScope.$broadcast(link.event, link);
+            pipSideNav.close();
         }
-        setTimeout(focusInput, 500);
     }]);
 })();
-
+},{}],17:[function(require,module,exports){
+'use strict';
+var NavService = (function () {
+    NavService.$inject = ['$injector'];
+    function NavService($injector) {
+        "ngInject";
+        this.appBar = $injector.has('pipAppBar') ? $injector.get('pipAppBar') : null;
+        this.navIcon = $injector.has('pipNavIcon') ? $injector.get('pipNavIcon') : null;
+        this.breadcrumb = $injector.has('pipBreadcrumb') ? $injector.get('pipBreadcrumb') : null;
+        this.actions = $injector.has('pipActions') ? $injector.get('pipActions') : null;
+        this.search = $injector.has('pipSearch') ? $injector.get('pipSearch') : null;
+        this.sideNav = $injector.has('pipSideNav') ? $injector.get('pipSideNav') : null;
+        this.navHeader = $injector.has('pipNavHeader') ? $injector.get('pipNavHeader') : null;
+        this.navMenu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
+    }
+    return NavService;
+}());
+angular.module('pipNav.Service', [])
+    .service('pipNavService', NavService);
+},{}],18:[function(require,module,exports){
 (function () {
     'use strict';
-    var thisModule = angular.module('pipOptionsBigDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipOptionsBigDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, successCallback, cancelCallback) {
-                if (params.event) {
-                    params.event.stopPropagation();
-                    params.event.preventDefault();
-                }
-                function focusToggleControl() {
-                    if (params.event && params.event.currentTarget) {
-                        params.event.currentTarget.focus();
-                    }
-                }
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'options/options_big.html',
-                    controller: 'pipOptionsDialogBigController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function (option) {
-                    focusToggleControl();
-                    if (successCallback) {
-                        successCallback(option);
-                    }
-                }, function () {
-                    focusToggleControl();
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
+    var thisModule = angular.module('pipNavHeader.Service', []);
+    thisModule.provider('pipNavHeader', function () {
+        var config = {
+            defaultImageUrl: null,
+        };
+        this.config = getConfig;
+        this.clear = clear;
+        this.image = setImage;
+        this.$get = ['$rootScope', function ($rootScope) {
+            return {
+                config: getConfig,
+                image: showImage
+            };
+            function showImage(imageUrl) {
+                setImage(imageUrl);
+                sendConfigEvent();
             }
+            function sendConfigEvent() {
+                $rootScope.$broadcast('pipNavHeaderImageChanged', config);
+            }
+        }];
+        function getConfig() {
+            return config;
+        }
+        function clear() {
+            config.defaultImageUrl = null;
+        }
+        function setImage(imageUrl) {
+            config.defaultImageUrl = imageUrl;
+        }
+    });
+})();
+},{}],19:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipNavMenu.Service', []);
+    thisModule.provider('pipNavMenu', function () {
+        var config = [], collapsed = true, sectionIcon;
+        this.sections = init;
+        this.sectionIcon = setOrGetIcon;
+        this.collapsed = setOrGetCollapsed;
+        this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
+            return {
+                get: getConfig,
+                set: setConfig,
+                setCounter: setCounter,
+                collapsed: setOrGetCollapsed,
+                icon: setOrGetIcon
+            };
+            function getConfig() {
+                return config;
+            }
+            function setConfig(newConfig) {
+                init(newConfig);
+                $rootScope.$broadcast('pipNavMenuChanged', config);
+                return config;
+            }
+            function setCounter(linkTitle, counter) {
+                if (!linkTitle || !angular.isNumber(counter)) {
+                    return;
+                }
+                var section, menuItem;
+                section = _.find(config, function (s) {
+                    var item = _.find(s.links, { title: linkTitle });
+                    if (item) {
+                        return item;
+                    }
+                    else {
+                        return false;
+                    }
+                    ;
+                });
+                menuItem = _.find(section.links, { title: linkTitle });
+                menuItem.count = counter;
+                setConfig(config);
+            }
+        }];
+        function setOrGetIcon(value) {
+            if (_.isString(value)) {
+                sectionIcon = value;
+            }
+            return sectionIcon;
+        }
+        function setOrGetCollapsed(value) {
+            if (value !== undefined) {
+                collapsed = value;
+            }
+            return collapsed;
+        }
+        function init(newConfig) {
+            if (_.isArray(newConfig)) {
+                config = newConfig;
+            }
+            return config;
+        }
+        ;
+    });
+})();
+},{}],20:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSideNav.Part', ['pipSideNav.Service']);
+    thisModule.directive('pipSidenavPart', ['ngIfDirective', function (ngIfDirective) {
+        var ngIf = ngIfDirective[0];
+        return {
+            transclude: ngIf.transclude,
+            priority: ngIf.priority,
+            terminal: ngIf.terminal,
+            restrict: ngIf.restrict,
+            scope: true,
+            link: function ($scope, $element, $attrs) {
+                $attrs.ngIf = function () { return $scope.visible; };
+                ngIf.link.apply(ngIf);
+            },
+            controller: 'pipSideNavPartController'
         };
     }]);
-    thisModule.controller('pipOptionsDialogBigController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'OPTIONS_TITLE': 'Choose Option'
-            });
-            pipTranslate.translations('ru', {
-                'OPTIONS_TITLE': 'Выберите опцию'
-            });
-            $scope.title = params.title || 'OPTIONS_TITLE';
-            $scope.applyButtonTitle = params.applyButtonTitle || 'SELECT';
+    thisModule.controller('pipSideNavPartController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav', function ($scope, $element, $attrs, $rootScope, pipSideNav) {
+        var partName = '' + $attrs.pipSidenavPart;
+        var partValue = null;
+        var pos = partName.indexOf(':');
+        if (pos > 0) {
+            partValue = partName.substr(pos + 1);
+            partName = partName.substr(0, pos);
         }
-        else {
-            $scope.title = params.title || 'Choose Option';
-            $scope.applyButtonTitle = params.applyButtonTitle || 'Select';
+        onSideNavChanged(null, pipSideNav.config());
+        $rootScope.$on('pipSideNavChanged', onSideNavChanged);
+        function onSideNavChanged(event, config) {
+            var parts = config.parts || {};
+            var currentPartValue = config[partName];
+            $scope.visible = partValue ? currentPartValue == partValue : currentPartValue;
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.options = params.options;
-        $scope.noActions = params.noActions || false;
-        $scope.noTitle = params.noTitle || false;
-        $scope.hint = params.hint || '';
-        $scope.selectedOption = _.find(params.options, { active: true }) || {};
-        $scope.selectedOptionName = $scope.selectedOption.name;
-        $scope.optionIndex = _.findIndex(params.options, $scope.selectedOption);
-        $scope.deleted = params.deleted;
-        $scope.deletedTitle = params.deletedTitle;
-        $scope.onOptionSelect = function (event, option) {
-            event.stopPropagation();
-            $scope.selectedOptionName = option.name;
-            if ($scope.noActions) {
-                $scope.onSelect();
-            }
-        };
-        $scope.onSelected = function () {
-            $scope.selectedOptionName = $scope.options[$scope.optionIndex].name;
-            if ($scope.noActions) {
-            }
-        };
-        $scope.onKeyUp = function (event, index) {
-            if (event.keyCode === 32 || event.keyCode === 13) {
-                event.stopPropagation();
-                event.preventDefault();
-                if (index !== undefined && index > -1 && index < $scope.options.length) {
-                    $scope.selectedOptionName = $scope.options[index].name;
-                    $scope.onSelect();
-                }
-            }
-        };
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onSelect = function () {
-            var option;
-            option = _.find($scope.options, { name: $scope.selectedOptionName });
-            $mdDialog.hide({ option: option, deleted: $scope.deleted });
-        };
-        function focusInput() {
-            var list;
-            list = $('.pip-options-dialog .pip-list');
-            list.focus();
-        }
-        setTimeout(focusInput, 500);
     }]);
 })();
-
-
-
-
-
+},{}],21:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSideNav.Service', []);
+    thisModule.provider('pipSideNav', function () {
+        var config = {
+            theme: 'default',
+            parts: []
+        }, sideNavId = 'pip-sidenav';
+        this.id = id;
+        this.theme = theme;
+        this.parts = initParts;
+        this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
+            $rootScope.$on('pipOpenSideNav', open);
+            $rootScope.$on('pipCloseSideNav', close);
+            return {
+                config: getConfig,
+                part: getOrSetPart,
+                parts: getOrSetParts,
+                id: getOrSetId,
+                open: open,
+                close: close,
+                toggle: toggle
+            };
+            function getConfig() {
+                return config;
+            }
+            function getOrSetPart(name, value) {
+                if (!_.isString(name))
+                    throw new Error("Part name has to be a string");
+                if (value != undefined) {
+                    if (config.parts[name] != value) {
+                        config.parts[name] = value;
+                        sendConfigEvent();
+                    }
+                }
+                return config.parts[name];
+            }
+            function getOrSetId(id) {
+                if (_.isString(id)) {
+                    if (sideNavId !== id) {
+                        sideNavId = id;
+                    }
+                }
+                return sideNavId;
+            }
+            function getOrSetParts(parts) {
+                if (_.isObject(parts)) {
+                    if (!_.isEqual(config.parts, parts)) {
+                        config.parts = parts;
+                        sendConfigEvent();
+                    }
+                }
+                return config.parts;
+            }
+            function sendConfigEvent() {
+                $rootScope.$broadcast('pipSideNavChanged', config);
+            }
+            function open(event) {
+                console.log('open pip', sideNavId);
+                $mdSidenav(sideNavId).open();
+            }
+            function close(event) {
+                console.log('close pip', sideNavId);
+                $mdSidenav(sideNavId).close();
+            }
+            function toggle() {
+                console.log('toggle pip', sideNavId);
+                $mdSidenav(sideNavId).toggle();
+                $rootScope.$broadcast('pipSideNavToggle', config);
+            }
+        }];
+        function id(id) {
+            sideNavId = id || sideNavId;
+            return sideNavId;
+        }
+        function theme(theme) {
+            config.theme = theme || config.theme;
+            return config.theme;
+        }
+        function initParts(parts) {
+            if (_.isObject(parts)) {
+                config.parts = parts;
+            }
+            return config.parts;
+        }
+    });
+})();
+},{}],22:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
+    thisModule.run(['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate && pipTranslate.setTranslations) {
+            pipTranslate.setTranslations('en', {
+                'APPBAR_SEARCH': 'Search'
+            });
+            pipTranslate.setTranslations('ru', {
+                'APPBAR_SEARCH': 'Поиск'
+            });
+        }
+    }]);
+    thisModule.directive('pipSearchBar', function () {
+        return {
+            restrict: 'E',
+            scope: {},
+            replace: false,
+            templateUrl: function (element, attr) {
+                return 'search_bar/search_bar.html';
+            },
+            controller: 'pipSearchBarController'
+        };
+    });
+    thisModule.controller('pipSearchBarController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
+        $element.addClass('pip-search-bar');
+        $scope.config = pipSearch.config();
+        $scope.searchEnabled = false;
+        $scope.search = { text: '' };
+        $rootScope.$on('pipSearchChanged', onSearchBarChanged);
+        $scope.onSearchEnable = onSearchEnable;
+        $scope.onSearchClick = onSearchClick;
+        $scope.onSearchClear = onSearchClear;
+        $scope.onSearchKeyDown = onSearchKeyDown;
+        function onSearchBarChanged(event, config) {
+            $scope.config = config;
+            $scope.searchEnabled = false;
+            $scope.search.text = '';
+        }
+        function focusSearchText() {
+            var element;
+            setTimeout(function () {
+                element = $('.pip-search-text');
+                if (element.length > 0) {
+                    element.focus();
+                }
+            }, 0);
+        }
+        function onSearchEnable() {
+            $scope.search.text = $scope.config.criteria;
+            $scope.searchEnabled = true;
+            focusSearchText();
+        }
+        function onSearchClick() {
+            var searchText = $scope.search.text;
+            $scope.search.text = '';
+            $scope.searchEnabled = false;
+            if ($scope.config.callback) {
+                $scope.config.callback(searchText);
+            }
+            else {
+                $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
+            }
+        }
+        function onSearchClear() {
+            if ($scope.search.text) {
+                $scope.search.text = '';
+                focusSearchText();
+            }
+            else {
+                $scope.searchEnabled = false;
+                onSearchClick();
+            }
+        }
+        function onSearchKeyDown(event) {
+            if (event.keyCode === 13) {
+                $scope.onSearchClick();
+                return;
+            }
+            if (event.keyCode === 27) {
+                $scope.searchEnabled = false;
+            }
+        }
+    }]);
+})();
+},{}],23:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSearch.Service', []);
+    thisModule.provider('pipSearch', function () {
+        var config = {
+            visible: false,
+            criteria: '',
+            history: [],
+            callback: null,
+        };
+        this.$get = ['$rootScope', function ($rootScope) {
+            $rootScope.$on('pipSearchOpen', open);
+            $rootScope.$on('pipSearchClose', close);
+            return {
+                config: getConfig,
+                set: setSearch,
+                clear: clearSearch,
+                criteria: updateCriteria,
+                history: updateHistory,
+            };
+            function getConfig() {
+                return config;
+            }
+            function setSearch(callback, criteria, history) {
+                config.callback = callback;
+                config.criteria = criteria;
+                config.history = history;
+                sendConfigEvent();
+            }
+            function clearSearch() {
+                config.callback = null;
+                config.criteria = null;
+                sendConfigEvent();
+            }
+            function open(event) {
+                config.visible = true;
+                sendConfigEvent();
+            }
+            function close(event) {
+                config.visible = false;
+                sendConfigEvent();
+            }
+            function toggle() {
+                config.visible = !config.visible;
+                sendConfigEvent();
+            }
+            function updateCriteria(criteria) {
+                config.criteria = criteria;
+                sendConfigEvent();
+            }
+            function updateHistory(history) {
+                config.history = history;
+                sendConfigEvent();
+            }
+            function sendConfigEvent() {
+                $rootScope.$broadcast('pipSearchChanged', config);
+            }
+        }];
+    });
+})();
+},{}],24:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Part', 'pipSideNav.Service']);
+    thisModule.directive('pipSidenav', function () {
+        return {
+            restrict: 'E',
+            transclude: true,
+            scope: true,
+            templateUrl: 'sidenav/sidenav.html',
+            controller: 'pipSideNavController'
+        };
+    });
+    thisModule.controller('pipSideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', function ($scope, $element, $rootScope, pipSideNav) {
+        $element.addClass('pip-sidenav');
+        pipSideNav.id('pip-sidenav');
+        $rootScope.$on('pipNavIconClicked', onNavIconClick);
+        return;
+        function onNavIconClick(event) {
+            pipSideNav.open();
+        }
+    }]);
+})();
+},{}],25:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipStickyNavHeader', ['ngMaterial', 'pipNav.Templates', 'pipNavHeader.Service']);
+    thisModule.directive('pipStickyNavHeader', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                title: '=pipTitle',
+                subtitle: '=pipSubTitle',
+                imageUrl: '=pipImage',
+                imageCss: '=pipImageCss'
+            },
+            replace: false,
+            templateUrl: 'sticky_nav_header/sticky_nav_header.html',
+            controller: 'pipStickyNavHeaderController'
+        };
+    });
+    thisModule.controller('pipStickyNavHeaderController', ['$scope', '$element', '$rootScope', '$timeout', 'pipNavHeader', function ($scope, $element, $rootScope, $timeout, pipNavHeader) {
+        var image = null, imageBlock = $element.find('.pip-sticky-nav-header-user'), $image;
+        $element.addClass('pip-sticky-nav-header');
+        $rootScope.$on('pipIdentityChanged', onIdentityChanged);
+        $rootScope.$on('pipNavHeaderImageChanged', onIdentityChanged);
+        $rootScope.$on('pipNavExpanded', resizeImage);
+        $scope.onUserClick = onUserClick;
+        $timeout(function () {
+            $image = $element.find('.pip-sticky-nav-header-user-image');
+            onIdentityChanged();
+            $image.load(function ($event) {
+                image = $($event.target);
+                setImageMarginCSS(imageBlock, image);
+            });
+        }, 10);
+        return;
+        function resizeImage() {
+            if (!image) {
+                image = $element.find('.pip-sticky-nav-header-user-image');
+            }
+            $timeout(function () {
+                setImageMarginCSS(imageBlock, image);
+            }, 400);
+        }
+        function setImageMarginCSS(container, image) {
+            var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
+            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
+                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
+                cssParams['margin-left'] = '' + margin + 'px';
+                cssParams['height'] = '' + containerHeight + 'px';
+                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
+                cssParams['margin-top'] = '';
+            }
+            else {
+                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
+                cssParams['margin-top'] = '' + margin + 'px';
+                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
+                cssParams['width'] = '' + containerWidth + 'px';
+                cssParams['margin-left'] = '';
+            }
+            image.css(cssParams);
+        }
+        ;
+        function onIdentityChanged() {
+            var url, config = pipNavHeader.config();
+            url = $scope.imageUrl ? $scope.imageUrl : config.defaultImageUrl;
+            if (url) {
+                $image.attr('src', url);
+            }
+            else {
+                imageBlock.css('display', 'none');
+            }
+        }
+        function onUserClick() {
+            $rootScope.$broadcast('pipNavUserClicked');
+        }
+    }]);
+})();
+},{}],26:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipStickyNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
+    thisModule.directive('pipStickyNavMenu', function () {
+        return {
+            restrict: 'EA',
+            scope: {
+                config: '=pipLinks',
+                collapsed: '=pipCollapsed'
+            },
+            replace: false,
+            templateUrl: 'sticky_nav_menu/sticky_nav_menu.html',
+            controller: 'pipStickyNavMenuController'
+        };
+    });
+    thisModule.controller('pipStickyNavMenuController', ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
+        var pipSdeNavElement = $element.parent().parent();
+        $element.addClass('pip-sticky-nav-menu');
+        $scope.config = $scope.config || pipNavMenu.get();
+        setCollapsible();
+        $scope.expanded = true;
+        pipNavMenu.set($scope.config);
+        $scope.defaultIicon = 'icons:folder';
+        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
+        $scope.itemVisible = itemVisible;
+        $scope.onLinkClick = onLinkClick;
+        $scope.isSectionEmpty = isSectionEmpty;
+        $scope.onExpand = onExpand;
+        return;
+        function setCollapsible() {
+            var collapsed;
+            if (angular.isFunction($scope.collapsed)) {
+                collapsed = $scope.collapsed();
+            }
+            else {
+                collapsed = $scope.collapsed !== false && $scope.collapsed !== 'false';
+            }
+            $scope.collapsibled = collapsed;
+            pipNavMenu.collapsed(collapsed);
+        }
+        function onExpand() {
+            $scope.expanded = !$scope.expanded;
+            if ($scope.expanded) {
+                pipSdeNavElement.removeClass('pip-sticky-nav-small');
+            }
+            else {
+                pipSdeNavElement.addClass('pip-sticky-nav-small');
+            }
+            $rootScope.$broadcast('pipNavExpanded', $scope.expanded);
+        }
+        function itemVisible(item) {
+            return item && item.access && !item.access(item);
+        }
+        function isSectionEmpty(linkCollection) {
+            var result = true;
+            _.each(linkCollection, function (link) {
+                if (!itemVisible(link))
+                    result = false;
+            });
+            return result;
+        }
+        function onConfigChanged(event, config) {
+            $scope.isCollapsed = pipNavMenu.collapsed();
+            $scope.config = config;
+        }
+        function onLinkClick(event, link) {
+            event.stopPropagation();
+            if (!link) {
+                pipSideNav.close();
+                return;
+            }
+            if (link.href) {
+                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    $window.location.href = link.href;
+                }, 300);
+                return;
+            }
+            else if (link.url) {
+                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    $location.url(link.url);
+                }, 300);
+                return;
+            }
+            else if (link.state) {
+                var $state = $injector.has('$state') ? $injector.get('$state') : null;
+                if ($state != null && $state.current.name === link.state) {
+                    pipSideNav.close();
+                    return;
+                }
+                pipSideNav.close();
+                $timeout(function () {
+                    if ($injector.has('$state')) {
+                        var $state = $injector.get('$state');
+                        $state.go(link.state, link.stateParams);
+                    }
+                }, 300);
+                return;
+            }
+            else if (link.event)
+                $rootScope.$broadcast(link.event, link);
+            pipSideNav.close();
+        }
+    }]);
+})();
+},{}],27:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipStickySideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Part', 'pipSideNav.Service']);
+    thisModule.directive('pipStickySidenav', function () {
+        return {
+            restrict: 'E',
+            transclude: true,
+            scope: true,
+            templateUrl: 'sticky_sidenav/sticky_sidenav.html',
+            controller: 'pipStickySideNavController'
+        };
+    });
+    thisModule.controller('pipStickySideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', '$mdMedia', function ($scope, $element, $rootScope, pipSideNav, $mdMedia) {
+        $element.addClass('pip-sticky-sidenav');
+        $scope.$mdMedia = $mdMedia;
+        $rootScope.$on('pipNavIconClicked', onNavIconClick);
+        $rootScope.$on('pipSideNavToggle', onNavToggle);
+        pipSideNav.id('pip-sticky-sidenav');
+        return;
+        function onNavIconClick(event) {
+            pipSideNav.open();
+        }
+        function onNavToggle(event) {
+            console.log('onNavToggle');
+            $element.addClass('overflow-visible');
+        }
+    }]);
+})();
+},{}],28:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module("pipTabs", ['pipNav.Templates']);
+    thisModule.directive('pipTabs', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                ngDisabled: '&',
+                tabs: '=pipTabs',
+                showTabs: '&pipShowTabs',
+                showTabsShadow: '&pipTabsShadow',
+                activeIndex: '=pipActiveIndex',
+                select: '=pipTabsSelect'
+            },
+            templateUrl: 'tabs/tabs.html',
+            controller: ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', '$injector', function ($scope, $element, $attrs, $mdMedia, localStorageService, $injector) {
+                $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
+                $scope.$mdMedia = $mdMedia;
+                $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
+                var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+                if (pipTranslate) {
+                    if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
+                        pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
+                    }
+                    else {
+                        pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+                    }
+                }
+                $scope.activeIndex = $scope.activeIndex || 0;
+                $scope.activeTab = $scope.activeIndex;
+                $scope.disabled = function () {
+                    if ($scope.ngDisabled) {
+                        return $scope.ngDisabled();
+                    }
+                };
+                $scope.tabDisabled = function (index) {
+                    return ($scope.disabled() && $scope.activeIndex != index);
+                };
+                $scope.onSelect = function (index) {
+                    if ($scope.disabled())
+                        return;
+                    $scope.activeIndex = index;
+                    $scope.activeTab = $scope.activeIndex;
+                    if ($scope.select) {
+                        $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
+                    }
+                };
+                $scope.showShadow = function () {
+                    if ($scope.showTabsShadow) {
+                        return $scope.showTabsShadow();
+                    }
+                    else {
+                        return false;
+                    }
+                };
+                $scope.show = function () {
+                    if ($scope.showTabs) {
+                        return $scope.showTabs();
+                    }
+                    else {
+                        return true;
+                    }
+                };
+            }]
+        };
+    });
+})();
+},{}],29:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipNav.Templates');
@@ -6615,14 +8249,14 @@ module.run(['$templateCache', function($templateCache) {
     '                ng-click="onUserClick()"\n' +
     '                aria-label="current user">\n' +
     '\n' +
-    '        <img  src="" class="pip-sticky-nav-header-user-image flex-fixed" ng-class="imageCss"></img>\n' +
+    '        <img  src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></img>\n' +
     '    </md-button>\n' +
     '    \n' +
     '    <div class="pip-sticky-nav-header-user-text">\n' +
-    '        <a class="pip-sticky-nav-header-user-pri"\n' +
+    '        <div class="pip-sticky-nav-header-user-pri"\n' +
     '            ng-click="onUserClick()">\n' +
     '            {{ title }}\n' +
-    '        </a>\n' +
+    '        </div>\n' +
     '        <div class="pip-sticky-nav-header-user-sec">\n' +
     '            {{ subtitle | translate }}\n' +
     '        </div>\n' +
@@ -6652,7 +8286,7 @@ module.run(['$templateCache', function($templateCache) {
     '        <md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider>\n' +
     '        <md-subheader ng-show="section.title" style="height: 48px;">\n' +
     '             <!--|| !expanded && section.icon-->\n' +
-    '            <span ng-if="expanded">\n' +
+    '            <span ng-if="expanded" class="pip-sticky-nav-menu-title"> \n' +
     '                {{::section.title | translate}}\n' +
     '            </span>\n' +
     '            <md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon"></md-icon>\n' +
@@ -6663,14 +8297,20 @@ module.run(['$templateCache', function($templateCache) {
     '            ng-repeat="link in section.links"\n' +
     '            ng-click="onLinkClick($event, link)"\n' +
     '            ng-hide="link.access && !link.access(link)">\n' +
-    '            <md-icon md-svg-icon="{{link.icon}}" \n' +
-    '                ng-hide="!link.icon" \n' +
-    '                class="pip-sticky-nav-menu-icon"></md-icon>\n' +
-    '            <p class="pip-sticky-nav-menu-title">{{::link.title | translate}}</p>\n' +
-    '            <div class="flex pip-sticky-nav-menu-expander"></div>\n' +
-    '            <div class="pip-sticky-nav-menu-badge color-badge-bg flex-fixed" ng-if="link.count">\n' +
-    '                 {{link.count}} \n' +
-    '            </div>\n' +
+    '\n' +
+    '                <div class="pip-sticky-nav-menu-icon-block">\n' +
+    '                    <md-icon md-svg-icon="{{link.icon}}" \n' +
+    '                        ng-hide="!link.icon" \n' +
+    '                        class="pip-sticky-nav-menu-icon flex-fixed">\n' +
+    '                    </md-icon>\n' +
+    '                </div>\n' +
+    '                <p class="pip-sticky-nav-menu-title">{{::link.title | translate}}</p>\n' +
+    '\n' +
+    '                <!--<div class="flex pip-sticky-nav-menu-expander"></div>-->\n' +
+    '                <div class="pip-sticky-nav-menu-badge color-badge-bg flex-fixed" ng-if="link.count">\n' +
+    '                    {{link.count}} \n' +
+    '                </div>\n' +
+    '\n' +
     '        </md-list-item>\n' +
     '    </div>\n' +
     '</md-list>\n' +
@@ -6742,1835 +8382,12 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-var pip;
-(function (pip) {
-    var nav;
-    (function (nav) {
-        'use strict';
-        angular.module('pipNav', [
-            'pipNav.Service',
-            'pipDropdown',
-            'pipTabs',
-            'pipAppBar',
-            'pipNavIcon',
-            'pipBreadcrumb',
-            'pipPrimaryActions',
-            'pipSecondaryActions',
-            'pipSideNav',
-            'pipNavMenu',
-            'pipNavHeader',
-            'pipStickySideNav',
-            'pipStickyNavMenu',
-            'pipStickyNavHeader'
-        ]);
-    })(nav = pip.nav || (pip.nav = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var nav;
-    (function (nav) {
-        'use strict';
-        var NavService = (function () {
-            NavService.$inject = ['$injector'];
-            function NavService($injector) {
-                "ngInject";
-                this.appBar = $injector.has('pipAppBar') ? $injector.get('pipAppBar') : null;
-                this.navIcon = $injector.has('pipNavIcon') ? $injector.get('pipNavIcon') : null;
-                this.breadcrumb = $injector.has('pipBreadcrumb') ? $injector.get('pipBreadcrumb') : null;
-                this.actions = $injector.has('pipActions') ? $injector.get('pipActions') : null;
-                this.search = $injector.has('pipSearch') ? $injector.get('pipSearch') : null;
-                this.sideNav = $injector.has('pipSideNav') ? $injector.get('pipSideNav') : null;
-                this.navHeader = $injector.has('pipNavHeader') ? $injector.get('pipNavHeader') : null;
-                this.navMenu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
-            }
-            return NavService;
-        }());
-        angular.module('pipNav.Service', [])
-            .service('pipNavService', NavService);
-    })(nav = pip.nav || (pip.nav = {}));
-})(pip || (pip = {}));
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipActions.Service', []);
-    thisModule.provider('pipActions', function () {
-        var config = {
-            primaryGlobalActions: [],
-            primaryLocalActions: [],
-            secondaryGlobalActions: [],
-            secondaryLocalActions: []
-        };
-        this.globalActions = globalActions;
-        this.globalPrimaryActions = globalPrimaryActions;
-        this.globalSecondaryActions = globalSecondaryActions;
-        this.$get = ['$rootScope', function ($rootScope) {
-            return {
-                config: getConfig,
-                show: showLocalActions,
-                hide: hideLocalActions,
-                count: updateActionCount,
-            };
-            function getConfig() {
-                return config;
-            }
-            function hideLocalActions() {
-                config.primaryLocalActions = [];
-                config.secondaryLocalActions = [];
-                sendConfigEvent();
-            }
-            function showLocalActions(primaryActions, secondaryActions) {
-                config.primaryLocalActions = primaryActions || [];
-                config.secondaryLocalActions = secondaryActions || [];
-                sendConfigEvent();
-            }
-            function updateActionCount(actionName, count) {
-                _.each(config.primaryGlobalActions, function (action) {
-                    if (action.name === actionName) {
-                        action.count = count;
-                    }
-                });
-                _.each(config.primaryLocalActions, function (action) {
-                    if (action.name === actionName) {
-                        action.count = count;
-                    }
-                });
-                sendConfigEvent();
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipActionsChanged', config);
-            }
-        }];
-        function globalActions(primaryActions, secondaryActions) {
-            config.primaryGlobalActions = primaryActions || [];
-            config.secondaryGlobalActions = secondaryActions || [];
-        }
-        function globalPrimaryActions(primaryActions) {
-            config.primaryGlobalActions = primaryActions || [];
-        }
-        function globalSecondaryActions(secondaryActions) {
-            config.secondaryGlobalActions = secondaryActions || [];
-        }
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipPrimaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
-    thisModule.directive('pipPrimaryActions', function () {
-        return {
-            restrict: 'E',
-            scope: {
-                localActions: '=pipLocalActions',
-                globalActions: '=pipGlobalActions'
-            },
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'actions/primary_actions.html';
-            },
-            controller: 'pipPrimaryActionsController'
-        };
-    });
-    thisModule.controller('pipPrimaryActionsController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
-        $element.addClass('pip-primary-actions');
-        $scope.config = pipActions.config();
-        if ($scope.localActions) {
-            pipActions.showLocalActions();
-            $scope.config.primaryLocalActions = $scope.localActions[0];
-        }
-        if ($scope.globalActions) {
-            pipActions.showLocalActions();
-            $scope.config.primaryGlobalActions = $scope.globalActions[0];
-        }
-        $rootScope.$on('pipActionsChanged', onActionsChanged);
-        $scope.actionHidden = actionHidden;
-        $scope.actionCount = actionCount;
-        $scope.onActionClick = onActionClick;
-        function onActionsChanged(event, config) {
-            $scope.config = config;
-        }
-        function actionHidden(action) {
-            return action.access && !action.access(action);
-        }
-        function actionCount(action) {
-            if (action.count === null || action.count <= 0) {
-                return '';
-            }
-            if (action.count > 99) {
-                return '!';
-            }
-            return action.count;
-        }
-        function calcActions(actions) {
-            var count = 0;
-            _.each(actions, function (action) {
-                if (!actionHidden(action)) {
-                    count++;
-                }
-            });
-            return count;
-        }
-        function secondaryActionsVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
-                calcActions($scope.config.secondaryLocalActions) > 0;
-        }
-        function secondaryDividerVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
-                calcActions($scope.config.secondaryLocalActions) > 0;
-        }
-        function onActionClick(action, $mdOpenMenu) {
-            if (!action || action.divider) {
-                return;
-            }
-            if (action.close) {
-                $scope.originatorEv = null;
-            }
-            if (action.menu) {
-                $mdOpenMenu($scope.originatorEv);
-                return;
-            }
-            if (action.callback) {
-                action.callback();
-                return;
-            }
-            if (action.href) {
-                $window.location.href = action.href;
-                return;
-            }
-            if (action.url) {
-                $location.url(action.url);
-                return;
-            }
-            if (action.state) {
-                if ($injector.has('$state')) {
-                    var $state = $injector.get('$state');
-                    $state.go(action.state, action.stateParams);
-                }
-                return;
-            }
-            if (action.event) {
-                $rootScope.$broadcast(action.event);
-            }
-            else {
-                $rootScope.$broadcast('pipActionClicked', action.name);
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSecondaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
-    thisModule.directive('pipSecondaryActions', function () {
-        return {
-            restrict: 'E',
-            scope: {
-                title: '=pipTitle',
-                showMenu: '=pipShowMenu',
-                localActions: '=pipLocalActions',
-                globalActions: '=pipGlobalActions',
-                partyAvatarUrl: '=pipPartyAvatarUrl'
-            },
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'actions/secondary_actions.html';
-            },
-            controller: 'pipSecondaryActionsController'
-        };
-    });
-    thisModule.controller('pipSecondaryActionsController', ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', function ($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
-        $element.addClass('pip-secondary-actions');
-        $scope.config = pipActions.config();
-        if ($scope.localActions) {
-            pipActions.showLocalActions();
-            $scope.config.secondaryLocalActions = $scope.localActions[1];
-        }
-        if ($scope.globalActions) {
-            pipActions.showLocalActions();
-            $scope.config.secondaryGlobalActions = $scope.globalActions[0];
-        }
-        $rootScope.$on('pipActionsChanged', onActionsChanged);
-        $scope.actionHidden = actionHidden;
-        $scope.actionCount = actionCount;
-        $scope.secondaryActionsVisible = secondaryActionsVisible;
-        $scope.secondaryDividerVisible = secondaryDividerVisible;
-        $scope.onActionClick = onActionClick;
-        $scope.openMenu = openMenu;
-        function openMenu($mdOpenMenu, ev) {
-            $scope.originatorEv = ev;
-            $mdOpenMenu(ev);
-        }
-        function onActionsChanged(event, config) {
-            $scope.config = config;
-        }
-        function actionHidden(action) {
-            return action.access && !action.access(action);
-        }
-        function actionCount(action) {
-            if (action.count === null || action.count <= 0) {
-                return '';
-            }
-            if (action.count > 99) {
-                return '!';
-            }
-            return action.count;
-        }
-        function calcActions(actions) {
-            var count = 0;
-            _.each(actions, function (action) {
-                if (!actionHidden(action)) {
-                    count++;
-                }
-            });
-            return count;
-        }
-        function secondaryActionsVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
-                calcActions($scope.config.secondaryLocalActions) > 0;
-        }
-        function secondaryDividerVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
-                calcActions($scope.config.secondaryLocalActions) > 0;
-        }
-        function onActionClick(action, $mdOpenMenu) {
-            if (!action || action.divider) {
-                return;
-            }
-            if (action.close) {
-                $scope.originatorEv = null;
-            }
-            if (action.menu) {
-                $mdOpenMenu($scope.originatorEv);
-                return;
-            }
-            if (action.callback) {
-                action.callback();
-                return;
-            }
-            if (action.href) {
-                $window.location.href = action.href;
-                return;
-            }
-            if (action.url) {
-                $location.url(action.url);
-                return;
-            }
-            if (action.state) {
-                if ($injector.has('$state')) {
-                    var $state = $injector.get('$state');
-                    $state.go(action.state, action.stateParams);
-                }
-                return;
-            }
-            if (action.event) {
-                $rootScope.$broadcast(action.event);
-            }
-            else {
-                $rootScope.$broadcast('pipActionClicked', action.name);
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipAppBar', ['ngMaterial', 'pipNav.Templates', 'pipAppBar.Service']);
-    thisModule.directive('pipAppbar', function () {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: true,
-            templateUrl: 'appbar/appbar.html',
-            controller: 'pipAppBarController'
-        };
-    });
-    thisModule.controller('pipAppBarController', ['$scope', '$element', '$rootScope', 'pipAppBar', function ($scope, $element, $rootScope, pipAppBar) {
-        $element.addClass('pip-appbar');
-        $element.addClass('color-primary-bg');
-        $scope.$emit('pipResizeWindow');
-        $scope.config = pipAppBar.config();
-        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
-        function onAppBarChanged(event, config) {
-            $scope.config = config;
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipAppBar.Part', ['pipAppBar.Service']);
-    thisModule.directive('pipAppbarPart', ['ngIfDirective', function (ngIfDirective) {
-        var ngIf = ngIfDirective[0];
-        return {
-            transclude: ngIf.transclude,
-            priority: ngIf.priority,
-            terminal: ngIf.terminal,
-            restrict: ngIf.restrict,
-            scope: true,
-            link: function linkFunction($scope, $element, $attrs) {
-                $attrs.ngIf = function () {
-                    return $scope.visible;
-                };
-                ngIf.link.apply(ngIf, arguments);
-            },
-            controller: 'pipAppBarPartController'
-        };
-    }]);
-    thisModule.controller('pipAppBarPartController', ['$scope', '$element', '$attrs', '$rootScope', 'pipAppBar', function ($scope, $element, $attrs, $rootScope, pipAppBar) {
-        var partName = '' + $attrs.pipAppbarPart;
-        var partValue = null;
-        var pos = partName.indexOf(':');
-        if (pos > 0) {
-            partValue = partName.substr(pos + 1);
-            partName = partName.substr(0, pos);
-        }
-        onAppBarChanged(null, pipAppBar.config());
-        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
-        function onAppBarChanged(event, config) {
-            var parts = config.parts || {};
-            var currentPartValue = parts[partName];
-            var visible = !!(partValue ? currentPartValue == partValue : currentPartValue);
-            if (visible != $scope.visible)
-                $scope.visible = visible;
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipAppBar.Service', []);
-    thisModule.provider('pipAppBar', function () {
-        var config = {
-            theme: 'default',
-            cssClass: '',
-            ngClasses: {},
-            parts: {},
-            showAppBar: true
-        };
-        this.theme = theme;
-        this.parts = initParts;
-        this.$get = ['$rootScope', function ($rootScope) {
-            return {
-                config: getConfig,
-                cssClass: cssClass,
-                part: getOrSetPart,
-                parts: getOrSetParts,
-                show: showAppBar,
-                hide: hideAppBar,
-                showShadow: showShadow,
-                showShadowSm: showShadowSm,
-                showShadowSmXs: showShadowSmXs,
-                hideShadow: hideShadow
-            };
-            function getConfig() {
-                return config;
-            }
-            function cssClass(newCssClass) {
-                if (newCssClass != undefined) {
-                    config.cssClass = newCssClass;
-                    sendConfigEvent();
-                }
-                return config.cssClass;
-            }
-            function showAppBar() {
-                config.showAppBar = true;
-                sendConfigEvent();
-            }
-            function hideAppBar() {
-                config.showAppBar = false;
-                sendConfigEvent();
-            }
-            function showShadowSm() {
-                config.ngClasses['pip-shadow'] = false;
-                config.ngClasses['pip-shadow-sm'] = true;
-                config.ngClasses['pip-shadow-xs'] = false;
-                sendConfigEvent();
-            }
-            function showShadowSmXs() {
-                config.ngClasses['pip-shadow'] = false;
-                config.ngClasses['pip-shadow-sm'] = true;
-                config.ngClasses['pip-shadow-xs'] = true;
-                sendConfigEvent();
-            }
-            function showShadow() {
-                config.ngClasses['pip-shadow'] = true;
-                sendConfigEvent();
-            }
-            function hideShadow() {
-                config.ngClasses['pip-shadow'] = false;
-                config.ngClasses['pip-shadow-sm'] = false;
-                config.ngClasses['pip-shadow-xs'] = false;
-                sendConfigEvent();
-            }
-            function getOrSetPart(name, value) {
-                if (!_.isString(name))
-                    throw new Error("Part name has to be a string");
-                if (value != undefined) {
-                    if (config.parts[name] != value) {
-                        config.parts[name] = value;
-                        sendConfigEvent();
-                    }
-                }
-                return config.parts[name];
-            }
-            function getOrSetParts(parts) {
-                if (_.isObject(parts)) {
-                    if (!_.isEqual(config.parts, parts)) {
-                        config.parts = parts;
-                        sendConfigEvent();
-                    }
-                }
-                return config.parts;
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipAppBarChanged', config);
-            }
-        }];
-        function theme(theme) {
-            config.theme = theme || config.theme;
-            return config.theme;
-        }
-        function initParts(parts) {
-            if (_.isObject(parts)) {
-                config.parts = parts;
-            }
-            return config.parts;
-        }
-    });
-})();
-
-var pip;
-(function (pip) {
-    var nav;
-    (function (nav) {
-        var BreadcrumbController = (function () {
-            BreadcrumbController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', 'pipBreadcrumb'];
-            function BreadcrumbController($scope, $element, $attrs, $rootScope, $window, $state, pipBreadcrumb) {
-                "ngInject";
-                this._rootScope = $rootScope;
-                this._window = $window;
-                $element.addClass('pip-breadcrumb');
-                this.config = pipBreadcrumb.config;
-                $rootScope.$on(nav.BreadcrumbChangedEvent, this.onBreadcrumbChanged);
-                $rootScope.$on(nav.BreadcrumbBackEvent, this.onBreadcrumbBack);
-            }
-            BreadcrumbController.prototype.onBreadcrumbChanged = function (event, config) {
-                this.config = config;
-            };
-            BreadcrumbController.prototype.onBreadcrumbBack = function () {
-                var items = this.config.items;
-                if (_.isArray(items) && items.length > 0) {
-                    var backCallback = items[items.length - 1].click;
-                    if (_.isFunction(backCallback))
-                        backCallback();
-                    else
-                        this._window.history.back();
-                }
-                else
-                    this._window.history.back();
-            };
-            BreadcrumbController.prototype.onBreadcrumbClick = function (item) {
-                if (_.isFunction(item.click))
-                    item.click(item);
-            };
-            BreadcrumbController.prototype.onSearchOpen = function () {
-                this._rootScope.$broadcast('pipSearchOpen');
-            };
-            return BreadcrumbController;
-        }());
-        function breadcrumbDirective() {
-            return {
-                restrict: 'E',
-                scope: {},
-                replace: false,
-                templateUrl: function (element, attr) {
-                    return 'breadcrumb/breadcrumb.html';
-                },
-                controller: BreadcrumbController,
-                controllerAs: 'vm'
-            };
-        }
-        angular
-            .module('pipBreadcrumb', [
-            'ngMaterial',
-            'pipNav.Templates',
-            'pipNav.Translate',
-            'pipBreadcrumb.Service'
-        ])
-            .directive('pipBreadcrumb', breadcrumbDirective);
-    })(nav = pip.nav || (pip.nav = {}));
-})(pip || (pip = {}));
-
-var pip;
-(function (pip) {
-    var nav;
-    (function (nav) {
-        nav.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
-        nav.BreadcrumbBackEvent = "pipBreadcrumbBack";
-        var BreadcrumbItem = (function () {
-            function BreadcrumbItem() {
-            }
-            return BreadcrumbItem;
-        }());
-        nav.BreadcrumbItem = BreadcrumbItem;
-        var BreadcrumbConfig = (function () {
-            function BreadcrumbConfig() {
-            }
-            return BreadcrumbConfig;
-        }());
-        nav.BreadcrumbConfig = BreadcrumbConfig;
-        var BreadcrumbService = (function () {
-            function BreadcrumbService(config, $rootScope) {
-                this._config = config;
-                this._rootScope = $rootScope;
-            }
-            Object.defineProperty(BreadcrumbService.prototype, "config", {
-                get: function () {
-                    return this._config;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(BreadcrumbService.prototype, "text", {
-                get: function () {
-                    return this._config.text;
-                },
-                set: function (value) {
-                    this._config.text = value;
-                    this._config.items = null;
-                    this.sendEvent();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(BreadcrumbService.prototype, "items", {
-                get: function () {
-                    return this._config.items;
-                },
-                set: function (value) {
-                    this._config.text = null;
-                    this._config.items = value;
-                    this.sendEvent();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(BreadcrumbService.prototype, "criteria", {
-                get: function () {
-                    return this._config.criteria;
-                },
-                set: function (value) {
-                    this._config.criteria = value;
-                    this.sendEvent();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            BreadcrumbService.prototype.sendEvent = function () {
-                this._rootScope.$broadcast(pip.nav.BreadcrumbChangedEvent, this._config);
-            };
-            return BreadcrumbService;
-        }());
-        var BreadcrumbProvider = (function () {
-            function BreadcrumbProvider() {
-                this._config = {
-                    text: null,
-                    items: null,
-                    criteria: null
-                };
-            }
-            Object.defineProperty(BreadcrumbProvider.prototype, "text", {
-                get: function () {
-                    return this._config.text;
-                },
-                set: function (value) {
-                    this._config.text = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            BreadcrumbProvider.prototype.$get = ['$rootScope', function ($rootScope) {
-                "ngInject";
-                if (this._service == null)
-                    this._service = new BreadcrumbService(this._config, $rootScope);
-                return this._service;
-            }];
-            return BreadcrumbProvider;
-        }());
-        angular
-            .module('pipBreadcrumb.Service', [])
-            .provider('pipBreadcrumb', BreadcrumbProvider);
-    })(nav = pip.nav || (pip.nav = {}));
-})(pip || (pip = {}));
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNav.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
-        return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipDropdown', ['pipNav.Templates']);
-    thisModule.directive('pipDropdown', ['$mdMedia', function ($mdMedia) {
-        return {
-            restrict: 'E',
-            scope: {
-                ngDisabled: '&',
-                actions: '=pipActions',
-                showDropdown: '&pipShow',
-                activeIndex: '=pipActiveIndex',
-                select: '=pipDropdownSelect'
-            },
-            templateUrl: 'dropdown/dropdown.html',
-            controller: ['$scope', '$element', '$attrs', 'localStorageService', function ($scope, $element, $attrs, localStorageService) {
-                $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
-                $scope.$mdMedia = $mdMedia;
-                $scope.actions = ($scope.actions && _.isArray($scope.actions)) ? $scope.actions : [];
-                $scope.activeIndex = $scope.activeIndex || 0;
-                $scope.disabled = function () {
-                    if ($scope.ngDisabled()) {
-                        return $scope.ngDisabled();
-                    }
-                    else {
-                        return false;
-                    }
-                };
-                $scope.onSelect = function (index) {
-                    $scope.activeIndex = index;
-                    if ($scope.select) {
-                        $scope.select($scope.actions[index], $scope.activeIndex);
-                    }
-                };
-                $scope.show = function () {
-                    if ($scope.showDropdown()) {
-                        return $scope.showDropdown();
-                    }
-                    else {
-                        return true;
-                    }
-                };
-            }]
-        };
-    }]);
-})();
-
-var pip;
-(function (pip) {
-    var nav;
-    (function (nav) {
-        'use strict';
-        var LanguagePickerController = (function () {
-            LanguagePickerController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$timeout', '$injector'];
-            function LanguagePickerController($scope, $element, $attrs, $rootScope, $timeout, $injector) {
-                "ngInject";
-                this.languages = ['en', 'ru'];
-                this._timeout = $timeout;
-                this._translate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-                $element.addClass('pip-language-picker');
-                this.languages = $scope.languages;
-                $rootScope.$on('pipSetLanguages', this.setLanguages);
-            }
-            Object.defineProperty(LanguagePickerController.prototype, "language", {
-                get: function () {
-                    return this._translate ? this._translate.language : null;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            LanguagePickerController.prototype.setLanguages = function (lang) {
-                this.languages = lang.length > 0 ? lang : ['en', 'ru'];
-            };
-            LanguagePickerController.prototype.onLanguageClick = function (language) {
-                var _this = this;
-                if (this._translate != null) {
-                    this._timeout(function () {
-                        _this._translate.language = _this.language;
-                    }, 0);
-                }
-            };
-            return LanguagePickerController;
-        }());
-        function languagePickerDirective() {
-            return {
-                restrict: 'E',
-                scope: {
-                    languages: '=languages',
-                },
-                replace: false,
-                templateUrl: function (element, attr) {
-                    return 'language_picker/language_picker.html';
-                },
-                controller: LanguagePickerController,
-                controllerAs: 'vm'
-            };
-        }
-        angular
-            .module('pipLanguagePicker', [
-            'ngMaterial', 'pipNav.Translate', 'pipNav.Templates'
-        ])
-            .directive('pipLanguagePicker', languagePickerDirective);
-    })(nav = pip.nav || (pip.nav = {}));
-})(pip || (pip = {}));
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates', 'pipNavHeader.Service']);
-    thisModule.directive('pipNavHeader', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                title: '=pipTitle',
-                subtitle: '=pipSubTitle',
-                imageUrl: '=pipImage',
-                imageCss: '=pipImageCss'
-            },
-            replace: false,
-            templateUrl: 'nav_header/nav_header.html',
-            controller: 'pipNavHeaderController'
-        };
-    });
-    thisModule.controller('pipNavHeaderController', ['$scope', '$element', '$rootScope', '$timeout', 'pipNavHeader', function ($scope, $element, $rootScope, $timeout, pipNavHeader) {
-        var image = null, imageBlock = $element.find('.pip-nav-header-user'), $image;
-        $element.addClass('pip-nav-header');
-        $rootScope.$on('pipIdentityChanged', onIdentityChanged);
-        $rootScope.$on('pipNavHeaderImageChanged', onIdentityChanged);
-        $scope.onUserClick = onUserClick;
-        $timeout(function () {
-            $image = $element.find('.pip-nav-header-user-image');
-            onIdentityChanged();
-            $image.load(function ($event) {
-                image = $($event.target);
-                setImageMarginCSS(imageBlock, image);
-            });
-        }, 10);
-        return;
-        function setImageMarginCSS(container, image) {
-            var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
-            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
-                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
-                cssParams['margin-left'] = '' + margin + 'px';
-                cssParams['height'] = '' + containerHeight + 'px';
-                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
-                cssParams['margin-top'] = '';
-            }
-            else {
-                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
-                cssParams['margin-top'] = '' + margin + 'px';
-                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
-                cssParams['width'] = '' + containerWidth + 'px';
-                cssParams['margin-left'] = '';
-            }
-            image.css(cssParams);
-        }
-        ;
-        function onIdentityChanged() {
-            var url, config = pipNavHeader.config();
-            url = $scope.imageUrl ? $scope.imageUrl : config.defaultImageUrl;
-            if (url) {
-                console.log('url', url);
-                $image.attr('src', url);
-            }
-            else {
-                console.log('display none');
-                imageBlock.css('display', 'none');
-            }
-        }
-        function onUserClick() {
-            $rootScope.$broadcast('pipNavUserClicked');
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavIcon.Service']);
-    thisModule.directive('pipNavIcon', function () {
-        return {
-            restrict: 'E',
-            scope: {
-                type: '=pipType',
-                imageUrl: '=pipImageUrl'
-            },
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'nav_icon/nav_icon.html';
-            },
-            controller: 'pipNavIconController'
-        };
-    });
-    thisModule.controller('pipNavIconController', ['$scope', '$element', '$attrs', '$rootScope', '$window', 'pipNavIcon', function ($scope, $element, $attrs, $rootScope, $window, pipNavIcon) {
-        $element.addClass('pip-nav-icon');
-        $scope.config = pipNavIcon.config();
-        $rootScope.$on('pipNavIconChanged', onNavIconChanged);
-        $scope.onNavIconClick = onNavIconClick;
-        function onNavIconChanged(event, config) {
-            $scope.config = config;
-        }
-        function onNavIconClick() {
-            var breadcrumb, backCallback;
-            if (_.isFunction($scope.config.callback)) {
-                $scope.config.callback();
-            }
-            else if ($scope.config.event) {
-                $rootScope.$broadcast($scope.config.event);
-            }
-            else if ($scope.config.type == 'menu') {
-                $rootScope.$broadcast('pipOpenSideNav');
-            }
-            else if ($scope.config.type == 'back') {
-                $window.history.back();
-            }
-            else {
-                $rootScope.$broadcast('pipNavIconClicked');
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNavIcon.Service', []);
-    thisModule.provider('pipNavIcon', function () {
-        var config = {
-            type: 'menu',
-            imageUrl: null,
-            iconName: 'back',
-            callback: null,
-            event: null
-        };
-        this.config = getConfig;
-        this.clear = clear;
-        this.menu = setMenu;
-        this.back = setBack;
-        this.icon = setIcon;
-        this.image = setImage;
-        this.$get = ['$rootScope', function ($rootScope) {
-            return {
-                config: getConfig,
-                hide: hide,
-                menu: showMenu,
-                back: showBack,
-                icon: showIcon,
-                image: showImage
-            };
-            function hide() {
-                clear();
-                sendConfigEvent();
-            }
-            function showMenu(callbackOrEvent) {
-                setMenu(callbackOrEvent);
-                sendConfigEvent();
-            }
-            function showIcon(iconName, callbackOrEvent) {
-                setIcon(iconName, callbackOrEvent);
-                sendConfigEvent();
-            }
-            function showBack(callbackOrEvent) {
-                setBack(callbackOrEvent);
-                sendConfigEvent();
-            }
-            function showImage(imageUrl, callbackOrEvent) {
-                setImage(imageUrl, callbackOrEvent);
-                sendConfigEvent();
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipNavIconChanged', config);
-            }
-        }];
-        function getConfig() {
-            return config;
-        }
-        function clear() {
-            config.type = 'none';
-            config.callback = null;
-            config.event = null;
-        }
-        function setMenu(callbackOrEvent) {
-            config.type = 'menu';
-            config.callback = null;
-            config.event = null;
-            if (_.isFunction(callbackOrEvent))
-                config.callback = callbackOrEvent;
-            if (_.isString(callbackOrEvent))
-                config.event = callbackOrEvent;
-        }
-        function setIcon(iconName, callbackOrEvent) {
-            config.type = 'icon';
-            config.iconName = iconName;
-            config.callback = null;
-            config.event = null;
-            if (_.isFunction(callbackOrEvent))
-                config.callback = callbackOrEvent;
-            if (_.isString(callbackOrEvent))
-                config.event = callbackOrEvent;
-        }
-        function setBack(callbackOrEvent) {
-            config.type = 'back';
-            config.callback = null;
-            config.event = null;
-            if (_.isFunction(callbackOrEvent))
-                config.callback = callbackOrEvent;
-            if (_.isString(callbackOrEvent))
-                config.event = callbackOrEvent;
-        }
-        function setImage(imageUrl, callbackOrEvent) {
-            config.type = 'image';
-            config.imageUrl = imageUrl;
-            config.callback = null;
-            config.event = null;
-            if (_.isFunction(callbackOrEvent))
-                config.callback = callbackOrEvent;
-            if (_.isString(callbackOrEvent))
-                config.event = callbackOrEvent;
-        }
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
-    thisModule.directive('pipNavMenu', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                config: '=pipLinks'
-            },
-            replace: false,
-            templateUrl: 'nav_menu/nav_menu.html',
-            controller: 'pipNavMenuController'
-        };
-    });
-    thisModule.controller('pipNavMenuController', ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
-        $element.addClass('pip-nav-menu');
-        $scope.config = $scope.config || pipNavMenu.get();
-        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
-        $scope.itemVisible = itemVisible;
-        $scope.onLinkClick = onLinkClick;
-        $scope.isSectionEmpty = isSectionEmpty;
-        return;
-        function itemVisible(item) {
-            return item && item.access && !item.access(item);
-        }
-        function isSectionEmpty(linkCollection) {
-            var result = true;
-            _.each(linkCollection, function (link) {
-                if (!itemVisible(link))
-                    result = false;
-            });
-            return result;
-        }
-        function onConfigChanged(event, config) {
-            $scope.config = config;
-        }
-        function onLinkClick(event, link) {
-            event.stopPropagation();
-            if (!link) {
-                pipSideNav.close();
-                return;
-            }
-            if (link.href) {
-                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
-                    pipSideNav.close();
-                    return;
-                }
-                pipSideNav.close();
-                $timeout(function () {
-                    $window.location.href = link.href;
-                }, 300);
-                return;
-            }
-            else if (link.url) {
-                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
-                    pipSideNav.close();
-                    return;
-                }
-                pipSideNav.close();
-                $timeout(function () {
-                    $location.url(link.url);
-                }, 300);
-                return;
-            }
-            else if (link.state) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.current.name === link.state) {
-                    pipSideNav.close();
-                    return;
-                }
-                pipSideNav.close();
-                $timeout(function () {
-                    if ($injector.has('$state')) {
-                        var $state = $injector.get('$state');
-                        $state.go(link.state, link.stateParams);
-                    }
-                }, 300);
-                return;
-            }
-            else if (link.event)
-                $rootScope.$broadcast(link.event, link);
-            pipSideNav.close();
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNavHeader.Service', []);
-    thisModule.provider('pipNavHeader', function () {
-        var config = {
-            defaultImageUrl: null,
-        };
-        this.config = getConfig;
-        this.clear = clear;
-        this.image = setImage;
-        this.$get = ['$rootScope', function ($rootScope) {
-            return {
-                config: getConfig,
-                image: showImage
-            };
-            function showImage(imageUrl) {
-                setImage(imageUrl);
-                sendConfigEvent();
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipNavHeaderImageChanged', config);
-            }
-        }];
-        function getConfig() {
-            return config;
-        }
-        function clear() {
-            config.defaultImageUrl = null;
-        }
-        function setImage(imageUrl) {
-            config.defaultImageUrl = imageUrl;
-        }
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipNavMenu.Service', []);
-    thisModule.provider('pipNavMenu', function () {
-        var config = [], collapsed = true, sectionIcon;
-        this.sections = init;
-        this.sectionIcon = setOrGetIcon;
-        this.collapsed = setOrGetCollapsed;
-        this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
-            return {
-                get: getConfig,
-                set: setConfig,
-                setCounter: setCounter,
-                collapsed: setOrGetCollapsed,
-                icon: setOrGetIcon
-            };
-            function getConfig() {
-                return config;
-            }
-            function setConfig(newConfig) {
-                init(newConfig);
-                $rootScope.$broadcast('pipNavMenuChanged', config);
-                return config;
-            }
-            function setCounter(linkTitle, counter) {
-                if (!linkTitle || !angular.isNumber(counter)) {
-                    return;
-                }
-                var section, menuItem;
-                section = _.find(config, function (s) {
-                    var item = _.find(s.links, { title: linkTitle });
-                    if (item) {
-                        return item;
-                    }
-                    else {
-                        return false;
-                    }
-                    ;
-                });
-                menuItem = _.find(section.links, { title: linkTitle });
-                menuItem.count = counter;
-                setConfig(config);
-            }
-        }];
-        function setOrGetIcon(value) {
-            if (_.isString(value)) {
-                sectionIcon = value;
-            }
-            return sectionIcon;
-        }
-        function setOrGetCollapsed(value) {
-            if (value !== undefined) {
-                collapsed = value;
-            }
-            return collapsed;
-        }
-        function init(newConfig) {
-            if (_.isArray(newConfig)) {
-                config = newConfig;
-            }
-            return config;
-        }
-        ;
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSideNav.Part', ['pipSideNav.Service']);
-    thisModule.directive('pipSidenavPart', ['ngIfDirective', function (ngIfDirective) {
-        var ngIf = ngIfDirective[0];
-        return {
-            transclude: ngIf.transclude,
-            priority: ngIf.priority,
-            terminal: ngIf.terminal,
-            restrict: ngIf.restrict,
-            scope: true,
-            link: function ($scope, $element, $attrs) {
-                $attrs.ngIf = function () { return $scope.visible; };
-                ngIf.link.apply(ngIf);
-            },
-            controller: 'pipSideNavPartController'
-        };
-    }]);
-    thisModule.controller('pipSideNavPartController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav', function ($scope, $element, $attrs, $rootScope, pipSideNav) {
-        var partName = '' + $attrs.pipSidenavPart;
-        var partValue = null;
-        var pos = partName.indexOf(':');
-        if (pos > 0) {
-            partValue = partName.substr(pos + 1);
-            partName = partName.substr(0, pos);
-        }
-        onSideNavChanged(null, pipSideNav.config());
-        $rootScope.$on('pipSideNavChanged', onSideNavChanged);
-        function onSideNavChanged(event, config) {
-            var parts = config.parts || {};
-            var currentPartValue = config[partName];
-            $scope.visible = partValue ? currentPartValue == partValue : currentPartValue;
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSideNav.Service', []);
-    thisModule.provider('pipSideNav', function () {
-        var config = {
-            theme: 'default',
-            parts: []
-        }, sideNavId = 'pip-sidenav';
-        this.id = id;
-        this.theme = theme;
-        this.parts = initParts;
-        this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
-            $rootScope.$on('pipOpenSideNav', open);
-            $rootScope.$on('pipCloseSideNav', close);
-            return {
-                config: getConfig,
-                part: getOrSetPart,
-                parts: getOrSetParts,
-                id: getOrSetId,
-                open: open,
-                close: close,
-                toggle: toggle
-            };
-            function getConfig() {
-                return config;
-            }
-            function getOrSetPart(name, value) {
-                if (!_.isString(name))
-                    throw new Error("Part name has to be a string");
-                if (value != undefined) {
-                    if (config.parts[name] != value) {
-                        config.parts[name] = value;
-                        sendConfigEvent();
-                    }
-                }
-                return config.parts[name];
-            }
-            function getOrSetId(id) {
-                if (_.isString(id)) {
-                    if (sideNavId !== id) {
-                        sideNavId = id;
-                    }
-                }
-                return sideNavId;
-            }
-            function getOrSetParts(parts) {
-                if (_.isObject(parts)) {
-                    if (!_.isEqual(config.parts, parts)) {
-                        config.parts = parts;
-                        sendConfigEvent();
-                    }
-                }
-                return config.parts;
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipSideNavChanged', config);
-            }
-            function open(event) {
-                console.log('open pip', sideNavId);
-                $mdSidenav(sideNavId).open();
-            }
-            function close(event) {
-                console.log('close pip', sideNavId);
-                $mdSidenav(sideNavId).close();
-            }
-            function toggle() {
-                console.log('toggle pip', sideNavId);
-                $mdSidenav(sideNavId).toggle();
-                $rootScope.$broadcast('pipSideNavToggle', config);
-            }
-        }];
-        function id(id) {
-            sideNavId = id || sideNavId;
-            return sideNavId;
-        }
-        function theme(theme) {
-            config.theme = theme || config.theme;
-            return config.theme;
-        }
-        function initParts(parts) {
-            if (_.isObject(parts)) {
-                config.parts = parts;
-            }
-            return config.parts;
-        }
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
-    thisModule.run(['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate && pipTranslate.setTranslations) {
-            pipTranslate.setTranslations('en', {
-                'APPBAR_SEARCH': 'Search'
-            });
-            pipTranslate.setTranslations('ru', {
-                'APPBAR_SEARCH': 'Поиск'
-            });
-        }
-    }]);
-    thisModule.directive('pipSearchBar', function () {
-        return {
-            restrict: 'E',
-            scope: {},
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'search_bar/search_bar.html';
-            },
-            controller: 'pipSearchBarController'
-        };
-    });
-    thisModule.controller('pipSearchBarController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
-        $element.addClass('pip-search-bar');
-        $scope.config = pipSearch.config();
-        $scope.searchEnabled = false;
-        $scope.search = { text: '' };
-        $rootScope.$on('pipSearchChanged', onSearchBarChanged);
-        $scope.onSearchEnable = onSearchEnable;
-        $scope.onSearchClick = onSearchClick;
-        $scope.onSearchClear = onSearchClear;
-        $scope.onSearchKeyDown = onSearchKeyDown;
-        function onSearchBarChanged(event, config) {
-            $scope.config = config;
-            $scope.searchEnabled = false;
-            $scope.search.text = '';
-        }
-        function focusSearchText() {
-            var element;
-            setTimeout(function () {
-                element = $('.pip-search-text');
-                if (element.length > 0) {
-                    element.focus();
-                }
-            }, 0);
-        }
-        function onSearchEnable() {
-            $scope.search.text = $scope.config.criteria;
-            $scope.searchEnabled = true;
-            focusSearchText();
-        }
-        function onSearchClick() {
-            var searchText = $scope.search.text;
-            $scope.search.text = '';
-            $scope.searchEnabled = false;
-            if ($scope.config.callback) {
-                $scope.config.callback(searchText);
-            }
-            else {
-                $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
-            }
-        }
-        function onSearchClear() {
-            if ($scope.search.text) {
-                $scope.search.text = '';
-                focusSearchText();
-            }
-            else {
-                $scope.searchEnabled = false;
-                onSearchClick();
-            }
-        }
-        function onSearchKeyDown(event) {
-            if (event.keyCode === 13) {
-                $scope.onSearchClick();
-                return;
-            }
-            if (event.keyCode === 27) {
-                $scope.searchEnabled = false;
-            }
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSearch.Service', []);
-    thisModule.provider('pipSearch', function () {
-        var config = {
-            visible: false,
-            criteria: '',
-            history: [],
-            callback: null,
-        };
-        this.$get = ['$rootScope', function ($rootScope) {
-            $rootScope.$on('pipSearchOpen', open);
-            $rootScope.$on('pipSearchClose', close);
-            return {
-                config: getConfig,
-                set: setSearch,
-                clear: clearSearch,
-                criteria: updateCriteria,
-                history: updateHistory,
-            };
-            function getConfig() {
-                return config;
-            }
-            function setSearch(callback, criteria, history) {
-                config.callback = callback;
-                config.criteria = criteria;
-                config.history = history;
-                sendConfigEvent();
-            }
-            function clearSearch() {
-                config.callback = null;
-                config.criteria = null;
-                sendConfigEvent();
-            }
-            function open(event) {
-                config.visible = true;
-                sendConfigEvent();
-            }
-            function close(event) {
-                config.visible = false;
-                sendConfigEvent();
-            }
-            function toggle() {
-                config.visible = !config.visible;
-                sendConfigEvent();
-            }
-            function updateCriteria(criteria) {
-                config.criteria = criteria;
-                sendConfigEvent();
-            }
-            function updateHistory(history) {
-                config.history = history;
-                sendConfigEvent();
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipSearchChanged', config);
-            }
-        }];
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Part', 'pipSideNav.Service']);
-    thisModule.directive('pipSidenav', function () {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: true,
-            templateUrl: 'sidenav/sidenav.html',
-            controller: 'pipSideNavController'
-        };
-    });
-    thisModule.controller('pipSideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', function ($scope, $element, $rootScope, pipSideNav) {
-        $element.addClass('pip-sidenav');
-        pipSideNav.id('pip-sidenav');
-        $rootScope.$on('pipNavIconClicked', onNavIconClick);
-        return;
-        function onNavIconClick(event) {
-            pipSideNav.open();
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipStickyNavHeader', ['ngMaterial', 'pipNav.Templates', 'pipNavHeader.Service']);
-    thisModule.directive('pipStickyNavHeader', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                title: '=pipTitle',
-                subtitle: '=pipSubTitle',
-                imageUrl: '=pipImage',
-                imageCss: '=pipImageCss'
-            },
-            replace: false,
-            templateUrl: 'sticky_nav_header/sticky_nav_header.html',
-            controller: 'pipStickyNavHeaderController'
-        };
-    });
-    thisModule.controller('pipStickyNavHeaderController', ['$scope', '$element', '$rootScope', '$timeout', 'pipNavHeader', function ($scope, $element, $rootScope, $timeout, pipNavHeader) {
-        var image = null, imageBlock = $element.find('.pip-sticky-nav-header-user'), $image;
-        $element.addClass('pip-sticky-nav-header');
-        $rootScope.$on('pipIdentityChanged', onIdentityChanged);
-        $rootScope.$on('pipNavHeaderImageChanged', onIdentityChanged);
-        $rootScope.$on('pipNavExpanded', resizeImage);
-        $scope.onUserClick = onUserClick;
-        $timeout(function () {
-            $image = $element.find('.pip-sticky-nav-header-user-image');
-            onIdentityChanged();
-            $image.load(function ($event) {
-                image = $($event.target);
-                setImageMarginCSS(imageBlock, image);
-            });
-        }, 10);
-        return;
-        function resizeImage() {
-            if (!image) {
-                image = $element.find('.pip-sticky-nav-header-user-image');
-            }
-            setImageMarginCSS(imageBlock, image);
-        }
-        function setImageMarginCSS(container, image) {
-            var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
-            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
-                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
-                cssParams['margin-left'] = '' + margin + 'px';
-                cssParams['height'] = '' + containerHeight + 'px';
-                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
-                cssParams['margin-top'] = '';
-            }
-            else {
-                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
-                cssParams['margin-top'] = '' + margin + 'px';
-                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
-                cssParams['width'] = '' + containerWidth + 'px';
-                cssParams['margin-left'] = '';
-            }
-            image.css(cssParams);
-        }
-        ;
-        function onIdentityChanged() {
-            var url, config = pipNavHeader.config();
-            url = $scope.imageUrl ? $scope.imageUrl : config.defaultImageUrl;
-            if (url) {
-                $image.attr('src', url);
-            }
-            else {
-                imageBlock.css('display', 'none');
-            }
-        }
-        function onUserClick() {
-            $rootScope.$broadcast('pipNavUserClicked');
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipStickyNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
-    thisModule.directive('pipStickyNavMenu', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                config: '=pipLinks',
-                collapsed: '=pipCollapsed'
-            },
-            replace: false,
-            templateUrl: 'sticky_nav_menu/sticky_nav_menu.html',
-            controller: 'pipStickyNavMenuController'
-        };
-    });
-    thisModule.controller('pipStickyNavMenuController', ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu', function ($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
-        var pipSdeNavElement = $element.parent().parent();
-        $element.addClass('pip-sticky-nav-menu');
-        $scope.config = $scope.config || pipNavMenu.get();
-        setCollapsible();
-        $scope.expanded = true;
-        pipNavMenu.set($scope.config);
-        $scope.defaultIicon = 'icons:folder';
-        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
-        $scope.itemVisible = itemVisible;
-        $scope.onLinkClick = onLinkClick;
-        $scope.isSectionEmpty = isSectionEmpty;
-        $scope.onExpand = onExpand;
-        return;
-        function setCollapsible() {
-            var collapsed;
-            if (angular.isFunction($scope.collapsed)) {
-                collapsed = $scope.collapsed();
-            }
-            else {
-                collapsed = $scope.collapsed !== false && $scope.collapsed !== 'false';
-            }
-            $scope.collapsibled = collapsed;
-            pipNavMenu.collapsed(collapsed);
-        }
-        function onExpand() {
-            $scope.expanded = !$scope.expanded;
-            if ($scope.expanded) {
-                pipSdeNavElement.removeClass('pip-sticky-nav-small');
-            }
-            else {
-                pipSdeNavElement.addClass('pip-sticky-nav-small');
-            }
-            $rootScope.$broadcast('pipNavExpanded', $scope.expanded);
-        }
-        function itemVisible(item) {
-            return item && item.access && !item.access(item);
-        }
-        function isSectionEmpty(linkCollection) {
-            var result = true;
-            _.each(linkCollection, function (link) {
-                if (!itemVisible(link))
-                    result = false;
-            });
-            return result;
-        }
-        function onConfigChanged(event, config) {
-            $scope.isCollapsed = pipNavMenu.collapsed();
-            $scope.config = config;
-        }
-        function onLinkClick(event, link) {
-            event.stopPropagation();
-            if (!link) {
-                pipSideNav.close();
-                return;
-            }
-            if (link.href) {
-                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
-                    pipSideNav.close();
-                    return;
-                }
-                pipSideNav.close();
-                $timeout(function () {
-                    $window.location.href = link.href;
-                }, 300);
-                return;
-            }
-            else if (link.url) {
-                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
-                    pipSideNav.close();
-                    return;
-                }
-                pipSideNav.close();
-                $timeout(function () {
-                    $location.url(link.url);
-                }, 300);
-                return;
-            }
-            else if (link.state) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.current.name === link.state) {
-                    pipSideNav.close();
-                    return;
-                }
-                pipSideNav.close();
-                $timeout(function () {
-                    if ($injector.has('$state')) {
-                        var $state = $injector.get('$state');
-                        $state.go(link.state, link.stateParams);
-                    }
-                }, 300);
-                return;
-            }
-            else if (link.event)
-                $rootScope.$broadcast(link.event, link);
-            pipSideNav.close();
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipStickySideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Part', 'pipSideNav.Service']);
-    thisModule.directive('pipStickySidenav', function () {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: true,
-            templateUrl: 'sticky_sidenav/sticky_sidenav.html',
-            controller: 'pipStickySideNavController'
-        };
-    });
-    thisModule.controller('pipStickySideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', '$mdMedia', function ($scope, $element, $rootScope, pipSideNav, $mdMedia) {
-        $element.addClass('pip-sticky-sidenav');
-        $scope.$mdMedia = $mdMedia;
-        $rootScope.$on('pipNavIconClicked', onNavIconClick);
-        $rootScope.$on('pipSideNavToggle', onNavToggle);
-        pipSideNav.id('pip-sticky-sidenav');
-        return;
-        function onNavIconClick(event) {
-            pipSideNav.open();
-        }
-        function onNavToggle(event) {
-            console.log('onNavToggle');
-            $element.addClass('overflow-visible');
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipTabs", ['pipNav.Templates']);
-    thisModule.directive('pipTabs', function () {
-        return {
-            restrict: 'E',
-            scope: {
-                ngDisabled: '&',
-                tabs: '=pipTabs',
-                showTabs: '&pipShowTabs',
-                showTabsShadow: '&pipTabsShadow',
-                activeIndex: '=pipActiveIndex',
-                select: '=pipTabsSelect'
-            },
-            templateUrl: 'tabs/tabs.html',
-            controller: ['$scope', '$element', '$attrs', '$mdMedia', 'localStorageService', '$injector', function ($scope, $element, $attrs, $mdMedia, localStorageService, $injector) {
-                $scope.class = ($attrs.class || '') + ' md-' + localStorageService.get('theme') + '-theme';
-                $scope.$mdMedia = $mdMedia;
-                $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
-                var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-                if (pipTranslate) {
-                    if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
-                        pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
-                    }
-                    else {
-                        pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
-                    }
-                }
-                $scope.activeIndex = $scope.activeIndex || 0;
-                $scope.activeTab = $scope.activeIndex;
-                $scope.disabled = function () {
-                    if ($scope.ngDisabled) {
-                        return $scope.ngDisabled();
-                    }
-                };
-                $scope.tabDisabled = function (index) {
-                    return ($scope.disabled() && $scope.activeIndex != index);
-                };
-                $scope.onSelect = function (index) {
-                    if ($scope.disabled())
-                        return;
-                    $scope.activeIndex = index;
-                    $scope.activeTab = $scope.activeIndex;
-                    if ($scope.select) {
-                        $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
-                    }
-                };
-                $scope.showShadow = function () {
-                    if ($scope.showTabsShadow) {
-                        return $scope.showTabsShadow();
-                    }
-                    else {
-                        return false;
-                    }
-                };
-                $scope.show = function () {
-                    if ($scope.showTabs) {
-                        return $scope.showTabs();
-                    }
-                    else {
-                        return true;
-                    }
-                };
-            }]
-        };
-    });
-})();
+},{}]},{},[1,2,3,5,6,4,8,7,9,10,11,13,15,14,16,17,18,19,20,21,12,22,23,24,25,26,27,28,29])
 
 
 
 
-
-(function () {
-    'use strict';
-    run.$inject = ['pipTheme'];
-    var thisModule = angular.module('pipTheme', ['LocalStorageModule', 'ngMaterial']);
-    thisModule.run(run);
-    function run(pipTheme) {
-        pipTheme.theme();
-    }
-    thisModule.provider('pipTheme', function () {
-        var theme = 'default', persist = true, setRoot = true;
-        this.use = initTheme;
-        this.init = initTheme;
-        this.persist = initPersist;
-        this.setRoot = initSetRoot;
-        this.$get = ['$rootScope', '$timeout', 'localStorageService', '$mdTheming', function ($rootScope, $timeout, localStorageService, $mdTheming) {
-            if (persist)
-                theme = localStorageService.get('theme') || theme;
-            if (setRoot)
-                $rootScope.$theme = theme;
-            function resetContent(fullReset, partialReset) {
-                fullReset = fullReset !== undefined ? !!fullReset : false;
-                partialReset = partialReset !== undefined ? !!partialReset : false;
-                $rootScope.$reset = fullReset;
-                $rootScope.$partialReset = partialReset;
-                $timeout(function () {
-                    $rootScope.$reset = false;
-                    $rootScope.$partialReset = false;
-                }, 0);
-            }
-            function getOrSetTheme(newTheme, fullReset, partialReset) {
-                if (newTheme != null && newTheme != theme) {
-                    if (!(theme in $mdTheming.THEMES))
-                        throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
-                    theme = newTheme;
-                    if (persist)
-                        localStorageService.set('theme', theme);
-                    if (setRoot)
-                        $rootScope.$theme = theme;
-                    resetContent(fullReset, partialReset);
-                    $rootScope.$broadcast('pipThemeChanged', newTheme);
-                }
-                return theme;
-            }
-            return {
-                use: getOrSetTheme,
-                theme: getOrSetTheme
-            };
-        }];
-        function initTheme(newTheme) {
-            if (newTheme != null)
-                theme = newTheme;
-            return theme;
-        }
-        function initPersist(newPersist) {
-            if (newPersist != null)
-                persist = newPersist;
-            return persist;
-        }
-        function initSetRoot(newSetRoot) {
-            if (newSetRoot != null)
-                setRoot = newSetRoot;
-            return setRoot;
-        }
-    });
-})();
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipTheme.Bootbarn', [
@@ -8579,7 +8396,7 @@ var pip;
         'pipTheme.Bootbarn.Monochrome'
     ]);
 })();
-
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8621,7 +8438,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8663,7 +8480,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8710,7 +8527,7 @@ var pip;
         });
     }
 })();
-
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8722,7 +8539,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],6:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8758,7 +8575,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],7:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8827,7 +8644,7 @@ var pip;
         }
     }
 })();
-
+},{}],8:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8872,7 +8689,7 @@ var pip;
         }
     }
 })();
-
+},{}],9:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8912,7 +8729,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],10:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8948,7 +8765,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],11:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -8984,7 +8801,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],12:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -9023,7 +8840,7 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
-
+},{}],13:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$mdThemingProvider'];
@@ -9063,11 +8880,519 @@ var pip;
         $mdThemingProvider.alwaysWatchTheme(true);
     }
 })();
+},{}],14:[function(require,module,exports){
+(function () {
+    'use strict';
+    run.$inject = ['pipTheme'];
+    var thisModule = angular.module('pipTheme', ['LocalStorageModule', 'ngMaterial']);
+    thisModule.run(run);
+    function run(pipTheme) {
+        pipTheme.theme();
+    }
+    thisModule.provider('pipTheme', function () {
+        var theme = 'default', persist = true, setRoot = true;
+        this.use = initTheme;
+        this.init = initTheme;
+        this.persist = initPersist;
+        this.setRoot = initSetRoot;
+        this.$get = ['$rootScope', '$timeout', 'localStorageService', '$mdTheming', function ($rootScope, $timeout, localStorageService, $mdTheming) {
+            if (persist)
+                theme = localStorageService.get('theme') || theme;
+            if (setRoot)
+                $rootScope.$theme = theme;
+            function resetContent(fullReset, partialReset) {
+                fullReset = fullReset !== undefined ? !!fullReset : false;
+                partialReset = partialReset !== undefined ? !!partialReset : false;
+                $rootScope.$reset = fullReset;
+                $rootScope.$partialReset = partialReset;
+                $timeout(function () {
+                    $rootScope.$reset = false;
+                    $rootScope.$partialReset = false;
+                }, 0);
+            }
+            function getOrSetTheme(newTheme, fullReset, partialReset) {
+                if (newTheme != null && newTheme != theme) {
+                    if (!(theme in $mdTheming.THEMES))
+                        throw new Error('Theme ' + theme + ' is not registered. Please, register it first with $mdThemingProvider');
+                    theme = newTheme;
+                    if (persist)
+                        localStorageService.set('theme', theme);
+                    if (setRoot)
+                        $rootScope.$theme = theme;
+                    resetContent(fullReset, partialReset);
+                    $rootScope.$broadcast('pipThemeChanged', newTheme);
+                }
+                return theme;
+            }
+            return {
+                use: getOrSetTheme,
+                theme: getOrSetTheme
+            };
+        }];
+        function initTheme(newTheme) {
+            if (newTheme != null)
+                theme = newTheme;
+            return theme;
+        }
+        function initPersist(newPersist) {
+            if (newPersist != null)
+                persist = newPersist;
+            return persist;
+        }
+        function initSetRoot(newSetRoot) {
+            if (newSetRoot != null)
+                setRoot = newSetRoot;
+            return setRoot;
+        }
+    });
+})();
+},{}]},{},[2,3,4,1,6,7,8,9,10,11,12,13,5,14])
 
 
 
 
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.Strings', ['pipTranslate']);
+    thisModule.run(['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate == null)
+            return;
+        pipTranslate.translations('en', {
+            'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
+            'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
+            'ERROR_ROUTE_CONTINUE': 'Continue',
+            'ERROR_ROUTE_TRY_AGAIN': 'Try again',
+            'ERROR_ROUTE_GO_BACK': 'Go Back',
+            'ERROR_ROUTE_PAGE_TITLE': 'Wrong page',
+            'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
+            'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
+            'ERROR_UNKNOWN_CLOSE': 'Close',
+            'ERROR_UNKNOWN_DETAILS': 'Details',
+            'ERROR_AVAILABLE_TITLE': 'The server is on maintenance',
+            'ERROR_AVAILABLE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
+                'a short period. We\'ll be back soon. Thank for your patience.',
+            'ERROR_AVAILABLE_CLOSE': 'Close',
+            'ERROR_AVAILABLE_TRY_AGAIN': 'Try after',
+            'ERROR_RESPONDING_TITLE': 'No connection to the server',
+            'ERROR_RESPONDING_SUBTITLE': 'Unable to connect to the server. Check your Internet connection and try again.',
+            'ERROR_RESPONDING_RETRY': 'Retry',
+            'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
+            'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
+                'and easier to use. Unfortunately, your browser doesn\'t support those ' +
+                'technologies. Download on of these great browsers and you\'ll be on your way:',
+            'ERROR_UNSUPPORTED_O': 'Opera',
+            'ERROR_UNSUPPORTED_O_VER': 'Version 36+',
+            'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
+            'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
+            'ERROR_UNSUPPORTED_GC': 'Google Chrome',
+            'ERROR_UNSUPPORTED_GC_VER': 'Version 48+',
+            'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
+            'ERROR_UNSUPPORTED_FM_VER': 'Version 45+'
+        });
+        pipTranslate.translations('ru', {
+            'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
+            'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
+            'ERROR_ROUTE_CONTINUE': 'Continue',
+            'ERROR_ROUTE_TRY_AGAIN': 'Try again',
+            'ERROR_ROUTE_GO_BACK': 'Go Back',
+            'ERROR_ROUTE_PAGE_TITLE': 'Wrong page',
+            'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
+            'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
+            'ERROR_UNKNOWN_CLOSE': 'Close',
+            'ERROR_UNKNOWN_DETAILS': 'Details',
+            'ERROR_AVAILABLE_TITLE': 'The server is on maintenance',
+            'ERROR_AVAILABLE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
+                'a short period. We\'ll be back soon. Thank for your patience.',
+            'ERROR_AVAILABLE_CLOSE': 'Close',
+            'ERROR_AVAILABLE_TRY_AGAIN': 'Try after',
+            'ERROR_RESPONDING_TITLE': 'No connection to the server',
+            'ERROR_RESPONDING_SUBTITLE': 'Unable to connect to server. Check your Internet connection and try again.',
+            'ERROR_RESPONDING_RETRY': 'Retry',
+            'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
+            'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
+                'and easier to use. Unfortunately, your browser doesn\'t support those ' +
+                'technologies. Download on of these great browsers and you\'ll be on your way:',
+            'ERROR_UNSUPPORTED_O': 'Opera',
+            'ERROR_UNSUPPORTED_O_VER': 'Version 35+',
+            'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
+            'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
+            'ERROR_UNSUPPORTED_GC': 'Google Chrome',
+            'ERROR_UNSUPPORTED_GC_VER': 'Version 47+',
+            'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
+            'ERROR_UNSUPPORTED_FM_VER': 'Version 43+'
+        });
+    }]);
+})();
+},{}],2:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.Translate', []);
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }]);
+})();
+},{}],3:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipErrors', [
+        'pipErrors.Pages',
+        'pipNoConnectionPanel',
+        'pipClearErrors',
+        'pipFormErrors'
+    ]);
+})();
+},{}],4:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.Pages', [
+        'ngMaterial',
+        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
+        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
+    ]);
+    thisModule.config(['$stateProvider', function ($stateProvider) {
+        $stateProvider
+            .state('errors_no_connection', {
+            url: '/errors/no_connection',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorNoConnectionController',
+            templateUrl: 'no_connection/no_connection.html'
+        })
+            .state('errors_maintenance', {
+            url: '/errors/maintenance',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorMaintenanceController',
+            templateUrl: 'maintenance/maintenance.html'
+        })
+            .state('errors_missing_route', {
+            url: '/errors/missing_route',
+            params: {
+                unfoundState: null,
+                fromState: null
+            },
+            controller: 'pipErrorMissingRouteController',
+            templateUrl: 'missing_route/missing_route.html'
+        })
+            .state('errors_unsupported', {
+            url: '/errors/unsupported',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorUnsupportedController',
+            templateUrl: 'unsupported/unsupported.html'
+        })
+            .state('errors_unknown', {
+            url: '/errors/unknown',
+            params: {
+                error: null
+            },
+            controller: 'pipErrorUnknownController',
+            templateUrl: 'unknown/unknown.html'
+        });
+    }]);
+})();
+},{}],5:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipClearErrors', []);
+    thisModule.directive('pipClearErrors', function () {
+        return {
+            restrict: 'A',
+            require: ['ngModel', '^?form'],
+            link: function ($scope, $element, $attrs, $ctrls) {
+                var fieldController = $ctrls[0], formController = $ctrls[1];
+                $scope.$watch($attrs.ngModel, function (newValue) {
+                    clearFieldErrors();
+                    clearFormErrors();
+                });
+                function clearFieldErrors() {
+                    var errors = fieldController.$error;
+                    for (var prop in errors) {
+                        if (errors.hasOwnProperty(prop) && prop.substring(0, 6) == 'ERROR_') {
+                            fieldController.$setValidity(prop, true);
+                        }
+                    }
+                    ;
+                }
+                function clearFormErrors() {
+                    formController.$serverError = {};
+                }
+                ;
+            }
+        };
+    });
+})();
+},{}],6:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipFormErrors', []);
+    thisModule.factory('pipFormErrors', ['$rootScope', function ($rootScope) {
+        return {
+            errorsWithHint: errorsWithHint,
+            touchedErrorsWithHint: touchedErrorsWithHint,
+            resetFormErrors: resetFormErrors,
+            setFormError: setFormError,
+            resetFieldsErrors: resetFieldsErrors
+        };
+        function errorsWithHint(field) {
+            if (field == null)
+                return;
+            return _.isEmpty(field.$error) ? { hint: true } : field.$error;
+        }
+        ;
+        function touchedErrorsWithHint(form, field) {
+            if (form == null)
+                return;
+            if (field == null)
+                return;
+            if (form.$submitted && (field.$touched || form.$dirty) || !form.$submitted && (field.$touched || field.$dirty)) {
+                var result = _.isEmpty(field.$error) ? { hint: true } : field.$error;
+                return result;
+            }
+            return { hint: true };
+        }
+        ;
+        function resetFormErrors(form, errors) {
+            form.$setPristine();
+            form.$setUntouched();
+            if (errors) {
+                form.$setDirty();
+                form.$setSubmitted();
+            }
+            form.$serverError = {};
+        }
+        ;
+        function resetFieldsErrors(form, field) {
+            if (!form)
+                return;
+            if (field && form[field] && form[field].$error) {
+                form[field].$error = {};
+            }
+            else {
+                for (var prop in form) {
+                    if (form[prop] && form[prop].$error) {
+                        form[prop].$error = {};
+                    }
+                    ;
+                }
+                if (form && form.$error)
+                    form.$error = {};
+            }
+        }
+        ;
+        function setFormError(form, error, errorFieldMap) {
+            if (error == null)
+                return;
+            form.$serverError = form.$serverError || {};
+            var code = error.code || (error.data || {}).code || null;
+            if (!code && error.status)
+                code = error.status;
+            if (code) {
+                var errorName = 'ERROR_' + code, field = errorFieldMap ? errorFieldMap[code] : null;
+                if (field && form[field] && form[field].$setValidity) {
+                    form[field].$setValidity(errorName, false);
+                    return;
+                }
+                if (field == 'form') {
+                    form.$serverError[errorName] = true;
+                    return;
+                }
+            }
+            if (error.data && error.data.message) {
+                form.$serverError['ERROR_UNKNOWN'] = error.data.message;
+                goToUnhandledErrorPage(error);
+                return;
+            }
+            if (error.message) {
+                form.$serverError['ERROR_UNKNOWN'] = error.message;
+                goToUnhandledErrorPage(error);
+                return;
+            }
+            if (error.name) {
+                form.$serverError['ERROR_UNKNOWN'] = error.name;
+                goToUnhandledErrorPage(error);
+                return;
+            }
+            form.$serverError['ERROR_UNKNOWN'] = error;
+            goToUnhandledErrorPage(error);
+        }
+        ;
+        function goToUnhandledErrorPage(error) {
+            $rootScope.$emit('pipUnhandledInternalError', {
+                error: error
+            });
+        }
+        ;
+    }]);
+})();
+},{}],7:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.Maintenance', []);
+    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+        $rootScope.$routing = false;
+        $scope.isCordova = false;
+        appHeader();
+        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
+        $scope.timeoutInterval = $scope.error && $scope.error.config &&
+            $scope.error.config.params && $scope.error.config.params.interval ? $scope.error.config.params.interval : 0;
+        $scope.onClose = onClose;
+        return;
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        }
+        ;
+        function onClose() {
+        }
+        ;
+    }]);
+})();
+},{}],8:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.MissingRoute', []);
+    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+        appHeader();
+        $rootScope.$routing = false;
+        $scope.error = $state && $state.params && $state.params.error ? $state.params.fromState : {};
+        $scope.unfoundState = $state && $state.params ? $state.params.unfoundState : {};
+        $scope.url = $scope.unfoundState && $scope.unfoundState.to ? $state.href($scope.unfoundState.to, $scope.unfoundState.toParams, { absolute: true }) : '';
+        $scope.urlBack = $scope.fromState && $scope.fromState.to ? $state.href($scope.fromState.to, $scope.fromState.fromParams, { absolute: true }) : '';
+        $scope.onContinue = onContinue;
+        return;
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_ROUTE_PAGE_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        }
+        ;
+        function onContinue() {
+        }
+        ;
+    }]);
+})();
+},{}],9:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.NoConnection', []);
+    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', 'pipAppBar', function ($scope, $state, $rootScope, $window, pipAppBar) {
+        $rootScope.$routing = false;
+        appHeader();
+        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
+        $scope.onRetry = onRetry;
+        return;
+        function onRetry() {
+            $window.history.back();
+        }
+        ;
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        }
+        ;
+    }]);
+})();
+},{}],10:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module("pipNoConnectionPanel", ['pipErrors.Translate']);
+    thisModule.directive('pipNoConnectionPanel', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                error: '=pipError',
+                retry: '=pipRetry'
+            },
+            templateUrl: 'no_connection_panel/no_connection_panel.html',
+            controller: 'pipNoConnectionPanelController'
+        };
+    });
+    thisModule.controller('pipNoConnectionPanelController', ['$scope', '$element', '$attrs', 'pipTranslate', function ($scope, $element, $attrs, pipTranslate) {
+        $scope.onRetry = onRetry;
+        return;
+        function onRetry() {
+            if ($scope.retry && angular.isFunction($scope.retry))
+                $scope.retry();
+        }
+        ;
+    }]);
+})();
+},{}],11:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.Unknown', []);
+    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+        $rootScope.$routing = false;
+        $scope.isCordova = false;
+        appHeader();
+        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
+        $scope.error_details = null;
+        $scope.onDetails = onDetails;
+        $scope.onClose = onClose;
+        parseError();
+        return;
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_UNKNOWN_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        }
+        ;
+        function parseError() {
+            $scope.error_details = {};
+            $scope.error_details.code = $scope.error.code;
+            $scope.error_details.description = $scope.error.message;
+            $scope.error_details.status = $scope.error.status;
+            $scope.error_details.server_stacktrace = function () {
+            };
+            $scope.error_details.client_stacktrace = function () {
+            };
+        }
+        ;
+        function onDetails() {
+            $scope.showError = true;
+        }
+        ;
+        function onClose() {
+        }
+        ;
+    }]);
+})();
+},{}],12:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipErrors.Unsupported', []);
+    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', 'pipAppBar', function ($scope, $state, $rootScope, $mdMedia, pipAppBar) {
+        $scope.$mdMedia = $mdMedia;
+        $rootScope.$routing = false;
+        appHeader();
+        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
+        return;
+        function appHeader() {
+            pipAppBar.showMenuNavIcon();
+            pipAppBar.showShadow();
+            pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
+            pipAppBar.showLocalActions(null, []);
+        }
+        ;
+    }]);
+})();
+},{}],13:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -9312,554 +9637,12 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-(function () {
-    'use strict';
-    angular.module('pipErrors', [
-        'pipErrors.Pages',
-        'pipNoConnectionPanel',
-        'pipClearErrors',
-        'pipFormErrors'
-    ]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Strings', ['pipTranslate']);
-    thisModule.run(['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate == null)
-            return;
-        pipTranslate.translations('en', {
-            'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
-            'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
-            'ERROR_ROUTE_CONTINUE': 'Continue',
-            'ERROR_ROUTE_TRY_AGAIN': 'Try again',
-            'ERROR_ROUTE_GO_BACK': 'Go Back',
-            'ERROR_ROUTE_PAGE_TITLE': 'Wrong page',
-            'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
-            'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
-            'ERROR_UNKNOWN_CLOSE': 'Close',
-            'ERROR_UNKNOWN_DETAILS': 'Details',
-            'ERROR_AVAILABLE_TITLE': 'The server is on maintenance',
-            'ERROR_AVAILABLE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
-                'a short period. We\'ll be back soon. Thank for your patience.',
-            'ERROR_AVAILABLE_CLOSE': 'Close',
-            'ERROR_AVAILABLE_TRY_AGAIN': 'Try after',
-            'ERROR_RESPONDING_TITLE': 'No connection to the server',
-            'ERROR_RESPONDING_SUBTITLE': 'Unable to connect to the server. Check your Internet connection and try again.',
-            'ERROR_RESPONDING_RETRY': 'Retry',
-            'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
-            'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
-                'and easier to use. Unfortunately, your browser doesn\'t support those ' +
-                'technologies. Download on of these great browsers and you\'ll be on your way:',
-            'ERROR_UNSUPPORTED_O': 'Opera',
-            'ERROR_UNSUPPORTED_O_VER': 'Version 36+',
-            'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
-            'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
-            'ERROR_UNSUPPORTED_GC': 'Google Chrome',
-            'ERROR_UNSUPPORTED_GC_VER': 'Version 48+',
-            'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
-            'ERROR_UNSUPPORTED_FM_VER': 'Version 45+'
-        });
-        pipTranslate.translations('ru', {
-            'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
-            'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
-            'ERROR_ROUTE_CONTINUE': 'Continue',
-            'ERROR_ROUTE_TRY_AGAIN': 'Try again',
-            'ERROR_ROUTE_GO_BACK': 'Go Back',
-            'ERROR_ROUTE_PAGE_TITLE': 'Wrong page',
-            'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
-            'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
-            'ERROR_UNKNOWN_CLOSE': 'Close',
-            'ERROR_UNKNOWN_DETAILS': 'Details',
-            'ERROR_AVAILABLE_TITLE': 'The server is on maintenance',
-            'ERROR_AVAILABLE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
-                'a short period. We\'ll be back soon. Thank for your patience.',
-            'ERROR_AVAILABLE_CLOSE': 'Close',
-            'ERROR_AVAILABLE_TRY_AGAIN': 'Try after',
-            'ERROR_RESPONDING_TITLE': 'No connection to the server',
-            'ERROR_RESPONDING_SUBTITLE': 'Unable to connect to server. Check your Internet connection and try again.',
-            'ERROR_RESPONDING_RETRY': 'Retry',
-            'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
-            'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
-                'and easier to use. Unfortunately, your browser doesn\'t support those ' +
-                'technologies. Download on of these great browsers and you\'ll be on your way:',
-            'ERROR_UNSUPPORTED_O': 'Opera',
-            'ERROR_UNSUPPORTED_O_VER': 'Version 35+',
-            'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
-            'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
-            'ERROR_UNSUPPORTED_GC': 'Google Chrome',
-            'ERROR_UNSUPPORTED_GC_VER': 'Version 47+',
-            'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
-            'ERROR_UNSUPPORTED_FM_VER': 'Version 43+'
-        });
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
-        return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipClearErrors', []);
-    thisModule.directive('pipClearErrors', function () {
-        return {
-            restrict: 'A',
-            require: ['ngModel', '^?form'],
-            link: function ($scope, $element, $attrs, $ctrls) {
-                var fieldController = $ctrls[0], formController = $ctrls[1];
-                $scope.$watch($attrs.ngModel, function (newValue) {
-                    clearFieldErrors();
-                    clearFormErrors();
-                });
-                function clearFieldErrors() {
-                    var errors = fieldController.$error;
-                    for (var prop in errors) {
-                        if (errors.hasOwnProperty(prop) && prop.substring(0, 6) == 'ERROR_') {
-                            fieldController.$setValidity(prop, true);
-                        }
-                    }
-                    ;
-                }
-                function clearFormErrors() {
-                    formController.$serverError = {};
-                }
-                ;
-            }
-        };
-    });
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipFormErrors', []);
-    thisModule.factory('pipFormErrors', ['$rootScope', function ($rootScope) {
-        return {
-            errorsWithHint: errorsWithHint,
-            touchedErrorsWithHint: touchedErrorsWithHint,
-            resetFormErrors: resetFormErrors,
-            setFormError: setFormError,
-            resetFieldsErrors: resetFieldsErrors
-        };
-        function errorsWithHint(field) {
-            if (field == null)
-                return;
-            return _.isEmpty(field.$error) ? { hint: true } : field.$error;
-        }
-        ;
-        function touchedErrorsWithHint(form, field) {
-            if (form == null)
-                return;
-            if (field == null)
-                return;
-            if (form.$submitted && (field.$touched || form.$dirty) || !form.$submitted && (field.$touched || field.$dirty)) {
-                var result = _.isEmpty(field.$error) ? { hint: true } : field.$error;
-                return result;
-            }
-            return { hint: true };
-        }
-        ;
-        function resetFormErrors(form, errors) {
-            form.$setPristine();
-            form.$setUntouched();
-            if (errors) {
-                form.$setDirty();
-                form.$setSubmitted();
-            }
-            form.$serverError = {};
-        }
-        ;
-        function resetFieldsErrors(form, field) {
-            if (!form)
-                return;
-            if (field && form[field] && form[field].$error) {
-                form[field].$error = {};
-            }
-            else {
-                for (var prop in form) {
-                    if (form[prop] && form[prop].$error) {
-                        form[prop].$error = {};
-                    }
-                    ;
-                }
-                if (form && form.$error)
-                    form.$error = {};
-            }
-        }
-        ;
-        function setFormError(form, error, errorFieldMap) {
-            if (error == null)
-                return;
-            form.$serverError = form.$serverError || {};
-            var code = error.code || (error.data || {}).code || null;
-            if (!code && error.status)
-                code = error.status;
-            if (code) {
-                var errorName = 'ERROR_' + code, field = errorFieldMap ? errorFieldMap[code] : null;
-                if (field && form[field] && form[field].$setValidity) {
-                    form[field].$setValidity(errorName, false);
-                    return;
-                }
-                if (field == 'form') {
-                    form.$serverError[errorName] = true;
-                    return;
-                }
-            }
-            if (error.data && error.data.message) {
-                form.$serverError['ERROR_UNKNOWN'] = error.data.message;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-            if (error.message) {
-                form.$serverError['ERROR_UNKNOWN'] = error.message;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-            if (error.name) {
-                form.$serverError['ERROR_UNKNOWN'] = error.name;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-            form.$serverError['ERROR_UNKNOWN'] = error;
-            goToUnhandledErrorPage(error);
-        }
-        ;
-        function goToUnhandledErrorPage(error) {
-            $rootScope.$emit('pipUnhandledInternalError', {
-                error: error
-            });
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Pages', [
-        'ngMaterial',
-        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
-        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
-    ]);
-    thisModule.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider
-            .state('errors_no_connection', {
-            url: '/errors/no_connection',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorNoConnectionController',
-            templateUrl: 'no_connection/no_connection.html'
-        })
-            .state('errors_maintenance', {
-            url: '/errors/maintenance',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorMaintenanceController',
-            templateUrl: 'maintenance/maintenance.html'
-        })
-            .state('errors_missing_route', {
-            url: '/errors/missing_route',
-            params: {
-                unfoundState: null,
-                fromState: null
-            },
-            controller: 'pipErrorMissingRouteController',
-            templateUrl: 'missing_route/missing_route.html'
-        })
-            .state('errors_unsupported', {
-            url: '/errors/unsupported',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorUnsupportedController',
-            templateUrl: 'unsupported/unsupported.html'
-        })
-            .state('errors_unknown', {
-            url: '/errors/unknown',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorUnknownController',
-            templateUrl: 'unknown/unknown.html'
-        });
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Maintenance', []);
-    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
-        $rootScope.$routing = false;
-        $scope.isCordova = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.timeoutInterval = $scope.error && $scope.error.config &&
-            $scope.error.config.params && $scope.error.config.params.interval ? $scope.error.config.params.interval : 0;
-        $scope.onClose = onClose;
-        return;
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        }
-        ;
-        function onClose() {
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.MissingRoute', []);
-    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
-        appHeader();
-        $rootScope.$routing = false;
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.fromState : {};
-        $scope.unfoundState = $state && $state.params ? $state.params.unfoundState : {};
-        $scope.url = $scope.unfoundState && $scope.unfoundState.to ? $state.href($scope.unfoundState.to, $scope.unfoundState.toParams, { absolute: true }) : '';
-        $scope.urlBack = $scope.fromState && $scope.fromState.to ? $state.href($scope.fromState.to, $scope.fromState.fromParams, { absolute: true }) : '';
-        $scope.onContinue = onContinue;
-        return;
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_ROUTE_PAGE_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        }
-        ;
-        function onContinue() {
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.NoConnection', []);
-    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', 'pipAppBar', function ($scope, $state, $rootScope, $window, pipAppBar) {
-        $rootScope.$routing = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.onRetry = onRetry;
-        return;
-        function onRetry() {
-            $window.history.back();
-        }
-        ;
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipNoConnectionPanel", ['pipErrors.Translate']);
-    thisModule.directive('pipNoConnectionPanel', function () {
-        return {
-            restrict: 'E',
-            scope: {
-                error: '=pipError',
-                retry: '=pipRetry'
-            },
-            templateUrl: 'no_connection_panel/no_connection_panel.html',
-            controller: 'pipNoConnectionPanelController'
-        };
-    });
-    thisModule.controller('pipNoConnectionPanelController', ['$scope', '$element', '$attrs', 'pipTranslate', function ($scope, $element, $attrs, pipTranslate) {
-        $scope.onRetry = onRetry;
-        return;
-        function onRetry() {
-            if ($scope.retry && angular.isFunction($scope.retry))
-                $scope.retry();
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Unknown', []);
-    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
-        $rootScope.$routing = false;
-        $scope.isCordova = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.error_details = null;
-        $scope.onDetails = onDetails;
-        $scope.onClose = onClose;
-        parseError();
-        return;
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_UNKNOWN_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        }
-        ;
-        function parseError() {
-            $scope.error_details = {};
-            $scope.error_details.code = $scope.error.code;
-            $scope.error_details.description = $scope.error.message;
-            $scope.error_details.status = $scope.error.status;
-            $scope.error_details.server_stacktrace = function () {
-            };
-            $scope.error_details.client_stacktrace = function () {
-            };
-        }
-        ;
-        function onDetails() {
-            $scope.showError = true;
-        }
-        ;
-        function onClose() {
-        }
-        ;
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Unsupported', []);
-    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', 'pipAppBar', function ($scope, $state, $rootScope, $mdMedia, pipAppBar) {
-        $scope.$mdMedia = $mdMedia;
-        $rootScope.$routing = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        return;
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
-        }
-        ;
-    }]);
-})();
+},{}]},{},[1,2,4,3,5,6,7,8,10,9,11,12,13])
 
 
 
 
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart flex-auto layout-column">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('legend/interactive_legend.html',
-    '<div >\n' +
-    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
-    '        <md-checkbox class="lp16 m8"\n' +
-    '                     ng-model="item.disabled"\n' +
-    '                     ng-true-value="false"\n' +
-    '                     ng-false-value="true"\n' +
-    '                     ng-if="interactive"\n' +
-    '                     aria-label="{{ item.label }}">\n' +
-    '            <p class="legend-item-value"\n' +
-    '               ng-style="{\'background-color\': item.color}">\n' +
-    '                {{ item.value }}\n' +
-    '            </p>\n' +
-    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
-    '        </md-checkbox>\n' +
-    '\n' +
-    '        <div ng-if="!interactive">\n' +
-    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '            <span>{{:: item.label || item.key}}</span>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column">\n' +
-    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
-    '    </svg>\n' +
-    '    <div class="visual-scroll">\n' +
-    '        <div class="scrolled-block"></div>\n' +
-    '    </div>\n' +
-    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
-    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
-    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
-    '');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" flex="auto" layout="column">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
-}]);
-})();
-
-
-
-(function () {
-    'use strict';
-    angular.module('pipCharts', [
-        'pipBarCharts',
-        'pipLineCharts',
-        'pipPieCharts',
-        'pipChartLegends'
-    ]);
-})();
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipBarCharts', [])
@@ -9958,7 +9741,17 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
-
+},{}],2:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipCharts', [
+        'pipBarCharts',
+        'pipLineCharts',
+        'pipPieCharts',
+        'pipChartLegends'
+    ]);
+})();
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipChartLegends', [])
@@ -10019,7 +9812,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
-
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipLineCharts', [])
@@ -10041,6 +9834,7 @@ module.run(['$templateCache', function($templateCache) {
                 var chart = null;
                 var chartElem = null;
                 var setZoom = null;
+                var updateZoomOptions = null;
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
@@ -10074,6 +9868,8 @@ module.run(['$templateCache', function($templateCache) {
                     generateParameterColor();
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
+                        if (updateZoomOptions)
+                            updateZoomOptions(vm.data);
                     }
                 }, true);
                 nv.addGraph(function () {
@@ -10086,7 +9882,7 @@ module.run(['$templateCache', function($templateCache) {
                         return d.value;
                     })
                         .height(270)
-                        .interactive(true)
+                        .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -10106,16 +9902,7 @@ module.run(['$templateCache', function($templateCache) {
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
                     chartElem.datum(vm.data).style('height', 270).call(chart);
                     if (vm.dynamic) {
-                        addZoom({
-                            xAxis: chart.xAxis,
-                            yAxis: chart.yAxis,
-                            yDomain: chart.yDomain,
-                            xDomain: chart.xDomain,
-                            redraw: function () {
-                                chart.update();
-                            },
-                            svg: chartElem
-                        });
+                        addZoom(chart, chartElem);
                     }
                     nv.utils.windowResize(chart.update);
                     return chart;
@@ -10136,25 +9923,39 @@ module.run(['$templateCache', function($templateCache) {
                         return domDiff / bDiff * 100 + '%';
                     });
                 }
-                function addZoom(options) {
+                function addZoom(chart, svg) {
                     var scaleExtent = 4;
-                    var yAxis = options.yAxis;
-                    var xAxis = options.xAxis;
-                    var xDomain = options.xDomain || xAxis.scale().domain;
-                    var yDomain = options.yDomain || yAxis.scale().domain;
-                    var redraw = options.redraw;
-                    var svg = options.svg;
-                    var discrete = options.discrete;
-                    var xScale = xAxis.scale();
-                    var yScale = yAxis.scale();
-                    var x_boundary = xAxis.scale().domain().slice();
-                    var y_boundary = yAxis.scale().domain().slice();
+                    var yAxis = null;
+                    var xAxis = null;
+                    var xDomain = null;
+                    var yDomain = null;
+                    var redraw = null;
+                    var svg = svg;
+                    var xScale = null;
+                    var yScale = null;
+                    var x_boundary = null;
+                    var y_boundary = null;
                     var d3zoom = d3.behavior.zoom();
-                    var prevXDomain = x_boundary;
-                    var prevScale = d3zoom.scale();
-                    var prevTranslate = d3zoom.translate();
-                    xScale.nice();
-                    yScale.nice();
+                    var prevXDomain = null;
+                    var prevScale = null;
+                    var prevTranslate = null;
+                    setData(chart);
+                    function setData(newChart) {
+                        yAxis = newChart.yAxis;
+                        xAxis = newChart.xAxis;
+                        xDomain = newChart.xDomain || xAxis.scale().domain;
+                        yDomain = newChart.yDomain || yAxis.scale().domain;
+                        redraw = newChart.update;
+                        xScale = xAxis.scale();
+                        yScale = yAxis.scale();
+                        x_boundary = xAxis.scale().domain().slice();
+                        y_boundary = yAxis.scale().domain().slice();
+                        prevXDomain = x_boundary;
+                        prevScale = d3zoom.scale();
+                        prevTranslate = d3zoom.translate();
+                        xScale.nice();
+                        yScale.nice();
+                    }
                     function fixDomain(domain, boundary, scale, translate) {
                         if (domain[0] < boundary[0]) {
                             domain[0] = boundary[0];
@@ -10182,9 +9983,17 @@ module.run(['$templateCache', function($templateCache) {
                         prevTranslate = _.clone(translate);
                         return domain;
                     }
+                    function updateChart() {
+                        d3zoom.scale(1);
+                        d3zoom.translate([0, 0]);
+                        xScale.domain(x_boundary);
+                        d3zoom.x(xScale).y(yScale);
+                        svg.call(d3zoom);
+                    }
                     function zoomed() {
                         if (d3.event.scale === 1) {
                             unzoomed();
+                            updateChart();
                         }
                         else {
                             xDomain(fixDomain(xScale.domain(), x_boundary, d3.event.scale, d3.event.translate));
@@ -10242,7 +10051,6 @@ module.run(['$templateCache', function($templateCache) {
                     }
                     function unzoomed() {
                         xDomain(x_boundary);
-                        yDomain(y_boundary);
                         redraw();
                         d3zoom.scale(1);
                         d3zoom.translate([0, 0]);
@@ -10260,6 +10068,31 @@ module.run(['$templateCache', function($templateCache) {
                         .style('outline', 'none')
                         .on('keydown', keypress)
                         .on('focus', function () { });
+                    var getXMinMax = function (data) {
+                        var maxVal, minVal = null;
+                        for (var i = 0; i < data.length; i++) {
+                            if (!data[i].disabled) {
+                                var tempMinVal = d3.max(data[i].values, function (d) { return d.x; });
+                                var tempMaxVal = d3.min(data[i].values, function (d) { return d.x; });
+                                minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
+                                maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
+                            }
+                        }
+                        return [maxVal, minVal];
+                    };
+                    updateZoomOptions = function (data) {
+                        yAxis = chart.yAxis;
+                        xAxis = chart.xAxis;
+                        xScale = xAxis.scale();
+                        yScale = yAxis.scale();
+                        x_boundary = getXMinMax(data);
+                        if (d3zoom.scale() === 1) {
+                            d3zoom.x(xScale).y(yScale);
+                            svg.call(d3zoom);
+                            d3zoom.event(svg);
+                        }
+                        updateScroll(xScale.domain(), x_boundary);
+                    };
                 }
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
@@ -10276,7 +10109,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
-
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipPieCharts', [])
@@ -10285,7 +10118,11 @@ module.run(['$templateCache', function($templateCache) {
         return {
             restrict: 'E',
             scope: {
-                series: '=pipSeries'
+                series: '=pipSeries',
+                donut: '=pipDonut',
+                legend: '=pipShowLegend',
+                total: '=pipShowTotal',
+                size: '=pipPieSize'
             },
             bindToController: true,
             controllerAs: 'pieChart',
@@ -10300,6 +10137,9 @@ module.run(['$templateCache', function($templateCache) {
                 });
                 var resizeTitleLabel = resizeTitleLabelUnwrap;
                 vm.data = vm.data || [];
+                vm.showLegend = function () {
+                    return vm.legend !== undefined ? vm.legend : true;
+                };
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
@@ -10319,17 +10159,17 @@ module.run(['$templateCache', function($templateCache) {
                     chart = nv.models.pieChart()
                         .margin({ top: 0, right: 0, bottom: 0, left: 0 })
                         .x(function (d) {
-                        return d.value;
+                        return vm.donut ? d.value : null;
                     })
                         .y(function (d) {
                         return d.value;
                     })
-                        .height(250)
-                        .width(250)
+                        .height(vm.size || 250)
+                        .width(vm.size || 250)
                         .showLabels(true)
                         .labelThreshold(.001)
                         .growOnHover(false)
-                        .donut(true)
+                        .donut(vm.donut)
                         .donutRatio(0.5)
                         .color(function (d) {
                         return d.color || d3.scale.paletteColors().range();
@@ -10339,7 +10179,8 @@ module.run(['$templateCache', function($templateCache) {
                     chart.showLegend(false);
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
-                        .attr('height', 250)
+                        .attr('height', vm.size || 250)
+                        .attr('width', vm.size || 250)
                         .style('opacity', 0)
                         .datum(vm.data)
                         .call(chart);
@@ -10349,10 +10190,19 @@ module.run(['$templateCache', function($templateCache) {
                     });
                     return chart;
                 }, function () {
-                    $timeout(renderTotalLabel);
+                    $timeout(function () {
+                        var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                        renderTotalLabel(svgElem);
+                        d3.select(svgElem)
+                            .transition()
+                            .duration(1000)
+                            .style('opacity', 1);
+                        $timeout(resizeTitleLabelUnwrap, 800);
+                    });
                 });
-                function renderTotalLabel() {
-                    var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                function renderTotalLabel(svgElem) {
+                    if (!vm.total && !vm.donut)
+                        return;
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
                     }, 0);
@@ -10363,19 +10213,17 @@ module.run(['$templateCache', function($templateCache) {
                         .attr('text-anchor', 'middle')
                         .style('dominant-baseline', 'central')
                         .text(totalVal);
-                    d3.select(svgElem)
-                        .transition()
-                        .duration(1000)
-                        .style('opacity', 1);
-                    titleElem = d3.select($element.find('text.label-total').get(0));
-                    resizeTitleLabel();
+                    titleElem = d3.select($element.find('text.label-total').get(0)).style('opacity', 0);
                 }
                 function resizeTitleLabelUnwrap() {
-                    var boxSize = $element.find('.nv-pieLabels').get(0).getBBox();
+                    if (!vm.total && !vm.donut)
+                        return;
+                    var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
+                        : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
                     if (!boxSize.width || !boxSize.height) {
                         return;
                     }
-                    titleElem.style('font-size', ~~boxSize.width / 2);
+                    titleElem.style('font-size', ~~boxSize.width / (vm.donut ? 2 : 2.5)).style('opacity', 1);
                 }
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
@@ -10392,11 +10240,755 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
+},{}],6:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('bar/bar_chart.html',
+    '<div class="bar-chart flex-auto layout-column">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('legend/interactive_legend.html',
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
+    '        <md-checkbox class="lp16 m8"\n' +
+    '                     ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
+    '    </svg>\n' +
+    '    <div class="visual-scroll">\n' +
+    '        <div class="scrolled-block"></div>\n' +
+    '    </div>\n' +
+    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
+    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
+    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !pieChart.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+}]);
+})();
+
+
+
+},{}]},{},[1,2,3,4,5,6])
 
 
 
 
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipSettings', [
+        'pipSettings.Service',
+        'pipSettings.Page'
+    ]);
+})();
+},{}],2:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSettings.Page', [
+        'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
+        'pipSettings.Templates', 'pipNavIcon', 'pipActions.Service'
+    ]);
+    thisModule.config(['$stateProvider', function ($stateProvider) {
+        $stateProvider.state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controller: 'pipSettingsPageController',
+            templateUrl: 'settings_page/settings_page.html'
+        });
+    }]);
+    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', 'pipActions', 'pipBreadcrumb', 'pipNavIcon', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings, pipActions, pipBreadcrumb, pipNavIcon) {
+        $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+            if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
+                return tab;
+            }
+        });
+        $scope.tabs = _.sortBy($scope.tabs, 'index');
+        $scope.selected = {};
+        if ($state.current.name !== 'settings') {
+            initSelect($state.current.name);
+        }
+        else if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+            initSelect(pipSettings.getDefaultTab().state);
+        }
+        else {
+            $timeout(function () {
+                if (pipSettings.getDefaultTab()) {
+                    initSelect(pipSettings.getDefaultTab().state);
+                }
+                if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
+                    initSelect($scope.tabs[0].state);
+                }
+            });
+        }
+        appHeader();
+        $scope.onNavigationSelect = onNavigationSelect;
+        $scope.onDropdownSelect = onDropdownSelect;
+        function appHeader() {
+            pipActions.hide();
+            pipAppBar.part('menu', true);
+            pipAppBar.part('actions', 'primary');
+            pipAppBar.part('icon', true);
+            pipAppBar.part('title', 'breadcrumb');
+            pipAppBar.hideShadow();
+            pipBreadcrumb.text = 'Settings';
+            pipNavIcon.menu();
+        }
+        function onDropdownSelect(state) {
+            onNavigationSelect(state.state);
+        }
+        function onNavigationSelect(state) {
+            initSelect(state);
+            if ($scope.selected.tab) {
+                $state.go(state);
+            }
+        }
+        function initSelect(state) {
+            $scope.selected.tab = _.find($scope.tabs, function (tab) {
+                return tab.state === state;
+            });
+            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
+            $scope.selected.tabId = state;
+        }
+    }]);
+})();
+},{}],3:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSettings.Service', []);
+    thisModule.provider('pipSettings', ['$stateProvider', function ($stateProvider) {
+        var defaultTab, tabs = [], titleText = 'SETTINGS_TITLE', titleLogo = null, isNavIcon = true;
+        this.showTitleText = showTitleText;
+        this.showTitleLogo = showTitleLogo;
+        this.showNavIcon = showNavIcon;
+        return {
+            addTab: addTab,
+            getTabs: getTabs,
+            setDefaultTab: setDefaultTab,
+            getDefaultTab: getDefaultTab,
+            showTitleText: showTitleText,
+            showTitleLogo: showTitleLogo,
+            showNavIcon: showNavIcon,
+            $get: function () {
+                return {
+                    getTabs: getTabs,
+                    addTab: addTab,
+                    getDefaultTab: getDefaultTab,
+                    setDefaultTab: setDefaultTab,
+                    showTitleText: showTitleText,
+                    showTitleLogo: showTitleLogo,
+                    showNavIcon: showNavIcon
+                };
+            }
+        };
+        function getFullStateName(state) {
+            return 'settings.' + state;
+        }
+        function getTabs() {
+            return _.cloneDeep(tabs);
+        }
+        function getDefaultTab() {
+            var defaultTab;
+            defaultTab = _.find(tabs, function (p) {
+                return p.state === defaultTab;
+            });
+            return _.cloneDeep(defaultTab);
+        }
+        function addTab(tabObj) {
+            var existingTab;
+            validateTab(tabObj);
+            existingTab = _.find(tabs, function (p) {
+                return p.state === getFullStateName(tabObj.state);
+            });
+            if (existingTab) {
+                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
+            }
+            tabs.push({
+                state: getFullStateName(tabObj.state),
+                title: tabObj.title,
+                index: tabObj.index || 100000,
+                access: tabObj.access,
+                visible: tabObj.visible !== false,
+                stateConfig: _.cloneDeep(tabObj.stateConfig)
+            });
+            $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
+            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
+                setDefaultTab(tabObj.state);
+            }
+        }
+        function setDefaultTab(name) {
+            if (!_.find(tabs, function (tab) {
+                return tab.state === getFullStateName(name);
+            })) {
+                throw new Error('Tab with state name "' + name + '" is not registered');
+            }
+            defaultTab = getFullStateName(name);
+        }
+        function validateTab(tabObj) {
+            if (!tabObj || !_.isObject(tabObj)) {
+                throw new Error('Invalid object');
+            }
+            if (tabObj.state === null || tabObj.state === '') {
+                throw new Error('Tab should have valid Angular UI router state name');
+            }
+            if (tabObj.access && !_.isFunction(tabObj.access)) {
+                throw new Error('"access" should be a function');
+            }
+            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
+                throw new Error('Invalid state configuration object');
+            }
+        }
+        function showTitleText(newTitleText) {
+            if (newTitleText) {
+                titleText = newTitleText;
+                titleLogo = null;
+            }
+            return titleText;
+        }
+        function showTitleLogo(newTitleLogo) {
+            if (newTitleLogo) {
+                titleLogo = newTitleLogo;
+                titleText = null;
+            }
+            return titleLogo;
+        }
+        function showNavIcon(value) {
+            if (value !== null && value !== undefined) {
+                isNavIcon = !!value;
+            }
+            return isNavIcon;
+        }
+    }]);
+})();
+},{}],4:[function(require,module,exports){
+(function () {
+    'use strict';
+    angular.module('pipUserSettings', [
+        'ngMaterial', 'pipData',
+        'pipSettings.Service',
+        'pipSettings.Page',
+        'pipUserSettings.Strings',
+        'pipUserSettings.Sessions',
+        'pipUserSettings.BasicInfo',
+        'pipSettings.Templates'
+    ]);
+})();
+},{}],5:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipUserSettings.BasicInfo', ['pipUserSettings.ChangePassword', 'pipUserSettings.VerifyEmail',
+        'pipSettings.Service', 'pipSettings.Page',]);
+    thisModule.config(['pipSettingsProvider', function (pipSettingsProvider) {
+        pipSettingsProvider.addTab({
+            state: 'basic_info',
+            index: 1,
+            title: 'SETTINGS_BASIC_INFO_TITLE',
+            stateConfig: {
+                url: '/basic_info',
+                controller: 'pipUserSettingsBasicInfoController',
+                templateUrl: 'user_settings/user_settings_basic_info.html',
+                auth: true
+            }
+        });
+        pipSettingsProvider.setDefaultTab('basic_info');
+    }]);
+    thisModule.controller('pipUserSettingsBasicInfoController', ['$scope', '$rootScope', '$mdDialog', '$state', '$window', '$timeout', '$mdTheming', 'pipTranslate', 'pipTransaction', 'pipTheme', 'pipToasts', 'pipDataUser', 'pipDataParty', 'pipFormErrors', function ($scope, $rootScope, $mdDialog, $state, $window, $timeout, $mdTheming, pipTranslate, pipTransaction, pipTheme, pipToasts, pipDataUser, pipDataParty, pipFormErrors) {
+        try {
+            $scope.originalParty = angular.toJson($rootScope.$party);
+        }
+        catch (err) {
+            throw err;
+        }
+        $scope.nameCopy = $rootScope.$party.name;
+        $timeout(function () {
+            $scope.loc_pos = $rootScope.$party.loc_pos;
+        });
+        $scope.genders = pipTranslate.translateSet(['male', 'female', 'n/s']);
+        $scope.languages = pipTranslate.translateSet(['ru', 'en']);
+        $scope.transaction = pipTransaction('settings.basic_info', $scope);
+        $scope.themes = _.keys(_.omit($mdTheming.THEMES, 'default'));
+        $state.get('settings.basic_info').onExit = saveChanges;
+        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
+        $scope.onChangePassword = onChangePassword;
+        $scope.onVerifyEmail = onVerifyEmail;
+        $scope.onPictureCreated = onPictureCreated;
+        $scope.onPictureChanged = onPictureChanged;
+        $scope.onChangeUser = _.debounce(updateUser, 2000);
+        $scope.onChangeBasicInfo = _.debounce(saveChanges, 2000);
+        function onPictureChanged() {
+            $scope.picture.save(function () {
+                $rootScope.$broadcast('pipPartyAvatarUpdated');
+            }, function (error) {
+                return new Error(error);
+            });
+        }
+        function onPictureCreated($event) {
+            $scope.picture = $event.sender;
+            $scope.picture.save(function () {
+                $rootScope.$broadcast('pipPartyAvatarUpdated');
+            }, function (error) {
+                return new Error(error);
+            });
+        }
+        function saveChanges() {
+            if ($scope.form) {
+                $scope.form.$setSubmitted();
+            }
+            if ($rootScope.$party) {
+                if ($rootScope.$party.type === 'person' && $scope.form.$invalid) {
+                    return;
+                }
+                $rootScope.$party.loc_pos = $scope.loc_pos;
+                try {
+                    var party = angular.toJson($rootScope.$party);
+                }
+                catch (err) {
+                    throw err;
+                }
+                if (party !== $scope.originalParty) {
+                    var tid = $scope.transaction.begin('UPDATING');
+                    pipDataParty.updateParty($rootScope.$party, function (data) {
+                        if ($scope.transaction.aborted(tid)) {
+                            return;
+                        }
+                        $scope.transaction.end();
+                        $scope.originalParty = party;
+                        $scope.nameCopy = data.name;
+                    }, function (error) {
+                        $scope.transaction.end(error);
+                        $scope.message = String() + 'ERROR_' + error.status || error.data.status_code;
+                        $rootScope.$party = angular.fromJson($scope.originalParty);
+                    });
+                }
+            }
+        }
+        function updateUser() {
+            var tid = $scope.transaction.begin('RequestEmailVerification');
+            if ($rootScope.$user.id === $rootScope.$party.id) {
+                pipDataUser.updateUser({
+                    item: $rootScope.$user
+                }, function (data) {
+                    if ($scope.transaction.aborted(tid)) {
+                        return;
+                    }
+                    $scope.transaction.end();
+                    pipTranslate.use(data.language);
+                    $rootScope.$user.language = data.language;
+                    $rootScope.$user.theme = data.theme;
+                    if ($rootScope.$user.theme) {
+                        pipTheme.setCurrentTheme($rootScope.$user.theme, true);
+                    }
+                }, function (error) {
+                    var message;
+                    $scope.transaction.end(error);
+                    message = String() + 'ERROR_' + error.status || error.data.status_code;
+                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
+                });
+            }
+        }
+        function onChangePassword(event) {
+            var message;
+            $mdDialog.show({
+                templateUrl: 'user_settings/user_settings_change_password.html',
+                controller: 'pipUserSettingsChangePasswordController',
+                targetEvent: event,
+                locals: { email: $rootScope.$party.email }
+            }).then(function (answer) {
+                if (answer) {
+                    message = String() + 'RESET_PWD_SUCCESS_TEXT';
+                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
+                }
+            });
+        }
+        function onVerifyEmail(event) {
+            var message;
+            $mdDialog.show({
+                templateUrl: 'user_settings/user_settings_verify_email.html',
+                controller: 'pipUserSettingsVerifyEmailController',
+                targetEvent: event,
+                locals: { email: $rootScope.$party.email }
+            }).then(function (answer) {
+                $scope.user.email_ver = answer;
+                if (answer) {
+                    message = String() + 'VERIFY_EMAIL_SUCCESS_TEXT';
+                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
+                }
+            });
+        }
+    }]);
+})();
+},{}],6:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipUserSettings.ChangePassword', []);
+    thisModule.controller('pipUserSettingsChangePasswordController', ['$scope', '$rootScope', '$mdDialog', 'email', 'pipDataUser', 'pipTransaction', 'pipFormErrors', function ($scope, $rootScope, $mdDialog, email, pipDataUser, pipTransaction, pipFormErrors) {
+        $scope.transaction = pipTransaction('settings.change_password', $scope);
+        $scope.errorsRepeatWithHint = function (form, formPart) {
+            if ($scope.showRepeatHint) {
+                return pipFormErrors.errorsWithHint(form, formPart);
+            }
+            return {};
+        };
+        $scope.showRepeatHint = true;
+        $scope.changePasData = {};
+        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
+        $scope.onCancel = onCancel;
+        $scope.onCheckRepeatPassword = onCheckRepeatPassword;
+        $scope.onApply = onApply;
+        function onCancel() {
+            $mdDialog.cancel();
+        }
+        function onCheckRepeatPassword() {
+            if ($scope.changePasData) {
+                if ($scope.repeat === $scope.changePasData.new_password || $scope.repeat === '' || !$scope.repeat) {
+                    $scope.form.repeat.$setValidity('repeat', true);
+                    if ($scope.repeat === $scope.changePasData.new_password) {
+                        $scope.showRepeatHint = false;
+                    }
+                    else {
+                        $scope.showRepeatHint = true;
+                    }
+                }
+                else {
+                    $scope.showRepeatHint = true;
+                    $scope.form.repeat.$setValidity('repeat', false);
+                }
+            }
+        }
+        function onApply() {
+            $scope.onCheckRepeatPassword();
+            if ($scope.form.$invalid) {
+                return;
+            }
+            if (!$scope.transaction.begin('CHANGE_PASSWORD')) {
+                return;
+            }
+            $scope.changePasData.email = email;
+            pipDataUser.changePassword($scope.changePasData, function () {
+                $scope.transaction.end();
+                $mdDialog.hide(true);
+            }, function (error) {
+                $scope.transaction.end(error);
+                pipFormErrors.setFormError($scope.form, error, {
+                    1107: 'oldPassword',
+                    1105: 'newPassword'
+                });
+            });
+        }
+    }]);
+})();
+},{}],7:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipUserSettings.Sessions', [
+        'pipSettings.Service', 'pipSettings.Page',]);
+    thisModule.config(['pipSettingsProvider', 'pipDataSessionProvider', function (pipSettingsProvider, pipDataSessionProvider) {
+        pipSettingsProvider.addTab({
+            state: 'sessions',
+            index: 3,
+            title: 'SETTINGS_ACTIVE_SESSIONS_TITLE',
+            stateConfig: {
+                url: '/sessions',
+                controller: 'pipUserSettingsSessionsController',
+                templateUrl: 'user_settings/user_settings_sessions.html',
+                auth: true,
+                resolve: {
+                    sessions: pipDataSessionProvider.readSessionsResolver,
+                    sessionId: pipDataSessionProvider.readSessionIdResolver
+                }
+            }
+        });
+    }]);
+    thisModule.controller('pipUserSettingsSessionsController', ['$scope', 'pipTransaction', 'pipDataSession', 'sessions', 'sessionId', function ($scope, pipTransaction, pipDataSession, sessions, sessionId) {
+        $scope.sessionId = sessionId;
+        $scope.transaction = pipTransaction('settings.sessions', $scope);
+        $scope.sessions = sessions;
+        $scope.onRemoveAll = onRemoveAll;
+        $scope.onRemove = onRemove;
+        function onRemoveAll() {
+            var tid = $scope.transaction.begin('REMOVING');
+            async.eachSeries($scope.sessions, function (session, callback) {
+                if (session.id == $scope.sessionId) {
+                    callback();
+                }
+                else {
+                    pipDataSession.removeSession({
+                        session: session
+                    }, function () {
+                        $scope.sessions = _.without($scope.sessions, session);
+                        callback();
+                    }, function (error) {
+                        callback;
+                    });
+                }
+            }, function (err) {
+                if (err) {
+                    $scope.transaction.end(err);
+                }
+                if ($scope.transaction.aborted(tid)) {
+                    return;
+                }
+                $scope.transaction.end();
+            });
+        }
+        function onRemove(session, callback) {
+            if (session.id === $scope.sessionId) {
+                return;
+            }
+            var tid = $scope.transaction.begin('REMOVING');
+            pipDataSession.removeSession({
+                session: session
+            }, function () {
+                if ($scope.transaction.aborted(tid)) {
+                    return;
+                }
+                $scope.transaction.end();
+                $scope.sessions = _.without($scope.sessions, session);
+                if (callback) {
+                    callback();
+                }
+            }, function (error) {
+                $scope.transaction.end(error);
+                $scope.message = 'ERROR_' + error.status || error.data.status_code;
+            });
+        }
+    }]);
+})();
+},{}],8:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipUserSettings.Strings', ['pipTranslate']);
+    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
+        pipTranslateProvider.translations('en', {
+            'SETTINGS_TITLE': 'Settings',
+            'SETTINGS_BASIC_INFO_TITLE': 'Basic info',
+            'SETTINGS_ACTIVE_SESSIONS_TITLE': 'Active sessions',
+            'SETTINGS_BASIC_INFO_FULL_NAME': 'Full name',
+            'SETTINGS_BASIC_INFO_VERIFY_HINT': 'Please, verify your email address.',
+            'SETTINGS_BASIC_INFO_VERIFY_CODE': 'Verify email address',
+            'SETTINGS_BASIC_INFO_DATE_CHANGE_PASSWORD': 'Your password was changed on ',
+            'SETTINGS_BASIC_INFO_CHANGE_PASSWORD': 'Change your password',
+            'SETTINGS_BASIC_INFO_NAME_HINT': 'Please, use your real name to let other people know who you are.',
+            'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME': 'Few words about yourself',
+            'SETTINGS_BASIC_INFO_GENDER': 'Gender',
+            'SETTINGS_BASIC_INFO_BIRTHDAY': 'Birthday',
+            'SETTINGS_BASIC_INFO_LOCATION': 'Current location',
+            'SETTINGS_BASIC_INFO_PRIMARY_EMAIL': 'Primary email',
+            'SETTINGS_BASIC_INFO_FROM': 'User since ',
+            'SETTINGS_BASIC_INFO_USER_ID': 'User ID',
+            'SETTINGS_CHANGE_PASSWORD_TITLE': 'Change password',
+            'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD': 'New password',
+            'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD': 'Repeat password',
+            'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD': 'Current password',
+            'SETTINGS_ACTIVE_SESSIONS_SUBTITLE': ' If you notice any unfamiliar devices or locations, click' +
+                '"Close Session" to end the session.',
+            'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION': 'Close session',
+            'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS': 'Close active sessions',
+            'SETTINGS_ACTIVE_SESSION_OS': 'OS: ',
+            'SETTINGS_ACTIVE_SESSION_IP': 'IP: ',
+            'SETTINGS_ACTIVE_SESSION_ACTIVE': 'active',
+            'SETTINGS_BLACKLIST_TITLE': 'Blacklist',
+            'SETTINGS_BLACKLIST_SUBTITLE': 'Parties from blacklist will not be able to send you invitations and ' +
+                'private messages.',
+            'SETTINGS_BLACKLIST_UNBLOCK': 'Unblock',
+            'SETTINGS_BLACKLIST_EMPTY': 'You have no blocked parties',
+            'SETTINGS_CONTACT_INFO_TITLE': 'Contact info',
+            'SETTINGS_CONTACT_INFO_EMAIL': 'Email',
+            'SETTINGS_CONTACT_INFO_ADD_EMAIL': 'Add email',
+            'SETTINGS_CONTACT_INFO_ADD_PHONE': 'Add phone',
+            'SETTINGS_CONTACT_INFO_ADD_ADDRESS': 'Add address',
+            'SETTINGS_CONTACT_INFO_ADD_ACCOUNT': 'Add account',
+            'SETTINGS_CONTACT_INFO_ADD_URL': 'Add URL',
+            'SETTINGS_CONTACT_INFO_ADDRESS': 'Address',
+            'SETTINGS_CONTACT_INFO_PHONE': 'Phone',
+            'SETTINGS_CONTACT_INFO_ACCOUNT_NAME': 'Account name',
+            'SETTINGS_CONTACT_INFO_URL': 'URL',
+            'THEME': 'Theme',
+            'HINT_PASSWORD': 'Minimum 6 characters',
+            'HINT_REPEAT_PASSWORD': 'Repeat password',
+            'ERROR_WRONG_PASSWORD': 'Wrong password',
+            'ERROR_IDENTICAL_PASSWORDS': 'Old and new passwords are identical',
+            'REPEAT_PASSWORD_INVALID': 'Password does not match',
+            'ERROR_EMAIL_INVALID': 'Please, enter a valid email'
+        });
+        pipTranslateProvider.translations('ru', {
+            'SETTINGS_TITLE': 'Настройки',
+            'SETTINGS_BASIC_INFO_TITLE': 'Основные данные',
+            'SETTINGS_ACTIVE_SESSIONS_TITLE': 'Активные сессии',
+            'SETTINGS_BASIC_INFO_FULL_NAME': 'Полное имя',
+            'SETTINGS_BASIC_INFO_NAME_HINT': 'Пожалуйста, используйте реальное имя, чтоб люди могли вас узнать',
+            'SETTINGS_BASIC_INFO_VERIFY_HINT': 'Пожалуйста, подтвердите адрес своей электронной почты',
+            'SETTINGS_BASIC_INFO_VERIFY_CODE': 'Подтвердите адрес эл.почты',
+            'SETTINGS_BASIC_INFO_DATE_CHANGE_PASSWORD': 'Ваш пароль был изменен ',
+            'SETTINGS_BASIC_INFO_CHANGE_PASSWORD': 'Поменять пароль',
+            'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME': 'Несколько слов о себе',
+            'SETTINGS_BASIC_INFO_GENDER': 'Пол',
+            'SETTINGS_BASIC_INFO_BIRTHDAY': 'Дата рождения',
+            'SETTINGS_BASIC_INFO_LOCATION': 'Текущее местонахождение',
+            'SETTINGS_BASIC_INFO_PRIMARY_EMAIL': 'Основной адрес эл. почты',
+            'SETTINGS_BASIC_INFO_FROM': 'Начиная с',
+            'SETTINGS_BASIC_INFO_USER_ID': 'Личный код',
+            'SETTINGS_CHANGE_PASSWORD_TITLE': 'Изменить пароль',
+            'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD': 'Новый пароль',
+            'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD': 'Повтор',
+            'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD': 'Текущий пароль',
+            'SETTINGS_ACTIVE_SESSIONS_SUBTITLE': 'Если вы заметили какие-либо незнакомые устройства или ' +
+                'месторасположение, нажмите кнопку "Закончить сеанс", чтобы завершить сеанс.',
+            'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION': 'Закрыть сессию',
+            'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS': 'Закрыть активные сессии',
+            'SETTINGS_ACTIVE_SESSION_OS': 'ОС: ',
+            'SETTINGS_ACTIVE_SESSION_IP': 'IP: ',
+            'SETTINGS_ACTIVE_SESSION_ACTIVE': 'Активно',
+            'SETTINGS_BLACKLIST_TITLE': 'Блокировки',
+            'SETTINGS_BLACKLIST_SUBTITLE': 'Участники из черного списка не смогут' +
+                ' посылать вам приглашения и личные сообщения.',
+            'SETTINGS_BLACKLIST_UNBLOCK': 'Разблокировать',
+            'SETTINGS_BLACKLIST_EMPTY': 'У вас нет заблокированных участников',
+            'SETTINGS_CONTACT_INFO_TITLE': 'Контакты',
+            'SETTINGS_CONTACT_INFO_EMAIL': 'Адрес электронной почты',
+            'SETTINGS_CONTACT_INFO_ADD_EMAIL': 'Добавить адрес эл. почты',
+            'SETTINGS_CONTACT_INFO_ADD_PHONE': 'Добавить телефон',
+            'SETTINGS_CONTACT_INFO_ADD_ADDRESS': 'Добавить адрес',
+            'SETTINGS_CONTACT_INFO_ADD_ACCOUNT': 'Добавить аккаунт',
+            'SETTINGS_CONTACT_INFO_ADD_URL': 'Добавить веб-сайт',
+            'SETTINGS_CONTACT_INFO_ADDRESS': 'Адрес',
+            'SETTINGS_CONTACT_INFO_PHONE': 'Телефон',
+            'SETTINGS_CONTACT_INFO_ACCOUNT_NAME': 'Учетка в мессенджере',
+            'SETTINGS_CONTACT_INFO_URL': 'Веб сайт',
+            'THEME': 'Тема',
+            'HINT_PASSWORD': 'Минимум 6 знаков',
+            'HINT_REPEAT_PASSWORD': 'Повторите пароль',
+            'ERROR_WRONG_PASSWORD': 'Неправильный пароль',
+            'ERROR_IDENTICAL_PASSWORDS': 'Старый и новый пароли идентичны',
+            'REPEAT_PASSWORD_INVALID': 'Пароль не совпадает',
+            'ERROR_EMAIL_INVALID': 'Пожалуйста, введите правильный почт.адрес'
+        });
+    }]);
+})();
+},{}],9:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipUserSettings.VerifyEmail', []);
+    thisModule.controller('pipUserSettingsVerifyEmailController', ['$scope', '$rootScope', '$mdDialog', 'pipTransaction', 'pipFormErrors', 'pipDataUser', 'email', function ($scope, $rootScope, $mdDialog, pipTransaction, pipFormErrors, pipDataUser, email) {
+        $scope.emailVerified = false;
+        $scope.data = {
+            email: email,
+            code: ''
+        };
+        $scope.transaction = pipTransaction('settings.verify_email', $scope);
+        $scope.onAbort = onAbort;
+        $scope.onRequestVerificationClick = onRequestVerificationClick;
+        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
+        $scope.onVerify = onVerify;
+        $scope.onCancel = onCancel;
+        function onAbort() {
+            $scope.transaction.abort();
+        }
+        function onCancel() {
+            $mdDialog.cancel();
+        }
+        function onRequestVerificationClick() {
+            var tid = $scope.transaction.begin('RequestEmailVerification');
+            pipDataUser.requestEmailVerification({}, function (result) {
+                if ($scope.transaction.aborted(tid)) {
+                    return;
+                }
+                $scope.transaction.end();
+            }, function (error) {
+                $scope.transaction.end(error);
+            });
+        }
+        function onVerify() {
+            $scope.form.$setSubmitted();
+            if ($scope.form.$invalid) {
+                return;
+            }
+            var tid = $scope.transaction.begin('Verifying');
+            pipDataUser.verifyEmail({
+                email: $scope.data.email,
+                code: $scope.data.code
+            }, function (verifyData) {
+                if ($scope.transaction.aborted(tid)) {
+                    return;
+                }
+                $scope.transaction.end();
+                $mdDialog.hide(true);
+            }, function (error) {
+                $scope.transaction.end(error);
+                pipFormErrors.setFormError($scope.form, error, {
+                    1106: 'email',
+                    1103: 'code'
+                });
+            });
+        }
+    }]);
+})();
+},{}],10:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipSettings.Templates');
@@ -10832,707 +11424,12 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-(function () {
-    'use strict';
-    angular.module('pipSettings', [
-        'pipSettings.Service',
-        'pipSettings.Page'
-    ]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSettings.Page', [
-        'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates', 'pipNavIcon', 'pipActions.Service'
-    ]);
-    thisModule.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('settings', {
-            url: '/settings?party_id',
-            auth: true,
-            controller: 'pipSettingsPageController',
-            templateUrl: 'settings_page/settings_page.html'
-        });
-    }]);
-    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', 'pipActions', 'pipBreadcrumb', 'pipNavIcon', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings, pipActions, pipBreadcrumb, pipNavIcon) {
-        $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-            if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
-                return tab;
-            }
-        });
-        $scope.tabs = _.sortBy($scope.tabs, 'index');
-        $scope.selected = {};
-        if ($state.current.name !== 'settings') {
-            initSelect($state.current.name);
-        }
-        else if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-            initSelect(pipSettings.getDefaultTab().state);
-        }
-        else {
-            $timeout(function () {
-                if (pipSettings.getDefaultTab()) {
-                    initSelect(pipSettings.getDefaultTab().state);
-                }
-                if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
-                    initSelect($scope.tabs[0].state);
-                }
-            });
-        }
-        appHeader();
-        $scope.onNavigationSelect = onNavigationSelect;
-        $scope.onDropdownSelect = onDropdownSelect;
-        function appHeader() {
-            pipActions.hide();
-            pipAppBar.part('menu', true);
-            pipAppBar.part('actions', 'primary');
-            pipAppBar.part('icon', true);
-            pipAppBar.part('title', 'breadcrumb');
-            pipAppBar.hideShadow();
-            pipBreadcrumb.text = 'Settings';
-            pipNavIcon.menu();
-        }
-        function onDropdownSelect(state) {
-            onNavigationSelect(state.state);
-        }
-        function onNavigationSelect(state) {
-            initSelect(state);
-            if ($scope.selected.tab) {
-                $state.go(state);
-            }
-        }
-        function initSelect(state) {
-            $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                return tab.state === state;
-            });
-            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-            $scope.selected.tabId = state;
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSettings.Service', []);
-    thisModule.provider('pipSettings', ['$stateProvider', function ($stateProvider) {
-        var defaultTab, tabs = [], titleText = 'SETTINGS_TITLE', titleLogo = null, isNavIcon = true;
-        this.showTitleText = showTitleText;
-        this.showTitleLogo = showTitleLogo;
-        this.showNavIcon = showNavIcon;
-        return {
-            addTab: addTab,
-            getTabs: getTabs,
-            setDefaultTab: setDefaultTab,
-            getDefaultTab: getDefaultTab,
-            showTitleText: showTitleText,
-            showTitleLogo: showTitleLogo,
-            showNavIcon: showNavIcon,
-            $get: function () {
-                return {
-                    getTabs: getTabs,
-                    addTab: addTab,
-                    getDefaultTab: getDefaultTab,
-                    setDefaultTab: setDefaultTab,
-                    showTitleText: showTitleText,
-                    showTitleLogo: showTitleLogo,
-                    showNavIcon: showNavIcon
-                };
-            }
-        };
-        function getFullStateName(state) {
-            return 'settings.' + state;
-        }
-        function getTabs() {
-            return _.cloneDeep(tabs);
-        }
-        function getDefaultTab() {
-            var defaultTab;
-            defaultTab = _.find(tabs, function (p) {
-                return p.state === defaultTab;
-            });
-            return _.cloneDeep(defaultTab);
-        }
-        function addTab(tabObj) {
-            var existingTab;
-            validateTab(tabObj);
-            existingTab = _.find(tabs, function (p) {
-                return p.state === getFullStateName(tabObj.state);
-            });
-            if (existingTab) {
-                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
-            }
-            tabs.push({
-                state: getFullStateName(tabObj.state),
-                title: tabObj.title,
-                index: tabObj.index || 100000,
-                access: tabObj.access,
-                visible: tabObj.visible !== false,
-                stateConfig: _.cloneDeep(tabObj.stateConfig)
-            });
-            $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
-            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
-                setDefaultTab(tabObj.state);
-            }
-        }
-        function setDefaultTab(name) {
-            if (!_.find(tabs, function (tab) {
-                return tab.state === getFullStateName(name);
-            })) {
-                throw new Error('Tab with state name "' + name + '" is not registered');
-            }
-            defaultTab = getFullStateName(name);
-        }
-        function validateTab(tabObj) {
-            if (!tabObj || !_.isObject(tabObj)) {
-                throw new Error('Invalid object');
-            }
-            if (tabObj.state === null || tabObj.state === '') {
-                throw new Error('Tab should have valid Angular UI router state name');
-            }
-            if (tabObj.access && !_.isFunction(tabObj.access)) {
-                throw new Error('"access" should be a function');
-            }
-            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
-                throw new Error('Invalid state configuration object');
-            }
-        }
-        function showTitleText(newTitleText) {
-            if (newTitleText) {
-                titleText = newTitleText;
-                titleLogo = null;
-            }
-            return titleText;
-        }
-        function showTitleLogo(newTitleLogo) {
-            if (newTitleLogo) {
-                titleLogo = newTitleLogo;
-                titleText = null;
-            }
-            return titleLogo;
-        }
-        function showNavIcon(value) {
-            if (value !== null && value !== undefined) {
-                isNavIcon = !!value;
-            }
-            return isNavIcon;
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    angular.module('pipUserSettings', [
-        'ngMaterial', 'pipData',
-        'pipSettings.Service',
-        'pipSettings.Page',
-        'pipUserSettings.Strings',
-        'pipUserSettings.Sessions',
-        'pipUserSettings.BasicInfo',
-        'pipSettings.Templates'
-    ]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.BasicInfo', ['pipUserSettings.ChangePassword', 'pipUserSettings.VerifyEmail',
-        'pipSettings.Service', 'pipSettings.Page',]);
-    thisModule.config(['pipSettingsProvider', function (pipSettingsProvider) {
-        pipSettingsProvider.addTab({
-            state: 'basic_info',
-            index: 1,
-            title: 'SETTINGS_BASIC_INFO_TITLE',
-            stateConfig: {
-                url: '/basic_info',
-                controller: 'pipUserSettingsBasicInfoController',
-                templateUrl: 'user_settings/user_settings_basic_info.html',
-                auth: true
-            }
-        });
-        pipSettingsProvider.setDefaultTab('basic_info');
-    }]);
-    thisModule.controller('pipUserSettingsBasicInfoController', ['$scope', '$rootScope', '$mdDialog', '$state', '$window', '$timeout', '$mdTheming', 'pipTranslate', 'pipTransaction', 'pipTheme', 'pipToasts', 'pipDataUser', 'pipDataParty', 'pipFormErrors', function ($scope, $rootScope, $mdDialog, $state, $window, $timeout, $mdTheming, pipTranslate, pipTransaction, pipTheme, pipToasts, pipDataUser, pipDataParty, pipFormErrors) {
-        try {
-            $scope.originalParty = angular.toJson($rootScope.$party);
-        }
-        catch (err) {
-            throw err;
-        }
-        $scope.nameCopy = $rootScope.$party.name;
-        $timeout(function () {
-            $scope.loc_pos = $rootScope.$party.loc_pos;
-        });
-        $scope.genders = pipTranslate.translateSet(['male', 'female', 'n/s']);
-        $scope.languages = pipTranslate.translateSet(['ru', 'en']);
-        $scope.transaction = pipTransaction('settings.basic_info', $scope);
-        $scope.themes = _.keys(_.omit($mdTheming.THEMES, 'default'));
-        $state.get('settings.basic_info').onExit = saveChanges;
-        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
-        $scope.onChangePassword = onChangePassword;
-        $scope.onVerifyEmail = onVerifyEmail;
-        $scope.onPictureCreated = onPictureCreated;
-        $scope.onPictureChanged = onPictureChanged;
-        $scope.onChangeUser = _.debounce(updateUser, 2000);
-        $scope.onChangeBasicInfo = _.debounce(saveChanges, 2000);
-        function onPictureChanged() {
-            $scope.picture.save(function () {
-                $rootScope.$broadcast('pipPartyAvatarUpdated');
-            }, function (error) {
-                return new Error(error);
-            });
-        }
-        function onPictureCreated($event) {
-            $scope.picture = $event.sender;
-            $scope.picture.save(function () {
-                $rootScope.$broadcast('pipPartyAvatarUpdated');
-            }, function (error) {
-                return new Error(error);
-            });
-        }
-        function saveChanges() {
-            if ($scope.form) {
-                $scope.form.$setSubmitted();
-            }
-            if ($rootScope.$party) {
-                if ($rootScope.$party.type === 'person' && $scope.form.$invalid) {
-                    return;
-                }
-                $rootScope.$party.loc_pos = $scope.loc_pos;
-                try {
-                    var party = angular.toJson($rootScope.$party);
-                }
-                catch (err) {
-                    throw err;
-                }
-                if (party !== $scope.originalParty) {
-                    var tid = $scope.transaction.begin('UPDATING');
-                    pipDataParty.updateParty($rootScope.$party, function (data) {
-                        if ($scope.transaction.aborted(tid)) {
-                            return;
-                        }
-                        $scope.transaction.end();
-                        $scope.originalParty = party;
-                        $scope.nameCopy = data.name;
-                    }, function (error) {
-                        $scope.transaction.end(error);
-                        $scope.message = String() + 'ERROR_' + error.status || error.data.status_code;
-                        $rootScope.$party = angular.fromJson($scope.originalParty);
-                    });
-                }
-            }
-        }
-        function updateUser() {
-            var tid = $scope.transaction.begin('RequestEmailVerification');
-            if ($rootScope.$user.id === $rootScope.$party.id) {
-                pipDataUser.updateUser({
-                    item: $rootScope.$user
-                }, function (data) {
-                    if ($scope.transaction.aborted(tid)) {
-                        return;
-                    }
-                    $scope.transaction.end();
-                    pipTranslate.use(data.language);
-                    $rootScope.$user.language = data.language;
-                    $rootScope.$user.theme = data.theme;
-                    if ($rootScope.$user.theme) {
-                        pipTheme.setCurrentTheme($rootScope.$user.theme, true);
-                    }
-                }, function (error) {
-                    var message;
-                    $scope.transaction.end(error);
-                    message = String() + 'ERROR_' + error.status || error.data.status_code;
-                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
-                });
-            }
-        }
-        function onChangePassword(event) {
-            var message;
-            $mdDialog.show({
-                templateUrl: 'user_settings/user_settings_change_password.html',
-                controller: 'pipUserSettingsChangePasswordController',
-                targetEvent: event,
-                locals: { email: $rootScope.$party.email }
-            }).then(function (answer) {
-                if (answer) {
-                    message = String() + 'RESET_PWD_SUCCESS_TEXT';
-                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
-                }
-            });
-        }
-        function onVerifyEmail(event) {
-            var message;
-            $mdDialog.show({
-                templateUrl: 'user_settings/user_settings_verify_email.html',
-                controller: 'pipUserSettingsVerifyEmailController',
-                targetEvent: event,
-                locals: { email: $rootScope.$party.email }
-            }).then(function (answer) {
-                $scope.user.email_ver = answer;
-                if (answer) {
-                    message = String() + 'VERIFY_EMAIL_SUCCESS_TEXT';
-                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
-                }
-            });
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.ChangePassword', []);
-    thisModule.controller('pipUserSettingsChangePasswordController', ['$scope', '$rootScope', '$mdDialog', 'email', 'pipDataUser', 'pipTransaction', 'pipFormErrors', function ($scope, $rootScope, $mdDialog, email, pipDataUser, pipTransaction, pipFormErrors) {
-        $scope.transaction = pipTransaction('settings.change_password', $scope);
-        $scope.errorsRepeatWithHint = function (form, formPart) {
-            if ($scope.showRepeatHint) {
-                return pipFormErrors.errorsWithHint(form, formPart);
-            }
-            return {};
-        };
-        $scope.showRepeatHint = true;
-        $scope.changePasData = {};
-        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
-        $scope.onCancel = onCancel;
-        $scope.onCheckRepeatPassword = onCheckRepeatPassword;
-        $scope.onApply = onApply;
-        function onCancel() {
-            $mdDialog.cancel();
-        }
-        function onCheckRepeatPassword() {
-            if ($scope.changePasData) {
-                if ($scope.repeat === $scope.changePasData.new_password || $scope.repeat === '' || !$scope.repeat) {
-                    $scope.form.repeat.$setValidity('repeat', true);
-                    if ($scope.repeat === $scope.changePasData.new_password) {
-                        $scope.showRepeatHint = false;
-                    }
-                    else {
-                        $scope.showRepeatHint = true;
-                    }
-                }
-                else {
-                    $scope.showRepeatHint = true;
-                    $scope.form.repeat.$setValidity('repeat', false);
-                }
-            }
-        }
-        function onApply() {
-            $scope.onCheckRepeatPassword();
-            if ($scope.form.$invalid) {
-                return;
-            }
-            if (!$scope.transaction.begin('CHANGE_PASSWORD')) {
-                return;
-            }
-            $scope.changePasData.email = email;
-            pipDataUser.changePassword($scope.changePasData, function () {
-                $scope.transaction.end();
-                $mdDialog.hide(true);
-            }, function (error) {
-                $scope.transaction.end(error);
-                pipFormErrors.setFormError($scope.form, error, {
-                    1107: 'oldPassword',
-                    1105: 'newPassword'
-                });
-            });
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.Sessions', [
-        'pipSettings.Service', 'pipSettings.Page',]);
-    thisModule.config(['pipSettingsProvider', 'pipDataSessionProvider', function (pipSettingsProvider, pipDataSessionProvider) {
-        pipSettingsProvider.addTab({
-            state: 'sessions',
-            index: 3,
-            title: 'SETTINGS_ACTIVE_SESSIONS_TITLE',
-            stateConfig: {
-                url: '/sessions',
-                controller: 'pipUserSettingsSessionsController',
-                templateUrl: 'user_settings/user_settings_sessions.html',
-                auth: true,
-                resolve: {
-                    sessions: pipDataSessionProvider.readSessionsResolver,
-                    sessionId: pipDataSessionProvider.readSessionIdResolver
-                }
-            }
-        });
-    }]);
-    thisModule.controller('pipUserSettingsSessionsController', ['$scope', 'pipTransaction', 'pipDataSession', 'sessions', 'sessionId', function ($scope, pipTransaction, pipDataSession, sessions, sessionId) {
-        $scope.sessionId = sessionId;
-        $scope.transaction = pipTransaction('settings.sessions', $scope);
-        $scope.sessions = sessions;
-        $scope.onRemoveAll = onRemoveAll;
-        $scope.onRemove = onRemove;
-        function onRemoveAll() {
-            var tid = $scope.transaction.begin('REMOVING');
-            async.eachSeries($scope.sessions, function (session, callback) {
-                if (session.id == $scope.sessionId) {
-                    callback();
-                }
-                else {
-                    pipDataSession.removeSession({
-                        session: session
-                    }, function () {
-                        $scope.sessions = _.without($scope.sessions, session);
-                        callback();
-                    }, function (error) {
-                        callback;
-                    });
-                }
-            }, function (err) {
-                if (err) {
-                    $scope.transaction.end(err);
-                }
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-            });
-        }
-        function onRemove(session, callback) {
-            if (session.id === $scope.sessionId) {
-                return;
-            }
-            var tid = $scope.transaction.begin('REMOVING');
-            pipDataSession.removeSession({
-                session: session
-            }, function () {
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-                $scope.sessions = _.without($scope.sessions, session);
-                if (callback) {
-                    callback();
-                }
-            }, function (error) {
-                $scope.transaction.end(error);
-                $scope.message = 'ERROR_' + error.status || error.data.status_code;
-            });
-        }
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.Strings', ['pipTranslate']);
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'SETTINGS_TITLE': 'Settings',
-            'SETTINGS_BASIC_INFO_TITLE': 'Basic info',
-            'SETTINGS_ACTIVE_SESSIONS_TITLE': 'Active sessions',
-            'SETTINGS_BASIC_INFO_FULL_NAME': 'Full name',
-            'SETTINGS_BASIC_INFO_VERIFY_HINT': 'Please, verify your email address.',
-            'SETTINGS_BASIC_INFO_VERIFY_CODE': 'Verify email address',
-            'SETTINGS_BASIC_INFO_DATE_CHANGE_PASSWORD': 'Your password was changed on ',
-            'SETTINGS_BASIC_INFO_CHANGE_PASSWORD': 'Change your password',
-            'SETTINGS_BASIC_INFO_NAME_HINT': 'Please, use your real name to let other people know who you are.',
-            'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME': 'Few words about yourself',
-            'SETTINGS_BASIC_INFO_GENDER': 'Gender',
-            'SETTINGS_BASIC_INFO_BIRTHDAY': 'Birthday',
-            'SETTINGS_BASIC_INFO_LOCATION': 'Current location',
-            'SETTINGS_BASIC_INFO_PRIMARY_EMAIL': 'Primary email',
-            'SETTINGS_BASIC_INFO_FROM': 'User since ',
-            'SETTINGS_BASIC_INFO_USER_ID': 'User ID',
-            'SETTINGS_CHANGE_PASSWORD_TITLE': 'Change password',
-            'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD': 'New password',
-            'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD': 'Repeat password',
-            'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD': 'Current password',
-            'SETTINGS_ACTIVE_SESSIONS_SUBTITLE': ' If you notice any unfamiliar devices or locations, click' +
-                '"Close Session" to end the session.',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION': 'Close session',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS': 'Close active sessions',
-            'SETTINGS_ACTIVE_SESSION_OS': 'OS: ',
-            'SETTINGS_ACTIVE_SESSION_IP': 'IP: ',
-            'SETTINGS_ACTIVE_SESSION_ACTIVE': 'active',
-            'SETTINGS_BLACKLIST_TITLE': 'Blacklist',
-            'SETTINGS_BLACKLIST_SUBTITLE': 'Parties from blacklist will not be able to send you invitations and ' +
-                'private messages.',
-            'SETTINGS_BLACKLIST_UNBLOCK': 'Unblock',
-            'SETTINGS_BLACKLIST_EMPTY': 'You have no blocked parties',
-            'SETTINGS_CONTACT_INFO_TITLE': 'Contact info',
-            'SETTINGS_CONTACT_INFO_EMAIL': 'Email',
-            'SETTINGS_CONTACT_INFO_ADD_EMAIL': 'Add email',
-            'SETTINGS_CONTACT_INFO_ADD_PHONE': 'Add phone',
-            'SETTINGS_CONTACT_INFO_ADD_ADDRESS': 'Add address',
-            'SETTINGS_CONTACT_INFO_ADD_ACCOUNT': 'Add account',
-            'SETTINGS_CONTACT_INFO_ADD_URL': 'Add URL',
-            'SETTINGS_CONTACT_INFO_ADDRESS': 'Address',
-            'SETTINGS_CONTACT_INFO_PHONE': 'Phone',
-            'SETTINGS_CONTACT_INFO_ACCOUNT_NAME': 'Account name',
-            'SETTINGS_CONTACT_INFO_URL': 'URL',
-            'THEME': 'Theme',
-            'HINT_PASSWORD': 'Minimum 6 characters',
-            'HINT_REPEAT_PASSWORD': 'Repeat password',
-            'ERROR_WRONG_PASSWORD': 'Wrong password',
-            'ERROR_IDENTICAL_PASSWORDS': 'Old and new passwords are identical',
-            'REPEAT_PASSWORD_INVALID': 'Password does not match',
-            'ERROR_EMAIL_INVALID': 'Please, enter a valid email'
-        });
-        pipTranslateProvider.translations('ru', {
-            'SETTINGS_TITLE': 'Настройки',
-            'SETTINGS_BASIC_INFO_TITLE': 'Основные данные',
-            'SETTINGS_ACTIVE_SESSIONS_TITLE': 'Активные сессии',
-            'SETTINGS_BASIC_INFO_FULL_NAME': 'Полное имя',
-            'SETTINGS_BASIC_INFO_NAME_HINT': 'Пожалуйста, используйте реальное имя, чтоб люди могли вас узнать',
-            'SETTINGS_BASIC_INFO_VERIFY_HINT': 'Пожалуйста, подтвердите адрес своей электронной почты',
-            'SETTINGS_BASIC_INFO_VERIFY_CODE': 'Подтвердите адрес эл.почты',
-            'SETTINGS_BASIC_INFO_DATE_CHANGE_PASSWORD': 'Ваш пароль был изменен ',
-            'SETTINGS_BASIC_INFO_CHANGE_PASSWORD': 'Поменять пароль',
-            'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME': 'Несколько слов о себе',
-            'SETTINGS_BASIC_INFO_GENDER': 'Пол',
-            'SETTINGS_BASIC_INFO_BIRTHDAY': 'Дата рождения',
-            'SETTINGS_BASIC_INFO_LOCATION': 'Текущее местонахождение',
-            'SETTINGS_BASIC_INFO_PRIMARY_EMAIL': 'Основной адрес эл. почты',
-            'SETTINGS_BASIC_INFO_FROM': 'Начиная с',
-            'SETTINGS_BASIC_INFO_USER_ID': 'Личный код',
-            'SETTINGS_CHANGE_PASSWORD_TITLE': 'Изменить пароль',
-            'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD': 'Новый пароль',
-            'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD': 'Повтор',
-            'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD': 'Текущий пароль',
-            'SETTINGS_ACTIVE_SESSIONS_SUBTITLE': 'Если вы заметили какие-либо незнакомые устройства или ' +
-                'месторасположение, нажмите кнопку "Закончить сеанс", чтобы завершить сеанс.',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION': 'Закрыть сессию',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS': 'Закрыть активные сессии',
-            'SETTINGS_ACTIVE_SESSION_OS': 'ОС: ',
-            'SETTINGS_ACTIVE_SESSION_IP': 'IP: ',
-            'SETTINGS_ACTIVE_SESSION_ACTIVE': 'Активно',
-            'SETTINGS_BLACKLIST_TITLE': 'Блокировки',
-            'SETTINGS_BLACKLIST_SUBTITLE': 'Участники из черного списка не смогут' +
-                ' посылать вам приглашения и личные сообщения.',
-            'SETTINGS_BLACKLIST_UNBLOCK': 'Разблокировать',
-            'SETTINGS_BLACKLIST_EMPTY': 'У вас нет заблокированных участников',
-            'SETTINGS_CONTACT_INFO_TITLE': 'Контакты',
-            'SETTINGS_CONTACT_INFO_EMAIL': 'Адрес электронной почты',
-            'SETTINGS_CONTACT_INFO_ADD_EMAIL': 'Добавить адрес эл. почты',
-            'SETTINGS_CONTACT_INFO_ADD_PHONE': 'Добавить телефон',
-            'SETTINGS_CONTACT_INFO_ADD_ADDRESS': 'Добавить адрес',
-            'SETTINGS_CONTACT_INFO_ADD_ACCOUNT': 'Добавить аккаунт',
-            'SETTINGS_CONTACT_INFO_ADD_URL': 'Добавить веб-сайт',
-            'SETTINGS_CONTACT_INFO_ADDRESS': 'Адрес',
-            'SETTINGS_CONTACT_INFO_PHONE': 'Телефон',
-            'SETTINGS_CONTACT_INFO_ACCOUNT_NAME': 'Учетка в мессенджере',
-            'SETTINGS_CONTACT_INFO_URL': 'Веб сайт',
-            'THEME': 'Тема',
-            'HINT_PASSWORD': 'Минимум 6 знаков',
-            'HINT_REPEAT_PASSWORD': 'Повторите пароль',
-            'ERROR_WRONG_PASSWORD': 'Неправильный пароль',
-            'ERROR_IDENTICAL_PASSWORDS': 'Старый и новый пароли идентичны',
-            'REPEAT_PASSWORD_INVALID': 'Пароль не совпадает',
-            'ERROR_EMAIL_INVALID': 'Пожалуйста, введите правильный почт.адрес'
-        });
-    }]);
-})();
-
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.VerifyEmail', []);
-    thisModule.controller('pipUserSettingsVerifyEmailController', ['$scope', '$rootScope', '$mdDialog', 'pipTransaction', 'pipFormErrors', 'pipDataUser', 'email', function ($scope, $rootScope, $mdDialog, pipTransaction, pipFormErrors, pipDataUser, email) {
-        $scope.emailVerified = false;
-        $scope.data = {
-            email: email,
-            code: ''
-        };
-        $scope.transaction = pipTransaction('settings.verify_email', $scope);
-        $scope.onAbort = onAbort;
-        $scope.onRequestVerificationClick = onRequestVerificationClick;
-        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
-        $scope.onVerify = onVerify;
-        $scope.onCancel = onCancel;
-        function onAbort() {
-            $scope.transaction.abort();
-        }
-        function onCancel() {
-            $mdDialog.cancel();
-        }
-        function onRequestVerificationClick() {
-            var tid = $scope.transaction.begin('RequestEmailVerification');
-            pipDataUser.requestEmailVerification({}, function (result) {
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-            }, function (error) {
-                $scope.transaction.end(error);
-            });
-        }
-        function onVerify() {
-            $scope.form.$setSubmitted();
-            if ($scope.form.$invalid) {
-                return;
-            }
-            var tid = $scope.transaction.begin('Verifying');
-            pipDataUser.verifyEmail({
-                email: $scope.data.email,
-                code: $scope.data.code
-            }, function (verifyData) {
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-                $mdDialog.hide(true);
-            }, function (error) {
-                $scope.transaction.end(error);
-                pipFormErrors.setFormError($scope.form, error, {
-                    1106: 'email',
-                    1103: 'code'
-                });
-            });
-        }
-    }]);
-})();
+},{}]},{},[2,3,1,5,6,7,8,9,4,10])
 
 
 
 
-
-(function(module) {
-try {
-  module = angular.module('pipHelp.Templates');
-} catch (e) {
-  module = angular.module('pipHelp.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('help_page/help_page.html',
-    '<!--\n' +
-    '@file Help page\n' +
-    '@copyright Digital Living Software Corp. 2014-2016\n' +
-    '-->\n' +
-    '\n' +
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar>\n' +
-    '\n' +
-    '<pip-document width="800" min-height="400">\n' +
-    '    <div class="pip-menu-container pip-help"\n' +
-    '         ng-if="manager !== false">\n' +
-    '        <md-list class="pip-menu pip-simple-list hide-xs"\n' +
-    '                 pip-selected="selected.tabIndex"\n' +
-    '                 pip-selected-watch="selected.navId"\n' +
-    '                 pip-select="onNavigationSelect($event.id)">\n' +
-    '            <md-list-item class="pip-simple-list-item pip-selectable"\n' +
-    '                          ng-repeat="tab in tabs track by tab.state"\n' +
-    '                          md-ink-ripple\n' +
-    '                          pip-id="{{::tab.state }}">\n' +
-    '                <p> {{::tab.title | translate}} </p>\n' +
-    '            </md-list-item>\n' +
-    '        </md-list>\n' +
-    '\n' +
-    '        <div class="pip-content-container">\n' +
-    '            <pip-dropdown class="hide-gt-xs"\n' +
-    '                          pip-actions="tabs"\n' +
-    '                          pip-dropdown-select="onDropdownSelect"\n' +
-    '                          pip-active-index="selected.tabIndex"></pip-dropdown>\n' +
-    '            <div class="pip-body layout-column flex" ui-view></div>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '    <div class="layout-column layout-align-center-center flex"\n' +
-    '         ng-if="manager === false">\n' +
-    '        {{::\'ERROR_400\' | translate}}\n' +
-    '    </div>\n' +
-    '</pip-document>');
-}]);
-})();
-
-
-
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipHelp', [
@@ -11540,7 +11437,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipHelp.Page'
     ]);
 })();
-
+},{}],2:[function(require,module,exports){
 (function () {
     'use strict';
     config.$inject = ['$stateProvider'];
@@ -11597,7 +11494,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }
 })();
-
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipHelp.Service', ['ui.router'])
@@ -11675,7 +11572,56 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
+},{}],4:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipHelp.Templates');
+} catch (e) {
+  module = angular.module('pipHelp.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('help_page/help_page.html',
+    '<!--\n' +
+    '@file Help page\n' +
+    '@copyright Digital Living Software Corp. 2014-2016\n' +
+    '-->\n' +
+    '\n' +
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar>\n' +
+    '\n' +
+    '<pip-document width="800" min-height="400">\n' +
+    '    <div class="pip-menu-container pip-help"\n' +
+    '         ng-if="manager !== false">\n' +
+    '        <md-list class="pip-menu pip-simple-list hide-xs"\n' +
+    '                 pip-selected="selected.tabIndex"\n' +
+    '                 pip-selected-watch="selected.navId"\n' +
+    '                 pip-select="onNavigationSelect($event.id)">\n' +
+    '            <md-list-item class="pip-simple-list-item pip-selectable"\n' +
+    '                          ng-repeat="tab in tabs track by tab.state"\n' +
+    '                          md-ink-ripple\n' +
+    '                          pip-id="{{::tab.state }}">\n' +
+    '                <p> {{::tab.title | translate}} </p>\n' +
+    '            </md-list-item>\n' +
+    '        </md-list>\n' +
+    '\n' +
+    '        <div class="pip-content-container">\n' +
+    '            <pip-dropdown class="hide-gt-xs"\n' +
+    '                          pip-actions="tabs"\n' +
+    '                          pip-dropdown-select="onDropdownSelect"\n' +
+    '                          pip-active-index="selected.tabIndex"></pip-dropdown>\n' +
+    '            <div class="pip-body layout-column flex" ui-view></div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="layout-column layout-align-center-center flex"\n' +
+    '         ng-if="manager === false">\n' +
+    '        {{::\'ERROR_400\' | translate}}\n' +
+    '    </div>\n' +
+    '</pip-document>');
+}]);
+})();
 
+
+
+},{}]},{},[2,3,1,4])
 
 
 
