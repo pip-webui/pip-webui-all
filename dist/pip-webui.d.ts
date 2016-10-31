@@ -430,13 +430,13 @@ export class NavService implements INavService {
     navMenu: any;
 }
 
-
-
-
-
-
-
 var thisModule: ng.IModule;
+
+
+
+
+
+
 
 
 
@@ -483,7 +483,6 @@ export class BreadcrumbItem {
     title: string;
     click: (item: BreadcrumbItem) => void;
     constructor(title?: string, click?: (item: BreadcrumbItem) => void);
-    withClick(click: (item: BreadcrumbItem) => void): BreadcrumbItem;
 }
 export class BreadcrumbConfig {
     text: string;
