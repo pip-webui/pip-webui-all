@@ -1,8 +1,30 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).services = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-},{}],2:[function(require,module,exports){
-
-},{}],3:[function(require,module,exports){
+'use strict';
+require('./translate/TranslateModule');
+require('./session/SessionModule');
+require('./transactions/TransactionModule');
+require('./routing/RoutingModule');
+require('./utilities/Format');
+require('./utilities/TimerService');
+require('./utilities/ScrollService');
+require('./utilities/Tags');
+require('./utilities/Codes');
+require('./utilities/SystemInfo');
+require('./utilities/PageResetService');
+angular.module('pipServices', [
+    'pipTranslate',
+    'pipSession',
+    'pipTransaction',
+    'pipRouting',
+    'pipFormat',
+    'pipTimer',
+    'pipScroll',
+    'pipTags',
+    'pipCodes',
+    'pipSystemInfo',
+    'pipPageReset'
+]);
+},{"./routing/RoutingModule":5,"./session/SessionModule":7,"./transactions/TransactionModule":11,"./translate/TranslateModule":16,"./utilities/Codes":19,"./utilities/Format":20,"./utilities/PageResetService":21,"./utilities/ScrollService":22,"./utilities/SystemInfo":23,"./utilities/Tags":24,"./utilities/TimerService":25}],2:[function(require,module,exports){
 'use strict';
 captureStateTranslations.$inject = ['$rootScope'];
 decorateBackStateService.$inject = ['$delegate', '$window'];
@@ -46,22 +68,22 @@ function addBackStateDecorator($provide) {
     $provide.decorator('$state', decorateBackStateService);
 }
 angular
-    .module('pipRouting.Back', [])
+    .module('pipRouting')
     .config(addBackStateDecorator)
     .run(captureStateTranslations);
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 decorateRedirectStateProvider.$inject = ['$delegate'];
 addRedirectStateProviderDecorator.$inject = ['$provide'];
 decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
 addRedirectStateDecorator.$inject = ['$provide'];
-exports.RedirectedStates = {};
+var RedirectedStates = {};
 function decorateRedirectStateProvider($delegate) {
     "ngInject";
     $delegate.redirect = redirect;
     return $delegate;
     function redirect(fromState, toState) {
-        exports.RedirectedStates[fromState] = toState;
+        RedirectedStates[fromState] = toState;
         return this;
     }
 }
@@ -74,7 +96,7 @@ function decorateRedirectStateService($delegate, $timeout) {
     $delegate.redirect = redirect;
     return $delegate;
     function redirect(event, state, params) {
-        var toState = exports.RedirectedStates[state.name];
+        var toState = RedirectedStates[state.name];
         if (_.isFunction(toState)) {
             toState = toState(state.name, params);
             if (_.isNull(toState))
@@ -95,19 +117,14 @@ function addRedirectStateDecorator($provide) {
     $provide.decorator('$state', decorateRedirectStateService);
 }
 angular
-    .module('pipRouting.Redirect', ['ui.router'])
+    .module('pipRouting')
     .config(addRedirectStateProviderDecorator)
     .config(addRedirectStateDecorator);
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 'use strict';
-angular.module('pipRouting', [
-    'ui.router', 'pipRouting.Events', 'pipRouting.Back', 'pipRouting.Redirect'
-]);
-},{}],6:[function(require,module,exports){
-'use strict';
-hookRoutingEvents.$inject = ['$log', '$rootScope', '$state'];
+hookRoutingEvents.$inject = ['$rootScope', '$log', '$state'];
 exports.RoutingVar = "$routing";
-function hookRoutingEvents($log, $rootScope, $state) {
+function hookRoutingEvents($rootScope, $log, $state) {
     "ngInject";
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         $rootScope[exports.RoutingVar] = true;
@@ -119,8 +136,6 @@ function hookRoutingEvents($log, $rootScope, $state) {
         $rootScope[exports.RoutingVar] = false;
         $log.error('Error while switching route to ' + toState.name);
         $log.error(error);
-        console.error('Error while switching route to ' + toState.name);
-        console.error(error);
     });
     $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
         event.preventDefault();
@@ -135,248 +150,24 @@ function hookRoutingEvents($log, $rootScope, $state) {
     });
 }
 angular
-    .module('pipRouting.Events', [])
+    .module('pipRouting')
     .run(hookRoutingEvents);
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
-angular.module('pipScope', ['pipTranslate', 'pipScope.Error', 'pipScope.Transaction']);
-angular.module('pipTransactions', ['pipScope']);
-},{}],8:[function(require,module,exports){
-'use strict';
-var thisModule = angular.module('pipScope.Error', []);
-thisModule.factory('pipError', ['$rootScope', function ($rootScope) {
-    $rootScope.errors = {};
-    return createError;
-    function initError(scope) {
-        $rootScope.errors[scope] = {
-            message: undefined,
-            code: undefined,
-            details: undefined
-        };
-    }
-    ;
-    function errorMessage(error) {
-        if (_.isNull(error)) {
-            return null;
-        }
-        if (error.message) {
-            return error.message;
-        }
-        if (error.data) {
-            if (error.data.code) {
-                return 'ERROR_' + error.data.code;
-            }
-            if (error.data.message) {
-                return error.data.message;
-            }
-        }
-        if (error.statusText) {
-            return error.statusText;
-        }
-        if (error.status) {
-            return 'ERROR_' + error.status;
-        }
-        return error.data ? error.data : error;
-    }
-    ;
-    function errorCode(error) {
-        if (_.isNull(error)) {
-            return null;
-        }
-        if (error.data && error.data.code) {
-            return error.data.code;
-        }
-        if (error.status) {
-            return error.status;
-        }
-        return null;
-    }
-    ;
-    function errorDetails(error) {
-        return error && error.data ? error.data : error;
-    }
-    ;
-    function createError(scope, scopeObject) {
-        scope = scope || 'global';
-        var error = {
-            reset: function () {
-                initError(scope);
-            },
-            empty: function () {
-                var error = $rootScope.errors[scope];
-                return _.isNull(error) || (_.isNull(error.message) && _.isNull(error.code));
-            },
-            get: function () {
-                if ($rootScope.errors[scope]) {
-                    return $rootScope.errors[scope];
-                }
-                return '';
-            },
-            message: function () {
-                if ($rootScope.errors[scope]) {
-                    return $rootScope.errors[scope].message;
-                }
-                return null;
-            },
-            code: function () {
-                if ($rootScope.errors[scope]) {
-                    return $rootScope.errors[scope].code;
-                }
-                return null;
-            },
-            details: function () {
-                if ($rootScope.errors[scope]) {
-                    return $rootScope.errors[scope].details;
-                }
-                return null;
-            },
-            set: function (error) {
-                if (error) {
-                    $rootScope.errors[scope] = {
-                        message: errorMessage(error),
-                        code: errorCode(error),
-                        details: errorDetails(error)
-                    };
-                    console.error($rootScope.errors[scope]);
-                }
-                else {
-                    initError(scope);
-                }
-            }
-        };
-        if (_.isObject(scopeObject))
-            scopeObject.error = error;
-        return error;
-    }
-    ;
-}]);
-},{}],9:[function(require,module,exports){
-'use strict';
-var thisModule = angular.module('pipScope.Transaction', ['pipTranslate']);
-thisModule.run(['$injector', function ($injector) {
-    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-    if (pipTranslate) {
-        pipTranslate.setTranslations('en', {
-            'ENTERING': 'Entering...',
-            'PROCESSING': 'Processing...',
-            'LOADING': 'Loading...',
-            'SAVING': 'Saving...'
-        });
-        pipTranslate.setTranslations('ru', {
-            'ENTERING': 'Вход в систему...',
-            'PROCESSING': 'Обрабатывается...',
-            'LOADING': 'Загружается...',
-            'SAVING': 'Сохраняется...'
-        });
-    }
-}]);
-thisModule.factory('pipTransaction', ['$rootScope', 'pipError', function ($rootScope, pipError) {
-    $rootScope.transactions = {};
-    return createTransaction;
-    function initTransaction(scope) {
-        $rootScope.transactions[scope] = {
-            id: undefined,
-            operation: undefined
-        };
-    }
-    function createTransaction(scope, scopeObject) {
-        scope = scope || 'global';
-        var error = pipError(scope);
-        var transaction = {
-            error: error,
-            reset: function () {
-                initTransaction("");
-                error.reset();
-            },
-            busy: function () {
-                var transaction = $rootScope.transactions[scope];
-                return transaction != null && transaction.id;
-            },
-            failed: function () {
-                return !error.empty();
-            },
-            aborted: function (id) {
-                var transaction = $rootScope.transactions[scope];
-                return _.isNull(transaction) || transaction.id != id;
-            },
-            get: function () {
-                if (_.isNull($rootScope.transactions[scope])) {
-                    initTransaction(scope);
-                }
-                return $rootScope.transactions[scope];
-            },
-            id: function () {
-                var transaction = $rootScope.transactions[scope];
-                return transaction ? transaction.id : null;
-            },
-            operation: function () {
-                var transaction = $rootScope.transactions[scope];
-                return transaction ? transaction.operation : null;
-            },
-            errorMessage: function () {
-                return error.message();
-            },
-            begin: function (operation) {
-                var transaction = $rootScope.transactions[scope];
-                if (transaction != null && transaction.id) {
-                    return null;
-                }
-                transaction = $rootScope.transactions[scope] = {
-                    id: new Date().getTime(),
-                    operation: operation || 'PROCESSING'
-                };
-                error.reset();
-                return transaction.id;
-            },
-            abort: function () {
-                var transaction = $rootScope.transactions[scope];
-                if (transaction) {
-                    transaction.id = null;
-                }
-                error.reset();
-            },
-            end: function (err) {
-                if (err)
-                    error.set(err);
-                else
-                    error.reset();
-                var transaction = $rootScope.transactions[scope];
-                if (transaction != null) {
-                    transaction.id = null;
-                }
-            }
-        };
-        if (_.isObject(scopeObject)) {
-            scopeObject.error = error;
-            scopeObject.transaction = transaction;
-        }
-        return transaction;
-    }
-}]);
-},{}],10:[function(require,module,exports){
-'use strict';
-angular.module('pipServices', [
-    'pipScope',
-    'pipTranslate',
-    'pipRouting',
-    'pipTimer',
-    'pipSession',
-    'pipIdentity',
-    'pipSystemInfo',
-    'pipFormat',
-    'pipScroll',
-    'pipPageReset',
-    'pipTags'
-]);
-},{}],11:[function(require,module,exports){
+angular.module('pipRouting', ['ui.router']);
+require('./BackDecorator');
+require('./RedirectDecorator');
+require('./RoutingEvents');
+},{"./BackDecorator":2,"./RedirectDecorator":3,"./RoutingEvents":4}],6:[function(require,module,exports){
 'use strict';
 exports.IdentityRootVar = "$identity";
 exports.IdentityChangedEvent = "pipIdentityChanged";
 var IdentityService = (function () {
-    function IdentityService(setRootVar, identity, $rootScope) {
+    function IdentityService(setRootVar, identity, $rootScope, $log) {
         this._setRootVar = setRootVar;
         this._identity = identity;
         this._rootScope = $rootScope;
+        this._log = $log;
         this.setRootVar();
     }
     IdentityService.prototype.setRootVar = function () {
@@ -390,7 +181,9 @@ var IdentityService = (function () {
         set: function (value) {
             this._identity = value;
             this.setRootVar();
-            this._rootScope.$broadcast(exports.IdentityChangedEvent, this._identity);
+            this._rootScope.$emit(exports.IdentityChangedEvent, this._identity);
+            var identity = value || {};
+            this._log.debug("Changed identity to " + identity.id + " " + identity.full_name);
         },
         enumerable: true,
         configurable: true
@@ -423,27 +216,33 @@ var IdentityProvider = (function () {
         enumerable: true,
         configurable: true
     });
-    IdentityProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+    IdentityProvider.prototype.$get = ['$rootScope', '$log', function ($rootScope, $log) {
         "ngInject";
         if (this._service == null)
-            this._service = new IdentityService(this._setRootVar, this._identity, $rootScope);
+            this._service = new IdentityService(this._setRootVar, this._identity, $rootScope, $log);
         return this._service;
     }];
     return IdentityProvider;
 }());
 angular
-    .module('pipIdentity', [])
+    .module('pipSession')
     .provider('pipIdentity', IdentityProvider);
-},{}],12:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
+'use strict';
+angular.module('pipSession', []);
+require('./IdentityService');
+require('./SessionService');
+},{"./IdentityService":6,"./SessionService":8}],8:[function(require,module,exports){
 'use strict';
 exports.SessionRootVar = "$session";
 exports.SessionOpenedEvent = "pipSessionOpened";
 exports.SessionClosedEvent = "pipSessionClosed";
 var SessionService = (function () {
-    function SessionService(setRootVar, session, $rootScope) {
+    function SessionService(setRootVar, session, $rootScope, $log) {
         this._setRootVar = setRootVar;
         this._session = session;
         this._rootScope = $rootScope;
+        this._log = $log;
         this.setRootVar();
     }
     SessionService.prototype.setRootVar = function () {
@@ -457,13 +256,9 @@ var SessionService = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(SessionService.prototype, "isOpened", {
-        get: function () {
-            return this._session != null;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    SessionService.prototype.isOpened = function () {
+        return this._session != null;
+    };
     SessionService.prototype.open = function (session, fullReset, partialReset) {
         if (fullReset === void 0) { fullReset = false; }
         if (partialReset === void 0) { partialReset = false; }
@@ -471,7 +266,8 @@ var SessionService = (function () {
             throw new Error("Session cannot be null");
         this._session = session;
         this.setRootVar();
-        this._rootScope.$broadcast(exports.SessionOpenedEvent, session);
+        this._rootScope.$emit(exports.SessionOpenedEvent, session);
+        this._log.debug("Opened session " + session);
     };
     SessionService.prototype.close = function (fullReset, partialReset) {
         if (fullReset === void 0) { fullReset = false; }
@@ -479,7 +275,8 @@ var SessionService = (function () {
         var oldSession = this._session;
         this._session = null;
         this.setRootVar();
-        this._rootScope.$broadcast(exports.SessionClosedEvent, oldSession);
+        this._rootScope.$emit(exports.SessionClosedEvent, oldSession);
+        this._log.debug("Closed session " + oldSession);
     };
     return SessionService;
 }());
@@ -509,26 +306,217 @@ var SessionProvider = (function () {
         enumerable: true,
         configurable: true
     });
-    SessionProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+    SessionProvider.prototype.$get = ['$rootScope', '$log', function ($rootScope, $log) {
         "ngInject";
         if (this._service == null)
-            this._service = new SessionService(this._setRootVar, this._session, $rootScope);
+            this._service = new SessionService(this._setRootVar, this._session, $rootScope, $log);
         return this._service;
     }];
     return SessionProvider;
 }());
-angular.module('pipSession', ['pipPageReset'])
+angular
+    .module('pipSession')
     .provider('pipSession', SessionProvider);
-},{}],13:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
-angular.module('pipTranslate', [
-    'LocalStorageModule', 'pipTranslate.Service', 'pipTranslate.Filter', 'pipTranslate.Directive'
-]);
+var TransactionError_1 = require('./TransactionError');
+var Transaction = (function () {
+    function Transaction(scope) {
+        this._scope = null;
+        this._id = null;
+        this._operation = null;
+        this._error = new TransactionError_1.TransactionError();
+        this._progress = 0;
+        this._scope = scope;
+    }
+    Object.defineProperty(Transaction.prototype, "scope", {
+        get: function () {
+            return this._scope;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Transaction.prototype, "id", {
+        get: function () {
+            return this._id;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Transaction.prototype, "operation", {
+        get: function () {
+            return this._operation;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Transaction.prototype, "progress", {
+        get: function () {
+            return this._progress;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Transaction.prototype, "error", {
+        get: function () {
+            return this._error;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Transaction.prototype, "errorMessage", {
+        get: function () {
+            return this._error.message;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Transaction.prototype.reset = function () {
+        this._id = null;
+        this._operation = null;
+        this._progress = 0;
+        this._error.reset();
+    };
+    Transaction.prototype.busy = function () {
+        return this._id != null;
+    };
+    Transaction.prototype.failed = function () {
+        return !this._error.empty();
+    };
+    Transaction.prototype.aborted = function (id) {
+        return this._id != id;
+    };
+    Transaction.prototype.begin = function (operation) {
+        if (this._id != null)
+            return null;
+        this._id = new Date().getTime().toString();
+        this._operation = operation || 'PROCESSING';
+        this._error.reset();
+        return this._id;
+    };
+    Transaction.prototype.update = function (progress) {
+        this._progress = Math.max(progress, 100);
+    };
+    Transaction.prototype.abort = function () {
+        this._id = null;
+        this._error.reset();
+    };
+    Transaction.prototype.end = function (error) {
+        this._error.decode(error);
+        this._id = null;
+    };
+    return Transaction;
+}());
+exports.Transaction = Transaction;
+},{"./TransactionError":10}],10:[function(require,module,exports){
+'use strict';
+var TransactionError = (function () {
+    function TransactionError(error) {
+        if (error != null)
+            this.decode(error);
+    }
+    TransactionError.prototype.reset = function () {
+        this.code = null;
+        this.message = null;
+        this.details = null;
+        this.cause = null;
+        this.stack_trace = null;
+    };
+    TransactionError.prototype.empty = function () {
+        return this.message = null && this.code == null;
+    };
+    TransactionError.prototype.decode = function (error) {
+        this.reset();
+        if (error == null)
+            return;
+        if (error.message)
+            this.message = error.message;
+        if (error.data) {
+            if (error.data.code) {
+                this.message = this.message || 'ERROR_' + error.data.code;
+                this.code = this.code || error.data.code;
+            }
+            if (error.data.message)
+                this.message = this.message || error.data.message;
+            this.message = this.message || error.data;
+            this.details = this.details || error.data;
+            this.cause = error.data.cause;
+            this.stack_trace = error.data.stack_trace;
+            this.details = error.data.details;
+        }
+        if (error.statusText)
+            this.message = this.message || error.statusText;
+        if (error.status) {
+            this.message = this.message || 'ERROR_' + error.status;
+            this.code = this.code || error.status;
+        }
+        this.message = this.message || error;
+        this.details = this.details || error;
+    };
+    return TransactionError;
+}());
+exports.TransactionError = TransactionError;
+},{}],11:[function(require,module,exports){
+'use strict';
+angular.module('pipTransaction', []);
+require('./TransactionStrings');
+require('./TransactionService');
+},{"./TransactionService":12,"./TransactionStrings":13}],12:[function(require,module,exports){
+'use strict';
+var Transaction_1 = require('./Transaction');
+var TransactionService = (function () {
+    function TransactionService() {
+        this._transactions = {};
+    }
+    TransactionService.prototype.create = function (scope) {
+        var transaction = new Transaction_1.Transaction(scope);
+        if (scope != null)
+            this._transactions[scope] = transaction;
+        return transaction;
+    };
+    TransactionService.prototype.get = function (scope) {
+        var transaction = scope != null ? this._transactions[scope] : null;
+        if (transaction == null) {
+            transaction = new Transaction_1.Transaction(scope);
+            if (scope != null)
+                this._transactions[scope] = transaction;
+        }
+        return transaction;
+    };
+    return TransactionService;
+}());
+angular
+    .module('pipTransaction')
+    .service('pipTransaction', TransactionService);
+},{"./Transaction":9}],13:[function(require,module,exports){
+'use strict';
+configureTransactionStrings.$inject = ['$injector'];
+function configureTransactionStrings($injector) {
+    "ngInject";
+    var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
+    if (pipTranslate) {
+        pipTranslate.setTranslations('en', {
+            'ENTERING': 'Entering...',
+            'PROCESSING': 'Processing...',
+            'LOADING': 'Loading...',
+            'SAVING': 'Saving...'
+        });
+        pipTranslate.setTranslations('ru', {
+            'ENTERING': 'Вход в систему...',
+            'PROCESSING': 'Обрабатывается...',
+            'LOADING': 'Загружается...',
+            'SAVING': 'Сохраняется...'
+        });
+    }
+}
+angular
+    .module('pipTransaction')
+    .config(configureTransactionStrings);
 },{}],14:[function(require,module,exports){
 'use strict';
-pipTranslateDirective.$inject = ['pipTranslate'];
-pipTranslateHtmlDirective.$inject = ['pipTranslate'];
-function pipTranslateDirective(pipTranslate) {
+translateDirective.$inject = ['pipTranslate'];
+translateHtmlDirective.$inject = ['pipTranslate'];
+function translateDirective(pipTranslate) {
     "ngInject";
     return {
         restrict: 'EA',
@@ -543,7 +531,7 @@ function pipTranslateDirective(pipTranslate) {
         }
     };
 }
-function pipTranslateHtmlDirective(pipTranslate) {
+function translateHtmlDirective(pipTranslate) {
     "ngInject";
     return {
         restrict: 'EA',
@@ -559,9 +547,9 @@ function pipTranslateHtmlDirective(pipTranslate) {
     };
 }
 angular
-    .module('pipTranslate.Directive', [])
-    .directive('pipTranslate', pipTranslateDirective)
-    .directive('pipTranslateHtml', pipTranslateHtmlDirective);
+    .module('pipTranslate')
+    .directive('pipTranslate', translateDirective)
+    .directive('pipTranslateHtml', translateHtmlDirective);
 },{}],15:[function(require,module,exports){
 'use strict';
 translateFilter.$inject = ['pipTranslate'];
@@ -581,17 +569,134 @@ function optionalTranslateFilter($injector) {
     };
 }
 angular
-    .module('pipTranslate.Filter', [])
+    .module('pipTranslate')
     .filter('translate', translateFilter);
 },{}],16:[function(require,module,exports){
+'use strict';
+angular.module('pipTranslate', []);
+require('./TranslateService');
+require('./TranslateFilter');
+require('./TranslateDirective');
+},{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":17}],17:[function(require,module,exports){
 'use strict';
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Translation_1 = require('./Translation');
+var PageResetService_1 = require('../utilities/PageResetService');
 exports.LanguageRootVar = "$language";
 exports.LanguageChangedEvent = "pipLanguageChanged";
+var TranslateService = (function () {
+    function TranslateService(translation, setRootVar, persist, $rootScope, $log, $window) {
+        this._setRootVar = setRootVar;
+        this._persist = persist;
+        this._translation = translation;
+        this._rootScope = $rootScope;
+        this._log = $log;
+        this._window = $window;
+        if (this._persist && this._window.localStorage)
+            this._translation.language = this._window.localStorage.getItem('language') || this._translation.language;
+        this._log.debug("Set language to " + this._translation.language);
+        this.save();
+    }
+    TranslateService.prototype.save = function () {
+        if (this._setRootVar)
+            this._rootScope[exports.LanguageRootVar] = this._translation.language;
+        if (this._persist && this._window.localStorage != null)
+            this._window.localStorage.setItem('language', this._translation.language);
+    };
+    Object.defineProperty(TranslateService.prototype, "language", {
+        get: function () {
+            return this._translation.language;
+        },
+        set: function (value) {
+            if (value != this._translation.language) {
+                this._translation.language = value;
+                this._log.debug("Changing language to " + value);
+                this.save();
+                this._rootScope.$emit(exports.LanguageChangedEvent, value);
+                this._rootScope.$emit(PageResetService_1.ResetPageEvent);
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TranslateService.prototype.use = function (language) {
+        if (language != null)
+            this.language = language;
+        return this.language;
+    };
+    TranslateService.prototype.setTranslations = function (language, translations) {
+        return this._translation.setTranslations(language, translations);
+    };
+    TranslateService.prototype.translations = function (language, translations) {
+        return this._translation.setTranslations(language, translations);
+    };
+    TranslateService.prototype.translate = function (key) {
+        return this._translation.translate(key);
+    };
+    TranslateService.prototype.translateArray = function (keys) {
+        return this._translation.translateArray(keys);
+    };
+    TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
+        return this._translation.translateSet(keys, keyProp, valueProp);
+    };
+    TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
+        return this._translation.translateObjects(items, keyProp, valueProp);
+    };
+    TranslateService.prototype.translateWithPrefix = function (prefix, key) {
+        return this._translation.translateWithPrefix(prefix, key);
+    };
+    TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
+        return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
+    };
+    TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
+        return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
+    };
+    return TranslateService;
+}());
+var TranslateProvider = (function (_super) {
+    __extends(TranslateProvider, _super);
+    function TranslateProvider() {
+        _super.call(this);
+        this._setRootVar = true;
+        this._persist = true;
+    }
+    Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
+        get: function () {
+            return this._setRootVar;
+        },
+        set: function (value) {
+            this._setRootVar = !!value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TranslateProvider.prototype, "persist", {
+        get: function () {
+            return this._persist;
+        },
+        set: function (value) {
+            this._persist = !!value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TranslateProvider.prototype.$get = ['$rootScope', '$log', '$window', function ($rootScope, $log, $window) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, $log, $window);
+        return this._service;
+    }];
+    return TranslateProvider;
+}(Translation_1.Translation));
+angular
+    .module('pipTranslate')
+    .provider('pipTranslate', TranslateProvider);
+},{"../utilities/PageResetService":21,"./Translation":18}],18:[function(require,module,exports){
+'use strict';
 var Translation = (function () {
     function Translation() {
         this._language = 'en';
@@ -628,6 +733,9 @@ var Translation = (function () {
     Translation.prototype.setTranslations = function (language, translations) {
         var map = this._translations[language] || {};
         this._translations[language] = _.extend(map, translations);
+    };
+    Translation.prototype.translations = function (language, translations) {
+        this.setTranslations(language, translations);
     };
     Translation.prototype.translate = function (key) {
         if (_.isNull(key) || _.isUndefined(key))
@@ -720,142 +828,43 @@ var Translation = (function () {
     };
     return Translation;
 }());
-var TranslateService = (function () {
-    function TranslateService(translation, setRootVar, persist, $rootScope, localStorageService) {
-        this._setRootVar = setRootVar;
-        this._persist = persist;
-        this._translation = translation;
-        this._rootScope = $rootScope;
-        this._storage = localStorageService;
-        if (this._persist) {
-            this._translation.language = localStorageService.get('language')
-                || this._translation.language;
-        }
-        this.save();
-    }
-    TranslateService.prototype.save = function () {
-        if (this._setRootVar)
-            this._rootScope[exports.LanguageRootVar] = this._translation.language;
-        if (this._persist)
-            this._storage.set('language', this._translation.language);
-    };
-    Object.defineProperty(TranslateService.prototype, "language", {
-        get: function () {
-            return this._translation.language;
-        },
-        set: function (value) {
-            if (value != this._translation.language) {
-                this._translation.language = value;
-                this.save();
-                this._rootScope.$broadcast(exports.LanguageChangedEvent, value);
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    TranslateService.prototype.use = function (language) {
-        if (language != null)
-            this.language = language;
-        return this.language;
-    };
-    TranslateService.prototype.setTranslations = function (language, translations) {
-        return this._translation.setTranslations(language, translations);
-    };
-    TranslateService.prototype.translate = function (key) {
-        return this._translation.translate(key);
-    };
-    TranslateService.prototype.translateArray = function (keys) {
-        return this._translation.translateArray(keys);
-    };
-    TranslateService.prototype.translateSet = function (keys, keyProp, valueProp) {
-        return this._translation.translateSet(keys, keyProp, valueProp);
-    };
-    TranslateService.prototype.translateObjects = function (items, keyProp, valueProp) {
-        return this._translation.translateObjects(items, keyProp, valueProp);
-    };
-    TranslateService.prototype.translateWithPrefix = function (prefix, key) {
-        return this._translation.translateWithPrefix(prefix, key);
-    };
-    TranslateService.prototype.translateSetWithPrefix = function (prefix, keys, keyProp, valueProp) {
-        return this._translation.translateSetWithPrefix(prefix, keys, keyProp, valueProp);
-    };
-    TranslateService.prototype.translateSetWithPrefix2 = function (prefix, keys, keyProp, valueProp) {
-        return this._translation.translateSetWithPrefix2(prefix, keys, keyProp, valueProp);
-    };
-    return TranslateService;
-}());
-var TranslateProvider = (function (_super) {
-    __extends(TranslateProvider, _super);
-    function TranslateProvider() {
-        _super.call(this);
-    }
-    Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
-        get: function () {
-            return this._setRootVar;
-        },
-        set: function (value) {
-            this._setRootVar = !!value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TranslateProvider.prototype, "persist", {
-        get: function () {
-            return this._persist;
-        },
-        set: function (value) {
-            this._persist = !!value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    TranslateProvider.prototype.$get = ['$rootScope', 'localStorageService', function ($rootScope, localStorageService) {
-        "ngInject";
-        if (this._service == null)
-            this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, localStorageService);
-        return this._service;
-    }];
-    return TranslateProvider;
-}(Translation));
-angular
-    .module('pipTranslate.Service', [])
-    .provider('pipTranslate', TranslateProvider);
-},{}],17:[function(require,module,exports){
+exports.Translation = Translation;
+},{}],19:[function(require,module,exports){
 'use strict';
-var thisModule = angular.module('pipCodes', []);
-thisModule.factory('pipCodes', function () {
-    return {
-        hash: hash,
-        verification: verification
-    };
-    function hash(value) {
+var Codes = (function () {
+    function Codes() {
+    }
+    Codes.prototype.hash = function (value) {
         if (value == null)
             return 0;
         var result = 0;
-        for (var i = 0; i < value.length; i++) {
+        for (var i = 0; i < value.length; i++)
             result += value.charCodeAt(i);
-        }
         return result;
-    }
-    function verification() {
+    };
+    Codes.prototype.verification = function () {
         return Math.random().toString(36).substr(2, 10).toUpperCase();
-    }
-});
-},{}],18:[function(require,module,exports){
-
-},{}],19:[function(require,module,exports){
+    };
+    return Codes;
+}());
+angular
+    .module('pipCodes', [])
+    .service('pipCodes', Codes);
+},{}],20:[function(require,module,exports){
 'use strict';
-var thisModule = angular.module('pipFormat', []);
-thisModule.factory('pipFormat', function () {
-    function sample(value, maxLength) {
+var Format = (function () {
+    function Format() {
+        this.cache = {};
+    }
+    Format.prototype.sample = function (value, maxLength) {
         if (!value || value == '')
             return '';
         var length = value.indexOf('\n');
         length = length >= 0 ? length : value.length;
         length = length < maxLength ? value.length : maxLength;
         return value.substring(0, length);
-    }
-    function strRepeat(str, qty) {
+    };
+    Format.prototype.strRepeat = function (str, qty) {
         if (qty < 1)
             return '';
         var result = '';
@@ -865,189 +874,190 @@ thisModule.factory('pipFormat', function () {
             qty >>= 1, str += str;
         }
         return result;
-    }
-    var sprintf = (function sprintf() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        function get_type(variable) {
-            return toString.call(variable).slice(8, -1).toLowerCase();
-        }
-        var str_repeat = strRepeat;
-        var str_format = function () {
-            if (!str_format.cache.hasOwnProperty(arguments[0])) {
-                str_format.cache[arguments[0]] = str_format.parse(arguments[0]);
+    };
+    Format.prototype.getType = function (variable) {
+        return toString.call(variable).slice(8, -1).toLowerCase();
+    };
+    Format.prototype.parseFormat = function (fmt) {
+        var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
+        while (_fmt) {
+            if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
+                parse_tree.push(match[0]);
             }
-            return str_format.format.call(null, str_format.cache[arguments[0]], arguments);
-        };
-        str_format.format = function (parse_tree, argv) {
-            var cursor = 1, tree_length = parse_tree.length, node_type = '', arg, output = [], i, k, match, pad, pad_character, pad_length;
-            for (i = 0; i < tree_length; i++) {
-                node_type = get_type(parse_tree[i]);
-                if (node_type === 'string') {
-                    output.push(parse_tree[i]);
-                }
-                else if (node_type === 'array') {
-                    match = parse_tree[i];
-                    if (match[2]) {
-                        arg = argv[cursor];
-                        for (k = 0; k < match[2].length; k++) {
-                            if (!arg.hasOwnProperty(match[2][k])) {
-                                throw new Error(sprintf('[_.sprintf] property "%s" does not exist', match[2][k]));
+            else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
+                parse_tree.push('%');
+            }
+            else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
+                if (match[2]) {
+                    arg_names |= 1;
+                    var field_list = [], replacement_field = match[2], field_match = [];
+                    if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+                        field_list.push(field_match[1]);
+                        while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
+                            if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
+                                field_list.push(field_match[1]);
                             }
-                            arg = arg[match[2][k]];
-                        }
-                    }
-                    else if (match[1]) {
-                        arg = argv[match[1]];
-                    }
-                    else {
-                        arg = argv[cursor++];
-                    }
-                    if (/[^s]/.test(match[8]) && (get_type(arg) != 'number')) {
-                        throw new Error(sprintf('[_.sprintf] expecting number but found %s', get_type(arg)));
-                    }
-                    switch (match[8]) {
-                        case 'b':
-                            arg = arg.toString(2);
-                            break;
-                        case 'c':
-                            arg = String.fromCharCode(arg);
-                            break;
-                        case 'd':
-                            arg = parseInt(arg, 10);
-                            break;
-                        case 'e':
-                            arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential();
-                            break;
-                        case 'f':
-                            arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg);
-                            break;
-                        case 'o':
-                            arg = arg.toString(8);
-                            break;
-                        case 's':
-                            arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg);
-                            break;
-                        case 'u':
-                            arg = Math.abs(arg);
-                            break;
-                        case 'x':
-                            arg = arg.toString(16);
-                            break;
-                        case 'X':
-                            arg = arg.toString(16).toUpperCase();
-                            break;
-                    }
-                    arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+' + arg : arg);
-                    pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
-                    pad_length = match[6] - String(arg).length;
-                    pad = match[6] ? str_repeat(pad_character, pad_length) : '';
-                    output.push(match[5] ? arg + pad : pad + arg);
-                }
-            }
-            return output.join('');
-        };
-        str_format.cache = {};
-        str_format.parse = function (fmt) {
-            var _fmt = fmt, match = [], parse_tree = [], arg_names = 0;
-            while (_fmt) {
-                if ((match = /^[^\x25]+/.exec(_fmt)) !== null) {
-                    parse_tree.push(match[0]);
-                }
-                else if ((match = /^\x25{2}/.exec(_fmt)) !== null) {
-                    parse_tree.push('%');
-                }
-                else if ((match = /^\x25(?:([1-9]\d*)\$|\(([^\)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-fosuxX])/.exec(_fmt)) !== null) {
-                    if (match[2]) {
-                        arg_names |= 1;
-                        var field_list = [], replacement_field = match[2], field_match = [];
-                        if ((field_match = /^([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-                            field_list.push(field_match[1]);
-                            while ((replacement_field = replacement_field.substring(field_match[0].length)) !== '') {
-                                if ((field_match = /^\.([a-z_][a-z_\d]*)/i.exec(replacement_field)) !== null) {
-                                    field_list.push(field_match[1]);
-                                }
-                                else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
-                                    field_list.push(field_match[1]);
-                                }
-                                else {
-                                    throw new Error('[_.sprintf] huh?');
-                                }
+                            else if ((field_match = /^\[(\d+)\]/.exec(replacement_field)) !== null) {
+                                field_list.push(field_match[1]);
+                            }
+                            else {
+                                throw new Error('Unknown error');
                             }
                         }
-                        else {
-                            throw new Error('[_.sprintf] huh?');
-                        }
-                        match[2] = field_list;
                     }
                     else {
-                        arg_names |= 2;
+                        throw new Error('Unknown error');
                     }
-                    if (arg_names === 3) {
-                        throw new Error('[_.sprintf] mixing positional and named placeholders is not (yet) supported');
-                    }
-                    parse_tree.push(match);
+                    match[2] = field_list;
                 }
                 else {
-                    throw new Error('[_.sprintf] huh?');
+                    arg_names |= 2;
                 }
-                _fmt = _fmt.substring(match[0].length);
+                if (arg_names === 3) {
+                    throw new Error('Mixing positional and named placeholders is not (yet) supported');
+                }
+                parse_tree.push(match);
             }
-            return parse_tree;
-        };
-        return str_format;
-    })();
-    return {
-        sprintf: sprintf,
-        format: sprintf,
-        sample: sample
+            else {
+                throw new Error('Unknown error');
+            }
+            _fmt = _fmt.substring(match[0].length);
+        }
+        return parse_tree;
     };
-});
-},{}],20:[function(require,module,exports){
-
+    Format.prototype.format = function (parse_tree, argv) {
+        var cursor = 0;
+        var tree_length = parse_tree.length;
+        var output = [];
+        for (var i = 0; i < tree_length; i++) {
+            var node_type = this.getType(parse_tree[i]);
+            if (node_type === 'string') {
+                output.push(parse_tree[i]);
+            }
+            else if (node_type === 'array') {
+                var match = parse_tree[i];
+                var arg = void 0;
+                if (match[2]) {
+                    arg = argv[cursor];
+                    for (var k = 0; k < match[2].length; k++) {
+                        if (!arg.hasOwnProperty(match[2][k])) {
+                            throw new Error(this.sprintf('Property "%s" does not exist', match[2][k]));
+                        }
+                        arg = arg[match[2][k]];
+                    }
+                }
+                else if (match[1]) {
+                    arg = argv[match[1]];
+                }
+                else {
+                    arg = argv[cursor++];
+                }
+                if (/[^s]/.test(match[8]) && (this.getType(arg) != 'number')) {
+                    throw new Error(this.sprintf('Expecting number but found %s', this.getType(arg)));
+                }
+                switch (match[8]) {
+                    case 'b':
+                        arg = arg.toString(2);
+                        break;
+                    case 'c':
+                        arg = String.fromCharCode(arg);
+                        break;
+                    case 'd':
+                        arg = parseInt(arg, 10);
+                        break;
+                    case 'e':
+                        arg = match[7] ? arg.toExponential(match[7]) : arg.toExponential();
+                        break;
+                    case 'f':
+                        arg = match[7] ? parseFloat(arg).toFixed(match[7]) : parseFloat(arg);
+                        break;
+                    case 'o':
+                        arg = arg.toString(8);
+                        break;
+                    case 's':
+                        arg = ((arg = String(arg)) && match[7] ? arg.substring(0, match[7]) : arg);
+                        break;
+                    case 'u':
+                        arg = Math.abs(arg);
+                        break;
+                    case 'x':
+                        arg = arg.toString(16);
+                        break;
+                    case 'X':
+                        arg = arg.toString(16).toUpperCase();
+                        break;
+                }
+                arg = (/[def]/.test(match[8]) && match[3] && arg >= 0 ? '+' + arg : arg);
+                var pad_character = match[4] ? match[4] == '0' ? '0' : match[4].charAt(1) : ' ';
+                var pad_length = match[6] - String(arg).length;
+                var pad = match[6] ? this.strRepeat(pad_character, pad_length) : '';
+                output.push(match[5] ? arg + pad : pad + arg);
+            }
+        }
+        return output.join('');
+    };
+    Format.prototype.sprintf = function (message) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
+        if (!this.cache.hasOwnProperty(message))
+            this.cache[message] = this.parseFormat(message);
+        return this.format(this.cache[message], args);
+    };
+    return Format;
+}());
+angular
+    .module('pipFormat', [])
+    .service('pipFormat', Format);
 },{}],21:[function(require,module,exports){
 'use strict';
-var thisModule = angular.module('pipPageReset', []);
-thisModule.factory('pipPageReset', ['$rootScope', '$timeout', function ($rootScope, $timeout) {
-    $rootScope.$on('pipResetPage', resetAll);
-    return {
-        resetPartial: resetPartial,
-        resetFull: resetFull,
-        resetAll: resetAll,
-        reset: reset
+hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
+exports.ResetPageEvent = "pipResetPage";
+exports.ResetAreaEvent = "pipResetArea";
+exports.ResetRootVar = "$reset";
+exports.ResetAreaRootVar = "$resetArea";
+var PageResetService = (function () {
+    PageResetService.$inject = ['$rootScope', '$log', '$timeout'];
+    function PageResetService($rootScope, $log, $timeout) {
+        this._rootScope = $rootScope;
+        this._log = $log;
+        this._timeout = $timeout;
+        $rootScope[exports.ResetRootVar] = false;
+        $rootScope[exports.ResetAreaRootVar] = null;
+    }
+    PageResetService.prototype.reset = function () {
+        this._log.debug("Resetting the entire page");
+        this.performReset(null);
     };
-    function resetPartial() {
-        reset(false, true);
-    }
-    function resetFull() {
-        reset(true, false);
-    }
-    function resetAll() {
-        reset(true, true);
-    }
-    function reset(full, partial) {
-        full = full !== undefined ? !!full : true;
-        partial = partial !== undefined ? !!partial : true;
-        if (full || partial) {
-            $rootScope.$reset = full;
-            $rootScope.$partialReset = partial;
-            $timeout(function () {
-                $rootScope.$reset = false;
-                $rootScope.$partialReset = false;
-            }, 0);
-        }
-    }
-}]);
+    PageResetService.prototype.resetArea = function (area) {
+        this._log.debug("Resetting the area " + area);
+        this.performReset(area);
+    };
+    PageResetService.prototype.performReset = function (area) {
+        var _this = this;
+        this._rootScope[exports.ResetRootVar] = area == null;
+        this._rootScope[exports.ResetAreaRootVar] = area;
+        this._timeout(function () {
+            _this._rootScope[exports.ResetRootVar] = false;
+            _this._rootScope[exports.ResetAreaRootVar] = null;
+        }, 0);
+    };
+    return PageResetService;
+}());
+function hookResetEvents($rootScope, pipPageReset) {
+    $rootScope.$on(exports.ResetPageEvent, function () { pipPageReset.reset(); });
+    $rootScope.$on(exports.ResetAreaEvent, function (event, area) { pipPageReset.resetArea(area); });
+}
+angular.module('pipPageReset', [])
+    .service('pipPageReset', PageResetService)
+    .run(hookResetEvents);
 },{}],22:[function(require,module,exports){
 'use strict';
-var thisModule = angular.module('pipScroll', []);
-thisModule.factory('pipScroll', function () {
-    return {
-        scrollTo: scrollTo
-    };
-    function scrollTo(parentElement, childElement, animationDuration) {
+var ScrollService = (function () {
+    function ScrollService() {
+    }
+    ScrollService.prototype.scrollTo = function (parentElement, childElement, animationDuration) {
         if (!parentElement || !childElement)
             return;
         if (animationDuration == undefined)
@@ -1064,111 +1074,126 @@ thisModule.factory('pipScroll', function () {
                     scrollTop: scrollTo + 'px'
                 }, animationDuration);
         }, 100);
-    }
-});
+    };
+    return ScrollService;
+}());
+angular
+    .module('pipScroll', [])
+    .service('pipScroll', ScrollService);
 },{}],23:[function(require,module,exports){
 'use strict';
-var thisModule = angular.module('pipSystemInfo', []);
-thisModule.factory('pipSystemInfo', ['$rootScope', '$window', function ($rootScope, $window) {
-    return {
-        getBrowserName: getBrowserName,
-        getBrowserVersion: getBrowserVersion,
-        getPlatform: getPlatform,
-        isDesktop: isDesktop,
-        isMobile: isMobile,
-        isCordova: isCordova,
-        getOS: getOS,
-        isSupported: isSupported
+var SystemInfo = (function () {
+    SystemInfo.$inject = ['$window'];
+    function SystemInfo($window) {
+        "ngInject";
+        this._window = $window;
+    }
+    Object.defineProperty(SystemInfo.prototype, "browserName", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            if (ua.search(/Edge/) > -1)
+                return "edge";
+            if (ua.search(/MSIE/) > -1)
+                return "ie";
+            if (ua.search(/Trident/) > -1)
+                return "ie";
+            if (ua.search(/Firefox/) > -1)
+                return "firefox";
+            if (ua.search(/Opera/) > -1)
+                return "opera";
+            if (ua.search(/OPR/) > -1)
+                return "opera";
+            if (ua.search(/YaBrowser/) > -1)
+                return "yabrowser";
+            if (ua.search(/Chrome/) > -1)
+                return "chrome";
+            if (ua.search(/Safari/) > -1)
+                return "safari";
+            if (ua.search(/Maxthon/) > -1)
+                return "maxthon";
+            return "unknown";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "browserVersion", {
+        get: function () {
+            var version;
+            var ua = this._window.navigator.userAgent;
+            var browser = this.browserName;
+            switch (browser) {
+                case "edge":
+                    version = (ua.split("Edge")[1]).split("/")[1];
+                    break;
+                case "ie":
+                    version = (ua.split("MSIE ")[1]).split(";")[0];
+                    break;
+                case "ie11":
+                    browser = "ie";
+                    version = (ua.split("; rv:")[1]).split(")")[0];
+                    break;
+                case "firefox":
+                    version = ua.split("Firefox/")[1];
+                    break;
+                case "opera":
+                    version = ua.split("Version/")[1];
+                    break;
+                case "operaWebkit":
+                    version = ua.split("OPR/")[1];
+                    break;
+                case "yabrowser":
+                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
+                    break;
+                case "chrome":
+                    version = (ua.split("Chrome/")[1]).split(" ")[0];
+                    break;
+                case "safari":
+                    version = (ua.split("Version/")[1]).split(" ")[0];
+                    break;
+                case "maxthon":
+                    version = ua.split("Maxthon/")[1];
+                    break;
+            }
+            return version;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "platform", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
+                return 'mobile';
+            return 'desktop';
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "os", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            try {
+                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris');
+                var osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
+                return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
+            }
+            catch (err) {
+                return 'unknown';
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SystemInfo.prototype.isDesktop = function () {
+        return this.platform == 'desktop';
     };
-    function getBrowserName() {
-        var ua = $window.navigator.userAgent;
-        if (ua.search(/Edge/) > -1)
-            return "edge";
-        if (ua.search(/MSIE/) > -1)
-            return "ie";
-        if (ua.search(/Trident/) > -1)
-            return "ie";
-        if (ua.search(/Firefox/) > -1)
-            return "firefox";
-        if (ua.search(/Opera/) > -1)
-            return "opera";
-        if (ua.search(/OPR/) > -1)
-            return "opera";
-        if (ua.search(/YaBrowser/) > -1)
-            return "yabrowser";
-        if (ua.search(/Chrome/) > -1)
-            return "chrome";
-        if (ua.search(/Safari/) > -1)
-            return "safari";
-        if (ua.search(/Maxthon/) > -1)
-            return "maxthon";
-        return "unknown";
-    }
-    function getBrowserVersion() {
-        var browser, version;
-        var ua = $window.navigator.userAgent;
-        browser = getBrowserName();
-        switch (browser) {
-            case "edge":
-                version = (ua.split("Edge")[1]).split("/")[1];
-                break;
-            case "ie":
-                version = (ua.split("MSIE ")[1]).split(";")[0];
-                break;
-            case "ie11":
-                browser = "ie";
-                version = (ua.split("; rv:")[1]).split(")")[0];
-                break;
-            case "firefox":
-                version = ua.split("Firefox/")[1];
-                break;
-            case "opera":
-                version = ua.split("Version/")[1];
-                break;
-            case "operaWebkit":
-                version = ua.split("OPR/")[1];
-                break;
-            case "yabrowser":
-                version = (ua.split("YaBrowser/")[1]).split(" ")[0];
-                break;
-            case "chrome":
-                version = (ua.split("Chrome/")[1]).split(" ")[0];
-                break;
-            case "safari":
-                version = (ua.split("Version/")[1]).split(" ")[0];
-                break;
-            case "maxthon":
-                version = ua.split("Maxthon/")[1];
-                break;
-        }
-        return version;
-    }
-    function getPlatform() {
-        var ua = $window.navigator.userAgent;
-        if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
-            return 'mobile';
-        return 'desktop';
-    }
-    function isDesktop() {
-        return getPlatform() == 'desktop';
-    }
-    function isMobile() {
-        return getPlatform() == 'mobile';
-    }
-    function isCordova() {
-        return null;
-    }
-    function getOS() {
-        var ua = $window.navigator.userAgent;
-        try {
-            var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris'), osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
-            return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
-        }
-        catch (err) {
-            return 'unknown';
-        }
-    }
-    function isSupported(supported) {
+    SystemInfo.prototype.isMobile = function () {
+        return this.platform == 'mobile';
+    };
+    SystemInfo.prototype.isCordova = function () {
+        return false;
+    };
+    SystemInfo.prototype.isSupported = function (supported) {
         if (!supported)
             supported = {
                 edge: 11,
@@ -1177,103 +1202,98 @@ thisModule.factory('pipSystemInfo', ['$rootScope', '$window', function ($rootSco
                 opera: 35,
                 chrome: 47
             };
-        var browser = getBrowserName();
-        var version = getBrowserVersion();
+        var browser = this.browserName;
+        var version = this.browserVersion;
         version = version.split(".")[0];
         if (browser && supported[browser] && version >= supported[browser])
             return true;
         return true;
-    }
-    ;
-}]);
+    };
+    return SystemInfo;
+}());
+angular
+    .module('pipSystemInfo', [])
+    .service('pipSystemInfo', SystemInfo);
 },{}],24:[function(require,module,exports){
 'use strict';
-var thisModule = angular.module('pipTags', []);
-thisModule.factory('pipTags', function () {
-    return {
-        equal: equal,
-        normalizeOne: normalizeOne,
-        normalizeAll: normalizeAll,
-        normalize: normalizeAll,
-        compressOne: compressOne,
-        compressAll: compressAll,
-        compress: compressAll,
-        extract: extract
-    };
-    function normalizeOne(tag) {
+var Tags = (function () {
+    function Tags() {
+    }
+    Tags.prototype.normalizeOne = function (tag) {
         return tag
             ? _.trim(tag.replace(/(_|#)+/g, ' '))
             : null;
-    }
-    function compressOne(tag) {
+    };
+    Tags.prototype.compressOne = function (tag) {
         return tag
             ? tag.replace(/( |_|#)/g, '').toLowerCase()
             : null;
-    }
-    function equal(tag1, tag2) {
+    };
+    Tags.prototype.equal = function (tag1, tag2) {
         if (tag1 == null && tag2 == null)
             return true;
         if (tag1 == null || tag2 == null)
             return false;
-        return compressOne(tag1) == compressOne(tag2);
-    }
-    function normalizeAll(tags) {
-        if (_.isString(tags)) {
-            tags = tags.split(/( |,|;)+/);
-        }
-        tags = _.map(tags, function (tag) {
-            return normalizeOne(tag);
-        });
-        return tags;
-    }
-    function compressAll(tags) {
+        return this.compressOne(tag1) == this.compressOne(tag2);
+    };
+    Tags.prototype.normalizeAll = function (tags) {
+        var _this = this;
         if (_.isString(tags))
             tags = tags.split(/( |,|;)+/);
-        tags = _.map(tags, function (tag) {
-            return compressOne(tag);
-        });
+        tags = _.map(tags, function (tag) { return _this.normalizeOne(tag); });
         return tags;
-    }
-    ;
-    function extract(entity, searchFields) {
-        var tags = normalizeAll(entity.tags);
+    };
+    Tags.prototype.compressAll = function (tags) {
+        var _this = this;
+        if (_.isString(tags))
+            tags = tags.split(/( |,|;)+/);
+        tags = _.map(tags, function (tag) { return _this.compressOne(tag); });
+        return tags;
+    };
+    Tags.prototype.extract = function (entity, searchFields) {
+        var _this = this;
+        var tags = this.normalizeAll(entity.tags);
         _.each(searchFields, function (field) {
             var text = entity[field] || '';
             if (text != '') {
                 var hashTags = text.match(/#\w+/g);
-                tags = tags.concat(normalizeAll(hashTags));
+                tags = tags.concat(_this.normalizeAll(hashTags));
             }
         });
         return _.uniq(tags);
-    }
-});
+    };
+    return Tags;
+}());
+angular
+    .module('pipTags', [])
+    .service('pipTags', Tags);
 },{}],25:[function(require,module,exports){
 'use strict';
 var TimerEvent = (function () {
-    function TimerEvent() {
+    function TimerEvent(event, timeout) {
+        this.event = event;
+        this.timeout = timeout;
     }
     return TimerEvent;
 }());
 var DefaultEvents = [
-    { event: 'pipAutoPullChanges', timeout: 60000 },
-    { event: 'pipAutoUpdatePage', timeout: 15000 },
-    { event: 'pipAutoUpdateCollection', timeout: 300000 }
+    new TimerEvent('pipAutoPullChanges', 60000),
+    new TimerEvent('pipAutoUpdatePage', 15000),
+    new TimerEvent('pipAutoUpdateCollection', 300000)
 ];
 var TimerService = (function () {
-    TimerService.$inject = ['$rootScope', '$interval'];
-    function TimerService($rootScope, $interval) {
+    TimerService.$inject = ['$rootScope', '$log', '$interval'];
+    function TimerService($rootScope, $log, $interval) {
+        "ngInject";
         this._started = false;
         this._events = _.cloneDeep(DefaultEvents);
         this._rootScope = $rootScope;
+        this._log = $log;
         this._interval = $interval;
     }
-    Object.defineProperty(TimerService.prototype, "isStarted", {
-        get: function () {
-            return this._started;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    TimerService.prototype.isStarted = function () {
+        return this._started;
+    };
     TimerService.prototype.addEvent = function (event, timeout) {
         var existingEvent = _.find(this._events, function (e) { return e.event == event; });
         if (existingEvent != null)
@@ -1301,7 +1321,10 @@ var TimerService = (function () {
     };
     TimerService.prototype.startEvent = function (event) {
         var _this = this;
-        event.interval = this._interval(function () { _this._rootScope.$broadcast(event.event); }, event.timeout);
+        event.interval = this._interval(function () {
+            _this._log.debug('Generated timer event ' + event.event);
+            _this._rootScope.$emit(event.event);
+        }, event.timeout);
     };
     TimerService.prototype.stopEvent = function (event) {
         if (event.interval != null) {
@@ -1331,12 +1354,9 @@ var TimerService = (function () {
     };
     return TimerService;
 }());
-angular
-    .module('pipTimer', [])
+angular.module('pipTimer', [])
     .service('pipTimer', TimerService);
-},{}],26:[function(require,module,exports){
-
-},{}]},{},[1,2,3,4,6,5,8,9,7,10,11,12,14,15,16,13,17,18,19,20,21,22,23,24,25,26])(26)
+},{}]},{},[1])(1)
 });
 
 
@@ -6111,6 +6131,45 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
+var NavService_1 = require('./NavService');
+angular
+    .module('pipNav', [
+    'pipDropdown',
+    'pipTabs',
+    'pipAppBar',
+    'pipSearchBar',
+    'pipNavIcon',
+    'pipBreadcrumb',
+    'pipPrimaryActions',
+    'pipSecondaryActions',
+    'pipSideNav',
+    'pipNavMenu',
+    'pipNavHeader',
+    'pipStickySideNav',
+    'pipStickyNavMenu',
+    'pipStickyNavHeader'
+])
+    .service('pipNav', NavService_1.NavService);
+},{"./NavService":2}],2:[function(require,module,exports){
+'use strict';
+var NavService = (function () {
+    NavService.$inject = ['$injector'];
+    function NavService($injector) {
+        "ngInject";
+        this.appBar = $injector.has('pipAppBar') ? $injector.get('pipAppBar') : null;
+        this.navIcon = $injector.has('pipNavIcon') ? $injector.get('pipNavIcon') : null;
+        this.breadcrumb = $injector.has('pipBreadcrumb') ? $injector.get('pipBreadcrumb') : null;
+        this.actions = $injector.has('pipActions') ? $injector.get('pipActions') : null;
+        this.search = $injector.has('pipSearch') ? $injector.get('pipSearch') : null;
+        this.sideNav = $injector.has('pipSideNav') ? $injector.get('pipSideNav') : null;
+        this.navHeader = $injector.has('pipNavHeader') ? $injector.get('pipNavHeader') : null;
+        this.navMenu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
+    }
+    return NavService;
+}());
+exports.NavService = NavService;
+},{}],3:[function(require,module,exports){
+'use strict';
 var thisModule = angular.module('pipActions.Service', []);
 thisModule.provider('pipActions', function () {
     var config = {
@@ -6170,7 +6229,7 @@ thisModule.provider('pipActions', function () {
         config.secondaryGlobalActions = secondaryActions || [];
     }
 });
-},{}],2:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipPrimaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
@@ -6274,7 +6333,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],3:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSecondaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
@@ -6388,7 +6447,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipAppBar', ['ngMaterial', 'pipNav.Templates', 'pipAppBar.Service']);
@@ -6412,7 +6471,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipAppBar.Part', ['pipAppBar.Service']);
@@ -6452,7 +6511,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipAppBar.Service', []);
@@ -6555,20 +6614,21 @@ thisModule.provider('pipActions', function () {
         }
     });
 })();
-},{}],7:[function(require,module,exports){
-"use strict";
-var breadcrumb_service_1 = require('./breadcrumb_service');
-var breadcrumb_service_2 = require('./breadcrumb_service');
+},{}],9:[function(require,module,exports){
+'use strict';
+var BreadcrumbService_1 = require('./BreadcrumbService');
+var BreadcrumbService_2 = require('./BreadcrumbService');
+var SearchService_1 = require('../search/SearchService');
 var BreadcrumbController = (function () {
-    BreadcrumbController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$state', 'pipBreadcrumb'];
-    function BreadcrumbController($scope, $element, $attrs, $rootScope, $window, $state, pipBreadcrumb) {
+    BreadcrumbController.$inject = ['$element', '$rootScope', '$window', '$state', 'pipBreadcrumb'];
+    function BreadcrumbController($element, $rootScope, $window, $state, pipBreadcrumb) {
         "ngInject";
         this._rootScope = $rootScope;
         this._window = $window;
         $element.addClass('pip-breadcrumb');
         this.config = pipBreadcrumb.config;
-        $rootScope.$on(breadcrumb_service_1.BreadcrumbChangedEvent, this.onBreadcrumbChanged);
-        $rootScope.$on(breadcrumb_service_2.BreadcrumbBackEvent, this.onBreadcrumbBack);
+        $rootScope.$on(BreadcrumbService_1.BreadcrumbChangedEvent, this.onBreadcrumbChanged);
+        $rootScope.$on(BreadcrumbService_2.BreadcrumbBackEvent, this.onBreadcrumbBack);
     }
     BreadcrumbController.prototype.onBreadcrumbChanged = function (event, config) {
         this.config = config;
@@ -6576,51 +6636,93 @@ var BreadcrumbController = (function () {
     BreadcrumbController.prototype.onBreadcrumbBack = function () {
         var items = this.config.items;
         if (_.isArray(items) && items.length > 0) {
-            var backCallback = items[items.length - 1].click;
+            var item = items[items.length - 1];
+            var backCallback = item.click;
             if (_.isFunction(backCallback))
-                backCallback();
+                backCallback(item);
             else
                 this._window.history.back();
         }
         else
             this._window.history.back();
     };
-    BreadcrumbController.prototype.onBreadcrumbClick = function (item) {
+    BreadcrumbController.prototype.onClick = function (item) {
         if (_.isFunction(item.click))
             item.click(item);
     };
-    BreadcrumbController.prototype.onSearchOpen = function () {
-        this._rootScope.$broadcast('pipSearchOpen');
+    BreadcrumbController.prototype.openSearch = function () {
+        this._rootScope.$broadcast(SearchService_1.OpenSearchEvent);
     };
     return BreadcrumbController;
 }());
+exports.BreadcrumbController = BreadcrumbController;
+},{"../search/SearchService":29,"./BreadcrumbService":13}],10:[function(require,module,exports){
+'use strict';
+var BreadcrumbController_1 = require('./BreadcrumbController');
 function breadcrumbDirective() {
     return {
         restrict: 'E',
         scope: {},
         replace: false,
-        templateUrl: function (element, attr) {
-            return 'breadcrumb/breadcrumb.html';
-        },
-        controller: BreadcrumbController,
+        templateUrl: 'breadcrumb/Breadcrumb.html',
+        controller: BreadcrumbController_1.BreadcrumbController,
         controllerAs: 'vm'
     };
 }
+exports.breadcrumbDirective = breadcrumbDirective;
+},{"./BreadcrumbController":9}],11:[function(require,module,exports){
+'use strict';
+var BreadcrumbProvider_1 = require('./BreadcrumbProvider');
+var BreadcrumbDirective_1 = require('./BreadcrumbDirective');
 angular
-    .module('pipBreadcrumb', [
-    'ngMaterial',
-    'pipNav.Templates',
-    'pipNav.Translate',
-    'pipBreadcrumb.Service'
-])
-    .directive('pipBreadcrumb', breadcrumbDirective);
-},{"./breadcrumb_service":8}],8:[function(require,module,exports){
-"use strict";
+    .module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate'])
+    .provider('pipBreadcrumb', BreadcrumbProvider_1.BreadcrumbProvider)
+    .directive('pipBreadcrumb', BreadcrumbDirective_1.breadcrumbDirective);
+},{"./BreadcrumbDirective":10,"./BreadcrumbProvider":12}],12:[function(require,module,exports){
+'use strict';
+var BreadcrumbService_1 = require('./BreadcrumbService');
+var BreadcrumbProvider = (function () {
+    function BreadcrumbProvider() {
+        this._config = {
+            text: null,
+            items: null,
+            criteria: null
+        };
+    }
+    Object.defineProperty(BreadcrumbProvider.prototype, "text", {
+        get: function () {
+            return this._config.text;
+        },
+        set: function (value) {
+            this._config.text = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    BreadcrumbProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new BreadcrumbService_1.BreadcrumbService(this._config, $rootScope);
+        return this._service;
+    }];
+    return BreadcrumbProvider;
+}());
+exports.BreadcrumbProvider = BreadcrumbProvider;
+},{"./BreadcrumbService":13}],13:[function(require,module,exports){
+'use strict';
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
 exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
 var BreadcrumbItem = (function () {
-    function BreadcrumbItem() {
+    function BreadcrumbItem(title, click) {
+        if (title === void 0) { title = null; }
+        if (click === void 0) { click = null; }
+        this.title = title;
+        this.click = click;
     }
+    BreadcrumbItem.prototype.withClick = function (click) {
+        this.click = click;
+        return this;
+    };
     return BreadcrumbItem;
 }());
 exports.BreadcrumbItem = BreadcrumbItem;
@@ -6682,36 +6784,8 @@ var BreadcrumbService = (function () {
     };
     return BreadcrumbService;
 }());
-var BreadcrumbProvider = (function () {
-    function BreadcrumbProvider() {
-        this._config = {
-            text: null,
-            items: null,
-            criteria: null
-        };
-    }
-    Object.defineProperty(BreadcrumbProvider.prototype, "text", {
-        get: function () {
-            return this._config.text;
-        },
-        set: function (value) {
-            this._config.text = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    BreadcrumbProvider.prototype.$get = ['$rootScope', function ($rootScope) {
-        "ngInject";
-        if (this._service == null)
-            this._service = new BreadcrumbService(this._config, $rootScope);
-        return this._service;
-    }];
-    return BreadcrumbProvider;
-}());
-angular
-    .module('pipBreadcrumb.Service', [])
-    .provider('pipBreadcrumb', BreadcrumbProvider);
-},{}],9:[function(require,module,exports){
+exports.BreadcrumbService = BreadcrumbService;
+},{}],14:[function(require,module,exports){
 'use strict';
 translateFilter.$inject = ['$injector'];
 function translateFilter($injector) {
@@ -6724,7 +6798,7 @@ function translateFilter($injector) {
 angular
     .module('pipNav.Translate', [])
     .filter('translate', translateFilter);
-},{}],10:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipDropdown', ['pipNav.Templates']);
@@ -6770,7 +6844,7 @@ angular
         };
     }]);
 })();
-},{}],11:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var pip;
 (function (pip) {
     var nav;
@@ -6828,31 +6902,7 @@ var pip;
             .directive('pipLanguagePicker', languagePickerDirective);
     })(nav = pip.nav || (pip.nav = {}));
 })(pip || (pip = {}));
-},{}],12:[function(require,module,exports){
-var pip;
-(function (pip) {
-    var nav;
-    (function (nav) {
-        'use strict';
-        angular.module('pipNav', [
-            'pipNav.Service',
-            'pipDropdown',
-            'pipTabs',
-            'pipAppBar',
-            'pipNavIcon',
-            'pipBreadcrumb',
-            'pipPrimaryActions',
-            'pipSecondaryActions',
-            'pipSideNav',
-            'pipNavMenu',
-            'pipNavHeader',
-            'pipStickySideNav',
-            'pipStickyNavMenu',
-            'pipStickyNavHeader'
-        ]);
-    })(nav = pip.nav || (pip.nav = {}));
-})(pip || (pip = {}));
-},{}],13:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates', 'pipNavHeader.Service']);
@@ -6908,11 +6958,9 @@ var pip;
             var url, config = pipNavHeader.config();
             url = $scope.imageUrl ? $scope.imageUrl : config.defaultImageUrl;
             if (url) {
-                console.log('url', url);
                 $image.attr('src', url);
             }
             else {
-                console.log('display none');
                 imageBlock.css('display', 'none');
             }
         }
@@ -6921,7 +6969,7 @@ var pip;
         }
     }]);
 })();
-},{}],14:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavIcon.Service']);
@@ -6967,7 +7015,7 @@ var pip;
         }
     }]);
 })();
-},{}],15:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipNavIcon.Service', []);
@@ -7066,7 +7114,7 @@ var pip;
         }
     });
 })();
-},{}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
@@ -7152,26 +7200,7 @@ var pip;
         }
     }]);
 })();
-},{}],17:[function(require,module,exports){
-'use strict';
-var NavService = (function () {
-    NavService.$inject = ['$injector'];
-    function NavService($injector) {
-        "ngInject";
-        this.appBar = $injector.has('pipAppBar') ? $injector.get('pipAppBar') : null;
-        this.navIcon = $injector.has('pipNavIcon') ? $injector.get('pipNavIcon') : null;
-        this.breadcrumb = $injector.has('pipBreadcrumb') ? $injector.get('pipBreadcrumb') : null;
-        this.actions = $injector.has('pipActions') ? $injector.get('pipActions') : null;
-        this.search = $injector.has('pipSearch') ? $injector.get('pipSearch') : null;
-        this.sideNav = $injector.has('pipSideNav') ? $injector.get('pipSideNav') : null;
-        this.navHeader = $injector.has('pipNavHeader') ? $injector.get('pipNavHeader') : null;
-        this.navMenu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
-    }
-    return NavService;
-}());
-angular.module('pipNav.Service', [])
-    .service('pipNavService', NavService);
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipNavHeader.Service', []);
@@ -7206,7 +7235,7 @@ angular.module('pipNav.Service', [])
         }
     });
 })();
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipNavMenu.Service', []);
@@ -7272,7 +7301,7 @@ angular.module('pipNav.Service', [])
         ;
     });
 })();
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSideNav.Part', ['pipSideNav.Service']);
@@ -7308,7 +7337,7 @@ angular.module('pipNav.Service', [])
         }
     }]);
 })();
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSideNav.Service', []);
@@ -7316,10 +7345,11 @@ angular.module('pipNav.Service', [])
         var config = {
             theme: 'default',
             parts: []
-        }, sideNavId = 'pip-sidenav';
+        }, sideNavId = 'pip-sidenav', sideNavState = {};
         this.id = id;
         this.theme = theme;
         this.parts = initParts;
+        this.state = setState;
         this.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
             $rootScope.$on('pipOpenSideNav', open);
             $rootScope.$on('pipCloseSideNav', close);
@@ -7330,7 +7360,8 @@ angular.module('pipNav.Service', [])
                 id: getOrSetId,
                 open: open,
                 close: close,
-                toggle: toggle
+                toggle: toggle,
+                state: getOrSetState
             };
             function getConfig() {
                 return config;
@@ -7346,13 +7377,20 @@ angular.module('pipNav.Service', [])
                 }
                 return config.parts[name];
             }
-            function getOrSetId(id) {
-                if (_.isString(id)) {
-                    if (sideNavId !== id) {
-                        sideNavId = id;
+            function getOrSetId(value) {
+                if (_.isString(value)) {
+                    if (sideNavId !== value) {
+                        sideNavId = value;
                     }
                 }
                 return sideNavId;
+            }
+            function getOrSetState(state) {
+                if (angular.isObject(state)) {
+                    sideNavState = _.cloneDeep(state);
+                }
+                $rootScope.$broadcast('pipSideNavStateChange', sideNavState);
+                return sideNavState;
             }
             function getOrSetParts(parts) {
                 if (_.isObject(parts)) {
@@ -7367,21 +7405,22 @@ angular.module('pipNav.Service', [])
                 $rootScope.$broadcast('pipSideNavChanged', config);
             }
             function open(event) {
-                console.log('open pip', sideNavId);
                 $mdSidenav(sideNavId).open();
             }
             function close(event) {
-                console.log('close pip', sideNavId);
                 $mdSidenav(sideNavId).close();
             }
             function toggle() {
-                console.log('toggle pip', sideNavId);
                 $mdSidenav(sideNavId).toggle();
                 $rootScope.$broadcast('pipSideNavToggle', config);
             }
         }];
-        function id(id) {
-            sideNavId = id || sideNavId;
+        function setState(state) {
+            sideNavState = state || sideNavState;
+            return sideNavState;
+        }
+        function id(value) {
+            sideNavId = value || sideNavId;
             return sideNavId;
         }
         function theme(theme) {
@@ -7396,155 +7435,174 @@ angular.module('pipNav.Service', [])
         }
     });
 })();
-},{}],22:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipSearch.Service']);
-    thisModule.run(['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate && pipTranslate.setTranslations) {
-            pipTranslate.setTranslations('en', {
-                'APPBAR_SEARCH': 'Search'
-            });
-            pipTranslate.setTranslations('ru', {
-                'APPBAR_SEARCH': 'Поиск'
-            });
-        }
-    }]);
-    thisModule.directive('pipSearchBar', function () {
-        return {
-            restrict: 'E',
-            scope: {},
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'search_bar/search_bar.html';
-            },
-            controller: 'pipSearchBarController'
-        };
-    });
-    thisModule.controller('pipSearchBarController', ['$scope', '$element', '$attrs', '$rootScope', 'pipSearch', function ($scope, $element, $attrs, $rootScope, pipSearch) {
+},{}],25:[function(require,module,exports){
+'use strict';
+var SearchService_1 = require('./SearchService');
+var SearchService_2 = require('./SearchService');
+var SearchBarController = (function () {
+    SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
+    function SearchBarController($element, $rootScope, pipSearch) {
+        "ngInject";
+        var _this = this;
+        this.enabled = false;
+        this.search = { text: '' };
+        this._rootScope = $rootScope;
         $element.addClass('pip-search-bar');
-        $scope.config = pipSearch.config();
-        $scope.searchEnabled = false;
-        $scope.search = { text: '' };
-        $rootScope.$on('pipSearchChanged', onSearchBarChanged);
-        $scope.onSearchEnable = onSearchEnable;
-        $scope.onSearchClick = onSearchClick;
-        $scope.onSearchClear = onSearchClear;
-        $scope.onSearchKeyDown = onSearchKeyDown;
-        function onSearchBarChanged(event, config) {
-            $scope.config = config;
-            $scope.searchEnabled = false;
-            $scope.search.text = '';
+        this.config = pipSearch.config;
+        $rootScope.$on(SearchService_1.SearchChangedEvent, function (event, config) {
+            _this.onSearchChanged(event, config);
+        });
+    }
+    SearchBarController.prototype.onSearchChanged = function (event, config) {
+        this.config = config;
+        this.enabled = false;
+        this.search.text = '';
+    };
+    SearchBarController.prototype.focusText = function () {
+        setTimeout(function () {
+            var element = $('.pip-search-text');
+            if (element.length > 0)
+                element.focus();
+        }, 0);
+    };
+    SearchBarController.prototype.enable = function () {
+        this.search.text = this.config.criteria;
+        this.enabled = true;
+        this.focusText();
+    };
+    SearchBarController.prototype.onClick = function () {
+        var search = this.search.text;
+        this.search.text = '';
+        this.enabled = false;
+        if (this.config.callback)
+            this.config.callback(search);
+        else
+            this._rootScope.$broadcast(SearchService_2.SearchActivatedEvent, search);
+    };
+    SearchBarController.prototype.clear = function () {
+        if (this.search.text) {
+            this.search.text = '';
+            this.focusText();
         }
-        function focusSearchText() {
-            var element;
-            setTimeout(function () {
-                element = $('.pip-search-text');
-                if (element.length > 0) {
-                    element.focus();
-                }
-            }, 0);
+        else {
+            this.enabled = false;
+            this.onClick();
         }
-        function onSearchEnable() {
-            $scope.search.text = $scope.config.criteria;
-            $scope.searchEnabled = true;
-            focusSearchText();
-        }
-        function onSearchClick() {
-            var searchText = $scope.search.text;
-            $scope.search.text = '';
-            $scope.searchEnabled = false;
-            if ($scope.config.callback) {
-                $scope.config.callback(searchText);
-            }
-            else {
-                $rootScope.$broadcast('pipSearchBarSearchClicked', searchText);
-            }
-        }
-        function onSearchClear() {
-            if ($scope.search.text) {
-                $scope.search.text = '';
-                focusSearchText();
-            }
-            else {
-                $scope.searchEnabled = false;
-                onSearchClick();
-            }
-        }
-        function onSearchKeyDown(event) {
-            if (event.keyCode === 13) {
-                $scope.onSearchClick();
-                return;
-            }
-            if (event.keyCode === 27) {
-                $scope.searchEnabled = false;
-            }
-        }
-    }]);
-})();
-},{}],23:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSearch.Service', []);
-    thisModule.provider('pipSearch', function () {
-        var config = {
-            visible: false,
-            criteria: '',
-            history: [],
-            callback: null,
-        };
-        this.$get = ['$rootScope', function ($rootScope) {
-            $rootScope.$on('pipSearchOpen', open);
-            $rootScope.$on('pipSearchClose', close);
-            return {
-                config: getConfig,
-                set: setSearch,
-                clear: clearSearch,
-                criteria: updateCriteria,
-                history: updateHistory,
-            };
-            function getConfig() {
-                return config;
-            }
-            function setSearch(callback, criteria, history) {
-                config.callback = callback;
-                config.criteria = criteria;
-                config.history = history;
-                sendConfigEvent();
-            }
-            function clearSearch() {
-                config.callback = null;
-                config.criteria = null;
-                sendConfigEvent();
-            }
-            function open(event) {
-                config.visible = true;
-                sendConfigEvent();
-            }
-            function close(event) {
-                config.visible = false;
-                sendConfigEvent();
-            }
-            function toggle() {
-                config.visible = !config.visible;
-                sendConfigEvent();
-            }
-            function updateCriteria(criteria) {
-                config.criteria = criteria;
-                sendConfigEvent();
-            }
-            function updateHistory(history) {
-                config.history = history;
-                sendConfigEvent();
-            }
-            function sendConfigEvent() {
-                $rootScope.$broadcast('pipSearchChanged', config);
-            }
-        }];
+    };
+    SearchBarController.prototype.onKeyDown = function (event) {
+        if (event.keyCode === 13)
+            this.onClick();
+        else if (event.keyCode === 27)
+            this.enabled = false;
+    };
+    return SearchBarController;
+}());
+exports.SearchBarController = SearchBarController;
+},{"./SearchService":29}],26:[function(require,module,exports){
+'use strict';
+var SearchBarController_1 = require('./SearchBarController');
+function searchBarDirective() {
+    return {
+        restrict: 'E',
+        scope: {},
+        replace: false,
+        templateUrl: 'search/SearchBar.html',
+        controller: SearchBarController_1.SearchBarController,
+        controllerAs: 'vm'
+    };
+}
+exports.searchBarDirective = searchBarDirective;
+},{"./SearchBarController":25}],27:[function(require,module,exports){
+'use strict';
+var SearchBarDirective_1 = require('./SearchBarDirective');
+var SearchProvider_1 = require('./SearchProvider');
+angular
+    .module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates'])
+    .provider('pipSearch', SearchProvider_1.SearchProvider)
+    .directive('pipSearchBar', SearchBarDirective_1.searchBarDirective);
+},{"./SearchBarDirective":26,"./SearchProvider":28}],28:[function(require,module,exports){
+'use strict';
+var SearchService_1 = require('./SearchService');
+var SearchService_2 = require('./SearchService');
+var SearchProvider = (function () {
+    function SearchProvider() {
+        this._config = new SearchService_1.SearchConfig();
+        this._service = null;
+    }
+    SearchProvider.prototype.$get = ['$rootScope', function ($rootScope) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new SearchService_2.SearchService(this._config, $rootScope);
+        return this._service;
+    }];
+    return SearchProvider;
+}());
+exports.SearchProvider = SearchProvider;
+},{"./SearchService":29}],29:[function(require,module,exports){
+'use strict';
+exports.OpenSearchEvent = 'pipOpenSearch';
+exports.CloseSearchEvent = 'pipCloseSearch';
+exports.SearchChangedEvent = 'pipSearchChanged';
+exports.SearchActivatedEvent = 'pipSearchActivated';
+var SearchConfig = (function () {
+    function SearchConfig() {
+    }
+    return SearchConfig;
+}());
+exports.SearchConfig = SearchConfig;
+var SearchService = (function () {
+    function SearchService(config, $rootScope) {
+        var _this = this;
+        this._config = config;
+        this._rootScope = $rootScope;
+        $rootScope.$on(exports.OpenSearchEvent, function () { _this.open; });
+        $rootScope.$on(exports.CloseSearchEvent, function () { _this.close; });
+    }
+    Object.defineProperty(SearchService.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        enumerable: true,
+        configurable: true
     });
-})();
-},{}],24:[function(require,module,exports){
+    SearchService.prototype.set = function (callback, criteria, history) {
+        this._config.callback = callback;
+        this._config.criteria = criteria;
+        this._config.history = history;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.clear = function () {
+        this._config.callback = null;
+        this._config.criteria = null;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.open = function () {
+        this._config.visible = true;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.close = function () {
+        this._config.visible = false;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.toggle = function () {
+        this._config.visible = !this._config.visible;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.criteria = function (value) {
+        this._config.criteria = value;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.history = function (history) {
+        this._config.history = history;
+        this.sendConfigEvent();
+    };
+    SearchService.prototype.sendConfigEvent = function () {
+        this._rootScope.$broadcast(exports.SearchChangedEvent, this._config);
+    };
+    return SearchService;
+}());
+exports.SearchService = SearchService;
+},{}],30:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Part', 'pipSideNav.Service']);
@@ -7567,7 +7625,7 @@ angular.module('pipNav.Service', [])
         }
     }]);
 })();
-},{}],25:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipStickyNavHeader', ['ngMaterial', 'pipNav.Templates', 'pipNavHeader.Service']);
@@ -7590,7 +7648,6 @@ angular.module('pipNav.Service', [])
         $element.addClass('pip-sticky-nav-header');
         $rootScope.$on('pipIdentityChanged', onIdentityChanged);
         $rootScope.$on('pipNavHeaderImageChanged', onIdentityChanged);
-        $rootScope.$on('pipNavExpanded', resizeImage);
         $scope.onUserClick = onUserClick;
         $timeout(function () {
             $image = $element.find('.pip-sticky-nav-header-user-image');
@@ -7601,14 +7658,6 @@ angular.module('pipNav.Service', [])
             });
         }, 10);
         return;
-        function resizeImage() {
-            if (!image) {
-                image = $element.find('.pip-sticky-nav-header-user-image');
-            }
-            $timeout(function () {
-                setImageMarginCSS(imageBlock, image);
-            }, 400);
-        }
         function setImageMarginCSS(container, image) {
             var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
             if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
@@ -7643,7 +7692,7 @@ angular.module('pipNav.Service', [])
         }
     }]);
 })();
-},{}],26:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipStickyNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipNavMenu.Service']);
@@ -7668,6 +7717,7 @@ angular.module('pipNav.Service', [])
         pipNavMenu.set($scope.config);
         $scope.defaultIicon = 'icons:folder';
         $rootScope.$on('pipNavMenuChanged', onConfigChanged);
+        $rootScope.$on('pipSideNavStateChange', onStateChanged);
         $scope.itemVisible = itemVisible;
         $scope.onLinkClick = onLinkClick;
         $scope.isSectionEmpty = isSectionEmpty;
@@ -7708,6 +7758,9 @@ angular.module('pipNav.Service', [])
         function onConfigChanged(event, config) {
             $scope.isCollapsed = pipNavMenu.collapsed();
             $scope.config = config;
+        }
+        function onStateChanged(event, state) {
+            $scope.sideNavState = state;
         }
         function onLinkClick(event, link) {
             event.stopPropagation();
@@ -7758,7 +7811,7 @@ angular.module('pipNav.Service', [])
         }
     }]);
 })();
-},{}],27:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipStickySideNav', ['ngMaterial', 'pipNav.Templates', 'pipSideNav.Part', 'pipSideNav.Service']);
@@ -7772,22 +7825,101 @@ angular.module('pipNav.Service', [])
         };
     });
     thisModule.controller('pipStickySideNavController', ['$scope', '$element', '$rootScope', 'pipSideNav', '$mdMedia', function ($scope, $element, $rootScope, pipSideNav, $mdMedia) {
+        $scope.navState = {
+            toggle: {
+                addClass: 'sidenav-mobile',
+                showHeader: true,
+                isLockedOpen: false,
+                expandedButton: false,
+                isExpanded: false,
+                expand: true,
+                showIconTooltype: false
+            },
+            small: {
+                addClass: 'pip-sticky-nav-small sidenav-tablet',
+                showHeader: false,
+                isLockedOpen: true,
+                expandedButton: false,
+                isExpanded: false,
+                expand: false,
+                showIconTooltype: true
+            },
+            large: {
+                addClass: 'sidenav-desktop',
+                showHeader: false,
+                isLockedOpen: true,
+                expandedButton: true,
+                isExpanded: true,
+                expand: true,
+                showIconTooltype: true
+            },
+            xlarge: {
+                addClass: 'sidenav-xdesktop',
+                showHeader: false,
+                isLockedOpen: true,
+                expandedButton: true,
+                isExpanded: false,
+                expand: true,
+                showIconTooltype: false
+            }
+        };
         $element.addClass('pip-sticky-sidenav');
+        pipSideNav.id('pip-sticky-sidenav');
+        setSideNaveState();
         $scope.$mdMedia = $mdMedia;
         $rootScope.$on('pipNavIconClicked', onNavIconClick);
         $rootScope.$on('pipSideNavToggle', onNavToggle);
-        pipSideNav.id('pip-sticky-sidenav');
+        $rootScope.$on('pipWindowResized', onWindowResized);
         return;
         function onNavIconClick(event) {
             pipSideNav.open();
         }
         function onNavToggle(event) {
-            console.log('onNavToggle');
             $element.addClass('overflow-visible');
+        }
+        function onWindowResized() {
+            console.log('$scope.windowSize', $scope.windowSize);
+            if (!$mdMedia($scope.windowSize)) {
+                setSideNaveState();
+            }
+        }
+        function setSideNaveState() {
+            if ($mdMedia('xs')) {
+                setState($scope.navState.toggle);
+                $scope.windowSize = 'xs';
+                return;
+            }
+            if ($mdMedia('sm')) {
+                setState($scope.navState.toggle);
+                $scope.windowSize = 'sm';
+                return;
+            }
+            if ($mdMedia('md')) {
+                setState($scope.navState.small);
+                $scope.windowSize = 'md';
+                return;
+            }
+            if ($mdMedia('lg')) {
+                setState($scope.navState.large);
+                $scope.windowSize = 'lg';
+                return;
+            }
+            if ($mdMedia('xl')) {
+                setState($scope.navState.xlarge);
+                $scope.windowSize = 'xl';
+                return;
+            }
+        }
+        function setState(state) {
+            $element.removeClass('sidenav-mobile sidenav-desktop sidenav-tablet sidenav-xdesktop pip-sticky-nav-small');
+            $scope.sidenavState = state;
+            $element.addClass($scope.sidenavState.addClass);
+            console.log('$scope.sidenavState', $scope.sidenavState);
+            pipSideNav.state($scope.sidenavState);
         }
     }]);
 })();
-},{}],28:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipTabs", ['pipNav.Templates']);
@@ -7855,7 +7987,7 @@ angular.module('pipNav.Service', [])
         };
     });
 })();
-},{}],29:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipNav.Templates');
@@ -7993,17 +8125,17 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('breadcrumb/breadcrumb.html',
+  $templateCache.put('breadcrumb/Breadcrumb.html',
     '<div>\n' +
     '    <div class="hide-xs text-overflow">\n' +
     '        <!-- Search criteria -->\n' +
     '        <span ng-if="vm.config.criteria"\n' +
-    '            ng-click="vm.onSearchOpen()">{{vm.config.criteria}} -</span>\n' +
+    '            ng-click="vm.openSearch()">{{vm.config.criteria}} -</span>\n' +
     '        <!-- Breadcrumb navigation -->\n' +
     '        <span class="pip-breadcrumb-item"\n' +
     '            ng-if="vm.config.items && vm.config.items.length > 0"\n' +
     '            ng-repeat-start="item in vm.config.items"\n' +
-    '            ng-click="vm.onBreadcrumbClick(item)"\n' +
+    '            ng-click="vm.onClick(item)"\n' +
     '            ng-init="stepWidth = 100/(vm.config.items.length + 1)"\n' +
     '            ng-class="{\'cursor-pointer\': !$last}"\n' +
     '            ng-style="{\'max-width\': stepWidth + \'%\'}">\n' +
@@ -8023,7 +8155,7 @@ module.run(['$templateCache', function($templateCache) {
     '            <span class="text-overflow">\n' +
     '                <!-- Search criteria -->\n' +
     '                <span ng-if="vm.config.criteria"\n' +
-    '                    ng-click="vm.onSearchOpen()">{{vm.config.criteria}} -</span>\n' +
+    '                    ng-click="vm.openSearch()">{{vm.config.criteria}} -</span>\n' +
     '                <span ng-if="vm.config.text">    \n' +
     '                    {{vm.config.text | translate}}\n' +
     '                </span>   \n' +
@@ -8035,7 +8167,7 @@ module.run(['$templateCache', function($templateCache) {
     '        </span>\n' +
     '        <md-menu-content width="3">\n' +
     '            <md-menu-item  ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0">\n' +
-    '                <md-button ng-click="vm.onBreadcrumbClick(item)"><span>{{item.title | translate}}</span></md-button>\n' +
+    '                <md-button ng-click="vm.onClick(item)"><span>{{item.title | translate}}</span></md-button>\n' +
     '            </md-menu-item>\n' +
     '            <md-menu-item  ng-if="vm.config.text">\n' +
     '                <md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button>\n' +
@@ -8197,27 +8329,27 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search_bar/search_bar.html',
-    '<div class="md-toolbar-tools layout-row" ng-if="searchEnabled">\n' +
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled">\n' +
     '    <md-button class="md-icon-button" \n' +
     '        aria-label="start search" \n' +
-    '        ng-click="onSearchClick()">\n' +
+    '        ng-click="vm.onClick()">\n' +
     '        <md-icon md-svg-icon="icons:search"></md-icon>\n' +
     '    </md-button>\n' +
     '    <input class="pip-search-text flex"\n' +
     '        type="search"\n' +
-    '        ng-model="search.text" \n' +
-    '        ng-keydown="onSearchKeyDown($event)" />\n' +
+    '        ng-model="vm.search.text" \n' +
+    '        ng-keydown="vm.onKeyDown($event)" />\n' +
     '    <md-button class="md-icon-button" \n' +
     '        aria-label="clear search" \n' +
-    '        ng-click="onSearchClear()">\n' +
+    '        ng-click="vm.clear()">\n' +
     '        <md-icon md-svg-icon="icons:cross-circle"></md-icon>\n' +
     '    </md-button>\n' +
     '</div>\n' +
-    '<div class="md-toolbar-tools layout-row layout-align-end-center"  ng-if="!searchEnabled">\n' +
+    '<div class="md-toolbar-tools layout-row layout-align-end-center"  ng-if="!vm.enabled">\n' +
     '    <md-button class="md-icon-button"\n' +
     '               aria-label="start search"\n' +
-    '               ng-click="onSearchEnable()">\n' +
+    '               ng-click="vm.enable()">\n' +
     '        <md-icon md-svg-icon="icons:search"></md-icon>\n' +
     '    </md-button>\n' +
     '</div>\n' +
@@ -8256,15 +8388,15 @@ module.run(['$templateCache', function($templateCache) {
     '<md-toolbar md-theme="{{ $theme }}" ng-hide="!title" class="layout-row layout-align-start-center">\n' +
     '\n' +
     '    <md-button class="pip-sticky-nav-header-user md-icon-button flex-fixed"\n' +
-    '                ng-click="onUserClick()"\n' +
-    '                aria-label="current user">\n' +
+    '               ng-click="onUserClick()"\n' +
+    '               aria-label="current user">\n' +
     '\n' +
     '        <img  src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></img>\n' +
     '    </md-button>\n' +
-    '    \n' +
+    '\n' +
     '    <div class="pip-sticky-nav-header-user-text">\n' +
     '        <div class="pip-sticky-nav-header-user-pri"\n' +
-    '            ng-click="onUserClick()">\n' +
+    '             ng-click="onUserClick()">\n' +
     '            {{ title }}\n' +
     '        </div>\n' +
     '        <div class="pip-sticky-nav-header-user-sec">\n' +
@@ -8289,38 +8421,40 @@ module.run(['$templateCache', function($templateCache) {
     '    <md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()">\n' +
     '        <md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"></md-icon>\n' +
     '        <md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"></md-icon>\n' +
-    '    </md-list-item>    \n' +
+    '    </md-list-item>\n' +
     '    <div class="pip-section" ng-repeat="section in config"\n' +
-    '        ng-hide="section.access && !section.access(section)">\n' +
+    '         ng-hide="section.access && !section.access(section)">\n' +
     '\n' +
     '        <md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider>\n' +
     '        <md-subheader ng-show="section.title" style="height: 48px;">\n' +
-    '             <!--|| !expanded && section.icon-->\n' +
-    '            <span ng-if="expanded" class="pip-sticky-nav-menu-title"> \n' +
+    '            <span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">\n' +
     '                {{::section.title | translate}}\n' +
     '            </span>\n' +
-    '            <md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon"></md-icon>\n' +
-    '            <md-icon md-svg-icon="{{defaultIicon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon"></md-icon>\n' +
+    '            <md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon>\n' +
+    '            <md-icon md-svg-icon="{{defaultIicon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon>\n' +
     '        </md-subheader>\n' +
-    '        \n' +
-    '        <md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item" \n' +
-    '            ng-repeat="link in section.links"\n' +
-    '            ng-click="onLinkClick($event, link)"\n' +
-    '            ng-hide="link.access && !link.access(link)">\n' +
     '\n' +
+    '        <md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item"\n' +
+    '                      ng-repeat="link in section.links"\n' +
+    '                      xxxng-click="onLinkClick($event, link)"\n' +
+    '                      ng-hide="link.access && !link.access(link)">\n' +
+    '            <md-button class="layout-row layout-align-start-center"\n' +
+    '                       ng-click="onLinkClick($event, link)"\n' +
+    '                       xxxstyle="height: 48px; width: 100%; margin: 0px; padding: 0px;">\n' +
     '                <div class="pip-sticky-nav-menu-icon-block">\n' +
-    '                    <md-icon md-svg-icon="{{link.icon}}" \n' +
-    '                        ng-hide="!link.icon" \n' +
-    '                        class="pip-sticky-nav-menu-icon flex-fixed">\n' +
+    '                    <md-icon md-svg-icon="{{link.icon}}"\n' +
+    '                             ng-hide="!link.icon"\n' +
+    '                             class="pip-sticky-nav-menu-icon flex-fixed">\n' +
+    '                        <md-tooltip>jjjjjjjjj</md-tooltip>\n' +
     '                    </md-icon>\n' +
     '                </div>\n' +
-    '                <p class="pip-sticky-nav-menu-title">{{::link.title | translate}}</p>\n' +
+    '                <div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div>\n' +
     '\n' +
     '                <!--<div class="flex pip-sticky-nav-menu-expander"></div>-->\n' +
     '                <div class="pip-sticky-nav-menu-badge color-badge-bg flex-fixed" ng-if="link.count">\n' +
-    '                    {{link.count}} \n' +
+    '                    {{link.count}}\n' +
     '                </div>\n' +
-    '\n' +
+    '            </md-button>\n' +
     '        </md-list-item>\n' +
     '    </div>\n' +
     '</md-list>\n' +
@@ -8341,8 +8475,8 @@ module.run(['$templateCache', function($templateCache) {
     '@copyright Digital Living Software Corp. 2014-2016\n' +
     '-->\n' +
     '\n' +
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="$mdMedia(\'gt-xs\')" \n' +
-    '    md-component-id="pip-sticky-sidenav" ng-if="!$partialReset" pip-focused ng-transclude>\n' +
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen"\n' +
+    '            md-component-id="pip-sticky-sidenav" ng-if="!$partialReset" pip-focused ng-transclude>\n' +
     '</md-sidenav>\n' +
     '\n' +
     '');
@@ -8392,7 +8526,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,5,6,4,8,7,9,10,11,13,15,14,16,17,18,19,20,21,12,22,23,24,25,26,27,28,29])(29)
+},{}]},{},[3,4,5,7,8,6,9,10,11,12,13,14,15,16,17,19,18,20,21,22,23,24,1,2,25,26,27,28,29,30,31,32,33,34,35])(35)
 });
 
 

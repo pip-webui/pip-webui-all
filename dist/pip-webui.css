@@ -6711,25 +6711,240 @@ md-select md-select-value .md-text .pip-tabs-badge {
   -webkit-appearance: none;
   /* без сброса оформление не применится */
 }
+.pip-sidenav md-list-item .md-button .md-list-item-inner {
+  line-height: 48px;
+}
+.pip-sidenav md-list .md-subheader {
+  line-height: 48px;
+}
+.pip-sidenav md-list .md-subheader .md-subheader-inner {
+  padding: 24px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.pip-sidenav md-list .pip-section {
+  padding-bottom: 8px;
+}
+.pip-sidenav md-list .pip-section md-divider {
+  margin-bottom: 8px;
+}
+.pip-sidenav .pip-sidenav-header {
+  position: relative;
+  padding-top: 102px;
+  min-height: 164px !important;
+  padding-bottom: 16px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.pip-sidenav .pip-sidenav-header.pip-sidenav-owner {
+  min-height: 144px !important;
+}
+.pip-sidenav .pip-sidenav-header .pip-sidenav-party {
+  display: inline-block;
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  min-width: initial;
+  width: 80px;
+  height: 80px;
+  margin: 0px;
+  padding: 0px;
+}
+.pip-sidenav .pip-sidenav-header .pip-sidenav-user {
+  display: inline-block;
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  width: 50px;
+  min-width: initial;
+  height: 50px;
+  margin: 0px;
+  padding: 0px;
+}
+.pip-sidenav .pip-sidenav-party-text .pip-sidenav-party-pri {
+  display: block;
+  font-size: 22px;
+  text-decoration: none;
+  color: #ffffff;
+  letter-spacing: 0.005em;
+  word-wrap: break-word;
+}
+.pip-sidenav .pip-sidenav-party-text .pip-sidenav-party-pri:hover,
+.pip-sidenav .pip-sidenav-party-text .pip-sidenav-party-pri:focus {
+  color: #ffffff;
+  text-decoration: none;
+}
+.pip-sidenav .pip-sidenav-party-text .pip-sidenav-party-sec {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pip-sidenav md-list-item .md-button {
+  padding-left: 24px;
+  padding-right: 24px;
+  border-radius: 0;
+}
+@media (max-width: 768px) {
+  .pip-sidenav .pip-sidenav-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .pip-sidenav md-list-item .md-button {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .pip-sidenav .pip-sidenav-party {
+    left: 16px;
+  }
+  .pip-sidenav .pip-sidenav-user {
+    right: 16px;
+  }
+}
+.pip-nav-header md-toolbar {
+  position: relative;
+  padding-top: 16px;
+  min-height: 82px !important;
+  padding-bottom: 16px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.pip-nav-header md-toolbar.pip-nav-header-owner {
+  min-height: 82px !important;
+}
+.pip-nav-header .pip-nav-header-party {
+  display: inline-block;
+  top: 16px;
+  left: 24px;
+  min-width: initial;
+  width: 80px;
+  height: 80px;
+  margin: 0px;
+  padding: 0px;
+}
+.pip-nav-header .pip-nav-header-party .pip-nav-header-user-image {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+}
+.pip-nav-header .pip-nav-header-user {
+  width: 80px;
+  min-width: initial;
+  height: 80px;
+  margin: 0px 16px 0px 0px;
+  padding: 0px;
+}
+.pip-nav-header .pip-nav-header-user .pip-nav-header-user-image {
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+}
+.pip-nav-header .pip-nav-header-user-text .pip-nav-header-user-pri {
+  cursor: pointer !important;
+  font-size: 22px;
+  text-decoration: none;
+  color: #ffffff;
+  letter-spacing: 0.005em;
+  word-wrap: break-word;
+}
+.pip-nav-header .pip-nav-header-user-text .pip-nav-header-user-sec {
+  margin-top: 4px;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pip-nav-header .pip-nav-header-party-text .pip-nav-header-party-pri {
+  display: block;
+  font-size: 22px;
+  text-decoration: none;
+  color: #ffffff;
+  letter-spacing: 0.005em;
+  word-wrap: break-word;
+  cursor: pointer !important;
+}
+.pip-nav-header .pip-nav-header-party-text .pip-nav-header-party-pri:hover,
+.pip-nav-header .pip-nav-header-party-text .pip-nav-header-party-pri:focus {
+  color: #ffffff;
+  text-decoration: none;
+}
+.pip-nav-header .pip-nav-header-party-text .pip-nav-header-party-sec {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .pip-nav-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .pip-nav-header .pip-nav-header-party {
+    left: 16px;
+  }
+  .pip-nav-header .pip-nav-header-user {
+    right: 16px;
+  }
+}
+.pip-nav-menu md-list-item .md-button .md-list-item-inner {
+  line-height: 48px;
+}
+.pip-nav-menu .md-subheader {
+  line-height: 48px;
+}
+.pip-nav-menu .md-subheader .md-subheader-inner {
+  padding: 24px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.pip-nav-menu .pip-section {
+  padding-bottom: 8px;
+}
+.pip-nav-menu .pip-section md-divider {
+  margin-bottom: 8px;
+}
+.pip-nav-menu md-list-item .md-button {
+  padding-left: 24px;
+  padding-right: 24px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+@media (max-width: 768px) {
+  .pip-nav-menu md-list-item .md-button {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
 .pip-sticky-sidenav.overflow-visible {
   overflow: visible!important;
 }
 .pip-sticky-sidenav md-backdrop.md-opaque.ng-enter {
   opacity: .48;
 }
-.pip-sticky-sidenav md-sidenav {
+.pip-sticky-sidenav {
   background: #e0e0e0;
   border-right: solid 1px #ffffff;
+}
+.pip-sticky-sidenav md-sidenav {
+  border-right: solid 1px rgba(0, 0, 0, 0.12);
+  background: #e0e0e0;
   width: 320px !important;
   transition: width 0.35s ease;
+  height: calc(100%);
   overflow-x: hidden;
-}
-.pip-sticky-sidenav.pip-sticky-nav-small {
-  border-right: solid 1px #ffffff;
 }
 .pip-sticky-sidenav.pip-sticky-nav-small md-sidenav {
   width: 72px !important;
   transition: width 0.35s ease;
+}
+.pip-sticky-sidenav.sidenav-desktop .pip-sticky-nav-header,
+.pip-sticky-sidenav.sidenav-tablet .pip-sticky-nav-header,
+.pip-sticky-sidenav.sidenav-xdesktop .pip-sticky-nav-header {
+  display: none;
 }
 .pip-sticky-nav-header {
   height: 112px;
@@ -6761,7 +6976,6 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-sticky-nav-header .pip-sticky-nav-header-user-text {
   max-height: 112px;
   padding-left: 16px;
-  opacity: 1;
 }
 .pip-sticky-nav-header .pip-sticky-nav-header-user-text .pip-sticky-nav-header-user-pri {
   max-height: 84px;
@@ -6777,37 +6991,6 @@ md-select md-select-value .md-text .pip-tabs-badge {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.pip-sticky-nav-small .pip-sticky-nav-header {
-  width: 100%;
-  height: 112px;
-}
-.pip-sticky-nav-small .pip-sticky-nav-header md-toolbar {
-  position: relative;
-  min-height: 82px !important;
-  padding-left: 0px;
-  padding-right: 0px;
-}
-.pip-sticky-nav-small .pip-sticky-nav-header md-toolbar.pip-sticky-nav-header-owner {
-  min-height: 82px !important;
-}
-.pip-sticky-nav-small .pip-sticky-nav-header .pip-sticky-nav-header-user-text {
-  opacity: 0;
-  width: 0px;
-  padding-left: 0px;
-}
-.pip-sticky-nav-small .pip-sticky-nav-header .pip-sticky-nav-header-user {
-  width: 40px;
-  min-width: initial;
-  height: 40px;
-  margin-left: 16px;
-  margin-right: 0px;
-  padding: 0px;
-}
-.pip-sticky-nav-small .pip-sticky-nav-header .pip-sticky-nav-header-user .pip-sticky-nav-header-user-image {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
 }
 .pip-sticky-nav-expanded-button .md-button .pip-sticky-nav-menu-icon {
   margin-left: 0px;
@@ -6833,6 +7016,10 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button {
   padding-left: 24px !important;
   padding-right: 24px !important;
+  line-height: 48px;
+  height: 48px;
+  margin: 0px;
+  width: 100%;
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
   border-radius: 0px;
@@ -6840,25 +7027,25 @@ md-select md-select-value .md-text .pip-tabs-badge {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
-.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .md-list-item-inner {
-  line-height: 48px;
-}
-.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .md-list-item-inner .pip-sticky-nav-menu-title {
-  padding-right: 24px;
+.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
+  padding-right: 0px 24px 0px 0px;
+  width: 200px;
+  text-transform: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   animation: title-animation 0.35s ease;
+  text-align: left;
 }
-.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .md-list-item-inner .pip-sticky-nav-menu-icon-block {
-  width: 24px;
+.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-icon-block {
+  width: 48px;
   padding-right: 24px !important;
 }
-.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .md-list-item-inner .pip-sticky-nav-menu-icon-block .pip-sticky-nav-menu-icon {
+.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-icon-block .pip-sticky-nav-menu-icon {
   margin-top: 12px;
   margin-bottom: 12px;
 }
-.pip-sticky-nav-menu .pip-sticky-nav-menu-badge {
+.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   position: absolute;
   left: 274px;
   top: 11px;
@@ -6873,61 +7060,89 @@ md-select md-select-value .md-text .pip-tabs-badge {
   background: red;
   animation: badge-animation 0.35s ease;
 }
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-badge {
-  position: absolute;
-  top: 5px;
-  left: 32px;
-  animation: bage-animation-back 0.35s ease;
+.pip-sticky-nav-menu .section-title.ng-enter,
+.pip-sticky-nav-menu .section-title.ng-leave,
+.pip-sticky-nav-menu .section-icon.ng-enter,
+.pip-sticky-nav-menu .section-icon.ng-leave {
+  -webkit-transition: 1s linear all;
+  -moz-transition: 1s linear all;
+  -ms-transition: 1s linear all;
+  -o-transition: 1s linear all;
+  transition: 1s linear all;
+}
+.pip-sticky-nav-menu .section-title.ng-enter,
+.pip-sticky-nav-menu .section-icon.ng-enter {
+  opacity: 0;
+}
+.pip-sticky-nav-menu .section-title.ng-enter.ng-enter-active,
+.pip-sticky-nav-menu .section-icon.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+.pip-sticky-nav-menu .section-title.ng-leave,
+.pip-sticky-nav-menu .section-icon.ng-leave {
+  opacity: 1;
+}
+.pip-sticky-nav-menu .section-title.ng-leave.ng-leave-active,
+.pip-sticky-nav-menu .section-icon.ng-leave.ng-leave-active {
+  opacity: 1;
 }
 .pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button {
   margin-right: 0px;
 }
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .md-list-item-inner .pip-sticky-nav-menu-title {
+.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
+  top: 5px;
+  left: 32px;
+  animation: badge-animation-back 0.35s ease;
+}
+.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
+  opacity: 0;
   animation: title-animation-back 0.35s ease;
 }
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .md-list-item-inner .pip-sticky-nav-menu-icon-block .pip-sticky-nav-menu-icon {
+.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-icon-block .pip-sticky-nav-menu-icon {
   margin-left: 0px;
 }
 @keyframes title-animation {
-  from {
+  0% {
     opacity: 0;
-    width: 220px;
-  }
-  to {
-    opacity: 1;
     width: 0px;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 1;
+    width: 200px;
   }
 }
 @keyframes title-animation-back {
   0% {
-    opacity: 0;
-    width: 220px;
+    opacity: 1;
+    width: 200px;
   }
-  30% {
+  50% {
+    opacity: 0.3;
+  }
+  80% {
     opacity: 0;
-    width: 220px;
+    width: 0px;
   }
   100% {
-    opacity: 1;
+    opacity: 0;
     width: 0px;
   }
 }
-@keyframes bage-animation {
-  from {
+@keyframes badge-animation {
+  0% {
     top: 5px;
     left: 32px;
   }
-  to {
+  100% {
     left: 274px;
     top: 11px;
   }
 }
-@keyframes bage-animation-back {
+@keyframes badge-animation-back {
   0% {
-    left: 274px;
-    top: 11px;
-  }
-  30% {
     left: 274px;
     top: 11px;
   }
