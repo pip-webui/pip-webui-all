@@ -1,4 +1,4 @@
-declare module pip {
+declare module pip.services {
 
 
 
@@ -223,7 +223,7 @@ export interface ITimerService {
 
 }
 
-declare module pip {
+declare module pip.buttons {
 
 
 
@@ -236,11 +236,11 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.landing {
 
 }
 
-declare module pip {
+declare module pip.layouts {
 
 
 
@@ -252,11 +252,11 @@ var Masonry: any;
 
 }
 
-declare module pip {
+declare module pip.split {
 
 }
 
-declare module pip {
+declare module pip.behaviors {
 
 
 
@@ -267,7 +267,7 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.controls {
 
 
 
@@ -295,13 +295,13 @@ var marked: any;
 
 }
 
-declare module pip {
+declare module pip.lists {
 
 
 
 }
 
-declare module pip {
+declare module pip.dates {
 
 
 function formatTimeFilter(pipDateTime: any): (value: any, format: string) => string;
@@ -394,7 +394,7 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 }
 
-declare module pip {
+declare module pip.dialogs {
 
 
 
@@ -404,7 +404,7 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.nav {
 
 
 
@@ -430,13 +430,13 @@ export class NavService implements INavService {
     navMenu: any;
 }
 
+
+
+
+
+
+
 var thisModule: ng.IModule;
-
-
-
-
-
-
 
 
 
@@ -614,7 +614,7 @@ export class SearchService implements ISearchService {
 
 }
 
-declare module pip {
+declare module pip.themes {
 
 
 
@@ -631,7 +631,7 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.errors {
 
 
 
@@ -646,7 +646,7 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.charts {
 
 
 
@@ -654,7 +654,7 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.settings {
 
 
 
@@ -666,7 +666,7 @@ declare module pip {
 
 }
 
-declare module pip {
+declare module pip.help {
 
 
 
