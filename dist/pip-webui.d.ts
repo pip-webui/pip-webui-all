@@ -10,9 +10,14 @@ declare module pip.services {
 
 
 
-
 export let CurrentState: any;
 export let PreviousState: any;
+
+
+
+
+
+
 
 let RedirectedStates: any;
 function decorateRedirectStateProvider($delegate: any): any;
@@ -21,10 +26,6 @@ function decorateRedirectStateService($delegate: any, $timeout: any): any;
 function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
-
-
-
-
 
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
@@ -46,6 +47,8 @@ export interface IIdentityProvider extends ng.IServiceProvider {
 
 
 
+
+
 export const SessionRootVar: string;
 export const SessionOpenedEvent: string;
 export const SessionClosedEvent: string;
@@ -61,61 +64,17 @@ export interface ISessionProvider extends ng.IServiceProvider {
 }
 
 
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
 
 
 
 
 
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
 
 function translateDirective(pipTranslate: any): ng.IDirective;
 function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 
 function translateFilter(pipTranslate: any): (key: any) => any;
 function optionalTranslateFilter($injector: any): (key: any) => any;
-
-
-
-
 
 export let LanguageRootVar: string;
 export let LanguageChangedEvent: string;
@@ -169,6 +128,58 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
+
+
+
+
+
+
+
+
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
+
 export interface ICodes {
     hash(value: string): number;
     verification(): string;
@@ -178,6 +189,21 @@ export interface IFormat {
     sample(value: string, maxLength: number): string;
     sprintf(message: string, ...args: any[]): string;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export let ResetPageEvent: string;
 export let ResetAreaEvent: string;
@@ -248,7 +274,60 @@ declare module pip.layouts {
 
 
 
-var Masonry: any;
+
+
+
+
+export const __: any;
+
+export const __: any;
+
+export const __: any;
+
+export const __: any;
+
+function simpleDirective(): {
+    restrict: string;
+    link: ($scope: any, $element: any, $attrs: any) => void;
+};
+
+export const __: any;
+
+export class MediaBreakpoints {
+    constructor(xs: number, sm: number, md: number, lg: number);
+    xs: number;
+    sm: number;
+    md: number;
+    lg: number;
+}
+export class MediaBreakpointStatuses {
+    width: number;
+    'xs': boolean;
+    'gt-xs': boolean;
+    'sm': boolean;
+    'gt-sm': boolean;
+    'md': boolean;
+    'gt-md': boolean;
+    'lg': boolean;
+    'gt-lg': boolean;
+    'xl': boolean;
+    update(breakpoints: MediaBreakpoints, width: number): void;
+}
+export let MainResizedEvent: string;
+export let LayoutResizedEvent: string;
+export let MainBreakpoints: MediaBreakpoints;
+export let MainBreakpointStatuses: MediaBreakpointStatuses;
+export interface IMediaService {
+    (breakpoint: string): boolean;
+    breakpoints: MediaBreakpoints;
+    width: number;
+}
+export interface IMediaProvider extends ng.IServiceProvider {
+    breakpoints: MediaBreakpoints;
+}
+
+export function addResizeListener(element: any, listener: any): void;
+export function removeResizeListener(element: any, listener: any): void;
 
 }
 
@@ -283,13 +362,13 @@ declare module pip.controls {
 
 
 
+
+
+
+
+
+
 var marked: any;
-
-
-
-
-
-
 
 
 
@@ -442,6 +521,8 @@ var thisModule: ng.IModule;
 
 
 
+function translateFilter($injector: any): (key: any) => any;
+
 
 
 
@@ -505,8 +586,6 @@ export class BreadcrumbService implements IBreadcrumbService {
     criteria: string;
     sendEvent(): void;
 }
-
-function translateFilter($injector: any): (key: any) => any;
 
 
 
@@ -619,6 +698,45 @@ declare module pip.themes {
 
 
 
+function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnWarmTheme($mdThemingProvider: any): void;
+
+
+
+
+
+
+
+
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export interface IThemeService {
+    theme: string;
+    use(language: string): string;
+}
+export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
+
+function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultBlueTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultGreenTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultGreyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 
 
