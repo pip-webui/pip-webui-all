@@ -8172,8 +8172,8 @@ var SideNavProvider = (function () {
     return SideNavProvider;
 }());
 function hookSideNavEvents($rootScope, pipSideNav) {
-    $rootScope.$on(exports.OpenSideNavEvent, pipSideNav.open);
-    $rootScope.$on(exports.CloseSideNavEvent, pipSideNav.close);
+    $rootScope.$on(exports.OpenSideNavEvent, function () { pipSideNav.open(); });
+    $rootScope.$on(exports.CloseSideNavEvent, function () { pipSideNav.close(); });
 }
 angular
     .module('pipSideNav')
