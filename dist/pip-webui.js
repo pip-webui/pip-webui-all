@@ -6341,8 +6341,12 @@ var AppBarService = (function () {
         this._config.visible = false;
         this.sendConfigEvent();
     };
-    AppBarService.prototype.addShadow = function (breakpoints) {
+    AppBarService.prototype.addShadow = function () {
         var _this = this;
+        var breakpoints = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            breakpoints[_i - 0] = arguments[_i];
+        }
         this._config.classes = _.remove(this._config.classes, function (c) { return c.startsWith('pip-shadow'); });
         this._config.classes.push('pip-shadow');
         _.each(breakpoints, function (bp) {
