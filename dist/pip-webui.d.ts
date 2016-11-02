@@ -45,6 +45,65 @@ export interface ISessionProvider extends ng.IServiceProvider {
 }
 
 
+function translateDirective(pipTranslate: any): ng.IDirective;
+function translateHtmlDirective(pipTranslate: any): ng.IDirective;
+
+function translateFilter(pipTranslate: any): (key: any) => any;
+function optionalTranslateFilter($injector: any): (key: any) => any;
+
+export let LanguageRootVar: string;
+export let LanguageChangedEvent: string;
+export interface ITranslateService {
+    language: string;
+    use(language: string): string;
+    setTranslations(language: string, translations: any): void;
+    translations(language: string, translations: any): void;
+    translate(key: string): string;
+    translateArray(keys: string[]): string[];
+    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
+    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
+    translateWithPrefix(prefix: string, key: string): any;
+    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
+    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
+}
+export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
+}
+
+export class Translation {
+    protected _language: string;
+    protected _translations: {
+        en: {
+            'en': string;
+            'ru': string;
+            'es': string;
+            'pt': string;
+            'de': string;
+            'fr': string;
+        };
+        ru: {
+            'en': string;
+            'ru': string;
+            'es': string;
+            'pt': string;
+            'de': string;
+            'fr': string;
+        };
+    };
+    constructor();
+    language: string;
+    use(language: string): string;
+    setTranslations(language: string, translations: any): void;
+    translations(language: string, translations: any): void;
+    translate(key: string): string;
+    translateArray(keys: string[]): string[];
+    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
+    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
+    translateWithPrefix(prefix: string, key: string): any;
+    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+}
+
+
 export class Transaction {
     private _scope;
     private _id;
@@ -138,65 +197,6 @@ export interface ITimerService {
     clearEvents(): void;
     start(): void;
     stop(): void;
-}
-
-
-function translateDirective(pipTranslate: any): ng.IDirective;
-function translateHtmlDirective(pipTranslate: any): ng.IDirective;
-
-function translateFilter(pipTranslate: any): (key: any) => any;
-function optionalTranslateFilter($injector: any): (key: any) => any;
-
-export let LanguageRootVar: string;
-export let LanguageChangedEvent: string;
-export interface ITranslateService {
-    language: string;
-    use(language: string): string;
-    setTranslations(language: string, translations: any): void;
-    translations(language: string, translations: any): void;
-    translate(key: string): string;
-    translateArray(keys: string[]): string[];
-    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
-    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
-    translateWithPrefix(prefix: string, key: string): any;
-    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
-    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
-}
-export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
-}
-
-export class Translation {
-    protected _language: string;
-    protected _translations: {
-        en: {
-            'en': string;
-            'ru': string;
-            'es': string;
-            'pt': string;
-            'de': string;
-            'fr': string;
-        };
-        ru: {
-            'en': string;
-            'ru': string;
-            'es': string;
-            'pt': string;
-            'de': string;
-            'fr': string;
-        };
-    };
-    constructor();
-    language: string;
-    use(language: string): string;
-    setTranslations(language: string, translations: any): void;
-    translations(language: string, translations: any): void;
-    translate(key: string): string;
-    translateArray(keys: string[]): string[];
-    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
-    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
-    translateWithPrefix(prefix: string, key: string): any;
-    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
-    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
 }
@@ -495,6 +495,7 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -505,7 +506,6 @@ export interface INavService {
     header: INavHeaderService;
     menu: INavMenuService;
 }
-
 
 
 
@@ -679,6 +679,23 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 
 declare module pip.themes {
 
+function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultBlueTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultGreenTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultGreyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+
 function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
@@ -697,23 +714,6 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
-
-function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultBlueTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultGreenTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultGreyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
 
 }
 

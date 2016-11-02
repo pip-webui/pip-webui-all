@@ -5762,8 +5762,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/information.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/error_details.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -5774,8 +5774,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/error_details.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/information.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -8445,7 +8445,7 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('appbar/AppBar.html',
+  $templateCache.put('appbar/appbar.html',
     '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
 }]);
 })();
@@ -9635,6 +9635,18 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection_panel/no_connection_panel.html',
+    '<div class="pip-empty pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
@@ -9649,18 +9661,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection/no_connection.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-empty pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
