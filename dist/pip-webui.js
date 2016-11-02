@@ -1613,6 +1613,7 @@ __export(require('./media/MediaService'));
 __export(require('./media/ResizeFunctions'));
 },{"./layouts/CardDirective":2,"./layouts/DialogDirective":3,"./layouts/DocumentDirective":4,"./layouts/MainDirective":5,"./layouts/SimpleDirective":6,"./layouts/TilesDirective":7,"./media/MediaService":8,"./media/ResizeFunctions":9}],2:[function(require,module,exports){
 'use strict';
+<<<<<<< HEAD
 cardDirective.$inject = ['$rootScope'];
 var MediaService_1 = require('../media/MediaService');
 exports.__ = null;
@@ -1789,6 +1790,203 @@ exports.__ = null;
 var MediaService_1 = require('../media/MediaService');
 var TilesDirectiveLink = (function () {
     function TilesDirectiveLink($rootScope, $element, $attrs) {
+=======
+var MediaService_1 = require('../media/MediaService');
+(function () {
+    cardDirective.$inject = ['$rootScope'];
+    var CardDirectiveLink = (function () {
+        function CardDirectiveLink($rootScope, $element, $attrs) {
+            var _this = this;
+            this._element = $element;
+            this._rootScope = $rootScope;
+            this._attrs = $attrs;
+            $element.addClass('pip-card');
+            var listener = function () { _this.resize(); };
+            $rootScope.$on(MediaService_1.MainResizedEvent, listener);
+            this.resize();
+            setTimeout(listener, 100);
+        }
+        CardDirectiveLink.prototype.resize = function () {
+            var _this = this;
+            var $mainBody = $('.pip-main-body'), cardContainer = $('.pip-card-container'), windowWidth = $('pip-main').width(), maxWidth = $mainBody.width(), maxHeight = $mainBody.height(), minWidth = this._attrs.minWidth ? Math.floor(this._attrs.minWidth) : null, minHeight = this._attrs.minHeight ? Math.floor(this._attrs.minHeight) : null, width = this._attrs.width ? Math.floor(this._attrs.width) : null, height = this._attrs.height ? Math.floor(this._attrs.height) : null, left, top;
+            if (MediaService_1.MainBreakpointStatuses.xs) {
+                minWidth = null;
+                minHeight = null;
+                width = null;
+                height = null;
+                maxWidth = null;
+                maxHeight = null;
+            }
+            else {
+                var space = MediaService_1.MainBreakpointStatuses['gt-md'] ? 24 : 16;
+                maxWidth -= space * 2;
+                maxHeight -= space * 2;
+                minWidth = minWidth ? Math.min(minWidth, maxWidth) : null;
+                minHeight = minHeight ? Math.min(minHeight, maxHeight) : null;
+                width = width ? Math.min(width, maxWidth) : null;
+                height = height ? Math.min(height, maxHeight) : null;
+            }
+            this._element.css('max-width', maxWidth ? maxWidth + 'px' : '');
+            this._element.css('min-width', minWidth ? minWidth + 'px' : '');
+            this._element.css('width', width ? width + 'px' : '');
+            this._element.css('height', height ? height + 'px' : '');
+            if (!cardContainer.hasClass('pip-outer-scroll')) {
+                this._element.css('max-height', maxHeight ? maxHeight + 'px' : '');
+                this._element.css('min-height', minHeight ? minHeight + 'px' : '');
+                var $header = this._element.find('.pip-header:visible'), $footer = this._element.find('.pip-footer:visible'), $body = this._element.find('.pip-body'), maxBodyHeight = maxHeight || $mainBody.height();
+                if ($header.length > 0)
+                    maxBodyHeight -= $header.outerHeight(true);
+                if ($footer.length > 0)
+                    maxBodyHeight -= $footer.outerHeight(true);
+                $body.css('max-height', maxBodyHeight + 'px');
+            }
+            else {
+                cardContainer.addClass('pip-scroll');
+                if (MediaService_1.MainBreakpointStatuses.xs) {
+                    left = 0;
+                    top = 0;
+                }
+                else {
+                    left = cardContainer.width() / 2 - this._element.width() / 2 - 16;
+                    top = Math.max(cardContainer.height() / 2 - this._element.height() / 2 - 16, 0);
+                }
+                this._element.css('left', left);
+                this._element.css('top', top);
+                setTimeout(function () { _this._element.css('display', 'flex'); }, 100);
+            }
+            this._rootScope.$emit('pipLayoutResized');
+        };
+        return CardDirectiveLink;
+    }());
+    function cardDirective($rootScope) {
+        "ngInject";
+        return {
+            restrict: 'EA',
+            link: function ($scope, $element, $attrs) {
+                new CardDirectiveLink($rootScope, $element, $attrs);
+            }
+        };
+    }
+    angular
+        .module('pipLayout')
+        .directive('pipCard', cardDirective);
+})();
+},{"../media/MediaService":8}],3:[function(require,module,exports){
+'use strict';
+(function () {
+    function dialogDirective() {
+        return {
+            restrict: 'EA',
+            link: function ($scope, $element, $attrs) {
+                $element.addClass('pip-dialog');
+            }
+        };
+    }
+    angular
+        .module('pipLayout')
+        .directive('pipDialog', dialogDirective);
+})();
+},{}],4:[function(require,module,exports){
+'use strict';
+(function () {
+    function documentDirective() {
+        return {
+            restrict: 'EA',
+            link: function ($scope, $element, $attrs) {
+                $element.addClass('pip-document');
+            }
+        };
+    }
+    angular
+        .module('pipLayout')
+        .directive('pipDocument', documentDirective);
+})();
+},{}],5:[function(require,module,exports){
+'use strict';
+var ResizeFunctions_1 = require('../media/ResizeFunctions');
+var MediaService_1 = require('../media/MediaService');
+(function () {
+    var MainDirectiveController = (function () {
+        MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout'];
+        function MainDirectiveController($scope, $element, $rootScope, $timeout) {
+            var _this = this;
+            this._element = $element;
+            this._rootScope = $rootScope;
+            this._timeout = $timeout;
+            $element.addClass('pip-main');
+            var listener = function () { _this.resize(); };
+            ResizeFunctions_1.addResizeListener($element[0], listener);
+            $scope.$on('$destroy', function () {
+                ResizeFunctions_1.removeResizeListener($element[0], listener);
+            });
+            this.updateBreakpointStatuses();
+        }
+        MainDirectiveController.prototype.updateBreakpointStatuses = function () {
+            var _this = this;
+            var width = this._element.innerWidth();
+            var body = $('body');
+            MediaService_1.MainBreakpointStatuses.update(MediaService_1.MainBreakpoints, width);
+            $.each(MediaService_1.MainBreakpointStatuses, function (breakpoint, status) {
+                if (_.isBoolean(status))
+                    body[status ? 'addClass' : 'removeClass']('pip-' + breakpoint);
+            });
+            this._timeout(function () {
+                _this._rootScope.$apply();
+            });
+        };
+        MainDirectiveController.prototype.resize = function () {
+            this.updateBreakpointStatuses();
+            this._rootScope.$emit(MediaService_1.MainResizedEvent, MediaService_1.MainBreakpointStatuses);
+        };
+        return MainDirectiveController;
+    }());
+    var MainBodyDirectiveLink = (function () {
+        function MainBodyDirectiveLink($scope, $element) {
+            $element.addClass('pip-main-body');
+        }
+        return MainBodyDirectiveLink;
+    }());
+    function mainDirective() {
+        return {
+            restrict: 'EA',
+            controller: MainDirectiveController,
+            controllerAs: 'vm'
+        };
+    }
+    function mainBodyDirective() {
+        return {
+            restrict: 'EA',
+            link: MainBodyDirectiveLink
+        };
+    }
+    angular
+        .module('pipLayout')
+        .directive('pipMain', mainDirective)
+        .directive('pipMainBody', mainBodyDirective);
+})();
+},{"../media/MediaService":8,"../media/ResizeFunctions":9}],6:[function(require,module,exports){
+'use strict';
+(function () {
+    function simpleDirective() {
+        return {
+            restrict: 'EA',
+            link: function ($scope, $element, $attrs) {
+                $element.addClass('pip-simple');
+            }
+        };
+    }
+    angular
+        .module('pipLayout')
+        .directive('pipSimple', simpleDirective);
+})();
+},{}],7:[function(require,module,exports){
+'use strict';
+tilesDirective.$inject = ['$rootScope'];
+var ResizeFunctions_1 = require('../media/ResizeFunctions');
+var MediaService_1 = require('../media/MediaService');
+var TilesDirectiveLink = (function () {
+    function TilesDirectiveLink($scope, $element, $rootScope, $attrs) {
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
         var _this = this;
         this._element = $element;
         this._rootScope = $rootScope;
@@ -1798,6 +1996,14 @@ var TilesDirectiveLink = (function () {
             this._prevContainerWidth = null,
             this._masonry = Masonry.data(this._container[0]);
         $element.addClass('pip-tiles');
+<<<<<<< HEAD
+=======
+        var listener = function () { _this.resize(false); };
+        ResizeFunctions_1.addResizeListener($element[0], listener);
+        $scope.$on('$destroy', function () {
+            ResizeFunctions_1.removeResizeListener($element[0], listener);
+        });
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
         this._sizer = $('<div class="pip-tile-sizer"></div>');
         this._sizer.appendTo(this._container);
         $rootScope.$on(MediaService_1.MainResizedEvent, function () { _this.resize(false); });
@@ -1806,7 +2012,12 @@ var TilesDirectiveLink = (function () {
     TilesDirectiveLink.prototype.resize = function (force) {
         var width = this._element.parent().width();
         var containerWidth;
+<<<<<<< HEAD
         if (MediaService_1.MainBreakpointStatuses.xs) {
+=======
+        console.log();
+        if (MediaService_1.MainBreakpointStatuses['gt-xs'] && (width - 36) > this._columnWidth) {
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
             width = width - 24 * 2;
             var columns = Math.floor(width / this._columnWidth);
             containerWidth = (this._columnWidth + 16) * columns - 16;
@@ -1861,6 +2072,205 @@ function tilesDirective($rootScope) {
                     + ' masonry-options="tilesOptions"  pip-scroll-container="\'.pip-tiles\'"'
                     + ' pip-infinite-scroll="readScroll()" >'
                     + '</div>';
+<<<<<<< HEAD
+=======
+            }
+            else {
+                return String()
+                    + '<div masonry class="pip-tiles-container" load-images="false" preserve-order  '
+                    + ' ng-transclude column-width=".pip-tile-sizer" item-selector=".pip-tile"'
+                    + ' masonry-options="tilesOptions">'
+                    + '</div>';
+            }
+        },
+        controller: ['$scope', function ($scope) {
+            $scope.tilesOptions = {
+                gutter: 8,
+                isFitWidth: false,
+                isResizeBound: false,
+                transitionDuration: 0
+            };
+        }],
+        link: function ($scope, $element, $attrs) {
+            new TilesDirectiveLink($scope, $element, $rootScope, $attrs);
+        }
+    };
+}
+angular
+    .module('pipLayout')
+    .directive('pipTiles', tilesDirective);
+},{"../media/MediaService":8,"../media/ResizeFunctions":9}],8:[function(require,module,exports){
+'use strict';
+var MediaBreakpoints = (function () {
+    function MediaBreakpoints(xs, sm, md, lg) {
+        this.xs = xs;
+        this.sm = sm;
+        this.md = md;
+        this.lg = lg;
+    }
+    return MediaBreakpoints;
+}());
+exports.MediaBreakpoints = MediaBreakpoints;
+var MediaBreakpointStatuses = (function () {
+    function MediaBreakpointStatuses() {
+    }
+    MediaBreakpointStatuses.prototype.update = function (breakpoints, width) {
+        if (breakpoints == null)
+            return;
+        this.width = width;
+        this['xs'] = width <= breakpoints.xs;
+        this['gt-xs'] = width > breakpoints.xs;
+        this['sm'] = width > breakpoints.xs && width <= breakpoints.sm;
+        this['gt-sm'] = width > breakpoints.sm;
+        this['md'] = width > breakpoints.sm && width <= breakpoints.md;
+        this['gt-md'] = width > breakpoints.md;
+        this['lg'] = width > breakpoints.md && width <= breakpoints.lg;
+        this['gt-lg'] = width > breakpoints.lg;
+        this['xl'] = this['gt-lg'];
+    };
+    return MediaBreakpointStatuses;
+}());
+exports.MediaBreakpointStatuses = MediaBreakpointStatuses;
+exports.MainResizedEvent = 'pipMainResized';
+exports.LayoutResizedEvent = 'pipLayoutResized';
+exports.MainBreakpoints = new MediaBreakpoints(639, 959, 1024, 1919);
+exports.MainBreakpointStatuses = new MediaBreakpointStatuses();
+var MediaProvider = (function () {
+    function MediaProvider() {
+    }
+    Object.defineProperty(MediaProvider.prototype, "breakpoints", {
+        get: function () {
+            return exports.MainBreakpoints;
+        },
+        set: function (value) {
+            exports.MainBreakpoints = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    MediaProvider.prototype.$get = function () {
+        var service = function (size) {
+            return exports.MainBreakpointStatuses[size];
+        };
+        Object.defineProperty(service, 'breakpoints', {
+            get: function () { return exports.MainBreakpoints; },
+            set: function (value) {
+                exports.MainBreakpoints = value || new MediaBreakpoints(639, 959, 1024, 1919);
+                exports.MainBreakpointStatuses.update(exports.MainBreakpoints, exports.MainBreakpointStatuses.width);
+            }
+        });
+        Object.defineProperty(service, 'width', {
+            get: function () {
+                return exports.MainBreakpointStatuses.width;
+            }
+        });
+        return service;
+    };
+    return MediaProvider;
+}());
+angular
+    .module('pipLayout')
+    .provider('pipMedia', MediaProvider);
+},{}],9:[function(require,module,exports){
+'use strict';
+var attachEvent = document.attachEvent;
+var isIE = navigator.userAgent.match(/Trident/);
+function requestFrame(callback) {
+    var frame = window.requestAnimationFrame
+        || window.mozRequestAnimationFrame
+        || window.webkitRequestAnimationFrame
+        || function (callback) {
+            return window.setTimeout(callback, 20);
+        };
+    return frame(callback);
+}
+function cancelFrame() {
+    var cancel = window.cancelAnimationFrame
+        || window.mozCancelAnimationFrame
+        || window.webkitCancelAnimationFrame
+        || window.clearTimeout;
+    return function (id) {
+        return cancel(id);
+    };
+}
+function resizeListener(event) {
+    var win = event.target || event.srcElement;
+    if (win.__resizeRAF__)
+        cancelFrame();
+    win.__resizeRAF__ = requestFrame(function () {
+        var trigger = win.__resizeTrigger__;
+        trigger.__resizeListeners__.forEach(function (fn) {
+            fn.call(trigger, event);
+        });
+    });
+}
+function loadListener(event) {
+    this.contentDocument.defaultView.__resizeTrigger__ = this.__resizeElement__;
+    this.contentDocument.defaultView.addEventListener('resize', resizeListener);
+}
+function addResizeListener(element, listener) {
+    if (!element.__resizeListeners__) {
+        element.__resizeListeners__ = [];
+        if (attachEvent) {
+            element.__resizeTrigger__ = element;
+            element.attachEvent('onresize', resizeListener);
+        }
+        else {
+            if (getComputedStyle(element).position == 'static')
+                element.style.position = 'relative';
+            var obj = element.__resizeTrigger__ = document.createElement('object');
+            obj.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;');
+            obj.__resizeElement__ = element;
+            obj.onload = loadListener;
+            obj.type = 'text/html';
+            if (isIE)
+                element.appendChild(obj);
+            obj.data = 'about:blank';
+            if (!isIE)
+                element.appendChild(obj);
+        }
+    }
+    element.__resizeListeners__.push(listener);
+}
+exports.addResizeListener = addResizeListener;
+function removeResizeListener(element, listener) {
+    if (listener)
+        element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(listener), 1);
+    if (!element.__resizeListeners__.length) {
+        if (attachEvent)
+            element.detachEvent('onresize', resizeListener);
+        else {
+            element.__resizeTrigger__.contentDocument.defaultView.removeEventListener('resize', resizeListener);
+            element.__resizeTrigger__ = !element.removeChild(element.__resizeTrigger__);
+        }
+    }
+}
+exports.removeResizeListener = removeResizeListener;
+},{}]},{},[1])(1)
+});
+
+
+
+
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSplit', []);
+    thisModule.run(['$rootScope', 'pipSplit', function ($rootScope, pipSplit) {
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+            var splitElements = $('.pip-split');
+            if (splitElements.length > 0) {
+                splitElements.removeClass('pip-transition-forward');
+                splitElements.removeClass('pip-transition-back');
+                if (toState.name != fromState.name) {
+                    if (pipSplit.forwardTransition(toState, fromState)) {
+                        splitElements.addClass('pip-transition-forward');
+                    }
+                    else {
+                        splitElements.addClass('pip-transition-back');
+                    }
+                }
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
             }
             else {
                 return String()
@@ -6245,27 +6655,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-var NavService_1 = require('./NavService');
-angular
-    .module('pipNav', [
-    'pipDropdown',
-    'pipTabs',
-    'pipAppBar',
-    'pipSearchBar',
-    'pipNavIcon',
-    'pipBreadcrumb',
-    'pipPrimaryActions',
-    'pipSecondaryActions',
-    'pipSideNav',
-    'pipNavMenu',
-    'pipNavHeader',
-    'pipStickySideNav',
-    'pipStickyNavMenu',
-    'pipStickyNavHeader'
-])
-    .service('pipNav', NavService_1.NavService);
-},{"./NavService":2}],2:[function(require,module,exports){
-'use strict';
 var NavService = (function () {
     NavService.$inject = ['$injector'];
     function NavService($injector) {
@@ -6282,7 +6671,7 @@ var NavService = (function () {
     return NavService;
 }());
 exports.NavService = NavService;
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 'use strict';
 var thisModule = angular.module('pipActions.Service', []);
 thisModule.provider('pipActions', function () {
@@ -6343,7 +6732,7 @@ thisModule.provider('pipActions', function () {
         config.secondaryGlobalActions = secondaryActions || [];
     }
 });
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipPrimaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
@@ -6447,7 +6836,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipSecondaryActions', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates', 'pipActions.Service']);
@@ -6561,7 +6950,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipAppBar', ['ngMaterial', 'pipNav.Templates', 'pipAppBar.Service']);
@@ -6585,7 +6974,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipAppBar.Part', ['pipAppBar.Service']);
@@ -6625,7 +7014,7 @@ thisModule.provider('pipActions', function () {
         }
     }]);
 })();
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipAppBar.Service', []);
@@ -6728,7 +7117,7 @@ thisModule.provider('pipActions', function () {
         }
     });
 })();
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 var BreadcrumbService_1 = require('./BreadcrumbService');
 var BreadcrumbService_2 = require('./BreadcrumbService');
@@ -6771,7 +7160,7 @@ var BreadcrumbController = (function () {
     return BreadcrumbController;
 }());
 exports.BreadcrumbController = BreadcrumbController;
-},{"../search/SearchService":29,"./BreadcrumbService":13}],10:[function(require,module,exports){
+},{"../search/SearchService":29,"./BreadcrumbService":12}],9:[function(require,module,exports){
 'use strict';
 var BreadcrumbController_1 = require('./BreadcrumbController');
 function breadcrumbDirective() {
@@ -6785,7 +7174,7 @@ function breadcrumbDirective() {
     };
 }
 exports.breadcrumbDirective = breadcrumbDirective;
-},{"./BreadcrumbController":9}],11:[function(require,module,exports){
+},{"./BreadcrumbController":8}],10:[function(require,module,exports){
 'use strict';
 var BreadcrumbProvider_1 = require('./BreadcrumbProvider');
 var BreadcrumbDirective_1 = require('./BreadcrumbDirective');
@@ -6793,7 +7182,7 @@ angular
     .module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate'])
     .provider('pipBreadcrumb', BreadcrumbProvider_1.BreadcrumbProvider)
     .directive('pipBreadcrumb', BreadcrumbDirective_1.breadcrumbDirective);
-},{"./BreadcrumbDirective":10,"./BreadcrumbProvider":12}],12:[function(require,module,exports){
+},{"./BreadcrumbDirective":9,"./BreadcrumbProvider":11}],11:[function(require,module,exports){
 'use strict';
 var BreadcrumbService_1 = require('./BreadcrumbService');
 var BreadcrumbProvider = (function () {
@@ -6823,7 +7212,7 @@ var BreadcrumbProvider = (function () {
     return BreadcrumbProvider;
 }());
 exports.BreadcrumbProvider = BreadcrumbProvider;
-},{"./BreadcrumbService":13}],13:[function(require,module,exports){
+},{"./BreadcrumbService":12}],12:[function(require,module,exports){
 'use strict';
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
 exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
@@ -6896,7 +7285,7 @@ var BreadcrumbService = (function () {
     return BreadcrumbService;
 }());
 exports.BreadcrumbService = BreadcrumbService;
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 translateFilter.$inject = ['$injector'];
 function translateFilter($injector) {
@@ -6909,7 +7298,7 @@ function translateFilter($injector) {
 angular
     .module('pipNav.Translate', [])
     .filter('translate', translateFilter);
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipDropdown', ['pipNav.Templates']);
@@ -6962,7 +7351,28 @@ angular
         };
     }]);
 })();
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+'use strict';
+var NavService_1 = require('./NavService');
+angular
+    .module('pipNav', [
+    'pipDropdown',
+    'pipTabs',
+    'pipAppBar',
+    'pipSearchBar',
+    'pipNavIcon',
+    'pipBreadcrumb',
+    'pipPrimaryActions',
+    'pipSecondaryActions',
+    'pipSideNav',
+    'pipNavMenu',
+    'pipNavHeader',
+    'pipStickySideNav',
+    'pipStickyNavMenu',
+    'pipStickyNavHeader'
+])
+    .service('pipNav', NavService_1.NavService);
+},{"./NavService":1}],16:[function(require,module,exports){
 var pip;
 (function (pip) {
     var nav;
@@ -8733,7 +9143,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[3,4,5,7,8,6,9,10,11,12,13,14,15,16,17,19,18,20,21,22,23,24,1,2,25,26,27,28,29,30,31,32,33,34,35])(35)
+},{}]},{},[2,3,4,6,7,5,8,9,10,11,12,13,14,15,16,17,19,18,20,21,22,23,24,1,25,26,27,28,29,30,31,32,33,34,35])(35)
 });
 
 

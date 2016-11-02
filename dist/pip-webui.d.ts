@@ -64,7 +64,67 @@ export interface ISessionProvider extends ng.IServiceProvider {
 }
 
 
+<<<<<<< HEAD
 
+
+
+
+=======
+
+
+
+
+
+
+
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
+
+
+
+
+<<<<<<< HEAD
+=======
 
 
 
@@ -76,6 +136,7 @@ function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 function translateFilter(pipTranslate: any): (key: any) => any;
 function optionalTranslateFilter($injector: any): (key: any) => any;
 
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
 export let LanguageRootVar: string;
 export let LanguageChangedEvent: string;
 export interface ITranslateService {
@@ -274,6 +335,7 @@ declare module pip.layouts {
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -293,6 +355,8 @@ function simpleDirective(): {
 
 export const __: any;
 
+=======
+>>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
