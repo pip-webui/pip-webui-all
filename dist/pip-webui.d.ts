@@ -1,22 +1,7 @@
 declare module pip.services {
 
-
-
-
-
-
-
-
-
-
-
 export let CurrentState: any;
 export let PreviousState: any;
-
-
-
-
-
 
 
 let RedirectedStates: any;
@@ -45,10 +30,6 @@ export interface IIdentityProvider extends ng.IServiceProvider {
 }
 
 
-
-
-
-
 export const SessionRootVar: string;
 export const SessionOpenedEvent: string;
 export const SessionClosedEvent: string;
@@ -62,20 +43,6 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
-
-
-<<<<<<< HEAD
-
-
-
-
-=======
-
-
-
-
-
-
 
 
 export class Transaction {
@@ -113,21 +80,65 @@ export class TransactionError {
     decode(error: any): void;
 }
 
-
 export interface ITransactionService {
     create(scope?: string): Transaction;
     get(scope?: string): Transaction;
 }
->>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
+
+function configureTransactionStrings($injector: any): void;
+
+export interface ICodes {
+    hash(value: string): number;
+    verification(): string;
+}
+
+export interface IFormat {
+    sample(value: string, maxLength: number): string;
+    sprintf(message: string, ...args: any[]): string;
+}
 
 
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+export interface IPageResetService {
+    reset(): void;
+    resetArea(area: string): void;
+}
 
+export interface IScrollService {
+    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
+}
 
-<<<<<<< HEAD
-=======
+export interface ISystemInfo {
+    browserName: string;
+    browserVersion: string;
+    platform: string;
+    os: string;
+    isDesktop(): boolean;
+    isMobile(): boolean;
+    isCordova(): boolean;
+    isSupported(supported?: any): boolean;
+}
 
+export interface ITags {
+    normalizeOne(tag: string): string;
+    compressOne(tag: string): string;
+    equal(tag1: string, tag2: string): boolean;
+    normalizeAll(tags: any): string[];
+    compressAll(tags: any): string[];
+    extract(entity: any, searchFields?: string[]): string[];
+}
 
-
+export interface ITimerService {
+    isStarted(): boolean;
+    addEvent(event: string, timeout: number): void;
+    removeEvent(event: string): void;
+    clearEvents(): void;
+    start(): void;
+    stop(): void;
+}
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -136,7 +147,6 @@ function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 function translateFilter(pipTranslate: any): (key: any) => any;
 function optionalTranslateFilter($injector: any): (key: any) => any;
 
->>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
 export let LanguageRootVar: string;
 export let LanguageChangedEvent: string;
 export interface ITranslateService {
@@ -189,133 +199,9 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
-
-
-
-
-
-
-
-
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
-
-export interface ICodes {
-    hash(value: string): number;
-    verification(): string;
-}
-
-export interface IFormat {
-    sample(value: string, maxLength: number): string;
-    sprintf(message: string, ...args: any[]): string;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
-export interface IPageResetService {
-    reset(): void;
-    resetArea(area: string): void;
-}
-
-export interface IScrollService {
-    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
-}
-
-export interface ISystemInfo {
-    browserName: string;
-    browserVersion: string;
-    platform: string;
-    os: string;
-    isDesktop(): boolean;
-    isMobile(): boolean;
-    isCordova(): boolean;
-    isSupported(supported?: any): boolean;
-}
-
-export interface ITags {
-    normalizeOne(tag: string): string;
-    compressOne(tag: string): string;
-    equal(tag1: string, tag2: string): boolean;
-    normalizeAll(tags: any): string[];
-    compressAll(tags: any): string[];
-    extract(entity: any, searchFields?: string[]): string[];
-}
-
-export interface ITimerService {
-    isStarted(): boolean;
-    addEvent(event: string, timeout: number): void;
-    removeEvent(event: string): void;
-    clearEvents(): void;
-    start(): void;
-    stop(): void;
-}
-
 }
 
 declare module pip.buttons {
-
-
-
-
-
 
 
 
@@ -335,28 +221,6 @@ declare module pip.layouts {
 
 
 
-<<<<<<< HEAD
-
-
-
-
-export const __: any;
-
-export const __: any;
-
-export const __: any;
-
-export const __: any;
-
-function simpleDirective(): {
-    restrict: string;
-    link: ($scope: any, $element: any, $attrs: any) => void;
-};
-
-export const __: any;
-
-=======
->>>>>>> 8f8b6f729670d1c73b770e2b6c9dfafb956b8a84
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -406,8 +270,6 @@ declare module pip.behaviors {
 
 
 
-
-
 }
 
 declare module pip.controls {
@@ -418,21 +280,9 @@ declare module pip.controls {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var marked: any;
+
+
 
 
 
@@ -531,10 +381,6 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 
 
-
-
-
-
 }
 
 declare module pip.dialogs {
@@ -549,85 +395,89 @@ declare module pip.dialogs {
 
 declare module pip.nav {
 
-
-
-export interface INavService {
-    appBar: any;
-    navIcon: any;
-    breadcrumb: IBreadcrumbService;
-    actions: any;
-    search: ISearchService;
-    sideNav: any;
-    navHeader: any;
-    navMenu: any;
+export let ActionsChangedEvent: string;
+export class SimpleActionItem {
+    name: string;
+    title?: string;
+    divider?: boolean;
+    icon?: string;
+    count?: number;
+    access?: (action: SimpleActionItem) => boolean;
+    breakpoints?: string[];
+    href?: string;
+    url?: string;
+    state?: string;
+    stateParams?: any;
+    event?: string;
+    click?: (action: SimpleActionItem) => void;
 }
-export class NavService implements INavService {
-    constructor($injector: any);
-    appBar: any;
-    navIcon: any;
-    breadcrumb: IBreadcrumbService;
-    actions: any;
-    search: ISearchService;
-    sideNav: any;
-    navHeader: any;
-    navMenu: any;
+export class ActionItem extends SimpleActionItem {
+    subActions: SimpleActionItem[];
 }
-
-var thisModule: ng.IModule;
-
-
-
-
-
-
-
-
-
-
-
-function translateFilter($injector: any): (key: any) => any;
-
-
-
-
-export class BreadcrumbController {
-    private _rootScope;
-    private _window;
-    config: BreadcrumbConfig;
-    constructor($element: any, $rootScope: ng.IRootScopeService, $window: ng.IWindowService, $state: ng.ui.IStateService, pipBreadcrumb: IBreadcrumbService);
-    private onBreadcrumbChanged(event, config);
-    private onBreadcrumbBack();
-    onClick(item: BreadcrumbItem): void;
-    openSearch(): void;
+export class ActionsConfig {
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+}
+export interface IActionsService {
+    readonly config: ActionsConfig;
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+    show(primaryActions?: ActionItem[], secondaryActions?: ActionItem[]): void;
+    hide(): void;
+    updateCount(link: string, count: number): void;
+    clearCounts(): void;
+}
+export interface IActionsProvider extends ng.IServiceProvider {
+    config: ActionsConfig;
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
 }
 
 
-export function breadcrumbDirective(): {
-    restrict: string;
-    scope: {};
-    replace: boolean;
-    templateUrl: string;
-    controller: typeof BreadcrumbController;
-    controllerAs: string;
-};
 
 
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
+
+
+export let AppBarChangedEvent: string;
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
 }
-export class BreadcrumbProvider implements IBreadcrumbProvider {
-    private _config;
-    private _service;
-    text: string;
-    $get($rootScope: ng.IRootScopeService): any;
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(): void;
+    hide(): void;
+    addShadow(breakpoints?: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
 }
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
 export class BreadcrumbItem {
     title: string;
-    click: (item: BreadcrumbItem) => void;
-    constructor(title?: string, click?: (item: BreadcrumbItem) => void);
+    click?: (item: BreadcrumbItem) => void;
 }
 export class BreadcrumbConfig {
     text: string;
@@ -640,74 +490,126 @@ export interface IBreadcrumbService {
     items: BreadcrumbItem[];
     criteria: string;
 }
-export class BreadcrumbService implements IBreadcrumbService {
-    private _config;
-    private _rootScope;
-    constructor(config: BreadcrumbConfig, $rootScope: ng.IRootScopeService);
-    readonly config: BreadcrumbConfig;
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    sendEvent(): void;
+}
+
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
 }
 
 
 
 
-module pip.nav {
+
+export let NavHeaderChangedEvent: 'pipNavHeaderChanged';
+export class NavHeaderConfig {
+    imageUrl: string;
+    defaultImageUrl: string;
+    title: string;
+    subtitle: string;
+    click: () => void;
+    event: string;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export class SearchBarController {
-    private _rootScope;
-    config: SearchConfig;
-    enabled: boolean;
-    search: any;
-    constructor($element: any, $rootScope: ng.IRootScopeService, pipSearch: ISearchService);
-    private onSearchChanged(event, config);
-    private focusText();
-    enable(): void;
-    onClick(): void;
+export interface INavHeaderService {
+    readonly config: NavHeaderConfig;
+    imageUrl: string;
+    title: string;
+    subtitle: string;
+    click: () => void;
+    event: string;
+    show(title: string, subtitle: string, imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavHeaderProvider extends ng.IServiceProvider {
+    config: NavHeaderConfig;
+    defaultImageUrl: string;
+    imageUrl: string;
+    title: string;
+    subtitle: string;
+    click: () => void;
+    event: string;
+    set(title: string, subtitle: string, imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
-    onKeyDown(event: any): void;
 }
 
 
-export function searchBarDirective(): {
-    restrict: string;
-    scope: {};
-    replace: boolean;
-    templateUrl: string;
-    controller: typeof SearchBarController;
-    controllerAs: string;
-};
 
 
-
-export interface ISearchProvider extends ng.IServiceProvider {
+export let NavIconChangedEvent: 'pipNavIconChanged';
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
 }
-export class SearchProvider implements ISearchProvider {
-    private _config;
-    private _service;
-    $get($rootScope: ng.IRootScopeService): SearchService;
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
 }
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+
+
+export let NavMenuChangedEvent: string;
+export class NavMenuLink {
+    name: string;
+    title: string;
+    icon?: string;
+    count?: number;
+    access?: (link: NavMenuLink) => boolean;
+    href?: string;
+    url?: string;
+    state?: string;
+    stateParams?: any;
+    event?: string;
+    click?: (link: NavMenuLink) => void;
+}
+export class NavMenuSection {
+    name: string;
+    title?: string;
+    icon?: string;
+    links: NavMenuLink[];
+    access?: (section: NavMenuSection) => boolean;
+}
+export class NavMenuConfig {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+}
+export interface INavMenuService {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+    updateCount(link: string, count: number): void;
+    clearCounts(): void;
+}
+export interface INavMenuProvider extends ng.IServiceProvider {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+}
+
+
+
 
 export let OpenSearchEvent: string;
 export let CloseSearchEvent: string;
@@ -716,41 +618,60 @@ export let SearchActivatedEvent: string;
 export class SearchConfig {
     visible: boolean;
     criteria: string;
+    params: any;
     history: string[];
     callback: (criteria: string) => void;
 }
 export interface ISearchService {
     config: SearchConfig;
-    set(callback: (criteria: string) => void, criteria?: string, history?: string[]): void;
-    criteria(value: string): void;
-    history(history: string[]): void;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
     clear(): void;
     open(): void;
     close(): void;
     toggle(): void;
 }
-export class SearchService implements ISearchService {
-    private _config;
-    private _rootScope;
-    constructor(config: SearchConfig, $rootScope: ng.IRootScopeService);
-    readonly config: SearchConfig;
-    set(callback: (criteria: string) => void, criteria?: string, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-    criteria(value: string): void;
-    history(history: string[]): void;
-    private sendConfigEvent();
+export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
 
 
-
-
-
-
+export let SideNavChangedEvent: string;
+export let SideNavStateChangedEvent: string;
+export let OpenSideNavEvent: string;
+export let CloseSideNavEvent: string;
+export class SideNavConfig {
+    id: string;
+    parts: any;
+    classes: string[];
+    state: any;
+}
+export interface ISideNavService {
+    readonly config: SideNavConfig;
+    readonly classes: string[];
+    id: string;
+    parts: any;
+    state: any;
+    open(): void;
+    close(): void;
+    toggle(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface ISideNavProvider extends ng.IServiceProvider {
+    config: SideNavConfig;
+    id: string;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
 
 
 
@@ -758,20 +679,11 @@ export class SearchService implements ISearchService {
 
 declare module pip.themes {
 
-
-
-
-
 function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
-
-
-
-
 
 
 
@@ -801,13 +713,6 @@ function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvi
 function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-
-
-
-
-
-
 
 
 }
