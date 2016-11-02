@@ -9472,7 +9472,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9497,7 +9497,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_ROUTE_PAGE_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9523,7 +9523,7 @@ __export(require('./common'));
         ;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9571,7 +9571,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_UNKNOWN_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9608,7 +9608,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -10407,7 +10407,7 @@ module.run(['$templateCache', function($templateCache) {
             pipAppBar.part('actions', 'primary');
             pipAppBar.part('icon', true);
             pipAppBar.part('title', 'breadcrumb');
-            pipAppBar.hideShadow();
+            pipAppBar.removeShadow();
             pipBreadcrumb.text = 'Settings';
             pipNavIcon.menu();
         }
