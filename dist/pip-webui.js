@@ -10413,7 +10413,7 @@ module.run(['$templateCache', function($templateCache) {
             pipAppBar.part('title', 'breadcrumb');
             pipAppBar.removeShadow();
             pipBreadcrumb.text = 'Settings';
-            pipNavIcon.menu();
+            pipNavIcon.showMenu();
         }
         function onDropdownSelect(state) {
             onNavigationSelect(state.state);
