@@ -7065,7 +7065,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
   position: relative;
   padding-top: 16px;
   height: 112px;
-  width: 320px;
+  width: 100%;
   padding-bottom: 16px;
   padding-left: 24px;
   padding-right: 24px;

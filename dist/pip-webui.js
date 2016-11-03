@@ -603,18 +603,31 @@ var PageResetService_1 = require('../utilities/PageResetService');
 exports.LanguageRootVar = "$language";
 exports.LanguageChangedEvent = "pipLanguageChanged";
 var TranslateService = (function () {
-    function TranslateService(translation, setRootVar, persist, $rootScope, $log, $window) {
+    function TranslateService(translation, setRootVar, persist, $rootScope, $log, $window, $mdDateLocale) {
         this._setRootVar = setRootVar;
         this._persist = persist;
         this._translation = translation;
         this._rootScope = $rootScope;
         this._log = $log;
         this._window = $window;
+        this._mdDateLocale = $mdDateLocale;
         if (this._persist && this._window.localStorage)
             this._translation.language = this._window.localStorage.getItem('language') || this._translation.language;
         this._log.debug("Set language to " + this._translation.language);
         this.save();
     }
+    TranslateService.prototype.changeLocale = function (locale) {
+        if (!locale)
+            return;
+        var localeDate;
+        moment.locale(locale);
+        localeDate = moment.localeData();
+        this._mdDateLocale.months = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format;
+        this._mdDateLocale.shortMonths = angular.isArray(localeDate._monthsShort) ? localeDate._monthsShort : localeDate._monthsShort.format;
+        this._mdDateLocale.days = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format;
+        this._mdDateLocale.shortDays = localeDate._weekdaysMin;
+        this._mdDateLocale.firstDayOfWeek = localeDate._week.dow;
+    };
     TranslateService.prototype.save = function () {
         if (this._setRootVar)
             this._rootScope[exports.LanguageRootVar] = this._translation.language;
@@ -629,6 +642,7 @@ var TranslateService = (function () {
             if (value != this._translation.language) {
                 this._translation.language = value;
                 this._log.debug("Changing language to " + value);
+                this.changeLocale(this._translation.language);
                 this.save();
                 this._rootScope.$emit(exports.LanguageChangedEvent, value);
                 this._rootScope.$emit(PageResetService_1.ResetPageEvent);
@@ -698,10 +712,10 @@ var TranslateProvider = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    TranslateProvider.prototype.$get = ['$rootScope', '$log', '$window', function ($rootScope, $log, $window) {
+    TranslateProvider.prototype.$get = ['$rootScope', '$log', '$window', '$mdDateLocale', function ($rootScope, $log, $window, $mdDateLocale) {
         "ngInject";
         if (this._service == null)
-            this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, $log, $window);
+            this._service = new TranslateService(this, this._setRootVar, this._persist, $rootScope, $log, $window, $mdDateLocale);
         return this._service;
     }];
     return TranslateProvider;
@@ -3815,6 +3829,10 @@ formatShortISOWeekFilter.$inject = ['pipDateTime'];
 formatISOWeekOrdinalFilter.$inject = ['pipDateTime'];
 formatDateYFilter.$inject = ['pipDateTime'];
 formatLongDateYFilter.$inject = ['pipDateTime'];
+formatTodayDateLongTimeLongFilter.$inject = ['pipDateTime'];
+formatTodayDateShortTimeLongFilter.$inject = ['pipDateTime'];
+formatTodayDateLongTimeShortFilter.$inject = ['pipDateTime'];
+formatTodayDateShortTimeShortFilter.$inject = ['pipDateTime'];
 formatMillisecondsToSecondsFilter.$inject = ['pipDateTime'];
 formatElapsedIntervalFilter.$inject = ['pipDateTime'];
 getDateJSONFilter.$inject = ['pipDateTime'];
@@ -3986,6 +4004,30 @@ function formatLongDateYFilter(pipDateTime) {
         return pipDateTime.formatLongDateY(value);
     };
 }
+function formatTodayDateLongTimeLongFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatTodayDateLongTimeLong(value);
+    };
+}
+function formatTodayDateShortTimeLongFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatTodayDateShortTimeLong(value);
+    };
+}
+function formatTodayDateLongTimeShortFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatTodayDateLongTimeShort(value);
+    };
+}
+function formatTodayDateShortTimeShortFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatTodayDateShortTimeShort(value);
+    };
+}
 function formatMillisecondsToSecondsFilter(pipDateTime) {
     "ngInject";
     return function (value) {
@@ -4034,6 +4076,10 @@ angular
     .filter('formatISOWeekOrdinal', formatISOWeekOrdinalFilter)
     .filter('formatDateY', formatDateYFilter)
     .filter('formatLongDateY', formatLongDateYFilter)
+    .filter('formatTodayDateLongTimeLong', formatTodayDateLongTimeLongFilter)
+    .filter('formatTodayDateShortTimeLong', formatTodayDateShortTimeLongFilter)
+    .filter('formatTodayDateLongTimeShort', formatTodayDateLongTimeShortFilter)
+    .filter('formatTodayDateShortTimeShort', formatTodayDateShortTimeShortFilter)
     .filter('formatMillisecondsToSeconds', formatMillisecondsToSecondsFilter)
     .filter('formatElapsedInterval', formatElapsedIntervalFilter);
 },{}],3:[function(require,module,exports){
@@ -4188,6 +4234,24 @@ var DateTime = (function () {
         }
         return date.startOf(range).toDate();
     };
+    DateTime.prototype.toTodayDate = function (value, formatDate, formatTime) {
+        var date, result, nowDate;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        date = moment(value);
+        if (!date.isValid()) {
+            return '';
+        }
+        nowDate = moment();
+        if (nowDate.year() == date.year() && nowDate.month() == date.month() && nowDate.day() == date.day()) {
+            result = date.format(formatTime);
+        }
+        else {
+            result = date.format(formatDate) + ' ' + date.format(formatTime);
+        }
+        return result;
+    };
     ;
     DateTime.prototype.formatTime = function (value, format) {
         return this.formatDateTime(value, 'LLL');
@@ -4272,6 +4336,18 @@ var DateTime = (function () {
     };
     DateTime.prototype.formatLongDateY = function (value) {
         return this.formatDateTimeY(value, 'LL');
+    };
+    DateTime.prototype.formatTodayDateLongTimeLong = function (value) {
+        return this.toTodayDate(value, 'LL', 'LTS');
+    };
+    DateTime.prototype.formatTodayDateShortTimeLong = function (value) {
+        return this.toTodayDate(value, 'LL', 'LTS');
+    };
+    DateTime.prototype.formatTodayDateLongTimeShort = function (value) {
+        return this.toTodayDate(value, 'LL', 'LT');
+    };
+    DateTime.prototype.formatTodayDateShortTimeShort = function (value) {
+        return this.toTodayDate(value, 'll', 'LT');
     };
     DateTime.prototype.formatMillisecondsToSeconds = function (value) {
         return '';
@@ -4456,6 +4532,18 @@ var DateTimeService = (function () {
     };
     DateTimeService.prototype.formatLongDateY = function (value) {
         return this._datetime.formatLongDateY(value);
+    };
+    DateTimeService.prototype.formatTodayDateLongTimeLong = function (value) {
+        return this._datetime.formatTodayDateLongTimeLong(value);
+    };
+    DateTimeService.prototype.formatTodayDateShortTimeLong = function (value) {
+        return this._datetime.formatTodayDateShortTimeLong(value);
+    };
+    DateTimeService.prototype.formatTodayDateLongTimeShort = function (value) {
+        return this._datetime.formatTodayDateLongTimeShort(value);
+    };
+    DateTimeService.prototype.formatTodayDateShortTimeShort = function (value) {
+        return this._datetime.formatTodayDateShortTimeShort(value);
     };
     DateTimeService.prototype.formatMillisecondsToSeconds = function (value) {
         return this._datetime.formatMillisecondsToSeconds(value);
@@ -5324,8 +5412,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
+  $templateCache.put('time_range_edit_directive/time_range_edit.html',
+    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
 }]);
 })();
 
@@ -5336,8 +5424,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_edit_directive/time_range_edit.html',
-    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
+  $templateCache.put('time_range_directive/time_range.html',
+    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
 }]);
 })();
 
@@ -5762,8 +5850,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/information.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/error_details.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -5774,8 +5862,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/error_details.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/information.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -8596,7 +8684,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[22,37])(37)
+},{}]},{},[37,22])(37)
 });
 
 
@@ -10363,8 +10451,8 @@ module.run(['$templateCache', function($templateCache) {
 (function () {
     'use strict';
     var thisModule = angular.module('pipSettings.Page', [
-        'pipSettings.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates', 'pipNavIcon', 'pipActions.Service'
+        'pipSettings.Service', 'pipNav', 'pipSelected', 'pipTranslate',
+        'pipSettings.Templates'
     ]);
     thisModule.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('settings', {
@@ -10407,9 +10495,9 @@ module.run(['$templateCache', function($templateCache) {
             pipAppBar.part('actions', 'primary');
             pipAppBar.part('icon', true);
             pipAppBar.part('title', 'breadcrumb');
-            pipAppBar.hideShadow();
+            pipAppBar.removeShadow();
             pipBreadcrumb.text = 'Settings';
-            pipNavIcon.menu();
+            pipNavIcon.showMenu();
         }
         function onDropdownSelect(state) {
             onNavigationSelect(state.state);
