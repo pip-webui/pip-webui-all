@@ -462,9 +462,9 @@ export interface IAppBarService {
     readonly config: AppBarConfig;
     readonly classes: string[];
     parts: any;
-    show(): void;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
     hide(): void;
-    addShadow(breakpoints?: string[]): void;
+    addShadow(...breakpoints: string[]): void;
     removeShadow(): void;
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
@@ -508,12 +508,29 @@ export interface IBreadcrumbService {
     text: string;
     items: BreadcrumbItem[];
     criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
 }
 export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
 
+<<<<<<< HEAD
+=======
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+>>>>>>> d5440c018427b1ff0cb4cc19f81e6f4ce4d38718
 
 
 
@@ -687,13 +704,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 
 declare module pip.themes {
 
-function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
-
 
 export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
@@ -705,6 +715,13 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
+
+function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnWarmTheme($mdThemingProvider: any): void;
+
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 

@@ -6421,25 +6421,37 @@ var AppBarService = (function () {
         enumerable: true,
         configurable: true
     });
-    AppBarService.prototype.show = function () {
+    AppBarService.prototype.show = function (parts, classes, shadowBreakpoints) {
         this._config.visible = true;
+        this._config.parts = parts || {};
+        this._config.classes = classes || [];
+        this.setShadow(shadowBreakpoints);
         this.sendConfigEvent();
     };
     AppBarService.prototype.hide = function () {
         this._config.visible = false;
         this.sendConfigEvent();
     };
-    AppBarService.prototype.addShadow = function (breakpoints) {
+    AppBarService.prototype.setShadow = function (breakpoints) {
         var _this = this;
         this._config.classes = _.remove(this._config.classes, function (c) { return c.startsWith('pip-shadow'); });
-        this._config.classes.push('pip-shadow');
-        _.each(breakpoints, function (bp) {
-            _this._config.classes.push('pip-shadow-' + bp);
-        });
+        if (breakpoints != null) {
+            this._config.classes.push('pip-shadow');
+            _.each(breakpoints, function (bp) {
+                _this._config.classes.push('pip-shadow-' + bp);
+            });
+        }
+    };
+    AppBarService.prototype.addShadow = function () {
+        var breakpoints = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            breakpoints[_i - 0] = arguments[_i];
+        }
+        this.setShadow(breakpoints);
         this.sendConfigEvent();
     };
     AppBarService.prototype.removeShadow = function () {
-        this._config.classes = _.remove(this._config.classes, function (c) { return c.startsWith('pip-shadow'); });
+        this.setShadow(null);
         this.sendConfigEvent();
     };
     AppBarService.prototype.addClass = function () {
@@ -6647,7 +6659,7 @@ var BreadcrumbService = (function () {
         set: function (value) {
             this._config.text = value;
             this._config.items = null;
-            this.sendEvent();
+            this.sendConfigEvent();
         },
         enumerable: true,
         configurable: true
@@ -6659,7 +6671,7 @@ var BreadcrumbService = (function () {
         set: function (value) {
             this._config.text = null;
             this._config.items = value;
-            this.sendEvent();
+            this.sendConfigEvent();
         },
         enumerable: true,
         configurable: true
@@ -6670,12 +6682,24 @@ var BreadcrumbService = (function () {
         },
         set: function (value) {
             this._config.criteria = value;
-            this.sendEvent();
+            this.sendConfigEvent();
         },
         enumerable: true,
         configurable: true
     });
-    BreadcrumbService.prototype.sendEvent = function () {
+    BreadcrumbService.prototype.showText = function (text, criteria) {
+        this._config.text = text;
+        this._config.items = null;
+        this._config.criteria = criteria;
+        this.sendConfigEvent();
+    };
+    BreadcrumbService.prototype.showItems = function (items, criteria) {
+        this._config.items = items || [];
+        this._config.text = null;
+        this._config.criteria = criteria;
+        this.sendConfigEvent();
+    };
+    BreadcrumbService.prototype.sendConfigEvent = function () {
         this._rootScope.$broadcast(exports.BreadcrumbChangedEvent, this._config);
     };
     return BreadcrumbService;
@@ -6732,6 +6756,18 @@ var NavService = (function () {
         this.header = $injector.has('pipNavHeader') ? $injector.get('pipNavHeader') : null;
         this.menu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
     }
+    NavService.prototype.reset = function () {
+        if (this.appbar)
+            this.appbar.show();
+        if (this.icon)
+            this.icon.showMenu();
+        if (this.breadcrumb)
+            this.breadcrumb.showText(null);
+        if (this.actions)
+            this.actions.show();
+        if (this.search)
+            this.search.set(null);
+    };
     return NavService;
 }());
 angular
@@ -8260,8 +8296,8 @@ var SideNavProvider = (function () {
     return SideNavProvider;
 }());
 function hookSideNavEvents($rootScope, pipSideNav) {
-    $rootScope.$on(exports.OpenSideNavEvent, pipSideNav.open);
-    $rootScope.$on(exports.CloseSideNavEvent, pipSideNav.close);
+    $rootScope.$on(exports.OpenSideNavEvent, function () { pipSideNav.open(); });
+    $rootScope.$on(exports.CloseSideNavEvent, function () { pipSideNav.close(); });
 }
 angular
     .module('pipSideNav')
@@ -9560,7 +9596,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9585,7 +9621,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_ROUTE_PAGE_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9611,7 +9647,7 @@ __export(require('./common'));
         ;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9659,7 +9695,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_UNKNOWN_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
@@ -9696,7 +9732,7 @@ __export(require('./common'));
         return;
         function appHeader() {
             pipAppBar.showMenuNavIcon();
-            pipAppBar.showShadow();
+            pipAppBar.addShadow();
             pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
             pipAppBar.showLocalActions(null, []);
         }
