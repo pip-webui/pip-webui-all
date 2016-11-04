@@ -215,12 +215,6 @@ declare module pip.landing {
 
 declare module pip.layouts {
 
-
-
-
-
-
-
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -256,6 +250,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
+
+
+
+
+
+
 
 }
 
@@ -295,7 +295,6 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
-
 
 
 function formatTimeFilter(pipDateTime: any): (value: any, format: string) => string;
@@ -389,6 +388,7 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 
 
+
 }
 
 declare module pip.dialogs {
@@ -451,6 +451,31 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -480,31 +505,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -516,10 +516,6 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 7dd7ef7d296d93c0cc9c1dcfdf5fe4a0b786b448
 
 
 
@@ -624,8 +620,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
-<<<<<<< HEAD
-=======
 export let OpenSearchEvent: string;
 export let CloseSearchEvent: string;
 export let SearchChangedEvent: string;
@@ -655,7 +649,6 @@ export interface ISearchProvider extends ng.IServiceProvider {
 
 
 
->>>>>>> 7dd7ef7d296d93c0cc9c1dcfdf5fe4a0b786b448
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -689,38 +682,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 }
 
 
-
-<<<<<<< HEAD
-
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-=======
->>>>>>> 7dd7ef7d296d93c0cc9c1dcfdf5fe4a0b786b448
 }
 
 declare module pip.themes {
