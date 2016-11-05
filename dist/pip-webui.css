@@ -6800,6 +6800,10 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-sticky-sidenav md-backdrop.md-opaque.ng-enter {
   opacity: .48;
 }
+.pip-sticky-sidenav.sidenav-mobile md-sidenav.md-closed {
+  width: 0px !important;
+  overflow-x: hidden;
+}
 .pip-sticky-sidenav {
   background: #e0e0e0;
   border-right: solid 1px #ffffff;
@@ -7021,45 +7025,19 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   background: red;
   animation: badge-animation 0.35s ease;
 }
-.pip-sticky-nav-menu .section-title.ng-enter,
-.pip-sticky-nav-menu .section-title.ng-leave,
-.pip-sticky-nav-menu .section-icon.ng-enter,
-.pip-sticky-nav-menu .section-icon.ng-leave {
-  -webkit-transition: 1s linear all;
-  -moz-transition: 1s linear all;
-  -ms-transition: 1s linear all;
-  -o-transition: 1s linear all;
-  transition: 1s linear all;
-}
-.pip-sticky-nav-menu .section-title.ng-enter,
-.pip-sticky-nav-menu .section-icon.ng-enter {
-  opacity: 0;
-}
-.pip-sticky-nav-menu .section-title.ng-enter.ng-enter-active,
-.pip-sticky-nav-menu .section-icon.ng-enter.ng-enter-active {
-  opacity: 1;
-}
-.pip-sticky-nav-menu .section-title.ng-leave,
-.pip-sticky-nav-menu .section-icon.ng-leave {
-  opacity: 1;
-}
-.pip-sticky-nav-menu .section-title.ng-leave.ng-leave-active,
-.pip-sticky-nav-menu .section-icon.ng-leave.ng-leave-active {
-  opacity: 1;
-}
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button {
+.pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button {
   margin-right: 0px;
 }
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
+.pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   top: 5px;
   left: 32px;
   animation: badge-animation-back 0.35s ease;
 }
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
+.pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   opacity: 0;
   animation: title-animation-back 0.35s ease;
 }
-.pip-sticky-nav-small .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-icon-block .pip-sticky-nav-menu-icon {
+.pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-icon-block .pip-sticky-nav-menu-icon {
   margin-left: 0px;
 }
 @keyframes title-animation {

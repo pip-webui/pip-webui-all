@@ -451,31 +451,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -502,6 +477,31 @@ export interface IAppBarProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
+}
+
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
 }
 
 
@@ -648,7 +648,6 @@ export interface ISearchProvider extends ng.IServiceProvider {
 
 
 
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -680,6 +679,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
 
 
 }
