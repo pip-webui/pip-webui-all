@@ -282,8 +282,8 @@ declare module pip.controls {
 
 
 
-
 var marked: any;
+
 
 
 }
@@ -620,6 +620,35 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+
+
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -650,35 +679,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
-}
-
-
-
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
@@ -750,6 +750,38 @@ declare module pip.charts {
 declare module pip.settings {
 
 
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+export class SettingsTab {
+    state: string;
+    title: string;
+    index: string;
+    access: boolean;
+    visible: boolean;
+    stateConfig: any;
+}
+export interface ISettingsService {
+    getDefaultTab(): any;
+    showTitleText(newTitleText: any): any;
+    showTitleLogo(newTitleLogo: any): any;
+    showNavIcon(value: any): any;
+    getTabs(): any;
+}
+export interface ISettingsProvider extends ng.IServiceProvider {
+    getDefaultTab(): any;
+    addTab(tabObj: any): any;
+}
+export class SettingsConfig {
+    defaultTab: string;
+    tabs: SettingsTab[];
+    titleText: string;
+    titleLogo: boolean;
+    isNavIcon: boolean;
+}
 
 
 

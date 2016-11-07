@@ -1939,7 +1939,7 @@ var MediaBreakpointStatuses = (function () {
 exports.MediaBreakpointStatuses = MediaBreakpointStatuses;
 exports.MainResizedEvent = 'pipMainResized';
 exports.LayoutResizedEvent = 'pipLayoutResized';
-exports.MainBreakpoints = new MediaBreakpoints(639, 959, 1024, 1919);
+exports.MainBreakpoints = new MediaBreakpoints(639, 1110, 1220, 1599);
 exports.MainBreakpointStatuses = new MediaBreakpointStatuses();
 var MediaProvider = (function () {
     function MediaProvider() {
@@ -1961,7 +1961,7 @@ var MediaProvider = (function () {
         Object.defineProperty(service, 'breakpoints', {
             get: function () { return exports.MainBreakpoints; },
             set: function (value) {
-                exports.MainBreakpoints = value || new MediaBreakpoints(639, 959, 1024, 1919);
+                exports.MainBreakpoints = value || new MediaBreakpoints(639, 1110, 1220, 1599);
                 exports.MainBreakpointStatuses.update(exports.MainBreakpoints, exports.MainBreakpointStatuses.width);
             }
         });
@@ -5412,8 +5412,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
+  $templateCache.put('time_range_edit_directive/time_range_edit.html',
+    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
 }]);
 })();
 
@@ -5424,8 +5424,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_edit_directive/time_range_edit.html',
-    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
+  $templateCache.put('time_range_directive/time_range.html',
+    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
 }]);
 })();
 
@@ -5850,30 +5850,6 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/error_details.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDialogs.Templates');
-} catch (e) {
-  module = angular.module('pipDialogs.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/information.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDialogs.Templates');
-} catch (e) {
-  module = angular.module('pipDialogs.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/options.html',
     '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{theme}}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{::title | translate}}</h3><div ng-show="deletedTitle" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::deletedTitle | translate}}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="onKeyPress($event)" tabindex="0"><div ng-repeat="option in options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{::option.title | translate}}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{::option.title | translate}}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="onSelect()">{{::applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
 }]);
@@ -5888,6 +5864,30 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/options_big.html',
     '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{theme}}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !noActions}"><div class="pip-header" ng-class="{\'header-hint\': noTitle && hint}"><h3 class="m0" ng-if="!noTitle">{{::title | translate}}</h3><div ng-show="noTitle && hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{::hint | translate}}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="optionIndex" index="{{optionIndex }}" pip-select="onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="onKeyUp($event, $index)" ng-repeat="option in options"><div class="pip-content content-stretch" ng-click="onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{::option.title | translate}}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{::option.subtitle | translate}}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!noActions"><div><md-button class="pip-cancel" ng-click="onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="onSelect()" style="margin-right: -6px">{{::applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('error_details/error_details.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('information/information.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7081,6 +7081,8 @@ angular
         $rootScope.$on('pipSideNavStateChanged', onStateChanged);
         return;
         function initHeader() {
+            if (!pipNavHeader.config)
+                return;
             $scope.title = pipNavHeader.config.title;
             $scope.subtitle = pipNavHeader.config.subtitle;
             $scope.imageUrl = pipNavHeader.config.imageUrl;
@@ -7132,6 +7134,8 @@ angular
         }
         ;
         function setImage(config, loadError) {
+            if (!config)
+                return;
             var url;
             if (!loadError && !!config.imageUrl && !loadedDefaultImage) {
                 url = config.imageUrl;
@@ -7140,7 +7144,7 @@ angular
                 loadedDefaultImage = true;
                 url = config.defaultImageUrl;
             }
-            if (url) {
+            if (url && $image) {
                 $image.attr('src', url);
             }
             else {
@@ -7620,6 +7624,8 @@ angular
             return result;
         }
         function onConfigChanged(event, config) {
+            if (!config)
+                return;
             $scope.sections = config.sections;
         }
         function onStateChanged(event, state) {
@@ -8528,18 +8534,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('sidenav/StickySideNav.html',
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('search/SearchBar.html',
     '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div><div class="md-toolbar-tools layout-row layout-align-end-center" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
@@ -8554,6 +8548,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/Tabs.html',
     '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="$mdMedia(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('sidenav/StickySideNav.html',
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
 }]);
 })();
 
@@ -9586,18 +9592,6 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('maintenance/maintenance.html',
     '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
@@ -9624,6 +9618,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection_panel/no_connection_panel.html',
     '<div class="pip-empty pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -9712,7 +9718,7 @@ module.run(['$templateCache', function($templateCache) {
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
@@ -9803,6 +9809,8 @@ module.run(['$templateCache', function($templateCache) {
                     });
                 }
                 function prepareSeries() {
+                    if (!$scope.series)
+                        return;
                     $scope.series.forEach(function (item, index) {
                         item.color = item.color || colors[index];
                         item.disabled = item.disabled || false;
@@ -9873,7 +9881,7 @@ module.run(['$templateCache', function($templateCache) {
                         setZoom('out');
                     }
                 };
-                if (vm.series.length > colors.length) {
+                if (vm.series && vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
                 generateParameterColor();
@@ -9884,7 +9892,7 @@ module.run(['$templateCache', function($templateCache) {
                     vm.data = updatedSeries;
                     generateParameterColor();
                     if (chart) {
-                        chartElem.datum(vm.data).call(chart);
+                        chartElem.datum(vm.data || []).call(chart);
                         if (updateZoomOptions)
                             updateZoomOptions(vm.data);
                     }
@@ -9907,7 +9915,7 @@ module.run(['$templateCache', function($templateCache) {
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chart.yAxis
                         .tickFormat(function (d) {
                         return d / 1000 + 'k';
@@ -9917,13 +9925,38 @@ module.run(['$templateCache', function($templateCache) {
                         return d.toFixed(2);
                     });
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
-                    chartElem.datum(vm.data).style('height', 270).call(chart);
+                    chartElem.datum(vm.data || []).style('height', 270).call(chart);
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
                     }
                     nv.utils.windowResize(chart.update);
                     return chart;
+                }, function () {
+                    drawEmptyState();
                 });
+                function drawEmptyState() {
+                    if (!$element.find('text.nv-noData').get(0))
+                        return;
+                    chartElem
+                        .append("defs")
+                        .append("pattern")
+                        .attr("height", 1)
+                        .attr("width", 1)
+                        .attr("x", "0")
+                        .attr("y", "0")
+                        .attr("id", "bg")
+                        .append("image")
+                        .attr('x', 27)
+                        .attr('y', 0)
+                        .attr('height', "100%")
+                        .attr('width', 1151)
+                        .attr("xlink:href", "images/line_chart_empty_state.svg");
+                    chartElem
+                        .append('rect')
+                        .attr('height', "100%")
+                        .attr('width', "100%")
+                        .attr('fill', 'url(#bg)');
+                }
                 function updateScroll(domains, boundary) {
                     var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = (domains[1] - domains[0]) / bDiff === 1;
                     $($element[0]).find('.visual-scroll')
@@ -10118,6 +10151,8 @@ module.run(['$templateCache', function($templateCache) {
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
+                    if (!vm.data)
+                        return;
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
@@ -10157,7 +10192,7 @@ module.run(['$templateCache', function($templateCache) {
                 vm.showLegend = function () {
                     return vm.legend !== undefined ? vm.legend : true;
                 };
-                if (vm.series.length > colors.length) {
+                if (vm.series && vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
                 $scope.$watch('pieChart.series', function (newVal) {
@@ -10192,14 +10227,14 @@ module.run(['$templateCache', function($templateCache) {
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chart.showLegend(false);
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
                         .attr('height', vm.size || 250)
                         .attr('width', vm.size || 250)
                         .style('opacity', 0)
-                        .datum(vm.data)
+                        .datum(vm.data || [])
                         .call(chart);
                     nv.utils.windowResize(function () {
                         chart.update();
@@ -10215,10 +10250,29 @@ module.run(['$templateCache', function($templateCache) {
                             .duration(1000)
                             .style('opacity', 1);
                         $timeout(resizeTitleLabelUnwrap, 800);
+                        drawEmptyState(svgElem);
                     });
                 });
+                function drawEmptyState(svg) {
+                    if (!$element.find('text.nv-noData').get(0))
+                        return;
+                    $element.find('.pie-chart')
+                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                    var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
+                    var arc = d3.svg.arc()
+                        .innerRadius(size / 2 - 20)
+                        .outerRadius(size / 2 - 57);
+                    svg = d3.select(svg)
+                        .append("g")
+                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                    var path = svg.selectAll("path")
+                        .data(pie([1]))
+                        .enter().append("path")
+                        .attr("fill", "rgba(0, 0, 0, 0.08)")
+                        .attr("d", arc);
+                }
                 function renderTotalLabel(svgElem) {
-                    if (!vm.total && !vm.donut)
+                    if ((!vm.total && !vm.donut) || !vm.data)
                         return;
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
@@ -10233,7 +10287,7 @@ module.run(['$templateCache', function($templateCache) {
                     titleElem = d3.select($element.find('text.label-total').get(0)).style('opacity', 0);
                 }
                 function resizeTitleLabelUnwrap() {
-                    if (!vm.total && !vm.donut)
+                    if ((!vm.total && !vm.donut) || !vm.data)
                         return;
                     var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
                         : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
@@ -10249,6 +10303,8 @@ module.run(['$templateCache', function($templateCache) {
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
+                    if (!vm.data)
+                        return;
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
@@ -10315,6 +10371,14 @@ module.run(['$templateCache', function($templateCache) {
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+require('./settings_service/index');
+require('./settings_page/index');
+angular.module('pipSettings', [
+    'pipSettings.Service',
+    'pipSettings.Page'
+]);
+},{"./settings_page/index":5,"./settings_service/index":8}],2:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipSettings', [
@@ -10322,186 +10386,245 @@ module.run(['$templateCache', function($templateCache) {
         'pipSettings.Page'
     ]);
 })();
-},{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSettings.Page', [
-        'pipSettings.Service', 'pipNav', 'pipSelected', 'pipTranslate',
-        'pipSettings.Templates'
-    ]);
-    thisModule.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('settings', {
-            url: '/settings?party_id',
-            auth: true,
-            controller: 'pipSettingsPageController',
-            templateUrl: 'settings_page/settings_page.html'
-        });
-    }]);
-    thisModule.controller('pipSettingsPageController', ['$scope', '$state', '$rootScope', '$timeout', 'pipAppBar', 'pipSettings', 'pipActions', 'pipBreadcrumb', 'pipNavIcon', function ($scope, $state, $rootScope, $timeout, pipAppBar, pipSettings, pipActions, pipBreadcrumb, pipNavIcon) {
-        $scope.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-            if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
-                return tab;
-            }
-        });
-        $scope.tabs = _.sortBy($scope.tabs, 'index');
-        $scope.selected = {};
-        if ($state.current.name !== 'settings') {
-            initSelect($state.current.name);
-        }
-        else if ($state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-            initSelect(pipSettings.getDefaultTab().state);
-        }
-        else {
-            $timeout(function () {
-                if (pipSettings.getDefaultTab()) {
-                    initSelect(pipSettings.getDefaultTab().state);
-                }
-                if (!pipSettings.getDefaultTab() && $scope.tabs.length > 0) {
-                    initSelect($scope.tabs[0].state);
-                }
-            });
-        }
-        appHeader();
-        $scope.onNavigationSelect = onNavigationSelect;
-        $scope.onDropdownSelect = onDropdownSelect;
-        function appHeader() {
-            pipActions.hide();
-            pipAppBar.part('menu', true);
-            pipAppBar.part('actions', 'primary');
-            pipAppBar.part('icon', true);
-            pipAppBar.part('title', 'breadcrumb');
-            pipAppBar.removeShadow();
-            pipBreadcrumb.text = 'Settings';
-            pipNavIcon.showMenu();
-            pipAppBar.removeShadow();
-        }
-        function onDropdownSelect(state) {
-            onNavigationSelect(state.state);
-        }
-        function onNavigationSelect(state) {
-            initSelect(state);
-            if ($scope.selected.tab) {
-                $state.go(state);
-            }
-        }
-        function initSelect(state) {
-            $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                return tab.state === state;
-            });
-            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-            $scope.selected.tabId = state;
-        }
-    }]);
-})();
 },{}],3:[function(require,module,exports){
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipSettings.Service', []);
-    thisModule.provider('pipSettings', ['$stateProvider', function ($stateProvider) {
-        var defaultTab, tabs = [], titleText = 'SETTINGS_TITLE', titleLogo = null, isNavIcon = true;
-        this.showTitleText = showTitleText;
-        this.showTitleLogo = showTitleLogo;
-        this.showNavIcon = showNavIcon;
-        return {
-            addTab: addTab,
-            getTabs: getTabs,
-            setDefaultTab: setDefaultTab,
-            getDefaultTab: getDefaultTab,
-            showTitleText: showTitleText,
-            showTitleLogo: showTitleLogo,
-            showNavIcon: showNavIcon,
-            $get: function () {
-                return {
-                    getTabs: getTabs,
-                    addTab: addTab,
-                    getDefaultTab: getDefaultTab,
-                    setDefaultTab: setDefaultTab,
-                    showTitleText: showTitleText,
-                    showTitleLogo: showTitleLogo,
-                    showNavIcon: showNavIcon
-                };
+    var SettingsPageController = (function () {
+        SettingsPageController.$inject = ['$log', '$q', '$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
+        function SettingsPageController($log, $q, $state, pipNavService, pipSettings, $rootScope, $timeout) {
+            this._log = $log;
+            this._q = $q;
+            this._state = $state;
+            this.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+                if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
+                    return tab;
+                }
+            });
+            this.tabs = _.sortBy(this.tabs, 'index');
+            this.selected = {};
+            if (this._state.current.name !== 'settings') {
+                this.initSelect(this._state.current.name);
+            }
+            else if (this._state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+                this.initSelect(pipSettings.getDefaultTab().state);
+            }
+            else {
+                $timeout(function () {
+                    if (pipSettings.getDefaultTab()) {
+                        this.initSelect(pipSettings.getDefaultTab().state);
+                    }
+                    if (!pipSettings.getDefaultTab() && this.tabs.length > 0) {
+                        this.initSelect(this.tabs[0].state);
+                    }
+                });
+            }
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = "Settings";
+            pipNavService.actions.hide();
+            pipNavService.appbar.removeShadow();
+        }
+        SettingsPageController.prototype.initSelect = function (state) {
+            this.selected.tab = _.find(this.tabs, function (tab) {
+                return tab.state === state;
+            });
+            this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
+            this.selected.tabId = state;
+        };
+        SettingsPageController.prototype.onDropdownSelect = function (state) {
+            this.onNavigationSelect(state.state);
+        };
+        SettingsPageController.prototype.onNavigationSelect = function (state) {
+            this.initSelect(state);
+            if (this.selected.tab) {
+                this._state.go(state);
             }
         };
-        function getFullStateName(state) {
-            return 'settings.' + state;
-        }
-        function getTabs() {
-            return _.cloneDeep(tabs);
-        }
-        function getDefaultTab() {
-            var defaultTab;
-            defaultTab = _.find(tabs, function (p) {
-                return p.state === defaultTab;
-            });
-            return _.cloneDeep(defaultTab);
-        }
-        function addTab(tabObj) {
-            var existingTab;
-            validateTab(tabObj);
-            existingTab = _.find(tabs, function (p) {
-                return p.state === getFullStateName(tabObj.state);
-            });
-            if (existingTab) {
-                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
-            }
-            tabs.push({
-                state: getFullStateName(tabObj.state),
-                title: tabObj.title,
-                index: tabObj.index || 100000,
-                access: tabObj.access,
-                visible: tabObj.visible !== false,
-                stateConfig: _.cloneDeep(tabObj.stateConfig)
-            });
-            $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
-            if (typeof defaultTab === 'undefined' && tabs.length === 1) {
-                setDefaultTab(tabObj.state);
-            }
-        }
-        function setDefaultTab(name) {
-            if (!_.find(tabs, function (tab) {
-                return tab.state === getFullStateName(name);
-            })) {
-                throw new Error('Tab with state name "' + name + '" is not registered');
-            }
-            defaultTab = getFullStateName(name);
-        }
-        function validateTab(tabObj) {
-            if (!tabObj || !_.isObject(tabObj)) {
-                throw new Error('Invalid object');
-            }
-            if (tabObj.state === null || tabObj.state === '') {
-                throw new Error('Tab should have valid Angular UI router state name');
-            }
-            if (tabObj.access && !_.isFunction(tabObj.access)) {
-                throw new Error('"access" should be a function');
-            }
-            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
-                throw new Error('Invalid state configuration object');
-            }
-        }
-        function showTitleText(newTitleText) {
-            if (newTitleText) {
-                titleText = newTitleText;
-                titleLogo = null;
-            }
-            return titleText;
-        }
-        function showTitleLogo(newTitleLogo) {
-            if (newTitleLogo) {
-                titleLogo = newTitleLogo;
-                titleText = null;
-            }
-            return titleLogo;
-        }
-        function showNavIcon(value) {
-            if (value !== null && value !== undefined) {
-                isNavIcon = !!value;
-            }
-            return isNavIcon;
-        }
-    }]);
+        return SettingsPageController;
+    }());
+    angular.module('pipSettings.Page')
+        .controller('pipSettingsPageController', SettingsPageController);
 })();
 },{}],4:[function(require,module,exports){
+'use strict';
+configureSettingsPageRoutes.$inject = ['$stateProvider'];
+function configureSettingsPageRoutes($stateProvider) {
+    $stateProvider
+        .state('settings', {
+        url: '/settings?party_id',
+        auth: true,
+        controllerAs: 'vm',
+        controller: 'pipSettingsPageController',
+        templateUrl: 'settings_page/SettingsPage.html'
+    });
+}
+angular.module('pipSettings.Page')
+    .config(configureSettingsPageRoutes);
+},{}],5:[function(require,module,exports){
+'use strict';
+angular.module('pipSettings.Page', [
+    'ui.router',
+    'pipSettings.Service',
+    'pipNav',
+    'pipSelected',
+    'pipTranslate',
+    'pipSettings.Templates'
+]);
+require('./SettingsPageController');
+require('./SettingsPageRoutes');
+},{"./SettingsPageController":3,"./SettingsPageRoutes":4}],6:[function(require,module,exports){
+
+},{}],7:[function(require,module,exports){
+'use strict';
+var SettingsTab = (function () {
+    function SettingsTab() {
+    }
+    return SettingsTab;
+}());
+exports.SettingsTab = SettingsTab;
+var SettingsConfig = (function () {
+    function SettingsConfig() {
+        this.tabs = [];
+        this.titleText = 'SETTINGS_TITLE';
+        this.titleLogo = null;
+        this.isNavIcon = true;
+    }
+    return SettingsConfig;
+}());
+exports.SettingsConfig = SettingsConfig;
+var SettingsService = (function () {
+    SettingsService.$inject = ['$rootScope', 'config'];
+    function SettingsService($rootScope, config) {
+        "ngInject";
+        this._rootScope = $rootScope;
+        this._config = config;
+    }
+    SettingsService.prototype.getDefaultTab = function () {
+        var defaultTab;
+        defaultTab = _.find(this._config.tabs, function (p) {
+            return p.state === defaultTab;
+        });
+        return _.cloneDeep(defaultTab);
+    };
+    SettingsService.prototype.showTitleText = function (newTitleText) {
+        if (newTitleText) {
+            this._config.titleText = newTitleText;
+            this._config.titleLogo = null;
+        }
+        return this._config.titleText;
+    };
+    SettingsService.prototype.showTitleLogo = function (newTitleLogo) {
+        if (newTitleLogo) {
+            this._config.titleLogo = newTitleLogo;
+            this._config.titleText = null;
+        }
+        return this._config.titleLogo;
+    };
+    SettingsService.prototype.showNavIcon = function (value) {
+        if (value !== null && value !== undefined) {
+            this._config.isNavIcon = !!value;
+        }
+        return this._config.isNavIcon;
+    };
+    SettingsService.prototype.getTabs = function () {
+        return _.cloneDeep(this._config.tabs);
+    };
+    return SettingsService;
+}());
+var SettingsProvider = (function () {
+    SettingsProvider.$inject = ['$stateProvider'];
+    function SettingsProvider($stateProvider) {
+        this._config = new SettingsConfig();
+        this._stateProvider = $stateProvider;
+    }
+    SettingsProvider.prototype.getFullStateName = function (state) {
+        return 'settings.' + state;
+    };
+    SettingsProvider.prototype.getDefaultTab = function () {
+        var defaultTab;
+        defaultTab = _.find(this._config.tabs, function (p) {
+            return p.state === defaultTab;
+        });
+        return _.cloneDeep(defaultTab);
+    };
+    SettingsProvider.prototype.addTab = function (tabObj) {
+        var existingTab;
+        this.validateTab(tabObj);
+        existingTab = _.find(this._config.tabs, function (p) {
+            return p.state === 'settings.' + tabObj.state;
+        });
+        if (existingTab) {
+            throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
+        }
+        this._config.tabs.push({
+            state: this.getFullStateName(tabObj.state),
+            title: tabObj.title,
+            index: tabObj.index || 100000,
+            access: tabObj.access,
+            visible: tabObj.visible !== false,
+            stateConfig: _.cloneDeep(tabObj.stateConfig)
+        });
+        this._stateProvider.state(this.getFullStateName(tabObj.state), tabObj.stateConfig);
+        if (typeof this._config.defaultTab === 'undefined' && this._config.tabs.length === 1) {
+            this.setDefaultTab(tabObj.state);
+        }
+    };
+    SettingsProvider.prototype.setDefaultTab = function (name) {
+        if (!_.find(this._config.tabs, function (tab) {
+            return tab.state === 'settings.' + name;
+        })) {
+            throw new Error('Tab with state name "' + name + '" is not registered');
+        }
+        this._config.defaultTab = this.getFullStateName(name);
+    };
+    SettingsProvider.prototype.validateTab = function (tabObj) {
+        if (!tabObj || !_.isObject(tabObj)) {
+            throw new Error('Invalid object');
+        }
+        if (tabObj.state === null || tabObj.state === '') {
+            throw new Error('Tab should have valid Angular UI router state name');
+        }
+        if (tabObj.access && !_.isFunction(tabObj.access)) {
+            throw new Error('"access" should be a function');
+        }
+        if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
+            throw new Error('Invalid state configuration object');
+        }
+    };
+    SettingsProvider.prototype.showTitleText = function (newTitleText) {
+        if (newTitleText) {
+            this._config.titleText = newTitleText;
+            this._config.titleLogo = null;
+        }
+        return this._config.titleText;
+    };
+    SettingsProvider.prototype.showTitleLogo = function (newTitleLogo) {
+        if (newTitleLogo) {
+            this._config.titleLogo = newTitleLogo;
+            this._config.titleText = null;
+        }
+        return this._config.titleLogo;
+    };
+    SettingsProvider.prototype.showNavIcon = function (value) {
+        if (value !== null && value !== undefined) {
+            this._config.isNavIcon = !!value;
+        }
+        return this._config.isNavIcon;
+    };
+    SettingsProvider.prototype.$get = ['$rootScope', '$state', function ($rootScope, $state) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new SettingsService($rootScope, this._config);
+        return this._service;
+    }];
+    return SettingsProvider;
+}());
+angular
+    .module('pipSettings.Service')
+    .provider('pipSettings', SettingsProvider);
+},{}],8:[function(require,module,exports){
+'use strict';
+angular.module('pipSettings.Service', []);
+require('./SettingsService');
+},{"./SettingsService":7}],9:[function(require,module,exports){
 (function () {
     'use strict';
     angular.module('pipUserSettings', [
@@ -10514,7 +10637,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipSettings.Templates'
     ]);
 })();
-},{}],5:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.BasicInfo', ['pipUserSettings.ChangePassword', 'pipUserSettings.VerifyEmail',
@@ -10658,7 +10781,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-},{}],6:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.ChangePassword', []);
@@ -10718,7 +10841,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-},{}],7:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.Sessions', [
@@ -10795,7 +10918,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-},{}],8:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.Strings', ['pipTranslate']);
@@ -10906,7 +11029,7 @@ module.run(['$templateCache', function($templateCache) {
         });
     }]);
 })();
-},{}],9:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.VerifyEmail', []);
@@ -10964,7 +11087,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
-},{}],10:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipSettings.Templates');
@@ -10972,8 +11095,8 @@ try {
   module = angular.module('pipSettings.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('settings_page/settings_page.html',
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-settings"><div class="pip-menu-container" ng-hide="manager === false || !tabs || tabs.length < 1"><md-list class="pip-menu pip-simple-list hide-xs" pip-selected="selected.tabIndex" pip-selected-watch="selected.navId" pip-select="onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in tabs track by tab.state" ng-if="$party.id == $user.id || tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\' || tab.state ==\'settings.blacklist\'" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown class="hide-gt-xs" pip-actions="tabs" pip-dropdown-select="onDropdownSelect" pip-active-index="selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="manager === false || !tabs || tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
+  $templateCache.put('settings_page/SettingsPage.html',
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-settings"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list hide-xs" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" ng-if="vm.$party.id == vm.$user.id || tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\' || tab.state ==\'settings.blacklist\'" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown class="hide-gt-xs" pip-actions="vm.tabs" pip-dropdown-select="onDropdownSelect" pip-active-index="selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
 }]);
 })();
 
@@ -11027,7 +11150,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[2,3,1,5,6,7,8,9,4,10])(10)
+},{}]},{},[5,6,3,4,8,7,2,1,10,11,12,13,14,9,15])(15)
 });
 
 

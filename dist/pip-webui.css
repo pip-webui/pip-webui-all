@@ -8539,11 +8539,25 @@ pip-line-chart .nvd3 .nv-axis text {
   font-weight: 500 !important;
   fill: rgba(0, 0, 0, 0.54);
 }
+pip-line-chart .nvd3 .nvd3.nv-line .nvd3.nv-scatter .nv-groups .nv-point {
+  fill-opacity: 0 !important;
+  stroke-opacity: 0 !important;
+}
+pip-line-chart .nvd3 line.nv-guideline {
+  stroke: #626262;
+  stroke-width: 2;
+}
 pip-line-chart .nvd3 .nv-x .tick:not(.zero) line {
   opacity: 0;
 }
 pip-line-chart .nvd3 .nv-y .tick:not(.zero) line {
   opacity: 0;
+}
+pip-line-chart .nvd3.nv-noData {
+  font-size: 14px;
+  font-family: Roboto;
+  fill: rgba(0, 0, 0, 0.54);
+  font-weight: normal;
 }
 pip-line-chart .visible-x-axis .nvd3 .nv-x .tick:not(.zero) line {
   opacity: 1;
@@ -8613,9 +8627,23 @@ pip-line-chart.dynamic svg:hover {
 }
 pip-pie-chart .pie-chart {
   display: inline-block;
+  position: relative;
+}
+pip-pie-chart .pie-chart .pip-empty-pie-text {
+  position: absolute;
+  font-family: Roboto;
+  font-size: 14px;
+  width: calc(100% - 120px);
+  top: calc(50% - 15px);
+  left: 60px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
 }
 pip-pie-chart svg.nvd3-svg {
   width: auto;
+}
+pip-pie-chart svg.nvd3-svg .nv-noData {
+  display: none;
 }
 pip-pie-chart .circle .nvd3.nv-pie .label-total {
   fill: white !important;
