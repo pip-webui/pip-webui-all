@@ -8502,6 +8502,7 @@ button:focus {
 pip-bar-chart .bar-chart {
   opacity: 0;
   margin-bottom: 20px;
+  display: inline-block;
 }
 pip-bar-chart .bar-chart.visible {
   opacity: 1;
@@ -8512,6 +8513,11 @@ pip-bar-chart .bar-chart text {
 }
 pip-bar-chart .bar-chart .nv-zeroLine {
   display: none;
+}
+pip-bar-chart .bar-chart .nv-noData {
+  font-size: 14px;
+  font-weight: normal;
+  fill: rgba(0, 0, 0, 0.54);
 }
 pip-bar-chart .nvd3 .nv-discretebar .nv-groups rect:hover {
   fill-opacity: inherit;
@@ -8599,6 +8605,11 @@ pip-line-chart.dynamic .line-chart .minus-button {
 pip-line-chart.dynamic .line-chart .plus-button {
   right: 20px;
 }
+pip-line-chart.dynamic .line-chart .scroll-container {
+  position: absolute;
+  width: 100%;
+  top: 240px;
+}
 pip-line-chart.dynamic .line-chart .visual-scroll {
   transition: all 0.5s ease;
   opacity: 0;
@@ -8667,6 +8678,7 @@ pip-pie-chart .nvd3.nv-pie .nv-pieLabels .nv-label text {
   font-stretch: normal;
   text-align: center;
   fill: #ffffff !important;
+  dominant-baseline: middle;
 }
 pip-chart-legend .chart-legend-item {
   display: inline-block;

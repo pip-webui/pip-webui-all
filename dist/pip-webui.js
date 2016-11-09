@@ -1591,10 +1591,279 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
+var MediaService_1 = require('../media/MediaService');
+(function () {
+    var AuxPanelDirectiveController = (function () {
+        AuxPanelDirectiveController.$inject = ['pipAuxPanel'];
+        function AuxPanelDirectiveController(pipAuxPanel) {
+            this._pipAuxPanel = pipAuxPanel;
+        }
+        AuxPanelDirectiveController.prototype.isGtxs = function () {
+            return Number($('body').width()) > MediaService_1.MainBreakpoints.xs && this._pipAuxPanel.isOpen();
+        };
+        return AuxPanelDirectiveController;
+    }());
+    function AuxPanelDirective() {
+        return {
+            restrict: 'E',
+            replace: true,
+            controller: AuxPanelDirectiveController,
+            transclude: true,
+            controllerAs: 'vm',
+            template: '<md-sidenav class="md-sidenav-right md-whiteframe-z2 pip-auxpanel color-content-bg"' +
+                'md-component-id="pip-auxpanel" md-is-locked-open="vm.isGtxs()" pip-focused ng-transclude>' +
+                '</md-sidenav>'
+        };
+    }
+    angular
+        .module('pipAuxPanel')
+        .directive('pipAuxPanel', AuxPanelDirective);
+})();
+},{"../media/MediaService":12}],2:[function(require,module,exports){
+'use strict';
+(function () {
+    AuxPanelPartDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipAuxPanel'];
+    AuxPanelPartDirective.$inject = ['ngIfDirective'];
+    function AuxPanelPartDirectiveController($scope, $element, $attrs, $rootScope, pipAuxPanel) {
+        "ngInject";
+        var partName = '' + $attrs.pipAuxPanelPart;
+        var partValue = null;
+        var pos = partName.indexOf(':');
+        if (pos > 0) {
+            partValue = partName.substr(pos + 1);
+            partName = partName.substr(0, pos);
+        }
+        onAuxPanelChanged(null, pipAuxPanel.config);
+        $rootScope.$on('pipAuxPanelChanged', onAuxPanelChanged);
+        function onAuxPanelChanged(event, config) {
+            var parts = config.parts || {};
+            var currentPartValue = config[partName];
+            $scope.visible = partValue ? currentPartValue == partValue : currentPartValue;
+        }
+    }
+    function AuxPanelPartDirective(ngIfDirective) {
+        "ngInject";
+        var ngIf = ngIfDirective[0];
+        return {
+            transclude: ngIf.transclude,
+            priority: ngIf.priority,
+            terminal: ngIf.terminal,
+            restrict: ngIf.restrict,
+            scope: true,
+            link: function ($scope, $element, $attrs) {
+                $attrs.ngIf = function () { return $scope.visible; };
+                ngIf.link.apply(ngIf);
+            },
+            controller: AuxPanelPartDirectiveController
+        };
+    }
+    angular
+        .module('pipAuxPanel')
+        .directive('pipAuxPanelPart', AuxPanelPartDirective);
+})();
+},{}],3:[function(require,module,exports){
+'use strict';
+hookAuxPanelEvents.$inject = ['$rootScope', 'pipAuxPanel'];
+exports.AuxPanelChangedEvent = 'pipAuxPanelChanged';
+exports.AuxPanelStateChangedEvent = 'pipAuxPanelStateChanged';
+exports.OpenAuxPanelEvent = 'pipOpenAuxPanel';
+exports.CloseAuxPanelEvent = 'pipCloseAuxPanel';
+var AuxPanelConfig = (function () {
+    function AuxPanelConfig() {
+    }
+    return AuxPanelConfig;
+}());
+exports.AuxPanelConfig = AuxPanelConfig;
+var AuxPanelService = (function () {
+    function AuxPanelService(config, $rootScope, $mdSidenav) {
+        this.id = 'pip-auxpanel';
+        this._config = config;
+        this._rootScope = $rootScope;
+        this._sidenav = $mdSidenav;
+    }
+    Object.defineProperty(AuxPanelService.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AuxPanelService.prototype, "classes", {
+        get: function () {
+            return this._config.classes;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AuxPanelService.prototype, "parts", {
+        get: function () {
+            return this._config.parts;
+        },
+        set: function (value) {
+            this._config.parts = value || {};
+            this.sendConfigEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AuxPanelService.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        set: function (value) {
+            this._state = value || {};
+            this._rootScope.$broadcast(exports.AuxPanelStateChangedEvent, value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    AuxPanelService.prototype.isOpen = function () {
+        return this._sidenav(this.id).isOpen();
+    };
+    AuxPanelService.prototype.open = function () {
+        this._sidenav(this.id).open();
+    };
+    AuxPanelService.prototype.close = function () {
+        this._sidenav(this.id).close();
+    };
+    AuxPanelService.prototype.toggle = function () {
+        this._sidenav(this.id).toggle();
+    };
+    AuxPanelService.prototype.addClass = function () {
+        var _this = this;
+        var classes = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            classes[_i - 0] = arguments[_i];
+        }
+        _.each(classes, function (c) {
+            _this._config.classes.push(c);
+        });
+        this.sendConfigEvent();
+    };
+    AuxPanelService.prototype.removeClass = function () {
+        var _this = this;
+        var classes = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            classes[_i - 0] = arguments[_i];
+        }
+        _.each(classes, function (c) {
+            _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
+        });
+        this.sendConfigEvent();
+    };
+    AuxPanelService.prototype.part = function (part, value) {
+        this._config.parts[part] = value;
+        this.sendConfigEvent();
+    };
+    AuxPanelService.prototype.sendConfigEvent = function () {
+        this._rootScope.$emit(exports.AuxPanelChangedEvent, this._config);
+    };
+    return AuxPanelService;
+}());
+var AuxPanelProvider = (function () {
+    function AuxPanelProvider() {
+        this._config = {
+            parts: {},
+            classes: [],
+            type: 'sticky',
+            state: null
+        };
+    }
+    Object.defineProperty(AuxPanelProvider.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        set: function (value) {
+            this._config = value || new AuxPanelConfig();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AuxPanelProvider.prototype, "parts", {
+        get: function () {
+            return this._config.parts;
+        },
+        set: function (value) {
+            this._config.parts = value || {};
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AuxPanelProvider.prototype, "type", {
+        get: function () {
+            return this._config.type;
+        },
+        set: function (value) {
+            this._config.type = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AuxPanelProvider.prototype, "classes", {
+        get: function () {
+            return this._config.classes;
+        },
+        set: function (value) {
+            this._config.classes = value || [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    AuxPanelProvider.prototype.addClass = function () {
+        var _this = this;
+        var classes = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            classes[_i - 0] = arguments[_i];
+        }
+        _.each(classes, function (c) {
+            _this._config.classes.push(c);
+        });
+    };
+    AuxPanelProvider.prototype.removeClass = function () {
+        var _this = this;
+        var classes = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            classes[_i - 0] = arguments[_i];
+        }
+        _.each(classes, function (c) {
+            _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
+        });
+    };
+    AuxPanelProvider.prototype.part = function (part, value) {
+        this._config.parts[part] = value;
+    };
+    AuxPanelProvider.prototype.$get = ['$rootScope', '$mdSidenav', function ($rootScope, $mdSidenav) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new AuxPanelService(this._config, $rootScope, $mdSidenav);
+        return this._service;
+    }];
+    return AuxPanelProvider;
+}());
+function hookAuxPanelEvents($rootScope, pipAuxPanel) {
+    $rootScope.$on(exports.OpenAuxPanelEvent, function () { pipAuxPanel.open(); });
+    $rootScope.$on(exports.CloseAuxPanelEvent, function () { pipAuxPanel.close(); });
+}
+angular
+    .module('pipAuxPanel')
+    .provider('pipAuxPanel', AuxPanelProvider)
+    .run(hookAuxPanelEvents);
+},{}],4:[function(require,module,exports){
+'use strict';
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-angular.module('pipLayout', ['wu.masonry']);
+angular.module('pipAuxPanel', ['ngMaterial']);
+require('./AuxPanelService');
+require('./AuxPanelPartDirective');
+require('./AuxPanelDirective');
+__export(require('./AuxPanelService'));
+},{"./AuxPanelDirective":1,"./AuxPanelPartDirective":2,"./AuxPanelService":3}],5:[function(require,module,exports){
+'use strict';
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+angular.module('pipLayout', ['wu.masonry', 'pipAuxPanel']);
 require('./media/MediaService');
 require('./media/ResizeFunctions');
 require('./layouts/MainDirective');
@@ -1603,9 +1872,10 @@ require('./layouts/DialogDirective');
 require('./layouts/DocumentDirective');
 require('./layouts/SimpleDirective');
 require('./layouts/TilesDirective');
+require('./auxpanel/index');
 __export(require('./media/MediaService'));
 __export(require('./media/ResizeFunctions'));
-},{"./layouts/CardDirective":2,"./layouts/DialogDirective":3,"./layouts/DocumentDirective":4,"./layouts/MainDirective":5,"./layouts/SimpleDirective":6,"./layouts/TilesDirective":7,"./media/MediaService":8,"./media/ResizeFunctions":9}],2:[function(require,module,exports){
+},{"./auxpanel/index":4,"./layouts/CardDirective":6,"./layouts/DialogDirective":7,"./layouts/DocumentDirective":8,"./layouts/MainDirective":9,"./layouts/SimpleDirective":10,"./layouts/TilesDirective":11,"./media/MediaService":12,"./media/ResizeFunctions":13}],6:[function(require,module,exports){
 'use strict';
 var MediaService_1 = require('../media/MediaService');
 (function () {
@@ -1687,7 +1957,7 @@ var MediaService_1 = require('../media/MediaService');
         .module('pipLayout')
         .directive('pipCard', cardDirective);
 })();
-},{"../media/MediaService":8}],3:[function(require,module,exports){
+},{"../media/MediaService":12}],7:[function(require,module,exports){
 'use strict';
 (function () {
     function dialogDirective() {
@@ -1702,7 +1972,7 @@ var MediaService_1 = require('../media/MediaService');
         .module('pipLayout')
         .directive('pipDialog', dialogDirective);
 })();
-},{}],4:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 (function () {
     function documentDirective() {
@@ -1717,7 +1987,7 @@ var MediaService_1 = require('../media/MediaService');
         .module('pipLayout')
         .directive('pipDocument', documentDirective);
 })();
-},{}],5:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 var ResizeFunctions_1 = require('../media/ResizeFunctions');
 var MediaService_1 = require('../media/MediaService');
@@ -1780,7 +2050,7 @@ var MediaService_1 = require('../media/MediaService');
         .directive('pipMain', mainDirective)
         .directive('pipMainBody', mainBodyDirective);
 })();
-},{"../media/MediaService":8,"../media/ResizeFunctions":9}],6:[function(require,module,exports){
+},{"../media/MediaService":12,"../media/ResizeFunctions":13}],10:[function(require,module,exports){
 'use strict';
 (function () {
     function simpleDirective() {
@@ -1795,7 +2065,7 @@ var MediaService_1 = require('../media/MediaService');
         .module('pipLayout')
         .directive('pipSimple', simpleDirective);
 })();
-},{}],7:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 tilesDirective.$inject = ['$rootScope'];
 var ResizeFunctions_1 = require('../media/ResizeFunctions');
@@ -1905,7 +2175,7 @@ function tilesDirective($rootScope) {
 angular
     .module('pipLayout')
     .directive('pipTiles', tilesDirective);
-},{"../media/MediaService":8,"../media/ResizeFunctions":9}],8:[function(require,module,exports){
+},{"../media/MediaService":12,"../media/ResizeFunctions":13}],12:[function(require,module,exports){
 'use strict';
 var MediaBreakpoints = (function () {
     function MediaBreakpoints(xs, sm, md, lg) {
@@ -1977,7 +2247,7 @@ var MediaProvider = (function () {
 angular
     .module('pipLayout')
     .provider('pipMedia', MediaProvider);
-},{}],9:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 var attachEvent = document.attachEvent;
 var isIE = navigator.userAgent.match(/Trident/);
@@ -2052,7 +2322,7 @@ function removeResizeListener(element, listener) {
     }
 }
 exports.removeResizeListener = removeResizeListener;
-},{}]},{},[1])(1)
+},{}]},{},[5])(5)
 });
 
 
@@ -5400,6 +5670,18 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('time_range_directive/time_range.html',
+    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDates.Templates');
+} catch (e) {
+  module = angular.module('pipDates.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('date_range_directive/date_range.html',
     '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
@@ -5417,18 +5699,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-(function(module) {
-try {
-  module = angular.module('pipDates.Templates');
-} catch (e) {
-  module = angular.module('pipDates.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
-}]);
-})();
-
 
 
 },{}]},{},[7,4,5,2,3,1,6,8,9,10])(10)
@@ -5438,59 +5708,86 @@ module.run(['$templateCache', function($templateCache) {
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipConfirmationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipConfirmationDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, successCallback, cancelCallback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'confirmation/confirmation.html',
-                    controller: 'pipConfirmationDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (successCallback) {
-                        successCallback();
-                    }
-                }, function () {
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
-            }
-        };
-    }]);
-    thisModule.controller('pipConfirmationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+'use strict';
+var ConfirmationParams = (function () {
+    function ConfirmationParams() {
+        this.ok = 'OK';
+        this.cancel = 'Cancel';
+    }
+    return ConfirmationParams;
+}());
+exports.ConfirmationParams = ConfirmationParams;
+var ConfirmationDialogController = (function () {
+    ConfirmationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
+    function ConfirmationDialogController($mdDialog, $injector, $rootScope, params) {
+        "ngInject";
+        this.config = new ConfirmationParams();
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'CONFIRM_TITLE': 'Confirm'
-            });
-            pipTranslate.translations('ru', {
-                'CONFIRM_TITLE': 'Подтвердите'
-            });
-            $scope.title = params.title || 'CONFIRM_TITLE';
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
+            pipTranslate.translations('en', { 'CONFIRM_TITLE': 'Confirm' });
+            pipTranslate.translations('ru', { 'CONFIRM_TITLE': 'Подтвердите' });
+            this.config.title = params.title || 'CONFIRM_TITLE';
+            this.config.ok = params.ok || 'OK';
+            this.config.cancel = params.cancel || 'CANCEL';
         }
         else {
-            $scope.title = params.title || 'Confirm';
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'Cancel';
+            this.config.title = params.title || 'Confirm';
+            this.config.ok = params.ok || 'OK';
+            this.config.cancel = params.cancel || 'Cancel';
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onOk = function () {
-            $mdDialog.hide();
-        };
-    }]);
-})();
+        this.$mdDialog = $mdDialog;
+        this.theme = $rootScope.$theme;
+    }
+    ConfirmationDialogController.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    ConfirmationDialogController.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    return ConfirmationDialogController;
+}());
+exports.ConfirmationDialogController = ConfirmationDialogController;
+angular
+    .module('pipConfirmationDialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates'])
+    .controller('pipConfirmationDialogController', ConfirmationDialogController);
 },{}],2:[function(require,module,exports){
+var ConfirmationService = (function () {
+    ConfirmationService.$inject = ['$mdDialog'];
+    function ConfirmationService($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    ConfirmationService.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'confirmation/ConfirmationDialog.html',
+            controller: 'pipConfirmationDialogController',
+            controllerAs: 'vm',
+            locals: { params: params },
+            clickOutsideToClose: true
+        })
+            .then(function () {
+            if (successCallback) {
+                successCallback();
+            }
+        }, function () {
+            if (cancelCallback) {
+                cancelCallback();
+            }
+        });
+    };
+    return ConfirmationService;
+}());
+angular
+    .module('pipConfirmationDialog')
+    .service('pipConfirmationDialog', ConfirmationService);
+},{}],3:[function(require,module,exports){
+'use strict';
+require('./ConfirmationController');
+require('./ConfirmationService');
+},{"./ConfirmationController":1,"./ConfirmationService":2}],4:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipDialogs.Translate', []);
@@ -5502,44 +5799,158 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipDialogs', [
-        'pipInformationDialog',
-        'pipConfirmationDialog',
-        'pipOptionsDialog',
-        'pipOptionsBigDialog',
-        'pipErrorDetailsDialog'
-    ]);
-})();
-},{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrorDetailsDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipErrorDetailsDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, successCallback, cancelCallback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'error_details/error_details.html',
-                    controller: 'pipErrorDetailsDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (successCallback) {
-                        successCallback();
-                    }
-                }, function () {
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
+},{}],5:[function(require,module,exports){
+'use strict';
+require('./error_details');
+require('./error_details2');
+require('./information');
+require('./options');
+require('./confirmation');
+angular
+    .module('pipDialogs', [
+    'pipInformationDialog',
+    'pipConfirmationDialog',
+    'pipOptionsDialog',
+    'pipOptionsBigDialog',
+    'pipErrorDetailsDialog',
+    'pipErrorDetails2Dialog'
+]);
+},{"./confirmation":3,"./error_details":11,"./error_details2":8,"./information":14,"./options":19}],6:[function(require,module,exports){
+'use strict';
+var ErrorDetailsData = (function () {
+    function ErrorDetailsData() {
+    }
+    return ErrorDetailsData;
+}());
+exports.ErrorDetailsData = ErrorDetailsData;
+var ErrorDetailsStrings = (function () {
+    function ErrorDetailsStrings() {
+        this.time = 'Time';
+        this.type = 'Type';
+        this.correlationId = 'CorrelationId';
+        this.source = 'Source';
+        this.message = 'Message';
+        this.trace = 'Trace';
+    }
+    return ErrorDetailsStrings;
+}());
+exports.ErrorDetailsStrings = ErrorDetailsStrings;
+var ErrorDetailsDialogController2 = (function () {
+    ErrorDetailsDialogController2.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
+    function ErrorDetailsDialogController2($mdDialog, $injector, $rootScope, params) {
+        "ngInject";
+        this.localStrings = new ErrorDetailsStrings();
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.translations('en', {
+                'TIME': 'Time',
+                'TYPE': 'Type',
+                'CORRELATION_ID': 'CorrelationId',
+                'SOURCE': 'Source',
+                'MESSAGE': 'Message',
+                'TRACE': 'Trace'
+            });
+            pipTranslate.translations('ru', {
+                'TIME': 'Время',
+                'TYPE': 'Тип',
+                'CORRELATION_ID': 'Id',
+                'SOURCE': 'Source',
+                'MESSAGE': 'Сообщение',
+                'TRACE': 'Trace'
+            });
+            this.localStrings.time = 'TIME';
+            this.localStrings.type = 'TYPE';
+            this.localStrings.correlationId = 'CORRELATION_ID';
+            this.localStrings.source = 'SOURCE';
+            this.localStrings.message = 'MESSAGE';
+            this.localStrings.trace = 'TRACE';
+        }
+        this.$mdDialog = $mdDialog;
+        this.theme = $rootScope.$theme;
+    }
+    ErrorDetailsDialogController2.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    ErrorDetailsDialogController2.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    return ErrorDetailsDialogController2;
+}());
+exports.ErrorDetailsDialogController2 = ErrorDetailsDialogController2;
+angular
+    .module('pipErrorDetails2Dialog')
+    .controller('pipErrorDetails2DialogController', ErrorDetailsDialogController2);
+},{}],7:[function(require,module,exports){
+var ErrorDetailsService2 = (function () {
+    ErrorDetailsService2.$inject = ['$mdDialog'];
+    function ErrorDetailsService2($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    ErrorDetailsService2.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'error_details/ErrorDetails.html',
+            controller: 'pipErrorDetailsDialogController',
+            controllerAs: 'vm',
+            locals: { params: params },
+            clickOutsideToClose: true
+        })
+            .then(function () {
+            if (successCallback) {
+                successCallback();
             }
-        };
-    }]);
-    thisModule.controller('pipErrorDetailsDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        }, function () {
+            if (cancelCallback) {
+                cancelCallback();
+            }
+        });
+    };
+    return ErrorDetailsService2;
+}());
+angular
+    .module('pipErrorDetails2Dialog')
+    .service('pipErrorDetails2Dialog', ErrorDetailsService2);
+},{}],8:[function(require,module,exports){
+'use strict';
+angular
+    .module('pipErrorDetails2Dialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates']);
+require('./ErrorDetailsService2');
+require('./ErrorDetailsController2');
+},{"./ErrorDetailsController2":6,"./ErrorDetailsService2":7}],9:[function(require,module,exports){
+'use strict';
+var ErrorStrings = (function () {
+    function ErrorStrings() {
+        this.ok = 'OK';
+        this.cancel = 'Cancel';
+        this.errorDetails = 'Error details';
+        this.dismissButton = 'Dismiss';
+        this.errorMessage = 'Message';
+        this.errorCode = 'Code';
+        this.errorMethod = 'Method';
+        this.errorPath = 'Path';
+        this.error = 'Error';
+        this.errorText = 'Error';
+    }
+    return ErrorStrings;
+}());
+exports.ErrorStrings = ErrorStrings;
+var ErrorParams = (function () {
+    function ErrorParams() {
+        this.ok = 'OK';
+        this.cancel = 'CANCEL';
+        this.error = 'ERROR';
+    }
+    return ErrorParams;
+}());
+exports.ErrorParams = ErrorParams;
+var ErrorDetailsDialogController = (function () {
+    ErrorDetailsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
+    function ErrorDetailsDialogController($mdDialog, $injector, $rootScope, params) {
+        "ngInject";
+        this.config = new ErrorStrings();
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', {
@@ -5559,278 +5970,409 @@ module.run(['$templateCache', function($templateCache) {
                 'METHOD': 'Метод',
                 'MESSAGE': 'Сообщение'
             });
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'CANCEL';
-            $scope.errorDetails = 'ERROR_DETAILS';
-            $scope.dismissButton = 'DISMISS';
-            $scope.errorMessage = 'MESSAGE';
-            $scope.errorCode = 'CODE';
-            $scope.errorMethod = 'METHOD';
-            $scope.errorPath = 'PATH';
-            $scope.errorText = 'ERROR';
+            this.config.ok = params.ok;
+            this.config.cancel = params.cancel;
+            this.config.errorDetails = 'ERROR_DETAILS';
+            this.config.dismissButton = 'DISMISS';
+            this.config.errorMessage = 'MESSAGE';
+            this.config.errorCode = 'CODE';
+            this.config.errorMethod = 'METHOD';
+            this.config.errorPath = 'PATH';
+            this.config.errorText = 'ERROR';
         }
         else {
-            $scope.ok = params.ok || 'OK';
-            $scope.cancel = params.cancel || 'Cancel';
-            $scope.errorDetails = 'Error details';
-            $scope.dismissButton = 'Dismiss';
-            $scope.errorMessage = 'Message';
-            $scope.errorCode = 'Code';
-            $scope.errorMethod = 'Method';
-            $scope.errorPath = 'Path';
-            $scope.error = 'Error';
+            this.config.ok = params.ok;
+            this.config.cancel = params.cancel;
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.error = params.error;
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onOk = function () {
-            $mdDialog.hide();
-        };
-    }]);
-})();
-},{}],5:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipInformationDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipInformationDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, callback) {
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'information/information.html',
-                    controller: 'pipInformationDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function () {
-                    if (callback) {
-                        callback();
-                    }
-                });
+        this.$mdDialog = $mdDialog;
+        this.theme = $rootScope.$theme;
+        this.config.error = params.error;
+    }
+    ErrorDetailsDialogController.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    ErrorDetailsDialogController.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    return ErrorDetailsDialogController;
+}());
+exports.ErrorDetailsDialogController = ErrorDetailsDialogController;
+angular
+    .module('pipErrorDetailsDialog')
+    .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
+},{}],10:[function(require,module,exports){
+var ErrorDetailsService = (function () {
+    ErrorDetailsService.$inject = ['$mdDialog'];
+    function ErrorDetailsService($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    ErrorDetailsService.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'error_details/ErrorDetails.html',
+            controller: 'pipErrorDetailsDialogController',
+            controllerAs: 'vm',
+            locals: { params: params },
+            clickOutsideToClose: true
+        })
+            .then(function () {
+            if (successCallback) {
+                successCallback();
             }
-        };
-    }]);
-    thisModule.controller('pipInformationDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        }, function () {
+            if (cancelCallback) {
+                cancelCallback();
+            }
+        });
+    };
+    return ErrorDetailsService;
+}());
+angular
+    .module('pipErrorDetailsDialog')
+    .service('pipErrorDetailsDialog', ErrorDetailsService);
+},{}],11:[function(require,module,exports){
+'use strict';
+angular
+    .module('pipErrorDetailsDialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates']);
+require('./ErrorDetailsService');
+require('./ErrorDetailsController');
+},{"./ErrorDetailsController":9,"./ErrorDetailsService":10}],12:[function(require,module,exports){
+'use strict';
+var InformationStrings = (function () {
+    function InformationStrings() {
+        this.ok = 'OK';
+    }
+    return InformationStrings;
+}());
+exports.InformationStrings = InformationStrings;
+var InformationParams = (function () {
+    function InformationParams() {
+        this.ok = 'OK';
+    }
+    return InformationParams;
+}());
+exports.InformationParams = InformationParams;
+var InformationDialogController = (function () {
+    InformationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
+    function InformationDialogController($mdDialog, $injector, $rootScope, params) {
+        "ngInject";
+        this.config = new InformationStrings();
         var content = params.message, item;
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'INFORMATION_TITLE': 'Information'
-            });
-            pipTranslate.translations('ru', {
-                'INFORMATION_TITLE': 'Информация'
-            });
-            $scope.title = params.title || 'INFORMATION_TITLE';
-            $scope.ok = params.ok || 'OK';
+            pipTranslate.translations('en', { 'INFORMATION_TITLE': 'Information' });
+            pipTranslate.translations('ru', { 'INFORMATION_TITLE': 'Информация' });
+            this.config.title = params.title || 'INFORMATION_TITLE';
+            this.config.ok = params.ok || 'OK';
             content = pipTranslate.translate(content);
         }
         else {
-            $scope.title = params.title || 'Information';
-            $scope.ok = params.ok || 'OK';
+            this.config.title = params.title || 'Information';
+            this.config.ok = params.ok || 'OK';
         }
         var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
-        $scope.theme = $rootScope.$theme;
         if (params.item && pipFormat) {
             item = _.truncate(params.item, 25);
             content = pipFormat.sprintf(content, item);
             console.log('content2', content);
         }
-        $scope.content = content;
-        $scope.onOk = function () {
-            $mdDialog.hide();
-        };
-    }]);
-})();
-},{}],6:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipOptionsDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipOptionsDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, successCallback, cancelCallback) {
-                if (params.event) {
-                    params.event.stopPropagation();
-                    params.event.preventDefault();
-                }
-                function focusToggleControl() {
-                    if (params.event && params.event.currentTarget) {
-                        params.event.currentTarget.focus();
-                    }
-                }
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'options/options.html',
-                    controller: 'pipOptionsDialogController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function (option) {
-                    focusToggleControl();
-                    if (successCallback) {
-                        successCallback(option);
-                    }
-                }, function () {
-                    focusToggleControl();
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
+        this.config.content = content;
+        this.$mdDialog = $mdDialog;
+        this.theme = $rootScope.$theme;
+        this.config.error = params.error;
+    }
+    InformationDialogController.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    InformationDialogController.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    return InformationDialogController;
+}());
+exports.InformationDialogController = InformationDialogController;
+angular
+    .module('pipInformationDialog')
+    .controller('pipInformationDialogController', InformationDialogController);
+},{}],13:[function(require,module,exports){
+var InformationService = (function () {
+    InformationService.$inject = ['$mdDialog'];
+    function InformationService($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    InformationService.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'information/InformationDialog.html',
+            controller: 'pipInformationDialogController',
+            controllerAs: 'vm',
+            locals: { params: params },
+            clickOutsideToClose: true
+        })
+            .then(function () {
+            if (successCallback) {
+                successCallback();
             }
+        });
+    };
+    return InformationService;
+}());
+angular
+    .module('pipInformationDialog')
+    .service('pipInformationDialog', InformationService);
+},{}],14:[function(require,module,exports){
+'use strict';
+angular
+    .module('pipInformationDialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates']);
+require('./InformationService');
+require('./InformationController');
+},{"./InformationController":12,"./InformationService":13}],15:[function(require,module,exports){
+'use strict';
+var OptionsBigData = (function () {
+    function OptionsBigData() {
+    }
+    return OptionsBigData;
+}());
+exports.OptionsBigData = OptionsBigData;
+var OptionsBigParams = (function () {
+    function OptionsBigParams() {
+        this.noTitle = false;
+        this.noActions = false;
+        this.optionIndex = 0;
+    }
+    return OptionsBigParams;
+}());
+exports.OptionsBigParams = OptionsBigParams;
+var OptionsBigDialogController = (function () {
+    OptionsBigDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
+    function OptionsBigDialogController($mdDialog, $injector, $rootScope, params) {
+        "ngInject";
+        this.onSelect = function () {
+            var option;
+            option = _.find(this.config.options, { name: this.config.selectedOptionName }) || new OptionsBigData();
+            this.$mdDialog.hide({ option: option, deleted: this.config.deleted });
         };
-    }]);
-    thisModule.controller('pipOptionsDialogController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        this.$mdDialog = $mdDialog;
+        this.config = new OptionsBigParams();
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'OPTIONS_TITLE': 'Choose Option'
-            });
-            pipTranslate.translations('ru', {
-                'OPTIONS_TITLE': 'Выберите опцию'
-            });
-            $scope.title = params.title || 'OPTIONS_TITLE';
-            $scope.applyButtonTitle = params.appleButtonTitle || 'SELECT';
+            pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
+            pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
+            this.config.title = params.title || 'OPTIONS_TITLE';
+            this.config.applyButtonTitle = params.applyButtonTitle || 'SELECT';
         }
         else {
-            $scope.title = params.title || 'Choose Option';
-            $scope.applyButtonTitle = params.appleButtonTitle || 'Select';
+            this.config.title = params.title || 'Choose Option';
+            this.config.applyButtonTitle = params.applyButtonTitle || 'Select';
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.options = params.options;
-        $scope.selectedOption = _.find(params.options, { active: true }) || {};
-        $scope.selectedOptionName = $scope.selectedOption.name;
-        $scope.deleted = params.deleted;
-        $scope.deletedTitle = params.deletedTitle;
-        $scope.onOptionSelect = function (event, option) {
+        this.theme = $rootScope.$theme;
+        this.config.options = params.options;
+        this.config.selectedOption = _.find(params.options, { active: true }) || new OptionsBigData();
+        this.config.selectedOptionName = this.config.selectedOption.name;
+        this.config.deleted = params.deleted;
+        this.config.deletedTitle = params.deletedTitle;
+        this.config.noActions = params.noActions || false;
+        this.config.noTitle = params.noTitle || false;
+        this.config.hint = params.hint || '';
+        setTimeout(this.focusInput, 500);
+    }
+    OptionsBigDialogController.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    OptionsBigDialogController.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    OptionsBigDialogController.prototype.onOptionSelect = function (event, option) {
+        event.stopPropagation();
+        this.config.selectedOptionName = option.name;
+        if (this.config.noActions) {
+            this.onSelect();
+        }
+    };
+    OptionsBigDialogController.prototype.onSelected = function () {
+        this.config.selectedOptionName = this.config.options[this.config.optionIndex].name;
+        if (this.config.noActions) {
+            this.onSelect();
+        }
+    };
+    OptionsBigDialogController.prototype.onKeyUp = function (event, index) {
+        if (event.keyCode === 32 || event.keyCode === 13) {
             event.stopPropagation();
-            $scope.selectedOptionName = option.name;
-        };
-        $scope.onKeyPress = function (event) {
-            if (event.keyCode === 32 || event.keyCode === 13) {
-                event.stopPropagation();
-                event.preventDefault();
-                $scope.onSelect();
+            event.preventDefault();
+            if (index !== undefined && index > -1 && index < this.config.options.length) {
+                this.config.selectedOptionName = this.config.options[index].name;
+                this.onSelect();
             }
-        };
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onSelect = function () {
-            var option;
-            option = _.find(params.options, { name: $scope.selectedOptionName });
-            $mdDialog.hide({ option: option, deleted: $scope.deleted });
-        };
-        function focusInput() {
-            var list;
-            list = $('.pip-options-dialog .pip-list');
-            list.focus();
         }
-        setTimeout(focusInput, 500);
-    }]);
-})();
-},{}],7:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipOptionsBigDialog', ['ngMaterial', 'pipDialogs.Translate', 'pipDialogs.Templates']);
-    thisModule.factory('pipOptionsBigDialog', ['$mdDialog', function ($mdDialog) {
-        return {
-            show: function (params, successCallback, cancelCallback) {
-                if (params.event) {
-                    params.event.stopPropagation();
-                    params.event.preventDefault();
-                }
-                function focusToggleControl() {
-                    if (params.event && params.event.currentTarget) {
-                        params.event.currentTarget.focus();
-                    }
-                }
-                $mdDialog.show({
-                    targetEvent: params.event,
-                    templateUrl: 'options/options_big.html',
-                    controller: 'pipOptionsDialogBigController',
-                    locals: { params: params },
-                    clickOutsideToClose: true
-                })
-                    .then(function (option) {
-                    focusToggleControl();
-                    if (successCallback) {
-                        successCallback(option);
-                    }
-                }, function () {
-                    focusToggleControl();
-                    if (cancelCallback) {
-                        cancelCallback();
-                    }
-                });
+    };
+    OptionsBigDialogController.prototype.focusInput = function () {
+        var list;
+        list = $('.pip-options-dialog .pip-list');
+        list.focus();
+    };
+    return OptionsBigDialogController;
+}());
+exports.OptionsBigDialogController = OptionsBigDialogController;
+angular
+    .module('pipOptionsBigDialog')
+    .controller('pipOptionsBigDialogController', OptionsBigDialogController);
+},{}],16:[function(require,module,exports){
+var OptionsBigService = (function () {
+    OptionsBigService.$inject = ['$mdDialog'];
+    function OptionsBigService($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    OptionsBigService.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'options/OptionsBigDialog.html',
+            controller: 'pipOptionsBigDialogController',
+            controllerAs: 'vm',
+            locals: { params: params },
+            clickOutsideToClose: true
+        })
+            .then(function (option) {
+            if (successCallback) {
+                successCallback(option);
             }
-        };
-    }]);
-    thisModule.controller('pipOptionsDialogBigController', ['$scope', '$rootScope', '$mdDialog', '$injector', 'params', function ($scope, $rootScope, $mdDialog, $injector, params) {
+        }, function () {
+            if (cancelCallback) {
+                cancelCallback();
+            }
+        });
+    };
+    return OptionsBigService;
+}());
+angular
+    .module('pipOptionsBigDialog')
+    .service('pipOptionsBigDialog', OptionsBigService);
+},{}],17:[function(require,module,exports){
+'use strict';
+var OptionsData = (function () {
+    function OptionsData() {
+        this.icon = 'star';
+        this.active = true;
+    }
+    return OptionsData;
+}());
+exports.OptionsData = OptionsData;
+var OptionsParams = (function () {
+    function OptionsParams() {
+    }
+    return OptionsParams;
+}());
+exports.OptionsParams = OptionsParams;
+var OptionsDialogController = (function () {
+    OptionsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
+    function OptionsDialogController($mdDialog, $injector, $rootScope, params) {
+        "ngInject";
+        this.$mdDialog = $mdDialog;
+        this.config = new OptionsParams();
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
-            pipTranslate.translations('en', {
-                'OPTIONS_TITLE': 'Choose Option'
-            });
-            pipTranslate.translations('ru', {
-                'OPTIONS_TITLE': 'Выберите опцию'
-            });
-            $scope.title = params.title || 'OPTIONS_TITLE';
-            $scope.applyButtonTitle = params.applyButtonTitle || 'SELECT';
+            pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
+            pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
+            this.config.title = params.title || 'OPTIONS_TITLE';
+            this.config.applyButtonTitle = params.applyButtonTitle || 'SELECT';
         }
         else {
-            $scope.title = params.title || 'Choose Option';
-            $scope.applyButtonTitle = params.applyButtonTitle || 'Select';
+            this.config.title = params.title || 'Choose Option';
+            this.config.applyButtonTitle = params.applyButtonTitle || 'Select';
         }
-        $scope.theme = $rootScope.$theme;
-        $scope.options = params.options;
-        $scope.noActions = params.noActions || false;
-        $scope.noTitle = params.noTitle || false;
-        $scope.hint = params.hint || '';
-        $scope.selectedOption = _.find(params.options, { active: true }) || {};
-        $scope.selectedOptionName = $scope.selectedOption.name;
-        $scope.optionIndex = _.findIndex(params.options, $scope.selectedOption);
-        $scope.deleted = params.deleted;
-        $scope.deletedTitle = params.deletedTitle;
-        $scope.onOptionSelect = function (event, option) {
+        this.theme = $rootScope.$theme;
+        this.config.options = params.options;
+        this.config.selectedOption = _.find(params.options, { active: true }) || new OptionsData();
+        this.config.selectedOptionName = this.config.selectedOption.name;
+        this.config.deleted = params.deleted;
+        this.config.deletedTitle = params.deletedTitle;
+        setTimeout(this.focusInput, 500);
+    }
+    OptionsDialogController.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    OptionsDialogController.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    OptionsDialogController.prototype.onOptionSelect = function (event, option) {
+        event.stopPropagation();
+        this.config.selectedOptionName = option.name;
+    };
+    OptionsDialogController.prototype.onKeyPress = function (event) {
+        if (event.keyCode === 32 || event.keyCode === 13) {
             event.stopPropagation();
-            $scope.selectedOptionName = option.name;
-            if ($scope.noActions) {
-                $scope.onSelect();
-            }
-        };
-        $scope.onSelected = function () {
-            $scope.selectedOptionName = $scope.options[$scope.optionIndex].name;
-            if ($scope.noActions) {
-            }
-        };
-        $scope.onKeyUp = function (event, index) {
-            if (event.keyCode === 32 || event.keyCode === 13) {
-                event.stopPropagation();
-                event.preventDefault();
-                if (index !== undefined && index > -1 && index < $scope.options.length) {
-                    $scope.selectedOptionName = $scope.options[index].name;
-                    $scope.onSelect();
-                }
-            }
-        };
-        $scope.onCancel = function () {
-            $mdDialog.cancel();
-        };
-        $scope.onSelect = function () {
-            var option;
-            option = _.find($scope.options, { name: $scope.selectedOptionName });
-            $mdDialog.hide({ option: option, deleted: $scope.deleted });
-        };
-        function focusInput() {
-            var list;
-            list = $('.pip-options-dialog .pip-list');
-            list.focus();
+            event.preventDefault();
+            this.onSelect();
         }
-        setTimeout(focusInput, 500);
-    }]);
-})();
-},{}],8:[function(require,module,exports){
+    };
+    OptionsDialogController.prototype.onSelect = function () {
+        var option;
+        option = _.find(this.config.options, { name: this.config.selectedOptionName });
+        console.log(option);
+        this.$mdDialog.hide({ option: option, deleted: this.config.deleted });
+    };
+    OptionsDialogController.prototype.focusInput = function () {
+        var list;
+        list = $('.pip-options-dialog .pip-list');
+        list.focus();
+    };
+    return OptionsDialogController;
+}());
+exports.OptionsDialogController = OptionsDialogController;
+angular
+    .module('pipOptionsDialog')
+    .controller('pipOptionsDialogController', OptionsDialogController);
+},{}],18:[function(require,module,exports){
+var OptionsService = (function () {
+    OptionsService.$inject = ['$mdDialog'];
+    function OptionsService($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    OptionsService.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'options/OptionsDialog.html',
+            controller: 'pipOptionsDialogController',
+            controllerAs: 'vm',
+            locals: { params: params },
+            clickOutsideToClose: true
+        })
+            .then(function (option) {
+            if (successCallback) {
+                successCallback(option.option);
+            }
+        }, function () {
+            if (cancelCallback) {
+                cancelCallback();
+            }
+        });
+    };
+    return OptionsService;
+}());
+angular
+    .module('pipOptionsDialog')
+    .service('pipOptionsDialog', OptionsService);
+},{}],19:[function(require,module,exports){
+'use strict';
+angular
+    .module('pipOptionsDialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates']);
+require('./OptionsService');
+require('./OptionsController');
+angular
+    .module('pipOptionsBigDialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates']);
+require('./OptionsBigService');
+require('./OptionsBigController');
+},{"./OptionsBigController":15,"./OptionsBigService":16,"./OptionsController":17,"./OptionsService":18}],20:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipDialogs.Templates');
@@ -5838,8 +6380,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('confirmation/confirmation.html',
-    '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{::theme}}"><div class="pip-header"><h3>{{:: title}}</h3></div><div class="pip-footer"><div><md-button ng-click="onCancel()">{{:: cancel}}</md-button><md-button class="md-accent" ng-click="onOk()">{{:: ok}}</md-button></div></div></md-dialog>');
+  $templateCache.put('confirmation/ConfirmationDialog.html',
+    '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{::vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title}}</h3></div><div class="pip-footer"><div><md-button ng-click="vm.onCancel()">{{:: vm.config.cancel}}</md-button><md-button class="md-accent" ng-click="vm.onOk()">{{:: vm.config.ok}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -5850,8 +6392,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('options/options.html',
-    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{theme}}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{::title | translate}}</h3><div ng-show="deletedTitle" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::deletedTitle | translate}}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="onKeyPress($event)" tabindex="0"><div ng-repeat="option in options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{::option.title | translate}}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{::option.title | translate}}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="onSelect()">{{::applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/ErrorDetails.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -5862,8 +6404,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('options/options_big.html',
-    '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{theme}}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !noActions}"><div class="pip-header" ng-class="{\'header-hint\': noTitle && hint}"><h3 class="m0" ng-if="!noTitle">{{::title | translate}}</h3><div ng-show="noTitle && hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{::hint | translate}}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="optionIndex" index="{{optionIndex }}" pip-select="onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="onKeyUp($event, $index)" ng-repeat="option in options"><div class="pip-content content-stretch" ng-click="onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{::option.title | translate}}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{::option.subtitle | translate}}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!noActions"><div><md-button class="pip-cancel" ng-click="onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="onSelect()" style="margin-right: -6px">{{::applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details2/ErrorDetails2.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog-2 layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -5874,8 +6416,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/error_details.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.code || (error.data && error.data.code)">{{::errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.code || (error.data && error.data.code)">{{error.code || error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="error.path || (error.data && error.data.path)">{{::errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.path || (error.data && error.data.path)">{{error.path || error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.error || (error.data && error.data.error)">{{::errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.error || (error.data && error.data.error)">{{error.error || error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.method || (error.data && error.data.method)">{{::errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.method || (error.data && error.data.method)">{{error.method || error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="error.message || (error.data && error.data.message)">{{::errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="error.message || (error.data && error.data.message)">{{error.message || error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="onOk()">{{::dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -5886,14 +6428,26 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/information.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{theme}}"><div class="pip-header"><h3>{{ title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="onOk()">{{ ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('options/OptionsBigDialog.html',
+    '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !vm.config.noActions}"><div class="pip-header" ng-class="{\'header-hint\': vm.config.noTitle && vm.config.hint}"><h3 class="m0" ng-if="!vm.config.noTitle">{{::vm.config.title | translate}}</h3><div ng-show="vm.config.noTitle && vm.config.hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{::vm.config.hint | translate}}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="vm.config.optionIndex" index="{{vm.config.optionIndex }}" pip-select="vm.onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="vm.onKeyUp($event, $index)" ng-repeat="option in vm.config.options"><div class="pip-content content-stretch" ng-click="vm.onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{::option.title | translate}}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{::option.subtitle | translate}}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="vm.config.noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!vm.config.noActions"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()" style="margin-right: -6px">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('options/OptionsDialog.html',
+    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{::vm.config.title | translate}}</h3><div ng-show="vm.config.deletedTitle" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::vm.config.deletedTitle | translate}}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="vm.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="vm.onKeyPress($event)" tabindex="0"><div ng-repeat="option in vm.config.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'vm.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == vm.config.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{::option.title | translate}}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{::option.title | translate}}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
 
 
-},{}]},{},[1,2,3,4,5,7,6,8])(8)
+},{}]},{},[1,2,3,4,5,9,10,11,6,7,8,14,12,13,19,15,16,17,18,20])(20)
 });
 
 
@@ -8450,6 +9004,18 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('breadcrumb/Breadcrumb.html',
+    '<div><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}">{{item.title | translate}}</span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><md-menu xmd-offset="0 48" class="hide-gt-xs"><span class="pip-mobile-breadcrumb layout-row" ng-click="$mdOpenMenu()" md-ink-ripple="" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('appbar/AppBar.html',
     '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
 }]);
@@ -8462,8 +9028,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}">{{item.title | translate}}</span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><md-menu xmd-offset="0 48" class="hide-gt-xs"><span class="pip-mobile-breadcrumb layout-row" ng-click="$mdOpenMenu()" md-ink-ripple="" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div>');
+  $templateCache.put('header/StickyNavHeader.html',
+    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -8488,18 +9054,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('icon/NavIcon.html',
     '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('header/StickyNavHeader.html',
-    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -8546,8 +9100,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="$mdMedia(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+  $templateCache.put('sidenav/StickySideNav.html',
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
 }]);
 })();
 
@@ -8558,8 +9112,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('sidenav/StickySideNav.html',
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
+  $templateCache.put('tabs/Tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="$mdMedia(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
 })();
 
@@ -9604,8 +10158,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -9628,8 +10182,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+  $templateCache.put('no_connection/no_connection.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -9690,7 +10244,7 @@ module.run(['$templateCache', function($templateCache) {
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                vm.legend = vm.data[0].values;
+                vm.legend = vm.data[0] ? vm.data[0].values : [];
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -9701,6 +10255,10 @@ module.run(['$templateCache', function($templateCache) {
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         chart.update();
+                        drawEmptyState();
+                        $timeout(function () {
+                            vm.legend = vm.data[0] ? vm.data[0].values : [];
+                        });
                     }
                 });
                 nv.addGraph(function () {
@@ -9730,11 +10288,38 @@ module.run(['$templateCache', function($templateCache) {
                         $timeout(configBarWidthAndLabel, 0);
                     });
                     $timeout(configBarWidthAndLabel, 0);
+                    drawEmptyState();
                 });
+                function drawEmptyState() {
+                    if ($element.find('.nv-noData').length === 0) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                    }
+                    else {
+                        $element.find('.nv-noData').attr('x', 100);
+                        var g = chartElem.append('g').classed('empty-state', true);
+                        g.append('g')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 260)
+                            .attr('width', 38);
+                        g.append('g')
+                            .attr('transform', 'translate(46, 60)')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 200)
+                            .attr('width', 38);
+                        g.append('g')
+                            .attr('transform', 'translate(92, 160)')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 100)
+                            .attr('width', 38);
+                    }
+                }
                 function configBarWidthAndLabel() {
-                    var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
-                    d3.select('.bar-chart').classed('visible', true);
-                    chartBars.forEach(function (item, index) {
+                    var labels = $element.find('.nv-bar text'), chartBars = $element.find('.nv-bar'), parentHeight = $element.find('.nvd3-svg')[0].getBBox().height;
+                    d3.select($element.find('.bar-chart')[0]).classed('visible', true);
+                    chartBars.each(function (index, item) {
                         var barSize = item.getBBox(), element = d3.select(item), y = d3.transform(element.attr('transform')).translate[1];
                         element
                             .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
@@ -9756,7 +10341,9 @@ module.run(['$templateCache', function($templateCache) {
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
-                    vm.legend.forEach(function (item, index) {
+                    if (!vm.data[0] || !vm.data)
+                        return;
+                    vm.data[0].values.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
@@ -9849,7 +10436,8 @@ module.run(['$templateCache', function($templateCache) {
                 series: '=pipSeries',
                 showYAxis: '=pipYAxis',
                 showXAxis: '=pipXAxis',
-                dynamic: '=pipDynamic'
+                dynamic: '=pipDynamic',
+                interactiveLegend: '=pipInterLegend'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -9863,7 +10451,8 @@ module.run(['$templateCache', function($templateCache) {
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
-                vm.data = vm.series || [];
+                vm.data = prepareData(vm.series) || [];
+                vm.legend = _.clone(vm.series);
                 vm.sourceEvents = [];
                 vm.isVisibleX = function () {
                     return vm.showXAxis == undefined ? true : vm.showXAxis;
@@ -9889,14 +10478,34 @@ module.run(['$templateCache', function($templateCache) {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
                 $scope.$watch('lineChart.series', function (updatedSeries) {
-                    vm.data = updatedSeries;
+                    vm.data = prepareData(updatedSeries);
+                    vm.legend = _.clone(vm.series);
                     generateParameterColor();
                     if (chart) {
                         chartElem.datum(vm.data || []).call(chart);
+                        drawEmptyState();
                         if (updateZoomOptions)
                             updateZoomOptions(vm.data);
                     }
                 }, true);
+                $scope.$watch('lineChart.legend', function (updatedLegend) {
+                    vm.data = prepareData(updatedLegend);
+                    vm.legend = updatedLegend;
+                    if (chart) {
+                        chartElem.datum(vm.data || []).call(chart);
+                        drawEmptyState();
+                        if (updateZoomOptions)
+                            updateZoomOptions(vm.data);
+                    }
+                }, true);
+                function prepareData(data) {
+                    var result = [];
+                    _.each(data, function (seria) {
+                        if (!seria.disabled)
+                            result.push(seria);
+                    });
+                    return _.cloneDeep(result);
+                }
                 nv.addGraph(function () {
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
@@ -9935,27 +10544,31 @@ module.run(['$templateCache', function($templateCache) {
                     drawEmptyState();
                 });
                 function drawEmptyState() {
-                    if (!$element.find('text.nv-noData').get(0))
-                        return;
-                    chartElem
-                        .append("defs")
-                        .append("pattern")
-                        .attr("height", 1)
-                        .attr("width", 1)
-                        .attr("x", "0")
-                        .attr("y", "0")
-                        .attr("id", "bg")
-                        .append("image")
-                        .attr('x', 27)
-                        .attr('y', 0)
-                        .attr('height', "100%")
-                        .attr('width', 1151)
-                        .attr("xlink:href", "images/line_chart_empty_state.svg");
-                    chartElem
-                        .append('rect')
-                        .attr('height', "100%")
-                        .attr('width', "100%")
-                        .attr('fill', 'url(#bg)');
+                    if (!$element.find('text.nv-noData').get(0)) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                    }
+                    else {
+                        chartElem
+                            .append("defs")
+                            .append("pattern")
+                            .attr("height", 1)
+                            .attr("width", 1)
+                            .attr("x", "0")
+                            .attr("y", "0")
+                            .attr("id", "bg")
+                            .append("image")
+                            .attr('x', 27)
+                            .attr('y', 0)
+                            .attr('height', "100%")
+                            .attr('width', 1151)
+                            .attr("xlink:href", "images/line_chart_empty_state.svg");
+                        chartElem
+                            .append('rect')
+                            .classed('empty-state', true)
+                            .attr('height', "100%")
+                            .attr('width', "100%")
+                            .attr('fill', 'url(#bg)');
+                    }
                 }
                 function updateScroll(domains, boundary) {
                     var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = (domains[1] - domains[0]) / bDiff === 1;
@@ -10201,6 +10814,7 @@ module.run(['$templateCache', function($templateCache) {
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         $timeout(resizeTitleLabel);
+                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     }
                 }, true);
                 generateParameterColor();
@@ -10239,6 +10853,7 @@ module.run(['$templateCache', function($templateCache) {
                     nv.utils.windowResize(function () {
                         chart.update();
                         $timeout(resizeTitleLabel);
+                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     });
                     return chart;
                 }, function () {
@@ -10254,22 +10869,29 @@ module.run(['$templateCache', function($templateCache) {
                     });
                 });
                 function drawEmptyState(svg) {
-                    if (!$element.find('text.nv-noData').get(0))
-                        return;
-                    $element.find('.pie-chart')
-                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
-                    var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
-                    var arc = d3.svg.arc()
-                        .innerRadius(size / 2 - 20)
-                        .outerRadius(size / 2 - 57);
-                    svg = d3.select(svg)
-                        .append("g")
-                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
-                    var path = svg.selectAll("path")
-                        .data(pie([1]))
-                        .enter().append("path")
-                        .attr("fill", "rgba(0, 0, 0, 0.08)")
-                        .attr("d", arc);
+                    if (!$element.find('text.nv-noData').get(0)) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                        $element.find('.pip-empty-pie-text').remove();
+                    }
+                    else {
+                        if ($element.find('.pip-empty-pie-text').length === 0) {
+                            $element.find('.pie-chart')
+                                .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                        }
+                        var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
+                        var arc = d3.svg.arc()
+                            .innerRadius(size / 2 - 20)
+                            .outerRadius(size / 2 - 57);
+                        svg = d3.select(svg)
+                            .append("g")
+                            .classed('empty-state', true)
+                            .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                        var path = svg.selectAll("path")
+                            .data(pie([1]))
+                            .enter().append("path")
+                            .attr("fill", "rgba(0, 0, 0, 0.08)")
+                            .attr("d", arc);
+                    }
                 }
                 function renderTotalLabel(svgElem) {
                     if ((!vm.total && !vm.donut) || !vm.data)
@@ -10322,7 +10944,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart flex-auto layout-column"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+    '<div class="bar-chart"><svg></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -10334,7 +10956,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
-    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
+    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
 }]);
 })();
 
@@ -10346,7 +10968,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="visual-scroll"><div class="scrolled-block"></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>');
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 

@@ -215,6 +215,48 @@ declare module pip.landing {
 
 declare module pip.layouts {
 
+
+
+export let AuxPanelChangedEvent: string;
+export let AuxPanelStateChangedEvent: string;
+export let OpenAuxPanelEvent: string;
+export let CloseAuxPanelEvent: string;
+export class AuxPanelConfig {
+    parts: any;
+    classes: string[];
+    state: any;
+    type: string;
+}
+export interface IAuxPanelService {
+    readonly config: AuxPanelConfig;
+    readonly classes: string[];
+    parts: any;
+    state: any;
+    isOpen(): boolean;
+    open(): void;
+    close(): void;
+    toggle(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAuxPanelProvider extends ng.IServiceProvider {
+    config: AuxPanelConfig;
+    parts: any;
+    type: string;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -250,12 +292,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -393,11 +429,189 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 declare module pip.dialogs {
 
+export class ConfirmationParams {
+    ok: string;
+    title: string;
+    cancel: string;
+}
+export class ConfirmationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: ConfirmationParams;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: ConfirmationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class ConfirmationService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
 
 
 
+export class ErrorStrings {
+    ok: string;
+    cancel: string;
+    errorDetails: string;
+    dismissButton: string;
+    errorMessage: string;
+    errorCode: string;
+    errorMethod: string;
+    errorPath: string;
+    error: string;
+    errorText: string;
+}
+export class ErrorParams {
+    ok: string;
+    cancel: string;
+    error: string;
+}
+export class ErrorDetailsDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: ErrorStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: ErrorParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class ErrorDetailsService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
 
 
+export class ErrorDetailsData {
+}
+export class ErrorDetailsStrings {
+    time: string;
+    type: string;
+    correlationId: string;
+    source: string;
+    message: string;
+    trace: string;
+}
+export class ErrorDetailsDialogController2 {
+    $mdDialog: any;
+    theme: any;
+    localStrings: ErrorDetailsStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: ErrorDetailsData);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class ErrorDetailsService2 {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
+
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: InformationStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class InformationService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
+
+export class OptionsBigData {
+    name: string;
+    title: string;
+    subtitle: string;
+}
+export class OptionsBigParams {
+    title: string;
+    applyButtonTitle: string;
+    options: OptionsBigData[];
+    selectedOption: OptionsBigData;
+    deleted: any;
+    selectedOptionName: string;
+    deletedTitle: string;
+    hint: string;
+    noTitle: boolean;
+    noActions: boolean;
+    optionIndex: number;
+}
+export class OptionsBigDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: OptionsBigParams;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: OptionsBigParams);
+    onOk(): void;
+    onCancel(): void;
+    onOptionSelect(event: any, option: any): void;
+    onSelected(): void;
+    onKeyUp(event: any, index: any): void;
+    onSelect: () => void;
+    private focusInput();
+}
+
+class OptionsBigService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
+export class OptionsData {
+    icon: string;
+    name: string;
+    title: string;
+    active: boolean;
+}
+export class OptionsParams {
+    title: string;
+    applyButtonTitle: string;
+    options: OptionsData[];
+    selectedOption: OptionsData;
+    deleted: any;
+    selectedOptionName: string;
+    deletedTitle: string;
+}
+export class OptionsDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: OptionsParams;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: OptionsParams);
+    onOk(): void;
+    onCancel(): void;
+    onOptionSelect(event: any, option: OptionsData): void;
+    onKeyPress(event: any): void;
+    onSelect(): void;
+    private focusInput();
+}
+
+class OptionsService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
 
 }
 
@@ -451,6 +665,31 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -480,31 +719,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -517,34 +731,6 @@ export interface INavService {
     reset(): void;
 }
 
-
-
-
-
-export let NavIconChangedEvent: 'pipNavIconChanged';
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
 
 
 export let NavHeaderChangedEvent: string;
@@ -578,6 +764,34 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
     clear(): void;
 }
 
+
+
+
+
+export let NavIconChangedEvent: 'pipNavIconChanged';
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
 
 
 
@@ -648,7 +862,6 @@ export interface ISearchProvider extends ng.IServiceProvider {
 
 
 
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -680,6 +893,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
 
 
 }
