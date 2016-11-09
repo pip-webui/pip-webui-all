@@ -45,49 +45,6 @@ export interface ISessionProvider extends ng.IServiceProvider {
 }
 
 
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
-
-
 function translateDirective(pipTranslate: any): ng.IDirective;
 function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 
@@ -145,6 +102,49 @@ export class Translation {
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
+
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
 
 export interface ICodes {
     hash(value: string): number;
@@ -317,8 +317,8 @@ declare module pip.controls {
 
 
 
-
 var marked: any;
+
 
 
 
@@ -484,32 +484,6 @@ class ErrorDetailsService {
 }
 
 
-export class ErrorDetailsData {
-}
-export class ErrorDetailsStrings {
-    time: string;
-    type: string;
-    correlationId: string;
-    source: string;
-    message: string;
-    trace: string;
-}
-export class ErrorDetailsDialogController2 {
-    $mdDialog: any;
-    theme: any;
-    localStrings: ErrorDetailsStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: ErrorDetailsData);
-    onOk(): void;
-    onCancel(): void;
-}
-
-class ErrorDetailsService2 {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
-
-
 
 export class InformationStrings {
     ok: string;
@@ -613,6 +587,30 @@ class OptionsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
+export class ErrorDetailsData {
+    time: string;
+    type: string;
+    correlationId: string;
+    source: string;
+    message: string;
+    trace: string;
+    event: any;
+}
+export class ErrorDetailsDialogController2 {
+    $mdDialog: any;
+    theme: any;
+    localStrings: ErrorDetailsData;
+    error: ErrorDetailsData;
+    state: string;
+    buttonsCollections: any;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: ErrorDetailsData);
+    onOk(): void;
+    onCancel(): void;
+    onNewState(state: string): void;
+}
+
+
+
 }
 
 declare module pip.nav {
@@ -665,31 +663,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -732,6 +705,31 @@ export interface INavService {
 }
 
 
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 
 export let NavHeaderChangedEvent: string;
 export class NavHeaderConfig {
@@ -768,7 +766,7 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-export let NavIconChangedEvent: 'pipNavIconChanged';
+export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
     imageUrl: string;
@@ -791,6 +789,35 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setBack(callbackOrEvent?: any): void;
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
+}
+
+
+
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
@@ -834,34 +861,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -893,7 +892,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
-
 
 
 }
@@ -970,6 +968,12 @@ function configureSettingsPageRoutes($stateProvider: any): void;
 
 
 
+
+
+
+
+
+
 export class SettingsTab {
     state: string;
     title: string;
@@ -996,12 +1000,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-
-
-
 
 }
 

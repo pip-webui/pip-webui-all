@@ -6374,6 +6374,31 @@ button:focus {
 .pip-dialog.pip-information-dialog .pip-header h3 {
   margin: 0px;
 }
+.pip-dialog.pip-error-details-dialog-2 .pip-section {
+  height: 48px;
+}
+.pip-dialog.pip-error-details-dialog-2 .pip-section .pip-title-section {
+  font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.54);
+  width: 100px;
+  margin-right: 16px;
+}
+.pip-dialog.pip-error-details-dialog-2 .pip-section .pip-text-section {
+  font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.pip-dialog.pip-error-details-dialog-2 .pip-section .pip-title-section,
+.pip-dialog.pip-error-details-dialog-2 .pip-section .pip-text-section {
+  vertical-align: middle;
+  line-height: 48px;
+}
+.pip-dialog.pip-error-details-dialog-2 .pip-text-error {
+  margin-top: 16px;
+}
+.pip-dialog.pip-error-details-dialog-2 h3 {
+  margin: 0;
+  margin-bottom: 16px;
+}
 .pip-dialog .pip-footer {
   padding-left: 12px;
   padding-right: 10px;
