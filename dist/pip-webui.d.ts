@@ -1,5 +1,17 @@
 declare module pip.services {
 
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
+
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -31,18 +43,6 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
-
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
 
 
 export class Transaction {
@@ -689,6 +689,7 @@ export let BreadcrumbBackEvent: string;
 export class BreadcrumbItem {
     title: string;
     click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
 }
 export class BreadcrumbConfig {
     text: string;
@@ -709,33 +710,6 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 
 
 
-
-
-
-export let NavIconChangedEvent: string;
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
 
 
 export let NavHeaderChangedEvent: string;
@@ -769,6 +743,33 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
     clear(): void;
 }
 
+
+
+
+export let NavIconChangedEvent: string;
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
 
 
 
@@ -811,6 +812,7 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
+
 export let OpenSearchEvent: string;
 export let CloseSearchEvent: string;
 export let SearchChangedEvent: string;
@@ -848,6 +850,7 @@ export class SideNavConfig {
     classes: string[];
     state: any;
     type: string;
+    visible: boolean;
 }
 export interface ISideNavService {
     readonly config: SideNavConfig;
@@ -857,6 +860,8 @@ export interface ISideNavService {
     open(): void;
     close(): void;
     toggle(): void;
+    show(): void;
+    hide(): void;
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
@@ -865,12 +870,12 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     config: SideNavConfig;
     parts: any;
     type: string;
+    visible: boolean;
     classes: string[];
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
-
 
 
 }

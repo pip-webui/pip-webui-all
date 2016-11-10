@@ -6776,6 +6776,9 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-breadcrumb .cursor-pointer {
   cursor: pointer !important;
 }
+.pip-breadcrumb .pip-breadcrumb-item-menu {
+  display: inline-block;
+}
 .pip-search-bar {
   width: 100%;
 }
@@ -7024,6 +7027,9 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   color: #fafafa;
   background: red;
   animation: badge-animation 0.35s ease;
+}
+.pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu {
+  overflow: hidden;
 }
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button {
   margin-right: 0px;
