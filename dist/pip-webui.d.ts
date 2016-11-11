@@ -103,6 +103,49 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
+
 export interface ICodes {
     hash(value: string): number;
     verification(): string;
@@ -155,49 +198,6 @@ export interface ITimerService {
     start(): void;
     stop(): void;
 }
-
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
 
 }
 
@@ -254,6 +254,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -289,12 +295,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -641,6 +641,18 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
 
 
 export let AppBarChangedEvent: string;
@@ -697,17 +709,6 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
 
 
 
@@ -745,7 +746,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -770,7 +770,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
-
 
 
 export let NavMenuChangedEvent: string;
@@ -812,6 +811,35 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -850,34 +878,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 
 
 
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
 }
 
 declare module pip.themes {
@@ -888,19 +888,6 @@ function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemi
 
 function configureBootBarnWarmTheme($mdThemingProvider: any): void;
 
-
-
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
-export interface IThemeService {
-    theme: string;
-    use(language: string): string;
-}
-export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
-    setRootVar: boolean;
-    persist: boolean;
-}
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -918,6 +905,19 @@ function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingPro
 
 function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
+
+
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
+export interface IThemeService {
+    theme: string;
+    use(language: string): string;
+}
+export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
 
 }
 
@@ -953,12 +953,6 @@ function configureSettingsPageRoutes($stateProvider: any): void;
 
 
 
-
-
-
-
-
-
 export class SettingsTab {
     state: string;
     title: string;
@@ -985,6 +979,12 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
+
+
+
+
+
+
 
 }
 

@@ -3180,9 +3180,9 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   flex: 1 0 100%;
   position: absolute;
   height: calc(100% - 24px);
-  left: calc(50% - 550px);
+  left: calc(50% - 480px);
   margin: 0 auto;
-  width: 1100px;
+  width: 960px;
   max-width: 100%;
 }
 .pip-document .pip-content-container {
@@ -3242,8 +3242,7 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   height: 95px;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
-.pip-xs .pip-document,
-.pip-sm .pip-document {
+.pip-xs .pip-document {
   position: absolute;
   top: 0;
   left: 0;
@@ -3277,37 +3276,23 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 .pip-xs .pip-document.pip-single-content .pip-content-container {
   left: 0;
 }
-.pip-sm .pip-document {
-  left: 0;
-  width: 100%;
-  height: 100%;
+@media (max-width: 960px) {
+  .pip-sm .pip-document {
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 .pip-sm .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document {
   width: 100%;
   height: 100%;
-}
-.pip-md .pip-document {
-  width: 100%;
-  height: 100%;
-  left: 0;
-}
-.pip-md .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document {
-  width: 100%;
-  height: 100%;
-}
-@media (max-width: 1100px) {
-  .pip-lg .pip-document {
-    width: 100%;
-    height: 100%;
-    left: 0;
-  }
 }
 .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document {
   left: 2px;
   width: calc(100% - 16px);
   height: calc(100% - 16px);
   min-width: 320px;
-  max-width: 1100px;
+  max-width: 960px;
 }
 .pip-main-menu .pip-content-container .pip-document {
   transition: left 0.35s ease;
@@ -3514,7 +3499,7 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   position: absolute;
   transition: all 0.35s ease;
   border-right: none;
-  width: 390px;
+  width: 320px;
   opacity: 1;
   overflow-y: auto;
   max-height: 100%;
@@ -3523,9 +3508,9 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   margin: 0;
   transition: all 0.35s ease;
   position: absolute;
-  left: 390px;
+  left: 320px;
   height: 100%;
-  width: calc(100% - 390px);
+  width: calc(100% - 320px);
   overflow: hidden;
 }
 .pip-main-body .pip-main-menu > .pip-content-container .pip-scrolled-block {
@@ -3584,23 +3569,19 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 .pip-xs .pip-main-body .pip-main-menu.pip-single-content .pip-content-container {
   left: 0;
 }
-.pip-sm .pip-main-body .pip-main-menu .pip-menu {
-  width: 320px;
+.pip-gt-md .pip-main-body .pip-main-menu .pip-menu {
+  width: 480px;
 }
-.pip-sm .pip-main-body .pip-main-menu .pip-content-container {
-  left: 320px;
-  width: calc(100% - 320px);
-  height: 100%;
+.pip-gt-md .pip-main-body .pip-main-menu .pip-content-container {
+  left: 480px;
+  width: calc(100% - 480px);
 }
-.pip-gt-lg .pip-main-body .pip-main-menu .pip-menu {
-  width: 500px;
-}
-.pip-gt-lg .pip-main-body .pip-main-menu .pip-content-container {
-  left: 500px;
-  width: calc(100% - 500px);
-}
-.pip-gt-lg .pip-main-body .pip-main-menu.pip-single-content .pip-content-container {
+.pip-gt-md .pip-main-body .pip-main-menu.pip-single-content .pip-content-container {
   left: 0;
+}
+.pip-auxpanel.pip-large {
+  max-width: 480px;
+  width: 480px;
 }
 
 .text-hide {
