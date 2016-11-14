@@ -3975,8 +3975,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': toast.type==\'error\', \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || actionLenght > 4, \'pip-no-action-toast\': actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="message"></span><div class="layout-row layout-align-end-start" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)"><md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="onAction(action)" ng-repeat="action in actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -3987,8 +3987,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': toast.type==\'error\', \'pip-column-toast\': toast.type == \'error\' || toast.actions.length > 1 || actionLenght > 4, \'pip-no-action-toast\': actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="message"></span><div class="layout-row layout-align-end-start" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)"><md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="onAction(action)" ng-repeat="action in actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
 }]);
 })();
 
@@ -9008,18 +9008,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('icon/NavIcon.html',
-    '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('header/StickyNavHeader.html',
     '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
 }]);
@@ -9032,8 +9020,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('menu/StickyNavMenu.html',
-    '<md-list><md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Expand menu\' | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Shrink menu\' | translate}}</md-tooltip></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item" ng-repeat="link in section.links" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-focusable" ng-click="clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge color-badge-bg flex-fixed" ng-if="link.count">{{link.count}}</div></md-button></md-list-item></div></md-list>');
+  $templateCache.put('icon/NavIcon.html',
+    '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
 }]);
 })();
 
@@ -9046,6 +9034,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('language/LanguagePicker.html',
     '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{vm.language | translate}}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in vm.languages"><md-button ng-click="vm.onLanguageClick(lang)">{{language | translate}}</md-button></md-menu-item></md-menu-content></md-menu>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('menu/StickyNavMenu.html',
+    '<md-list><md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Expand menu\' | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Shrink menu\' | translate}}</md-tooltip></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item" ng-repeat="link in section.links" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-focusable" ng-click="clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge color-badge-bg flex-fixed" ng-if="link.count">{{link.count}}</div></md-button></md-list-item></div></md-list>');
 }]);
 })();
 
@@ -10139,8 +10139,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-empty pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('no_connection/no_connection.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10151,8 +10151,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('no_connection_panel/no_connection_panel.html',
+    '<div class="pip-empty pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10293,7 +10293,8 @@ module.run(['$templateCache', function($templateCache) {
                         element
                             .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
                             .select('rect')
-                            .attr('width', 38);
+                            .attr('width', '38')
+                            .attr('height', Number(element.select('rect').attr('height')) + 1);
                         element
                             .transition()
                             .duration(1000)
