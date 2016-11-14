@@ -1,17 +1,5 @@
 declare module pip.services {
 
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
-
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -43,6 +31,18 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
+
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -319,10 +319,10 @@ declare module pip.controls {
 
 
 
+
+
+
 var marked: any;
-
-
-
 
 
 }
@@ -594,65 +594,6 @@ class OptionsService {
 
 declare module pip.nav {
 
-export let ActionsChangedEvent: string;
-export class SimpleActionItem {
-    name: string;
-    title?: string;
-    divider?: boolean;
-    icon?: string;
-    count?: number;
-    access?: (action: SimpleActionItem) => boolean;
-    breakpoints?: string[];
-    href?: string;
-    url?: string;
-    state?: string;
-    stateParams?: any;
-    event?: string;
-    click?: (action: SimpleActionItem) => void;
-}
-export class ActionItem extends SimpleActionItem {
-    subActions: SimpleActionItem[];
-}
-export class ActionsConfig {
-    primaryGlobalActions: ActionItem[];
-    primaryLocalActions: ActionItem[];
-    secondaryGlobalActions: ActionItem[];
-    secondaryLocalActions: ActionItem[];
-}
-export interface IActionsService {
-    readonly config: ActionsConfig;
-    primaryGlobalActions: ActionItem[];
-    primaryLocalActions: ActionItem[];
-    secondaryGlobalActions: ActionItem[];
-    secondaryLocalActions: ActionItem[];
-    show(primaryActions?: ActionItem[], secondaryActions?: ActionItem[]): void;
-    hide(): void;
-    updateCount(link: string, count: number): void;
-    clearCounts(): void;
-}
-export interface IActionsProvider extends ng.IServiceProvider {
-    config: ActionsConfig;
-    primaryGlobalActions: ActionItem[];
-    primaryLocalActions: ActionItem[];
-    secondaryGlobalActions: ActionItem[];
-    secondaryLocalActions: ActionItem[];
-}
-
-
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
 
 
 export let AppBarChangedEvent: string;
@@ -709,6 +650,63 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+export let ActionsChangedEvent: string;
+export class SimpleActionItem {
+    name: string;
+    title?: string;
+    divider?: boolean;
+    icon?: string;
+    count?: number;
+    access?: (action: SimpleActionItem) => boolean;
+    breakpoints?: string[];
+    href?: string;
+    url?: string;
+    state?: string;
+    stateParams?: any;
+    event?: string;
+    click?: (action: SimpleActionItem) => void;
+}
+export class ActionItem extends SimpleActionItem {
+    subActions: SimpleActionItem[];
+}
+export class ActionsConfig {
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+}
+export interface IActionsService {
+    readonly config: ActionsConfig;
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+    show(primaryActions?: ActionItem[], secondaryActions?: ActionItem[]): void;
+    hide(): void;
+    updateCount(link: string, count: number): void;
+    clearCounts(): void;
+}
+export interface IActionsProvider extends ng.IServiceProvider {
+    config: ActionsConfig;
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+}
+
+
 
 
 
@@ -746,6 +744,8 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
+
+
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -770,6 +770,7 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 export let NavMenuChangedEvent: string;
@@ -811,7 +812,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
-
 export let OpenSearchEvent: string;
 export let CloseSearchEvent: string;
 export let SearchChangedEvent: string;
@@ -837,6 +837,7 @@ export interface ISearchService {
 }
 export interface ISearchProvider extends ng.IServiceProvider {
 }
+
 
 
 
@@ -877,10 +878,22 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 }
 
 
-
 }
 
 declare module pip.themes {
+
+
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
+export interface IThemeService {
+    theme: string;
+    use(language: string): string;
+}
+export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
 
 function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -905,19 +918,6 @@ function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingPro
 
 function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-
-
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
-export interface IThemeService {
-    theme: string;
-    use(language: string): string;
-}
-export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
-    setRootVar: boolean;
-    persist: boolean;
-}
 
 }
 
@@ -949,7 +949,8 @@ declare module pip.settings {
 
 
 
-function configureSettingsPageRoutes($stateProvider: any): void;
+
+
 
 
 
@@ -982,8 +983,7 @@ export class SettingsConfig {
 
 
 
-
-
+function configureSettingsPageRoutes($stateProvider: any): void;
 
 
 }
