@@ -1520,7 +1520,8 @@ __export(require('./PageResetService'));
                 buttons: '=pipButtons',
                 currentButtonValue: '=ngModel',
                 currentButton: '=?pipButtonObject',
-                change: '&ngChange'
+                change: '&ngChange',
+                onlyToggle: '=?pipOnlyToggle'
             },
             templateUrl: 'toggle_buttons/toggle_buttons.html',
             controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
@@ -1577,7 +1578,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toggle_buttons/toggle_buttons.html',
-    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)" ng-if="$mdMedia(\'gt-xs\')"><md-button tabindex="-1" ng-repeat="button in buttons" ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}" ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}" class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)" ng-disabled="button.disabled || disabled()">{{button.name || button.title | translate}} <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span></md-button></div><md-input-container class="md-block" ng-if="$mdMedia(\'xs\')"><md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)"><md-option ng-repeat="action in buttons" value="{{ ::$index }}">{{ (action.title || action.name) | translate }} <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span></md-option></md-select></md-input-container>');
+    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)" ng-if="$mdMedia(\'gt-xs\') || onlyToggle"><md-button tabindex="-1" ng-repeat="button in buttons" ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}" ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}" class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)" ng-disabled="button.disabled || disabled()">{{button.name || button.title | translate}} <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span></md-button></div><md-input-container class="md-block" ng-if="$mdMedia(\'xs\') && !onlyToggle"><md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)"><md-option ng-repeat="action in buttons" value="{{ ::$index }}">{{ (action.title || action.name) | translate }} <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span></md-option></md-select></md-input-container>');
 }]);
 })();
 
@@ -3963,8 +3964,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.html',
-    '<div ng-if="params.templateUrl" class="pip-popover flex layout-column" ng-click="onPopoverClick($event)" ng-include="params.templateUrl"></div><div ng-if="params.template" class="pip-popover" ng-click="onPopoverClick($event)"></div>');
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -3975,8 +3976,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('popover/popover.html',
+    '<div ng-if="params.templateUrl" class="pip-popover flex layout-column" ng-click="onPopoverClick($event)" ng-include="params.templateUrl"></div><div ng-if="params.template" class="pip-popover" ng-click="onPopoverClick($event)"></div>');
 }]);
 })();
 
@@ -4087,21 +4088,23 @@ formatTimeFilter.$inject = ['pipDateTime'];
 formatDateOptionalFilter.$inject = ['pipDateTime'];
 formatLongDateFilter.$inject = ['pipDateTime'];
 formatShortDateFilter.$inject = ['pipDateTime'];
+formatMiddleDateFilter.$inject = ['pipDateTime'];
 formatMonthFilter.$inject = ['pipDateTime'];
 formatLongMonthFilter.$inject = ['pipDateTime'];
 formatYearFilter.$inject = ['pipDateTime'];
 formatWeekFilter.$inject = ['pipDateTime'];
 formatShortWeekFilter.$inject = ['pipDateTime'];
 formatShortDateTimeFilter.$inject = ['pipDateTime'];
+formatMiddleDateTimeFilter.$inject = ['pipDateTime'];
 formatLongDateTimeFilter.$inject = ['pipDateTime'];
+formatShortDateLongTimeFilter.$inject = ['pipDateTime'];
+formatMiddleDateLongTimeFilter.$inject = ['pipDateTime'];
+formatLongDateLongTimeFilter.$inject = ['pipDateTime'];
+formatFullDateTimeFilter.$inject = ['pipDateTime'];
 formatShortTimeFilter.$inject = ['pipDateTime'];
 formatLongTimeFilter.$inject = ['pipDateTime'];
 formatShortDayOfWeekFilter.$inject = ['pipDateTime'];
 formatLongDayOfWeekFilter.$inject = ['pipDateTime'];
-formatDateNumberFilter.$inject = ['pipDateTime'];
-formatLongDateNumberFilter.$inject = ['pipDateTime'];
-formatTimeNumberFilter.$inject = ['pipDateTime'];
-formatLongTimeNumberFilter.$inject = ['pipDateTime'];
 formatLongMonthDayFilter.$inject = ['pipDateTime'];
 formatShortMonthDayFilter.$inject = ['pipDateTime'];
 formatDateRangeFilter.$inject = ['pipDateTime'];
@@ -4142,6 +4145,12 @@ function formatShortDateFilter(pipDateTime) {
         return pipDateTime.formatShortDate(value);
     };
 }
+function formatMiddleDateFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatMiddleDate(value);
+    };
+}
 function formatMonthFilter(pipDateTime) {
     "ngInject";
     return function (value) {
@@ -4178,10 +4187,40 @@ function formatShortDateTimeFilter(pipDateTime) {
         return pipDateTime.formatShortDateTime(value);
     };
 }
+function formatMiddleDateTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatMiddleDateTime(value);
+    };
+}
 function formatLongDateTimeFilter(pipDateTime) {
     "ngInject";
     return function (value) {
         return pipDateTime.formatLongDateTime(value);
+    };
+}
+function formatShortDateLongTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value, firstTime) {
+        return pipDateTime.formatShortDateLongTime(value, firstTime);
+    };
+}
+function formatMiddleDateLongTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value, firstTime) {
+        return pipDateTime.formatMiddleDateLongTime(value, firstTime);
+    };
+}
+function formatLongDateLongTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value, firstTime) {
+        return pipDateTime.formatLongDateLongTime(value, firstTime);
+    };
+}
+function formatFullDateTimeFilter(pipDateTime) {
+    "ngInject";
+    return function (value) {
+        return pipDateTime.formatFullDateTime(value);
     };
 }
 function formatShortTimeFilter(pipDateTime) {
@@ -4206,30 +4245,6 @@ function formatLongDayOfWeekFilter(pipDateTime) {
     "ngInject";
     return function (value) {
         return pipDateTime.formatLongDayOfWeek(value);
-    };
-}
-function formatDateNumberFilter(pipDateTime) {
-    "ngInject";
-    return function (value) {
-        return pipDateTime.formatDateNumber(value);
-    };
-}
-function formatLongDateNumberFilter(pipDateTime) {
-    "ngInject";
-    return function (value) {
-        return pipDateTime.formatLongDateNumber(value);
-    };
-}
-function formatTimeNumberFilter(pipDateTime) {
-    "ngInject";
-    return function (value) {
-        return pipDateTime.formatTimeNumber(value);
-    };
-}
-function formatLongTimeNumberFilter(pipDateTime) {
-    "ngInject";
-    return function (value) {
-        return pipDateTime.formatLongTimeNumber(value);
     };
 }
 function formatLongMonthDayFilter(pipDateTime) {
@@ -4333,6 +4348,7 @@ angular
     .filter('formatTime', formatTimeFilter)
     .filter('formatDateOptional', formatDateOptionalFilter)
     .filter('formatShortDate', formatShortDateFilter)
+    .filter('formatMiddleDate', formatMiddleDateFilter)
     .filter('formatLongDate', formatLongDateFilter)
     .filter('formatMonth', formatMonthFilter)
     .filter('formatLongMonth', formatLongMonthFilter)
@@ -4340,15 +4356,16 @@ angular
     .filter('formatWeek', formatWeekFilter)
     .filter('formatShortWeek', formatShortWeekFilter)
     .filter('formatShortDateTime', formatShortDateTimeFilter)
+    .filter('formatMiddleDateTime', formatMiddleDateTimeFilter)
     .filter('formatLongDateTime', formatLongDateTimeFilter)
+    .filter('formatShortDateLongTime', formatShortDateLongTimeFilter)
+    .filter('formatMiddleDateLongTime', formatMiddleDateLongTimeFilter)
+    .filter('formatLongDateLongTime', formatLongDateLongTimeFilter)
+    .filter('formatFullDateTime', formatFullDateTimeFilter)
     .filter('formatShortTime', formatShortTimeFilter)
     .filter('formatLongTime', formatLongTimeFilter)
     .filter('formatShortDayOfWeek', formatShortDayOfWeekFilter)
     .filter('formatLongDayOfWeek', formatLongDayOfWeekFilter)
-    .filter('formatDateNumber', formatDateNumberFilter)
-    .filter('formatLongDateNumber', formatLongDateNumberFilter)
-    .filter('formatTimeNumber', formatTimeNumberFilter)
-    .filter('formatLongTimeNumber', formatLongTimeNumberFilter)
     .filter('formatLongMonthDay', formatLongMonthDayFilter)
     .filter('formatShortMonthDay', formatShortMonthDayFilter)
     .filter('formatDateRange', formatDateRangeFilter)
@@ -4371,10 +4388,17 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var DateTimeConfig = (function () {
+    function DateTimeConfig() {
+    }
+    return DateTimeConfig;
+}());
+exports.DateTimeConfig = DateTimeConfig;
 var DateTime = (function () {
-    function DateTime() {
+    function DateTime(config) {
         this._momentRanged = new Array('year', 'month', 'week', 'isoweek', 'day');
         this._defaultFormat = 'LL';
+        this._config = config || { timeZone: null };
     }
     DateTime.prototype.isUndefinedOrNull = function (value) {
         return angular.isUndefined(value) || value === null;
@@ -4408,7 +4432,12 @@ var DateTime = (function () {
         if (this.isUndefinedOrNull(value)) {
             return '';
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
         if (!date.isValid()) {
             return '';
         }
@@ -4420,7 +4449,12 @@ var DateTime = (function () {
         if (this.isUndefinedOrNull(value)) {
             return '';
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
         if (!date.isValid()) {
             return '';
         }
@@ -4436,7 +4470,15 @@ var DateTime = (function () {
         if (this.isUndefinedOrNull(value)) {
             return '';
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
+        if (!date.isValid()) {
+            return '';
+        }
         return date.format(formatMonthYearless);
     };
     DateTime.prototype.formatMonthDay = function (value, basicFormat) {
@@ -4444,7 +4486,15 @@ var DateTime = (function () {
         if (this.isUndefinedOrNull(value)) {
             return '';
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
+        if (!date.isValid()) {
+            return '';
+        }
         return date.format(formatYearlessLL);
     };
     DateTime.prototype.formatRange = function (value1, value2, basicFormat) {
@@ -4453,13 +4503,13 @@ var DateTime = (function () {
             dateStart = null;
         }
         else {
-            dateStart = moment(value1);
+            dateStart = this._config.timeZone ? moment(value1).utcOffset(this._config.timeZone) : moment(value1);
         }
         if (this.isUndefinedOrNull(value2)) {
             dateEnd = null;
         }
         else {
-            dateEnd = moment(value2);
+            dateEnd = this._config.timeZone ? moment(value2).utcOffset(this._config.timeZone) : moment(value2);
         }
         if (dateStart === null && dateEnd === null)
             return '';
@@ -4490,7 +4540,12 @@ var DateTime = (function () {
         if (this.isUndefinedOrNull(value)) {
             return '';
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
         if (!date.isValid()) {
             return '';
         }
@@ -4504,7 +4559,12 @@ var DateTime = (function () {
         if (!angular.isNumber(offset)) {
             mssOffset = 0;
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
         if (!date.isValid()) {
             return '';
         }
@@ -4516,12 +4576,40 @@ var DateTime = (function () {
         }
         return date.startOf(range).toDate();
     };
+    DateTime.prototype.toDateWithTime = function (value, formatDate, formatTime, firstTime) {
+        var date, result, nowDate;
+        if (this.isUndefinedOrNull(value)) {
+            return '';
+        }
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
+        if (!date.isValid()) {
+            return '';
+        }
+        nowDate = moment();
+        if (firstTime) {
+            result = date.format(formatTime) + ' ' + date.format(formatDate);
+        }
+        else {
+            result = date.format(formatDate) + ' ' + date.format(formatTime);
+        }
+        return result;
+    };
     DateTime.prototype.toTodayDate = function (value, formatDate, formatTime) {
         var date, result, nowDate;
         if (this.isUndefinedOrNull(value)) {
             return '';
         }
-        date = moment(value);
+        if (this._config.timeZone) {
+            date = moment(value).utcOffset(this._config.timeZone);
+        }
+        else {
+            date = moment(value);
+        }
         if (!date.isValid()) {
             return '';
         }
@@ -4535,6 +4623,16 @@ var DateTime = (function () {
         return result;
     };
     ;
+    Object.defineProperty(DateTime.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    DateTime.prototype.useTimeZone = function (offset) {
+        this._config.timeZone = offset;
+    };
     DateTime.prototype.formatTime = function (value, format) {
         return this.formatDateTime(value, 'LLL');
     };
@@ -4543,6 +4641,9 @@ var DateTime = (function () {
     };
     DateTime.prototype.formatShortDate = function (value) {
         return this.formatDateTime(value, 'L');
+    };
+    DateTime.prototype.formatMiddleDate = function (value) {
+        return this.formatDateTime(value, 'll');
     };
     DateTime.prototype.formatLongDate = function (value) {
         return this.formatDateTime(value, 'LL');
@@ -4563,10 +4664,25 @@ var DateTime = (function () {
         return this.formatDateTime(value, 'w');
     };
     DateTime.prototype.formatShortDateTime = function (value) {
-        return this.formatDateTime(value, 'LLL');
+        return this.toDateWithTime(value, 'L', 'LT');
+    };
+    DateTime.prototype.formatMiddleDateTime = function (value) {
+        return this.formatDateTime(value, 'lll');
     };
     DateTime.prototype.formatLongDateTime = function (value) {
+        return this.formatDateTime(value, 'LLL');
+    };
+    DateTime.prototype.formatFullDateTime = function (value) {
         return this.formatDateTime(value, 'LLLL');
+    };
+    DateTime.prototype.formatShortDateLongTime = function (value, firstTime) {
+        return this.toDateWithTime(value, 'L', 'LTS', firstTime);
+    };
+    DateTime.prototype.formatMiddleDateLongTime = function (value, firstTime) {
+        return this.toDateWithTime(value, 'll', 'LTS', firstTime);
+    };
+    DateTime.prototype.formatLongDateLongTime = function (value, firstTime) {
+        return this.toDateWithTime(value, 'LL', 'LTS', firstTime);
     };
     DateTime.prototype.formatShortTime = function (value) {
         return this.formatDateTime(value, 'LT');
@@ -4579,18 +4695,6 @@ var DateTime = (function () {
     };
     DateTime.prototype.formatLongDayOfWeek = function (value) {
         return this.formatDateTime(value, 'dddd');
-    };
-    DateTime.prototype.formatDateNumber = function (value) {
-        return this.formatDateTime(value, 'l');
-    };
-    DateTime.prototype.formatLongDateNumber = function (value) {
-        return this.formatDateTime(value, 'll');
-    };
-    DateTime.prototype.formatTimeNumber = function (value) {
-        return this.formatDateTime(value, 'LLL');
-    };
-    DateTime.prototype.formatLongTimeNumber = function (value) {
-        return this.formatDateTime(value, 'LLLL');
     };
     DateTime.prototype.formatLongMonthDay = function (value) {
         return this.formatMonthDay(value, 'LL');
@@ -4729,8 +4833,12 @@ var DateTime = (function () {
 }());
 var DateTimeService = (function () {
     function DateTimeService(datetime) {
+        this._config = { timeZone: null };
         this._datetime = datetime;
     }
+    DateTimeService.prototype.useTimeZone = function (offset) {
+        return this._datetime.useTimeZone(offset);
+    };
     DateTimeService.prototype.formatTime = function (value, format) {
         return this._datetime.formatTime(value, format);
     };
@@ -4739,6 +4847,9 @@ var DateTimeService = (function () {
     };
     DateTimeService.prototype.formatShortDate = function (value) {
         return this._datetime.formatShortDate(value);
+    };
+    DateTimeService.prototype.formatMiddleDate = function (value) {
+        return this._datetime.formatMiddleDate(value);
     };
     DateTimeService.prototype.formatLongDate = function (value) {
         return this._datetime.formatLongDate(value);
@@ -4761,8 +4872,23 @@ var DateTimeService = (function () {
     DateTimeService.prototype.formatShortDateTime = function (value) {
         return this._datetime.formatShortDateTime(value);
     };
+    DateTimeService.prototype.formatMiddleDateTime = function (value) {
+        return this._datetime.formatMiddleDateTime(value);
+    };
     DateTimeService.prototype.formatLongDateTime = function (value) {
         return this._datetime.formatLongDateTime(value);
+    };
+    DateTimeService.prototype.formatFullDateTime = function (value) {
+        return this._datetime.formatFullDateTime(value);
+    };
+    DateTimeService.prototype.formatShortDateLongTime = function (value, firstTime) {
+        return this._datetime.formatShortDateLongTime(value, firstTime);
+    };
+    DateTimeService.prototype.formatMiddleDateLongTime = function (value, firstTime) {
+        return this._datetime.formatMiddleDateLongTime(value, firstTime);
+    };
+    DateTimeService.prototype.formatLongDateLongTime = function (value, firstTime) {
+        return this._datetime.formatLongDateLongTime(value, firstTime);
     };
     DateTimeService.prototype.formatShortTime = function (value) {
         return this._datetime.formatShortTime(value);
@@ -4775,18 +4901,6 @@ var DateTimeService = (function () {
     };
     DateTimeService.prototype.formatLongDayOfWeek = function (value) {
         return this._datetime.formatLongDayOfWeek(value);
-    };
-    DateTimeService.prototype.formatDateNumber = function (value) {
-        return this._datetime.formatDateNumber(value);
-    };
-    DateTimeService.prototype.formatLongDateNumber = function (value) {
-        return this._datetime.formatLongDateNumber(value);
-    };
-    DateTimeService.prototype.formatTimeNumber = function (value) {
-        return this._datetime.formatTimeNumber(value);
-    };
-    DateTimeService.prototype.formatLongTimeNumber = function (value) {
-        return this._datetime.formatLongTimeNumber(value);
     };
     DateTimeService.prototype.formatLongMonthDay = function (value) {
         return this._datetime.formatLongMonthDay(value);
@@ -4877,7 +4991,7 @@ var DateTimeService = (function () {
 var DateTimeProvider = (function (_super) {
     __extends(DateTimeProvider, _super);
     function DateTimeProvider() {
-        _super.call(this);
+        _super.call(this, { timeZone: null });
     }
     DateTimeProvider.prototype.$get = function () {
         "ngInject";
@@ -5694,8 +5808,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatShortDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatShortDateTime}}</span></p>');
+  $templateCache.put('time_range_edit_directive/time_range_edit.html',
+    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
 }]);
 })();
 
@@ -5706,8 +5820,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_edit_directive/time_range_edit.html',
-    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
+  $templateCache.put('time_range_directive/time_range.html',
+    '<p><span ng-if="data.start != null">{{data.start | formatLongDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatLongDateTime}}</span></p>');
 }]);
 })();
 
@@ -8985,19 +9099,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span class="hide-xs" ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><md-menu class="hide-xs" ng-if="$last && vm.actionsVisible(item)"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-hide="action.divider"><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><md-menu xmd-offset="0 48" class="hide-gt-xs"><span class="pip-mobile-breadcrumb layout-row" ng-click="$mdOpenMenu()" md-ink-ripple="" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dropdown/Dropdown.html',
-    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name) | translate }}</md-option></md-select></md-toolbar>');
+    '<div><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span class="hide-xs" ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><md-menu class="hide-xs" ng-if="$last && vm.actionsVisible(item)"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-hide="action.divider"><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><md-menu xmd-offset="0 48" class="hide-gt-xs"><span class="pip-mobile-breadcrumb layout-row" ng-click="$mdOpenMenu()" md-ink-ripple="" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 1"><md-button ng-click="vm.onClick(item)"><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div>');
 }]);
 })();
 
@@ -9032,6 +9134,18 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dropdown/Dropdown.html',
+    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': $mdMedia(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name) | translate }}</md-option></md-select></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('language/LanguagePicker.html',
     '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{vm.language | translate}}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in vm.languages"><md-button ng-click="vm.onLanguageClick(lang)">{{language | translate}}</md-button></md-menu-item></md-menu-content></md-menu>');
 }]);
@@ -9056,8 +9170,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div><div class="md-toolbar-tools layout-row layout-align-end-center" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+  $templateCache.put('tabs/Tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="$mdMedia(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
 })();
 
@@ -9080,8 +9194,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="$mdMedia(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="$mdMedia(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div><div class="md-toolbar-tools layout-row layout-align-end-center" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -10115,8 +10229,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -10127,8 +10241,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10163,8 +10277,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.status"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.description">Description: {{error_details.description}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
+  $templateCache.put('unsupported/unsupported.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div class="pip-error-text">{{::\'ERROR_UNSUPPORTED_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNSUPPORTED_SUBTITLE\' | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$mdMedia(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$mdMedia(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
 }]);
 })();
 
@@ -10175,8 +10289,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unsupported/unsupported.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div class="pip-error-text">{{::\'ERROR_UNSUPPORTED_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNSUPPORTED_SUBTITLE\' | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$mdMedia(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$mdMedia(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.status"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.description">Description: {{error_details.description}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
