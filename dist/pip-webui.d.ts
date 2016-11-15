@@ -315,11 +315,11 @@ declare module pip.controls {
 
 
 
-
-
-
-
 var marked: any;
+
+
+
+
 
 
 
@@ -708,6 +708,7 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -719,6 +720,7 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
+
 
 
 export let NavHeaderChangedEvent: string;
@@ -755,7 +757,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -779,36 +780,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setBack(callbackOrEvent?: any): void;
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
-}
-
-
-
-
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
@@ -848,6 +819,35 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     defaultIcon: string;
 }
 
+
+
+
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
 
 
 
@@ -900,19 +900,6 @@ function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemi
 function configureBootBarnWarmTheme($mdThemingProvider: any): void;
 
 
-
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
-export interface IThemeService {
-    theme: string;
-    use(language: string): string;
-}
-export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
-    setRootVar: boolean;
-    persist: boolean;
-}
-
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
@@ -929,6 +916,19 @@ function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingPro
 
 function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
+
+
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
+export interface IThemeService {
+    theme: string;
+    use(language: string): string;
+}
+export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
 
 }
 
@@ -959,6 +959,17 @@ declare module pip.settings {
 
 
 
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+
+
+
+
+
+
 export class SettingsTab {
     state: string;
     title: string;
@@ -985,17 +996,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-
-
-
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
 
 }
 

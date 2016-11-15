@@ -3242,7 +3242,9 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   height: 95px;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
-.pip-xs .pip-document {
+.pip-xs .pip-document,
+.pip-sm .pip-document,
+.pip-md .pip-document {
   position: absolute;
   top: 0;
   left: 0;
@@ -3276,14 +3278,23 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 .pip-xs .pip-document.pip-single-content .pip-content-container {
   left: 0;
 }
-@media (max-width: 960px) {
-  .pip-sm .pip-document {
+@media (max-width: 1200px) {
+  .pip-lg .pip-document {
+    position: absolute;
+    top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0px;
+    border: none;
+    border-radius: 0;
     width: 100%;
     height: 100%;
   }
 }
-.pip-sm .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document {
+.pip-sm .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document,
+.pip-md .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document,
+.pip-lg .pip-main-menu:not(.pip-single-content) .pip-content-container .pip-document {
   width: 100%;
   height: 100%;
 }
@@ -3368,7 +3379,7 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   max-height: 100%;
   box-sizing: border-box;
   max-height: inherit;
-  min-height: calc(100% - 64px - 48px);
+  min-height: 100%;
   left: 0;
   overflow: auto;
   margin: 0;
@@ -3385,20 +3396,6 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.87);
   letter-spacing: 0.005em;
-}
-.pip-tiles.pip-no-tabs {
-  max-height: calc(100% - 64px);
-  min-height: calc(100% - 64px);
-}
-@media (max-width: 766px) {
-  .pip-tiles {
-    max-height: calc(100% - 48px - 48px);
-    min-height: calc(100% - 48px - 48px);
-  }
-  .pip-tiles.pip-no-tabs {
-    max-height: calc(100% - 48px);
-    min-height: calc(100% - 48px);
-  }
 }
 .pip-tiles .pip-tiles-container {
   margin: 0 auto;
@@ -3502,7 +3499,19 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   width: 320px;
   opacity: 1;
   overflow-y: auto;
+  min-height: 100%;
+  overflow: hidden;
   max-height: 100%;
+}
+.pip-main-body .pip-main-menu > .pip-menu .pip-list-container {
+  overflow-y: auto;
+  position: inherit;
+  left: inherit;
+  right: inherit;
+  top: inherit;
+  bottom: inherit;
+  height: 100%;
+  width: 100%;
 }
 .pip-main-body .pip-main-menu > .pip-content-container {
   margin: 0;
@@ -3569,15 +3578,20 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 .pip-xs .pip-main-body .pip-main-menu.pip-single-content .pip-content-container {
   left: 0;
 }
-.pip-gt-md .pip-main-body .pip-main-menu .pip-menu {
+.pip-gt-lg .pip-main-body .pip-main-menu .pip-menu {
   width: 480px;
 }
-.pip-gt-md .pip-main-body .pip-main-menu .pip-content-container {
+.pip-gt-lg .pip-main-body .pip-main-menu .pip-content-container {
   left: 480px;
   width: calc(100% - 480px);
 }
-.pip-gt-md .pip-main-body .pip-main-menu.pip-single-content .pip-content-container {
+.pip-gt-lg .pip-main-body .pip-main-menu.pip-single-content .pip-content-container {
   left: 0;
+}
+.pip-auxpanel {
+  max-width: 320px;
+  width: 320px;
+  min-width: 320px;
 }
 .pip-auxpanel.pip-large {
   max-width: 480px;
