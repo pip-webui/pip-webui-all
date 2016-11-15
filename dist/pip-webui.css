@@ -8485,7 +8485,6 @@ button:focus {
 pip-bar-chart .bar-chart {
   opacity: 0;
   margin-bottom: 20px;
-  display: inline-block;
 }
 pip-bar-chart .bar-chart.visible {
   opacity: 1;
@@ -8494,12 +8493,25 @@ pip-bar-chart .bar-chart text {
   font-size: 14px;
   font-family: 'Roboto';
 }
-pip-bar-chart .bar-chart .nv-zeroLine {
-  display: none;
-}
 pip-bar-chart .bar-chart .nv-noData {
   font-size: 14px;
   font-weight: normal;
+  fill: rgba(0, 0, 0, 0.54);
+}
+pip-bar-chart .nvd3 .nv-axis line {
+  stroke-dasharray: 3, 3;
+  stroke: rgba(0, 0, 0, 0.12);
+}
+pip-bar-chart .nvd3 .nv-axis .nv-zeroLine line {
+  stroke-dasharray: none;
+}
+pip-bar-chart .nvd3 .nv-axis path {
+  stroke: rgba(0, 0, 0, 0.26);
+}
+pip-bar-chart .nvd3 .nv-axis text {
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500 !important;
   fill: rgba(0, 0, 0, 0.54);
 }
 pip-bar-chart .nvd3 .nv-discretebar .nv-groups rect:hover {
