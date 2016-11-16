@@ -1401,6 +1401,18 @@ md-menu-content {
 .divider {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus {
+  outline-width: 0 !important;
+}
 .pip-call-action {
   background-color: #333333;
   color: #fff;
@@ -1640,6 +1652,18 @@ md-menu-content {
 }
 .divider {
   border: 1px solid rgba(0, 0, 0, 0.12);
+}
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus {
+  outline-width: 0 !important;
 }
 .pip-ref-toolbar {
   display: -webkit-box;
@@ -6793,6 +6817,20 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-breadcrumb .pip-breadcrumb-item-menu {
   display: inline-block;
 }
+.pip-breadcrumb span.breadcrumb-accent,
+.pip-breadcrumb span.breadcrumb-accent span {
+  color: #ffffff;
+  font-weight: 500;
+}
+.pip-breadcrumb span.breadcrumb-accent md-icon,
+.pip-breadcrumb span.breadcrumb-accent span md-icon {
+  color: #ffffff;
+  fill: #ffffff;
+}
+.pip-breadcrumb span {
+  color: rgba(255, 255, 255, 0.54);
+  font-weight: 400;
+}
 .pip-search-bar {
   width: 100%;
 }
@@ -7043,7 +7081,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   vertical-align: middle;
   text-align: center;
   color: #fafafa;
-  background: red;
+  background-color: #f44336;
   animation: badge-animation 0.35s ease;
 }
 .sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
