@@ -6511,7 +6511,7 @@ pip-dropdown md-select md-select-value .md-select-icon {
     display: inline-block !important;
   }
 }
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
   .pip-full-width-dropdown {
     top: 48px !important;
     left: 0 !important;
@@ -6525,7 +6525,7 @@ pip-dropdown md-select md-select-value .md-select-icon {
     min-width: 100% !important;
   }
 }
-@media only screen and (max-width: 1199px) and (min-width: 0) and (orientation: portrait) {
+@media only screen and (max-width: 1023px) and (min-width: 0) and (orientation: portrait) {
   .pip-full-width-dropdown {
     top: 56px !important;
   }
@@ -6636,7 +6636,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-tabs-content md-option .md-text .pip-tabs-badge {
   top: 9px !important;
 }
-@media (min-width: 768px) and (max-width: 1200px) {
+@media (min-width: 704px) and (max-width: 1024px) {
   md-toolbar.pip-nav {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
@@ -6678,24 +6678,24 @@ md-select md-select-value .md-text .pip-tabs-badge {
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   z-index: 0;
 }
-@media (max-width: 768px) {
+@media (max-width: 704px) {
   .pip-appbar .pip-appbar-hide-sm {
     display: none;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 704px) {
   .pip-appbar .pip-appbar-show-sm {
     display: none;
   }
 }
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
 }
-@media (max-width: 1200px) and (min-width: 768px) {
+@media (max-width: 1024px) and (min-width: 704px) {
   .pip-appbar .pip-shadow-sm {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 704px) {
   .pip-appbar .pip-shadow-xs {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
@@ -6716,12 +6716,12 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-primary-actions .pip-primary-actions-action {
   margin: 0;
 }
-@media (max-width: 768px) {
+@media (max-width: 704px) {
   .pip-primary-actions .pip-primary-actions-hide-sm {
     display: none;
   }
 }
-@media (min-width: 768px) {
+@media (min-width: 704px) {
   .pip-primary-actions .pip-primary-actions-show-sm {
     display: none;
   }
@@ -6753,10 +6753,14 @@ md-select md-select-value .md-text .pip-tabs-badge {
   flex: 0 0 auto;
   padding: 0;
 }
+.pip-nav-icon .md-button.md-icon-button {
+  margin: 0px 0px 0px 8px;
+}
 .pip-breadcrumb {
   outline: none;
   vertical-align: middle;
   display: inline-block;
+  margin-left: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -6809,7 +6813,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
     border-radius: 4px;
     font-weight: 500;
     font-size: 14px; }
-    @media (min-width: 1200px) {
+    @media (min-width: @layout-breakpoint-md) {
       md-tooltip {
         font-size: 10px; } }
     md-tooltip .md-content {
@@ -6826,7 +6830,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
       line-height: 32px;
       padding-left: 16px;
       padding-right: 16px; }
-      @media (min-width: 1200px) {
+      @media (min-width: @layout-breakpoint-md) {
         md-tooltip .md-content {
           height: 22px;
           line-height: 22px;
@@ -6953,6 +6957,9 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-menu {
   width: 100%;
 }
+.pip-sticky-nav-menu .sidenav-list {
+  padding-top: 0px!important;
+}
 .pip-sticky-nav-menu .md-subheader {
   line-height: 48px;
   background: #e0e0e0;
@@ -6985,6 +6992,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 }
 .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   padding-right: 0px 24px 0px 0px;
+  margin-left: 2px;
   width: 200px;
   text-transform: none;
   overflow: hidden;
@@ -6992,6 +7000,9 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   white-space: nowrap;
   animation: title-animation 0.35s ease;
   text-align: left;
+}
+.pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .section-title.pip-sticky-nav-menu-title {
+  margin-left: 0px;
 }
 .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-icon-block {
   width: 47px;
