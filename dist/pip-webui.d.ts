@@ -87,59 +87,6 @@ export interface ITransactionService {
 
 function configureTransactionStrings($injector: any): void;
 
-export interface ICodes {
-    hash(value: string): number;
-    verification(): string;
-}
-
-export interface IFormat {
-    sample(value: string, maxLength: number): string;
-    sprintf(message: string, ...args: any[]): string;
-}
-
-
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
-export interface IPageResetService {
-    reset(): void;
-    resetArea(area: string): void;
-}
-
-export interface IScrollService {
-    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
-}
-
-export interface ISystemInfo {
-    browserName: string;
-    browserVersion: string;
-    platform: string;
-    os: string;
-    isDesktop(): boolean;
-    isMobile(): boolean;
-    isCordova(): boolean;
-    isSupported(supported?: any): boolean;
-}
-
-export interface ITags {
-    normalizeOne(tag: string): string;
-    compressOne(tag: string): string;
-    equal(tag1: string, tag2: string): boolean;
-    normalizeAll(tags: any): string[];
-    compressAll(tags: any): string[];
-    extract(entity: any, searchFields?: string[]): string[];
-}
-
-export interface ITimerService {
-    isStarted(): boolean;
-    addEvent(event: string, timeout: number): void;
-    removeEvent(event: string): void;
-    clearEvents(): void;
-    start(): void;
-    stop(): void;
-}
-
 
 function translateDirective(pipTranslate: any): ng.IDirective;
 function translateHtmlDirective(pipTranslate: any): ng.IDirective;
@@ -197,6 +144,59 @@ export class Translation {
     translateWithPrefix(prefix: string, key: string): any;
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+}
+
+export interface ICodes {
+    hash(value: string): number;
+    verification(): string;
+}
+
+export interface IFormat {
+    sample(value: string, maxLength: number): string;
+    sprintf(message: string, ...args: any[]): string;
+}
+
+
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+export interface IPageResetService {
+    reset(): void;
+    resetArea(area: string): void;
+}
+
+export interface IScrollService {
+    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
+}
+
+export interface ISystemInfo {
+    browserName: string;
+    browserVersion: string;
+    platform: string;
+    os: string;
+    isDesktop(): boolean;
+    isMobile(): boolean;
+    isCordova(): boolean;
+    isSupported(supported?: any): boolean;
+}
+
+export interface ITags {
+    normalizeOne(tag: string): string;
+    compressOne(tag: string): string;
+    equal(tag1: string, tag2: string): boolean;
+    normalizeAll(tags: any): string[];
+    compressAll(tags: any): string[];
+    extract(entity: any, searchFields?: string[]): string[];
+}
+
+export interface ITimerService {
+    isStarted(): boolean;
+    addEvent(event: string, timeout: number): void;
+    removeEvent(event: string): void;
+    clearEvents(): void;
+    start(): void;
+    stop(): void;
 }
 
 }
@@ -319,9 +319,9 @@ declare module pip.controls {
 
 
 
-
-
 var marked: any;
+
+
 
 
 
@@ -465,6 +465,36 @@ class ConfirmationService {
 
 
 
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: InformationStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class InformationService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
 export class ErrorStrings {
     ok: string;
     cancel: string;
@@ -497,36 +527,6 @@ class ErrorDetailsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
-
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: any;
-    theme: any;
-    config: InformationStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-class InformationService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
 
 
 export class OptionsBigData {
@@ -682,6 +682,18 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -707,18 +719,6 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
 
 
 
@@ -757,7 +757,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -782,6 +781,7 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 export let NavMenuChangedEvent: string;
@@ -965,6 +965,12 @@ function configureSettingsPageRoutes($stateProvider: any): void;
 
 
 
+
+
+
+
+
+
 export class SettingsTab {
     state: string;
     title: string;
@@ -991,12 +997,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-
-
-
 
 }
 
