@@ -8801,7 +8801,8 @@ pip-pie-chart .pie-chart .pip-empty-pie-text {
   color: rgba(0, 0, 0, 0.54);
 }
 pip-pie-chart svg.nvd3-svg {
-  width: auto;
+  width: inherit;
+  height: inherit;
 }
 pip-pie-chart svg.nvd3-svg .nv-noData {
   display: none;
