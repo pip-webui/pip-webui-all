@@ -1605,7 +1605,7 @@ var MediaService_1 = require('../media/MediaService');
             return Number($('body').width()) > MediaService_1.MainBreakpoints.xs && this._pipAuxPanel.isOpen();
         };
         AuxPanelDirectiveController.prototype.isGtlg = function () {
-            return Number($('body').width()) > (MediaService_1.MainBreakpoints.lg + (this.largeSize - this.normalSize + 20));
+            return Number($('body').width()) > (MediaService_1.MainBreakpoints.lg + this.largeSize);
         };
         return AuxPanelDirectiveController;
     }());
@@ -2008,23 +2008,24 @@ var ResizeFunctions_1 = require('../media/ResizeFunctions');
 var MediaService_1 = require('../media/MediaService');
 (function () {
     var MainDirectiveController = (function () {
-        MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout'];
-        function MainDirectiveController($scope, $element, $rootScope, $timeout) {
+        MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout', '$attrs'];
+        function MainDirectiveController($scope, $element, $rootScope, $timeout, $attrs) {
             var _this = this;
             this._element = $element;
             this._rootScope = $rootScope;
             this._timeout = $timeout;
+            this._container = $attrs.pipContainer ? $($attrs.pipContainer) : $element;
             $element.addClass('pip-main');
             var listener = function () { _this.resize(); };
-            ResizeFunctions_1.addResizeListener($element[0], listener);
+            ResizeFunctions_1.addResizeListener(this._container[0], listener);
             $scope.$on('$destroy', function () {
-                ResizeFunctions_1.removeResizeListener($element[0], listener);
+                ResizeFunctions_1.removeResizeListener(_this._container[0], listener);
             });
             this.updateBreakpointStatuses();
         }
         MainDirectiveController.prototype.updateBreakpointStatuses = function () {
             var _this = this;
-            var width = this._element.innerWidth();
+            var width = this._container.innerWidth();
             var body = $('body');
             MediaService_1.MainBreakpointStatuses.update(MediaService_1.MainBreakpoints, width);
             $.each(MediaService_1.MainBreakpointStatuses, function (breakpoint, status) {
@@ -5826,8 +5827,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_edit_directive/time_range_edit.html',
-    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
+  $templateCache.put('time_range_directive/time_range.html',
+    '<p><span ng-if="data.start != null">{{data.start | formatLongDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatLongDateTime}}</span></p>');
 }]);
 })();
 
@@ -5838,8 +5839,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatLongDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatLongDateTime}}</span></p>');
+  $templateCache.put('time_range_edit_directive/time_range_edit.html',
+    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex=""><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
 }]);
 })();
 
@@ -9199,8 +9200,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="media(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div><div class="md-toolbar-tools layout-row layout-align-end-center" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -9211,8 +9212,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div><div class="md-toolbar-tools layout-row layout-align-end-center" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+  $templateCache.put('tabs/Tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="media(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
 })();
 
@@ -10634,6 +10635,9 @@ module.run(['$templateCache', function($templateCache) {
                             updateZoomOptions(vm.data);
                     }
                 }, true);
+                $scope.$on('$destroy', function () {
+                    d3.selectAll('.nvtooltip').style('opacity', 0);
+                });
                 function prepareData(data) {
                     var result = [];
                     _.each(data, function (seria) {
@@ -10674,7 +10678,10 @@ module.run(['$templateCache', function($templateCache) {
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
                     }
-                    nv.utils.windowResize(chart.update);
+                    nv.utils.windowResize(function () {
+                        chart.update();
+                        drawEmptyState();
+                    });
                     return chart;
                 }, function () {
                     drawEmptyState();
@@ -10684,26 +10691,35 @@ module.run(['$templateCache', function($templateCache) {
                         d3.select($element.find('.empty-state')[0]).remove();
                     }
                     else {
-                        chartElem
-                            .append("defs")
-                            .append("pattern")
-                            .attr("height", 1)
-                            .attr("width", 1)
-                            .attr("x", "0")
-                            .attr("y", "0")
-                            .attr("id", "bg")
-                            .append("image")
-                            .attr('x', 47)
-                            .attr('y', 0)
-                            .attr('height', "100%")
-                            .attr('width', 1151)
-                            .attr("xlink:href", "images/line_chart_empty_state.svg");
-                        chartElem
-                            .append('rect')
-                            .classed('empty-state', true)
-                            .attr('height', "100%")
-                            .attr('width', "100%")
-                            .attr('fill', 'url(#bg)');
+                        var containerWidth = $element.find('.line-chart').innerWidth(), containerHeight = $element.find('.line-chart').innerHeight();
+                        if ($element.find('.empty-state').get(0)) {
+                            chartElem
+                                .select('image')
+                                .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')');
+                        }
+                        else {
+                            chartElem
+                                .append("defs")
+                                .append("pattern")
+                                .attr("height", 1)
+                                .attr("width", 1)
+                                .attr("x", "0")
+                                .attr("y", "0")
+                                .attr("id", "bg")
+                                .append("image")
+                                .attr('x', 27)
+                                .attr('y', 0)
+                                .attr('height', "216px")
+                                .attr('width', "1151px")
+                                .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')')
+                                .attr("xlink:href", "images/line_chart_empty_state.svg");
+                            chartElem
+                                .append('rect')
+                                .classed('empty-state', true)
+                                .attr('height', "100%")
+                                .attr('width', "100%")
+                                .attr('fill', 'url(#bg)');
+                        }
                     }
                 }
                 function updateScroll(domains, boundary) {
