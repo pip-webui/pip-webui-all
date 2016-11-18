@@ -8646,7 +8646,7 @@ pip-bar-chart .bar-chart.visible {
 }
 pip-bar-chart .bar-chart text {
   font-size: 14px;
-  font-family: 'Roboto';
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 pip-bar-chart .bar-chart .nv-noData {
   font-size: 14px;
@@ -8664,7 +8664,7 @@ pip-bar-chart .nvd3 .nv-axis path {
   stroke: rgba(0, 0, 0, 0.26);
 }
 pip-bar-chart .nvd3 .nv-axis text {
-  font-family: Roboto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-size: 14px;
   font-weight: 500 !important;
   fill: rgba(0, 0, 0, 0.54);
@@ -8690,7 +8690,7 @@ pip-line-chart .nvd3 .nv-axis path {
   stroke: rgba(0, 0, 0, 0.26);
 }
 pip-line-chart .nvd3 .nv-axis text {
-  font-family: Roboto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-size: 14px;
   font-weight: 500 !important;
   fill: rgba(0, 0, 0, 0.54);
@@ -8711,7 +8711,7 @@ pip-line-chart .nvd3 .nv-y .tick:not(.zero) line {
 }
 pip-line-chart .nvd3.nv-noData {
   font-size: 14px;
-  font-family: Roboto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   fill: rgba(0, 0, 0, 0.54);
   font-weight: normal;
 }
@@ -8792,7 +8792,7 @@ pip-pie-chart .pie-chart {
 }
 pip-pie-chart .pie-chart .pip-empty-pie-text {
   position: absolute;
-  font-family: Roboto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-size: 14px;
   width: calc(100% - 120px);
   top: calc(50% - 15px);
@@ -8815,14 +8815,14 @@ pip-pie-chart .nvd3.nv-pie path {
 }
 pip-pie-chart .nvd3.nv-pie .label-total {
   transition: opacity 0.35s ease;
-  font-family: Roboto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;
   text-align: center;
 }
 pip-pie-chart .nvd3.nv-pie .nv-pieLabels .nv-label text {
-  font-family: Roboto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-size: 14px;
   font-weight: bold;
   font-style: normal;
@@ -8837,8 +8837,8 @@ pip-chart-legend .chart-legend-item {
   opacity: 0;
   margin-left: -50px;
   transition: all 0.5s ease;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
   font-size: 12px;
-  font-family: 'Roboto';
   font-weight: 500;
   color: rgba(0, 0, 0, 0.54);
 }
