@@ -8926,16 +8926,7 @@ pip-chart-legend .chart-legend-item.visible {
   max-width: none !important;
   min-height: 100%;
 }
-@media (min-width: 1200px) {
-  .pip-settings md-list.pip-menu {
-    width: 300px;
-    min-width: 300px;
-  }
-  .pip-settings .pip-content-container {
-    width: 800px;
-  }
-}
-@media (min-width: 768px) and (max-width: 1200px) {
+@media (min-width: 716px) {
   .pip-settings md-list.pip-menu {
     width: 300px;
     min-width: 300px;
@@ -8944,7 +8935,7 @@ pip-chart-legend .chart-legend-item.visible {
     width: calc(100% - 300px);
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 716px) {
   .pip-settings .pip-content-container {
     width: 100%;
     left: 0 !important;
