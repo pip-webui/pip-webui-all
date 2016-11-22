@@ -1,17 +1,5 @@
 declare module pip.services {
 
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
-
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -23,11 +11,11 @@ export interface IIdentity {
     groups: string[];
 }
 export interface IIdentityService {
-    identity: IIdentity;
+    identity: any;
 }
 export interface IIdentityProvider extends ng.IServiceProvider {
     setRootVar: boolean;
-    identity: IIdentity;
+    identity: any;
 }
 
 
@@ -44,6 +32,18 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
+
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
 
 
 export class Transaction {
@@ -87,6 +87,59 @@ export interface ITransactionService {
 }
 
 function configureTransactionStrings($injector: any): void;
+
+export interface ICodes {
+    hash(value: string): number;
+    verification(): string;
+}
+
+export interface IFormat {
+    sample(value: string, maxLength: number): string;
+    sprintf(message: string, ...args: any[]): string;
+}
+
+
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+export interface IPageResetService {
+    reset(): void;
+    resetArea(area: string): void;
+}
+
+export interface IScrollService {
+    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
+}
+
+export interface ISystemInfo {
+    browserName: string;
+    browserVersion: string;
+    platform: string;
+    os: string;
+    isDesktop(): boolean;
+    isMobile(): boolean;
+    isCordova(): boolean;
+    isSupported(supported?: any): boolean;
+}
+
+export interface ITags {
+    normalizeOne(tag: string): string;
+    compressOne(tag: string): string;
+    equal(tag1: string, tag2: string): boolean;
+    normalizeAll(tags: any): string[];
+    compressAll(tags: any): string[];
+    extract(entity: any, searchFields?: string[]): string[];
+}
+
+export interface ITimerService {
+    isStarted(): boolean;
+    addEvent(event: string, timeout: number): void;
+    removeEvent(event: string): void;
+    clearEvents(): void;
+    start(): void;
+    stop(): void;
+}
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -145,59 +198,6 @@ export class Translation {
     translateWithPrefix(prefix: string, key: string): any;
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
-}
-
-export interface ICodes {
-    hash(value: string): number;
-    verification(): string;
-}
-
-export interface IFormat {
-    sample(value: string, maxLength: number): string;
-    sprintf(message: string, ...args: any[]): string;
-}
-
-
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
-export interface IPageResetService {
-    reset(): void;
-    resetArea(area: string): void;
-}
-
-export interface IScrollService {
-    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
-}
-
-export interface ISystemInfo {
-    browserName: string;
-    browserVersion: string;
-    platform: string;
-    os: string;
-    isDesktop(): boolean;
-    isMobile(): boolean;
-    isCordova(): boolean;
-    isSupported(supported?: any): boolean;
-}
-
-export interface ITags {
-    normalizeOne(tag: string): string;
-    compressOne(tag: string): string;
-    equal(tag1: string, tag2: string): boolean;
-    normalizeAll(tags: any): string[];
-    compressAll(tags: any): string[];
-    extract(entity: any, searchFields?: string[]): string[];
-}
-
-export interface ITimerService {
-    isStarted(): boolean;
-    addEvent(event: string, timeout: number): void;
-    removeEvent(event: string): void;
-    clearEvents(): void;
-    start(): void;
-    stop(): void;
 }
 
 }
@@ -500,36 +500,6 @@ class ErrorDetailsService {
 
 
 
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: any;
-    theme: any;
-    config: InformationStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-class InformationService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
-
-
 export class OptionsBigData {
     name: string;
     title: string;
@@ -597,6 +567,36 @@ export class OptionsDialogController {
 }
 
 class OptionsService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: InformationStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class InformationService {
     _mdDialog: any;
     constructor($mdDialog: any);
     show(params: any, successCallback: any, cancelCallback: any): void;
@@ -825,6 +825,7 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
+
 export let OpenSearchEvent: string;
 export let CloseSearchEvent: string;
 export let SearchChangedEvent: string;
@@ -850,7 +851,6 @@ export interface ISearchService {
 }
 export interface ISearchProvider extends ng.IServiceProvider {
 }
-
 
 
 
@@ -962,6 +962,11 @@ declare module pip.settings {
 
 
 
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+
 
 
 
@@ -993,11 +998,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
 
 }
 
