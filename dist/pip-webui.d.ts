@@ -12,6 +12,39 @@ function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
 
+export let IdentityRootVar: string;
+export let IdentityChangedEvent: string;
+export interface IIdentity {
+    id: string;
+    full_name: string;
+    details: string;
+    email: string;
+    photo_url: string;
+    groups: string[];
+}
+export interface IIdentityService {
+    identity: IIdentity;
+}
+export interface IIdentityProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    identity: IIdentity;
+}
+
+
+export const SessionRootVar: string;
+export const SessionOpenedEvent: string;
+export const SessionClosedEvent: string;
+export interface ISessionService {
+    session: any;
+    isOpened(): boolean;
+    open(session: any): void;
+    close(): void;
+}
+export interface ISessionProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    session: any;
+}
+
 
 export class Transaction {
     private _scope;
@@ -54,38 +87,6 @@ export interface ITransactionService {
 }
 
 function configureTransactionStrings($injector: any): void;
-
-export let IdentityRootVar: string;
-export let IdentityChangedEvent: string;
-export interface IIdentity {
-    id: string;
-    full_name: string;
-    details: string;
-    email: string;
-    photo_url: string;
-}
-export interface IIdentityService {
-    identity: IIdentity;
-}
-export interface IIdentityProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    identity: IIdentity;
-}
-
-
-export const SessionRootVar: string;
-export const SessionOpenedEvent: string;
-export const SessionClosedEvent: string;
-export interface ISessionService {
-    session: any;
-    isOpened(): boolean;
-    open(session: any): void;
-    close(): void;
-}
-export interface ISessionProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    session: any;
-}
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -254,6 +255,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -289,12 +296,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -682,18 +683,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -719,6 +708,18 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
 
 
 
@@ -961,11 +962,6 @@ declare module pip.settings {
 
 
 
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-
 
 
 
@@ -997,6 +993,11 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
+
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
 
 }
 
