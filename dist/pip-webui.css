@@ -8475,9 +8475,6 @@ button:focus {
     margin: 0px 8px;
   }
 }
-/*
- *
- */
 .pip-page-errors {
   background-color: rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
@@ -8591,6 +8588,101 @@ button:focus {
 .black .pip-page-errors .pip-error-text,
 .black .pip-page-errors .pip-error-details md-icon {
   color: #ff5252;
+}
+.pip-error-page {
+  margin: 0 auto;
+  height: calc(100vh - 64px);
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex-direction: column;
+  -moz-box-flex-direction: column;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+@media (max-width: 1200px) {
+  .pip-error-page {
+    height: calc(100vh - 48px);
+  }
+}
+@media (max-width: 768px) {
+  .pip-error-page {
+    height: calc(100vh - 56px);
+  }
+}
+.pip-error-page .pip-pic {
+  width: 350px !important;
+  height: 250px !important;
+  min-height: 250px !important;
+  margin: 25px 25px 0;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+.pip-error-page .pip-text {
+  width: 400px;
+  margin-top: 25px;
+  text-align: center;
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  color: rgba(0, 0, 0, 0.38);
+}
+.pip-error-page .pip-actions {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  width: 400px;
+  -webkit-box-flex-direction: column;
+  -moz-box-flex-direction: column;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.pip-error-page .pip-actions .md-button {
+  width: 384px !important;
+  max-height: 72px !important;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.pip-error-page .pip-actions .md-button span {
+  display: block;
+  white-space: normal;
+  line-height: 20px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 768px) {
+  .pip-error-page .pip-pic,
+  .pip-error-page .pip-text,
+  .pip-error-page .pip-actions {
+    margin: 0 auto;
+  }
+  .pip-error-page .pip-pic {
+    width: 80% !important;
+    min-height: 80%;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    margin-bottom: 16px;
+  }
+  .pip-error-page .pip-pic.pip-no-image-sm {
+    width: 0px;
+    height: 0px;
+    display: none;
+  }
+  .pip-error-page .pip-text {
+    width: 80%;
+    padding-left: 16px;
+    padding-right: 16px;
+    font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  }
+  .pip-error-page .pip-actions {
+    width: 80%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .pip-error-page .pip-actions .md-button {
+    width: calc(84%) !important;
+  }
 }
 
 @-webkit-keyframes blink-hint {
