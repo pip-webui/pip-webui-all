@@ -6831,23 +6831,33 @@ md-select md-select-value .md-text .pip-tabs-badge {
   color: rgba(255, 255, 255, 0.54);
   font-weight: 400;
 }
-.pip-search-bar {
+.pip-search-bar .pip-search-container {
   width: 100%;
 }
-.pip-search-bar .pip-search-text {
+.pip-search-bar .pip-search-container .pip-search-text {
   color: #fff !important;
   background-color: transparent;
   border: none;
   font-size: 16px;
   outline: none;
 }
-.pip-search-bar .pip-search-text::-ms-clear {
+.pip-search-bar .pip-search-container .pip-search-text::-ms-clear {
   display: none;
 }
-.pip-search-bar .pip-search-text::-webkit-search-cancel-button {
+.pip-search-bar .pip-search-container .pip-search-text::-webkit-search-cancel-button {
   /* псевдо что-то, что отвечает за кнопку очистки */
   -webkit-appearance: none;
   /* без сброса оформление не применится */
+}
+.pip-search-bar .md-toolbar-tools {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.pip-search-bar .md-toolbar-tools .md-button:last-child {
+  margin-right: 0px;
+}
+.pip-search-bar .md-toolbar-tools .md-button:first-child {
+  margin-left: 0px;
 }
 .pip-sticky-sidenav.overflow-visible {
   overflow: visible!important;
