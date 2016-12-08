@@ -6650,7 +6650,8 @@ pip-tabs .pip-tabs-content md-select[disabled] md-select-value {
 }
 md-tabs md-tab-item .md-text,
 .pip-tabs-content md-option .md-text,
-md-select md-select-value .md-text {
+md-select md-select-value .md-text,
+.pip-full-width-dropdown md-option .md-text {
   position: relative;
   height: 40px;
   line-height: 40px;
@@ -6658,10 +6659,11 @@ md-select md-select-value .md-text {
 }
 md-tabs md-tab-item .pip-tabs-badge,
 .pip-tabs-content md-option .pip-tabs-badge,
-md-select md-select-value .pip-tabs-badge {
+md-select md-select-value .pip-tabs-badge,
+.pip-full-width-dropdown md-option .pip-tabs-badge {
   position: absolute;
   right: 0px;
-  top: 14px;
+  top: 12px;
   font-size: 10px !important;
   min-width: 20px !important;
   height: 20px !important;
@@ -6671,6 +6673,9 @@ md-select md-select-value .pip-tabs-badge {
   text-align: center;
   color: #fafafa;
   background-color: #f44336;
+}
+.pip-full-width-dropdown md-option .pip-tabs-badge {
+  top: 10px;
 }
 md-select md-select-value .md-text .pip-tabs-badge {
   top: -4px !important;
@@ -6858,6 +6863,41 @@ md-select md-select-value .md-text .pip-tabs-badge {
 }
 .pip-search-bar .md-toolbar-tools .md-button:first-child {
   margin-left: 0px;
+}
+.pip-search-active {
+  padding: 0px!important;
+}
+.pip-search-active .pip-search-bar {
+  width: 100%;
+  position: absolute;
+}
+.pip-search-active .pip-search-bar .pip-search-selected {
+  width: calc(100% - 16px);
+  background-color: rgba(0, 0, 0, 0.12);
+  margin: 0 auto;
+  border-radius: 4px;
+  animation: search-animation 0.35s ease;
+}
+.pip-search-active .pip-search-bar .md-toolbar-tools .md-button:last-child {
+  margin-right: 16px;
+}
+.pip-search-active .pip-secondary-actions,
+.pip-search-active .pip-primary-actions,
+.pip-search-active .pip-language-picker,
+.pip-search-active .pip-breadcrumb,
+.pip-search-active .pip-nav-icon {
+  display: none;
+}
+@keyframes search-animation {
+  0% {
+    width: 0px;
+  }
+  10% {
+    width: 70%;
+  }
+  100% {
+    width: calc(100% - 16px);
+  }
 }
 .pip-sticky-sidenav.overflow-visible {
   overflow: visible!important;
