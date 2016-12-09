@@ -7122,7 +7122,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   position: absolute;
   left: 274px;
-  top: 11px;
+  top: 13px;
   font-size: 12px !important;
   min-width: 22px !important;
   height: 22px !important;
@@ -7224,13 +7224,13 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   }
   100% {
     left: 274px;
-    top: 11px;
+    top: 13px;
   }
 }
 @keyframes badge-animation-back {
   0% {
     left: 274px;
-    top: 11px;
+    top: 13px;
   }
   100% {
     top: 5px;
@@ -7274,13 +7274,13 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   }
   100% {
     left: 194px;
-    top: 11px;
+    top: 13px;
   }
 }
 @keyframes badge-animation-sm-back {
   0% {
     left: 194px;
-    top: 11px;
+    top: 13px;
   }
   100% {
     top: 5px;
