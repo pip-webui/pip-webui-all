@@ -7134,6 +7134,15 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   background-color: #f44336;
   animation: badge-animation 0.35s ease;
 }
+.pip-sticky-sidenav.sidenav-mobile .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
+  width: 100%;
+}
+.pip-sticky-sidenav.sidenav-mobile .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
+  position: relative;
+  left: 0px;
+  top: 0px;
+  animation: none;
+}
 .sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   width: 140px;
   animation: title-animation-sm 0.35s ease;
