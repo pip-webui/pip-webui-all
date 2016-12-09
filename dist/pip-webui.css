@@ -6674,15 +6674,16 @@ md-select md-select-value .pip-tabs-badge,
   color: #fafafa;
   background-color: #f44336;
 }
-.pip-full-width-dropdown md-option .pip-tabs-badge {
+.pip-full-width-dropdown .pip-tab-option .md-text {
+  width: 100%;
+}
+.pip-full-width-dropdown .pip-tab-option .md-text .pip-tabs-badge {
+  position: absolute;
   top: 10px;
 }
 md-select md-select-value .md-text .pip-tabs-badge {
   top: -4px !important;
   right: -3px;
-}
-.pip-tabs-content md-option .md-text .pip-tabs-badge {
-  top: 9px !important;
 }
 @media (min-width: 704px) and (max-width: 1024px) {
   md-toolbar.pip-nav {
@@ -6879,7 +6880,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
   animation: search-animation 0.35s ease;
 }
 .pip-search-active .pip-search-bar .md-toolbar-tools .md-button:last-child {
-  margin-right: 16px;
+  margin-right: 8px;
 }
 .pip-search-active .pip-secondary-actions,
 .pip-search-active .pip-primary-actions,

@@ -1,17 +1,5 @@
 declare module pip.services {
 
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
-
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -44,6 +32,18 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
+
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
 
 
 export class Transaction {
@@ -255,12 +255,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
-
-
-
-
-
-
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -296,6 +290,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
+
+
+
+
+
+
 
 }
 
@@ -653,6 +653,18 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
 
 
 export let AppBarChangedEvent: string;
@@ -709,19 +721,6 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
 
 export let NavHeaderChangedEvent: string;
 export class NavHeaderConfig {
@@ -758,6 +757,7 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
+
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -781,35 +781,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setBack(callbackOrEvent?: any): void;
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
-}
-
-
-
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
@@ -852,6 +823,35 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     defaultIcon: string;
 }
 
+
+
+
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
 
 
 
@@ -963,6 +963,11 @@ declare module pip.settings {
 
 
 
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
 export class SettingsTab {
     state: string;
     title: string;
@@ -989,11 +994,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
 
 
 
