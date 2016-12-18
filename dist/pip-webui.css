@@ -7154,7 +7154,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   text-align: center;
   color: #fafafa;
   background-color: #f44336;
-  animation: badge-animation 0.35s ease;
 }
 .pip-sticky-sidenav.sidenav-mobile .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   width: 100%;
@@ -7171,7 +7170,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 }
 .sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   left: 194px;
-  animation: badge-animation-sm 0.35s ease;
 }
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu {
   overflow: hidden;
@@ -7182,7 +7180,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   top: 5px;
   left: 32px;
-  animation: badge-animation-back 0.35s ease;
 }
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   opacity: 0;
@@ -7200,7 +7197,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-small.sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   top: 5px;
   left: 32px;
-  animation: badge-animation-sm-back 0.35s ease;
 }
 .pip-sticky-nav-small.sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   opacity: 0;
