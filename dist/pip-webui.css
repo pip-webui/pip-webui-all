@@ -3522,7 +3522,7 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 }
 .pip-main-body .pip-main-menu > .pip-menu {
   position: absolute;
-  transition: all 0.35s ease;
+  transition: width 0.35s ease;
   border-right: none;
   width: 320px;
   opacity: 1;
