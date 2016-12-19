@@ -26,7 +26,7 @@ __export(require("./session"));
 __export(require("./transactions"));
 __export(require("./routing"));
 __export(require("./utilities"));
-},{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":25}],2:[function(require,module,exports){
+},{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":26}],2:[function(require,module,exports){
 'use strict';
 captureStateTranslations.$inject = ['$rootScope'];
 decorateBackStateService.$inject = ['$delegate', '$window'];
@@ -728,7 +728,7 @@ angular
     .module('pipTranslate')
     .provider('pipTranslate', TranslateProvider)
     .run(initTranslate);
-},{"../utilities/PageResetService":19,"./Translation":17}],17:[function(require,module,exports){
+},{"../utilities/PageResetService":21,"./Translation":17}],17:[function(require,module,exports){
 'use strict';
 var Translation = (function () {
     function Translation() {
@@ -876,299 +876,6 @@ __export(require("./Translation"));
 __export(require("./TranslateService"));
 },{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":16,"./Translation":17}],19:[function(require,module,exports){
 'use strict';
-hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
-exports.ResetPageEvent = "pipResetPage";
-exports.ResetAreaEvent = "pipResetArea";
-exports.ResetRootVar = "$reset";
-exports.ResetAreaRootVar = "$resetArea";
-var PageResetService = (function () {
-    PageResetService.$inject = ['$rootScope', '$log', '$timeout'];
-    function PageResetService($rootScope, $log, $timeout) {
-        this._rootScope = $rootScope;
-        this._log = $log;
-        this._timeout = $timeout;
-        $rootScope[exports.ResetRootVar] = false;
-        $rootScope[exports.ResetAreaRootVar] = null;
-    }
-    PageResetService.prototype.reset = function () {
-        this._log.debug("Resetting the entire page");
-        this.performReset(null);
-    };
-    PageResetService.prototype.resetArea = function (area) {
-        this._log.debug("Resetting the area " + area);
-        this.performReset(area);
-    };
-    PageResetService.prototype.performReset = function (area) {
-        var _this = this;
-        this._rootScope[exports.ResetRootVar] = area == null;
-        this._rootScope[exports.ResetAreaRootVar] = area;
-        this._timeout(function () {
-            _this._rootScope[exports.ResetRootVar] = false;
-            _this._rootScope[exports.ResetAreaRootVar] = null;
-        }, 0);
-    };
-    return PageResetService;
-}());
-function hookResetEvents($rootScope, pipPageReset) {
-    $rootScope.$on(exports.ResetPageEvent, function () { pipPageReset.reset(); });
-    $rootScope.$on(exports.ResetAreaEvent, function (event, area) { pipPageReset.resetArea(area); });
-}
-angular.module('pipPageReset', [])
-    .service('pipPageReset', PageResetService)
-    .run(hookResetEvents);
-},{}],20:[function(require,module,exports){
-'use strict';
-var ScrollService = (function () {
-    function ScrollService() {
-    }
-    ScrollService.prototype.scrollTo = function (parentElement, childElement, animationDuration) {
-        if (!parentElement || !childElement)
-            return;
-        if (animationDuration == undefined)
-            animationDuration = 300;
-        setTimeout(function () {
-            if (!$(childElement).position())
-                return;
-            var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
-            if (modDiff < 20)
-                return;
-            var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
-            if (animationDuration > 0)
-                $(parentElement).animate({
-                    scrollTop: scrollTo + 'px'
-                }, animationDuration);
-        }, 100);
-    };
-    return ScrollService;
-}());
-angular
-    .module('pipScroll', [])
-    .service('pipScroll', ScrollService);
-},{}],21:[function(require,module,exports){
-'use strict';
-var SystemInfo = (function () {
-    SystemInfo.$inject = ['$window'];
-    function SystemInfo($window) {
-        "ngInject";
-        this._window = $window;
-    }
-    Object.defineProperty(SystemInfo.prototype, "browserName", {
-        get: function () {
-            var ua = this._window.navigator.userAgent;
-            if (ua.search(/Edge/) > -1)
-                return "edge";
-            if (ua.search(/MSIE/) > -1)
-                return "ie";
-            if (ua.search(/Trident/) > -1)
-                return "ie";
-            if (ua.search(/Firefox/) > -1)
-                return "firefox";
-            if (ua.search(/Opera/) > -1)
-                return "opera";
-            if (ua.search(/OPR/) > -1)
-                return "opera";
-            if (ua.search(/YaBrowser/) > -1)
-                return "yabrowser";
-            if (ua.search(/Chrome/) > -1)
-                return "chrome";
-            if (ua.search(/Safari/) > -1)
-                return "safari";
-            if (ua.search(/Maxthon/) > -1)
-                return "maxthon";
-            return "unknown";
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SystemInfo.prototype, "browserVersion", {
-        get: function () {
-            var version;
-            var ua = this._window.navigator.userAgent;
-            var browser = this.browserName;
-            switch (browser) {
-                case "edge":
-                    version = (ua.split("Edge")[1]).split("/")[1];
-                    break;
-                case "ie":
-                    version = (ua.split("MSIE ")[1]).split(";")[0];
-                    break;
-                case "ie11":
-                    browser = "ie";
-                    version = (ua.split("; rv:")[1]).split(")")[0];
-                    break;
-                case "firefox":
-                    version = ua.split("Firefox/")[1];
-                    break;
-                case "opera":
-                    version = ua.split("Version/")[1];
-                    break;
-                case "operaWebkit":
-                    version = ua.split("OPR/")[1];
-                    break;
-                case "yabrowser":
-                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
-                    break;
-                case "chrome":
-                    version = (ua.split("Chrome/")[1]).split(" ")[0];
-                    break;
-                case "safari":
-                    version = (ua.split("Version/")[1]).split(" ")[0];
-                    break;
-                case "maxthon":
-                    version = ua.split("Maxthon/")[1];
-                    break;
-            }
-            return version;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SystemInfo.prototype, "platform", {
-        get: function () {
-            var ua = this._window.navigator.userAgent;
-            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
-                return 'mobile';
-            return 'desktop';
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SystemInfo.prototype, "os", {
-        get: function () {
-            var ua = this._window.navigator.userAgent;
-            try {
-                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris');
-                var osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
-                return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
-            }
-            catch (err) {
-                return 'unknown';
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    SystemInfo.prototype.isDesktop = function () {
-        return this.platform == 'desktop';
-    };
-    SystemInfo.prototype.isMobile = function () {
-        return this.platform == 'mobile';
-    };
-    SystemInfo.prototype.isCordova = function () {
-        return false;
-    };
-    SystemInfo.prototype.isSupported = function (supported) {
-        if (!supported)
-            supported = {
-                edge: 11,
-                ie: 11,
-                firefox: 43,
-                opera: 35,
-                chrome: 47
-            };
-        var browser = this.browserName;
-        var version = this.browserVersion;
-        version = version.split(".")[0];
-        if (browser && supported[browser] && version >= supported[browser])
-            return true;
-        return true;
-    };
-    return SystemInfo;
-}());
-angular
-    .module('pipSystemInfo', [])
-    .service('pipSystemInfo', SystemInfo);
-},{}],22:[function(require,module,exports){
-'use strict';
-var TimerEvent = (function () {
-    function TimerEvent(event, timeout) {
-        this.event = event;
-        this.timeout = timeout;
-    }
-    return TimerEvent;
-}());
-var DefaultEvents = [
-    new TimerEvent('pipAutoPullChanges', 60000),
-    new TimerEvent('pipAutoUpdatePage', 15000),
-    new TimerEvent('pipAutoUpdateCollection', 300000)
-];
-var TimerService = (function () {
-    TimerService.$inject = ['$rootScope', '$log', '$interval'];
-    function TimerService($rootScope, $log, $interval) {
-        "ngInject";
-        this._started = false;
-        this._events = _.cloneDeep(DefaultEvents);
-        this._rootScope = $rootScope;
-        this._log = $log;
-        this._interval = $interval;
-    }
-    TimerService.prototype.isStarted = function () {
-        return this._started;
-    };
-    TimerService.prototype.addEvent = function (event, timeout) {
-        var existingEvent = _.find(this._events, function (e) { return e.event == event; });
-        if (existingEvent != null)
-            return;
-        var newEvent = {
-            event: event,
-            timeout: timeout
-        };
-        this._events.push(newEvent);
-        if (this._started)
-            this.startEvent(newEvent);
-    };
-    TimerService.prototype.removeEvent = function (event) {
-        for (var i = this._events.length - 1; i >= 0; i--) {
-            var existingEvent = this._events[i];
-            if (existingEvent.event == event) {
-                this.stopEvent(existingEvent);
-                this._events.splice(i, 1);
-            }
-        }
-    };
-    TimerService.prototype.clearEvents = function () {
-        this.stop();
-        this._events = [];
-    };
-    TimerService.prototype.startEvent = function (event) {
-        var _this = this;
-        event.interval = this._interval(function () {
-            _this._log.debug('Generated timer event ' + event.event);
-            _this._rootScope.$emit(event.event);
-        }, event.timeout);
-    };
-    TimerService.prototype.stopEvent = function (event) {
-        if (event.interval != null) {
-            try {
-                this._interval.cancel(event.interval);
-            }
-            catch (ex) {
-            }
-            event.interval = null;
-        }
-    };
-    TimerService.prototype.start = function () {
-        var _this = this;
-        if (this._started)
-            return;
-        _.each(this._events, function (event) {
-            _this.startEvent(event);
-        });
-        this._started = true;
-    };
-    TimerService.prototype.stop = function () {
-        var _this = this;
-        _.each(this._events, function (event) {
-            _this.stopEvent(event);
-        });
-        this._started = false;
-    };
-    return TimerService;
-}());
-angular.module('pipTimer', [])
-    .service('pipTimer', TimerService);
-},{}],23:[function(require,module,exports){
-'use strict';
 var Codes = (function () {
     function Codes() {
     }
@@ -1188,7 +895,7 @@ var Codes = (function () {
 angular
     .module('pipCodes', [])
     .service('pipCodes', Codes);
-},{}],24:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 var Format = (function () {
     function Format() {
@@ -1348,20 +1055,211 @@ var Format = (function () {
 angular
     .module('pipFormat', [])
     .service('pipFormat', Format);
-},{}],25:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
+exports.ResetPageEvent = "pipResetPage";
+exports.ResetAreaEvent = "pipResetArea";
+exports.ResetRootVar = "$reset";
+exports.ResetAreaRootVar = "$resetArea";
+var PageResetService = (function () {
+    PageResetService.$inject = ['$rootScope', '$log', '$timeout'];
+    function PageResetService($rootScope, $log, $timeout) {
+        this._rootScope = $rootScope;
+        this._log = $log;
+        this._timeout = $timeout;
+        $rootScope[exports.ResetRootVar] = false;
+        $rootScope[exports.ResetAreaRootVar] = null;
+    }
+    PageResetService.prototype.reset = function () {
+        this._log.debug("Resetting the entire page");
+        this.performReset(null);
+    };
+    PageResetService.prototype.resetArea = function (area) {
+        this._log.debug("Resetting the area " + area);
+        this.performReset(area);
+    };
+    PageResetService.prototype.performReset = function (area) {
+        var _this = this;
+        this._rootScope[exports.ResetRootVar] = area == null;
+        this._rootScope[exports.ResetAreaRootVar] = area;
+        this._timeout(function () {
+            _this._rootScope[exports.ResetRootVar] = false;
+            _this._rootScope[exports.ResetAreaRootVar] = null;
+        }, 0);
+    };
+    return PageResetService;
+}());
+function hookResetEvents($rootScope, pipPageReset) {
+    $rootScope.$on(exports.ResetPageEvent, function () { pipPageReset.reset(); });
+    $rootScope.$on(exports.ResetAreaEvent, function (event, area) { pipPageReset.resetArea(area); });
 }
-require("./Format");
-require("./TimerService");
-require("./ScrollService");
-require("./Tags");
-require("./Codes");
-require("./SystemInfo");
-require("./PageResetService");
-__export(require("./PageResetService"));
-},{"./Codes":23,"./Format":24,"./PageResetService":19,"./ScrollService":20,"./SystemInfo":21,"./Tags":26,"./TimerService":22}],26:[function(require,module,exports){
+angular.module('pipPageReset', [])
+    .service('pipPageReset', PageResetService)
+    .run(hookResetEvents);
+},{}],22:[function(require,module,exports){
+'use strict';
+var ScrollService = (function () {
+    function ScrollService() {
+    }
+    ScrollService.prototype.scrollTo = function (parentElement, childElement, animationDuration) {
+        if (!parentElement || !childElement)
+            return;
+        if (animationDuration == undefined)
+            animationDuration = 300;
+        setTimeout(function () {
+            if (!$(childElement).position())
+                return;
+            var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
+            if (modDiff < 20)
+                return;
+            var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
+            if (animationDuration > 0)
+                $(parentElement).animate({
+                    scrollTop: scrollTo + 'px'
+                }, animationDuration);
+        }, 100);
+    };
+    return ScrollService;
+}());
+angular
+    .module('pipScroll', [])
+    .service('pipScroll', ScrollService);
+},{}],23:[function(require,module,exports){
+'use strict';
+var SystemInfo = (function () {
+    SystemInfo.$inject = ['$window'];
+    function SystemInfo($window) {
+        "ngInject";
+        this._window = $window;
+    }
+    Object.defineProperty(SystemInfo.prototype, "browserName", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            if (ua.search(/Edge/) > -1)
+                return "edge";
+            if (ua.search(/MSIE/) > -1)
+                return "ie";
+            if (ua.search(/Trident/) > -1)
+                return "ie";
+            if (ua.search(/Firefox/) > -1)
+                return "firefox";
+            if (ua.search(/Opera/) > -1)
+                return "opera";
+            if (ua.search(/OPR/) > -1)
+                return "opera";
+            if (ua.search(/YaBrowser/) > -1)
+                return "yabrowser";
+            if (ua.search(/Chrome/) > -1)
+                return "chrome";
+            if (ua.search(/Safari/) > -1)
+                return "safari";
+            if (ua.search(/Maxthon/) > -1)
+                return "maxthon";
+            return "unknown";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "browserVersion", {
+        get: function () {
+            var version;
+            var ua = this._window.navigator.userAgent;
+            var browser = this.browserName;
+            switch (browser) {
+                case "edge":
+                    version = (ua.split("Edge")[1]).split("/")[1];
+                    break;
+                case "ie":
+                    version = (ua.split("MSIE ")[1]).split(";")[0];
+                    break;
+                case "ie11":
+                    browser = "ie";
+                    version = (ua.split("; rv:")[1]).split(")")[0];
+                    break;
+                case "firefox":
+                    version = ua.split("Firefox/")[1];
+                    break;
+                case "opera":
+                    version = ua.split("Version/")[1];
+                    break;
+                case "operaWebkit":
+                    version = ua.split("OPR/")[1];
+                    break;
+                case "yabrowser":
+                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
+                    break;
+                case "chrome":
+                    version = (ua.split("Chrome/")[1]).split(" ")[0];
+                    break;
+                case "safari":
+                    version = (ua.split("Version/")[1]).split(" ")[0];
+                    break;
+                case "maxthon":
+                    version = ua.split("Maxthon/")[1];
+                    break;
+            }
+            return version;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "platform", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
+                return 'mobile';
+            return 'desktop';
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "os", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            try {
+                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris');
+                var osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
+                return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
+            }
+            catch (err) {
+                return 'unknown';
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SystemInfo.prototype.isDesktop = function () {
+        return this.platform == 'desktop';
+    };
+    SystemInfo.prototype.isMobile = function () {
+        return this.platform == 'mobile';
+    };
+    SystemInfo.prototype.isCordova = function () {
+        return false;
+    };
+    SystemInfo.prototype.isSupported = function (supported) {
+        if (!supported)
+            supported = {
+                edge: 11,
+                ie: 11,
+                firefox: 43,
+                opera: 35,
+                chrome: 47
+            };
+        var browser = this.browserName;
+        var version = this.browserVersion;
+        version = version.split(".")[0];
+        if (browser && supported[browser] && version >= supported[browser])
+            return true;
+        return true;
+    };
+    return SystemInfo;
+}());
+angular
+    .module('pipSystemInfo', [])
+    .service('pipSystemInfo', SystemInfo);
+},{}],24:[function(require,module,exports){
 'use strict';
 var Tags = (function () {
     function Tags() {
@@ -1414,7 +1312,109 @@ var Tags = (function () {
 angular
     .module('pipTags', [])
     .service('pipTags', Tags);
-},{}]},{},[1])(1)
+},{}],25:[function(require,module,exports){
+'use strict';
+var TimerEvent = (function () {
+    function TimerEvent(event, timeout) {
+        this.event = event;
+        this.timeout = timeout;
+    }
+    return TimerEvent;
+}());
+var DefaultEvents = [
+    new TimerEvent('pipAutoPullChanges', 60000),
+    new TimerEvent('pipAutoUpdatePage', 15000),
+    new TimerEvent('pipAutoUpdateCollection', 300000)
+];
+var TimerService = (function () {
+    TimerService.$inject = ['$rootScope', '$log', '$interval'];
+    function TimerService($rootScope, $log, $interval) {
+        "ngInject";
+        this._started = false;
+        this._events = _.cloneDeep(DefaultEvents);
+        this._rootScope = $rootScope;
+        this._log = $log;
+        this._interval = $interval;
+    }
+    TimerService.prototype.isStarted = function () {
+        return this._started;
+    };
+    TimerService.prototype.addEvent = function (event, timeout) {
+        var existingEvent = _.find(this._events, function (e) { return e.event == event; });
+        if (existingEvent != null)
+            return;
+        var newEvent = {
+            event: event,
+            timeout: timeout
+        };
+        this._events.push(newEvent);
+        if (this._started)
+            this.startEvent(newEvent);
+    };
+    TimerService.prototype.removeEvent = function (event) {
+        for (var i = this._events.length - 1; i >= 0; i--) {
+            var existingEvent = this._events[i];
+            if (existingEvent.event == event) {
+                this.stopEvent(existingEvent);
+                this._events.splice(i, 1);
+            }
+        }
+    };
+    TimerService.prototype.clearEvents = function () {
+        this.stop();
+        this._events = [];
+    };
+    TimerService.prototype.startEvent = function (event) {
+        var _this = this;
+        event.interval = this._interval(function () {
+            _this._log.debug('Generated timer event ' + event.event);
+            _this._rootScope.$emit(event.event);
+        }, event.timeout);
+    };
+    TimerService.prototype.stopEvent = function (event) {
+        if (event.interval != null) {
+            try {
+                this._interval.cancel(event.interval);
+            }
+            catch (ex) {
+            }
+            event.interval = null;
+        }
+    };
+    TimerService.prototype.start = function () {
+        var _this = this;
+        if (this._started)
+            return;
+        _.each(this._events, function (event) {
+            _this.startEvent(event);
+        });
+        this._started = true;
+    };
+    TimerService.prototype.stop = function () {
+        var _this = this;
+        _.each(this._events, function (event) {
+            _this.stopEvent(event);
+        });
+        this._started = false;
+    };
+    return TimerService;
+}());
+angular.module('pipTimer', [])
+    .service('pipTimer', TimerService);
+},{}],26:[function(require,module,exports){
+'use strict';
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+require("./Format");
+require("./TimerService");
+require("./ScrollService");
+require("./Tags");
+require("./Codes");
+require("./SystemInfo");
+require("./PageResetService");
+__export(require("./PageResetService"));
+},{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -5802,8 +5802,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range_directive/date_range.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -5814,8 +5814,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_directive/date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6432,8 +6432,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/ErrorDetails.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -6444,8 +6444,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/ErrorDetails.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -9212,23 +9212,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('menu/StickyNavMenu.html',
-<<<<<<< HEAD
     '<md-list class="sidenav-list"><md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Expand menu\' | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Shrink menu\' | translate}}</md-tooltip></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right" class="md-secondary">{{::section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item" ng-repeat="link in section.links" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-focusable" ng-click="clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{link.count}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list>');
-=======
-    '<md-list class="sidenav-list"><md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Expand menu\' | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Shrink menu\' | translate}}</md-tooltip></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right" class="md-secondary">{{::section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item" ng-repeat="link in section.links" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-focusable" ng-click="clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count">{{link.count}}</div></md-button></md-list-item></div></md-list>');
->>>>>>> 9cfa715043765b60313bab253c20de1321a187ce
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -9241,6 +9225,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/StickySideNav.html',
     '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -10385,8 +10381,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10397,8 +10393,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -11256,6 +11252,18 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
     '<div><div class="chart-legend-item" ng-repeat="item in series" ng-show="item.values || item.value"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
 }]);
@@ -11270,18 +11278,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
     '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
