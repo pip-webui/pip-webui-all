@@ -7084,6 +7084,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 }
 .pip-sticky-nav-menu {
   width: 100%;
+  position: relative;
 }
 .pip-sticky-nav-menu .sidenav-list {
   padding-top: 0px!important;
