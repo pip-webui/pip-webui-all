@@ -654,32 +654,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -720,6 +694,32 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
 
 
 
@@ -864,6 +864,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 
 
 
+
 export let OpenSearchEvent: string;
 export let CloseSearchEvent: string;
 export let SearchChangedEvent: string;
@@ -890,7 +891,6 @@ export interface ISearchService {
 export interface ISearchProvider extends ng.IServiceProvider {
 }
 
-
 }
 
 declare module pip.themes {
@@ -901,6 +901,19 @@ function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemi
 
 function configureBootBarnWarmTheme($mdThemingProvider: any): void;
 
+
+
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
+export interface IThemeService {
+    theme: string;
+    use(language: string): string;
+}
+export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -918,19 +931,6 @@ function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingPro
 
 function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-
-
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
-export interface IThemeService {
-    theme: string;
-    use(language: string): string;
-}
-export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
-    setRootVar: boolean;
-    persist: boolean;
-}
 
 }
 
