@@ -2367,8 +2367,10 @@ body.pip-windows .pip-popover-content::-webkit-scrollbar,
 body.pip-windows .pip-guide-page::-webkit-scrollbar,
 body.pip-windows .pip-contributor-details::-webkit-scrollbar,
 body.pip-windows .pip-sharing-details::-webkit-scrollbar,
+body.pip-windows textarea::-webkit-scrollbar,
 body.pip-windows .pip-scroll::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 body.pip-windows .pip-menu::-webkit-scrollbar-track,
 body.pip-windows md-content::-webkit-scrollbar-track,
@@ -2390,6 +2392,7 @@ body.pip-windows .pip-popover-content::-webkit-scrollbar-track,
 body.pip-windows .pip-guide-page::-webkit-scrollbar-track,
 body.pip-windows .pip-contributor-details::-webkit-scrollbar-track,
 body.pip-windows .pip-sharing-details::-webkit-scrollbar-track,
+body.pip-windows textarea::-webkit-scrollbar-track,
 body.pip-windows .pip-scroll::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
@@ -2413,6 +2416,7 @@ body.pip-windows .pip-popover-content::-webkit-scrollbar-thumb,
 body.pip-windows .pip-guide-page::-webkit-scrollbar-thumb,
 body.pip-windows .pip-contributor-details::-webkit-scrollbar-thumb,
 body.pip-windows .pip-sharing-details::-webkit-scrollbar-thumb,
+body.pip-windows textarea::-webkit-scrollbar-thumb,
 body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
   background-color: darkgrey;
   outline: 1px solid slategrey;
@@ -3518,7 +3522,6 @@ body.pip-windows .pip-scroll::-webkit-scrollbar-thumb {
 }
 .pip-main-body .pip-main-menu > .pip-menu {
   position: absolute;
-  transition: all 0.35s ease;
   border-right: none;
   width: 320px;
   opacity: 1;
@@ -4408,9 +4411,15 @@ md-list-item .pip-markdown h4 {
   max-height: 48px !important;
 }
 .pip-toast .pip-text {
-  overflow: hidden;
+  display: -webkit-box;
   max-height: 32px;
-  margin-right: 0px;
+  margin: 0 auto;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 16px;
   vertical-align: middle;
 }
 .pip-toast .pip-toast-button {
@@ -4431,15 +4440,15 @@ md-list-item .pip-markdown h4 {
     max-height: 124px !important;
     padding: 0;
   }
+  .pip-toast .md-toast-content::before {
+    min-height: 0px!important;
+  }
   .pip-toast .md-toast-content {
     padding-top: 8px;
     max-height: 92px !important;
   }
   .pip-toast .md-toast-content .pip-text {
     margin-right: 0;
-    width: 100%;
-  }
-  .pip-toast .md-toast-content .pip-actions {
     width: 100%;
   }
   .pip-toast.pip-column-toast .md-toast-content {
@@ -4464,8 +4473,19 @@ md-list-item .pip-markdown h4 {
     align-items: center;
   }
 }
+.pip-toast.pip-error {
+  z-index: 1000;
+}
 .pip-toast.pip-error .md-toast-content {
   background-color: #ff5252;
+}
+@media (max-width: 768px) {
+  .pip-toast.pip-column-toast .md-toast-content::before {
+    min-height: 0px!important;
+  }
+  .pip-toast.pip-column-toast .pip-actions {
+    width: 100%;
+  }
 }
 .pip-routing-progress {
   background-position: 50% 50%;
@@ -8072,13 +8092,13 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   border-color: rgba(0, 0, 0, 0.12) !important;
 }
 .bootbarn-warm .color-badge {
-  color: #ff5722 !important;
+  color: #ff5252 !important;
 }
 .bootbarn-warm .color-badge-bg {
-  background-color: #ff5722 !important;
+  background-color: #ff5252 !important;
 }
 .bootbarn-warm .color-error {
-  color: #ff5722 !important;
+  color: #ff5252 !important;
 }
 .bootbarn-warm .color-toast {
   background-color: #2e2e2e !important;
