@@ -3,11 +3,11 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./translate');
-require('./session');
-require('./transactions');
-require('./routing');
-require('./utilities');
+require("./translate");
+require("./session");
+require("./transactions");
+require("./routing");
+require("./utilities");
 angular.module('pipServices', [
     'pipTranslate',
     'pipSession',
@@ -21,11 +21,11 @@ angular.module('pipServices', [
     'pipSystemInfo',
     'pipPageReset'
 ]);
-__export(require('./translate'));
-__export(require('./session'));
-__export(require('./transactions'));
-__export(require('./routing'));
-__export(require('./utilities'));
+__export(require("./translate"));
+__export(require("./session"));
+__export(require("./transactions"));
+__export(require("./routing"));
+__export(require("./utilities"));
 },{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":26}],2:[function(require,module,exports){
 'use strict';
 captureStateTranslations.$inject = ['$rootScope'];
@@ -160,11 +160,11 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipRouting', ['ui.router']);
-require('./BackDecorator');
-require('./RedirectDecorator');
-require('./RoutingEvents');
-__export(require('./BackDecorator'));
-__export(require('./RoutingEvents'));
+require("./BackDecorator");
+require("./RedirectDecorator");
+require("./RoutingEvents");
+__export(require("./BackDecorator"));
+__export(require("./RoutingEvents"));
 },{"./BackDecorator":2,"./RedirectDecorator":3,"./RoutingEvents":4}],6:[function(require,module,exports){
 'use strict';
 exports.IdentityRootVar = "$identity";
@@ -325,13 +325,13 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSession', []);
-require('./IdentityService');
-require('./SessionService');
-__export(require('./IdentityService'));
-__export(require('./SessionService'));
+require("./IdentityService");
+require("./SessionService");
+__export(require("./IdentityService"));
+__export(require("./SessionService"));
 },{"./IdentityService":6,"./SessionService":7}],9:[function(require,module,exports){
 'use strict';
-var TransactionError_1 = require('./TransactionError');
+var TransactionError_1 = require("./TransactionError");
 var Transaction = (function () {
     function Transaction(scope) {
         this._scope = null;
@@ -470,7 +470,7 @@ var TransactionError = (function () {
 exports.TransactionError = TransactionError;
 },{}],11:[function(require,module,exports){
 'use strict';
-var Transaction_1 = require('./Transaction');
+var Transaction_1 = require("./Transaction");
 var TransactionService = (function () {
     function TransactionService() {
         this._transactions = {};
@@ -525,12 +525,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipTransaction', []);
-require('./TransactionStrings');
-require('./TransactionError');
-require('./Transaction');
-require('./TransactionService');
-__export(require('./TransactionError'));
-__export(require('./Transaction'));
+require("./TransactionStrings");
+require("./TransactionError");
+require("./Transaction");
+require("./TransactionService");
+__export(require("./TransactionError"));
+__export(require("./Transaction"));
 },{"./Transaction":9,"./TransactionError":10,"./TransactionService":11,"./TransactionStrings":12}],14:[function(require,module,exports){
 'use strict';
 translateDirective.$inject = ['pipTranslate'];
@@ -598,8 +598,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Translation_1 = require('./Translation');
-var PageResetService_1 = require('../utilities/PageResetService');
+var Translation_1 = require("./Translation");
+var PageResetService_1 = require("../utilities/PageResetService");
 exports.LanguageRootVar = "$language";
 exports.LanguageChangedEvent = "pipLanguageChanged";
 var TranslateService = (function () {
@@ -688,9 +688,10 @@ var TranslateService = (function () {
 var TranslateProvider = (function (_super) {
     __extends(TranslateProvider, _super);
     function TranslateProvider() {
-        _super.call(this);
-        this._setRootVar = true;
-        this._persist = true;
+        var _this = _super.call(this) || this;
+        _this._setRootVar = true;
+        _this._persist = true;
+        return _this;
     }
     Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
         get: function () {
@@ -867,12 +868,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipTranslate', []);
-require('./Translation');
-require('./TranslateService');
-require('./TranslateFilter');
-require('./TranslateDirective');
-__export(require('./Translation'));
-__export(require('./TranslateService'));
+require("./Translation");
+require("./TranslateService");
+require("./TranslateFilter");
+require("./TranslateDirective");
+__export(require("./Translation"));
+__export(require("./TranslateService"));
 },{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":16,"./Translation":17}],19:[function(require,module,exports){
 'use strict';
 var Codes = (function () {
@@ -1405,19 +1406,16 @@ angular.module('pipTimer', [])
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./Format');
-require('./TimerService');
-require('./ScrollService');
-require('./Tags');
-require('./Codes');
-require('./SystemInfo');
-require('./PageResetService');
-__export(require('./PageResetService'));
+require("./Format");
+require("./TimerService");
+require("./ScrollService");
+require("./Tags");
+require("./Codes");
+require("./SystemInfo");
+require("./PageResetService");
+__export(require("./PageResetService"));
 },{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -1584,15 +1582,12 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,4,5,6])(6)
+},{}]},{},[6,1,2,3,4,5])(6)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-var MediaService_1 = require('../media/MediaService');
+var MediaService_1 = require("../media/MediaService");
 (function () {
     var AuxPanelDirectiveController = (function () {
         AuxPanelDirectiveController.$inject = ['pipAuxPanel'];
@@ -1739,7 +1734,7 @@ var AuxPanelService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -1750,7 +1745,7 @@ var AuxPanelService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -1819,7 +1814,7 @@ var AuxPanelProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -1829,7 +1824,7 @@ var AuxPanelProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -1869,30 +1864,30 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipAuxPanel', ['ngMaterial']);
-require('./AuxPanelService');
-require('./AuxPanelPartDirective');
-require('./AuxPanelDirective');
-__export(require('./AuxPanelService'));
+require("./AuxPanelService");
+require("./AuxPanelPartDirective");
+require("./AuxPanelDirective");
+__export(require("./AuxPanelService"));
 },{"./AuxPanelDirective":1,"./AuxPanelPartDirective":2,"./AuxPanelService":3}],5:[function(require,module,exports){
 'use strict';
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipLayout', ['wu.masonry', 'pipAuxPanel']);
-require('./media/MediaService');
-require('./media/ResizeFunctions');
-require('./layouts/MainDirective');
-require('./layouts/CardDirective');
-require('./layouts/DialogDirective');
-require('./layouts/DocumentDirective');
-require('./layouts/SimpleDirective');
-require('./layouts/TilesDirective');
-require('./auxpanel/index');
-__export(require('./media/MediaService'));
-__export(require('./media/ResizeFunctions'));
+require("./media/MediaService");
+require("./media/ResizeFunctions");
+require("./layouts/MainDirective");
+require("./layouts/CardDirective");
+require("./layouts/DialogDirective");
+require("./layouts/DocumentDirective");
+require("./layouts/SimpleDirective");
+require("./layouts/TilesDirective");
+require("./auxpanel/index");
+__export(require("./media/MediaService"));
+__export(require("./media/ResizeFunctions"));
 },{"./auxpanel/index":4,"./layouts/CardDirective":6,"./layouts/DialogDirective":7,"./layouts/DocumentDirective":8,"./layouts/MainDirective":9,"./layouts/SimpleDirective":10,"./layouts/TilesDirective":11,"./media/MediaService":12,"./media/ResizeFunctions":13}],6:[function(require,module,exports){
 'use strict';
-var MediaService_1 = require('../media/MediaService');
+var MediaService_1 = require("../media/MediaService");
 (function () {
     cardDirective.$inject = ['$rootScope'];
     var CardDirectiveLink = (function () {
@@ -2004,8 +1999,8 @@ var MediaService_1 = require('../media/MediaService');
 })();
 },{}],9:[function(require,module,exports){
 'use strict';
-var ResizeFunctions_1 = require('../media/ResizeFunctions');
-var MediaService_1 = require('../media/MediaService');
+var ResizeFunctions_1 = require("../media/ResizeFunctions");
+var MediaService_1 = require("../media/MediaService");
 (function () {
     var MainDirectiveController = (function () {
         MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout', '$attrs'];
@@ -2084,8 +2079,8 @@ var MediaService_1 = require('../media/MediaService');
 },{}],11:[function(require,module,exports){
 'use strict';
 tilesDirective.$inject = ['$rootScope'];
-var ResizeFunctions_1 = require('../media/ResizeFunctions');
-var MediaService_1 = require('../media/MediaService');
+var ResizeFunctions_1 = require("../media/ResizeFunctions");
+var MediaService_1 = require("../media/MediaService");
 var TilesDirectiveLink = (function () {
     function TilesDirectiveLink($scope, $element, $rootScope, $attrs) {
         var _this = this;
@@ -2341,9 +2336,6 @@ exports.removeResizeListener = removeResizeListener;
 },{}]},{},[5])(5)
 });
 
-
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -2395,9 +2387,6 @@ exports.removeResizeListener = removeResizeListener;
 })();
 },{}]},{},[1])(1)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -3280,9 +3269,6 @@ exports.removeResizeListener = removeResizeListener;
 },{}]},{},[1,2,3,4,5,6])(6)
 });
 
-
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4007,11 +3993,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,5,4,6,7,8,10,9,11,12,13])(13)
+},{}]},{},[13,1,2,3,5,4,6,7,8,10,9,11,12])(13)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -4083,11 +4066,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,4])(4)
+},{}]},{},[4,1,2,3])(4)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -5017,7 +4997,7 @@ var DateTimeService = (function () {
 var DateTimeProvider = (function (_super) {
     __extends(DateTimeProvider, _super);
     function DateTimeProvider() {
-        _super.call(this, { timeZone: null });
+        return _super.call(this, { timeZone: null }) || this;
     }
     DateTimeProvider.prototype.$get = function () {
         "ngInject";
@@ -5822,8 +5802,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_directive/date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -5834,8 +5814,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range_directive/date_range.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -5865,11 +5845,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[7,4,5,2,3,1,6,8,9,10])(10)
+},{}]},{},[10,7,4,5,2,3,1,6,8,9])(10)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -5915,7 +5892,8 @@ angular
     .module('pipConfirmationDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates'])
+    'pipDialogs.Templates'
+])
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
 },{}],2:[function(require,module,exports){
 var ConfirmationService = (function () {
@@ -5949,8 +5927,8 @@ angular
     .service('pipConfirmationDialog', ConfirmationService);
 },{}],3:[function(require,module,exports){
 'use strict';
-require('./ConfirmationController');
-require('./ConfirmationService');
+require("./ConfirmationController");
+require("./ConfirmationService");
 },{"./ConfirmationController":1,"./ConfirmationService":2}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -5965,10 +5943,10 @@ require('./ConfirmationService');
 })();
 },{}],5:[function(require,module,exports){
 'use strict';
-require('./error_details');
-require('./information');
-require('./options');
-require('./confirmation');
+require("./error_details");
+require("./information");
+require("./options");
+require("./confirmation");
 angular
     .module('pipDialogs', [
     'pipInformationDialog',
@@ -6094,9 +6072,10 @@ angular
     .module('pipErrorDetailsDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./ErrorDetailsService');
-require('./ErrorDetailsController');
+    'pipDialogs.Templates'
+]);
+require("./ErrorDetailsService");
+require("./ErrorDetailsController");
 },{"./ErrorDetailsController":6,"./ErrorDetailsService":7}],9:[function(require,module,exports){
 'use strict';
 var InformationStrings = (function () {
@@ -6186,9 +6165,10 @@ angular
     .module('pipInformationDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./InformationService');
-require('./InformationController');
+    'pipDialogs.Templates'
+]);
+require("./InformationService");
+require("./InformationController");
 },{"./InformationController":9,"./InformationService":10}],12:[function(require,module,exports){
 'use strict';
 var OptionsBigData = (function () {
@@ -6420,16 +6400,18 @@ angular
     .module('pipOptionsDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./OptionsService');
-require('./OptionsController');
+    'pipDialogs.Templates'
+]);
+require("./OptionsService");
+require("./OptionsController");
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./OptionsBigService');
-require('./OptionsBigController');
+    'pipDialogs.Templates'
+]);
+require("./OptionsBigService");
+require("./OptionsBigController");
 },{"./OptionsBigController":12,"./OptionsBigService":13,"./OptionsController":14,"./OptionsService":15}],17:[function(require,module,exports){
 (function(module) {
 try {
@@ -6493,11 +6475,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15,17])(17)
+},{}]},{},[17,1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15])(17)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -6516,7 +6495,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        _super.apply(this, arguments);
+        return _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -6906,10 +6885,10 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipActions', ['ngMaterial', 'pipNav.Templates', 'ui.router']);
-require('./ActionsService');
-require('./PrimaryActionsDirective');
-require('./SecondaryActionsDirective');
-__export(require('./ActionsService'));
+require("./ActionsService");
+require("./PrimaryActionsDirective");
+require("./SecondaryActionsDirective");
+__export(require("./ActionsService"));
 },{"./ActionsService":1,"./PrimaryActionsDirective":2,"./SecondaryActionsDirective":3}],5:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7033,33 +7012,38 @@ var AppBarService = (function () {
         this._config.visible = false;
         this.sendConfigEvent();
     };
+    AppBarService.prototype.hideShadow = function () {
+        this._config.classes = _.reject(this._config.classes, function (c) { return c.startsWith('pip-shadow'); });
+    };
     AppBarService.prototype.setShadow = function (breakpoints) {
         var _this = this;
-        this._config.classes = _.reject(this._config.classes, function (c) { return c.startsWith('pip-shadow'); });
-        if (breakpoints != null) {
-            this._config.classes.push('pip-shadow');
+        this.hideShadow();
+        if (breakpoints != null && breakpoints.length > 0) {
             _.each(breakpoints, function (bp) {
                 _this._config.classes.push('pip-shadow-' + bp);
             });
+        }
+        else {
+            this._config.classes.push('pip-shadow');
         }
     };
     AppBarService.prototype.addShadow = function () {
         var breakpoints = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            breakpoints[_i - 0] = arguments[_i];
+            breakpoints[_i] = arguments[_i];
         }
         this.setShadow(breakpoints);
         this.sendConfigEvent();
     };
     AppBarService.prototype.removeShadow = function () {
-        this.setShadow(null);
+        this.hideShadow();
         this.sendConfigEvent();
     };
     AppBarService.prototype.addClass = function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -7070,7 +7054,7 @@ var AppBarService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -7128,7 +7112,7 @@ var AppBarProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -7138,7 +7122,7 @@ var AppBarProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -7165,15 +7149,15 @@ function __export(m) {
 }
 angular
     .module('pipAppBar', ['ngMaterial', 'pipNav.Templates']);
-require('./AppBarService');
-require('./AppBarDirective');
-require('./AppBarPartDirective');
-__export(require('./AppBarService'));
+require("./AppBarService");
+require("./AppBarDirective");
+require("./AppBarPartDirective");
+__export(require("./AppBarService"));
 },{"./AppBarDirective":5,"./AppBarPartDirective":6,"./AppBarService":7}],9:[function(require,module,exports){
 'use strict';
-var BreadcrumbService_1 = require('./BreadcrumbService');
-var BreadcrumbService_2 = require('./BreadcrumbService');
-var SearchService_1 = require('../search/SearchService');
+var BreadcrumbService_1 = require("./BreadcrumbService");
+var BreadcrumbService_2 = require("./BreadcrumbService");
+var SearchService_1 = require("../search/SearchService");
 (function () {
     var BreadcrumbController = (function () {
         BreadcrumbController.$inject = ['$element', '$rootScope', '$window', '$state', '$location', '$injector', 'pipBreadcrumb'];
@@ -7380,9 +7364,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate']);
-require('./BreadcrumbDirective');
-require('./BreadcrumbService');
-__export(require('./BreadcrumbService'));
+require("./BreadcrumbDirective");
+require("./BreadcrumbService");
+__export(require("./BreadcrumbService"));
 },{"./BreadcrumbDirective":9,"./BreadcrumbService":10}],12:[function(require,module,exports){
 'use strict';
 var NavService = (function () {
@@ -7834,9 +7818,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
-require('./NavHeaderService');
-require('./StickyNavHeaderDirective');
-__export(require('./NavHeaderService'));
+require("./NavHeaderService");
+require("./StickyNavHeaderDirective");
+__export(require("./NavHeaderService"));
 },{"./NavHeaderService":15,"./StickyNavHeaderDirective":16}],18:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7909,12 +7893,18 @@ var NavIconService = (function () {
         configurable: true
     });
     NavIconService.prototype.setCallbackOrEvent = function (callbackOrEvent) {
-        if (_.isFunction(callbackOrEvent))
+        if (_.isFunction(callbackOrEvent)) {
             this._config.click = callbackOrEvent;
-        else if (_.isString(callbackOrEvent))
-            this._config.event = callbackOrEvent;
-        else
             this._config.event = null;
+        }
+        else if (_.isString(callbackOrEvent)) {
+            this._config.click = null;
+            this._config.event = callbackOrEvent;
+        }
+        else {
+            this._config.click = null;
+            this._config.event = null;
+        }
     };
     NavIconService.prototype.showMenu = function (callbackOrEvent) {
         this._config.type = 'menu';
@@ -8011,27 +8001,27 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-require('./NavIconService');
-require('./NavIconDirective');
-__export(require('./NavIconService'));
+require("./NavIconService");
+require("./NavIconDirective");
+__export(require("./NavIconService"));
 },{"./NavIconDirective":18,"./NavIconService":19}],21:[function(require,module,exports){
 'use strict';
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./dependencies/TranslateFilter');
-require('./language/LanguagePickerDirective');
-require('./dropdown/DropdownDirective');
-require('./tabs/TabsDirective');
-require('./actions');
-require('./appbar');
-require('./search');
-require('./breadcrumb');
-require('./sidenav');
-require('./header');
-require('./menu');
-require('./icon');
-require('./common/NavService');
+require("./dependencies/TranslateFilter");
+require("./language/LanguagePickerDirective");
+require("./dropdown/DropdownDirective");
+require("./tabs/TabsDirective");
+require("./actions");
+require("./appbar");
+require("./search");
+require("./breadcrumb");
+require("./sidenav");
+require("./header");
+require("./menu");
+require("./icon");
+require("./common/NavService");
 angular
     .module('pipNav', [
     'pipNavService',
@@ -8046,14 +8036,14 @@ angular
     'pipNavMenu',
     'pipNavHeader'
 ]);
-__export(require('./actions'));
-__export(require('./appbar'));
-__export(require('./breadcrumb'));
-__export(require('./search'));
-__export(require('./sidenav'));
-__export(require('./icon'));
-__export(require('./menu'));
-__export(require('./header'));
+__export(require("./actions"));
+__export(require("./appbar"));
+__export(require("./breadcrumb"));
+__export(require("./search"));
+__export(require("./sidenav"));
+__export(require("./icon"));
+__export(require("./menu"));
+__export(require("./header"));
 },{"./actions":4,"./appbar":8,"./breadcrumb":11,"./common/NavService":12,"./dependencies/TranslateFilter":13,"./dropdown/DropdownDirective":14,"./header":17,"./icon":20,"./language/LanguagePickerDirective":22,"./menu":25,"./search":28,"./sidenav":32,"./tabs/TabsDirective":33}],22:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8156,6 +8146,17 @@ var NavMenuService = (function () {
         enumerable: true,
         configurable: true
     });
+    NavMenuService.prototype.updateBadgeStyle = function (link, style) {
+        if (link == null || !_.isString(style))
+            return;
+        _.each(this._config.sections, function (s) {
+            _.each(s.links, function (l) {
+                if (l.name == link)
+                    l.badgeStyle = style;
+            });
+        });
+        this.sendChangeEvent();
+    };
     NavMenuService.prototype.updateCount = function (link, count) {
         if (link == null || !_.isNumber(count))
             return;
@@ -8227,7 +8228,6 @@ angular
         var animationDuration = 450, pipSideNavElement = $element.parent().parent();
         $element.addClass('pip-sticky-nav-menu');
         $scope.sections = $scope.sections || pipNavMenu.sections;
-        $scope.showTooltip = true;
         setCollapsible();
         $scope.defaultIcon = pipNavMenu.defaultIcon;
         onStateChanged(null, pipSideNav.state);
@@ -8287,9 +8287,9 @@ angular
             $scope.sideNavState = state;
         }
         function isActive(link) {
-            if (link.parentstate) {
+            if (link.parentState) {
                 var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.includes(link.parentstate)) {
+                if ($state != null && $state.includes(link.parentState)) {
                     return true;
                 }
             }
@@ -8378,13 +8378,13 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-require('./NavMenuService');
-require('./StickyNavMenuDirective');
-__export(require('./NavMenuService'));
+require("./NavMenuService");
+require("./StickyNavMenuDirective");
+__export(require("./NavMenuService"));
 },{"./NavMenuService":23,"./StickyNavMenuDirective":24}],26:[function(require,module,exports){
 'use strict';
-var SearchService_1 = require('./SearchService');
-var SearchService_2 = require('./SearchService');
+var SearchService_1 = require("./SearchService");
+var SearchService_2 = require("./SearchService");
 (function () {
     var SearchBarController = (function () {
         SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
@@ -8394,16 +8394,31 @@ var SearchService_2 = require('./SearchService');
             this.enabled = false;
             this.search = { text: '' };
             this._rootScope = $rootScope;
+            this._element = $element;
             $element.addClass('pip-search-bar');
             this.config = pipSearch.config;
+            this.stateChange();
             $rootScope.$on(SearchService_1.SearchChangedEvent, function (event, config) {
                 _this.onSearchChanged(event, config);
             });
         }
+        SearchBarController.prototype.stateChange = function () {
+            if (this.enabled) {
+                console.log('element', this._element.parent());
+                this._element.addClass('w-stretch');
+                this._element.parent().addClass('pip-search-active');
+            }
+            else {
+                console.log('element', this._element.parent());
+                this._element.removeClass('w-stretch');
+                this._element.parent().removeClass('pip-search-active');
+            }
+        };
         SearchBarController.prototype.onSearchChanged = function (event, config) {
             this.config = config;
             this.enabled = false;
             this.search.text = '';
+            this.stateChange();
         };
         SearchBarController.prototype.focusText = function () {
             setTimeout(function () {
@@ -8416,11 +8431,13 @@ var SearchService_2 = require('./SearchService');
             this.search.text = this.config.criteria;
             this.enabled = true;
             this.focusText();
+            this.stateChange();
         };
         SearchBarController.prototype.onClick = function () {
             var search = this.search.text;
             this.search.text = '';
             this.enabled = false;
+            this.stateChange();
             if (this.config.callback)
                 this.config.callback(search);
             else
@@ -8433,14 +8450,17 @@ var SearchService_2 = require('./SearchService');
             }
             else {
                 this.enabled = false;
+                this.stateChange();
                 this.onClick();
             }
         };
         SearchBarController.prototype.onKeyDown = function (event) {
             if (event.keyCode === 13)
                 this.onClick();
-            else if (event.keyCode === 27)
+            else if (event.keyCode === 27) {
                 this.enabled = false;
+                this.stateChange();
+            }
         };
         return SearchBarController;
     }());
@@ -8579,9 +8599,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-require('./SearchService');
-require('./SearchBarDirective');
-__export(require('./SearchService'));
+require("./SearchService");
+require("./SearchBarDirective");
+__export(require("./SearchService"));
 },{"./SearchBarDirective":26,"./SearchService":27}],29:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8707,7 +8727,7 @@ var SideNavService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -8718,7 +8738,7 @@ var SideNavService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -8798,7 +8818,7 @@ var SideNavProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -8808,7 +8828,7 @@ var SideNavProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -9001,17 +9021,18 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates']);
-require('./SideNavService');
-require('./SideNavPartDirective');
-require('./StickySideNavDirective');
-__export(require('./SideNavService'));
+require("./SideNavService");
+require("./SideNavPartDirective");
+require("./StickySideNavDirective");
+__export(require("./SideNavService"));
 },{"./SideNavPartDirective":29,"./SideNavService":30,"./StickySideNavDirective":31}],33:[function(require,module,exports){
 'use strict';
 (function () {
-    TabsDirectiveController.$inject = ['$scope', '$element', '$attrs', '$mdMedia', '$injector', '$rootScope'];
-    function TabsDirectiveController($scope, $element, $attrs, $mdMedia, $injector, $rootScope) {
+    TabsDirectiveController.$inject = ['$scope', '$element', '$attrs', '$mdMedia', '$injector', '$rootScope', '$parse'];
+    function TabsDirectiveController($scope, $element, $attrs, $mdMedia, $injector, $rootScope, $parse) {
         "ngInject";
         var pipTheme = $injector.has('pipTheme') ? $injector.get('pipTheme') : null, pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null, currentTheme = 'default';
+        $scope.selected = {};
         if (pipTheme)
             currentTheme = pipTheme.use();
         else if ($rootScope.$theme)
@@ -9036,41 +9057,67 @@ __export(require('./SideNavService'));
                 pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
             }
         }
-        $scope.activeIndex = $scope.activeIndex || 0;
-        $scope.activeTab = $scope.activeIndex;
-        $scope.disabled = function () {
+        $scope.selected.activeIndex = $scope.activeIndex || 0;
+        $scope.selected.activeTab = $scope.selected.activeIndex;
+        $scope.disabled = disabled;
+        $scope.tabDisabled = tabDisabled;
+        $scope.onSelect = onSelect;
+        $scope.showShadow = showShadow;
+        $scope.show = show;
+        if (toBoolean($attrs.pipRebind)) {
+            $scope.$watch('activeIndex', function (newValue) {
+                $scope.selected.activeIndex = newValue || 0;
+                $scope.selected.activeTab = $scope.selected.activeIndex;
+            });
+        }
+        return;
+        function disabled() {
             if ($scope.ngDisabled) {
                 return $scope.ngDisabled();
             }
-        };
-        $scope.tabDisabled = function (index) {
-            return ($scope.disabled() && $scope.activeIndex != index);
-        };
-        $scope.onSelect = function (index) {
+        }
+        ;
+        function tabDisabled(index) {
+            return ($scope.disabled() && $scope.selected.activeIndex != index);
+        }
+        ;
+        function onSelect(index) {
             if ($scope.disabled())
                 return;
             $scope.activeIndex = index;
-            $scope.activeTab = $scope.activeIndex;
+            $scope.selected.activeIndex = index;
+            $scope.selected.activeTab = $scope.selected.activeIndex;
             if ($scope.select) {
-                $scope.select($scope.tabs[$scope.activeIndex], $scope.activeIndex);
+                $scope.select($scope.tabs[$scope.selected.activeIndex], $scope.selected.activeIndex);
             }
-        };
-        $scope.showShadow = function () {
+        }
+        ;
+        function showShadow() {
             if ($scope.showTabsShadow) {
                 return $scope.showTabsShadow();
             }
             else {
                 return false;
             }
-        };
-        $scope.show = function () {
+        }
+        ;
+        function show() {
             if ($scope.showTabs) {
                 return $scope.showTabs();
             }
             else {
                 return true;
             }
-        };
+        }
+        ;
+        function toBoolean(value) {
+            if (value == null)
+                return false;
+            if (!value)
+                return false;
+            value = value.toString().toLowerCase();
+            return value == '1' || value == 'true';
+        }
     }
     function tabsDirective() {
         return {
@@ -9136,7 +9183,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span class="hide-xs" ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu class="hide-xs" md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-hide="action.divider"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" class="hide-gt-xs"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return" md-ink-ripple="" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+    '<div style="height: 23px;"><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span class="hide-xs" ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu class="hide-xs" md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-hide="action.divider"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" class="hide-gt-xs"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
 }]);
 })();
 
@@ -9159,8 +9206,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('icon/NavIcon.html',
-    '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
+  $templateCache.put('header/StickyNavHeader.html',
+    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -9171,8 +9218,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('header/StickyNavHeader.html',
-    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
+  $templateCache.put('icon/NavIcon.html',
+    '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
 }]);
 })();
 
@@ -9196,7 +9243,31 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('menu/StickyNavMenu.html',
-    '<md-list class="sidenav-list"><md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Expand menu\' | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::\'Shrink menu\' | translate}}</md-tooltip></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right" class="md-secondary">{{::section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item" ng-repeat="link in section.links" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-focusable" ng-click="clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip xxxmd-visible="showTooltip" ng-show="sideNavState.showIconTooltype && !expanded" md-direction="right">{{::link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge color-badge-bg flex-fixed" ng-if="link.count">{{link.count}}</div></md-button></md-list-item></div></md-list>');
+    '<md-list class="sidenav-list"><md-list-item class="pip-focusable no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{section.icon}}" ng-if="sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" md-direction="right">{{::section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{::section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item" ng-repeat="link in section.links" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-focusable" ng-click="clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-if="!(sideNavState.showIconTooltype && !expanded)" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"></md-icon><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" ng-if="sideNavState.showIconTooltype && !expanded" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" md-direction="right">{{::link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{link.count}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tabs/Tabs.html',
+    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-xs\')" md-selected="selected.activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="media(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="selected.activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(selected.activeIndex)"><md-option ng-repeat="tab in tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
 })();
 
@@ -9212,37 +9283,10 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-xs\')" md-selected="activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="media(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(activeIndex)"><md-option ng-repeat="tab in tabs track by $index" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ ::tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools layout-row" ng-if="vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div><div class="md-toolbar-tools layout-row layout-align-end-center" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
-}]);
-})();
-
 
 
 },{}]},{},[34,21])(34)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -9373,9 +9417,9 @@ angular.module('pipTheme.BootBarn.Warm', ['ngMaterial'])
     .config(configureBootBarnWarmTheme);
 },{}],4:[function(require,module,exports){
 'use strict';
-require('./BootBarnCoolTheme');
-require('./BootBarnWarmTheme');
-require('./BootBarnMonochromeTheme');
+require("./BootBarnCoolTheme");
+require("./BootBarnWarmTheme");
+require("./BootBarnMonochromeTheme");
 angular.module('pipTheme.BootBarn', [
     'ngMaterial',
     'pipTheme.BootBarn.Warm',
@@ -9509,8 +9553,8 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipTheme', ['ngMaterial']);
-require('./ThemeService');
-__export(require('./ThemeService'));
+require("./ThemeService");
+__export(require("./ThemeService"));
 },{"./ThemeService":5}],7:[function(require,module,exports){
 'use strict';
 configureDefaultAmberTheme.$inject = ['$mdThemingProvider'];
@@ -9779,13 +9823,13 @@ angular
 },{}],14:[function(require,module,exports){
 'use strict';
 configureDefaultTheme.$inject = ['$mdThemingProvider'];
-require('./DefaultBlueTheme');
-require('./DefaultPinkTheme');
-require('./DefaultAmberTheme');
-require('./DefaultOrangeTheme');
-require('./DefaultGreenTheme');
-require('./DefaultNavyTheme');
-require('./DefaultGreyTheme');
+require("./DefaultBlueTheme");
+require("./DefaultPinkTheme");
+require("./DefaultAmberTheme");
+require("./DefaultOrangeTheme");
+require("./DefaultGreenTheme");
+require("./DefaultNavyTheme");
+require("./DefaultGreyTheme");
 angular
     .module('pipTheme.Default', [
     'ngMaterial',
@@ -9807,15 +9851,12 @@ function configureDefaultTheme($mdThemingProvider) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./common');
-require('./default');
-require('./bootbarn');
-__export(require('./common'));
+require("./common");
+require("./default");
+require("./bootbarn");
+__export(require("./common"));
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -9921,7 +9962,8 @@ __export(require('./common'));
         'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
         'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
     ]);
-    thisModule.config(['$stateProvider', function ($stateProvider) {
+    thisModule.config(['$stateProvider', '$httpProvider', function ($stateProvider, $httpProvider) {
+        $httpProvider.interceptors.push('pipAuthHttpResponseInterceptor');
         $stateProvider
             .state('errors_no_connection', {
             url: '/errors/no_connection',
@@ -9964,6 +10006,86 @@ __export(require('./common'));
             controller: 'pipErrorUnknownController',
             templateUrl: 'unknown/unknown.html'
         });
+    }]);
+    thisModule.run(['$rootScope', '$state', '$injector', function ($rootScope, $state, $injector) {
+        checkSupported();
+        $rootScope.$on('pipMaintenanceError', maintenanceError);
+        $rootScope.$on('pipNoConnectionError', noConnectionError);
+        $rootScope.$on('pipUnknownError', unknownError);
+        $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
+            event.preventDefault();
+            $state.go('errors_missing_route', {
+                unfoundState: unfoundState,
+                fromState: {
+                    to: fromState ? fromState.name : '',
+                    fromParams: fromParams
+                }
+            });
+            $rootScope.$routing = false;
+        });
+        function goToErrors(toState, params) {
+            if (toState == null)
+                throw new Error('Error state was not defined');
+            $state.go(toState, params);
+        }
+        ;
+        function maintenanceError(event, params) {
+            goToErrors('errors_maintenance', params);
+        }
+        function noConnectionError(event, params) {
+            goToErrors('errors_no_connection', params);
+        }
+        function unknownError(event, params) {
+            goToErrors('errors_unknown', params);
+        }
+        function checkSupported(supported) {
+            var pipSystemInfo = $injector.has('pipSystemInfo') ? $injector.get('pipSystemInfo') : null;
+            if (!pipSystemInfo) {
+                return;
+            }
+            if (!supported) {
+                supported = {
+                    edge: 11,
+                    ie: 11,
+                    firefox: 43,
+                    opera: 35,
+                    chrome: 47
+                };
+            }
+            var browser = pipSystemInfo.browserName;
+            var version = pipSystemInfo.browserVersion;
+            version = version.split(".")[0];
+            if (browser && supported[browser] && version >= supported[browser]) {
+                return;
+            }
+            $state.go('errors_unsupported');
+        }
+    }]);
+    thisModule.factory('pipAuthHttpResponseInterceptor', ['$q', '$location', '$rootScope', function ($q, $location, $rootScope) {
+        return {
+            responseError: function (rejection) {
+                var toState = $rootScope.$state && $rootScope.$state.name ? $rootScope.$state.name : null, toParams = $rootScope.$state && $rootScope.$state.params ? $rootScope.$state.params : null;
+                switch (rejection.status) {
+                    case 503:
+                        $rootScope.$emit('pipMaintenanceError', {
+                            error: rejection
+                        });
+                        console.error("errors_maintenance", rejection);
+                        break;
+                    case -1:
+                        if (!$rootScope.$identity)
+                            $rootScope.$emit('pipNoConnectionError', {
+                                error: rejection
+                            });
+                        console.error("errors_no_connection", rejection);
+                        break;
+                    default:
+                        console.error("errors_unknown", rejection);
+                        break;
+                }
+                return $q.reject(rejection);
+            }
+        };
     }]);
 })();
 },{}],5:[function(require,module,exports){
@@ -10104,7 +10226,10 @@ __export(require('./common'));
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Maintenance', []);
-    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $mdMedia, $injector) {
+        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        $scope.media = pipMedia ? pipMedia : $mdMedia;
         $rootScope.$routing = false;
         $scope.isCordova = false;
         appHeader();
@@ -10114,10 +10239,12 @@ __export(require('./common'));
         $scope.onClose = onClose;
         return;
         function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.addShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_AVAILABLE_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
+            if (!pipNavService)
+                return;
+            pipNavService.appbar.addShadow();
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = 'ERROR_AVAILABLE_TITLE';
+            pipNavService.actions.hide();
         }
         ;
         function onClose() {
@@ -10129,7 +10256,10 @@ __export(require('./common'));
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.MissingRoute', []);
-    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $mdMedia, $injector) {
+        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        $scope.media = pipMedia ? pipMedia : $mdMedia;
         appHeader();
         $rootScope.$routing = false;
         $scope.error = $state && $state.params && $state.params.error ? $state.params.fromState : {};
@@ -10139,10 +10269,12 @@ __export(require('./common'));
         $scope.onContinue = onContinue;
         return;
         function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.addShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_ROUTE_PAGE_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
+            if (!pipNavService)
+                return;
+            pipNavService.appbar.addShadow();
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = 'ERROR_ROUTE_PAGE_TITLE';
+            pipNavService.actions.hide();
         }
         ;
         function onContinue() {
@@ -10154,7 +10286,10 @@ __export(require('./common'));
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.NoConnection', []);
-    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', 'pipAppBar', function ($scope, $state, $rootScope, $window, pipAppBar) {
+    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $window, $mdMedia, $injector) {
+        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        $scope.media = pipMedia ? pipMedia : $mdMedia;
         $rootScope.$routing = false;
         appHeader();
         $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
@@ -10165,10 +10300,12 @@ __export(require('./common'));
         }
         ;
         function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.addShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_RESPONDING_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
+            if (!pipNavService)
+                return;
+            pipNavService.appbar.addShadow();
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = 'ERROR_RESPONDING_TITLE';
+            pipNavService.actions.hide();
         }
         ;
     }]);
@@ -10202,7 +10339,10 @@ __export(require('./common'));
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Unknown', []);
-    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', 'pipAppBar', function ($scope, $state, $rootScope, pipAppBar) {
+    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', '$injector', '$mdMedia', function ($scope, $state, $rootScope, $injector, $mdMedia) {
+        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        $scope.media = pipMedia ? pipMedia : $mdMedia;
         $rootScope.$routing = false;
         $scope.isCordova = false;
         appHeader();
@@ -10213,10 +10353,12 @@ __export(require('./common'));
         parseError();
         return;
         function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.addShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_UNKNOWN_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
+            if (!pipNavService)
+                return;
+            pipNavService.appbar.addShadow();
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = 'ERROR_UNKNOWN_TITLE';
+            pipNavService.actions.hide();
         }
         ;
         function parseError() {
@@ -10243,17 +10385,21 @@ __export(require('./common'));
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Unsupported', []);
-    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', 'pipAppBar', function ($scope, $state, $rootScope, $mdMedia, pipAppBar) {
-        $scope.$mdMedia = $mdMedia;
+    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $mdMedia, $injector) {
+        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        $scope.media = pipMedia ? pipMedia : $mdMedia;
         $rootScope.$routing = false;
-        appHeader();
+        if (pipNavService) {
+            appHeader();
+        }
         $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
         return;
         function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.addShadow();
-            pipAppBar.showTitleBreadcrumb('ERROR_UNSUPPORTED_TITLE', []);
-            pipAppBar.showLocalActions(null, []);
+            pipNavService.appbar.addShadow();
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = 'ERROR_UNSUPPORTED_TITLE';
+            pipNavService.actions.hide();
         }
         ;
     }]);
@@ -10267,19 +10413,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10291,7 +10425,19 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -10303,7 +10449,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-empty pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10315,7 +10461,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.status"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.description">Description: {{error_details.description}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.status"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.description">Description: {{error_details.description}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -10327,17 +10473,14 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('unsupported/unsupported.html',
-    '<div class="pip-error pip-empty layout-column flex layout-align-center-center"><div class="pip-error-text">{{::\'ERROR_UNSUPPORTED_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNSUPPORTED_SUBTITLE\' | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$mdMedia(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$mdMedia(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::\'ERROR_UNSUPPORTED_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNSUPPORTED_SUBTITLE\' | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
 }]);
 })();
 
 
 
-},{}]},{},[1,2,4,3,5,6,7,8,10,9,11,12,13])(13)
+},{}]},{},[13,1,2,4,3,5,6,7,8,10,9,11,12])(13)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -11140,18 +11283,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('legend/interactive_legend.html',
-    '<div><div class="chart-legend-item" ng-repeat="item in series" ng-show="item.values || item.value"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('pie/pie_chart.html',
     '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
@@ -11169,18 +11300,27 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('legend/interactive_legend.html',
+    '<div><div class="chart-legend-item" ng-repeat="item in series" ng-show="item.values || item.value"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
+}]);
+})();
 
 
-},{}]},{},[1,2,3,4,5,6])(6)
+
+},{}]},{},[6,1,2,3,4,5])(6)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-require('./settings_service/index');
-require('./settings_page/index');
+require("./settings_service/index");
+require("./settings_page/index");
 angular.module('pipSettings', [
     'pipSettings.Service',
     'pipSettings.Page'
@@ -11198,7 +11338,6 @@ angular.module('pipSettings', [
     var SettingsPageController = (function () {
         SettingsPageController.$inject = ['$log', '$q', '$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
         function SettingsPageController($log, $q, $state, pipNavService, pipSettings, $rootScope, $timeout) {
-            var _this = this;
             this._log = $log;
             this._q = $q;
             this._state = $state;
@@ -11229,9 +11368,6 @@ angular.module('pipSettings', [
             pipNavService.breadcrumb.text = "Settings";
             pipNavService.actions.hide();
             pipNavService.appbar.removeShadow();
-            this.onDropdownSelect = function (state) {
-                _this.onNavigationSelect(state.state);
-            };
         }
         SettingsPageController.prototype.initSelect = function (state) {
             this.selected.tab = _.find(this.tabs, function (tab) {
@@ -11239,6 +11375,9 @@ angular.module('pipSettings', [
             });
             this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
             this.selected.tabId = state;
+        };
+        SettingsPageController.prototype.onDropdownSelect = function (state) {
+            this.onNavigationSelect(state.state);
         };
         SettingsPageController.prototype.onNavigationSelect = function (state) {
             this.initSelect(state);
@@ -11276,8 +11415,8 @@ angular.module('pipSettings.Page', [
     'pipTranslate',
     'pipSettings.Templates'
 ]);
-require('./SettingsPageController');
-require('./SettingsPageRoutes');
+require("./SettingsPageController");
+require("./SettingsPageRoutes");
 },{"./SettingsPageController":3,"./SettingsPageRoutes":4}],6:[function(require,module,exports){
 
 },{}],7:[function(require,module,exports){
@@ -11431,7 +11570,7 @@ angular
 },{}],8:[function(require,module,exports){
 'use strict';
 angular.module('pipSettings.Service', []);
-require('./SettingsService');
+require("./SettingsService");
 },{"./SettingsService":7}],9:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11653,7 +11792,8 @@ require('./SettingsService');
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.Sessions', [
-        'pipSettings.Service', 'pipSettings.Page',]);
+        'pipSettings.Service', 'pipSettings.Page',
+    ]);
     thisModule.config(['pipSettingsProvider', 'pipDataSessionProvider', function (pipSettingsProvider, pipDataSessionProvider) {
         pipSettingsProvider.addTab({
             state: 'sessions',
@@ -11904,7 +12044,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('settings_page/SettingsPage.html',
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-settings"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" ng-if="vm.$party.id == vm.$user.id || tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\' || tab.state ==\'settings.blacklist\'" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-settings"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" ng-if="vm.$party.id == vm.$user.id || tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\' || tab.state ==\'settings.blacklist\'" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="onDropdownSelect" pip-active-index="selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
 }]);
 })();
 
@@ -11958,11 +12098,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[5,6,3,4,8,7,2,1,10,11,12,13,14,9,15])(15)
+},{}]},{},[15,5,6,3,4,8,7,2,1,10,11,12,13,14,9])(15)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -12122,10 +12259,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[2,3,1,4])(4)
+},{}]},{},[4,2,3,1])(4)
 });
-
-
-
 
 //# sourceMappingURL=pip-webui.js.map

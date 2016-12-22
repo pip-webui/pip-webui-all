@@ -6670,7 +6670,8 @@ pip-tabs .pip-tabs-content md-select[disabled] md-select-value {
 }
 md-tabs md-tab-item .md-text,
 .pip-tabs-content md-option .md-text,
-md-select md-select-value .md-text {
+md-select md-select-value .md-text,
+.pip-full-width-dropdown md-option .md-text {
   position: relative;
   height: 40px;
   line-height: 40px;
@@ -6678,10 +6679,11 @@ md-select md-select-value .md-text {
 }
 md-tabs md-tab-item .pip-tabs-badge,
 .pip-tabs-content md-option .pip-tabs-badge,
-md-select md-select-value .pip-tabs-badge {
+md-select md-select-value .pip-tabs-badge,
+.pip-full-width-dropdown md-option .pip-tabs-badge {
   position: absolute;
   right: 0px;
-  top: 14px;
+  top: 12px;
   font-size: 10px !important;
   min-width: 20px !important;
   height: 20px !important;
@@ -6692,12 +6694,16 @@ md-select md-select-value .pip-tabs-badge {
   color: #fafafa;
   background-color: #f44336;
 }
+.pip-full-width-dropdown .pip-tab-option .md-text {
+  width: 100%;
+}
+.pip-full-width-dropdown .pip-tab-option .md-text .pip-tabs-badge {
+  position: absolute;
+  top: 10px;
+}
 md-select md-select-value .md-text .pip-tabs-badge {
   top: -4px !important;
   right: -3px;
-}
-.pip-tabs-content md-option .md-text .pip-tabs-badge {
-  top: 9px !important;
 }
 @media (min-width: 704px) and (max-width: 1024px) {
   md-toolbar.pip-nav {
@@ -6851,23 +6857,68 @@ md-select md-select-value .md-text .pip-tabs-badge {
   color: rgba(255, 255, 255, 0.54);
   font-weight: 400;
 }
-.pip-search-bar {
+.pip-search-bar .pip-search-container {
   width: 100%;
 }
-.pip-search-bar .pip-search-text {
+.pip-search-bar .pip-search-container .pip-search-text {
   color: #fff !important;
   background-color: transparent;
   border: none;
   font-size: 16px;
   outline: none;
 }
-.pip-search-bar .pip-search-text::-ms-clear {
+.pip-search-bar .pip-search-container .pip-search-text::-ms-clear {
   display: none;
 }
-.pip-search-bar .pip-search-text::-webkit-search-cancel-button {
+.pip-search-bar .pip-search-container .pip-search-text::-webkit-search-cancel-button {
   /* псевдо что-то, что отвечает за кнопку очистки */
   -webkit-appearance: none;
   /* без сброса оформление не применится */
+}
+.pip-search-bar .md-toolbar-tools {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.pip-search-bar .md-toolbar-tools .md-button:last-child {
+  margin-right: 0px;
+}
+.pip-search-bar .md-toolbar-tools .md-button:first-child {
+  margin-left: 0px;
+}
+.pip-search-active {
+  padding: 0px!important;
+}
+.pip-search-active .pip-search-bar {
+  width: 100%;
+  position: absolute;
+}
+.pip-search-active .pip-search-bar .pip-search-selected {
+  width: calc(100% - 16px);
+  background-color: rgba(0, 0, 0, 0.12);
+  margin: 0 auto;
+  border-radius: 4px;
+  animation: search-animation 0.35s ease;
+}
+.pip-search-active .pip-search-bar .md-toolbar-tools .md-button:last-child {
+  margin-right: 8px;
+}
+.pip-search-active .pip-secondary-actions,
+.pip-search-active .pip-primary-actions,
+.pip-search-active .pip-language-picker,
+.pip-search-active .pip-breadcrumb,
+.pip-search-active .pip-nav-icon {
+  display: none;
+}
+@keyframes search-animation {
+  0% {
+    width: 0px;
+  }
+  10% {
+    width: 70%;
+  }
+  100% {
+    width: calc(100% - 16px);
+  }
 }
 .pip-sticky-sidenav.overflow-visible {
   overflow: visible!important;
@@ -7033,6 +7084,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 }
 .pip-sticky-nav-menu {
   width: 100%;
+  position: relative;
 }
 .pip-sticky-nav-menu .sidenav-list {
   padding-top: 0px!important;
@@ -7092,7 +7144,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   position: absolute;
   left: 274px;
-  top: 11px;
+  top: 13px;
   font-size: 12px !important;
   min-width: 22px !important;
   height: 22px !important;
@@ -7102,7 +7154,15 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   text-align: center;
   color: #fafafa;
   background-color: #f44336;
-  animation: badge-animation 0.35s ease;
+}
+.pip-sticky-sidenav.sidenav-mobile .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
+  width: 100%;
+}
+.pip-sticky-sidenav.sidenav-mobile .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
+  position: relative;
+  left: 0px;
+  top: 0px;
+  animation: none;
 }
 .sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   width: 140px;
@@ -7110,7 +7170,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 }
 .sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   left: 194px;
-  animation: badge-animation-sm 0.35s ease;
 }
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu {
   overflow: hidden;
@@ -7121,7 +7180,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   top: 5px;
   left: 32px;
-  animation: badge-animation-back 0.35s ease;
 }
 .pip-sticky-nav-small.sidenav-desktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   opacity: 0;
@@ -7139,7 +7197,6 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-small.sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   top: 5px;
   left: 32px;
-  animation: badge-animation-sm-back 0.35s ease;
 }
 .pip-sticky-nav-small.sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-title {
   opacity: 0;
@@ -7185,13 +7242,13 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   }
   100% {
     left: 274px;
-    top: 11px;
+    top: 13px;
   }
 }
 @keyframes badge-animation-back {
   0% {
     left: 274px;
-    top: 11px;
+    top: 13px;
   }
   100% {
     top: 5px;
@@ -7235,13 +7292,13 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   }
   100% {
     left: 194px;
-    top: 11px;
+    top: 13px;
   }
 }
 @keyframes badge-animation-sm-back {
   0% {
     left: 194px;
-    top: 11px;
+    top: 13px;
   }
   100% {
     top: 5px;
@@ -8495,9 +8552,6 @@ button:focus {
     margin: 0px 8px;
   }
 }
-/*
- *
- */
 .pip-page-errors {
   background-color: rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
@@ -8611,6 +8665,101 @@ button:focus {
 .black .pip-page-errors .pip-error-text,
 .black .pip-page-errors .pip-error-details md-icon {
   color: #ff5252;
+}
+.pip-error-page {
+  margin: 0 auto;
+  height: calc(100vh - 64px);
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex-direction: column;
+  -moz-box-flex-direction: column;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+@media (max-width: 1200px) {
+  .pip-error-page {
+    height: calc(100vh - 48px);
+  }
+}
+@media (max-width: 768px) {
+  .pip-error-page {
+    height: calc(100vh - 56px);
+  }
+}
+.pip-error-page .pip-pic {
+  width: 350px !important;
+  height: 250px !important;
+  min-height: 250px !important;
+  margin: 25px 25px 0;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+}
+.pip-error-page .pip-text {
+  width: 400px;
+  margin-top: 25px;
+  text-align: center;
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  color: rgba(0, 0, 0, 0.38);
+}
+.pip-error-page .pip-actions {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  width: 400px;
+  -webkit-box-flex-direction: column;
+  -moz-box-flex-direction: column;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.pip-error-page .pip-actions .md-button {
+  width: 384px !important;
+  max-height: 72px !important;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.pip-error-page .pip-actions .md-button span {
+  display: block;
+  white-space: normal;
+  line-height: 20px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 768px) {
+  .pip-error-page .pip-pic,
+  .pip-error-page .pip-text,
+  .pip-error-page .pip-actions {
+    margin: 0 auto;
+  }
+  .pip-error-page .pip-pic {
+    width: 80% !important;
+    min-height: 80%;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    margin-bottom: 16px;
+  }
+  .pip-error-page .pip-pic.pip-no-image-sm {
+    width: 0px;
+    height: 0px;
+    display: none;
+  }
+  .pip-error-page .pip-text {
+    width: 80%;
+    padding-left: 16px;
+    padding-right: 16px;
+    font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+  }
+  .pip-error-page .pip-actions {
+    width: 80%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .pip-error-page .pip-actions .md-button {
+    width: calc(84%) !important;
+  }
 }
 
 @-webkit-keyframes blink-hint {
