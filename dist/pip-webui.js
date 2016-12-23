@@ -3,11 +3,11 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./translate');
-require('./session');
-require('./transactions');
-require('./routing');
-require('./utilities');
+require("./translate");
+require("./session");
+require("./transactions");
+require("./routing");
+require("./utilities");
 angular.module('pipServices', [
     'pipTranslate',
     'pipSession',
@@ -21,11 +21,11 @@ angular.module('pipServices', [
     'pipSystemInfo',
     'pipPageReset'
 ]);
-__export(require('./translate'));
-__export(require('./session'));
-__export(require('./transactions'));
-__export(require('./routing'));
-__export(require('./utilities'));
+__export(require("./translate"));
+__export(require("./session"));
+__export(require("./transactions"));
+__export(require("./routing"));
+__export(require("./utilities"));
 },{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":26}],2:[function(require,module,exports){
 'use strict';
 captureStateTranslations.$inject = ['$rootScope'];
@@ -160,11 +160,11 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipRouting', ['ui.router']);
-require('./BackDecorator');
-require('./RedirectDecorator');
-require('./RoutingEvents');
-__export(require('./BackDecorator'));
-__export(require('./RoutingEvents'));
+require("./BackDecorator");
+require("./RedirectDecorator");
+require("./RoutingEvents");
+__export(require("./BackDecorator"));
+__export(require("./RoutingEvents"));
 },{"./BackDecorator":2,"./RedirectDecorator":3,"./RoutingEvents":4}],6:[function(require,module,exports){
 'use strict';
 exports.IdentityRootVar = "$identity";
@@ -325,13 +325,13 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSession', []);
-require('./IdentityService');
-require('./SessionService');
-__export(require('./IdentityService'));
-__export(require('./SessionService'));
+require("./IdentityService");
+require("./SessionService");
+__export(require("./IdentityService"));
+__export(require("./SessionService"));
 },{"./IdentityService":6,"./SessionService":7}],9:[function(require,module,exports){
 'use strict';
-var TransactionError_1 = require('./TransactionError');
+var TransactionError_1 = require("./TransactionError");
 var Transaction = (function () {
     function Transaction(scope) {
         this._scope = null;
@@ -470,7 +470,7 @@ var TransactionError = (function () {
 exports.TransactionError = TransactionError;
 },{}],11:[function(require,module,exports){
 'use strict';
-var Transaction_1 = require('./Transaction');
+var Transaction_1 = require("./Transaction");
 var TransactionService = (function () {
     function TransactionService() {
         this._transactions = {};
@@ -525,12 +525,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipTransaction', []);
-require('./TransactionStrings');
-require('./TransactionError');
-require('./Transaction');
-require('./TransactionService');
-__export(require('./TransactionError'));
-__export(require('./Transaction'));
+require("./TransactionStrings");
+require("./TransactionError");
+require("./Transaction");
+require("./TransactionService");
+__export(require("./TransactionError"));
+__export(require("./Transaction"));
 },{"./Transaction":9,"./TransactionError":10,"./TransactionService":11,"./TransactionStrings":12}],14:[function(require,module,exports){
 'use strict';
 translateDirective.$inject = ['pipTranslate'];
@@ -598,8 +598,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var Translation_1 = require('./Translation');
-var PageResetService_1 = require('../utilities/PageResetService');
+var Translation_1 = require("./Translation");
+var PageResetService_1 = require("../utilities/PageResetService");
 exports.LanguageRootVar = "$language";
 exports.LanguageChangedEvent = "pipLanguageChanged";
 var TranslateService = (function () {
@@ -688,9 +688,10 @@ var TranslateService = (function () {
 var TranslateProvider = (function (_super) {
     __extends(TranslateProvider, _super);
     function TranslateProvider() {
-        _super.call(this);
-        this._setRootVar = true;
-        this._persist = true;
+        var _this = _super.call(this) || this;
+        _this._setRootVar = true;
+        _this._persist = true;
+        return _this;
     }
     Object.defineProperty(TranslateProvider.prototype, "setRootVar", {
         get: function () {
@@ -867,12 +868,12 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipTranslate', []);
-require('./Translation');
-require('./TranslateService');
-require('./TranslateFilter');
-require('./TranslateDirective');
-__export(require('./Translation'));
-__export(require('./TranslateService'));
+require("./Translation");
+require("./TranslateService");
+require("./TranslateFilter");
+require("./TranslateDirective");
+__export(require("./Translation"));
+__export(require("./TranslateService"));
 },{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":16,"./Translation":17}],19:[function(require,module,exports){
 'use strict';
 var Codes = (function () {
@@ -1405,19 +1406,16 @@ angular.module('pipTimer', [])
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./Format');
-require('./TimerService');
-require('./ScrollService');
-require('./Tags');
-require('./Codes');
-require('./SystemInfo');
-require('./PageResetService');
-__export(require('./PageResetService'));
+require("./Format");
+require("./TimerService");
+require("./ScrollService");
+require("./Tags");
+require("./Codes");
+require("./SystemInfo");
+require("./PageResetService");
+__export(require("./PageResetService"));
 },{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -1520,6 +1518,7 @@ __export(require('./PageResetService'));
                 buttons: '=pipButtons',
                 currentButtonValue: '=ngModel',
                 currentButton: '=?pipButtonObject',
+                multiselect: '=?pipMultiselect',
                 change: '&ngChange',
                 onlyToggle: '=?pipOnlyToggle'
             },
@@ -1528,6 +1527,7 @@ __export(require('./PageResetService'));
                 var index;
                 $scope.$mdMedia = $mdMedia;
                 $scope.class = $attrs.class || '';
+                $scope.multiselect = $scope.multiselect || false;
                 if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
                     $scope.buttons = [];
                 }
@@ -1556,6 +1556,14 @@ __export(require('./PageResetService'));
                         return $scope.ngDisabled();
                     }
                 };
+                $scope.highlightButton = function (index) {
+                    if ($scope.multiselect && $scope.currentButton.level !== undefined && $scope.buttons[index].level !== undefined) {
+                        return $scope.currentButton.level >= $scope.buttons[index].level;
+                    }
+                    else {
+                        return $scope.currentButtonIndex == index;
+                    }
+                };
             }],
             link: function (scope, elem) {
                 elem
@@ -1578,21 +1586,18 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('toggle_buttons/toggle_buttons.html',
-    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)" ng-if="$mdMedia(\'gt-xs\') || onlyToggle"><md-button tabindex="-1" ng-repeat="button in buttons" ng-class="{\'md-accent md-raised selected color-accent-bg\' : currentButtonIndex == $index}" ng-attr-style="{{ \'background-color:\' + (currentButtonIndex == $index ? button.backgroundColor : \'\') + \'!important\' }}" class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)" ng-disabled="button.disabled || disabled()">{{button.name || button.title | translate}} <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span></md-button></div><md-input-container class="md-block" ng-if="$mdMedia(\'xs\') && !onlyToggle"><md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)"><md-option ng-repeat="action in buttons" value="{{ ::$index }}">{{ (action.title || action.name) | translate }} <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span></md-option></md-select></md-input-container>');
+    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)" ng-if="$mdMedia(\'gt-xs\') || onlyToggle"><md-button tabindex="-1" ng-repeat="button in buttons" ng-class="{\'md-accent md-raised selected color-accent-bg\' : highlightButton($index)}" ng-attr-style="{{ \'background-color:\' + (highlightButton($index) ? button.backgroundColor : \'\') + \'!important\' }}" class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)" ng-disabled="button.disabled || disabled()">{{button.name || button.title | translate}} <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span></md-button></div><md-input-container class="md-block" ng-if="$mdMedia(\'xs\') && !onlyToggle"><md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)"><md-option ng-repeat="action in buttons" value="{{ ::$index }}">{{ (action.title || action.name) | translate }} <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span></md-option></md-select></md-input-container>');
 }]);
 })();
 
 
 
-},{}]},{},[1,2,3,4,5,6])(6)
+},{}]},{},[6,1,2,3,4,5])(6)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-var MediaService_1 = require('../media/MediaService');
+var MediaService_1 = require("../media/MediaService");
 (function () {
     var AuxPanelDirectiveController = (function () {
         AuxPanelDirectiveController.$inject = ['pipAuxPanel'];
@@ -1739,7 +1744,7 @@ var AuxPanelService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -1750,7 +1755,7 @@ var AuxPanelService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -1819,7 +1824,7 @@ var AuxPanelProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -1829,7 +1834,7 @@ var AuxPanelProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -1869,30 +1874,30 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipAuxPanel', ['ngMaterial']);
-require('./AuxPanelService');
-require('./AuxPanelPartDirective');
-require('./AuxPanelDirective');
-__export(require('./AuxPanelService'));
+require("./AuxPanelService");
+require("./AuxPanelPartDirective");
+require("./AuxPanelDirective");
+__export(require("./AuxPanelService"));
 },{"./AuxPanelDirective":1,"./AuxPanelPartDirective":2,"./AuxPanelService":3}],5:[function(require,module,exports){
 'use strict';
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipLayout', ['wu.masonry', 'pipAuxPanel']);
-require('./media/MediaService');
-require('./media/ResizeFunctions');
-require('./layouts/MainDirective');
-require('./layouts/CardDirective');
-require('./layouts/DialogDirective');
-require('./layouts/DocumentDirective');
-require('./layouts/SimpleDirective');
-require('./layouts/TilesDirective');
-require('./auxpanel/index');
-__export(require('./media/MediaService'));
-__export(require('./media/ResizeFunctions'));
+require("./media/MediaService");
+require("./media/ResizeFunctions");
+require("./layouts/MainDirective");
+require("./layouts/CardDirective");
+require("./layouts/DialogDirective");
+require("./layouts/DocumentDirective");
+require("./layouts/SimpleDirective");
+require("./layouts/TilesDirective");
+require("./auxpanel/index");
+__export(require("./media/MediaService"));
+__export(require("./media/ResizeFunctions"));
 },{"./auxpanel/index":4,"./layouts/CardDirective":6,"./layouts/DialogDirective":7,"./layouts/DocumentDirective":8,"./layouts/MainDirective":9,"./layouts/SimpleDirective":10,"./layouts/TilesDirective":11,"./media/MediaService":12,"./media/ResizeFunctions":13}],6:[function(require,module,exports){
 'use strict';
-var MediaService_1 = require('../media/MediaService');
+var MediaService_1 = require("../media/MediaService");
 (function () {
     cardDirective.$inject = ['$rootScope'];
     var CardDirectiveLink = (function () {
@@ -2004,8 +2009,8 @@ var MediaService_1 = require('../media/MediaService');
 })();
 },{}],9:[function(require,module,exports){
 'use strict';
-var ResizeFunctions_1 = require('../media/ResizeFunctions');
-var MediaService_1 = require('../media/MediaService');
+var ResizeFunctions_1 = require("../media/ResizeFunctions");
+var MediaService_1 = require("../media/MediaService");
 (function () {
     var MainDirectiveController = (function () {
         MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout', '$attrs'];
@@ -2084,8 +2089,8 @@ var MediaService_1 = require('../media/MediaService');
 },{}],11:[function(require,module,exports){
 'use strict';
 tilesDirective.$inject = ['$rootScope'];
-var ResizeFunctions_1 = require('../media/ResizeFunctions');
-var MediaService_1 = require('../media/MediaService');
+var ResizeFunctions_1 = require("../media/ResizeFunctions");
+var MediaService_1 = require("../media/MediaService");
 var TilesDirectiveLink = (function () {
     function TilesDirectiveLink($scope, $element, $rootScope, $attrs) {
         var _this = this;
@@ -2341,9 +2346,6 @@ exports.removeResizeListener = removeResizeListener;
 },{}]},{},[5])(5)
 });
 
-
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -2395,9 +2397,6 @@ exports.removeResizeListener = removeResizeListener;
 })();
 },{}]},{},[1])(1)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -3280,9 +3279,6 @@ exports.removeResizeListener = removeResizeListener;
 },{}]},{},[1,2,3,4,5,6])(6)
 });
 
-
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4007,11 +4003,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,5,4,6,7,8,10,9,11,12,13])(13)
+},{}]},{},[13,1,2,3,5,4,6,7,8,10,9,11,12])(13)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -4083,11 +4076,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,4])(4)
+},{}]},{},[4,1,2,3])(4)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -5017,7 +5007,7 @@ var DateTimeService = (function () {
 var DateTimeProvider = (function (_super) {
     __extends(DateTimeProvider, _super);
     function DateTimeProvider() {
-        _super.call(this, { timeZone: null });
+        return _super.call(this, { timeZone: null }) || this;
     }
     DateTimeProvider.prototype.$get = function () {
         "ngInject";
@@ -5865,11 +5855,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[7,4,5,2,3,1,6,8,9,10])(10)
+},{}]},{},[10,7,4,5,2,3,1,6,8,9])(10)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -5915,7 +5902,8 @@ angular
     .module('pipConfirmationDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates'])
+    'pipDialogs.Templates'
+])
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
 },{}],2:[function(require,module,exports){
 var ConfirmationService = (function () {
@@ -5949,8 +5937,8 @@ angular
     .service('pipConfirmationDialog', ConfirmationService);
 },{}],3:[function(require,module,exports){
 'use strict';
-require('./ConfirmationController');
-require('./ConfirmationService');
+require("./ConfirmationController");
+require("./ConfirmationService");
 },{"./ConfirmationController":1,"./ConfirmationService":2}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -5965,10 +5953,10 @@ require('./ConfirmationService');
 })();
 },{}],5:[function(require,module,exports){
 'use strict';
-require('./error_details');
-require('./information');
-require('./options');
-require('./confirmation');
+require("./error_details");
+require("./information");
+require("./options");
+require("./confirmation");
 angular
     .module('pipDialogs', [
     'pipInformationDialog',
@@ -6094,9 +6082,10 @@ angular
     .module('pipErrorDetailsDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./ErrorDetailsService');
-require('./ErrorDetailsController');
+    'pipDialogs.Templates'
+]);
+require("./ErrorDetailsService");
+require("./ErrorDetailsController");
 },{"./ErrorDetailsController":6,"./ErrorDetailsService":7}],9:[function(require,module,exports){
 'use strict';
 var InformationStrings = (function () {
@@ -6186,9 +6175,10 @@ angular
     .module('pipInformationDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./InformationService');
-require('./InformationController');
+    'pipDialogs.Templates'
+]);
+require("./InformationService");
+require("./InformationController");
 },{"./InformationController":9,"./InformationService":10}],12:[function(require,module,exports){
 'use strict';
 var OptionsBigData = (function () {
@@ -6420,16 +6410,18 @@ angular
     .module('pipOptionsDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./OptionsService');
-require('./OptionsController');
+    'pipDialogs.Templates'
+]);
+require("./OptionsService");
+require("./OptionsController");
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
-    'pipDialogs.Templates']);
-require('./OptionsBigService');
-require('./OptionsBigController');
+    'pipDialogs.Templates'
+]);
+require("./OptionsBigService");
+require("./OptionsBigController");
 },{"./OptionsBigController":12,"./OptionsBigService":13,"./OptionsController":14,"./OptionsService":15}],17:[function(require,module,exports){
 (function(module) {
 try {
@@ -6493,11 +6485,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15,17])(17)
+},{}]},{},[17,1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15])(17)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -6516,7 +6505,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        _super.apply(this, arguments);
+        return _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -6906,10 +6895,10 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipActions', ['ngMaterial', 'pipNav.Templates', 'ui.router']);
-require('./ActionsService');
-require('./PrimaryActionsDirective');
-require('./SecondaryActionsDirective');
-__export(require('./ActionsService'));
+require("./ActionsService");
+require("./PrimaryActionsDirective");
+require("./SecondaryActionsDirective");
+__export(require("./ActionsService"));
 },{"./ActionsService":1,"./PrimaryActionsDirective":2,"./SecondaryActionsDirective":3}],5:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7051,7 +7040,7 @@ var AppBarService = (function () {
     AppBarService.prototype.addShadow = function () {
         var breakpoints = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            breakpoints[_i - 0] = arguments[_i];
+            breakpoints[_i] = arguments[_i];
         }
         this.setShadow(breakpoints);
         this.sendConfigEvent();
@@ -7064,7 +7053,7 @@ var AppBarService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -7075,7 +7064,7 @@ var AppBarService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -7133,7 +7122,7 @@ var AppBarProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -7143,7 +7132,7 @@ var AppBarProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -7170,15 +7159,15 @@ function __export(m) {
 }
 angular
     .module('pipAppBar', ['ngMaterial', 'pipNav.Templates']);
-require('./AppBarService');
-require('./AppBarDirective');
-require('./AppBarPartDirective');
-__export(require('./AppBarService'));
+require("./AppBarService");
+require("./AppBarDirective");
+require("./AppBarPartDirective");
+__export(require("./AppBarService"));
 },{"./AppBarDirective":5,"./AppBarPartDirective":6,"./AppBarService":7}],9:[function(require,module,exports){
 'use strict';
-var BreadcrumbService_1 = require('./BreadcrumbService');
-var BreadcrumbService_2 = require('./BreadcrumbService');
-var SearchService_1 = require('../search/SearchService');
+var BreadcrumbService_1 = require("./BreadcrumbService");
+var BreadcrumbService_2 = require("./BreadcrumbService");
+var SearchService_1 = require("../search/SearchService");
 (function () {
     var BreadcrumbController = (function () {
         BreadcrumbController.$inject = ['$element', '$rootScope', '$window', '$state', '$location', '$injector', 'pipBreadcrumb'];
@@ -7385,9 +7374,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate']);
-require('./BreadcrumbDirective');
-require('./BreadcrumbService');
-__export(require('./BreadcrumbService'));
+require("./BreadcrumbDirective");
+require("./BreadcrumbService");
+__export(require("./BreadcrumbService"));
 },{"./BreadcrumbDirective":9,"./BreadcrumbService":10}],12:[function(require,module,exports){
 'use strict';
 var NavService = (function () {
@@ -7839,9 +7828,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
-require('./NavHeaderService');
-require('./StickyNavHeaderDirective');
-__export(require('./NavHeaderService'));
+require("./NavHeaderService");
+require("./StickyNavHeaderDirective");
+__export(require("./NavHeaderService"));
 },{"./NavHeaderService":15,"./StickyNavHeaderDirective":16}],18:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8022,27 +8011,27 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-require('./NavIconService');
-require('./NavIconDirective');
-__export(require('./NavIconService'));
+require("./NavIconService");
+require("./NavIconDirective");
+__export(require("./NavIconService"));
 },{"./NavIconDirective":18,"./NavIconService":19}],21:[function(require,module,exports){
 'use strict';
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./dependencies/TranslateFilter');
-require('./language/LanguagePickerDirective');
-require('./dropdown/DropdownDirective');
-require('./tabs/TabsDirective');
-require('./actions');
-require('./appbar');
-require('./search');
-require('./breadcrumb');
-require('./sidenav');
-require('./header');
-require('./menu');
-require('./icon');
-require('./common/NavService');
+require("./dependencies/TranslateFilter");
+require("./language/LanguagePickerDirective");
+require("./dropdown/DropdownDirective");
+require("./tabs/TabsDirective");
+require("./actions");
+require("./appbar");
+require("./search");
+require("./breadcrumb");
+require("./sidenav");
+require("./header");
+require("./menu");
+require("./icon");
+require("./common/NavService");
 angular
     .module('pipNav', [
     'pipNavService',
@@ -8057,14 +8046,14 @@ angular
     'pipNavMenu',
     'pipNavHeader'
 ]);
-__export(require('./actions'));
-__export(require('./appbar'));
-__export(require('./breadcrumb'));
-__export(require('./search'));
-__export(require('./sidenav'));
-__export(require('./icon'));
-__export(require('./menu'));
-__export(require('./header'));
+__export(require("./actions"));
+__export(require("./appbar"));
+__export(require("./breadcrumb"));
+__export(require("./search"));
+__export(require("./sidenav"));
+__export(require("./icon"));
+__export(require("./menu"));
+__export(require("./header"));
 },{"./actions":4,"./appbar":8,"./breadcrumb":11,"./common/NavService":12,"./dependencies/TranslateFilter":13,"./dropdown/DropdownDirective":14,"./header":17,"./icon":20,"./language/LanguagePickerDirective":22,"./menu":25,"./search":28,"./sidenav":32,"./tabs/TabsDirective":33}],22:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8399,13 +8388,13 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-require('./NavMenuService');
-require('./StickyNavMenuDirective');
-__export(require('./NavMenuService'));
+require("./NavMenuService");
+require("./StickyNavMenuDirective");
+__export(require("./NavMenuService"));
 },{"./NavMenuService":23,"./StickyNavMenuDirective":24}],26:[function(require,module,exports){
 'use strict';
-var SearchService_1 = require('./SearchService');
-var SearchService_2 = require('./SearchService');
+var SearchService_1 = require("./SearchService");
+var SearchService_2 = require("./SearchService");
 (function () {
     var SearchBarController = (function () {
         SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
@@ -8620,9 +8609,9 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
-require('./SearchService');
-require('./SearchBarDirective');
-__export(require('./SearchService'));
+require("./SearchService");
+require("./SearchBarDirective");
+__export(require("./SearchService"));
 },{"./SearchBarDirective":26,"./SearchService":27}],29:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8748,7 +8737,7 @@ var SideNavService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -8759,7 +8748,7 @@ var SideNavService = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -8839,7 +8828,7 @@ var SideNavProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes.push(c);
@@ -8849,7 +8838,7 @@ var SideNavProvider = (function () {
         var _this = this;
         var classes = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            classes[_i - 0] = arguments[_i];
+            classes[_i] = arguments[_i];
         }
         _.each(classes, function (c) {
             _this._config.classes = _.reject(_this._config.classes, function (cc) { return cc == c; });
@@ -9042,10 +9031,10 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates']);
-require('./SideNavService');
-require('./SideNavPartDirective');
-require('./StickySideNavDirective');
-__export(require('./SideNavService'));
+require("./SideNavService");
+require("./SideNavPartDirective");
+require("./StickySideNavDirective");
+__export(require("./SideNavService"));
 },{"./SideNavPartDirective":29,"./SideNavService":30,"./StickySideNavDirective":31}],33:[function(require,module,exports){
 'use strict';
 (function () {
@@ -9309,9 +9298,6 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[34,21])(34)
 });
 
-
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 configureBootBarnCoolTheme.$inject = ['$mdThemingProvider'];
@@ -9441,9 +9427,9 @@ angular.module('pipTheme.BootBarn.Warm', ['ngMaterial'])
     .config(configureBootBarnWarmTheme);
 },{}],4:[function(require,module,exports){
 'use strict';
-require('./BootBarnCoolTheme');
-require('./BootBarnWarmTheme');
-require('./BootBarnMonochromeTheme');
+require("./BootBarnCoolTheme");
+require("./BootBarnWarmTheme");
+require("./BootBarnMonochromeTheme");
 angular.module('pipTheme.BootBarn', [
     'ngMaterial',
     'pipTheme.BootBarn.Warm',
@@ -9577,8 +9563,8 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipTheme', ['ngMaterial']);
-require('./ThemeService');
-__export(require('./ThemeService'));
+require("./ThemeService");
+__export(require("./ThemeService"));
 },{"./ThemeService":5}],7:[function(require,module,exports){
 'use strict';
 configureDefaultAmberTheme.$inject = ['$mdThemingProvider'];
@@ -9847,13 +9833,13 @@ angular
 },{}],14:[function(require,module,exports){
 'use strict';
 configureDefaultTheme.$inject = ['$mdThemingProvider'];
-require('./DefaultBlueTheme');
-require('./DefaultPinkTheme');
-require('./DefaultAmberTheme');
-require('./DefaultOrangeTheme');
-require('./DefaultGreenTheme');
-require('./DefaultNavyTheme');
-require('./DefaultGreyTheme');
+require("./DefaultBlueTheme");
+require("./DefaultPinkTheme");
+require("./DefaultAmberTheme");
+require("./DefaultOrangeTheme");
+require("./DefaultGreenTheme");
+require("./DefaultNavyTheme");
+require("./DefaultGreyTheme");
 angular
     .module('pipTheme.Default', [
     'ngMaterial',
@@ -9875,15 +9861,12 @@ function configureDefaultTheme($mdThemingProvider) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require('./common');
-require('./default');
-require('./bootbarn');
-__export(require('./common'));
+require("./common");
+require("./default");
+require("./bootbarn");
+__export(require("./common"));
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -10506,11 +10489,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[1,2,4,3,5,6,7,8,10,9,11,12,13])(13)
+},{}]},{},[13,1,2,4,3,5,6,7,8,10,9,11,12])(13)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -11325,8 +11305,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -11337,23 +11317,20 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
 
 
-},{}]},{},[1,2,3,4,5,6])(6)
+},{}]},{},[6,1,2,3,4,5])(6)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-require('./settings_service/index');
-require('./settings_page/index');
+require("./settings_service/index");
+require("./settings_page/index");
 angular.module('pipSettings', [
     'pipSettings.Service',
     'pipSettings.Page'
@@ -11449,8 +11426,8 @@ angular.module('pipSettings.Page', [
     'pipTranslate',
     'pipSettings.Templates'
 ]);
-require('./SettingsPageController');
-require('./SettingsPageRoutes');
+require("./SettingsPageController");
+require("./SettingsPageRoutes");
 },{"./SettingsPageController":3,"./SettingsPageRoutes":4}],6:[function(require,module,exports){
 
 },{}],7:[function(require,module,exports){
@@ -11604,7 +11581,7 @@ angular
 },{}],8:[function(require,module,exports){
 'use strict';
 angular.module('pipSettings.Service', []);
-require('./SettingsService');
+require("./SettingsService");
 },{"./SettingsService":7}],9:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11826,7 +11803,8 @@ require('./SettingsService');
 (function () {
     'use strict';
     var thisModule = angular.module('pipUserSettings.Sessions', [
-        'pipSettings.Service', 'pipSettings.Page',]);
+        'pipSettings.Service', 'pipSettings.Page',
+    ]);
     thisModule.config(['pipSettingsProvider', 'pipDataSessionProvider', function (pipSettingsProvider, pipDataSessionProvider) {
         pipSettingsProvider.addTab({
             state: 'sessions',
@@ -12131,11 +12109,8 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[5,6,3,4,8,7,2,1,10,11,12,13,14,9,15])(15)
+},{}]},{},[15,5,6,3,4,8,7,2,1,10,11,12,13,14,9])(15)
 });
-
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -12295,10 +12270,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[2,3,1,4])(4)
+},{}]},{},[4,2,3,1])(4)
 });
-
-
-
 
 //# sourceMappingURL=pip-webui.js.map
