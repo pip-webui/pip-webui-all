@@ -9020,6 +9020,9 @@ pip-chart-legend .chart-legend-item .bullet {
 pip-chart-legend .chart-legend-item md-checkbox:not(.md-checked) .md-icon {
   background-color: transparent !important;
 }
+pip-chart-legend .chart-legend-item md-checkbox {
+  margin-bottom: 0px;
+}
 pip-chart-legend .chart-legend-item .legend-item-value,
 pip-chart-legend .chart-legend-item .legend-item-label {
   display: inline-block;
