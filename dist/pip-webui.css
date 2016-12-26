@@ -9047,6 +9047,284 @@ pip-chart-legend .chart-legend-item.visible {
   margin-left: 0px;
 }
 
+.text-hide {
+  font: 0/0;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-display4 {
+  font: normal 300 112px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-display3 {
+  font: normal 400 56px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-display2 {
+  font: normal 400 45px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-display1 {
+  font: normal 400 34px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-headline {
+  font: normal 400 24px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-title {
+  font: normal 500 20px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-subhead1 {
+  font: normal 400 16px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-subhead2 {
+  font: normal 500 16px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-body1 {
+  font: normal 400 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-body2 {
+  font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-caption {
+  font: normal 400 12px Roboto, 'Helvetica Neue', sans-serif;
+}
+.text-button {
+  font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;
+}
+.flex-fixed {
+  -webkit-box-flex: 0 0 auto;
+  -moz-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+.flex-var {
+  -webkit-box-flex: 1 1 auto;
+  -moz-box-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+.flex-grow {
+  -webkit-box-flex: 1 0 auto;
+  -moz-box-flex: 1 0 auto;
+  -webkit-flex: 1 0 auto;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+}
+.flex-shrink {
+  -webkit-box-flex: 0 1 auto;
+  -moz-box-flex: 0 1 auto;
+  -webkit-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+}
+.opacity-secondary {
+  opacity: 0.54;
+}
+.opacity-primary {
+  opacity: 0.87;
+}
+.opacity-disabled {
+  opacity: 0.38;
+}
+.no-divider {
+  border: none !important;
+}
+.divider {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus {
+  outline-width: 0 !important;
+}
+.pip-location-edit,
+.pip-location,
+.pip-location-map,
+.pip-location-ip {
+  display: block;
+}
+.pip-location-edit md-input-container,
+.pip-location md-input-container,
+.pip-location-map md-input-container,
+.pip-location-ip md-input-container {
+  padding: 0px !important;
+}
+.pip-location-edit input,
+.pip-location input,
+.pip-location-map input,
+.pip-location-ip input {
+  margin-bottom: 0px !important;
+}
+.pip-location-edit md-input-group,
+.pip-location md-input-group,
+.pip-location-map md-input-group,
+.pip-location-ip md-input-group {
+  min-height: 56px;
+}
+.pip-location .pip-location-name {
+  text-align: left;
+  padding-left: 0px;
+  padding-right: 0px;
+  font-size: 16px;
+  text-transform: none;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex-direction: row;
+  -moz-box-flex-direction: row;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+.pip-location .pip-location-name .pip-icon {
+  margin-right: 26px;
+}
+.pip-location .pip-location-name.md-button {
+  cursor: pointer;
+  margin-left: 0px;
+  width: 100%;
+}
+.pip-location .pip-location-name .pip-location-text {
+  vertical-align: middle;
+  line-height: 48px;
+  -webkit-box-flex: 1 1 auto;
+  -moz-box-flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pip-location-edit .pip-location-container,
+.pip-location-edit .pip-location-empty,
+.pip-location .pip-location-container,
+.pip-location-map .pip-location-container,
+.pip-location-ip .pip-location-container {
+  position: relative;
+  min-width: 100px;
+  height: 100px;
+}
+.pip-location-edit .pip-location-container.stretch,
+.pip-location-edit .pip-location-empty.stretch,
+.pip-location .pip-location-container.stretch,
+.pip-location-map .pip-location-container.stretch,
+.pip-location-ip .pip-location-container.stretch {
+  width: 100%;
+  height: 100%;
+}
+.pip-location-edit md-input-container {
+  height: 30px;
+  margin-bottom: 0px;
+}
+.pip-location-edit .pip-location-container:focus {
+  outline: 1px solid #2196f3;
+}
+.pip-location-container > div {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+}
+.pip-location-edit .pip-location-empty,
+.pip-location-ip .pip-location-container,
+.pip-location-map .pip-location-container {
+  background-color: lightgrey;
+  background-image: url("images/location_bg.svg");
+  background-repeat: repeat-x;
+  background-size: 20px 100px;
+}
+.pip-location-attachments md-input-group label:first-of-type {
+  margin-top: -6px;
+}
+.pip-location .pip-location-name {
+  height: 48px !important;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+.pip-dialog.pip-location-edit-dialog {
+  height: 500px;
+  width: 400px;
+  overflow-x: hidden;
+}
+.pip-dialog.pip-location-edit-dialog .pip-header .pip-progress-top {
+  width: calc(100% + 49px) !important;
+}
+.pip-dialog.pip-location-edit-dialog .pip-body {
+  position: relative;
+  padding: 0px;
+}
+.pip-dialog.pip-location-edit-dialog .pip-location-container {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  background-color: lightgrey;
+}
+.pip-dialog.pip-location-edit-dialog .md-fab {
+  background-color: white !important;
+  padding-top: 0px !important;
+}
+.pip-dialog.pip-location-edit-dialog .md-fab md-icon {
+  color: rgba(0, 0, 0, 0.54);
+  margin-top: 9px;
+  display: block;
+}
+.pip-dialog.pip-location-edit-dialog .md-fab > span {
+  font-size: 24px;
+  color: #808080;
+}
+.pip-dialog.pip-location-edit-dialog .md-fab.pip-zoom-in {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 16px;
+  right: 34px;
+  padding-top: 9px;
+}
+.pip-dialog.pip-location-edit-dialog .md-fab.pip-zoom-out {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 72px;
+  right: 34px;
+  padding-top: 9px;
+}
+.pip-dialog.pip-location-edit-dialog .md-fab.pip-set-location {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  bottom: 24px;
+  right: 24px;
+  padding-top: 12px;
+}
+@media (max-width: 768px) {
+  .pip-location-edit-dialog .pip-footer {
+    -webkit-box-flex-direction: column !important ;
+    -moz-box-flex-direction: column !important ;
+    -webkit-flex-direction: column !important ;
+    -ms-flex-direction: column !important ;
+    flex-direction: column !important ;
+  }
+}
+
 @-webkit-keyframes blink-hint {
   0% {
     opacity: 0.38;

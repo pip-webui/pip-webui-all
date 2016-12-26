@@ -26,7 +26,7 @@ __export(require("./session"));
 __export(require("./transactions"));
 __export(require("./routing"));
 __export(require("./utilities"));
-},{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":25}],2:[function(require,module,exports){
+},{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":26}],2:[function(require,module,exports){
 'use strict';
 captureStateTranslations.$inject = ['$rootScope'];
 decorateBackStateService.$inject = ['$delegate', '$window'];
@@ -728,7 +728,7 @@ angular
     .module('pipTranslate')
     .provider('pipTranslate', TranslateProvider)
     .run(initTranslate);
-},{"../utilities/PageResetService":19,"./Translation":17}],17:[function(require,module,exports){
+},{"../utilities/PageResetService":21,"./Translation":17}],17:[function(require,module,exports){
 'use strict';
 var Translation = (function () {
     function Translation() {
@@ -876,299 +876,6 @@ __export(require("./Translation"));
 __export(require("./TranslateService"));
 },{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":16,"./Translation":17}],19:[function(require,module,exports){
 'use strict';
-hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
-exports.ResetPageEvent = "pipResetPage";
-exports.ResetAreaEvent = "pipResetArea";
-exports.ResetRootVar = "$reset";
-exports.ResetAreaRootVar = "$resetArea";
-var PageResetService = (function () {
-    PageResetService.$inject = ['$rootScope', '$log', '$timeout'];
-    function PageResetService($rootScope, $log, $timeout) {
-        this._rootScope = $rootScope;
-        this._log = $log;
-        this._timeout = $timeout;
-        $rootScope[exports.ResetRootVar] = false;
-        $rootScope[exports.ResetAreaRootVar] = null;
-    }
-    PageResetService.prototype.reset = function () {
-        this._log.debug("Resetting the entire page");
-        this.performReset(null);
-    };
-    PageResetService.prototype.resetArea = function (area) {
-        this._log.debug("Resetting the area " + area);
-        this.performReset(area);
-    };
-    PageResetService.prototype.performReset = function (area) {
-        var _this = this;
-        this._rootScope[exports.ResetRootVar] = area == null;
-        this._rootScope[exports.ResetAreaRootVar] = area;
-        this._timeout(function () {
-            _this._rootScope[exports.ResetRootVar] = false;
-            _this._rootScope[exports.ResetAreaRootVar] = null;
-        }, 0);
-    };
-    return PageResetService;
-}());
-function hookResetEvents($rootScope, pipPageReset) {
-    $rootScope.$on(exports.ResetPageEvent, function () { pipPageReset.reset(); });
-    $rootScope.$on(exports.ResetAreaEvent, function (event, area) { pipPageReset.resetArea(area); });
-}
-angular.module('pipPageReset', [])
-    .service('pipPageReset', PageResetService)
-    .run(hookResetEvents);
-},{}],20:[function(require,module,exports){
-'use strict';
-var ScrollService = (function () {
-    function ScrollService() {
-    }
-    ScrollService.prototype.scrollTo = function (parentElement, childElement, animationDuration) {
-        if (!parentElement || !childElement)
-            return;
-        if (animationDuration == undefined)
-            animationDuration = 300;
-        setTimeout(function () {
-            if (!$(childElement).position())
-                return;
-            var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
-            if (modDiff < 20)
-                return;
-            var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
-            if (animationDuration > 0)
-                $(parentElement).animate({
-                    scrollTop: scrollTo + 'px'
-                }, animationDuration);
-        }, 100);
-    };
-    return ScrollService;
-}());
-angular
-    .module('pipScroll', [])
-    .service('pipScroll', ScrollService);
-},{}],21:[function(require,module,exports){
-'use strict';
-var SystemInfo = (function () {
-    SystemInfo.$inject = ['$window'];
-    function SystemInfo($window) {
-        "ngInject";
-        this._window = $window;
-    }
-    Object.defineProperty(SystemInfo.prototype, "browserName", {
-        get: function () {
-            var ua = this._window.navigator.userAgent;
-            if (ua.search(/Edge/) > -1)
-                return "edge";
-            if (ua.search(/MSIE/) > -1)
-                return "ie";
-            if (ua.search(/Trident/) > -1)
-                return "ie";
-            if (ua.search(/Firefox/) > -1)
-                return "firefox";
-            if (ua.search(/Opera/) > -1)
-                return "opera";
-            if (ua.search(/OPR/) > -1)
-                return "opera";
-            if (ua.search(/YaBrowser/) > -1)
-                return "yabrowser";
-            if (ua.search(/Chrome/) > -1)
-                return "chrome";
-            if (ua.search(/Safari/) > -1)
-                return "safari";
-            if (ua.search(/Maxthon/) > -1)
-                return "maxthon";
-            return "unknown";
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SystemInfo.prototype, "browserVersion", {
-        get: function () {
-            var version;
-            var ua = this._window.navigator.userAgent;
-            var browser = this.browserName;
-            switch (browser) {
-                case "edge":
-                    version = (ua.split("Edge")[1]).split("/")[1];
-                    break;
-                case "ie":
-                    version = (ua.split("MSIE ")[1]).split(";")[0];
-                    break;
-                case "ie11":
-                    browser = "ie";
-                    version = (ua.split("; rv:")[1]).split(")")[0];
-                    break;
-                case "firefox":
-                    version = ua.split("Firefox/")[1];
-                    break;
-                case "opera":
-                    version = ua.split("Version/")[1];
-                    break;
-                case "operaWebkit":
-                    version = ua.split("OPR/")[1];
-                    break;
-                case "yabrowser":
-                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
-                    break;
-                case "chrome":
-                    version = (ua.split("Chrome/")[1]).split(" ")[0];
-                    break;
-                case "safari":
-                    version = (ua.split("Version/")[1]).split(" ")[0];
-                    break;
-                case "maxthon":
-                    version = ua.split("Maxthon/")[1];
-                    break;
-            }
-            return version;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SystemInfo.prototype, "platform", {
-        get: function () {
-            var ua = this._window.navigator.userAgent;
-            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
-                return 'mobile';
-            return 'desktop';
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SystemInfo.prototype, "os", {
-        get: function () {
-            var ua = this._window.navigator.userAgent;
-            try {
-                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris');
-                var osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
-                return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
-            }
-            catch (err) {
-                return 'unknown';
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    SystemInfo.prototype.isDesktop = function () {
-        return this.platform == 'desktop';
-    };
-    SystemInfo.prototype.isMobile = function () {
-        return this.platform == 'mobile';
-    };
-    SystemInfo.prototype.isCordova = function () {
-        return false;
-    };
-    SystemInfo.prototype.isSupported = function (supported) {
-        if (!supported)
-            supported = {
-                edge: 11,
-                ie: 11,
-                firefox: 43,
-                opera: 35,
-                chrome: 47
-            };
-        var browser = this.browserName;
-        var version = this.browserVersion;
-        version = version.split(".")[0];
-        if (browser && supported[browser] && version >= supported[browser])
-            return true;
-        return true;
-    };
-    return SystemInfo;
-}());
-angular
-    .module('pipSystemInfo', [])
-    .service('pipSystemInfo', SystemInfo);
-},{}],22:[function(require,module,exports){
-'use strict';
-var TimerEvent = (function () {
-    function TimerEvent(event, timeout) {
-        this.event = event;
-        this.timeout = timeout;
-    }
-    return TimerEvent;
-}());
-var DefaultEvents = [
-    new TimerEvent('pipAutoPullChanges', 60000),
-    new TimerEvent('pipAutoUpdatePage', 15000),
-    new TimerEvent('pipAutoUpdateCollection', 300000)
-];
-var TimerService = (function () {
-    TimerService.$inject = ['$rootScope', '$log', '$interval'];
-    function TimerService($rootScope, $log, $interval) {
-        "ngInject";
-        this._started = false;
-        this._events = _.cloneDeep(DefaultEvents);
-        this._rootScope = $rootScope;
-        this._log = $log;
-        this._interval = $interval;
-    }
-    TimerService.prototype.isStarted = function () {
-        return this._started;
-    };
-    TimerService.prototype.addEvent = function (event, timeout) {
-        var existingEvent = _.find(this._events, function (e) { return e.event == event; });
-        if (existingEvent != null)
-            return;
-        var newEvent = {
-            event: event,
-            timeout: timeout
-        };
-        this._events.push(newEvent);
-        if (this._started)
-            this.startEvent(newEvent);
-    };
-    TimerService.prototype.removeEvent = function (event) {
-        for (var i = this._events.length - 1; i >= 0; i--) {
-            var existingEvent = this._events[i];
-            if (existingEvent.event == event) {
-                this.stopEvent(existingEvent);
-                this._events.splice(i, 1);
-            }
-        }
-    };
-    TimerService.prototype.clearEvents = function () {
-        this.stop();
-        this._events = [];
-    };
-    TimerService.prototype.startEvent = function (event) {
-        var _this = this;
-        event.interval = this._interval(function () {
-            _this._log.debug('Generated timer event ' + event.event);
-            _this._rootScope.$emit(event.event);
-        }, event.timeout);
-    };
-    TimerService.prototype.stopEvent = function (event) {
-        if (event.interval != null) {
-            try {
-                this._interval.cancel(event.interval);
-            }
-            catch (ex) {
-            }
-            event.interval = null;
-        }
-    };
-    TimerService.prototype.start = function () {
-        var _this = this;
-        if (this._started)
-            return;
-        _.each(this._events, function (event) {
-            _this.startEvent(event);
-        });
-        this._started = true;
-    };
-    TimerService.prototype.stop = function () {
-        var _this = this;
-        _.each(this._events, function (event) {
-            _this.stopEvent(event);
-        });
-        this._started = false;
-    };
-    return TimerService;
-}());
-angular.module('pipTimer', [])
-    .service('pipTimer', TimerService);
-},{}],23:[function(require,module,exports){
-'use strict';
 var Codes = (function () {
     function Codes() {
     }
@@ -1188,7 +895,7 @@ var Codes = (function () {
 angular
     .module('pipCodes', [])
     .service('pipCodes', Codes);
-},{}],24:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 var Format = (function () {
     function Format() {
@@ -1348,20 +1055,211 @@ var Format = (function () {
 angular
     .module('pipFormat', [])
     .service('pipFormat', Format);
-},{}],25:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
+exports.ResetPageEvent = "pipResetPage";
+exports.ResetAreaEvent = "pipResetArea";
+exports.ResetRootVar = "$reset";
+exports.ResetAreaRootVar = "$resetArea";
+var PageResetService = (function () {
+    PageResetService.$inject = ['$rootScope', '$log', '$timeout'];
+    function PageResetService($rootScope, $log, $timeout) {
+        this._rootScope = $rootScope;
+        this._log = $log;
+        this._timeout = $timeout;
+        $rootScope[exports.ResetRootVar] = false;
+        $rootScope[exports.ResetAreaRootVar] = null;
+    }
+    PageResetService.prototype.reset = function () {
+        this._log.debug("Resetting the entire page");
+        this.performReset(null);
+    };
+    PageResetService.prototype.resetArea = function (area) {
+        this._log.debug("Resetting the area " + area);
+        this.performReset(area);
+    };
+    PageResetService.prototype.performReset = function (area) {
+        var _this = this;
+        this._rootScope[exports.ResetRootVar] = area == null;
+        this._rootScope[exports.ResetAreaRootVar] = area;
+        this._timeout(function () {
+            _this._rootScope[exports.ResetRootVar] = false;
+            _this._rootScope[exports.ResetAreaRootVar] = null;
+        }, 0);
+    };
+    return PageResetService;
+}());
+function hookResetEvents($rootScope, pipPageReset) {
+    $rootScope.$on(exports.ResetPageEvent, function () { pipPageReset.reset(); });
+    $rootScope.$on(exports.ResetAreaEvent, function (event, area) { pipPageReset.resetArea(area); });
 }
-require("./Format");
-require("./TimerService");
-require("./ScrollService");
-require("./Tags");
-require("./Codes");
-require("./SystemInfo");
-require("./PageResetService");
-__export(require("./PageResetService"));
-},{"./Codes":23,"./Format":24,"./PageResetService":19,"./ScrollService":20,"./SystemInfo":21,"./Tags":26,"./TimerService":22}],26:[function(require,module,exports){
+angular.module('pipPageReset', [])
+    .service('pipPageReset', PageResetService)
+    .run(hookResetEvents);
+},{}],22:[function(require,module,exports){
+'use strict';
+var ScrollService = (function () {
+    function ScrollService() {
+    }
+    ScrollService.prototype.scrollTo = function (parentElement, childElement, animationDuration) {
+        if (!parentElement || !childElement)
+            return;
+        if (animationDuration == undefined)
+            animationDuration = 300;
+        setTimeout(function () {
+            if (!$(childElement).position())
+                return;
+            var modDiff = Math.abs($(parentElement).scrollTop() - $(childElement).position().top);
+            if (modDiff < 20)
+                return;
+            var scrollTo = $(parentElement).scrollTop() + ($(childElement).position().top - 20);
+            if (animationDuration > 0)
+                $(parentElement).animate({
+                    scrollTop: scrollTo + 'px'
+                }, animationDuration);
+        }, 100);
+    };
+    return ScrollService;
+}());
+angular
+    .module('pipScroll', [])
+    .service('pipScroll', ScrollService);
+},{}],23:[function(require,module,exports){
+'use strict';
+var SystemInfo = (function () {
+    SystemInfo.$inject = ['$window'];
+    function SystemInfo($window) {
+        "ngInject";
+        this._window = $window;
+    }
+    Object.defineProperty(SystemInfo.prototype, "browserName", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            if (ua.search(/Edge/) > -1)
+                return "edge";
+            if (ua.search(/MSIE/) > -1)
+                return "ie";
+            if (ua.search(/Trident/) > -1)
+                return "ie";
+            if (ua.search(/Firefox/) > -1)
+                return "firefox";
+            if (ua.search(/Opera/) > -1)
+                return "opera";
+            if (ua.search(/OPR/) > -1)
+                return "opera";
+            if (ua.search(/YaBrowser/) > -1)
+                return "yabrowser";
+            if (ua.search(/Chrome/) > -1)
+                return "chrome";
+            if (ua.search(/Safari/) > -1)
+                return "safari";
+            if (ua.search(/Maxthon/) > -1)
+                return "maxthon";
+            return "unknown";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "browserVersion", {
+        get: function () {
+            var version;
+            var ua = this._window.navigator.userAgent;
+            var browser = this.browserName;
+            switch (browser) {
+                case "edge":
+                    version = (ua.split("Edge")[1]).split("/")[1];
+                    break;
+                case "ie":
+                    version = (ua.split("MSIE ")[1]).split(";")[0];
+                    break;
+                case "ie11":
+                    browser = "ie";
+                    version = (ua.split("; rv:")[1]).split(")")[0];
+                    break;
+                case "firefox":
+                    version = ua.split("Firefox/")[1];
+                    break;
+                case "opera":
+                    version = ua.split("Version/")[1];
+                    break;
+                case "operaWebkit":
+                    version = ua.split("OPR/")[1];
+                    break;
+                case "yabrowser":
+                    version = (ua.split("YaBrowser/")[1]).split(" ")[0];
+                    break;
+                case "chrome":
+                    version = (ua.split("Chrome/")[1]).split(" ")[0];
+                    break;
+                case "safari":
+                    version = (ua.split("Version/")[1]).split(" ")[0];
+                    break;
+                case "maxthon":
+                    version = ua.split("Maxthon/")[1];
+                    break;
+            }
+            return version;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "platform", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            if (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(ua.toLowerCase()))
+                return 'mobile';
+            return 'desktop';
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SystemInfo.prototype, "os", {
+        get: function () {
+            var ua = this._window.navigator.userAgent;
+            try {
+                var osAll = (/(windows|mac|android|linux|blackberry|sunos|solaris|iphone)/.exec(ua.toLowerCase()) || [ua])[0].replace('sunos', 'solaris');
+                var osAndroid = (/(android)/.exec(ua.toLowerCase()) || '');
+                return osAndroid && (osAndroid == 'android' || (osAndroid[0] == 'android')) ? 'android' : osAll;
+            }
+            catch (err) {
+                return 'unknown';
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SystemInfo.prototype.isDesktop = function () {
+        return this.platform == 'desktop';
+    };
+    SystemInfo.prototype.isMobile = function () {
+        return this.platform == 'mobile';
+    };
+    SystemInfo.prototype.isCordova = function () {
+        return false;
+    };
+    SystemInfo.prototype.isSupported = function (supported) {
+        if (!supported)
+            supported = {
+                edge: 11,
+                ie: 11,
+                firefox: 43,
+                opera: 35,
+                chrome: 47
+            };
+        var browser = this.browserName;
+        var version = this.browserVersion;
+        version = version.split(".")[0];
+        if (browser && supported[browser] && version >= supported[browser])
+            return true;
+        return true;
+    };
+    return SystemInfo;
+}());
+angular
+    .module('pipSystemInfo', [])
+    .service('pipSystemInfo', SystemInfo);
+},{}],24:[function(require,module,exports){
 'use strict';
 var Tags = (function () {
     function Tags() {
@@ -1414,7 +1312,109 @@ var Tags = (function () {
 angular
     .module('pipTags', [])
     .service('pipTags', Tags);
-},{}]},{},[1])(1)
+},{}],25:[function(require,module,exports){
+'use strict';
+var TimerEvent = (function () {
+    function TimerEvent(event, timeout) {
+        this.event = event;
+        this.timeout = timeout;
+    }
+    return TimerEvent;
+}());
+var DefaultEvents = [
+    new TimerEvent('pipAutoPullChanges', 60000),
+    new TimerEvent('pipAutoUpdatePage', 15000),
+    new TimerEvent('pipAutoUpdateCollection', 300000)
+];
+var TimerService = (function () {
+    TimerService.$inject = ['$rootScope', '$log', '$interval'];
+    function TimerService($rootScope, $log, $interval) {
+        "ngInject";
+        this._started = false;
+        this._events = _.cloneDeep(DefaultEvents);
+        this._rootScope = $rootScope;
+        this._log = $log;
+        this._interval = $interval;
+    }
+    TimerService.prototype.isStarted = function () {
+        return this._started;
+    };
+    TimerService.prototype.addEvent = function (event, timeout) {
+        var existingEvent = _.find(this._events, function (e) { return e.event == event; });
+        if (existingEvent != null)
+            return;
+        var newEvent = {
+            event: event,
+            timeout: timeout
+        };
+        this._events.push(newEvent);
+        if (this._started)
+            this.startEvent(newEvent);
+    };
+    TimerService.prototype.removeEvent = function (event) {
+        for (var i = this._events.length - 1; i >= 0; i--) {
+            var existingEvent = this._events[i];
+            if (existingEvent.event == event) {
+                this.stopEvent(existingEvent);
+                this._events.splice(i, 1);
+            }
+        }
+    };
+    TimerService.prototype.clearEvents = function () {
+        this.stop();
+        this._events = [];
+    };
+    TimerService.prototype.startEvent = function (event) {
+        var _this = this;
+        event.interval = this._interval(function () {
+            _this._log.debug('Generated timer event ' + event.event);
+            _this._rootScope.$emit(event.event);
+        }, event.timeout);
+    };
+    TimerService.prototype.stopEvent = function (event) {
+        if (event.interval != null) {
+            try {
+                this._interval.cancel(event.interval);
+            }
+            catch (ex) {
+            }
+            event.interval = null;
+        }
+    };
+    TimerService.prototype.start = function () {
+        var _this = this;
+        if (this._started)
+            return;
+        _.each(this._events, function (event) {
+            _this.startEvent(event);
+        });
+        this._started = true;
+    };
+    TimerService.prototype.stop = function () {
+        var _this = this;
+        _.each(this._events, function (event) {
+            _this.stopEvent(event);
+        });
+        this._started = false;
+    };
+    return TimerService;
+}());
+angular.module('pipTimer', [])
+    .service('pipTimer', TimerService);
+},{}],26:[function(require,module,exports){
+'use strict';
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+require("./Format");
+require("./TimerService");
+require("./ScrollService");
+require("./Tags");
+require("./Codes");
+require("./SystemInfo");
+require("./PageResetService");
+__export(require("./PageResetService"));
+},{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -9204,8 +9204,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dropdown/Dropdown.html',
-    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
+  $templateCache.put('header/StickyNavHeader.html',
+    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -9216,8 +9216,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('header/StickyNavHeader.html',
-    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
+  $templateCache.put('dropdown/Dropdown.html',
+    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
 }]);
 })();
 
@@ -9264,18 +9264,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/StickySideNav.html',
     '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
 }]);
@@ -9290,6 +9278,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/Tabs.html',
     '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-xs\')" md-selected="selected.activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="media(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="selected.activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(selected.activeIndex)"><md-option ng-repeat="tab in tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -11405,6 +11405,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
     thisModule.controller('pipLocationController', ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
+        console.log('pipLocationController');
         function toBoolean(value) {
             if (value == null)
                 return false;
@@ -11479,21 +11480,7 @@ module.run(['$templateCache', function($templateCache) {
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
-    var thisModule = angular.module('pipLocationEditDialog', ['ngMaterial', 'pipTranslate', 'pipTransactions', 'pipLocations.Templates']);
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'LOCATION_ADD_LOCATION': 'Add location',
-            'LOCATION_SET_LOCATION': 'Set location',
-            'LOCATION_ADD_PIN': 'Add pin',
-            'LOCATION_REMOVE_PIN': 'Remove pin'
-        });
-        pipTranslateProvider.translations('ru', {
-            'LOCATION_ADD_LOCATION': 'Добавить местоположение',
-            'LOCATION_SET_LOCATION': 'Определить положение',
-            'LOCATION_ADD_PIN': 'Добавить точку',
-            'LOCATION_REMOVE_PIN': 'Убрать точку'
-        });
-    }]);
+    var thisModule = angular.module('pipLocationEditDialog', ['ngMaterial', 'pipLocations.Templates']);
     thisModule.factory('pipLocationEditDialog', ['$mdDialog', function ($mdDialog) {
         return {
             show: function (params, successCallback, cancelCallback) {
@@ -11518,14 +11505,14 @@ module.run(['$templateCache', function($templateCache) {
             }
         };
     }]);
-    thisModule.controller('pipLocationEditDialogController', ['$scope', '$rootScope', '$timeout', '$mdDialog', 'pipTransaction', 'locationPos', 'locationName', function ($scope, $rootScope, $timeout, $mdDialog, pipTransaction, locationPos, locationName) {
+    thisModule.controller('pipLocationEditDialogController', ['$scope', '$rootScope', '$timeout', '$mdDialog', 'locationPos', 'locationName', function ($scope, $rootScope, $timeout, $mdDialog, locationPos, locationName) {
+        console.log('pipLocationEditDialogController');
         $scope.theme = $rootScope.$theme;
         $scope.locationPos = locationPos && locationPos.type == 'Point'
             && locationPos.coordinates && locationPos.coordinates.length == 2
             ? locationPos : null;
         $scope.locationName = locationName;
         $scope.supportSet = navigator.geolocation != null;
-        $scope.transaction = pipTransaction('location_edit_dialog', $scope);
         var map = null, marker = null;
         function createMarker(coordinates) {
             if (marker)
@@ -11556,19 +11543,15 @@ module.run(['$templateCache', function($templateCache) {
             };
             $scope.locationName = null;
             if (tid == null) {
-                tid = $scope.transaction.begin();
                 if (tid == null)
                     return;
             }
             var geocoder = new google.maps.Geocoder();
             geocoder.geocode({ location: coordinates }, function (results, status) {
-                if ($scope.transaction.aborted(tid))
-                    return;
                 if (status == google.maps.GeocoderStatus.OK
                     && results && results.length > 0) {
                     $scope.locationName = results[0].formatted_address;
                 }
-                $scope.transaction.end();
                 $scope.$apply();
             });
         }
@@ -11627,19 +11610,12 @@ module.run(['$templateCache', function($templateCache) {
         $scope.onSetLocation = function () {
             if (map == null)
                 return;
-            var tid = $scope.transaction.begin();
-            if (tid == null)
-                return;
             navigator.geolocation.getCurrentPosition(function (position) {
-                if ($scope.transaction.aborted(tid))
-                    return;
                 var coordinates = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                 marker = createMarker(coordinates);
                 map.setCenter(coordinates);
                 map.setZoom(12);
-                changeLocation(coordinates, tid);
             }, function () {
-                $scope.transaction.end();
                 $scope.$apply();
             }, {
                 maximumAge: 0,
@@ -11675,13 +11651,13 @@ module.run(['$templateCache', function($templateCache) {
             },
             template: String()
                 + '<md-input-container class="md-block">'
-                + '<label>{{ \'LOCATION\' | translate }}</label>'
+                + '<label>{{ \'LOCATION\'  }}</label>'
                 + '<input ng-model="pipLocationName"'
                 + 'ng-disabled="ngDisabled()"/></md-input-container>'
                 + '<div class="pip-location-empty" layout="column" layout-align="center center">'
                 + '<md-button class="md-raised" ng-disabled="ngDisabled()" ng-click="onSetLocation()"'
                 + 'aria-label="LOCATION_ADD_LOCATION">'
-                + '<span class="icon-location"></span> {{::\'LOCATION_ADD_LOCATION\' | translate}}'
+                + '<span class="icon-location"></span> {{::\'LOCATION_ADD_LOCATION\' }}'
                 + '</md-button></div>'
                 + '<div class="pip-location-container" tabindex="{{ ngDisabled() ? -1 : 0 }}"'
                 + ' ng-click="onMapClick($event)" ng-keypress=""onMapKeyPress($event)"></div>',
@@ -11689,6 +11665,7 @@ module.run(['$templateCache', function($templateCache) {
                 $element.find('md-input-container').attr('md-no-float', !!$scope.pipLocationHolder);
             }],
             link: function ($scope, $element) {
+                console.log('pipLocationEdit');
                 var $empty = $element.children('.pip-location-empty'), $mapContainer = $element.children('.pip-location-container'), $mapControl = null;
                 function clearMap() {
                     if ($mapControl)
@@ -11842,6 +11819,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     });
     thisModule.controller('pipLocationIpController', ['$scope', '$element', '$attrs', '$http', function ($scope, $element, $attrs, $http) {
+        console.log('pipLocationIpController');
         var $mapContainer = $element.children('.pip-location-container'), $mapControl = null;
         function clearMap() {
             if ($mapControl)
@@ -12042,8 +12020,9 @@ module.run(['$templateCache', function($templateCache) {
         'pipLocation',
         'pipLocationMap',
         'pipLocationIp',
+        'pipLocationEditDialog',
         'pipLocationEdit',
-        'pipLocationEditDialog'
+        'pipLocations.Translate'
     ]);
 })();
 },{}],8:[function(require,module,exports){
@@ -12055,7 +12034,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('location_dialog/location_dialog.html',
-    '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{theme}}"><div class="pip-header layout-column layout-align-start-start"><md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><h3 class="m0 w-stretch flex">{{ \'LOCATION_SET_LOCATION\' | translate }}</h3></div><div class="pip-footer"><div class="layout-row layout-align-start-center"><md-button class="md-accent" ng-click="onAddPin()" ng-show="locationPos == null" ng-disabled="transaction.busy()" aria-label="{{ ::\'LOCATION_ADD_PIN\' | translate }}">{{ ::\'LOCATION_ADD_PIN\' | translate }}</md-button><md-button class="md-accent" ng-click="onRemovePin()" ng-show="locationPos != null" ng-disabled="transaction.busy()" aria-label="{{ ::\'LOCATION_REMOVE_PIN\' | translate }}">{{ ::\'LOCATION_REMOVE_PIN\' | translate }}</md-button></div><div class="flex"></div><div class="layout-row layout-align-end-center"><md-button ng-click="onCancel()" aria-label="{{ ::\'CANCEL\' | translate }}">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="md-accent" ng-click="onApply()" ng-disabled="transaction.busy()" aria-label="{{ ::\'APPLY\' | translate }}">{{ ::\'APPLY\' | translate }}</md-button></div></div><div class="pip-body"><div class="pip-location-container"></div><md-button class="md-icon-button md-fab pip-zoom-in" ng-click="onZoomIn()" aria-label="{{ ::\'LOCATION_ZOOM_IN\' | translate }}"><md-icon md-svg-icon="icons:plus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-zoom-out" ng-click="onZoomOut()" aria-label="{{ ::\'LOCATION_ZOOM_OUT\' | translate }}"><md-icon md-svg-icon="icons:minus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-set-location" ng-click="onSetLocation()" aria-label="{{ ::\'LOCATION_SET_LOCATION\' | translate }}" ng-show="supportSet" ng-disabled="transaction.busy()"><md-icon md-svg-icon="icons:target"></md-icon></md-button></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{theme}}"><div class="pip-header layout-column layout-align-start-start"><md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><h3 class="m0 w-stretch flex">{{ \'LOCATION_SET_LOCATION\' }}</h3></div><div class="pip-footer"><div class="layout-row layout-align-start-center"><md-button class="md-accent" ng-click="onAddPin()" ng-show="locationPos == null" ng-disabled="transaction.busy()" aria-label="{{ ::\'LOCATION_ADD_PIN\' }}">{{ ::\'LOCATION_ADD_PIN\' }}</md-button><md-button class="md-accent" ng-click="onRemovePin()" ng-show="locationPos != null" ng-disabled="transaction.busy()" aria-label="{{ ::\'LOCATION_REMOVE_PIN\' }}">{{ ::\'LOCATION_REMOVE_PIN\' }}</md-button></div><div class="flex"></div><div class="layout-row layout-align-end-center"><md-button ng-click="onCancel()" aria-label="{{ ::\'CANCEL\' }}">{{ ::\'CANCEL\' }}</md-button><md-button class="md-accent" ng-click="onApply()" ng-disabled="transaction.busy()" aria-label="{{ ::\'APPLY\' }}">{{ ::\'APPLY\' }}</md-button></div></div><div class="pip-body"><div class="pip-location-container"></div><md-button class="md-icon-button md-fab pip-zoom-in" ng-click="onZoomIn()" aria-label="{{ ::\'LOCATION_ZOOM_IN\' }}"><md-icon md-svg-icon="icons:plus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-zoom-out" ng-click="onZoomOut()" aria-label="{{ ::\'LOCATION_ZOOM_OUT\' }}"><md-icon md-svg-icon="icons:minus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-set-location" ng-click="onSetLocation()" aria-label="{{ ::\'LOCATION_SET_LOCATION\' }}" ng-show="supportSet" ng-disabled="transaction.busy()"><md-icon md-svg-icon="icons:target"></md-icon></md-button></div></md-dialog>');
 }]);
 })();
 
