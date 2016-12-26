@@ -12,6 +12,39 @@ function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
 
+export let IdentityRootVar: string;
+export let IdentityChangedEvent: string;
+export interface IIdentity {
+    id: string;
+    full_name: string;
+    details: string;
+    email: string;
+    photo_url: string;
+    groups: string[];
+}
+export interface IIdentityService {
+    identity: any;
+}
+export interface IIdentityProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    identity: any;
+}
+
+
+export const SessionRootVar = "$session";
+export const SessionOpenedEvent = "pipSessionOpened";
+export const SessionClosedEvent = "pipSessionClosed";
+export interface ISessionService {
+    session: any;
+    isOpened(): boolean;
+    open(session: any): void;
+    close(): void;
+}
+export interface ISessionProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    session: any;
+}
+
 
 export class Transaction {
     private _scope;
@@ -54,39 +87,6 @@ export interface ITransactionService {
 }
 
 function configureTransactionStrings($injector: any): void;
-
-export let IdentityRootVar: string;
-export let IdentityChangedEvent: string;
-export interface IIdentity {
-    id: string;
-    full_name: string;
-    details: string;
-    email: string;
-    photo_url: string;
-    groups: string[];
-}
-export interface IIdentityService {
-    identity: any;
-}
-export interface IIdentityProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    identity: any;
-}
-
-
-export const SessionRootVar = "$session";
-export const SessionOpenedEvent = "pipSessionOpened";
-export const SessionClosedEvent = "pipSessionClosed";
-export interface ISessionService {
-    session: any;
-    isOpened(): boolean;
-    open(session: any): void;
-    close(): void;
-}
-export interface ISessionProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    session: any;
-}
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -320,8 +320,8 @@ declare module pip.controls {
 
 
 
-var marked: any;
 
+var marked: any;
 
 
 
@@ -500,36 +500,6 @@ class ErrorDetailsService {
 
 
 
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: any;
-    theme: any;
-    config: InformationStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-class InformationService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
-
-
 export class OptionsBigData {
     name: string;
     title: string;
@@ -602,6 +572,36 @@ class OptionsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: InformationStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class InformationService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
 }
 
 declare module pip.nav {
@@ -654,32 +654,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -706,6 +680,32 @@ export interface IAppBarProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
+}
+
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
 }
 
 
@@ -786,6 +786,45 @@ export interface INavIconProvider extends ng.IServiceProvider {
 
 
 
+
+export let SideNavChangedEvent: string;
+export let SideNavStateChangedEvent: string;
+export let OpenSideNavEvent: string;
+export let CloseSideNavEvent: string;
+export class SideNavConfig {
+    parts: any;
+    classes: string[];
+    state: any;
+    type: string;
+    visible: boolean;
+}
+export interface ISideNavService {
+    readonly config: SideNavConfig;
+    readonly classes: string[];
+    parts: any;
+    state: any;
+    open(): void;
+    close(): void;
+    toggle(): void;
+    show(): void;
+    hide(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface ISideNavProvider extends ng.IServiceProvider {
+    config: SideNavConfig;
+    parts: any;
+    type: string;
+    visible: boolean;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
+
 export let NavMenuChangedEvent: string;
 export class NavMenuLink {
     name: string;
@@ -851,45 +890,6 @@ export interface ISearchService {
     toggle(): void;
 }
 export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-
-
-export let SideNavChangedEvent: string;
-export let SideNavStateChangedEvent: string;
-export let OpenSideNavEvent: string;
-export let CloseSideNavEvent: string;
-export class SideNavConfig {
-    parts: any;
-    classes: string[];
-    state: any;
-    type: string;
-    visible: boolean;
-}
-export interface ISideNavService {
-    readonly config: SideNavConfig;
-    readonly classes: string[];
-    parts: any;
-    state: any;
-    open(): void;
-    close(): void;
-    toggle(): void;
-    show(): void;
-    hide(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface ISideNavProvider extends ng.IServiceProvider {
-    config: SideNavConfig;
-    parts: any;
-    type: string;
-    visible: boolean;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
 }
 
 
@@ -974,11 +974,6 @@ declare module pip.settings {
 
 
 
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
 export class SettingsTab {
     state: string;
     title: string;
@@ -991,12 +986,15 @@ export interface ISettingsService {
     getDefaultTab(): any;
     showTitleText(newTitleText: any): any;
     showTitleLogo(newTitleLogo: any): any;
+    setDefaultTab(name: string): any;
     showNavIcon(value: any): any;
     getTabs(): any;
 }
 export interface ISettingsProvider extends ng.IServiceProvider {
-    getDefaultTab(): any;
+    getDefaultTab(): SettingsTab;
     addTab(tabObj: any): any;
+    setDefaultTab(name: string): void;
+    getFullStateName(state: string): string;
 }
 export class SettingsConfig {
     defaultTab: string;
@@ -1005,6 +1003,11 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
+
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
 
 
 
