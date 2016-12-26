@@ -9211,6 +9211,32 @@ button:focus {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.pip-location .pip-location-name .pip-location-icon-space {
+  padding-left: 24px !important;
+  padding-top: 16 px !important;
+}
+@media (max-width: 1200px) {
+  .pip-location .pip-location-name .pip-location-icon-space {
+    padding-left: 16px !important;
+  }
+}
+.pip-location .pip-location-container {
+  margin-bottom: 8px !important;
+}
+.pip-location .pip-location-container .pip-location-icon-space {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  padding-top: 0px !important;
+}
+@media (max-width: 1200px) {
+  .pip-location .pip-location-container .pip-location-icon-space {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+.pip-location .pip-location-name.location-collapse {
+  margin-bottom: 0px !important;
+}
 .pip-location-edit .pip-location-container,
 .pip-location-edit .pip-location-empty,
 .pip-location .pip-location-container,
@@ -9262,6 +9288,10 @@ button:focus {
   height: 500px;
   width: 400px;
   overflow-x: hidden;
+}
+.pip-dialog.pip-location-edit-dialog h3 {
+  margin: 0px !important;
+  width: 100%  !important;
 }
 .pip-dialog.pip-location-edit-dialog .pip-header .pip-progress-top {
   width: calc(100% + 49px) !important;

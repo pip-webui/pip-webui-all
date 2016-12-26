@@ -316,11 +316,11 @@ declare module pip.controls {
 
 
 
-
-
-
-
 var marked: any;
+
+
+
+
 
 
 
@@ -465,6 +465,7 @@ class ConfirmationService {
 }
 
 
+
 export class ErrorStrings {
     ok: string;
     cancel: string;
@@ -496,7 +497,6 @@ class ErrorDetailsService {
     constructor($mdDialog: any);
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
-
 
 
 
@@ -785,6 +785,35 @@ export interface INavIconProvider extends ng.IServiceProvider {
 
 
 
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+
 export let NavMenuChangedEvent: string;
 export class NavMenuLink {
     name: string;
@@ -823,35 +852,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
-
-
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
 
 
 
@@ -964,13 +964,18 @@ declare module pip.locations {
 
 
 
-
 let google: any;
+
 
 
 }
 
 declare module pip.settings {
+
+
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
 
 
 
@@ -1000,11 +1005,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
 
 
 
