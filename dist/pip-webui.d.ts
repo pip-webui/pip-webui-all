@@ -500,6 +500,36 @@ class ErrorDetailsService {
 
 
 
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: InformationStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class InformationService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
+
 export class OptionsBigData {
     name: string;
     title: string;
@@ -567,36 +597,6 @@ export class OptionsDialogController {
 }
 
 class OptionsService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
-
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: any;
-    theme: any;
-    config: InformationStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-class InformationService {
     _mdDialog: any;
     constructor($mdDialog: any);
     show(params: any, successCallback: any, cancelCallback: any): void;
@@ -724,7 +724,6 @@ export interface INavService {
 
 
 
-
 export let NavHeaderChangedEvent: string;
 export class NavHeaderConfig {
     imageUrl: string;
@@ -754,6 +753,48 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
     event: string;
     set(title: string, subtitle: string, imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
+}
+
+
+
+
+export let NavMenuChangedEvent: string;
+export class NavMenuLink {
+    name: string;
+    title: string;
+    icon?: string;
+    count?: number;
+    badgeStyle?: string;
+    access?: (link: NavMenuLink) => boolean;
+    href?: string;
+    url?: string;
+    state?: string;
+    stateParams?: any;
+    parentState?: string;
+    event?: string;
+    click?: (link: NavMenuLink) => void;
+}
+export class NavMenuSection {
+    name: string;
+    title?: string;
+    icon?: string;
+    links: NavMenuLink[];
+    access?: (section: NavMenuSection) => boolean;
+}
+export class NavMenuConfig {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+}
+export interface INavMenuService {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+    updateCount(link: string, count: number): void;
+    updateBadgeStyle(link: string, style: string): void;
+    clearCounts(): void;
+}
+export interface INavMenuProvider extends ng.IServiceProvider {
+    sections: NavMenuSection[];
+    defaultIcon: string;
 }
 
 
@@ -821,47 +862,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
-}
-
-
-
-export let NavMenuChangedEvent: string;
-export class NavMenuLink {
-    name: string;
-    title: string;
-    icon?: string;
-    count?: number;
-    badgeStyle?: string;
-    access?: (link: NavMenuLink) => boolean;
-    href?: string;
-    url?: string;
-    state?: string;
-    stateParams?: any;
-    parentState?: string;
-    event?: string;
-    click?: (link: NavMenuLink) => void;
-}
-export class NavMenuSection {
-    name: string;
-    title?: string;
-    icon?: string;
-    links: NavMenuLink[];
-    access?: (section: NavMenuSection) => boolean;
-}
-export class NavMenuConfig {
-    sections: NavMenuSection[];
-    defaultIcon: string;
-}
-export interface INavMenuService {
-    sections: NavMenuSection[];
-    defaultIcon: string;
-    updateCount(link: string, count: number): void;
-    updateBadgeStyle(link: string, style: string): void;
-    clearCounts(): void;
-}
-export interface INavMenuProvider extends ng.IServiceProvider {
-    sections: NavMenuSection[];
-    defaultIcon: string;
 }
 
 
@@ -964,8 +964,8 @@ declare module pip.locations {
 
 
 
-let google: any;
 
+let google: any;
 
 
 }
