@@ -255,6 +255,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -290,12 +296,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -500,36 +500,6 @@ class ErrorDetailsService {
 
 
 
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: any;
-    theme: any;
-    config: InformationStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-class InformationService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
-
-
 export class OptionsBigData {
     name: string;
     title: string;
@@ -602,6 +572,36 @@ class OptionsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: any;
+    theme: any;
+    config: InformationStrings;
+    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+class InformationService {
+    _mdDialog: any;
+    constructor($mdDialog: any);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+
 }
 
 declare module pip.nav {
@@ -654,32 +654,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -706,6 +680,32 @@ export interface IAppBarProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
+}
+
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
 }
 
 
@@ -827,34 +827,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-
 
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
@@ -893,6 +865,34 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 }
 
 
+
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
 }
 
 declare module pip.themes {
@@ -903,19 +903,6 @@ function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemi
 
 function configureBootBarnWarmTheme($mdThemingProvider: any): void;
 
-
-
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
-export interface IThemeService {
-    theme: string;
-    use(language: string): string;
-}
-export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
-    setRootVar: boolean;
-    persist: boolean;
-}
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -934,12 +921,52 @@ function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingPro
 function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
 
+
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
+export interface IThemeService {
+    theme: string;
+    use(language: string): string;
+}
+export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
+
 }
 
 declare module pip.errors {
 
 
 
+
+
+export class ErrorStateItem {
+    Active: boolean;
+    Name: string;
+    Event: string;
+    Title: string;
+    SubTitle: String;
+    Breadcrumb: string;
+    Image: string;
+    Params?: any;
+}
+export class pipErrorsConfig {
+    Maintenance: ErrorStateItem;
+    MissingRoute: ErrorStateItem;
+    NoConnection: ErrorStateItem;
+    Unknown: ErrorStateItem;
+    Unsupported: ErrorStateItem;
+}
+export interface IpipErrorsService {
+    getErrorItemByKey(errorName: string): ErrorStateItem;
+    config: pipErrorsConfig;
+}
+export interface IpipErrorsProvider extends ng.IServiceProvider {
+    configureErrorByKey(errorName: string, errorParams: ErrorStateItem): void;
+    configureErrors(value: pipErrorsConfig): void;
+}
 
 
 

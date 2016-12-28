@@ -3977,8 +3977,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': toast.type==\'error\', \'pip-column-toast\': toast.actions.length > 1 || actionLenght > 4, \'pip-no-action-toast\': actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)"><div class="flex" ng-if="toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="onAction(action)" ng-repeat="action in actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -3989,8 +3989,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': toast.type==\'error\', \'pip-column-toast\': toast.actions.length > 1 || actionLenght > 4, \'pip-no-action-toast\': actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)"><div class="flex" ng-if="toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="onAction(action)" ng-repeat="action in actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
 }]);
 })();
 
@@ -5805,8 +5805,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range_directive/date_range.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -5817,8 +5817,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_directive/date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6447,18 +6447,6 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDialogs.Templates');
-} catch (e) {
-  module = angular.module('pipDialogs.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/OptionsBigDialog.html',
     '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !vm.config.noActions}"><div class="pip-header" ng-class="{\'header-hint\': vm.config.noTitle && vm.config.hint}"><h3 class="m0" ng-if="!vm.config.noTitle">{{::vm.config.title | translate}}</h3><div ng-show="vm.config.noTitle && vm.config.hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{::vm.config.hint | translate}}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="vm.config.optionIndex" index="{{vm.config.optionIndex }}" pip-select="vm.onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="vm.onKeyUp($event, $index)" ng-repeat="option in vm.config.options"><div class="pip-content content-stretch" ng-click="vm.onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{::option.title | translate}}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{::option.subtitle | translate}}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="vm.config.noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!vm.config.noActions"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()" style="margin-right: -6px">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
 }]);
@@ -6473,6 +6461,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/OptionsDialog.html',
     '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{::vm.config.title | translate}}</h3><div ng-show="vm.config.deletedTitle" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::vm.config.deletedTitle | translate}}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="vm.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="vm.onKeyPress($event)" tabindex="0"><div ng-repeat="option in vm.config.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'vm.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == vm.config.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{::option.title | translate}}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{::option.title | translate}}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -9176,8 +9176,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div style="height: 23px;"><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span class="hide-xs" ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu class="hide-xs" md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-hide="action.divider"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" class="hide-gt-xs"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+  $templateCache.put('appbar/AppBar.html',
+    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
 }]);
 })();
 
@@ -9188,8 +9188,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('appbar/AppBar.html',
-    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
+  $templateCache.put('breadcrumb/Breadcrumb.html',
+    '<div style="height: 23px;"><div class="hide-xs text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span class="hide-xs" ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu class="hide-xs" md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-hide="action.divider"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" class="hide-gt-xs"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return" aria-label="open breadcrumb"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
 }]);
 })();
 
@@ -9260,18 +9260,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/SideNav.html',
     '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" pip-focused="" ng-transclude=""></md-sidenav>');
 }]);
@@ -9286,6 +9274,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/Tabs.html',
     '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-xs\')" md-selected="selected.activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="media(\'xs\')"><div class="pip-divider position-top m0"></div><md-select ng-model="selected.activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(selected.activeIndex)"><md-option ng-repeat="tab in tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -9955,12 +9955,17 @@ __export(require("./common"));
     'use strict';
     angular.module('pipErrors', [
         'pipErrors.Pages',
+        'pipErrorsService',
         'pipNoConnectionPanel',
         'pipClearErrors',
         'pipFormErrors'
     ]);
 })();
 },{}],4:[function(require,module,exports){
+'use strict';
+angular.module('pipErrorsService', []);
+require("./errors_service");
+},{"./errors_service":6}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Pages', [
@@ -10013,22 +10018,33 @@ __export(require("./common"));
             templateUrl: 'unknown/unknown.html'
         });
     }]);
-    thisModule.run(['$rootScope', '$state', '$injector', function ($rootScope, $state, $injector) {
-        checkSupported();
-        $rootScope.$on('pipMaintenanceError', maintenanceError);
-        $rootScope.$on('pipNoConnectionError', noConnectionError);
-        $rootScope.$on('pipUnknownError', unknownError);
-        $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
-            event.preventDefault();
-            $state.go('errors_missing_route', {
-                unfoundState: unfoundState,
-                fromState: {
-                    to: fromState ? fromState.name : '',
-                    fromParams: fromParams
-                }
+    thisModule.run(['$rootScope', '$state', '$injector', 'pipErrorsService', function ($rootScope, $state, $injector, pipErrorsService) {
+        var errorConfig = pipErrorsService.config;
+        if (errorConfig.Unsupported.Active) {
+            checkSupported();
+        }
+        if (errorConfig.MissingRoute.Active) {
+            $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
+                event.preventDefault();
+                $state.go('errors_missing_route', {
+                    unfoundState: unfoundState,
+                    fromState: {
+                        to: fromState ? fromState.name : '',
+                        fromParams: fromParams
+                    }
+                });
+                $rootScope.$routing = false;
             });
-            $rootScope.$routing = false;
-        });
+        }
+        if (errorConfig.NoConnection.Active) {
+            $rootScope.$on('pipNoConnectionError', noConnectionError);
+        }
+        if (errorConfig.Unknown.Active) {
+            $rootScope.$on('pipUnknownError', unknownError);
+        }
+        if (errorConfig.Maintenance.Active) {
+            $rootScope.$on('pipMaintenanceError', maintenanceError);
+        }
         function goToErrors(toState, params) {
             if (toState == null)
                 throw new Error('Error state was not defined');
@@ -10076,14 +10092,12 @@ __export(require("./common"));
                         $rootScope.$emit('pipMaintenanceError', {
                             error: rejection
                         });
-                        console.error("errors_maintenance", rejection);
                         break;
                     case -1:
                         if (!$rootScope.$identity)
                             $rootScope.$emit('pipNoConnectionError', {
                                 error: rejection
                             });
-                        console.error("errors_no_connection", rejection);
                         break;
                     default:
                         console.error("errors_unknown", rejection);
@@ -10094,7 +10108,123 @@ __export(require("./common"));
         };
     }]);
 })();
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+'use strict';
+var ErrorStateItem = (function () {
+    function ErrorStateItem() {
+    }
+    return ErrorStateItem;
+}());
+exports.ErrorStateItem = ErrorStateItem;
+var pipErrorsConfig = (function () {
+    function pipErrorsConfig() {
+        this.Maintenance = {
+            Active: true,
+            Name: 'errors_maintenance',
+            Event: 'pipMaintenanceError',
+            Title: 'ERROR_AVAILABLE_TITLE',
+            SubTitle: 'ERROR_AVAILABLE_SUBTITLE',
+            Breadcrumb: 'ERROR_AVAILABLE_TITLE',
+            Image: 'images/maintenance.svg'
+        };
+        this.MissingRoute = {
+            Active: true,
+            Name: 'errors_missing_route',
+            Event: '$stateNotFound',
+            Title: 'ERROR_ROUTE_TITLE',
+            SubTitle: 'ERROR_ROUTE_SUBTITLE',
+            Breadcrumb: 'ERROR_ROUTE_PAGE_TITLE',
+            Image: 'images/invalid_route.svg'
+        };
+        this.NoConnection = {
+            Active: true,
+            Name: 'errors_no_connection',
+            Event: 'pipNoConnectionError',
+            Title: 'ERROR_RESPONDING_TITLE',
+            SubTitle: 'ERROR_RESPONDING_SUBTITLE',
+            Breadcrumb: 'ERROR_RESPONDING_TITLE',
+            Image: 'images/no_response.svg'
+        };
+        this.Unknown = {
+            Active: true,
+            Name: 'errors_unknown',
+            Event: 'pipUnknownError',
+            Title: 'ERROR_UNKNOWN_TITLE',
+            SubTitle: 'ERROR_UNKNOWN_SUBTITLE',
+            Breadcrumb: 'ERROR_UNKNOWN_TITLE',
+            Image: 'images/unknown_error.svg'
+        };
+        this.Unsupported = {
+            Active: true,
+            Name: 'errors_unsupported',
+            Event: '',
+            Title: 'ERROR_UNSUPPORTED_TITLE',
+            SubTitle: 'ERROR_UNSUPPORTED_SUBTITLE',
+            Breadcrumb: 'ERROR_UNSUPPORTED_TITLE',
+            Image: '',
+            Params: {
+                supported: {
+                    edge: 11,
+                    ie: 11,
+                    firefox: 43,
+                    opera: 35,
+                    chrome: 47
+                }
+            }
+        };
+    }
+    return pipErrorsConfig;
+}());
+exports.pipErrorsConfig = pipErrorsConfig;
+var pipErrorsService = (function () {
+    pipErrorsService.$inject = ['config'];
+    function pipErrorsService(config) {
+        "ngInject";
+        this._config = config || new pipErrorsConfig();
+    }
+    Object.defineProperty(pipErrorsService.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    pipErrorsService.prototype.getErrorItemByKey = function (errorName) {
+        if (!errorName || !this._config[errorName]) {
+            return null;
+        }
+        return this._config[errorName];
+    };
+    return pipErrorsService;
+}());
+var pipErrorsProvider = (function () {
+    function pipErrorsProvider() {
+        this._config = new pipErrorsConfig();
+    }
+    pipErrorsProvider.prototype.configureErrorByKey = function (errorName, errorParams) {
+        if (!errorName || !errorParams)
+            return;
+        if (!this._config[errorName])
+            return;
+        this._config[errorName] = _.assign(this._config[errorName], errorParams);
+    };
+    pipErrorsProvider.prototype.configureErrors = function (value) {
+        if (!value)
+            return;
+        this._config = _.assign(this._config, value);
+    };
+    pipErrorsProvider.prototype.$get = function () {
+        "ngInject";
+        if (this._service == null)
+            this._service = new pipErrorsService(this._config);
+        return this._service;
+    };
+    return pipErrorsProvider;
+}());
+angular
+    .module('pipErrorsService')
+    .provider('pipErrorsService', pipErrorsProvider);
+},{}],7:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipClearErrors', []);
@@ -10125,7 +10255,7 @@ __export(require("./common"));
         };
     });
 })();
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipFormErrors', []);
@@ -10228,11 +10358,13 @@ __export(require("./common"));
         ;
     }]);
 })();
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Maintenance', []);
-    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $mdMedia, $injector) {
+    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $mdMedia, $injector, pipErrorsService) {
+        var errorKey = 'Maintenance';
+        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
         var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
         $scope.media = pipMedia ? pipMedia : $mdMedia;
@@ -10249,7 +10381,7 @@ __export(require("./common"));
                 return;
             pipNavService.appbar.addShadow();
             pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = 'ERROR_AVAILABLE_TITLE';
+            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
             pipNavService.actions.hide();
         }
         ;
@@ -10258,11 +10390,13 @@ __export(require("./common"));
         ;
     }]);
 })();
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.MissingRoute', []);
-    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $mdMedia, $injector) {
+    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $mdMedia, $injector, pipErrorsService) {
+        var errorKey = 'MissingRoute';
+        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
         var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
         $scope.media = pipMedia ? pipMedia : $mdMedia;
@@ -10279,7 +10413,7 @@ __export(require("./common"));
                 return;
             pipNavService.appbar.addShadow();
             pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = 'ERROR_ROUTE_PAGE_TITLE';
+            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
             pipNavService.actions.hide();
         }
         ;
@@ -10288,11 +10422,13 @@ __export(require("./common"));
         ;
     }]);
 })();
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.NoConnection', []);
-    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $window, $mdMedia, $injector) {
+    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $window, $mdMedia, $injector, pipErrorsService) {
+        var errorKey = 'NoConnection';
+        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
         var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
         $scope.media = pipMedia ? pipMedia : $mdMedia;
@@ -10310,13 +10446,13 @@ __export(require("./common"));
                 return;
             pipNavService.appbar.addShadow();
             pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = 'ERROR_RESPONDING_TITLE';
+            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
             pipNavService.actions.hide();
         }
         ;
     }]);
 })();
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipNoConnectionPanel", ['pipErrors.Translate']);
@@ -10341,11 +10477,13 @@ __export(require("./common"));
         ;
     }]);
 })();
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Unknown', []);
-    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', '$injector', '$mdMedia', function ($scope, $state, $rootScope, $injector, $mdMedia) {
+    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', '$injector', '$mdMedia', 'pipErrorsService', function ($scope, $state, $rootScope, $injector, $mdMedia, pipErrorsService) {
+        var errorKey = 'Unknown';
+        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
         var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
         $scope.media = pipMedia ? pipMedia : $mdMedia;
@@ -10363,7 +10501,7 @@ __export(require("./common"));
                 return;
             pipNavService.appbar.addShadow();
             pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = 'ERROR_UNKNOWN_TITLE';
+            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
             pipNavService.actions.hide();
         }
         ;
@@ -10387,11 +10525,13 @@ __export(require("./common"));
         ;
     }]);
 })();
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipErrors.Unsupported', []);
-    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', function ($scope, $state, $rootScope, $mdMedia, $injector) {
+    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $mdMedia, $injector, pipErrorsService) {
+        var errorKey = 'Unsupported';
+        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
         var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
         $scope.media = pipMedia ? pipMedia : $mdMedia;
@@ -10404,25 +10544,13 @@ __export(require("./common"));
         function appHeader() {
             pipNavService.appbar.addShadow();
             pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = 'ERROR_UNSUPPORTED_TITLE';
+            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
             pipNavService.actions.hide();
         }
         ;
     }]);
 })();
-},{}],13:[function(require,module,exports){
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/maintenance.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
-}]);
-})();
-
+},{}],15:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -10431,7 +10559,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/invalid_route.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_ROUTE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_ROUTE_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url({{errorConfig.Image}});" class="pip-pic"></div><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -10442,20 +10570,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/no_response.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="images/no_response.svg" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_RESPONDING_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_RESPONDING_SUBTITLE\' | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url({{errorConfig.Image}});" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10467,7 +10583,31 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url(\'images/unknown_error.svg\');" class="pip-pic"></div><div class="pip-error-text">{{::\'ERROR_UNKNOWN_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNKNOWN_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.status"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.description">Description: {{error_details.description}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url({{errorConfig.Image}});" class="pip-pic"></div><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.status"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.description">Description: {{error_details.description}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection/no_connection.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div style="background-image: url({{errorConfig.Image}});" class="pip-pic"></div><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection_panel/no_connection_panel.html',
+    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10479,13 +10619,13 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('unsupported/unsupported.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::\'ERROR_UNSUPPORTED_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_UNSUPPORTED_SUBTITLE\' | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
 }]);
 })();
 
 
 
-},{}]},{},[13,1,2,4,3,5,6,7,8,10,9,11,12])(13)
+},{}]},{},[15,1,2,4,5,6,3,7,8,9,10,12,11,13,14])(15)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
