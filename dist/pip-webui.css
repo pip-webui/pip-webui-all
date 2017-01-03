@@ -6705,7 +6705,7 @@ md-select md-select-value .md-text .pip-tabs-badge {
   top: -4px !important;
   right: -3px;
 }
-@media (min-width: 704px) and (max-width: 1024px) {
+@media (min-width: 716px) and (max-width: 1024px) {
   md-toolbar.pip-nav {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
@@ -6747,27 +6747,37 @@ md-select md-select-value .md-text .pip-tabs-badge {
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   z-index: 0;
 }
-@media (max-width: 704px) {
+@media (max-width: 716px) {
   .pip-appbar .pip-appbar-hide-sm {
     display: none;
   }
 }
-@media (min-width: 704px) {
+@media (min-width: 716px) {
   .pip-appbar .pip-appbar-show-sm {
     display: none;
   }
 }
 @media (max-width: 1024px) {
 }
-@media (max-width: 1024px) and (min-width: 704px) {
+@media (max-width: 1024px) and (min-width: 716px) {
   .pip-appbar .pip-shadow-sm {
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   }
 }
-@media (max-width: 704px) {
-  .pip-appbar .pip-shadow-xs {
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-  }
+.pip-xs .pip-appbar .pip-shadow-xs {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+.pip-sm .pip-appbar .pip-shadow-sm {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+.pip-md .pip-appbar .pip-shadow-md {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+.pip-lg .pip-appbar .pip-shadow-lg {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+.pip-xl .pip-appbar .pip-shadow-xl {
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 .pip-primary-actions .pip-primary-actions-badge {
   position: absolute;
@@ -6785,12 +6795,12 @@ md-select md-select-value .md-text .pip-tabs-badge {
 .pip-primary-actions .pip-primary-actions-action {
   margin: 0;
 }
-@media (max-width: 704px) {
+@media (max-width: 716px) {
   .pip-primary-actions .pip-primary-actions-hide-sm {
     display: none;
   }
 }
-@media (min-width: 704px) {
+@media (min-width: 716px) {
   .pip-primary-actions .pip-primary-actions-show-sm {
     display: none;
   }
@@ -8604,7 +8614,7 @@ button:focus {
   width: 20px;
   margin-right: 8px!important;
 }
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
   .pip-page-errors {
     padding-left: 16px!important;
     padding-right: 16px!important;
