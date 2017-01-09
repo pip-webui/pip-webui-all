@@ -6817,6 +6817,10 @@ md-select md-select-value .md-text .pip-tabs-badge {
   white-space: nowrap;
   color: rgba(0, 0, 0, 0.87) !important;
 }
+.pip-secondary-actions .md-icon-button {
+  margin-left: 0px;
+  margin-right: 8px;
+}
 .pip-language-picker .pip-language-action {
   margin-right: -7px;
 }
@@ -8702,8 +8706,8 @@ button:focus {
 }
 .pip-error-page .pip-pic {
   width: 350px !important;
-  height: 250px !important;
-  min-height: 250px !important;
+  height: 350px !important;
+  min-height: 350px !important;
   margin: 25px 25px 0;
   background-position: 50% 50%;
   background-repeat: no-repeat;
