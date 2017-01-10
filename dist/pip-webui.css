@@ -8555,7 +8555,7 @@ button:focus {
   width: 20px;
   margin-right: 8px!important;
 }
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .pip-page-errors {
     padding-left: 16px!important;
     padding-right: 16px!important;
@@ -8643,8 +8643,8 @@ button:focus {
 }
 .pip-error-page .pip-pic {
   width: 350px !important;
-  height: 350px !important;
-  min-height: 350px !important;
+  height: 250px !important;
+  min-height: 250px !important;
   margin: 25px 25px 0;
   background-position: 50% 50%;
   background-repeat: no-repeat;
