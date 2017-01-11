@@ -3971,6 +3971,24 @@ md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
   background-color: rgba(158, 158, 158, 0.2);
   border-left: 5px solid rgba(33, 150, 243, 0.5) !important;
 }
+.pip-focusable.md-focused.md-focused-opacity {
+  background-color: rgba(158, 158, 158, 0.2);
+}
+input:focus,
+p:focus,
+div:focus,
+li:focus,
+md-list-item:focus,
+md-list:focus,
+a:focus,
+md-autocomplete:focus,
+span:focus,
+button:focus,
+md-icon:focus,
+tr:focus,
+td:focus {
+  outline-width: 0 !important;
+}
 
 .text-hide {
   font: 0/0;
@@ -7224,6 +7242,9 @@ md-sidenav.md-closed .pip-sticky-nav-header {
     opacity: 0;
     width: 0px;
   }
+}
+.md-focused {
+  background: #eeffee !important;
 }
 
 .blue .color-primary {
