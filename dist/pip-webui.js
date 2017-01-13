@@ -26,6 +26,7 @@ __export(require("./session"));
 __export(require("./transactions"));
 __export(require("./routing"));
 __export(require("./utilities"));
+
 },{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":26}],2:[function(require,module,exports){
 'use strict';
 captureStateTranslations.$inject = ['$rootScope'];
@@ -73,6 +74,7 @@ angular
     .module('pipRouting')
     .config(addBackStateDecorator)
     .run(captureStateTranslations);
+
 },{}],3:[function(require,module,exports){
 'use strict';
 decorateRedirectStateProvider.$inject = ['$delegate'];
@@ -122,6 +124,7 @@ angular
     .module('pipRouting')
     .config(addRedirectStateProviderDecorator)
     .config(addRedirectStateDecorator);
+
 },{}],4:[function(require,module,exports){
 'use strict';
 hookRoutingEvents.$inject = ['$rootScope', '$log', '$state'];
@@ -154,6 +157,7 @@ function hookRoutingEvents($rootScope, $log, $state) {
 angular
     .module('pipRouting')
     .run(hookRoutingEvents);
+
 },{}],5:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -165,6 +169,7 @@ require("./RedirectDecorator");
 require("./RoutingEvents");
 __export(require("./BackDecorator"));
 __export(require("./RoutingEvents"));
+
 },{"./BackDecorator":2,"./RedirectDecorator":3,"./RoutingEvents":4}],6:[function(require,module,exports){
 'use strict';
 exports.IdentityRootVar = "$identity";
@@ -234,6 +239,7 @@ var IdentityProvider = (function () {
 angular
     .module('pipSession')
     .provider('pipIdentity', IdentityProvider);
+
 },{}],7:[function(require,module,exports){
 'use strict';
 exports.SessionRootVar = "$session";
@@ -319,6 +325,7 @@ var SessionProvider = (function () {
 angular
     .module('pipSession')
     .provider('pipSession', SessionProvider);
+
 },{}],8:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -329,6 +336,7 @@ require("./IdentityService");
 require("./SessionService");
 __export(require("./IdentityService"));
 __export(require("./SessionService"));
+
 },{"./IdentityService":6,"./SessionService":7}],9:[function(require,module,exports){
 'use strict';
 var TransactionError_1 = require("./TransactionError");
@@ -420,6 +428,7 @@ var Transaction = (function () {
     return Transaction;
 }());
 exports.Transaction = Transaction;
+
 },{"./TransactionError":10}],10:[function(require,module,exports){
 'use strict';
 var TransactionError = (function () {
@@ -468,6 +477,7 @@ var TransactionError = (function () {
     return TransactionError;
 }());
 exports.TransactionError = TransactionError;
+
 },{}],11:[function(require,module,exports){
 'use strict';
 var Transaction_1 = require("./Transaction");
@@ -495,6 +505,7 @@ var TransactionService = (function () {
 angular
     .module('pipTransaction')
     .service('pipTransaction', TransactionService);
+
 },{"./Transaction":9}],12:[function(require,module,exports){
 'use strict';
 configureTransactionStrings.$inject = ['$injector'];
@@ -519,6 +530,7 @@ function configureTransactionStrings($injector) {
 angular
     .module('pipTransaction')
     .config(configureTransactionStrings);
+
 },{}],13:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -531,6 +543,7 @@ require("./Transaction");
 require("./TransactionService");
 __export(require("./TransactionError"));
 __export(require("./Transaction"));
+
 },{"./Transaction":9,"./TransactionError":10,"./TransactionService":11,"./TransactionStrings":12}],14:[function(require,module,exports){
 'use strict';
 translateDirective.$inject = ['pipTranslate'];
@@ -569,6 +582,7 @@ angular
     .module('pipTranslate')
     .directive('pipTranslate', translateDirective)
     .directive('pipTranslateHtml', translateHtmlDirective);
+
 },{}],15:[function(require,module,exports){
 'use strict';
 translateFilter.$inject = ['pipTranslate'];
@@ -590,6 +604,7 @@ function optionalTranslateFilter($injector) {
 angular
     .module('pipTranslate')
     .filter('translate', translateFilter);
+
 },{}],16:[function(require,module,exports){
 'use strict';
 initTranslate.$inject = ['pipTranslate'];
@@ -728,6 +743,7 @@ angular
     .module('pipTranslate')
     .provider('pipTranslate', TranslateProvider)
     .run(initTranslate);
+
 },{"../utilities/PageResetService":21,"./Translation":17}],17:[function(require,module,exports){
 'use strict';
 var Translation = (function () {
@@ -862,6 +878,7 @@ var Translation = (function () {
     return Translation;
 }());
 exports.Translation = Translation;
+
 },{}],18:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -874,6 +891,7 @@ require("./TranslateFilter");
 require("./TranslateDirective");
 __export(require("./Translation"));
 __export(require("./TranslateService"));
+
 },{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":16,"./Translation":17}],19:[function(require,module,exports){
 'use strict';
 var Codes = (function () {
@@ -895,6 +913,7 @@ var Codes = (function () {
 angular
     .module('pipCodes', [])
     .service('pipCodes', Codes);
+
 },{}],20:[function(require,module,exports){
 'use strict';
 var Format = (function () {
@@ -1055,6 +1074,7 @@ var Format = (function () {
 angular
     .module('pipFormat', [])
     .service('pipFormat', Format);
+
 },{}],21:[function(require,module,exports){
 'use strict';
 hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
@@ -1097,6 +1117,7 @@ function hookResetEvents($rootScope, pipPageReset) {
 angular.module('pipPageReset', [])
     .service('pipPageReset', PageResetService)
     .run(hookResetEvents);
+
 },{}],22:[function(require,module,exports){
 'use strict';
 var ScrollService = (function () {
@@ -1125,6 +1146,7 @@ var ScrollService = (function () {
 angular
     .module('pipScroll', [])
     .service('pipScroll', ScrollService);
+
 },{}],23:[function(require,module,exports){
 'use strict';
 var SystemInfo = (function () {
@@ -1259,6 +1281,7 @@ var SystemInfo = (function () {
 angular
     .module('pipSystemInfo', [])
     .service('pipSystemInfo', SystemInfo);
+
 },{}],24:[function(require,module,exports){
 'use strict';
 var Tags = (function () {
@@ -1312,6 +1335,7 @@ var Tags = (function () {
 angular
     .module('pipTags', [])
     .service('pipTags', Tags);
+
 },{}],25:[function(require,module,exports){
 'use strict';
 var TimerEvent = (function () {
@@ -1401,6 +1425,7 @@ var TimerService = (function () {
 }());
 angular.module('pipTimer', [])
     .service('pipTimer', TimerService);
+
 },{}],26:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -1414,8 +1439,11 @@ require("./Codes");
 require("./SystemInfo");
 require("./PageResetService");
 __export(require("./PageResetService"));
+
 },{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -1426,6 +1454,7 @@ __export(require("./PageResetService"));
         'pipFabTooltipVisibility'
     ]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -1438,6 +1467,7 @@ __export(require("./PageResetService"));
         };
     }]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -1462,6 +1492,7 @@ __export(require("./PageResetService"));
         };
     }]);
 })();
+
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -1506,6 +1537,7 @@ __export(require("./PageResetService"));
         };
     }]);
 })();
+
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -1577,6 +1609,7 @@ __export(require("./PageResetService"));
         };
     });
 })();
+
 },{}],6:[function(require,module,exports){
 (function(module) {
 try {
@@ -1594,6 +1627,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[6,1,2,3,4,5])(6)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -1630,6 +1665,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipAuxPanel')
         .directive('pipAuxPanel', AuxPanelDirective);
 })();
+
 },{"../media/MediaService":12}],2:[function(require,module,exports){
 'use strict';
 (function () {
@@ -1672,6 +1708,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipAuxPanel')
         .directive('pipAuxPanelPart', AuxPanelPartDirective);
 })();
+
 },{}],3:[function(require,module,exports){
 'use strict';
 hookAuxPanelEvents.$inject = ['$rootScope', 'pipAuxPanel'];
@@ -1868,6 +1905,7 @@ angular
     .module('pipAuxPanel')
     .provider('pipAuxPanel', AuxPanelProvider)
     .run(hookAuxPanelEvents);
+
 },{}],4:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -1878,14 +1916,14 @@ require("./AuxPanelService");
 require("./AuxPanelPartDirective");
 require("./AuxPanelDirective");
 __export(require("./AuxPanelService"));
+
 },{"./AuxPanelDirective":1,"./AuxPanelPartDirective":2,"./AuxPanelService":3}],5:[function(require,module,exports){
 'use strict';
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-angular.module('pipLayout', ['wu.masonry', 'pipAuxPanel']);
-require("./media/MediaService");
-require("./media/ResizeFunctions");
+angular.module('pipLayout', ['wu.masonry', 'pipMedia', 'pipAuxPanel']);
+require("./media/index");
 require("./layouts/MainDirective");
 require("./layouts/CardDirective");
 require("./layouts/DialogDirective");
@@ -1893,9 +1931,9 @@ require("./layouts/DocumentDirective");
 require("./layouts/SimpleDirective");
 require("./layouts/TilesDirective");
 require("./auxpanel/index");
-__export(require("./media/MediaService"));
-__export(require("./media/ResizeFunctions"));
-},{"./auxpanel/index":4,"./layouts/CardDirective":6,"./layouts/DialogDirective":7,"./layouts/DocumentDirective":8,"./layouts/MainDirective":9,"./layouts/SimpleDirective":10,"./layouts/TilesDirective":11,"./media/MediaService":12,"./media/ResizeFunctions":13}],6:[function(require,module,exports){
+__export(require("./media/index"));
+
+},{"./auxpanel/index":4,"./layouts/CardDirective":6,"./layouts/DialogDirective":7,"./layouts/DocumentDirective":8,"./layouts/MainDirective":9,"./layouts/SimpleDirective":10,"./layouts/TilesDirective":11,"./media/index":14}],6:[function(require,module,exports){
 'use strict';
 var MediaService_1 = require("../media/MediaService");
 (function () {
@@ -1977,6 +2015,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipCard', cardDirective);
 })();
+
 },{"../media/MediaService":12}],7:[function(require,module,exports){
 'use strict';
 (function () {
@@ -1992,6 +2031,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipDialog', dialogDirective);
 })();
+
 },{}],8:[function(require,module,exports){
 'use strict';
 (function () {
@@ -2007,6 +2047,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipDocument', documentDirective);
 })();
+
 },{}],9:[function(require,module,exports){
 'use strict';
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
@@ -2071,6 +2112,7 @@ var MediaService_1 = require("../media/MediaService");
         .directive('pipMain', mainDirective)
         .directive('pipMainBody', mainBodyDirective);
 })();
+
 },{"../media/MediaService":12,"../media/ResizeFunctions":13}],10:[function(require,module,exports){
 'use strict';
 (function () {
@@ -2086,6 +2128,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipSimple', simpleDirective);
 })();
+
 },{}],11:[function(require,module,exports){
 'use strict';
 tilesDirective.$inject = ['$rootScope'];
@@ -2196,6 +2239,7 @@ function tilesDirective($rootScope) {
 angular
     .module('pipLayout')
     .directive('pipTiles', tilesDirective);
+
 },{"../media/MediaService":12,"../media/ResizeFunctions":13}],12:[function(require,module,exports){
 'use strict';
 var MediaBreakpoints = (function () {
@@ -2266,8 +2310,9 @@ var MediaProvider = (function () {
     return MediaProvider;
 }());
 angular
-    .module('pipLayout')
+    .module('pipMedia')
     .provider('pipMedia', MediaProvider);
+
 },{}],13:[function(require,module,exports){
 'use strict';
 var attachEvent = document.attachEvent;
@@ -2343,8 +2388,22 @@ function removeResizeListener(element, listener) {
     }
 }
 exports.removeResizeListener = removeResizeListener;
-},{}]},{},[5])(5)
+
+},{}],14:[function(require,module,exports){
+'use strict';
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+angular.module('pipMedia', []);
+require("./MediaService");
+require("./ResizeFunctions");
+__export(require("./MediaService"));
+__export(require("./ResizeFunctions"));
+
+},{"./MediaService":12,"./ResizeFunctions":13}]},{},[5])(5)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -2395,8 +2454,11 @@ exports.removeResizeListener = removeResizeListener;
         }
     });
 })();
+
 },{}]},{},[1])(1)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -2409,6 +2471,7 @@ exports.removeResizeListener = removeResizeListener;
         'pipDraggable'
     ]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -2865,6 +2928,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     });
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -2970,6 +3034,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3136,6 +3201,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3301,6 +3367,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}],6:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3339,8 +3406,11 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}]},{},[1,2,3,4,5,6])(6)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -3391,6 +3461,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3404,6 +3475,7 @@ exports.removeResizeListener = removeResizeListener;
         'pipControls.Translate'
     ]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3416,6 +3488,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3492,6 +3565,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     });
 })();
+
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3556,6 +3630,7 @@ exports.removeResizeListener = removeResizeListener;
         }
     }]);
 })();
+
 },{}],6:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3575,6 +3650,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     });
 })();
+
 },{}],7:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3595,6 +3671,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     });
 })();
+
 },{}],8:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3701,6 +3778,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     }]);
 })();
+
 },{}],9:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3782,6 +3860,7 @@ exports.removeResizeListener = removeResizeListener;
         };
     });
 })();
+
 },{}],10:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3821,6 +3900,7 @@ exports.removeResizeListener = removeResizeListener;
         }
     }]);
 })();
+
 },{}],11:[function(require,module,exports){
 (function () {
     'use strict';
@@ -3848,6 +3928,7 @@ exports.removeResizeListener = removeResizeListener;
         }
     }]);
 })();
+
 },{}],12:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4008,6 +4089,7 @@ exports.removeResizeListener = removeResizeListener;
         }
     }]);
 })();
+
 },{}],13:[function(require,module,exports){
 (function(module) {
 try {
@@ -4040,8 +4122,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
-    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': toast.type==\'error\', \'pip-column-toast\': toast.actions.length > 1 || actionLenght > 4, \'pip-no-action-toast\': actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)"><div class="flex" ng-if="toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="onAction(action)" ng-repeat="action in actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -4052,8 +4134,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('toast/toast.html',
+    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': toast.type==\'error\', \'pip-column-toast\': toast.actions.length > 1 || actionLenght > 4, \'pip-no-action-toast\': actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="actions.length > 0 || (toast.type==\'error\' && toast.error)"><div class="flex" ng-if="toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="toast.type==\'error\' && toast.error && showDetails" ng-click="onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="onAction(action)" ng-repeat="action in actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
 }]);
 })();
 
@@ -4061,6 +4143,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[13,1,2,3,5,4,6,7,8,10,9,11,12])(13)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -4074,6 +4158,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4081,6 +4166,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipTagList'
     ]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4117,6 +4203,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+
 },{}],4:[function(require,module,exports){
 (function(module) {
 try {
@@ -4135,11 +4222,14 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[4,1,2,3])(4)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 angular.module('pipDateTime', [
     'pipDateTime.Service', 'pipDateTime.Filter'
 ]);
+
 },{}],2:[function(require,module,exports){
 'use strict';
 formatTimeFilter.$inject = ['pipDateTime'];
@@ -4447,6 +4537,7 @@ angular
     .filter('formatTodayDateShortTimeShort', formatTodayDateShortTimeShortFilter)
     .filter('formatMillisecondsToSeconds', formatMillisecondsToSecondsFilter)
     .filter('formatElapsedInterval', formatElapsedIntervalFilter);
+
 },{}],3:[function(require,module,exports){
 'use strict';
 var __extends = (this && this.__extends) || function (d, b) {
@@ -5076,6 +5167,7 @@ var DateTimeProvider = (function (_super) {
 angular
     .module('pipDateTime.Service', [])
     .provider('pipDateTime', DateTimeProvider);
+
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -5212,6 +5304,7 @@ angular
         });
     }]);
 })();
+
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -5537,6 +5630,7 @@ angular
         }
     }]);
 })();
+
 },{}],6:[function(require,module,exports){
 'use strict';
 angular.module('pipDates', [
@@ -5547,6 +5641,7 @@ angular.module('pipDates', [
     'pipDateRange',
     'pipDates.Translate'
 ]);
+
 },{}],7:[function(require,module,exports){
 /**
  * @file Optional filter to translate string resources
@@ -5627,6 +5722,7 @@ angular.module('pipDates', [
         };
     });
 })();
+
 },{}],9:[function(require,module,exports){
 (function () {
     'use strict';
@@ -5860,6 +5956,7 @@ angular.module('pipDates', [
         $element.addClass('pip-time-range-edit');
     }]);
 })();
+
 },{}],10:[function(require,module,exports){
 (function(module) {
 try {
@@ -5892,8 +5989,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_edit_directive/time_range_edit.html',
-    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex="" ng-if="showTime"><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex="" ng-if="showTime"><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
+  $templateCache.put('time_range_directive/time_range.html',
+    '<p><span ng-if="data.start != null">{{data.start | formatLongDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatLongDateTime}}</span></p>');
 }]);
 })();
 
@@ -5904,8 +6001,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatLongDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatLongDateTime}}</span></p>');
+  $templateCache.put('time_range_edit_directive/time_range_edit.html',
+    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex="" ng-if="showTime"><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex="" ng-if="showTime"><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
 }]);
 })();
 
@@ -5913,6 +6010,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[10,7,4,5,2,3,1,6,8,9])(10)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -5961,6 +6060,7 @@ angular
     'pipDialogs.Templates'
 ])
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
+
 },{}],2:[function(require,module,exports){
 "use strict";
 var ConfirmationService = (function () {
@@ -5992,10 +6092,12 @@ var ConfirmationService = (function () {
 angular
     .module('pipConfirmationDialog')
     .service('pipConfirmationDialog', ConfirmationService);
+
 },{}],3:[function(require,module,exports){
 'use strict';
 require("./ConfirmationController");
 require("./ConfirmationService");
+
 },{"./ConfirmationController":1,"./ConfirmationService":2}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -6008,6 +6110,7 @@ require("./ConfirmationService");
         };
     }]);
 })();
+
 },{}],5:[function(require,module,exports){
 'use strict';
 require("./error_details");
@@ -6022,6 +6125,7 @@ angular
     'pipOptionsBigDialog',
     'pipErrorDetailsDialog',
 ]);
+
 },{"./confirmation":3,"./error_details":8,"./information":11,"./options":16}],6:[function(require,module,exports){
 'use strict';
 var ErrorStrings = (function () {
@@ -6103,6 +6207,7 @@ exports.ErrorDetailsDialogController = ErrorDetailsDialogController;
 angular
     .module('pipErrorDetailsDialog')
     .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
+
 },{}],7:[function(require,module,exports){
 var ErrorDetailsService = (function () {
     ErrorDetailsService.$inject = ['$mdDialog'];
@@ -6133,6 +6238,7 @@ var ErrorDetailsService = (function () {
 angular
     .module('pipErrorDetailsDialog')
     .service('pipErrorDetailsDialog', ErrorDetailsService);
+
 },{}],8:[function(require,module,exports){
 'use strict';
 angular
@@ -6143,6 +6249,7 @@ angular
 ]);
 require("./ErrorDetailsService");
 require("./ErrorDetailsController");
+
 },{"./ErrorDetailsController":6,"./ErrorDetailsService":7}],9:[function(require,module,exports){
 'use strict';
 var InformationStrings = (function () {
@@ -6200,6 +6307,7 @@ exports.InformationDialogController = InformationDialogController;
 angular
     .module('pipInformationDialog')
     .controller('pipInformationDialogController', InformationDialogController);
+
 },{}],10:[function(require,module,exports){
 "use strict";
 var InformationService = (function () {
@@ -6227,6 +6335,7 @@ var InformationService = (function () {
 angular
     .module('pipInformationDialog')
     .service('pipInformationDialog', InformationService);
+
 },{}],11:[function(require,module,exports){
 'use strict';
 angular
@@ -6237,6 +6346,7 @@ angular
 ]);
 require("./InformationService");
 require("./InformationController");
+
 },{"./InformationController":9,"./InformationService":10}],12:[function(require,module,exports){
 'use strict';
 var OptionsBigData = (function () {
@@ -6327,6 +6437,7 @@ exports.OptionsBigDialogController = OptionsBigDialogController;
 angular
     .module('pipOptionsBigDialog')
     .controller('pipOptionsBigDialogController', OptionsBigDialogController);
+
 },{}],13:[function(require,module,exports){
 "use strict";
 var OptionsBigService = (function () {
@@ -6358,6 +6469,7 @@ var OptionsBigService = (function () {
 angular
     .module('pipOptionsBigDialog')
     .service('pipOptionsBigDialog', OptionsBigService);
+
 },{}],14:[function(require,module,exports){
 'use strict';
 var OptionsData = (function () {
@@ -6433,6 +6545,7 @@ exports.OptionsDialogController = OptionsDialogController;
 angular
     .module('pipOptionsDialog')
     .controller('pipOptionsDialogController', OptionsDialogController);
+
 },{}],15:[function(require,module,exports){
 "use strict";
 var OptionsService = (function () {
@@ -6464,6 +6577,7 @@ var OptionsService = (function () {
 angular
     .module('pipOptionsDialog')
     .service('pipOptionsDialog', OptionsService);
+
 },{}],16:[function(require,module,exports){
 'use strict';
 angular
@@ -6482,6 +6596,7 @@ angular
 ]);
 require("./OptionsBigService");
 require("./OptionsBigController");
+
 },{"./OptionsBigController":12,"./OptionsBigService":13,"./OptionsController":14,"./OptionsService":15}],17:[function(require,module,exports){
 (function(module) {
 try {
@@ -6548,6 +6663,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[17,1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15])(17)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 var __extends = (this && this.__extends) || function (d, b) {
@@ -6565,7 +6682,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -6738,6 +6855,7 @@ var ActionsProvider = (function () {
 angular
     .module('pipActions')
     .provider('pipActions', ActionsProvider);
+
 },{}],2:[function(require,module,exports){
 'use strict';
 (function () {
@@ -6840,6 +6958,7 @@ angular
         .module('pipActions')
         .directive('pipPrimaryActions', primaryActionsDirective);
 })();
+
 },{}],3:[function(require,module,exports){
 'use strict';
 (function () {
@@ -6949,6 +7068,7 @@ angular
         .module('pipActions')
         .directive('pipSecondaryActions', secondaryActionsDirective);
 })();
+
 },{}],4:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -6959,6 +7079,7 @@ require("./ActionsService");
 require("./PrimaryActionsDirective");
 require("./SecondaryActionsDirective");
 __export(require("./ActionsService"));
+
 },{"./ActionsService":1,"./PrimaryActionsDirective":2,"./SecondaryActionsDirective":3}],5:[function(require,module,exports){
 'use strict';
 (function () {
@@ -6986,6 +7107,7 @@ __export(require("./ActionsService"));
         .module('pipAppBar')
         .directive('pipAppbar', appbarDirective);
 })();
+
 },{}],6:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7031,6 +7153,7 @@ __export(require("./ActionsService"));
     angular.module('pipAppBar')
         .directive('pipAppbarPart', appbarPartDirective);
 })();
+
 },{}],7:[function(require,module,exports){
 'use strict';
 exports.AppBarChangedEvent = 'pipAppBarChanged';
@@ -7212,6 +7335,7 @@ var AppBarProvider = (function () {
 angular
     .module('pipAppBar')
     .provider('pipAppBar', AppBarProvider);
+
 },{}],8:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -7223,6 +7347,7 @@ require("./AppBarService");
 require("./AppBarDirective");
 require("./AppBarPartDirective");
 __export(require("./AppBarService"));
+
 },{"./AppBarDirective":5,"./AppBarPartDirective":6,"./AppBarService":7}],9:[function(require,module,exports){
 'use strict';
 var BreadcrumbService_1 = require("./BreadcrumbService");
@@ -7320,6 +7445,7 @@ var SearchService_1 = require("../search/SearchService");
     angular.module('pipBreadcrumb')
         .directive('pipBreadcrumb', breadcrumbDirective);
 })();
+
 },{"../search/SearchService":27,"./BreadcrumbService":10}],10:[function(require,module,exports){
 'use strict';
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
@@ -7428,6 +7554,7 @@ var BreadcrumbProvider = (function () {
 }());
 angular.module('pipBreadcrumb')
     .provider('pipBreadcrumb', BreadcrumbProvider);
+
 },{}],11:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -7437,6 +7564,7 @@ angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Trans
 require("./BreadcrumbDirective");
 require("./BreadcrumbService");
 __export(require("./BreadcrumbService"));
+
 },{"./BreadcrumbDirective":9,"./BreadcrumbService":10}],12:[function(require,module,exports){
 'use strict';
 var NavService = (function () {
@@ -7471,6 +7599,7 @@ var NavService = (function () {
 angular
     .module('pipNavService', [])
     .service('pipNavService', NavService);
+
 },{}],13:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7486,6 +7615,7 @@ angular
         .module('pipNav.Translate', [])
         .filter('translate', translateFilter);
 })();
+
 },{}],14:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7550,6 +7680,7 @@ angular
         .module('pipDropdown', ['pipNav.Templates'])
         .directive('pipDropdown', dropdownDirective);
 })();
+
 },{}],15:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7673,6 +7804,7 @@ angular
         .module('pipNavHeader')
         .directive('pipNavHeader', navHeaderDirective);
 })();
+
 },{}],16:[function(require,module,exports){
 'use strict';
 exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
@@ -7882,6 +8014,7 @@ var NavHeaderProvider = (function () {
 angular
     .module('pipNavHeader')
     .provider('pipNavHeader', NavHeaderProvider);
+
 },{}],17:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -7891,6 +8024,7 @@ angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
 require("./NavHeaderService");
 require("./NavHeaderDirective");
 __export(require("./NavHeaderService"));
+
 },{"./NavHeaderDirective":15,"./NavHeaderService":16}],18:[function(require,module,exports){
 'use strict';
 (function () {
@@ -7940,6 +8074,7 @@ __export(require("./NavHeaderService"));
         .module('pipNavIcon')
         .directive('pipNavIcon', navIconDirective);
 })();
+
 },{}],19:[function(require,module,exports){
 'use strict';
 exports.NavIconChangedEvent = 'pipNavIconChanged';
@@ -8065,6 +8200,7 @@ var NavIconProvider = (function () {
 angular
     .module('pipNavIcon')
     .provider('pipNavIcon', NavIconProvider);
+
 },{}],20:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -8074,6 +8210,7 @@ angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Template
 require("./NavIconService");
 require("./NavIconDirective");
 __export(require("./NavIconService"));
+
 },{"./NavIconDirective":18,"./NavIconService":19}],21:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -8114,6 +8251,7 @@ __export(require("./sidenav"));
 __export(require("./icon"));
 __export(require("./menu"));
 __export(require("./header"));
+
 },{"./actions":4,"./appbar":8,"./breadcrumb":11,"./common/NavService":12,"./dependencies/TranslateFilter":13,"./dropdown/DropdownDirective":14,"./header":17,"./icon":20,"./language/LanguagePickerDirective":22,"./menu":25,"./search":28,"./sidenav":32,"./tabs/TabsDirective":33}],22:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8168,6 +8306,7 @@ __export(require("./header"));
     ])
         .directive('pipLanguagePicker', languagePickerDirective);
 })();
+
 },{}],23:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8321,6 +8460,7 @@ __export(require("./header"));
         .module('pipNavMenu')
         .directive('pipNavMenu', navMenuDirective);
 })();
+
 },{}],24:[function(require,module,exports){
 'use strict';
 exports.NavMenuChangedEvent = 'pipNavMenuChanged';
@@ -8442,6 +8582,7 @@ var NavMenuProvider = (function () {
 angular
     .module('pipNavMenu')
     .provider('pipNavMenu', NavMenuProvider);
+
 },{}],25:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -8451,6 +8592,7 @@ angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Template
 require("./NavMenuService");
 require("./NavMenuDirective");
 __export(require("./NavMenuService"));
+
 },{"./NavMenuDirective":23,"./NavMenuService":24}],26:[function(require,module,exports){
 'use strict';
 var SearchService_1 = require("./SearchService");
@@ -8545,6 +8687,7 @@ var SearchService_2 = require("./SearchService");
     angular.module('pipSearchBar')
         .directive('pipSearchBar', searchBarDirective);
 })();
+
 },{"./SearchService":27}],27:[function(require,module,exports){
 'use strict';
 exports.OpenSearchEvent = 'pipOpenSearch';
@@ -8661,6 +8804,7 @@ var SearchProvider = (function () {
 }());
 angular.module('pipSearchBar')
     .provider('pipSearch', SearchProvider);
+
 },{}],28:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -8670,6 +8814,7 @@ angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templa
 require("./SearchService");
 require("./SearchBarDirective");
 __export(require("./SearchService"));
+
 },{"./SearchBarDirective":26,"./SearchService":27}],29:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8840,6 +8985,7 @@ __export(require("./SearchService"));
         .module('pipSideNav')
         .directive('pipSidenav', sideNavDirective);
 })();
+
 },{}],30:[function(require,module,exports){
 'use strict';
 (function () {
@@ -8884,6 +9030,7 @@ __export(require("./SearchService"));
         .module('pipSideNav')
         .directive('pipSidenavPart', sidenavPartDirective);
 })();
+
 },{}],31:[function(require,module,exports){
 'use strict';
 hookSideNavEvents.$inject = ['$rootScope', 'pipSideNav'];
@@ -9090,6 +9237,7 @@ angular
     .module('pipSideNav')
     .provider('pipSideNav', SideNavProvider)
     .run(hookSideNavEvents);
+
 },{}],32:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -9100,6 +9248,7 @@ require("./SideNavService");
 require("./SideNavPartDirective");
 require("./SideNavDirective");
 __export(require("./SideNavService"));
+
 },{"./SideNavDirective":29,"./SideNavPartDirective":30,"./SideNavService":31}],33:[function(require,module,exports){
 'use strict';
 (function () {
@@ -9227,6 +9376,7 @@ __export(require("./SideNavService"));
         .module("pipTabs", ['pipNav.Templates'])
         .directive('pipTabs', tabsDirective);
 })();
+
 },{}],34:[function(require,module,exports){
 (function(module) {
 try {
@@ -9377,6 +9527,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[34,21])(34)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 configureBootBarnCoolTheme.$inject = ['$mdThemingProvider'];
@@ -9418,6 +9570,7 @@ function configureBootBarnCoolTheme($mdThemingProvider) {
 angular
     .module('pipTheme.BootBarn.Cool', ['ngMaterial'])
     .config(configureBootBarnCoolTheme);
+
 },{}],2:[function(require,module,exports){
 'use strict';
 configureBootBarnMonochromeTheme.$inject = ['$mdThemingProvider'];
@@ -9459,6 +9612,7 @@ function configureBootBarnMonochromeTheme($mdThemingProvider) {
 angular
     .module('pipTheme.BootBarn.Monochrome', ['ngMaterial'])
     .config(configureBootBarnMonochromeTheme);
+
 },{}],3:[function(require,module,exports){
 'use strict';
 configureBootBarnWarmTheme.$inject = ['$mdThemingProvider'];
@@ -9504,6 +9658,7 @@ function configureBootBarnWarmTheme($mdThemingProvider) {
 }
 angular.module('pipTheme.BootBarn.Warm', ['ngMaterial'])
     .config(configureBootBarnWarmTheme);
+
 },{}],4:[function(require,module,exports){
 'use strict';
 require("./BootBarnCoolTheme");
@@ -9515,6 +9670,7 @@ angular.module('pipTheme.BootBarn', [
     'pipTheme.BootBarn.Cool',
     'pipTheme.BootBarn.Monochrome',
 ]);
+
 },{"./BootBarnCoolTheme":1,"./BootBarnMonochromeTheme":2,"./BootBarnWarmTheme":3}],5:[function(require,module,exports){
 'use strict';
 initTheme.$inject = ['pipTheme'];
@@ -9636,6 +9792,7 @@ angular
     .module('pipTheme')
     .provider('pipTheme', ThemeProvider)
     .run(initTheme);
+
 },{}],6:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -9644,6 +9801,7 @@ function __export(m) {
 angular.module('pipTheme', ['ngMaterial']);
 require("./ThemeService");
 __export(require("./ThemeService"));
+
 },{"./ThemeService":5}],7:[function(require,module,exports){
 'use strict';
 configureDefaultAmberTheme.$inject = ['$mdThemingProvider'];
@@ -9679,6 +9837,7 @@ function configureDefaultAmberTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Amber', ['ngMaterial'])
     .config(configureDefaultAmberTheme);
+
 },{}],8:[function(require,module,exports){
 'use strict';
 configureDefaultBlueTheme.$inject = ['$mdThemingProvider'];
@@ -9723,6 +9882,7 @@ function configureDefaultBlueTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Blue', ['ngMaterial'])
     .config(configureDefaultBlueTheme);
+
 },{}],9:[function(require,module,exports){
 'use strict';
 configureDefaultGreenTheme.$inject = ['$mdThemingProvider'];
@@ -9762,6 +9922,7 @@ function configureDefaultGreenTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Green', ['ngMaterial'])
     .config(configureDefaultGreenTheme);
+
 },{}],10:[function(require,module,exports){
 'use strict';
 configureDefaultGreyTheme.$inject = ['$mdThemingProvider'];
@@ -9797,6 +9958,7 @@ function configureDefaultGreyTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Grey', ['ngMaterial'])
     .config(configureDefaultGreyTheme);
+
 },{}],11:[function(require,module,exports){
 'use strict';
 configureDefaultNavyTheme.$inject = ['$mdThemingProvider'];
@@ -9832,6 +9994,7 @@ function configureDefaultNavyTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Navy', ['ngMaterial'])
     .config(configureDefaultNavyTheme);
+
 },{}],12:[function(require,module,exports){
 'use strict';
 configureDefaultOrangeTheme.$inject = ['$mdThemingProvider'];
@@ -9870,6 +10033,7 @@ function configureDefaultOrangeTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Orange', ['ngMaterial'])
     .config(configureDefaultOrangeTheme);
+
 },{}],13:[function(require,module,exports){
 'use strict';
 configureDefaultPinkTheme.$inject = ['$mdThemingProvider'];
@@ -9909,6 +10073,7 @@ function configureDefaultPinkTheme($mdThemingProvider) {
 angular
     .module('pipTheme.Pink', ['ngMaterial'])
     .config(configureDefaultPinkTheme);
+
 },{}],14:[function(require,module,exports){
 'use strict';
 configureDefaultTheme.$inject = ['$mdThemingProvider'];
@@ -9935,6 +10100,7 @@ function configureDefaultTheme($mdThemingProvider) {
     $mdThemingProvider.setDefaultTheme('default');
     $mdThemingProvider.alwaysWatchTheme(true);
 }
+
 },{"./DefaultAmberTheme":7,"./DefaultBlueTheme":8,"./DefaultGreenTheme":9,"./DefaultGreyTheme":10,"./DefaultNavyTheme":11,"./DefaultOrangeTheme":12,"./DefaultPinkTheme":13}],15:[function(require,module,exports){
 'use strict';
 function __export(m) {
@@ -9944,8 +10110,11 @@ require("./common");
 require("./default");
 require("./bootbarn");
 __export(require("./common"));
+
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -10021,6 +10190,7 @@ __export(require("./common"));
         });
     }]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10033,6 +10203,7 @@ __export(require("./common"));
         };
     }]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10044,10 +10215,12 @@ __export(require("./common"));
         'pipFormErrors'
     ]);
 })();
+
 },{}],4:[function(require,module,exports){
 'use strict';
 angular.module('pipErrorsService', []);
 require("./errors_service");
+
 },{"./errors_service":6}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10190,6 +10363,7 @@ require("./errors_service");
         };
     }]);
 })();
+
 },{}],6:[function(require,module,exports){
 'use strict';
 var ErrorStateItem = (function () {
@@ -10306,6 +10480,7 @@ var pipErrorsProvider = (function () {
 angular
     .module('pipErrorsService')
     .provider('pipErrorsService', pipErrorsProvider);
+
 },{}],7:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10337,6 +10512,7 @@ angular
         };
     });
 })();
+
 },{}],8:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10440,6 +10616,7 @@ angular
         ;
     }]);
 })();
+
 },{}],9:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10472,6 +10649,7 @@ angular
         ;
     }]);
 })();
+
 },{}],10:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10504,6 +10682,7 @@ angular
         ;
     }]);
 })();
+
 },{}],11:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10534,6 +10713,7 @@ angular
         ;
     }]);
 })();
+
 },{}],12:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10559,6 +10739,7 @@ angular
         ;
     }]);
 })();
+
 },{}],13:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10607,6 +10788,7 @@ angular
         ;
     }]);
 })();
+
 },{}],14:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10632,6 +10814,7 @@ angular
         ;
     }]);
 })();
+
 },{}],15:[function(require,module,exports){
 (function(module) {
 try {
@@ -10664,18 +10847,6 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection/no_connection.html',
     '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
@@ -10688,8 +10859,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unsupported/unsupported.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
+  $templateCache.put('no_connection_panel/no_connection_panel.html',
+    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10705,10 +10876,24 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('unsupported/unsupported.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
+}]);
+})();
+
 
 
 },{}]},{},[15,1,2,4,5,6,3,7,8,9,10,12,11,13,14])(15)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -10876,6 +11061,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10887,6 +11073,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipCharts.Templates'
     ]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -10950,6 +11137,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
+
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11339,6 +11527,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
+
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11511,6 +11700,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }
 })();
+
 },{}],6:[function(require,module,exports){
 (function(module) {
 try {
@@ -11565,6 +11755,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[6,1,2,3,4,5])(6)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).locations = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11577,6 +11769,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11697,6 +11890,7 @@ module.run(['$templateCache', function($templateCache) {
             clearMap();
     }]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -11871,6 +12065,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12038,6 +12233,7 @@ module.run(['$templateCache', function($templateCache) {
         };
     }]);
 })();
+
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12137,6 +12333,7 @@ module.run(['$templateCache', function($templateCache) {
         defineCoordinates();
     }]);
 })();
+
 },{}],6:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12247,6 +12444,7 @@ module.run(['$templateCache', function($templateCache) {
                 clearMap();
         }]);
 })();
+
 },{}],7:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12259,6 +12457,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipLocations.Translate'
     ]);
 })();
+
 },{}],8:[function(require,module,exports){
 (function(module) {
 try {
@@ -12277,6 +12476,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[8,1,3,4,5,6,2,7])(8)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 require("./settings_service/index");
@@ -12285,6 +12486,7 @@ angular.module('pipSettings', [
     'pipSettings.Service',
     'pipSettings.Page'
 ]);
+
 },{"./settings_page/index":5,"./settings_service/index":8}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12293,6 +12495,7 @@ angular.module('pipSettings', [
         'pipSettings.Page'
     ]);
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     var SettingsPageController = (function () {
@@ -12351,6 +12554,7 @@ angular.module('pipSettings', [
     angular.module('pipSettings.Page')
         .controller('pipSettingsPageController', SettingsPageController);
 })();
+
 },{}],4:[function(require,module,exports){
 'use strict';
 configureSettingsPageRoutes.$inject = ['$stateProvider'];
@@ -12366,6 +12570,7 @@ function configureSettingsPageRoutes($stateProvider) {
 }
 angular.module('pipSettings.Page')
     .config(configureSettingsPageRoutes);
+
 },{}],5:[function(require,module,exports){
 'use strict';
 angular.module('pipSettings.Page', [
@@ -12378,6 +12583,7 @@ angular.module('pipSettings.Page', [
 ]);
 require("./SettingsPageController");
 require("./SettingsPageRoutes");
+
 },{"./SettingsPageController":3,"./SettingsPageRoutes":4}],6:[function(require,module,exports){
 
 },{}],7:[function(require,module,exports){
@@ -12539,10 +12745,12 @@ var SettingsProvider = (function () {
 angular
     .module('pipSettings.Service')
     .provider('pipSettings', SettingsProvider);
+
 },{}],8:[function(require,module,exports){
 'use strict';
 angular.module('pipSettings.Service', []);
 require("./SettingsService");
+
 },{"./SettingsService":7}],9:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12556,6 +12764,7 @@ require("./SettingsService");
         'pipSettings.Templates'
     ]);
 })();
+
 },{}],10:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12700,6 +12909,7 @@ require("./SettingsService");
         }
     }]);
 })();
+
 },{}],11:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12760,6 +12970,7 @@ require("./SettingsService");
         }
     }]);
 })();
+
 },{}],12:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12838,6 +13049,7 @@ require("./SettingsService");
         }
     }]);
 })();
+
 },{}],13:[function(require,module,exports){
 (function () {
     'use strict';
@@ -12949,6 +13161,7 @@ require("./SettingsService");
         });
     }]);
 })();
+
 },{}],14:[function(require,module,exports){
 (function () {
     'use strict';
@@ -13007,6 +13220,7 @@ require("./SettingsService");
         }
     }]);
 })();
+
 },{}],15:[function(require,module,exports){
 (function(module) {
 try {
@@ -13073,6 +13287,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[15,5,6,3,4,8,7,2,1,10,11,12,13,14,9])(15)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -13081,6 +13297,7 @@ module.run(['$templateCache', function($templateCache) {
         'pipHelp.Page'
     ]);
 })();
+
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -13138,6 +13355,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }
 })();
+
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -13216,6 +13434,7 @@ module.run(['$templateCache', function($templateCache) {
         }
     }]);
 })();
+
 },{}],4:[function(require,module,exports){
 (function(module) {
 try {
@@ -13233,5 +13452,7 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[4,2,3,1])(4)
 });
+
+
 
 //# sourceMappingURL=pip-webui.js.map

@@ -3,7 +3,6 @@ declare module pip.services {
 export let CurrentState: any;
 export let PreviousState: any;
 
-
 let RedirectedStates: any;
 function decorateRedirectStateProvider($delegate: any): any;
 function addRedirectStateProviderDecorator($provide: any): void;
@@ -11,6 +10,39 @@ function decorateRedirectStateService($delegate: any, $timeout: any): any;
 function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
+
+
+export let IdentityRootVar: string;
+export let IdentityChangedEvent: string;
+export interface IIdentity {
+    id: string;
+    full_name: string;
+    details: string;
+    email: string;
+    photo_url: string;
+    groups: string[];
+}
+export interface IIdentityService {
+    identity: any;
+}
+export interface IIdentityProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    identity: any;
+}
+
+export const SessionRootVar = "$session";
+export const SessionOpenedEvent = "pipSessionOpened";
+export const SessionClosedEvent = "pipSessionClosed";
+export interface ISessionService {
+    session: any;
+    isOpened(): boolean;
+    open(session: any): void;
+    close(): void;
+}
+export interface ISessionProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    session: any;
+}
 
 
 export class Transaction {
@@ -54,39 +86,6 @@ export interface ITransactionService {
 }
 
 function configureTransactionStrings($injector: any): void;
-
-export let IdentityRootVar: string;
-export let IdentityChangedEvent: string;
-export interface IIdentity {
-    id: string;
-    full_name: string;
-    details: string;
-    email: string;
-    photo_url: string;
-    groups: string[];
-}
-export interface IIdentityService {
-    identity: any;
-}
-export interface IIdentityProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    identity: any;
-}
-
-
-export const SessionRootVar = "$session";
-export const SessionOpenedEvent = "pipSessionOpened";
-export const SessionClosedEvent = "pipSessionClosed";
-export interface ISessionService {
-    session: any;
-    isOpened(): boolean;
-    open(session: any): void;
-    close(): void;
-}
-export interface ISessionProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    session: any;
-}
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -147,16 +146,6 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
-export interface ICodes {
-    hash(value: string): number;
-    verification(): string;
-}
-
-export interface IFormat {
-    sample(value: string, maxLength: number): string;
-    sprintf(message: string, ...args: any[]): string;
-}
-
 
 export let ResetPageEvent: string;
 export let ResetAreaEvent: string;
@@ -182,15 +171,6 @@ export interface ISystemInfo {
     isSupported(supported?: any): boolean;
 }
 
-export interface ITags {
-    normalizeOne(tag: string): string;
-    compressOne(tag: string): string;
-    equal(tag1: string, tag2: string): boolean;
-    normalizeAll(tags: any): string[];
-    compressAll(tags: any): string[];
-    extract(entity: any, searchFields?: string[]): string[];
-}
-
 export interface ITimerService {
     isStarted(): boolean;
     addEvent(event: string, timeout: number): void;
@@ -198,6 +178,26 @@ export interface ITimerService {
     clearEvents(): void;
     start(): void;
     stop(): void;
+}
+
+export interface ICodes {
+    hash(value: string): number;
+    verification(): string;
+}
+
+export interface IFormat {
+    sample(value: string, maxLength: number): string;
+    sprintf(message: string, ...args: any[]): string;
+}
+
+
+export interface ITags {
+    normalizeOne(tag: string): string;
+    compressOne(tag: string): string;
+    equal(tag1: string, tag2: string): boolean;
+    normalizeAll(tags: any): string[];
+    compressAll(tags: any): string[];
+    extract(entity: any, searchFields?: string[]): string[];
 }
 
 }
@@ -255,6 +255,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -290,11 +296,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
 
 
 }
@@ -335,6 +336,8 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
+
 
 
 function formatTimeFilter(pipDateTime: any): (value: any, format: string) => string;
@@ -438,8 +441,6 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 
 
-
-
 }
 
 declare module pip.dialogs {
@@ -462,7 +463,6 @@ export class ConfirmationDialogController {
 export interface IConfirmationService {
     show(params: ConfirmationParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
-
 
 
 
@@ -492,6 +492,7 @@ export class InformationDialogController {
 export interface IInformationService {
     show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
 }
+
 
 export class ErrorStrings {
     ok: string;
@@ -524,7 +525,6 @@ class ErrorDetailsService {
     constructor($mdDialog: angular.material.IDialogService);
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
-
 
 
 export class OptionsBigData {
@@ -604,6 +604,7 @@ export class OptionsDialogController {
 export interface IOptionsService {
     show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
 }
+
 
 }
 
@@ -723,7 +724,6 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
-
 
 
 
@@ -896,17 +896,10 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 }
 
 
+
 }
 
 declare module pip.themes {
-
-function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
-
 
 export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
@@ -919,6 +912,14 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
+
+
+function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnWarmTheme($mdThemingProvider: any): void;
+
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -1004,14 +1005,7 @@ declare module pip.settings {
 
 
 
-
 function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-
-
-
 
 
 
@@ -1044,6 +1038,13 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
+
+
+
+
+
+
+
 
 }
 
