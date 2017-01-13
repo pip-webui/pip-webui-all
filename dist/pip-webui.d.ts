@@ -206,7 +206,33 @@ declare module pip.buttons {
 
 
 
+class FabTooltipVisibilityController {
+    private _element;
+    private _scope;
+    private _timeout;
+    constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
+}
 
+class ToggleButtonsController {
+    private _element;
+    private _scope;
+    private _timeout;
+    $mdMedia: angular.material.IMedia;
+    class: string;
+    multiselect: boolean;
+    buttons: any;
+    currentButtonValue: any;
+    currentButtonIndex: number;
+    currentButton: any;
+    buttonSelected: any;
+    disabled: any;
+    enterSpacePress: Function;
+    ngDisabled: Function;
+    highlightButton: any;
+    change: Function;
+    onlyToggle: boolean;
+    constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService);
+}
 
 }
 
@@ -256,6 +282,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -292,12 +324,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
-
-
-
-
-
-
 }
 
 declare module pip.split {
@@ -317,11 +343,11 @@ declare module pip.controls {
 
 
 
+
+
+
+
 var marked: any;
-
-
-
-
 
 
 
@@ -658,32 +684,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -713,6 +713,32 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -724,7 +750,6 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
-
 
 
 
@@ -759,6 +784,7 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
     set(title: string, subtitle: string, imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 
@@ -860,7 +886,6 @@ export interface ISearchProvider extends ng.IServiceProvider {
 
 
 
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -896,6 +921,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
 
 }
 
