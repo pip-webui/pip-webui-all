@@ -1,5 +1,17 @@
 declare module pip.services {
 
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
+
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -32,18 +44,6 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
-
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
 
 
 export class Transaction {
@@ -205,6 +205,12 @@ export interface ITimerService {
 declare module pip.buttons {
 
 
+class FabTooltipVisibilityController {
+    private _element;
+    private _scope;
+    private _timeout;
+    constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
+}
 
 
 
@@ -256,11 +262,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
-
-
-
-
-
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -296,6 +297,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
+
+
+
+
+
+
 
 }
 
@@ -449,20 +456,19 @@ export class ConfirmationParams {
     ok: string;
     title: string;
     cancel: string;
+    event: any;
 }
 export class ConfirmationDialogController {
-    $mdDialog: any;
-    theme: any;
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
     config: ConfirmationParams;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: ConfirmationParams);
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: ConfirmationParams);
     onOk(): void;
     onCancel(): void;
 }
 
-class ConfirmationService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
+export interface IConfirmationService {
+    show(params: ConfirmationParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
@@ -493,8 +499,8 @@ export class ErrorDetailsDialogController {
 }
 
 class ErrorDetailsService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
+    _mdDialog: angular.material.IDialogService;
+    constructor($mdDialog: angular.material.IDialogService);
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
@@ -515,18 +521,16 @@ export class InformationParams {
     item: any;
 }
 export class InformationDialogController {
-    $mdDialog: any;
-    theme: any;
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
     config: InformationStrings;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: InformationParams);
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
     onOk(): void;
     onCancel(): void;
 }
 
-class InformationService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
@@ -548,11 +552,21 @@ export class OptionsBigParams {
     noActions: boolean;
     optionIndex: number;
 }
-export class OptionsBigDialogController {
-    $mdDialog: any;
-    theme: any;
+export interface IOptionsBigDialogController {
+    onOk(): void;
+    onCancel(): void;
+    onKeyUp(event: any, index: any): void;
+    onOptionSelect(event: any, option: any): any;
+    onSelected(): void;
+    onSelect: Function;
     config: OptionsBigParams;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: OptionsBigParams);
+    theme: string;
+}
+export class OptionsBigDialogController implements IOptionsBigDialogController {
+    private $mdDialog;
+    theme: string;
+    config: OptionsBigParams;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: OptionsBigParams);
     onOk(): void;
     onCancel(): void;
     onOptionSelect(event: any, option: any): void;
@@ -562,10 +576,8 @@ export class OptionsBigDialogController {
     private focusInput();
 }
 
-class OptionsBigService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
+export interface IOptionsBigService {
+    show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
 }
 
 export class OptionsData {
@@ -584,10 +596,10 @@ export class OptionsParams {
     deletedTitle: string;
 }
 export class OptionsDialogController {
-    $mdDialog: any;
-    theme: any;
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
     config: OptionsParams;
-    constructor($mdDialog: any, $injector: any, $rootScope: any, params: OptionsParams);
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: OptionsParams);
     onOk(): void;
     onCancel(): void;
     onOptionSelect(event: any, option: OptionsData): void;
@@ -596,10 +608,8 @@ export class OptionsDialogController {
     private focusInput();
 }
 
-class OptionsService {
-    _mdDialog: any;
-    constructor($mdDialog: any);
-    show(params: any, successCallback: any, cancelCallback: any): void;
+export interface IOptionsService {
+    show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
 }
 
 }
@@ -654,32 +664,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -706,6 +690,32 @@ export interface IAppBarProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
+}
+
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
 }
 
 
@@ -897,6 +907,13 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 
 declare module pip.themes {
 
+function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnWarmTheme($mdThemingProvider: any): void;
+
+
 
 export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
@@ -909,13 +926,6 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
-
-function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -942,6 +952,33 @@ declare module pip.errors {
 
 
 
+export class ErrorStateItem {
+    Active: boolean;
+    Name: string;
+    Event: string;
+    Title: string;
+    SubTitle: String;
+    Breadcrumb: string;
+    Image: string;
+    Params?: any;
+}
+export class pipErrorsConfig {
+    Maintenance: ErrorStateItem;
+    MissingRoute: ErrorStateItem;
+    NoConnection: ErrorStateItem;
+    Unknown: ErrorStateItem;
+    Unsupported: ErrorStateItem;
+}
+export interface IpipErrorsService {
+    getErrorItemByKey(errorName: string): ErrorStateItem;
+    config: pipErrorsConfig;
+}
+export interface IpipErrorsProvider extends ng.IServiceProvider {
+    configureErrorByKey(errorName: string, errorParams: ErrorStateItem): void;
+    configureErrors(value: pipErrorsConfig): void;
+}
+
+
 
 
 
@@ -965,18 +1002,12 @@ declare module pip.locations {
 
 
 
-
 let google: any;
+
 
 }
 
 declare module pip.settings {
-
-
-
-
-
-
 
 
 
@@ -1010,6 +1041,12 @@ export class SettingsConfig {
 
 
 function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+
+
+
 
 
 }
