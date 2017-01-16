@@ -1,5 +1,17 @@
 declare module pip.services {
 
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
+
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -32,18 +44,6 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
-
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
 
 
 export class Transaction {
@@ -205,13 +205,13 @@ export interface ITimerService {
 declare module pip.buttons {
 
 
-
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
+
 
 
 }
@@ -262,12 +262,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
-
-
-
-
-
-
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -303,6 +297,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
+
+
+
+
+
+
 
 }
 
@@ -693,6 +693,18 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -716,19 +728,6 @@ export interface IBreadcrumbService {
 }
 export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
-}
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
 }
 
 
@@ -765,6 +764,7 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
     set(title: string, subtitle: string, imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 
@@ -866,7 +866,6 @@ export interface ISearchProvider extends ng.IServiceProvider {
 
 
 
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -902,6 +901,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
 
 }
 
@@ -952,8 +952,6 @@ declare module pip.errors {
 
 
 
-
-
 export class ErrorStateItem {
     Active: boolean;
     Name: string;
@@ -986,6 +984,8 @@ export interface IpipErrorsProvider extends ng.IServiceProvider {
 
 
 
+
+
 }
 
 declare module pip.charts {
@@ -1002,12 +1002,17 @@ declare module pip.locations {
 
 
 
-let google: any;
 
+let google: any;
 
 }
 
 declare module pip.settings {
+
+
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
 
 
 
@@ -1040,11 +1045,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
 
 
 
