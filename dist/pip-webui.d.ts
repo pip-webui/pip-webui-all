@@ -205,13 +205,13 @@ export interface ITimerService {
 declare module pip.buttons {
 
 
+
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
-
 
 
 }
@@ -262,6 +262,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -298,12 +304,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
-
-
-
-
-
-
 }
 
 declare module pip.split {
@@ -323,11 +323,11 @@ declare module pip.controls {
 
 
 
-
-
-
-
 var marked: any;
+
+
+
+
 
 
 
@@ -506,34 +506,6 @@ class ErrorDetailsService {
 
 
 
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
 export class OptionsBigData {
     name: string;
     title: string;
@@ -610,6 +582,34 @@ export class OptionsDialogController {
 
 export interface IOptionsService {
     show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
+}
+
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 }
@@ -693,19 +693,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -729,6 +716,19 @@ export interface IBreadcrumbService {
 }
 export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
+}
+
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
 }
 
 
@@ -795,6 +795,35 @@ export interface INavIconProvider extends ng.IServiceProvider {
 
 
 
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+
 export let NavMenuChangedEvent: string;
 export class NavMenuLink {
     name: string;
@@ -837,7 +866,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -872,34 +900,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
-}
-
-
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
@@ -952,6 +952,8 @@ declare module pip.errors {
 
 
 
+
+
 export class ErrorStateItem {
     Active: boolean;
     Name: string;
@@ -984,8 +986,6 @@ export interface IpipErrorsProvider extends ng.IServiceProvider {
 
 
 
-
-
 }
 
 declare module pip.charts {
@@ -1008,17 +1008,6 @@ let google: any;
 }
 
 declare module pip.settings {
-
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-
-
-
 
 
 
@@ -1051,6 +1040,17 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
+
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+
+
+
+
 
 }
 
