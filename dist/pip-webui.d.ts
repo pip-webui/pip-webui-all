@@ -451,7 +451,6 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 declare module pip.dialogs {
 
-
 export class ConfirmationParams {
     ok: string;
     title: string;
@@ -470,6 +469,7 @@ export class ConfirmationDialogController {
 export interface IConfirmationService {
     show(params: ConfirmationParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
+
 
 
 export class ErrorStrings {
@@ -693,6 +693,19 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -716,19 +729,6 @@ export interface IBreadcrumbService {
 }
 export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
-}
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
 }
 
 
@@ -795,7 +795,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
 
 
 
-
 export let NavMenuChangedEvent: string;
 export class NavMenuLink {
     name: string;
@@ -837,33 +836,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
 
 
 export let SideNavChangedEvent: string;
@@ -900,6 +872,34 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
+}
+
+
+
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
@@ -1011,6 +1011,17 @@ declare module pip.settings {
 
 
 
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+
+
+
+
+
+
 export class SettingsTab {
     state: string;
     title: string;
@@ -1023,12 +1034,15 @@ export interface ISettingsService {
     getDefaultTab(): any;
     showTitleText(newTitleText: any): any;
     showTitleLogo(newTitleLogo: any): any;
+    setDefaultTab(name: string): any;
     showNavIcon(value: any): any;
     getTabs(): any;
 }
 export interface ISettingsProvider extends ng.IServiceProvider {
-    getDefaultTab(): any;
+    getDefaultTab(): SettingsTab;
     addTab(tabObj: any): any;
+    setDefaultTab(name: string): void;
+    getFullStateName(state: string): string;
 }
 export class SettingsConfig {
     defaultTab: string;
@@ -1037,17 +1051,6 @@ export class SettingsConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-
-
-
-
 
 }
 
