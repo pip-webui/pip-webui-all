@@ -46,6 +46,49 @@ function addRedirectStateDecorator($provide: any): void;
 export let RoutingVar: string;
 
 
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
+
+
 function translateDirective(pipTranslate: any): ng.IDirective;
 function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 
@@ -103,49 +146,6 @@ export class Translation {
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
-
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
 
 export interface ICodes {
     hash(value: string): number;
@@ -262,6 +262,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -297,12 +303,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -733,6 +733,35 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+
+
+export let NavIconChangedEvent: string;
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+
 export let NavHeaderChangedEvent: string;
 export class NavHeaderConfig {
     imageUrl: string;
@@ -768,29 +797,40 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-export let NavIconChangedEvent: string;
-export class NavIconConfig {
+export let SideNavChangedEvent: string;
+export let SideNavStateChangedEvent: string;
+export let OpenSideNavEvent: string;
+export let CloseSideNavEvent: string;
+export class SideNavConfig {
+    parts: any;
+    classes: string[];
+    state: any;
     type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
+    visible: boolean;
 }
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
+export interface ISideNavService {
+    readonly config: SideNavConfig;
+    readonly classes: string[];
+    parts: any;
+    state: any;
+    open(): void;
+    close(): void;
+    toggle(): void;
+    show(): void;
     hide(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
 }
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
+export interface ISideNavProvider extends ng.IServiceProvider {
+    config: SideNavConfig;
+    parts: any;
+    type: string;
+    visible: boolean;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
 }
 
 
@@ -863,56 +903,9 @@ export interface ISearchService {
 export interface ISearchProvider extends ng.IServiceProvider {
 }
 
-
-
-
-export let SideNavChangedEvent: string;
-export let SideNavStateChangedEvent: string;
-export let OpenSideNavEvent: string;
-export let CloseSideNavEvent: string;
-export class SideNavConfig {
-    parts: any;
-    classes: string[];
-    state: any;
-    type: string;
-    visible: boolean;
-}
-export interface ISideNavService {
-    readonly config: SideNavConfig;
-    readonly classes: string[];
-    parts: any;
-    state: any;
-    open(): void;
-    close(): void;
-    toggle(): void;
-    show(): void;
-    hide(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface ISideNavProvider extends ng.IServiceProvider {
-    config: SideNavConfig;
-    parts: any;
-    type: string;
-    visible: boolean;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
-
 }
 
 declare module pip.themes {
-
-function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
 
 
 export let ThemeRootVar: string;
@@ -926,6 +919,13 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
+
+function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnWarmTheme($mdThemingProvider: any): void;
+
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
