@@ -205,13 +205,13 @@ export interface ITimerService {
 declare module pip.buttons {
 
 
+
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
-
 
 
 }
@@ -262,6 +262,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -298,12 +304,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
-
-
-
-
-
-
 }
 
 declare module pip.split {
@@ -311,7 +311,6 @@ declare module pip.split {
 }
 
 declare module pip.behaviors {
-
 
 
 
@@ -392,6 +391,7 @@ export interface IShortcutsService {
     globalShortcuts: ShortcutItem[];
     localShortcuts: ShortcutItem[];
     on(globalShortcuts?: ShortcutItem[], localShortcuts?: ShortcutItem[]): void;
+    onLocal(localShortcuts?: ShortcutItem[]): void;
     off(): void;
 }
 export interface IShortcutsProvider extends ng.IServiceProvider {
@@ -403,19 +403,20 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
 
 
 
+
 }
 
 declare module pip.controls {
 
 
 
+
+
+
+
+
+
 var marked: any;
-
-
-
-
-
-
 
 
 
@@ -558,34 +559,6 @@ export interface IConfirmationService {
 
 
 
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
 export class ErrorStrings {
     ok: string;
     cancel: string;
@@ -618,6 +591,34 @@ class ErrorDetailsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
+
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
+}
 
 
 export class OptionsBigData {
@@ -779,18 +780,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -816,6 +805,18 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
 
 
 
@@ -886,6 +887,7 @@ export let NavMenuChangedEvent: string;
 export class NavMenuLink {
     name: string;
     title: string;
+    tooltipText?: string;
     icon?: string;
     count?: number;
     badgeStyle?: string;
@@ -901,6 +903,7 @@ export class NavMenuLink {
 export class NavMenuSection {
     name: string;
     title?: string;
+    tooltipText?: string;
     icon?: string;
     links: NavMenuLink[];
     access?: (section: NavMenuSection) => boolean;
@@ -952,7 +955,6 @@ export interface ISearchProvider extends ng.IServiceProvider {
 
 
 
-
 export let SideNavChangedEvent: string;
 export let SideNavStateChangedEvent: string;
 export let OpenSideNavEvent: string;
@@ -988,6 +990,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
 
 }
 
@@ -1038,8 +1041,6 @@ declare module pip.errors {
 
 
 
-
-
 export class ErrorStateItem {
     Active: boolean;
     Name: string;
@@ -1072,6 +1073,8 @@ export interface IpipErrorsProvider extends ng.IServiceProvider {
 
 
 
+
+
 }
 
 declare module pip.charts {
@@ -1086,9 +1089,9 @@ declare module pip.locations {
 
 
 
-
-
 let google: any;
+
+
 
 
 }

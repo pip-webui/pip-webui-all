@@ -7055,6 +7055,9 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.sidenav-icon-tooltip {
+  margin-left: 24px;
+}
 .pip-sticky-nav-expanded-button .md-button .pip-sticky-nav-menu-icon {
   margin-left: 0px;
 }
@@ -7158,6 +7161,7 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 }
 .pip-sticky-nav-small.sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button {
   margin-right: 0px;
+  min-width: 72px;
 }
 .pip-sticky-nav-small.sidenav-smalldesktop .pip-sticky-nav-menu .pip-sticky-nav-menu-item .md-button .pip-sticky-nav-menu-badge {
   position: absolute;
