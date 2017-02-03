@@ -2429,7 +2429,8 @@ __export(require("./ResizeFunctions"));
         'pipSelected',
         'pipInfiniteScroll',
         'pipUnsavedChanges',
-        'pipDraggable'
+        'pipDraggable',
+        'pipShortcuts'
     ]);
 })();
 },{}],2:[function(require,module,exports){
@@ -3170,6 +3171,596 @@ __export(require("./ResizeFunctions"));
     }]);
 })();
 },{}],5:[function(require,module,exports){
+'use strict';
+var ShortcutOption = (function () {
+    function ShortcutOption() {
+    }
+    return ShortcutOption;
+}());
+exports.ShortcutOption = ShortcutOption;
+var KeyboardEvent = (function () {
+    function KeyboardEvent() {
+    }
+    return KeyboardEvent;
+}());
+KeyboardEvent.Keydown = 'keydown';
+KeyboardEvent.Keyup = 'keyup';
+KeyboardEvent.Keypress = 'keypress';
+exports.KeyboardEvent = KeyboardEvent;
+var KeyboardShortcut = (function () {
+    KeyboardShortcut.$inject = ['element', 'shorcutCombination', 'option', 'callback'];
+    function KeyboardShortcut(element, shorcutCombination, option, callback) {
+        "ngInject";
+        var _this = this;
+        this.shift_nums = {
+            "`": "~",
+            "1": "!",
+            "2": "@",
+            "3": "#",
+            "4": "$",
+            "5": "%",
+            "6": "^",
+            "7": "&",
+            "8": "*",
+            "9": "(",
+            "0": ")",
+            "-": "_",
+            "=": "+",
+            ";": ":",
+            "'": "\"",
+            ",": "<",
+            ".": ">",
+            "/": "?",
+            "\\": "|"
+        };
+        this.special_keys = {
+            'esc': 27,
+            'escape': 27,
+            'tab': 9,
+            'space': 32,
+            'return': 13,
+            'enter': 13,
+            'backspace': 8,
+            'scrolllock': 145,
+            'scroll_lock': 145,
+            'scroll': 145,
+            'capslock': 20,
+            'caps_lock': 20,
+            'caps': 20,
+            'numlock': 144,
+            'num_lock': 144,
+            'num': 144,
+            'pause': 19,
+            'break': 19,
+            'insert': 45,
+            'home': 36,
+            'delete': 46,
+            'end': 35,
+            'pageup': 33,
+            'page_up': 33,
+            'pu': 33,
+            'pagedown': 34,
+            'page_down': 34,
+            'pd': 34,
+            'left': 37,
+            'up': 38,
+            'right': 39,
+            'down': 40,
+            'f1': 112,
+            'f2': 113,
+            'f3': 114,
+            'f4': 115,
+            'f5': 116,
+            'f6': 117,
+            'f7': 118,
+            'f8': 119,
+            'f9': 120,
+            'f10': 121,
+            'f11': 122,
+            'f12': 123
+        };
+        this.modifiers = {
+            shift: { wanted: false, pressed: false },
+            ctrl: { wanted: false, pressed: false },
+            alt: { wanted: false, pressed: false },
+            meta: { wanted: false, pressed: false }
+        };
+        this.target = element;
+        this.shorcut = shorcutCombination;
+        this.event = option.Type;
+        this.option = option;
+        this.callback = callback;
+        this.eventCallback = function (event) {
+            var e = event || window.event;
+            var code;
+            if (_this.option.DisableInInput) {
+                var element_1;
+                if (e.target) {
+                    element_1 = e.target;
+                }
+                else if (e.srcElement) {
+                    element_1 = e.srcElement;
+                }
+                if (element_1.nodeType == 3) {
+                    element_1 = element_1.parentNode;
+                }
+                if (element_1.tagName == 'INPUT' || element_1.tagName == 'TEXTAREA')
+                    return;
+            }
+            if (e.keyCode) {
+                code = e.keyCode;
+            }
+            else if (e.which) {
+                code = e.which;
+            }
+            var character = String.fromCharCode(code).toLowerCase();
+            if (code == 188)
+                character = ",";
+            if (code == 190)
+                character = ".";
+            var keys = _this.shorcut.split("+");
+            var kp = 0;
+            if (e.ctrlKey)
+                _this.modifiers.ctrl.pressed = e.ctrlKey;
+            if (e.shiftKey)
+                _this.modifiers.shift.pressed = e.shiftKey;
+            if (e.altKey)
+                _this.modifiers.alt.pressed = e.altKey;
+            if (e.metaKey)
+                _this.modifiers.meta.pressed = e.metaKey;
+            var i = 0;
+            for (i = 0; i < keys.length; i++) {
+                var k = keys[i];
+                if (k == 'ctrl' || k == 'control') {
+                    kp++;
+                    _this.modifiers.ctrl.wanted = true;
+                }
+                else if (k == 'shift') {
+                    kp++;
+                    _this.modifiers.shift.wanted = true;
+                }
+                else if (k == 'alt') {
+                    kp++;
+                    _this.modifiers.alt.wanted = true;
+                }
+                else if (k == 'meta') {
+                    kp++;
+                    _this.modifiers.meta.wanted = true;
+                }
+                else if (k.length > 1) {
+                    if (_this.special_keys[k] == code) {
+                        kp++;
+                    }
+                }
+                else if (_this.option.Keycode) {
+                    if (_this.option.Keycode == code)
+                        kp++;
+                }
+                else {
+                    if (character == k)
+                        kp++;
+                    else {
+                        if (_this.shift_nums[character] && e.shiftKey) {
+                            character = _this.shift_nums[character];
+                            if (character == k) {
+                                kp++;
+                            }
+                        }
+                    }
+                }
+            }
+            if (kp == keys.length &&
+                _this.modifiers.ctrl.pressed == _this.modifiers.ctrl.wanted &&
+                _this.modifiers.shift.pressed == _this.modifiers.shift.wanted &&
+                _this.modifiers.alt.pressed == _this.modifiers.alt.wanted &&
+                _this.modifiers.meta.pressed == _this.modifiers.meta.wanted) {
+                _this.callback(e);
+                if (!_this.option.Propagate) {
+                    e.cancelBubble = true;
+                    e.returnValue = false;
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                    return false;
+                }
+            }
+            _this.modifiers.ctrl.pressed = false;
+            _this.modifiers.shift.pressed = false;
+            _this.modifiers.alt.pressed = false;
+            _this.modifiers.meta.pressed = false;
+        };
+    }
+    return KeyboardShortcut;
+}());
+exports.KeyboardShortcut = KeyboardShortcut;
+},{}],6:[function(require,module,exports){
+'use strict';
+var KeyboardShortcut_1 = require("./KeyboardShortcut");
+var ShortcutsRegister = (function () {
+    ShortcutsRegister.$inject = ['$log', 'option'];
+    function ShortcutsRegister($log, option) {
+        "ngInject";
+        this._log = $log;
+        this._defaultOption = option ? _.defaults(option, this.getDefaultOption()) : this.getDefaultOption();
+        this._shortcuts = {};
+    }
+    ShortcutsRegister.prototype.getDefaultOption = function () {
+        var defaultOption = {
+            Type: KeyboardShortcut_1.KeyboardEvent.Keydown,
+            Propagate: false,
+            DisableInInput: false,
+            Target: document,
+            Keycode: null
+        };
+        return defaultOption;
+    };
+    ShortcutsRegister.prototype.checkAddShortcut = function (element, shorcutCombination, callback) {
+        if (!element) {
+            this._log.error('Register shortcut: element undentified!');
+            return false;
+        }
+        if (!shorcutCombination) {
+            this._log.error('Register shortcut: shorcut combination undentified!');
+            return false;
+        }
+        if (!callback) {
+            this._log.error('Register shortcut: shorcut callback undentified!');
+            return false;
+        }
+        return true;
+    };
+    Object.defineProperty(ShortcutsRegister.prototype, "shorcuts", {
+        get: function () {
+            return this._shortcuts;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ShortcutsRegister.prototype.add = function (shorcutName, callback, option) {
+        var shorcutOption = option ? _.defaults(option, this._defaultOption) : this._defaultOption;
+        var shorcutCombination = shorcutName.toLowerCase();
+        var element = shorcutOption.Target;
+        if (typeof shorcutOption.Target == 'string') {
+            element = document.getElementById(shorcutOption.Target);
+        }
+        else {
+            element = shorcutOption.Target;
+        }
+        if (!this.checkAddShortcut(element, shorcutCombination, callback)) {
+            return;
+        }
+        var newKeyboardShortcut = new KeyboardShortcut_1.KeyboardShortcut(element, shorcutCombination, shorcutOption, callback);
+        this._shortcuts[shorcutCombination] = newKeyboardShortcut;
+        if (element.addEventListener) {
+            element.addEventListener(shorcutOption.Type, newKeyboardShortcut.eventCallback, false);
+        }
+        else if (element.attachEvent) {
+            element.attachEvent('on' + shorcutOption.Type, newKeyboardShortcut.eventCallback);
+        }
+        else {
+            element.on(shorcutOption.Type, newKeyboardShortcut.eventCallback);
+        }
+    };
+    ShortcutsRegister.prototype.remove = function (shorcutName) {
+        var shortcutCombination = shorcutName.toLowerCase();
+        var binding = this._shortcuts[shortcutCombination];
+        delete (this._shortcuts[shortcutCombination]);
+        if (!binding)
+            return;
+        var type = binding.event;
+        var element = binding.target;
+        var callback = binding.eventCallback;
+        if (element.detachEvent) {
+            element.detachEvent('on' + type, callback);
+        }
+        else if (element.removeEventListener) {
+            element.removeEventListener(type, callback, false);
+        }
+        else {
+            element.off(type, callback);
+        }
+    };
+    return ShortcutsRegister;
+}());
+exports.ShortcutsRegister = ShortcutsRegister;
+var ShortcutsRegisterProvider = (function () {
+    function ShortcutsRegisterProvider() {
+    }
+    Object.defineProperty(ShortcutsRegisterProvider.prototype, "option", {
+        get: function () {
+            return this._option;
+        },
+        set: function (value) {
+            this._option = value || new KeyboardShortcut_1.ShortcutOption();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ShortcutsRegisterProvider.prototype.$get = ['$log', function ($log) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new ShortcutsRegister($log, this._option);
+        return this._service;
+    }];
+    return ShortcutsRegisterProvider;
+}());
+angular
+    .module('pipShortcuts')
+    .provider('pipShortcutsRegister', ShortcutsRegisterProvider);
+},{"./KeyboardShortcut":5}],7:[function(require,module,exports){
+'use strict';
+var ShortcutController = (function () {
+    ShortcutController.$inject = ['$element', '$attrs', '$scope', '$log', '$parse', 'pipShortcutsRegister'];
+    function ShortcutController($element, $attrs, $scope, $log, $parse, pipShortcutsRegister) {
+        "ngInject";
+        var _this = this;
+        this._log = $log;
+        if ($attrs.pipShortcutAction) {
+            this.actionShortcuts = $parse($attrs.pipShortcutAction);
+            var a1 = $attrs.pipShortcutAction;
+            this.actionShortcuts($scope, { $event: {} });
+        }
+        else {
+            this._log.error('Shorcunt action does not set.');
+            return;
+        }
+        if ($attrs.pipShortcutName && _.isString($attrs.pipShortcutName)) {
+            this.nameShortcuts = $attrs.pipShortcutName;
+        }
+        else {
+            this._log.error('Shorcunt name does not set.');
+            return;
+        }
+        this.options = $attrs.pipShorcutOptions ? $attrs.pipShorcutOptions : {};
+        this.options.Target = $element;
+        pipShortcutsRegister.add(this.nameShortcuts, function (e) {
+            _this.actionShortcuts($scope, { $event: { 'e': e } });
+        }, this.options);
+    }
+    ShortcutController.prototype.keypressShortcut = function (action) {
+        this.actionShortcuts();
+    };
+    return ShortcutController;
+}());
+(function () {
+    shortcutsDirective.$inject = ['$parse'];
+    function shortcutsDirective($parse) {
+        return {
+            restrict: 'A',
+            scope: false,
+            controller: ShortcutController
+        };
+    }
+    angular
+        .module('pipShortcuts')
+        .directive('pipShortcut', shortcutsDirective);
+})();
+},{}],8:[function(require,module,exports){
+'use strict';
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+exports.ShortcutsChangedEvent = 'pipShortcutsChanged';
+var SimpleShortcutItem = (function () {
+    function SimpleShortcutItem() {
+    }
+    return SimpleShortcutItem;
+}());
+exports.SimpleShortcutItem = SimpleShortcutItem;
+var ShortcutItem = (function (_super) {
+    __extends(ShortcutItem, _super);
+    function ShortcutItem() {
+        return _super.apply(this, arguments) || this;
+    }
+    return ShortcutItem;
+}(SimpleShortcutItem));
+exports.ShortcutItem = ShortcutItem;
+var ShortcutsConfig = (function () {
+    function ShortcutsConfig() {
+        this.globalShortcuts = [];
+        this.localShortcuts = [];
+        this.defaultOptions = null;
+    }
+    return ShortcutsConfig;
+}());
+exports.ShortcutsConfig = ShortcutsConfig;
+var ShortcutsService = (function () {
+    function ShortcutsService(config, $rootScope, $window, $location, $injector, pipShortcutsRegister) {
+        this._config = config;
+        this._oldConfig = _.cloneDeep(this._config);
+        this._rootScope = $rootScope;
+        this._window = $window;
+        this._location = $location;
+        this._injector = $injector;
+        this._pipShortcutsRegister = pipShortcutsRegister;
+        this.addShortcuts(this._config.globalShortcuts);
+        this.addShortcuts(this._config.localShortcuts);
+    }
+    ShortcutsService.prototype.sendChangeEvent = function () {
+        this.removeShortcuts(this._oldConfig.globalShortcuts);
+        this.removeShortcuts(this._oldConfig.localShortcuts);
+        this.addShortcuts(this._config.globalShortcuts);
+        this.addShortcuts(this._config.localShortcuts);
+        this._rootScope.$emit(exports.ShortcutsChangedEvent, this._config);
+        this._oldConfig = _.cloneDeep(this._config);
+    };
+    ShortcutsService.prototype.removeShortcuts = function (collection) {
+        var _this = this;
+        _.each(collection, function (k) {
+            _this._pipShortcutsRegister.remove(k.shortcut);
+        });
+    };
+    ShortcutsService.prototype.keypressShortcut = function (shorcut, event) {
+        if (shorcut.access && _.isFunction(shorcut.access)) {
+            if (!shorcut.access(event)) {
+                return;
+            }
+        }
+        if (shorcut.keypress) {
+            shorcut.keypress(event);
+            return;
+        }
+        if (shorcut.href) {
+            this._window.location.href = shorcut.href;
+            return;
+        }
+        if (shorcut.url) {
+            this._location.url(shorcut.url);
+            return;
+        }
+        if (shorcut.state) {
+            if (this._injector.has('$state')) {
+                var $state = this._injector.get('$state');
+                $state['go'](shorcut.state, shorcut.stateParams);
+            }
+            return;
+        }
+        if (shorcut.event) {
+            this._rootScope.$broadcast(shorcut.event);
+        }
+        else {
+            this._rootScope.$broadcast('pipShortcutKeypress', shorcut.shortcut);
+        }
+    };
+    ShortcutsService.prototype.addShortcuts = function (collection) {
+        var _this = this;
+        var generalOptions = this._config.defaultOptions ? this._config.defaultOptions : {};
+        _.each(collection, function (k) {
+            var option = k.options ? k.options : generalOptions;
+            var target;
+            target = k.target ? k.target : k.targetId;
+            option.Target = target;
+            _this._pipShortcutsRegister.add(k.shortcut, function (e) {
+                _this.keypressShortcut(k, e);
+            }, option);
+        });
+    };
+    Object.defineProperty(ShortcutsService.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ShortcutsService.prototype, "defaultOptions", {
+        get: function () {
+            return this._config.defaultOptions;
+        },
+        set: function (value) {
+            this._config.defaultOptions = value || null;
+            this.sendChangeEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ShortcutsService.prototype, "globalShortcuts", {
+        get: function () {
+            return this._config.globalShortcuts;
+        },
+        set: function (value) {
+            this._config.globalShortcuts = value || [];
+            this.sendChangeEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ShortcutsService.prototype, "localShortcuts", {
+        get: function () {
+            return this._config.localShortcuts;
+        },
+        set: function (value) {
+            this._config.localShortcuts = value || [];
+            this.sendChangeEvent();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ShortcutsService.prototype.on = function (globalShortcuts, localShortcuts) {
+        if (globalShortcuts && _.isArray(globalShortcuts)) {
+            this._config.globalShortcuts = globalShortcuts;
+        }
+        if (localShortcuts && _.isArray(localShortcuts)) {
+            this._config.localShortcuts = localShortcuts;
+        }
+        this.sendChangeEvent();
+    };
+    ShortcutsService.prototype.off = function () {
+        this._config.globalShortcuts = [];
+        this._config.localShortcuts = [];
+        this.sendChangeEvent();
+    };
+    return ShortcutsService;
+}());
+var ShortcutsProvider = (function () {
+    function ShortcutsProvider() {
+        this._config = new ShortcutsConfig();
+    }
+    Object.defineProperty(ShortcutsProvider.prototype, "config", {
+        get: function () {
+            return this._config;
+        },
+        set: function (value) {
+            this._config = value || new ShortcutsConfig();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ShortcutsProvider.prototype, "defaultOptions", {
+        get: function () {
+            return this._config.defaultOptions;
+        },
+        set: function (value) {
+            this._config.defaultOptions = value || null;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ShortcutsProvider.prototype, "globalShortcuts", {
+        get: function () {
+            return this._config.globalShortcuts;
+        },
+        set: function (value) {
+            this._config.globalShortcuts = value || [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(ShortcutsProvider.prototype, "localShortcuts", {
+        get: function () {
+            return this._config.localShortcuts;
+        },
+        set: function (value) {
+            this._config.localShortcuts = value || [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ShortcutsProvider.prototype.$get = ['$rootScope', '$window', '$location', '$injector', 'pipShortcutsRegister', function ($rootScope, $window, $location, $injector, pipShortcutsRegister) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new ShortcutsService(this._config, $rootScope, $window, $location, $injector, pipShortcutsRegister);
+        return this._service;
+    }];
+    return ShortcutsProvider;
+}());
+angular
+    .module('pipShortcuts')
+    .provider('pipShortcuts', ShortcutsProvider);
+},{}],9:[function(require,module,exports){
+'use strict';
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+angular.module('pipShortcuts', ['ngMaterial', 'ui.router']);
+require("./ShorcutsRegisterService");
+require("./ShortcutsService");
+require("./ShortcutDirective");
+__export(require("./ShortcutsService"));
+__export(require("./ShorcutsRegisterService"));
+},{"./ShorcutsRegisterService":6,"./ShortcutDirective":7,"./ShortcutsService":8}],10:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipSelected", []);
@@ -3411,7 +4002,7 @@ __export(require("./ResizeFunctions"));
         };
     }]);
 })();
-},{}],6:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module("pipUnsavedChanges", []);
@@ -3449,7 +4040,7 @@ __export(require("./ResizeFunctions"));
         };
     }]);
 })();
-},{}]},{},[1,2,3,4,5,6])(6)
+},{}]},{},[1,2,3,4,9,5,6,7,8,10,11])(11)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -4138,8 +4729,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.html',
-    '<div ng-if="params.templateUrl" class="pip-popover flex layout-column" ng-click="onPopoverClick($event)" ng-include="params.templateUrl"></div><div ng-if="params.template" class="pip-popover" ng-click="onPopoverClick($event)"></div>');
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -4150,8 +4741,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('popover/popover.html',
+    '<div ng-if="params.templateUrl" class="pip-popover flex layout-column" ng-click="onPopoverClick($event)" ng-include="params.templateUrl"></div><div ng-if="params.template" class="pip-popover" ng-click="onPopoverClick($event)"></div>');
 }]);
 })();
 
@@ -6613,8 +7204,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/ErrorDetails.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -6625,8 +7216,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/ErrorDetails.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -10753,8 +11344,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -10765,8 +11356,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
+  $templateCache.put('missing_route/missing_route.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
 })();
 
@@ -10789,8 +11380,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+  $templateCache.put('no_connection_panel/no_connection_panel.html',
+    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 

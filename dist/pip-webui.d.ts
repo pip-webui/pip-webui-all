@@ -1,5 +1,17 @@
 declare module pip.services {
 
+export let CurrentState: any;
+export let PreviousState: any;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
+
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -33,17 +45,48 @@ export interface ISessionProvider extends ng.IServiceProvider {
     session: any;
 }
 
-export let CurrentState: any;
-export let PreviousState: any;
 
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
 
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
 
-export let RoutingVar: string;
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -103,49 +146,6 @@ export class Translation {
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
-
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
 
 export interface ICodes {
     hash(value: string): number;
@@ -262,12 +262,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
-
-
-
-
-
-
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -304,6 +298,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
+
+
+
+
+
+
 }
 
 declare module pip.split {
@@ -316,6 +316,92 @@ declare module pip.behaviors {
 
 
 
+export class ShortcutOption {
+    Type: KeyboardEvent;
+    Propagate: boolean;
+    DisableInInput: boolean;
+    Target: any;
+    Keycode: number;
+}
+export class KeyboardEvent {
+    static Keydown: string;
+    static Keyup: string;
+    static Keypress: string;
+}
+export class KeyboardShortcut {
+    private shift_nums;
+    private special_keys;
+    private modifiers;
+    eventCallback: Function;
+    target: any;
+    event: KeyboardEvent;
+    option: ShortcutOption;
+    shorcut: string;
+    callback: Function;
+    constructor(element: any, shorcutCombination: string, option: ShortcutOption, callback: (e?: JQueryEventObject) => void);
+}
+
+export interface IKeyboardShortcuts {
+    [key: string]: KeyboardShortcut;
+}
+export interface IShortcutsRegisterService {
+    add(shorcutName: string, callback: () => void, options: ShortcutOption): void;
+    remove(shorcutName: string): void;
+    shorcuts: IKeyboardShortcuts;
+}
+export interface IShortcutsRegisterProvider extends ng.IServiceProvider {
+    option: ShortcutOption;
+}
+export class ShortcutsRegister implements IShortcutsRegisterService {
+    private _log;
+    private _defaultOption;
+    private _shortcuts;
+    constructor($log: ng.ILogService, option: ShortcutOption);
+    private getDefaultOption();
+    private checkAddShortcut(element, shorcutCombination, callback);
+    readonly shorcuts: IKeyboardShortcuts;
+    add(shorcutName: string, callback: (e: JQueryEventObject) => void, option: ShortcutOption): void;
+    remove(shorcutName: string): void;
+}
+
+
+export let ShortcutsChangedEvent: string;
+export class SimpleShortcutItem {
+    shortcut: string;
+    target?: any;
+    targetId?: string;
+    access?: (event: JQueryEventObject) => boolean;
+    href?: string;
+    url?: string;
+    state?: string;
+    stateParams?: any;
+    event?: string;
+    keypress?: (event: JQueryEventObject) => void;
+    options?: ShortcutOption;
+}
+export class ShortcutItem extends SimpleShortcutItem {
+    shortcuts: SimpleShortcutItem[];
+}
+export class ShortcutsConfig {
+    globalShortcuts: ShortcutItem[];
+    localShortcuts: ShortcutItem[];
+    defaultOptions: ShortcutOption;
+}
+export interface IShortcutsService {
+    readonly config: ShortcutsConfig;
+    globalShortcuts: ShortcutItem[];
+    localShortcuts: ShortcutItem[];
+    on(globalShortcuts?: ShortcutItem[], localShortcuts?: ShortcutItem[]): void;
+    off(): void;
+}
+export interface IShortcutsProvider extends ng.IServiceProvider {
+    config: ShortcutsConfig;
+    globalShortcuts: ShortcutItem[];
+    localShortcuts: ShortcutItem[];
+    defaultOptions: ShortcutOption;
+}
+
+
 
 }
 
@@ -323,11 +409,11 @@ declare module pip.controls {
 
 
 
-
-
-
-
 var marked: any;
+
+
+
+
 
 
 
@@ -472,6 +558,34 @@ export interface IConfirmationService {
 
 
 
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
 export class ErrorStrings {
     ok: string;
     cancel: string;
@@ -504,34 +618,6 @@ class ErrorDetailsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
-
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
-}
 
 
 export class OptionsBigData {
@@ -693,6 +779,18 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -718,18 +816,6 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
 
 
 
@@ -952,6 +1038,8 @@ declare module pip.errors {
 
 
 
+
+
 export class ErrorStateItem {
     Active: boolean;
     Name: string;
@@ -984,8 +1072,6 @@ export interface IpipErrorsProvider extends ng.IServiceProvider {
 
 
 
-
-
 }
 
 declare module pip.charts {
@@ -1002,8 +1088,8 @@ declare module pip.locations {
 
 
 
-
 let google: any;
+
 
 }
 
