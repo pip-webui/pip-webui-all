@@ -1,17 +1,5 @@
 declare module pip.services {
 
-export let CurrentState: any;
-export let PreviousState: any;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
-
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 export interface IIdentity {
@@ -45,48 +33,70 @@ export interface ISessionProvider extends ng.IServiceProvider {
     session: any;
 }
 
+export let CurrentState: any;
+export let PreviousState: any;
 
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
+
+export interface ICodes {
+    hash(value: string): number;
+    verification(): string;
+}
+
+export interface IFormat {
+    sample(value: string, maxLength: number): string;
+    sprintf(message: string, ...args: any[]): string;
+}
+
+
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+export interface IPageResetService {
     reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
+    resetArea(area: string): void;
 }
 
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
+export interface IScrollService {
+    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
 }
 
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
+export interface ISystemInfo {
+    browserName: string;
+    browserVersion: string;
+    platform: string;
+    os: string;
+    isDesktop(): boolean;
+    isMobile(): boolean;
+    isCordova(): boolean;
+    isSupported(supported?: any): boolean;
 }
 
-function configureTransactionStrings($injector: any): void;
+export interface ITags {
+    normalizeOne(tag: string): string;
+    compressOne(tag: string): string;
+    equal(tag1: string, tag2: string): boolean;
+    normalizeAll(tags: any): string[];
+    compressAll(tags: any): string[];
+    extract(entity: any, searchFields?: string[]): string[];
+}
+
+export interface ITimerService {
+    isStarted(): boolean;
+    addEvent(event: string, timeout: number): void;
+    removeEvent(event: string): void;
+    clearEvents(): void;
+    start(): void;
+    stop(): void;
+}
 
 
 function translateDirective(pipTranslate: any): ng.IDirective;
@@ -147,58 +157,48 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
-export interface ICodes {
-    hash(value: string): number;
-    verification(): string;
-}
 
-export interface IFormat {
-    sample(value: string, maxLength: number): string;
-    sprintf(message: string, ...args: any[]): string;
-}
-
-
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
-export interface IPageResetService {
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
     reset(): void;
-    resetArea(area: string): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
 }
 
-export interface IScrollService {
-    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
 }
 
-export interface ISystemInfo {
-    browserName: string;
-    browserVersion: string;
-    platform: string;
-    os: string;
-    isDesktop(): boolean;
-    isMobile(): boolean;
-    isCordova(): boolean;
-    isSupported(supported?: any): boolean;
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
 }
 
-export interface ITags {
-    normalizeOne(tag: string): string;
-    compressOne(tag: string): string;
-    equal(tag1: string, tag2: string): boolean;
-    normalizeAll(tags: any): string[];
-    compressAll(tags: any): string[];
-    extract(entity: any, searchFields?: string[]): string[];
-}
-
-export interface ITimerService {
-    isStarted(): boolean;
-    addEvent(event: string, timeout: number): void;
-    removeEvent(event: string): void;
-    clearEvents(): void;
-    start(): void;
-    stop(): void;
-}
+function configureTransactionStrings($injector: any): void;
 
 }
 
@@ -221,45 +221,6 @@ declare module pip.landing {
 }
 
 declare module pip.layouts {
-
-
-
-export let AuxPanelChangedEvent: string;
-export let AuxPanelStateChangedEvent: string;
-export let OpenAuxPanelEvent: string;
-export let CloseAuxPanelEvent: string;
-export class AuxPanelConfig {
-    parts: any;
-    classes: string[];
-    state: any;
-    type: string;
-}
-export interface IAuxPanelService {
-    readonly config: AuxPanelConfig;
-    readonly classes: string[];
-    parts: any;
-    state: any;
-    isOpen(): boolean;
-    open(): void;
-    close(): void;
-    toggle(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAuxPanelProvider extends ng.IServiceProvider {
-    config: AuxPanelConfig;
-    parts: any;
-    type: string;
-    classes: string[];
-    open(): void;
-    close(): void;
-    toggle(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
 
 
 
@@ -304,6 +265,45 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
+
+
+export let AuxPanelChangedEvent: string;
+export let AuxPanelStateChangedEvent: string;
+export let OpenAuxPanelEvent: string;
+export let CloseAuxPanelEvent: string;
+export class AuxPanelConfig {
+    parts: any;
+    classes: string[];
+    state: any;
+    type: string;
+}
+export interface IAuxPanelService {
+    readonly config: AuxPanelConfig;
+    readonly classes: string[];
+    parts: any;
+    state: any;
+    isOpen(): boolean;
+    open(): void;
+    close(): void;
+    toggle(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAuxPanelProvider extends ng.IServiceProvider {
+    config: AuxPanelConfig;
+    parts: any;
+    type: string;
+    classes: string[];
+    open(): void;
+    close(): void;
+    toggle(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
 }
 
 declare module pip.split {
@@ -311,6 +311,8 @@ declare module pip.split {
 }
 
 declare module pip.behaviors {
+
+
 
 
 
@@ -398,8 +400,6 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
     localShortcuts: ShortcutItem[];
     defaultOptions: ShortcutOption;
 }
-
-
 
 }
 
@@ -701,6 +701,7 @@ export interface IOptionsService {
 declare module pip.nav {
 
 export let ActionsChangedEvent: string;
+export let SecondaryActionsOpenEvent: string;
 export class SimpleActionItem {
     name: string;
     title?: string;
@@ -735,6 +736,7 @@ export interface IActionsService {
     hide(): void;
     updateCount(link: string, count: number): void;
     clearCounts(): void;
+    openMenuEvent(): void;
 }
 export interface IActionsProvider extends ng.IServiceProvider {
     config: ActionsConfig;
@@ -777,18 +779,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -815,6 +805,17 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
 
 
 
@@ -880,33 +881,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
 
 export let NavMenuChangedEvent: string;
 export class NavMenuLink {
@@ -951,6 +925,33 @@ export interface INavMenuProvider extends ng.IServiceProvider {
 
 
 
+export let OpenSearchEvent: string;
+export let CloseSearchEvent: string;
+export let SearchChangedEvent: string;
+export let SearchActivatedEvent: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
 
 
 export let SideNavChangedEvent: string;
@@ -989,9 +990,27 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     part(part: string, value: any): void;
 }
 
+
 }
 
 declare module pip.themes {
+
+function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultBlueTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultGreenTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultGreyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
 
 function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -1012,23 +1031,6 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
-
-function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultBlueTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultGreenTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultGreyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
 
 }
 
@@ -1087,8 +1089,8 @@ declare module pip.locations {
 
 
 
-
 let google: any;
+
 
 
 }
