@@ -6866,6 +6866,10 @@ md-select md-select-value .md-text .pip-tabs-badge {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.pip-breadcrumb .pip-breadcrumb-block {
+  height: 24px;
+  line-height: 24px;
+}
 .pip-breadcrumb .pip-triangle-down {
   margin: 0;
 }
