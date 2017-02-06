@@ -5762,6 +5762,81 @@ th {
     max-width: 300px;
   }
 }
+.pip-grouped-grid .pip-tile {
+  position: relative;
+}
+.pip-grouped-grid .pip-title-group {
+  font-size: 24px;
+  color: rgba(0, 0, 0, 0.54);
+}
+.pip-grouped-grid.grouped-grid-xs {
+  max-width: 100%;
+}
+.pip-grouped-grid .pip-group-md {
+  display: block;
+  padding: 0 16px;
+}
+.pip-grouped-grid .pip-group-xs {
+  display: block;
+  padding: 0 12px;
+}
+.pip-grouped-grid .pip-tile-xs {
+  width: calc(100% - 8px);
+  height: 48px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex-direction: row;
+  -moz-box-flex-direction: row;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+.pip-grouped-grid .pip-tile-xs .pip-text {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.pip-grouped-grid .pip-tile-xs .pip-grid-icon {
+  margin: 0;
+  margin-right: 16px;
+  height: 24px;
+  margin-left: 16px;
+  width: 24px;
+  margin-top: 12px;
+}
+.pip-grouped-grid .pip-tile-xs .pip-badge {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  margin-top: 8px;
+  margin-right: 8px;
+}
+.pip-grouped-grid .pip-badge {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  font-size: 9px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  line-height: 18px;
+  vertical-align: middle;
+  text-align: center;
+  background-color: #FF5252;
+}
+@media (max-width: 500px) {
+  .pip-grouped-grid {
+    max-width: 100%;
+  }
+}
 
 .text-hide {
   font: 0/0;
