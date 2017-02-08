@@ -7138,7 +7138,16 @@ md-sidenav.md-closed .pip-sticky-nav-header {
   margin-left: 24px;
 }
 .pip-sticky-nav-expanded-button .md-button .pip-sticky-nav-menu-icon {
-  margin-left: 0px;
+  margin-left: 0;
+}
+@-moz-document url-prefix() {
+  .pip-button-block {
+    display: block;
+  }
+  .pip-sticky-nav-menu-icon-block,
+  .pip-sticky-nav-menu-title {
+    display: inline-table;
+  }
 }
 .pip-sticky-nav-menu {
   width: 100%;
