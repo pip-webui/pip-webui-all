@@ -46,6 +46,49 @@ export interface ISessionProvider extends ng.IServiceProvider {
 }
 
 
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
+
+
 function translateDirective(pipTranslate: any): ng.IDirective;
 function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 
@@ -103,49 +146,6 @@ export class Translation {
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
-
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
 
 export interface ICodes {
     hash(value: string): number;
@@ -262,6 +262,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -298,12 +304,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
-
-
-
-
-
-
 }
 
 declare module pip.split {
@@ -311,7 +311,6 @@ declare module pip.split {
 }
 
 declare module pip.behaviors {
-
 
 
 
@@ -401,17 +400,18 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
 }
 
 
+
 }
 
 declare module pip.controls {
 
 
 
+
+
+
+
 var marked: any;
-
-
-
-
 
 
 
@@ -535,6 +535,7 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 declare module pip.dialogs {
 
+
 export class ConfirmationParams {
     ok: string;
     title: string;
@@ -553,7 +554,6 @@ export class ConfirmationDialogController {
 export interface IConfirmationService {
     show(params: ConfirmationParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
-
 
 
 export class ErrorStrings {
@@ -750,6 +750,32 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -779,32 +805,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -816,6 +816,7 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
+
 
 
 
@@ -850,7 +851,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
     set(title: string, subtitle: string, imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
-
 
 
 
@@ -1145,6 +1145,38 @@ export class SettingsConfig {
 declare module pip.help {
 
 
+
+function configureHelpPageRoutes($stateProvider: any): void;
+
+export class HelpTab {
+    state: string;
+    title: string;
+    index: string;
+    access: boolean;
+    visible: boolean;
+    stateConfig: any;
+}
+export interface IHelpService {
+    getDefaultTab(): any;
+    showTitleText(newTitleText: any): any;
+    showTitleLogo(newTitleLogo: any): any;
+    setDefaultTab(name: string): any;
+    showNavIcon(value: any): any;
+    getTabs(): any;
+}
+export interface IHelpProvider extends ng.IServiceProvider {
+    getDefaultTab(): HelpTab;
+    addTab(tabObj: any): any;
+    setDefaultTab(name: string): void;
+    getFullStateName(state: string): string;
+}
+export class HelpConfig {
+    defaultTab: string;
+    tabs: HelpTab[];
+    titleText: string;
+    titleLogo: boolean;
+    isNavIcon: boolean;
+}
 
 }
 

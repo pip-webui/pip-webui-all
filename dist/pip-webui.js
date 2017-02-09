@@ -1417,6 +1417,8 @@ __export(require("./PageResetService"));
 },{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -1609,6 +1611,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[6,1,2,3,4,5])(6)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -2369,6 +2373,8 @@ __export(require("./ResizeFunctions"));
 },{"./MediaService":12,"./ResizeFunctions":13}]},{},[5])(5)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -2420,6 +2426,8 @@ __export(require("./ResizeFunctions"));
 })();
 },{}]},{},[1])(1)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -4037,6 +4045,8 @@ __export(require("./ShorcutsRegisterService"));
 },{}]},{},[1,2,3,4,9,5,6,7,8,10,11])(11)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4757,6 +4767,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[13,1,2,3,5,4,6,7,8,10,9,11,12])(13)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -4829,6 +4841,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[4,1,2,3])(4)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -6564,8 +6578,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_directive/date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6576,8 +6590,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range_directive/date_range.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6609,6 +6623,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[10,7,4,5,2,3,1,6,8,9])(10)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -7244,6 +7260,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[17,1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15])(17)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 var __extends = (this && this.__extends) || function (d, b) {
@@ -7262,7 +7280,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -9968,18 +9986,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('appbar/AppBar.html',
-    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('breadcrumb/Breadcrumb.html',
     '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!vm._media(\'xs\')"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" ng-if="vm._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button tabindex="5"><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
 }]);
@@ -9992,8 +9998,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('header/NavHeader.html',
-    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()" tabindex="-1">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
+  $templateCache.put('appbar/AppBar.html',
+    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
 }]);
 })();
 
@@ -10006,6 +10012,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dropdown/Dropdown.html',
     '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" tabindex="15" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('header/NavHeader.html',
+    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()" tabindex="-1">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -10085,6 +10103,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[34,21])(34)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -10655,6 +10675,8 @@ require("./bootbarn");
 __export(require("./common"));
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -11418,6 +11440,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[15,1,2,4,5,6,3,7,8,9,10,12,11,13,14])(15)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -12336,6 +12360,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[6,1,2,3,4,5])(6)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).locations = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
@@ -13047,6 +13073,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[8,1,3,4,5,6,2,7])(8)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -13844,150 +13872,273 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[15,5,6,3,4,8,7,2,1,10,11,12,13,14,9])(15)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
     'use strict';
-    angular.module('pipHelp', [
-        'pipHelp.Service',
-        'pipHelp.Page'
-    ]);
-})();
-},{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    config.$inject = ['$stateProvider'];
-    HelpPageController.$inject = ['$rootScope', '$scope', '$state', 'pipAppBar', 'pipHelp'];
-    angular.module('pipHelp.Page', ['ui.router', 'pipHelp.Service', 'pipAppBar', 'pipSelected', 'pipTranslate',
-        'pipHelp.Templates'])
-        .config(config)
-        .controller('pipHelpPageController', HelpPageController);
-    function config($stateProvider) {
-        $stateProvider.state('help', {
-            url: '/help',
-            auth: false,
-            controller: 'pipHelpPageController',
-            templateUrl: 'help_page/help_page.html'
-        });
-    }
-    function HelpPageController($rootScope, $scope, $state, pipAppBar, pipHelp) {
-        $scope.tabs = _.filter(pipHelp.getTabs(), function (tab) {
-            if (tab.visible && (tab.access !== angular.noop ? tab.access($rootScope.$user, tab) : true)) {
-                return tab;
-            }
-        });
-        $scope.selected = {};
-        if ($state.current.name !== 'help') {
-            initSelect($state.current.name);
-        }
-        else {
-            initSelect(pipHelp.getDefaultTab().state);
-        }
-        appHeader();
-        $scope.onNavigationSelect = onNavigationSelect;
-        $scope.onDropdownSelect = onDropdownSelect;
-        function onDropdownSelect(state) {
-            onNavigationSelect(state.state);
-        }
-        function appHeader() {
-            pipAppBar.showMenuNavIcon();
-            pipAppBar.showTitleText('Help');
-            pipAppBar.showShadowSm();
-            pipAppBar.showLocalActions(null, []);
-        }
-        function onNavigationSelect(state) {
-            initSelect(state);
-            if ($scope.selected.tab) {
-                $state.go(state);
-            }
-        }
-        function initSelect(state) {
-            $scope.selected.tab = _.find($scope.tabs, function (tab) {
-                return tab.state === state;
-            });
-            $scope.selected.tabIndex = _.indexOf($scope.tabs, $scope.selected.tab);
-            $scope.selected.tabId = state;
-        }
-    }
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipHelp.Service', ['ui.router'])
-        .provider('pipHelp', ['$stateProvider', function ($stateProvider) {
-        var defaultTab, tabs = [];
-        this.addTab = addTab;
-        this.setDefaultTab = setDefaultTab;
-        this.getTabs = getTabs;
-        this.getDefaultTab = getDefaultTab;
-        this.$get = function () {
-            return {
-                getTabs: getTabs,
-                getDefaultTab: getDefaultTab,
-                addTab: addTab,
-                setDefaultTab: setDefaultTab
-            };
+    var thisModule = angular.module('pipHelp.Translate', []);
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
-        function getFullStateName(state) {
-            return 'help.' + state;
-        }
-        function getTabs() {
-            return _.cloneDeep(tabs);
-        }
-        function getDefaultTab() {
-            return _.cloneDeep(_.find(tabs, function (tab) {
-                return tab.state === defaultTab;
-            }));
-        }
-        function addTab(tabObj) {
-            var tab;
-            validateTab(tabObj);
-            tab = _.find(tabs, function (tab) {
-                return tab.state === getFullStateName(tabObj.state);
-            });
-            if (tab) {
-                throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
-            }
-            tabs.push({
-                state: getFullStateName(tabObj.state),
-                title: tabObj.title,
-                access: tabObj.access || angular.noop,
-                visible: tabObj.visible || true,
-                stateConfig: _.cloneDeep(tabObj.stateConfig)
-            });
-            $stateProvider.state(getFullStateName(tabObj.state), tabObj.stateConfig);
-            if (_.isUndefined(defaultTab) && tabs.length === 1) {
-                setDefaultTab(tabObj.state);
-            }
-        }
-        function setDefaultTab(name) {
-            var tab, error;
-            tab = _.find(tabs, function (tab) {
-                return tab.state === getFullStateName(name);
-            });
-            if (!tab) {
-                error = new Error('Tab with state name "' + name + '" is not registered');
-                throw error;
-            }
-            defaultTab = getFullStateName(name);
-            $stateProvider.redirect('help', getFullStateName(name));
-        }
-        function validateTab(tabObj) {
-            if (!tabObj || !_.isObject(tabObj)) {
-                throw new Error('Invalid object');
-            }
-            if (!tabObj.state || tabObj.state === '') {
-                throw new Error('Tab should have valid Angular UI router state name');
-            }
-            if (tabObj.access && !_.isFunction(tabObj.access)) {
-                throw new Error('"access" should be a function');
-            }
-            if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
-                throw new Error('Invalid state configuration object');
-            }
-        }
     }]);
 })();
+},{}],2:[function(require,module,exports){
+"use strict";
+(function () {
+    var HelpPageController = (function () {
+        HelpPageController.$inject = ['$log', '$q', '$state', 'pipNavService', 'pipHelp', '$rootScope', '$timeout'];
+        function HelpPageController($log, $q, $state, pipNavService, pipHelp, $rootScope, $timeout) {
+            var _this = this;
+            this._log = $log;
+            this._q = $q;
+            this._state = $state;
+            console.log(pipHelp.getTabs());
+            this.tabs = _.filter(pipHelp.getTabs(), function (tab) {
+                return tab;
+            });
+            this.tabs = _.sortBy(this.tabs, 'index');
+            this.selected = {};
+            if (this._state.current.name !== 'help') {
+                this.initSelect(this._state.current.name);
+            }
+            else if (this._state.current.name === 'help' && pipHelp.getDefaultTab()) {
+                this.initSelect(pipHelp.getDefaultTab().state);
+            }
+            else {
+                $timeout(function () {
+                    if (pipHelp.getDefaultTab()) {
+                        this.initSelect(pipHelp.getDefaultTab().state);
+                    }
+                    if (!pipHelp.getDefaultTab() && this.tabs && this.tabs.length > 0) {
+                        this.initSelect(this.tabs[0].state);
+                    }
+                });
+            }
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = "Help";
+            pipNavService.actions.hide();
+            pipNavService.appbar.removeShadow();
+            this.onDropdownSelect = function (state) {
+                _this.onNavigationSelect(state.state);
+            };
+        }
+        HelpPageController.prototype.initSelect = function (state) {
+            this.selected.tab = _.find(this.tabs, function (tab) {
+                return tab.state === state;
+            });
+            this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
+            this.selected.tabId = state;
+        };
+        HelpPageController.prototype.onNavigationSelect = function (state) {
+            this.initSelect(state);
+            if (this.selected.tab) {
+                this._state.go(state);
+            }
+        };
+        return HelpPageController;
+    }());
+    angular.module('pipHelp.Page', [
+        'ui.router',
+        'pipHelp.Service',
+        'pipNav',
+        'pipSelected',
+        'pipTranslate',
+        'pipHelp.Templates'
+    ])
+        .controller('pipHelpPageController', HelpPageController);
+})();
+require("./HelpPageRoutes");
+},{"./HelpPageRoutes":3}],3:[function(require,module,exports){
+'use strict';
+configureHelpPageRoutes.$inject = ['$stateProvider'];
+function configureHelpPageRoutes($stateProvider) {
+    $stateProvider
+        .state('help', {
+        url: '/help?party_id',
+        auth: true,
+        controllerAs: 'vm',
+        controller: 'pipHelpPageController',
+        templateUrl: 'help_page/HelpPage.html'
+    });
+}
+angular.module('pipHelp.Page')
+    .config(configureHelpPageRoutes);
 },{}],4:[function(require,module,exports){
+'use strict';
+var HelpTab = (function () {
+    function HelpTab() {
+    }
+    return HelpTab;
+}());
+exports.HelpTab = HelpTab;
+var HelpConfig = (function () {
+    function HelpConfig() {
+        this.tabs = [];
+        this.titleText = 'SETTINGS_TITLE';
+        this.titleLogo = null;
+        this.isNavIcon = true;
+    }
+    return HelpConfig;
+}());
+exports.HelpConfig = HelpConfig;
+var HelpService = (function () {
+    HelpService.$inject = ['$rootScope', 'config'];
+    function HelpService($rootScope, config) {
+        "ngInject";
+        this._rootScope = $rootScope;
+        this._config = config;
+    }
+    HelpService.prototype.getFullStateName = function (state) {
+        return 'help.' + state;
+    };
+    HelpService.prototype.setDefaultTab = function (name) {
+        if (!_.find(this._config.tabs, function (tab) {
+            return tab.state === 'help.' + name;
+        })) {
+            throw new Error('Tab with state name "' + name + '" is not registered');
+        }
+        this._config.defaultTab = this.getFullStateName(name);
+    };
+    HelpService.prototype.getDefaultTab = function () {
+        var defaultTab;
+        defaultTab = _.find(this._config.tabs, function (p) {
+            return p.state === defaultTab;
+        });
+        return _.cloneDeep(defaultTab);
+    };
+    HelpService.prototype.showTitleText = function (newTitleText) {
+        if (newTitleText) {
+            this._config.titleText = newTitleText;
+            this._config.titleLogo = null;
+        }
+        return this._config.titleText;
+    };
+    HelpService.prototype.showTitleLogo = function (newTitleLogo) {
+        if (newTitleLogo) {
+            this._config.titleLogo = newTitleLogo;
+            this._config.titleText = null;
+        }
+        return this._config.titleLogo;
+    };
+    HelpService.prototype.showNavIcon = function (value) {
+        if (value !== null && value !== undefined) {
+            this._config.isNavIcon = !!value;
+        }
+        return this._config.isNavIcon;
+    };
+    HelpService.prototype.getTabs = function () {
+        return _.cloneDeep(this._config.tabs);
+    };
+    return HelpService;
+}());
+var HelpProvider = (function () {
+    HelpProvider.$inject = ['$stateProvider'];
+    function HelpProvider($stateProvider) {
+        this._config = new HelpConfig();
+        this._stateProvider = $stateProvider;
+    }
+    HelpProvider.prototype.getFullStateName = function (state) {
+        return 'help.' + state;
+    };
+    HelpProvider.prototype.getDefaultTab = function () {
+        var defaultTab;
+        defaultTab = _.find(this._config.tabs, function (p) {
+            return p.state === defaultTab;
+        });
+        return _.cloneDeep(defaultTab);
+    };
+    HelpProvider.prototype.addTab = function (tabObj) {
+        var existingTab;
+        this.validateTab(tabObj);
+        existingTab = _.find(this._config.tabs, function (p) {
+            return p.state === 'help.' + tabObj.state;
+        });
+        if (existingTab) {
+            throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
+        }
+        this._config.tabs.push({
+            state: this.getFullStateName(tabObj.state),
+            title: tabObj.title,
+            index: tabObj.index || 100000,
+            access: tabObj.access,
+            visible: tabObj.visible !== false,
+            stateConfig: _.cloneDeep(tabObj.stateConfig)
+        });
+        this._stateProvider.state(this.getFullStateName(tabObj.state), tabObj.stateConfig);
+        if (typeof this._config.defaultTab === 'undefined' && this._config.tabs.length === 1) {
+            this.setDefaultTab(tabObj.state);
+        }
+    };
+    HelpProvider.prototype.setDefaultTab = function (name) {
+        if (!_.find(this._config.tabs, function (tab) {
+            return tab.state === 'help.' + name;
+        })) {
+            throw new Error('Tab with state name "' + name + '" is not registered');
+        }
+        this._config.defaultTab = this.getFullStateName(name);
+    };
+    HelpProvider.prototype.validateTab = function (tabObj) {
+        if (!tabObj || !_.isObject(tabObj)) {
+            throw new Error('Invalid object');
+        }
+        if (tabObj.state === null || tabObj.state === '') {
+            throw new Error('Tab should have valid Angular UI router state name');
+        }
+        if (tabObj.access && !_.isFunction(tabObj.access)) {
+            throw new Error('"access" should be a function');
+        }
+        if (!tabObj.stateConfig || !_.isObject(tabObj.stateConfig)) {
+            throw new Error('Invalid state configuration object');
+        }
+    };
+    HelpProvider.prototype.showTitleText = function (newTitleText) {
+        if (newTitleText) {
+            this._config.titleText = newTitleText;
+            this._config.titleLogo = null;
+        }
+        return this._config.titleText;
+    };
+    HelpProvider.prototype.showTitleLogo = function (newTitleLogo) {
+        if (newTitleLogo) {
+            this._config.titleLogo = newTitleLogo;
+            this._config.titleText = null;
+        }
+        return this._config.titleLogo;
+    };
+    HelpProvider.prototype.showNavIcon = function (value) {
+        if (value !== null && value !== undefined) {
+            this._config.isNavIcon = !!value;
+        }
+        return this._config.isNavIcon;
+    };
+    HelpProvider.prototype.$get = ['$rootScope', '$state', function ($rootScope, $state) {
+        "ngInject";
+        if (this._service == null)
+            this._service = new HelpService($rootScope, this._config);
+        return this._service;
+    }];
+    return HelpProvider;
+}());
+angular
+    .module('pipHelp.Service', [])
+    .provider('pipHelp', HelpProvider);
+},{}],5:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+require("./help_service/HelpService");
+require("./help_page/HelpPageController");
+angular.module('pipHelp', [
+    'pipHelp.Service',
+    'pipHelp.Page'
+]);
+__export(require("./help_service/HelpService"));
+},{"./help_page/HelpPageController":2,"./help_service/HelpService":4}],6:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -13995,14 +14146,16 @@ try {
   module = angular.module('pipHelp.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('help_page/help_page.html',
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400"><div class="pip-menu-container pip-help" ng-if="manager !== false"><md-list class="pip-menu pip-simple-list hide-xs" pip-selected="selected.tabIndex" pip-selected-watch="selected.navId" pip-select="onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable" ng-repeat="tab in tabs track by tab.state" md-ink-ripple="" pip-id="{{::tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown class="hide-gt-xs" pip-actions="tabs" pip-dropdown-select="onDropdownSelect" pip-active-index="selected.tabIndex"></pip-dropdown><div class="pip-body layout-column flex" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-if="manager === false">{{::\'ERROR_400\' | translate}}</div></pip-document>');
+  $templateCache.put('help_page/HelpPage.html',
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-help"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
 }]);
 })();
 
 
 
-},{}]},{},[4,2,3,1])(4)
+},{}]},{},[6,1,2,3,4,5])(6)
 });
+
+
 
 //# sourceMappingURL=pip-webui.js.map

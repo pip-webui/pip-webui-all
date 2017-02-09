@@ -9528,65 +9528,37 @@ button:focus {
     opacity: 0.38;
   }
 }
-.pip-help {
-  font-size: 14px;
-}
-@media (min-width: 1200px) {
-  .pip-help md-list.pip-menu {
-    width: 300px;
-    min-width: 300px;
-  }
-  .pip-help .pip-content-container {
-    width: 800px;
-  }
-}
-@media (min-width: 768px) and (max-width: 1200px) {
-  .pip-help md-list.pip-menu {
-    width: 300px;
-    min-width: 0;
-  }
-  .pip-help .pip-content-container {
-    width: calc(100% - 300px);
-  }
-}
-.pip-help.pip-card .pip-header ~ .pip-body,
-.pip-help.pip-document .pip-header ~ .pip-body {
-  padding-top: 24px !important;
+.pip-help .pip-content-container {
+  min-height: 100%;
 }
 .pip-help .pip-body {
   max-width: none !important;
-}
-@media (min-width: 1200px) {
-  .pip-help md-list:first-of-type {
-    width: 300px;
-  }
-  .pip-help .pip-content-container {
-    width: 800px;
-    position: absolute;
-    left: 300px;
-    max-height: 100%;
-    -ms-overflow-y: auto;
-  }
-}
-@media (min-width: 1000px) and (max-width: 1200px) {
-  .pip-help .pip-content-container {
-    width: calc(100% - 300px);
-    -ms-overflow-y: auto;
-  }
-}
-@media (min-width: 768px) and (max-width: 1200px) {
-  .pip-help md-list:first-of-type {
-    width: 30%;
-  }
-  .pip-help .pip-content-container {
-    width: 70%;
-    position: absolute;
-    left: 30%;
-    max-height: 100%;
-    -ms-overflow-y: auto;
-  }
+  min-height: 100%;
 }
 .pip-help.pip-card .pip-header ~ .pip-body,
 .pip-help.pip-document .pip-header ~ .pip-body {
   padding-top: 24px !important;
+}
+.pip-gt-sm .pip-help md-list.pip-menu {
+  width: 300px;
+  min-width: 300px;
+}
+.pip-gt-sm .pip-help .pip-content-container {
+  width: calc(100% - 300px);
+}
+.pip-gt-sm .pip-help pip-dropdown {
+  display: none;
+}
+.pip-xs .pip-help .pip-content-container,
+.pip-sm .pip-help .pip-content-container {
+  width: 100%;
+  left: 0 !important;
+}
+.pip-xs .pip-help md-list.pip-menu,
+.pip-sm .pip-help md-list.pip-menu {
+  display: none;
+}
+.pip-xs .pip-help .pip-body,
+.pip-sm .pip-help .pip-body {
+  min-height: calc(100% - 64px);
 }
