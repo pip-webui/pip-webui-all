@@ -405,6 +405,31 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
 
 declare module pip.controls {
 
+export interface IColorPicker {
+    class: string;
+    colors: string[];
+    currentColor: string;
+    currentColorIndex: number;
+    ngDisabled: Function;
+    colorChange: Function;
+    enterSpacePress(event: any): void;
+    disabled(): boolean;
+    selectColor(index: number): any;
+}
+export class ColorPickerController implements IColorPicker {
+    private _$timeout;
+    private _$scope;
+    class: string;
+    colors: string[];
+    currentColor: string;
+    currentColorIndex: number;
+    ngDisabled: Function;
+    colorChange: Function;
+    constructor($scope: ng.IScope, $element: any, $attrs: any, $timeout: any);
+    disabled(): boolean;
+    selectColor(index: number): void;
+    enterSpacePress(event: any): void;
+}
 
 
 
@@ -535,7 +560,6 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 declare module pip.dialogs {
 
-
 export class ConfirmationParams {
     ok: string;
     title: string;
@@ -554,6 +578,7 @@ export class ConfirmationDialogController {
 export interface IConfirmationService {
     show(params: ConfirmationParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
+
 
 
 export class ErrorStrings {
@@ -750,32 +775,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -816,6 +815,32 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
 
 
 
@@ -1092,6 +1117,66 @@ declare module pip.locations {
 
 let google: any;
 
+
+}
+
+declare module pip.files {
+
+
+export interface IFileProgressController {
+    name: string;
+    type: string;
+    globalProgress(): string;
+    localProgress(): number;
+    onCancel(): void;
+    onCancel(): void;
+    abort(): void;
+}
+export class FileProgressController implements IFileProgressController {
+    private _service;
+    private _cancel;
+    private _retry;
+    name: string;
+    type: string;
+    constructor($scope: ng.IScope, pipFileUpload: IFileUploadService);
+    globalProgress(): string;
+    errorFail(): string;
+    localProgress(): number;
+    onCancel(): void;
+    onRetry(): void;
+    abort(): void;
+}
+
+export interface IFileUploadService {
+    progress: number;
+    globalProgress: string;
+    error: string;
+    transaction: any;
+    upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
+    abort(): void;
+}
+export class FileUploadService implements IFileUploadService {
+    private _http;
+    progress: number;
+    globalProgress: string;
+    error: string;
+    transaction: any;
+    constructor($http: ng.IHttpService, pipTransaction: any);
+    upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
+    abort(): void;
+}
+
+export interface IFileUploadController {
+    localFile: any;
+    onUploadButtonClick(): void;
+    onDeleteButtonClick(): void;
+}
+export class FileUploadController implements IFileUploadController {
+    localFile: any;
+    constructor($scope: ng.IScope);
+    onUploadButtonClick(): void;
+    onDeleteButtonClick(): void;
+}
 
 }
 

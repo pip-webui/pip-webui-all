@@ -4048,10 +4048,53 @@ __export(require("./ShorcutsRegisterService"));
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+var ColorPickerController = (function () {
+    ColorPickerController.$inject = ['$scope', '$element', '$attrs', '$timeout'];
+    function ColorPickerController($scope, $element, $attrs, $timeout) {
+        var DEFAULT_COLORS = ['purple', 'lightgreen', 'green', 'darkred', 'pink', 'yellow', 'cyan'];
+        this._$timeout = $timeout;
+        this._$scope = $scope;
+        this.class = $attrs.class || '';
+        this.colors = !$scope['colors'] || _.isArray($scope['colors']) && $scope['colors'].length === 0 ? DEFAULT_COLORS : $scope['colors'];
+        this.colorChange = $scope['colorChange'] || null;
+        this.currentColor = $scope['currentColor'] || this.colors[0];
+        this.currentColorIndex = this.colors.indexOf(this.currentColor);
+        this.ngDisabled = $scope['ngDisabled'];
+    }
+    ColorPickerController.prototype.disabled = function () {
+        if (this.ngDisabled) {
+            return this.ngDisabled();
+        }
+        return true;
+    };
+    ;
+    ColorPickerController.prototype.selectColor = function (index) {
+        var _this = this;
+        if (this.disabled()) {
+            return;
+        }
+        this.currentColorIndex = index;
+        this.currentColor = this.colors[this.currentColorIndex];
+        this._$timeout(function () {
+            _this._$scope.$apply();
+        });
+        if (this.colorChange) {
+            this.colorChange();
+        }
+    };
+    ;
+    ColorPickerController.prototype.enterSpacePress = function (event) {
+        this.selectColor(event.index);
+    };
+    ;
+    return ColorPickerController;
+}());
+exports.ColorPickerController = ColorPickerController;
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipColorPicker', ['pipControls.Templates']);
-    thisModule.directive('pipColorPicker', function () {
+    pipColorPicker.$inject = ['$parse'];
+    function pipColorPicker($parse) {
+        "ngInject";
         return {
             restrict: 'EA',
             scope: {
@@ -4061,40 +4104,13 @@ __export(require("./ShorcutsRegisterService"));
                 colorChange: '&ngChange'
             },
             templateUrl: 'color_picker/color_picker.html',
-            controller: 'pipColorPickerController'
+            controller: ColorPickerController,
+            controllerAs: 'vm'
         };
-    });
-    thisModule.controller('pipColorPickerController', ['$scope', '$element', '$attrs', '$timeout', function ($scope, $element, $attrs, $timeout) {
-        var DEFAULT_COLORS = ['purple', 'lightgreen', 'green', 'darkred', 'pink', 'yellow', 'cyan'];
-        $scope.class = $attrs.class || '';
-        if (!$scope.colors || _.isArray($scope.colors) && $scope.colors.length === 0) {
-            $scope.colors = DEFAULT_COLORS;
-        }
-        $scope.currentColor = $scope.currentColor || $scope.colors[0];
-        $scope.currentColorIndex = $scope.colors.indexOf($scope.currentColor);
-        $scope.disabled = function () {
-            if ($scope.ngDisabled) {
-                return $scope.ngDisabled();
-            }
-            return true;
-        };
-        $scope.selectColor = function (index) {
-            if ($scope.disabled()) {
-                return;
-            }
-            $scope.currentColorIndex = index;
-            $scope.currentColor = $scope.colors[$scope.currentColorIndex];
-            $timeout(function () {
-                $scope.$apply();
-            });
-            if ($scope.colorChange) {
-                $scope.colorChange();
-            }
-        };
-        $scope.enterSpacePress = function (event) {
-            $scope.selectColor(event.index);
-        };
-    }]);
+    }
+    angular
+        .module('pipColorPicker', ['pipControls.Templates'])
+        .directive('pipColorPicker', pipColorPicker);
 })();
 },{}],2:[function(require,module,exports){
 (function () {
@@ -4722,7 +4738,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('color_picker/color_picker.html',
-    '<ul class="pip-color-picker {{class}}" pip-selected="currentColorIndex" pip-enter-space-press="enterSpacePress($event)"><li tabindex="-1" ng-repeat="color in colors track by color"><md-button tabindex="-1" class="md-icon-button pip-selectable" ng-click="selectColor($index)" aria-label="color" ng-disabled="disabled()"><md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == currentColor ? \'circle\' : \'radio-off\' }}"></md-icon></md-button></li></ul>');
+    '<ul class="pip-color-picker {{vm.class}}" pip-selected="vm.currentColorIndex" pip-enter-space-press="vm.enterSpacePress($event)"><li tabindex="-1" ng-repeat="color in vm.colors track by color"><md-button tabindex="-1" class="md-icon-button pip-selectable" ng-click="vm.selectColor($index)" aria-label="color" ng-disabled="vm.disabled()"><md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == vm.currentColor ? \'circle\' : \'radio-off\' }}"></md-icon></md-button></li></ul>');
 }]);
 })();
 
@@ -9986,8 +10002,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!vm._media(\'xs\')"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" ng-if="vm._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button tabindex="5"><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+  $templateCache.put('appbar/AppBar.html',
+    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
 }]);
 })();
 
@@ -9998,8 +10014,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('appbar/AppBar.html',
-    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
+  $templateCache.put('breadcrumb/Breadcrumb.html',
+    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!vm._media(\'xs\')"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" ng-if="vm._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button tabindex="5"><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
 }]);
 })();
 
@@ -13076,6 +13092,221 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).files = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipFiles.Translate', []);
+    thisModule.filter('translate', ['$injector', function ($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }]);
+})();
+},{}],2:[function(require,module,exports){
+"use strict";
+var FileUploadController_1 = require("./upload/FileUploadController");
+var FileProgressController_1 = require("./progress/FileProgressController");
+var FileUploadService_1 = require("./service/FileUploadService");
+(function () {
+    fileModelDirective.$inject = ['$parse'];
+    function fileModelDirective($parse) {
+        "ngInject";
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                var model = $parse(attrs.fileModel);
+                var modelSetter = model.assign;
+                element.bind('change', function () {
+                    scope.$apply(function () {
+                        modelSetter(scope, element[0].files[0]);
+                    });
+                });
+            }
+        };
+    }
+    function fileUploadDirective() {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                localFile: '='
+            },
+            controller: FileUploadController_1.FileUploadController,
+            controllerAs: 'vm',
+            templateUrl: 'upload/FileUpload.html'
+        };
+    }
+    function fileProgressDirective() {
+        return {
+            restrict: 'E',
+            replace: true,
+            controller: FileProgressController_1.FileProgressController,
+            controllerAs: 'vm',
+            scope: {
+                cancel: '=pipCancel',
+                retry: '=pipRetry',
+                name: '=pipName',
+                type: '=?pipType'
+            },
+            templateUrl: 'progress/FileProgress.html'
+        };
+    }
+    angular
+        .module('pipFiles', [])
+        .directive('fileModel', fileModelDirective)
+        .directive('pipFileUpload', fileUploadDirective)
+        .directive('pipFileProgress', fileProgressDirective)
+        .service('pipFileUpload', FileUploadService_1.FileUploadService);
+})();
+},{"./progress/FileProgressController":3,"./service/FileUploadService":4,"./upload/FileUploadController":5}],3:[function(require,module,exports){
+"use strict";
+var FileProgressController = (function () {
+    FileProgressController.$inject = ['$scope', 'pipFileUpload'];
+    function FileProgressController($scope, pipFileUpload) {
+        "ngInject";
+        this.type = $scope['type'] || 'file';
+        this._cancel = $scope['cancel'];
+        this._retry = $scope['retry'];
+        this.name = $scope['name'];
+        this._service = pipFileUpload;
+    }
+    FileProgressController.prototype.globalProgress = function () {
+        return this._service.globalProgress;
+    };
+    FileProgressController.prototype.errorFail = function () {
+        return this._service.error;
+    };
+    FileProgressController.prototype.localProgress = function () {
+        return this._service.progress;
+    };
+    FileProgressController.prototype.onCancel = function () {
+        if (this._cancel)
+            this._cancel();
+    };
+    FileProgressController.prototype.onRetry = function () {
+        if (this._retry)
+            this._retry();
+    };
+    FileProgressController.prototype.abort = function () {
+        this._service.abort();
+        if (this._cancel)
+            this._cancel();
+    };
+    return FileProgressController;
+}());
+exports.FileProgressController = FileProgressController;
+},{}],4:[function(require,module,exports){
+"use strict";
+var GlobalProgress = (function () {
+    function GlobalProgress() {
+    }
+    return GlobalProgress;
+}());
+GlobalProgress.All = ['start', 'upload', 'fail'];
+GlobalProgress.Start = 'start';
+GlobalProgress.Upload = 'upload';
+GlobalProgress.Fail = 'fail';
+var FileUploadService = (function () {
+    FileUploadService.$inject = ['$http', 'pipTransaction'];
+    function FileUploadService($http, pipTransaction) {
+        "ngInject";
+        this.error = null;
+        this._http = $http;
+        this.transaction = pipTransaction.create('upload file');
+    }
+    FileUploadService.prototype.upload = function (url, file, callback) {
+        var _this = this;
+        var fd = new FormData();
+        fd.append('file', file);
+        this.progress = 0;
+        this.transaction.begin(GlobalProgress.Start);
+        this.globalProgress = GlobalProgress.Start;
+        this._http.post(url, fd, {
+            uploadEventHandlers: {
+                progress: function (e) {
+                    if (e.lengthComputable) {
+                        _this.progress = (e.loaded / e.total) * 100;
+                    }
+                }
+            },
+            headers: { 'Content-Type': undefined }
+        })
+            .success(function (response) {
+            _this.globalProgress = GlobalProgress.Upload;
+            _this.transaction.end(GlobalProgress.Upload);
+            if (callback)
+                callback(response, null);
+        })
+            .error(function (response) {
+            _this.globalProgress = GlobalProgress.Fail;
+            _this.transaction.end(GlobalProgress.Fail);
+            _this.error = response.Error || response;
+            if (callback)
+                callback(null, response);
+        });
+    };
+    FileUploadService.prototype.abort = function () {
+        this.transaction.abort();
+    };
+    return FileUploadService;
+}());
+exports.FileUploadService = FileUploadService;
+},{}],5:[function(require,module,exports){
+"use strict";
+var FileUploadController = (function () {
+    FileUploadController.$inject = ['$scope'];
+    function FileUploadController($scope) {
+        "ngInject";
+        this.localFile = $scope['localFile'];
+        $scope.$watch('vm.localFile', function (item) {
+            $scope['localFile'] = item;
+        });
+    }
+    FileUploadController.prototype.onUploadButtonClick = function () {
+        $('#inp_file').click();
+    };
+    FileUploadController.prototype.onDeleteButtonClick = function () {
+        this.localFile = null;
+        var forml = document.getElementById('inp_form');
+        forml.reset();
+    };
+    return FileUploadController;
+}());
+exports.FileUploadController = FileUploadController;
+},{}],6:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('progress/FileProgress.html',
+    '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon" ng-class="{\'color-badge-bg\': vm.globalProgress() == \'fail\', \'bb-orange\': vm.globalProgress() == \'start\', \'bb-green\': vm.globalProgress() == \'upload\' }"><md-icon md-svg-icon="icons:check" ng-if="vm.globalProgress() == \'upload\'"></md-icon><md-icon md-svg-icon="bootbarn-icons:play" ng-if="vm.globalProgress() == \'start\'"></md-icon><md-icon md-svg-icon="icons:cross" ng-if="vm.globalProgress() == \'fail\'"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title" ng-if="vm.globalProgress() == \'start\'">Uploading {{vm.type}}</h3><h3 class="pip-title" ng-if="vm.globalProgress() == \'upload\'">Uploaded {{vm.type}} successfully!</h3><h3 class="pip-title" ng-if="vm.globalProgress() == \'fail\'">Uploading {{vm.type}} failed with errors!</h3><div class="color-secondary-text pip-subtitle">{{vm.name}}</div><div class="color-error pip-error" ng-if="vm.globalProgress() == \'fail\'">{{vm.errorFail()}}</div><div ng-if="vm.globalProgress() == \'start\'"><md-progress-linear md-mode="determinate" class="md-accent" value="{{vm.localProgress()}}" ng-if="vm.localProgress() < 100"></md-progress-linear><md-progress-linear md-mode="indeterminate" class="md-accent" ng-if="vm.localProgress() == 100"></md-progress-linear></div></div></div></div><div class="pip-footer layout-row layout-align-end-center"><div><md-button class="md-accent" ng-click="vm.onCancel()" ng-show="!vm.globalProgress() || vm.globalProgress() == \'fail\'">Cancel</md-button><md-button class="md-accent" ng-click="vm.onRetry()" ng-show="vm.globalProgress() == \'fail\'">Retry</md-button><md-button class="md-accent" ng-click="vm.abort()" ng-show="vm.globalProgress() == \'start\'">Abort</md-button></div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('upload/FileUpload.html',
+    '<div class="pip-file-upload"><form id="inp_form" class="pip-hidden-form"><input type="file" file-model="vm.localFile" id="inp_file" ng-model="vm.localFile"></form><md-button class="md-raised md-accent pip-button" ng-click="vm.onUploadButtonClick()" ng-if="!vm.localFile">Choose File</md-button><div ng-if="vm.localFile.name" class="pip-file layout-row layout-align-start-center"><md-icon md-svg-icon="icons:document" class="pip-icon"></md-icon><div class="flex"><div class="text-body2 text-overflow">{{vm.localFile.name}}</div><div ng-if="vm.localFile.size" class="color-secondary-text">{{vm.localFile.size}}</div></div><md-button ng-click="vm.onDeleteButtonClick()" class="md-icon-button"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div>');
+}]);
+})();
+
+
+
+},{}]},{},[6,1,2,3,4,5])(6)
+});
+
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 require("./settings_service/index");
@@ -14147,7 +14378,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('help_page/HelpPage.html',
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-help"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-help"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body p0 layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
 }]);
 })();
 
