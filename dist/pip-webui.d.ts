@@ -205,13 +205,13 @@ export interface ITimerService {
 declare module pip.buttons {
 
 
+
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
-
 
 
 }
@@ -262,6 +262,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -297,12 +303,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -722,6 +722,7 @@ export interface IConfirmationService {
 }
 
 
+
 export class ErrorStrings {
     ok: string;
     cancel: string;
@@ -755,6 +756,33 @@ class ErrorDetailsService {
 }
 
 
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
+}
 
 
 export class OptionsBigData {
@@ -833,34 +861,6 @@ export class OptionsDialogController {
 
 export interface IOptionsService {
     show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
-}
-
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 }
@@ -1021,7 +1021,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -1046,6 +1045,7 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 
@@ -1089,7 +1089,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
-
 
 
 
@@ -1157,6 +1156,7 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
 
 }
 
@@ -1340,6 +1340,11 @@ declare module pip.settings {
 
 
 
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
 export class SettingsTab {
     state: string;
     title: string;
@@ -1376,18 +1381,13 @@ export class SettingsConfig {
 
 
 
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
 }
 
 declare module pip.help {
 
 
-function configureHelpPageRoutes($stateProvider: any): void;
 
+function configureHelpPageRoutes($stateProvider: any): void;
 
 export class HelpTab {
     state: string;
