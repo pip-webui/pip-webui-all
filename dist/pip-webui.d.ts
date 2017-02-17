@@ -205,13 +205,13 @@ export interface ITimerService {
 declare module pip.buttons {
 
 
-
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
+
 
 
 }
@@ -315,6 +315,7 @@ declare module pip.behaviors {
 
 
 
+
 export class ShortcutOption {
     Type: KeyboardEvent;
     Propagate: boolean;
@@ -397,7 +398,6 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
     localShortcuts: ShortcutItem[];
     defaultOptions: ShortcutOption;
 }
-
 
 
 
@@ -1263,11 +1263,22 @@ class LocationDialogService {
 class LocationEditDialogController {
     private _map;
     private _marker;
+    private _$scope;
+    private _$mdDialog;
     theme: string;
     locationPos: any;
     locationName: any;
     supportSet: boolean;
     constructor($scope: ng.IScope, $rootScope: ng.IRootScopeService, $timeout: angular.ITimeoutService, $mdDialog: angular.material.IDialogService, locationPos: any, locationName: any);
+    createMarker(coordinates: any): any;
+    changeLocation(coordinates: any, tid: any): void;
+    onAddPin(): void;
+    onRemovePin(): void;
+    onZoomIn(): void;
+    onZoomOut(): void;
+    onSetLocation: () => void;
+    onCancel(): void;
+    onApply(): void;
 }
 
 
