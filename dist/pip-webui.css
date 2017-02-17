@@ -5474,6 +5474,13 @@ th {
   padding-top: 12px;
   padding-bottom: 12px;
 }
+.table md-menu {
+  margin-right: 8px !important;
+}
+.table md-menu .md-icon-button {
+  margin-right: 8px !important;
+  margin-left: 0px !important;
+}
 .pip-chip,
 .pip-type-chip {
   font: normal 500 14px Roboto, 'Helvetica Neue', sans-serif;

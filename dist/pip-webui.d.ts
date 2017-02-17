@@ -262,12 +262,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
-
-
-
-
-
-
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -304,6 +298,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
+
+
+
+
+
+
 }
 
 declare module pip.split {
@@ -311,7 +311,6 @@ declare module pip.split {
 }
 
 declare module pip.behaviors {
-
 
 
 
@@ -401,6 +400,7 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
 
 
 
+
 }
 
 declare module pip.controls {
@@ -432,15 +432,157 @@ export class ColorPickerController implements IColorPicker {
 }
 
 
+class pipImageSliderController {
+    private _$attrs;
+    private _$interval;
+    private _blocks;
+    private _index;
+    private _newIndex;
+    private _direction;
+    private _type;
+    private DEFAULT_INTERVAL;
+    private _interval;
+    private _timePromises;
+    private _throttled;
+    swipeStart: number;
+    sliderIndex: number;
+    slideTo: Function;
+    constructor($scope: ng.IScope, $element: any, $attrs: any, $parse: any, $timeout: angular.ITimeoutService, $interval: angular.IIntervalService, $pipImageSlider: any);
+    nextBlock(): void;
+    prevBlock(): void;
+    slideToPrivate(nextIndex: number): void;
+    private setIndex();
+    private startInterval();
+    private stopInterval();
+    private restartInterval();
+}
 
+interface IImageSliderService {
+    registerSlider(sliderId: string, sliderScope: any): void;
+    removeSlider(sliderId: string): void;
+    getSliderScope(sliderId: string): any;
+    nextCarousel(nextBlock: any, prevBlock: any): void;
+    prevCarousel(nextBlock: any, prevBlock: any): void;
+    toBlock(type: string, blocks: any[], oldIndex: number, nextIndex: number, direction: string): void;
+}
+class ImageSliderService {
+    private _$timeout;
+    private ANIMATION_DURATION;
+    private _sliders;
+    constructor($timeout: angular.ITimeoutService);
+    registerSlider(sliderId: string, sliderScope: any): void;
+    removeSlider(sliderId: string): void;
+    getSliderScope(sliderId: string): any;
+    nextCarousel(nextBlock: any, prevBlock: any): void;
+    prevCarousel(nextBlock: any, prevBlock: any): void;
+    toBlock(type: string, blocks: any[], oldIndex: number, nextIndex: number, direction: string): void;
+}
 
 
 
 var marked: any;
 
+export class PopoverController {
+    private _$timeout;
+    private _$scope;
+    timeout: any;
+    backdropElement: any;
+    content: any;
+    element: any;
+    calcH: boolean;
+    templateUrl: any;
+    template: any;
+    cancelCallback: Function;
+    constructor($scope: ng.IScope, $rootScope: any, $element: any, $timeout: any, $compile: any);
+    backdropClick(): void;
+    closePopover(): void;
+    onPopoverClick($e: any): void;
+    private init();
+    private position();
+    private onResize();
+    private calcHeight();
+}
 
+export class PopoverService {
+    private _$timeout;
+    private _$scope;
+    private _$compile;
+    private _$rootScope;
+    popoverTemplate: string;
+    constructor($compile: any, $rootScope: any, $timeout: any);
+    show(p: any): void;
+    hide(): void;
+    resize(): void;
+}
 
+class RoutingController {
+    private _image;
+    logoUrl: string;
+    showProgress: Function;
+    constructor($scope: ng.IScope, $element: any);
+    loadProgressImage(): void;
+}
 
+interface IPipToast {
+    type: string;
+    id: string;
+    error: any;
+    message: string;
+    actions: string[];
+    duration: number;
+    successCallback: Function;
+    cancelCallback: Function;
+}
+class ToastController {
+    private _$mdToast;
+    private _pipErrorDetailsDialog;
+    message: string;
+    actions: string[];
+    toast: IPipToast;
+    actionLenght: number;
+    showDetails: boolean;
+    constructor($mdToast: angular.material.IToastService, toast: IPipToast, $injector: any);
+    onDetails(): void;
+    onAction(action: any): void;
+}
+interface IToastService {
+    showNextToast(): void;
+    showToast(toast: IPipToast): void;
+    addToast(toast: any): void;
+    removeToasts(type: string): void;
+    getToastById(id: string): IPipToast;
+    removeToastsById(id: string): void;
+    onClearToasts(): void;
+    showNotification(message: string, actions: string[], successCallback: any, cancelCallback: any, id: string): any;
+    showMessage(message: string, successCallback: any, cancelCallback: any, id?: string): any;
+    showError(message: string, successCallback: any, cancelCallback: any, id: string, error: any): any;
+    hideAllToasts(): void;
+    clearToasts(type?: string): any;
+}
+class ToastService implements IToastService {
+    private SHOW_TIMEOUT;
+    private SHOW_TIMEOUT_NOTIFICATIONS;
+    private toasts;
+    private currentToast;
+    private sounds;
+    private _$mdToast;
+    constructor($rootScope: ng.IRootScopeService, $mdToast: angular.material.IToastService);
+    showNextToast(): void;
+    showToast(toast: IPipToast): void;
+    private showToastCancelResult(action);
+    private showToastOkResult(action);
+    addToast(toast: any): void;
+    removeToasts(type: string): void;
+    removeToastsById(id: string): void;
+    getToastById(id: string): IPipToast;
+    onStateChangeSuccess(): void;
+    onClearToasts(): void;
+    showNotification(message: string, actions: string[], successCallback: any, cancelCallback: any, id: string): void;
+    showMessage(message: string, successCallback: any, cancelCallback: any, id?: string): void;
+    showError(message: string, successCallback: any, cancelCallback: any, id: string, error: any): void;
+    hideAllToasts(): void;
+    clearToasts(type?: string): void;
+}
 
 }
 
@@ -580,7 +722,6 @@ export interface IConfirmationService {
 }
 
 
-
 export class ErrorStrings {
     ok: string;
     cancel: string;
@@ -614,33 +755,6 @@ class ErrorDetailsService {
 }
 
 
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
-}
 
 
 export class OptionsBigData {
@@ -719,6 +833,34 @@ export class OptionsDialogController {
 
 export interface IOptionsService {
     show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
+}
+
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 }
@@ -804,18 +946,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -841,6 +971,18 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
 
 
 
@@ -879,6 +1021,7 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
+
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -903,7 +1046,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
-
 
 
 
@@ -947,6 +1089,7 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
+
 
 
 
@@ -1014,7 +1157,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
-
 
 }
 
@@ -1113,6 +1255,20 @@ declare module pip.locations {
 
 
 
+class LocationDialogService {
+    private _$mdDialog;
+    constructor($mdDialog: angular.material.IDialogService);
+    show(params: any, successCallback: any, cancelCallback: any): void;
+}
+class LocationEditDialogController {
+    private _map;
+    private _marker;
+    theme: string;
+    locationPos: any;
+    locationName: any;
+    supportSet: boolean;
+    constructor($scope: ng.IScope, $rootScope: ng.IRootScopeService, $timeout: angular.ITimeoutService, $mdDialog: angular.material.IDialogService, locationPos: any, locationName: any);
+}
 
 
 let google: any;
@@ -1184,11 +1340,6 @@ declare module pip.settings {
 
 
 
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
 export class SettingsTab {
     state: string;
     title: string;
@@ -1225,13 +1376,18 @@ export class SettingsConfig {
 
 
 
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
 }
 
 declare module pip.help {
 
 
-
 function configureHelpPageRoutes($stateProvider: any): void;
+
 
 export class HelpTab {
     state: string;
