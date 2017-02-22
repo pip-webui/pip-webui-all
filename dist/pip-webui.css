@@ -9778,19 +9778,19 @@ button:focus {
   word-break: break-word;
   margin-top: 0;
 }
-.pip-file-upload .pip-hidden-form {
+.pip-file-select .pip-hidden-form {
   display: none;
 }
-.pip-file-upload .pip-button {
+.pip-file-select .pip-button {
   margin: 0;
   width: 100%;
 }
-.pip-file-upload .pip-file {
+.pip-file-select .pip-file {
   height: 60px;
   border-radius: 2px;
   background-color: rgba(0, 0, 0, 0.08);
 }
-.pip-file-upload .pip-file .pip-icon {
+.pip-file-select .pip-file .pip-icon {
   margin-right: 16px;
   margin-left: 12px;
 }
