@@ -46,6 +46,49 @@ function addRedirectStateDecorator($provide: any): void;
 export let RoutingVar: string;
 
 
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+function configureTransactionStrings($injector: any): void;
+
+
 function translateDirective(pipTranslate: any): ng.IDirective;
 function translateHtmlDirective(pipTranslate: any): ng.IDirective;
 
@@ -104,49 +147,6 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
-
 export interface ICodes {
     hash(value: string): number;
     verification(): string;
@@ -204,13 +204,13 @@ export interface ITimerService {
 
 declare module pip.buttons {
 
+
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
-
 
 
 
@@ -317,6 +317,7 @@ declare module pip.behaviors {
 
 
 
+
 export class ShortcutOption {
     Type: KeyboardEvent;
     Propagate: boolean;
@@ -400,7 +401,6 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
     defaultOptions: ShortcutOption;
 }
 
-
 }
 
 declare module pip.controls {
@@ -480,8 +480,6 @@ class ImageSliderService {
 
 
 
-var marked: any;
-
 export class PopoverController {
     private _$timeout;
     private _$scope;
@@ -522,6 +520,8 @@ class RoutingController {
     constructor($scope: ng.IScope, $element: any);
     loadProgressImage(): void;
 }
+
+var marked: any;
 
 interface IPipToast {
     type: string;
@@ -593,7 +593,6 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
-
 
 
 function formatTimeFilter(pipDateTime: any): (value: any, format: string) => string;
@@ -698,6 +697,7 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 
 
+
 }
 
 declare module pip.dialogs {
@@ -722,34 +722,6 @@ export interface IConfirmationService {
 }
 
 
-
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
-}
 
 export class ErrorStrings {
     ok: string;
@@ -783,6 +755,34 @@ class ErrorDetailsService {
     show(params: any, successCallback: any, cancelCallback: any): void;
 }
 
+
+
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
+}
 
 
 export class OptionsBigData {
@@ -867,55 +867,6 @@ export interface IOptionsService {
 
 declare module pip.nav {
 
-export let ActionsChangedEvent: string;
-export let SecondaryActionsOpenEvent: string;
-export class SimpleActionItem {
-    name: string;
-    title?: string;
-    divider?: boolean;
-    icon?: string;
-    count?: number;
-    access?: (action: SimpleActionItem) => boolean;
-    breakpoints?: string[];
-    href?: string;
-    url?: string;
-    state?: string;
-    stateParams?: any;
-    event?: string;
-    click?: (action: SimpleActionItem) => void;
-}
-export class ActionItem extends SimpleActionItem {
-    subActions: SimpleActionItem[];
-}
-export class ActionsConfig {
-    primaryGlobalActions: ActionItem[];
-    primaryLocalActions: ActionItem[];
-    secondaryGlobalActions: ActionItem[];
-    secondaryLocalActions: ActionItem[];
-}
-export interface IActionsService {
-    readonly config: ActionsConfig;
-    primaryGlobalActions: ActionItem[];
-    primaryLocalActions: ActionItem[];
-    secondaryGlobalActions: ActionItem[];
-    secondaryLocalActions: ActionItem[];
-    show(primaryActions?: ActionItem[], secondaryActions?: ActionItem[]): void;
-    hide(): void;
-    updateCount(link: string, count: number): void;
-    clearCounts(): void;
-    openMenuEvent(): void;
-}
-export interface IActionsProvider extends ng.IServiceProvider {
-    config: ActionsConfig;
-    primaryGlobalActions: ActionItem[];
-    primaryLocalActions: ActionItem[];
-    secondaryGlobalActions: ActionItem[];
-    secondaryLocalActions: ActionItem[];
-}
-
-
-
-
 
 export let BreadcrumbChangedEvent: string;
 export let BreadcrumbBackEvent: string;
@@ -984,6 +935,54 @@ export interface INavService {
     reset(): void;
 }
 
+export let ActionsChangedEvent: string;
+export let SecondaryActionsOpenEvent: string;
+export class SimpleActionItem {
+    name: string;
+    title?: string;
+    divider?: boolean;
+    icon?: string;
+    count?: number;
+    access?: (action: SimpleActionItem) => boolean;
+    breakpoints?: string[];
+    href?: string;
+    url?: string;
+    state?: string;
+    stateParams?: any;
+    event?: string;
+    click?: (action: SimpleActionItem) => void;
+}
+export class ActionItem extends SimpleActionItem {
+    subActions: SimpleActionItem[];
+}
+export class ActionsConfig {
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+}
+export interface IActionsService {
+    readonly config: ActionsConfig;
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+    show(primaryActions?: ActionItem[], secondaryActions?: ActionItem[]): void;
+    hide(): void;
+    updateCount(link: string, count: number): void;
+    clearCounts(): void;
+    openMenuEvent(): void;
+}
+export interface IActionsProvider extends ng.IServiceProvider {
+    config: ActionsConfig;
+    primaryGlobalActions: ActionItem[];
+    primaryLocalActions: ActionItem[];
+    secondaryGlobalActions: ActionItem[];
+    secondaryLocalActions: ActionItem[];
+}
+
+
+
 
 
 
@@ -1021,6 +1020,7 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
+
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -1045,6 +1045,7 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 
@@ -1088,7 +1089,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
-
 
 
 
@@ -1207,8 +1207,6 @@ declare module pip.errors {
 
 
 
-
-
 export class ErrorStateItem {
     Active: boolean;
     Name: string;
@@ -1241,6 +1239,8 @@ export interface IpipErrorsProvider extends ng.IServiceProvider {
 
 
 
+
+
 }
 
 declare module pip.charts {
@@ -1252,6 +1252,7 @@ declare module pip.charts {
 }
 
 declare module pip.locations {
+
 
 
 
@@ -1282,7 +1283,6 @@ class LocationEditDialogController {
 }
 
 let google: any;
-
 
 
 }
@@ -1533,6 +1533,7 @@ export class TilesGridService implements ITilesGridService {
 }
 
 
+
 export class MenuWidgetService {
     menu: any;
     constructor();
@@ -1545,21 +1546,9 @@ export class MenuWidgetService {
 
 
 
-
 }
 
 declare module pip.settings {
-
-
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-
-
-
 
 
 
@@ -1593,13 +1582,21 @@ export class SettingsConfig {
     isNavIcon: boolean;
 }
 
+
+
+function configureSettingsPageRoutes($stateProvider: any): void;
+
+
+
+
+
+
+
+
 }
 
 declare module pip.help {
 
-
-
-function configureHelpPageRoutes($stateProvider: any): void;
 
 export class HelpTab {
     state: string;
@@ -1630,6 +1627,9 @@ export class HelpConfig {
     titleLogo: boolean;
     isNavIcon: boolean;
 }
+
+
+function configureHelpPageRoutes($stateProvider: any): void;
 
 }
 

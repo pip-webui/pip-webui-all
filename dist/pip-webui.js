@@ -1556,7 +1556,7 @@ var FabTooltipVisibilityController = (function () {
                     }
                     $scope.currentButtonIndex = index;
                     $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
-                    $scope.currentButtonValue = $scope.currentButton.id || index;
+                    $scope.currentButtonValue = $scope.currentButton.id === undefined ? index : $scope.currentButton.id;
                     $timeout(function () {
                         if ($scope.change) {
                             $scope.change();
@@ -6639,8 +6639,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range_directive/date_range.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6651,8 +6651,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_directive/date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -7273,8 +7273,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/ErrorDetails.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7285,8 +7285,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/ErrorDetails.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -10019,30 +10019,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('actions/PrimaryActions.html',
-    '<div pip-focused="" pip-focused-tabindex="2"><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in config.primaryLocalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="clickAction(action, $mdOpenMenu);" tabindex="-1" ng-hide="isHidden(action)" aria-label="{{action.title | translate}}"><div class="pip-primary-actions-badge" ng-show="action.count > 0">{{actionCount(action)}}</div><md-icon md-svg-icon="{{action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="clickAction(subAction)">{{::subAction.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in config.primaryGlobalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="clickAction(action, $mdOpenMenu);" ng-hide="isHidden(action)" tabindex="-1" aria-label="{{action.title | translate}}"><div class="pip-primary-actions-badge color-badge-bg" ng-show="action.count > 0">{{actionCount(action)}}</div><md-icon md-svg-icon="{{action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="clickAction(subAction)">{{subAction.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('actions/SecondaryActions.html',
-    '<md-menu ng-if="secondaryActionsVisible()" md-position-mode="target-right target"><md-button class="md-icon-button" tabindex="3" ng-init="getMenu($mdOpenMenu)" ng-click="onSecondaryActionClick(); openMenu($mdOpenMenu, $event);" aria-label="open actions"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="action in config.secondaryLocalActions" ng-if="!action.divider" ng-hide="isHidden(action)"><md-button ng-hide="action.divider" ng-click="clickAction(action)">{{::action.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider><md-menu-divider ng-if="secondaryDividerVisible()"></md-menu-divider><md-menu-item ng-repeat-start="action in config.secondaryGlobalActions" ng-if="!action.divider" ng-hide="isHidden(action)"><md-button ng-hide="action.divider" ng-click="clickAction(action)">{{::action.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('breadcrumb/Breadcrumb.html',
     '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!vm._media(\'xs\')"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" ng-if="vm._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button tabindex="5"><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
 }]);
@@ -10067,8 +10043,20 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dropdown/Dropdown.html',
-    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" tabindex="15" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
+  $templateCache.put('actions/PrimaryActions.html',
+    '<div pip-focused="" pip-focused-tabindex="2"><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in config.primaryLocalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="clickAction(action, $mdOpenMenu);" tabindex="-1" ng-hide="isHidden(action)" aria-label="{{action.title | translate}}"><div class="pip-primary-actions-badge" ng-show="action.count > 0">{{actionCount(action)}}</div><md-icon md-svg-icon="{{action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="clickAction(subAction)">{{::subAction.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in config.primaryGlobalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="clickAction(action, $mdOpenMenu);" ng-hide="isHidden(action)" tabindex="-1" aria-label="{{action.title | translate}}"><div class="pip-primary-actions-badge color-badge-bg" ng-show="action.count > 0">{{actionCount(action)}}</div><md-icon md-svg-icon="{{action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="clickAction(subAction)">{{subAction.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('actions/SecondaryActions.html',
+    '<md-menu ng-if="secondaryActionsVisible()" md-position-mode="target-right target"><md-button class="md-icon-button" tabindex="3" ng-init="getMenu($mdOpenMenu)" ng-click="onSecondaryActionClick(); openMenu($mdOpenMenu, $event);" aria-label="open actions"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="action in config.secondaryLocalActions" ng-if="!action.divider" ng-hide="isHidden(action)"><md-button ng-hide="action.divider" ng-click="clickAction(action)">{{::action.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider><md-menu-divider ng-if="secondaryDividerVisible()"></md-menu-divider><md-menu-item ng-repeat-start="action in config.secondaryGlobalActions" ng-if="!action.divider" ng-hide="isHidden(action)"><md-button ng-hide="action.divider" ng-click="clickAction(action)">{{::action.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -10091,6 +10079,18 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dropdown/Dropdown.html',
+    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" tabindex="15" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('icon/NavIcon.html',
     '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" tabindex="{{config.type==\'menu\' || config.type==\'back\' ? 4 : -1 }}" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
 }]);
@@ -10103,8 +10103,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('menu/NavMenu.html',
-    '<div ng-if="sections && sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" tabindex="-1" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{section.icon}}" ng-if="sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" ng-repeat="link in section.links" tabindex="-1" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-click="clickLink($event, link)"><md-tooltip md-visible="showTooltip" md-direction="right">{{::link.tooltipText | translate}}</md-tooltip><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-if="!(sideNavState.showIconTooltype && !link.tooltipText && !expanded)" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"></md-icon><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" ng-if="sideNavState.showIconTooltype && !link.tooltipText && !expanded" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::link.tooltipText || link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{link.count}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
+  $templateCache.put('language/LanguagePicker.html',
+    '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{vm.language | translate}}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in vm.languages"><md-button ng-click="vm.onLanguageClick(lang)" tabindex="7">{{language | translate}}</md-button></md-menu-item></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -10115,8 +10115,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('language/LanguagePicker.html',
-    '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{vm.language | translate}}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in vm.languages"><md-button ng-click="vm.onLanguageClick(lang)" tabindex="7">{{language | translate}}</md-button></md-menu-item></md-menu-content></md-menu>');
+  $templateCache.put('menu/NavMenu.html',
+    '<div ng-if="sections && sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" tabindex="-1" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{section.icon}}" ng-if="sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" ng-repeat="link in section.links" tabindex="-1" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-click="clickLink($event, link)"><md-tooltip md-visible="showTooltip" md-direction="right">{{::link.tooltipText | translate}}</md-tooltip><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-if="!(sideNavState.showIconTooltype && !link.tooltipText && !expanded)" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"></md-icon><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" ng-if="sideNavState.showIconTooltype && !link.tooltipText && !expanded" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::link.tooltipText || link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{link.count}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
 }]);
 })();
 
@@ -11436,6 +11436,18 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('no_connection/no_connection.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
     '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
@@ -11460,8 +11472,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.message"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.message">Description: {{error_details.message}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48" ng-if="error_details && error_details.status"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -11474,18 +11486,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('unsupported/unsupported.html',
     '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.message"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.message">Description: {{error_details.message}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48" ng-if="error_details && error_details.status"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -12395,8 +12395,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -12407,8 +12407,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
@@ -15455,7 +15455,22 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('Dashboard.html',
-    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="dashboardCtrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="dashboardCtrl.groupedWidgets" pip-tiles-context="dashboardCtrl.widgetsContext" pip-draggable-grid="dashboardCtrl.draggableGridOptions" pip-group-menu-actions="dashboardCtrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
+    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component"\n' +
+    '           ng-click="dashboardCtrl.addComponent()">\n' +
+    '    <md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon>\n' +
+    '</md-button>\n' +
+    '\n' +
+    '<div class="pip-draggable-grid-holder">\n' +
+    '  <pip-draggable-grid pip-tiles-templates="dashboardCtrl.groupedWidgets"\n' +
+    '                      pip-tiles-context="dashboardCtrl.widgetsContext"\n' +
+    '                      pip-draggable-grid="dashboardCtrl.draggableGridOptions"\n' +
+    '                      pip-group-menu-actions="dashboardCtrl.groupMenuActions">\n' +
+    '  </pip-draggable-grid>\n' +
+    '\n' +
+    '  <md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular>\n' +
+    '\n' +
+    '</div>\n' +
+    '');
 }]);
 })();
 
@@ -15467,7 +15482,43 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('draggable/Draggable.html',
-    '<div class="pip-draggable-holder"><div class="pip-draggable-group" ng-repeat="group in draggableCtrl.groups" data-group-id="{{ $index }}" pip-draggable-tiles="group.source"><div class="pip-draggable-group-title layout-row layout-align-start-center"><div class="title-input-container" ng-click="draggableCtrl.onTitleClick(group, $event)"><input ng-if="group.editingName" ng-blur="draggableCtrl.onBlurTitleInput(group)" ng-keypress="draggableCtrl.onKyepressTitleInput(group, $event)" ng-model="group.title"><div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div></div><md-button class="md-icon-button flex-none layout-align-center-center" ng-show="group.editingName" ng-click="draggableCtrl.cancelEditing(group)" aria-label="Cancel"><md-icon md-svg-icon="icons:cross"></md-icon></md-button><md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName"><md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu"><md-icon md-svg-icon="icons:dots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="action in draggableCtrl.groupMenuActions"><md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button></md-menu-item></md-menu-content></md-menu></div></div><div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16"><div class="fict-group-text-container"><md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}</div></div></div>');
+    '<div class="pip-draggable-holder">\n' +
+    '  <div class="pip-draggable-group" \n' +
+    '       ng-repeat="group in draggableCtrl.groups" \n' +
+    '       data-group-id="{{ $index }}" \n' +
+    '       pip-draggable-tiles="group.source">\n' +
+    '    <div class="pip-draggable-group-title layout-row layout-align-start-center">\n' +
+    '      <div class="title-input-container" ng-click="draggableCtrl.onTitleClick(group, $event)">\n' +
+    '        <input ng-if="group.editingName" ng-blur="draggableCtrl.onBlurTitleInput(group)" \n' +
+    '               ng-keypress="draggableCtrl.onKyepressTitleInput(group, $event)"\n' +
+    '               ng-model="group.title">\n' +
+    '        </input>\n' +
+    '        <div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div>\n' +
+    '      </div>\n' +
+    '      <md-button class="md-icon-button flex-none layout-align-center-center" \n' +
+    '        ng-show="group.editingName" ng-click="draggableCtrl.cancelEditing(group)"\n' +
+    '        aria-label="Cancel">\n' +
+    '        <md-icon md-svg-icon="icons:cross"></md-icon>\n' +
+    '      </md-button>\n' +
+    '      <md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName">\n' +
+    '        <md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu">\n' +
+    '          <md-icon md-svg-icon="icons:dots"></md-icon>\n' +
+    '        </md-button>\n' +
+    '        <md-menu-content width="4">\n' +
+    '          <md-menu-item ng-repeat="action in draggableCtrl.groupMenuActions">\n' +
+    '            <md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button>\n' +
+    '          </md-menu-item>\n' +
+    '        </md-menu-content>\n' +
+    '      </md-menu>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '\n' +
+    '  <div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16" >\n' +
+    '    <div class="fict-group-text-container">\n' +
+    '          <md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -15479,7 +15530,46 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dialogs/add_component/AddComponent.html',
-    '<md-dialog class="pip-dialog pip-add-component-dialog"><md-dialog-content class="layout-column"><div class="theme-divider p16 flex-auto"><h3 class="hide-xs m0 bm16 theme-text-primary" hide-xs="">Add component<md-input-container class="layout-row flex-auto m0"><md-select class="flex-auto m0 theme-text-primary" ng-model="dialogCtrl.activeGroupIndex" placeholder="Create New Group" aria-label="Group"><md-option ng-value="$index" ng-repeat="group in dialogCtrl.groups">{{ group }}</md-option></md-select></md-input-container></h3></div><div class="pip-body pip-scroll p0 flex-auto"><p class="md-body-1 theme-text-secondary m0 lp16 rp16">Use "Enter" or "+" buttons on keyboard to encrease and "Delete" or "-" to decrease tiles amount</p><md-list ng-init="groupIndex = $index" ng-repeat="group in dialogCtrl.defaultWidgets"><md-list-item class="layout-row pip-list-item lp16 rp16" ng-repeat="item in group"><div class="icon-holder flex-none"><md-icon md-svg-icon="icons:{{:: item.icon }}"></md-icon><div class="pip-badge theme-badge md-warn" ng-if="item.amount"><span>{{ item.amount }}</span></div></div><span class="flex-auto lm24 theme-text-primary">{{:: item.title }}</span><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.encrease(groupIndex, $index)" aria-label="Encrease"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.decrease(groupIndex, $index)" aria-label="Decrease"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button></md-list-item><md-divider class="lm72 tm8 bm8" ng-if="groupIndex !== (dialogCtrl.defaultWidgets.length - 1)"></md-divider></md-list></div></md-dialog-content><md-dialog-actions class="flex-none layout-align-end-center theme-divider divider-top theme-text-primary"><md-button ng-click="dialogCtrl.cancel()" aria-label="Add">Cancel</md-button><md-button ng-click="dialogCtrl.add()" arial-label="Cancel">Add</md-button></md-dialog-actions></md-dialog>');
+    '<md-dialog class="pip-dialog pip-add-component-dialog">\n' +
+    '  <md-dialog-content class="layout-column">\n' +
+    '    <div class="theme-divider p16 flex-auto">\n' +
+    '      <h3 class="hide-xs m0 bm16 theme-text-primary" hide-xs>Add component</h4>\n' +
+    '      <md-input-container class="layout-row flex-auto m0">\n' +
+    '        <md-select class="flex-auto m0 theme-text-primary" ng-model="dialogCtrl.activeGroupIndex" placeholder="Create New Group"\n' +
+    '          aria-label="Group">\n' +
+    '          <md-option ng-value="$index" ng-repeat="group in dialogCtrl.groups">{{ group }}</md-option>\n' +
+    '        </md-select>\n' +
+    '      </md-input-container>\n' +
+    '    </div>\n' +
+    '    <div class="pip-body pip-scroll p0 flex-auto">\n' +
+    '      <p class="md-body-1 theme-text-secondary m0 lp16 rp16" >\n' +
+    '        Use "Enter" or "+" buttons on keyboard to encrease and "Delete" or "-" to decrease tiles amount\n' +
+    '      </p>\n' +
+    '      <md-list ng-init="groupIndex = $index" ng-repeat="group in dialogCtrl.defaultWidgets">\n' +
+    '        <md-list-item class="layout-row pip-list-item lp16 rp16" ng-repeat="item in group">\n' +
+    '          <div class="icon-holder flex-none">\n' +
+    '            <md-icon md-svg-icon="icons:{{:: item.icon }}"></md-icon>\n' +
+    '            <div class="pip-badge theme-badge md-warn" ng-if="item.amount">\n' +
+    '              <span>{{ item.amount }}</span>\n' +
+    '            </div>\n' +
+    '          </div>\n' +
+    '          <span class="flex-auto lm24 theme-text-primary">{{:: item.title }}</span>\n' +
+    '          <md-button class="md-icon-button flex-none" ng-click="dialogCtrl.encrease(groupIndex, $index)" aria-label="Encrease">\n' +
+    '            <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
+    '          </md-button>\n' +
+    '          <md-button class="md-icon-button flex-none" ng-click="dialogCtrl.decrease(groupIndex, $index)" aria-label="Decrease">\n' +
+    '            <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
+    '          </md-button>\n' +
+    '        </md-list-item>\n' +
+    '        <md-divider class="lm72 tm8 bm8" ng-if="groupIndex !== (dialogCtrl.defaultWidgets.length - 1)"></md-divider>\n' +
+    '      </md-list>\n' +
+    '    </div>\n' +
+    '  </md-dialog-content>\n' +
+    '  <md-dialog-actions class="flex-none layout-align-end-center theme-divider divider-top theme-text-primary">\n' +
+    '    <md-button ng-click="dialogCtrl.cancel()" aria-label="Add">Cancel</md-button>\n' +
+    '    <md-button ng-click="dialogCtrl.add()" arial-label="Cancel">Add</md-button>\n' +
+    '  </md-dialog-actions>\n' +
+    '</md-dialog>');
 }]);
 })();
 
@@ -15491,7 +15581,10 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dialogs/widget_config/ConfigDialog.html',
-    '<md-dialog class="pip-dialog pip-widget-config-dialog {{ vm.params.dialogClass }}" width="400" md-theme="{{vm.theme}}"><pip-widget-config-extend-component class="layout-column" pip-extension-url="{{ vm.params.extensionUrl }}"></pip-widget-config-extend-component></md-dialog>');
+    '<md-dialog class="pip-dialog pip-widget-config-dialog {{ vm.params.dialogClass }}" width="400" md-theme="{{vm.theme}}">\n' +
+    '    <pip-widget-config-extend-component class="layout-column" pip-extension-url="{{ vm.params.extensionUrl }}">\n' +
+    '    </pip-widget-config-extend-component>\n' +
+    '</md-dialog>');
 }]);
 })();
 
@@ -15503,44 +15596,21 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dialogs/widget_config/ConfigDialogExtendComponent.html',
-    '<h3 class="tm0 flex-none">{{vm.dialogTitle}}</h3><div class="pip-body pip-scroll p16 bp0 flex-auto"><pip-extension-point></pip-extension-point><pip-toggle-buttons class="bm16" ng-if="!vm.hideSizes" pip-buttons="vm.sizes" ng-model="vm.sizeId"></pip-toggle-buttons><pip-color-picker ng-if="!vm.hideColors" pip-colors="vm.colors" ng-model="vm.color"></pip-color-picker></div><div class="pip-footer flex-none"><div><md-button class="md-accent" ng-click="vm.onCancel()">Cancel</md-button><md-button class="md-accent" ng-click="vm.onApply()">Apply</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('widgets/menu/WidgetMenu.html',
-    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in widgetCtrl.menu"><md-button ng-if="!item.submenu" ng-click="widgetCtrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="widgetCtrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="widgetCtrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('widgets/event/ConfigDialogExtension.html',
-    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="vm.title"></md-input-container>Date:<md-datepicker ng-model="vm.date" class="w-stretch bm8"></md-datepicker><md-input-container class="w-stretch"><label>Description:</label> <textarea type="text" ng-model="vm.text">\n' +
-    '    </textarea></md-input-container>Backdrop\'s opacity:<md-slider aria-label="opacity" type="number" min="0.1" max="0.9" step="0.01" ng-model="vm.opacity" ng-change="vm.onOpacitytest(vm.opacity)"></md-slider></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('widgets/event/WidgetEvent.html',
-    '<div class="widget-box pip-event-widget {{ widgetCtrl.color }} layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"><img ng-if="widgetCtrl.options.image" ng-src="{{widgetCtrl.options.image}}" alt="{{widgetCtrl.options.title || widgetCtrl.options.name}}"><div class="text-backdrop" style="background-color: rgba(0, 0, 0, {{ widgetCtrl.opacity }})"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><div class="text-container flex-auto pip-scroll"><p class="date flex-none" ng-if="widgetCtrl.options.date">{{ widgetCtrl.options.date | formatShortDate }}</p><p class="text flex-auto">{{ widgetCtrl.options.text || widgetCtrl.options.description }}</p></div></div></div>');
+    '<h3 class="tm0 flex-none">{{vm.dialogTitle}}</h3>\n' +
+    '<div class="pip-body pip-scroll p16 bp0 flex-auto">\n' +
+    '    <pip-extension-point></pip-extension-point>\n' +
+    '    <pip-toggle-buttons class="bm16" ng-if="!vm.hideSizes" pip-buttons="vm.sizes" ng-model="vm.sizeId">\n' +
+    '    </pip-toggle-buttons>\n' +
+    '    <pip-color-picker ng-if="!vm.hideColors" pip-colors="vm.colors" ng-model="vm.color">\n' +
+    '    </pip-color-picker>\n' +
+    '</div>\n' +
+    '</div>\n' +
+    '<div class="pip-footer flex-none">\n' +
+    '    <div>\n' +
+    '        <md-button class="md-accent" ng-click="vm.onCancel()">Cancel</md-button>\n' +
+    '        <md-button class="md-accent" ng-click="vm.onApply()">Apply</md-button>\n' +
+    '    </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -15552,7 +15622,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/calendar/ConfigDialogExtension.html',
-    '<div class="w-stretch bm16">Date:<md-datepicker ng-model="vm.date" class="w-stretch"></md-datepicker></div>');
+    '<div class="w-stretch bm16">\n' +
+    '    Date:\n' +
+    '    <md-datepicker ng-model="vm.date" class="w-stretch ">\n' +
+    '    </md-datepicker>\n' +
+    '</div>');
 }]);
 })();
 
@@ -15564,7 +15638,131 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/calendar/WidgetCalendar.html',
-    '<div class="widget-box pip-calendar-widget {{ widgetCtrl.color }} layout-column layout-fill tp0" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-end-center flex-none"><pip-menu-widget></pip-menu-widget></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1"><span class="date lm24 rm12">{{ widgetCtrl.options.date.getDate() }}</span><div class="flex-auto layout-column"><span class="weekday md-headline">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span> <span class="month-year md-headline">{{ widgetCtrl.options.date | formatLongMonth }} {{ widgetCtrl.options.date | formatYear }}</span></div></div><div class="widget-content flex-auto layout-column layout-align-space-around-center" ng-hide="widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1"><span class="weekday md-headline" ng-hide="widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span> <span class="weekday" ng-show="widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span> <span class="date lm12 rm12">{{ widgetCtrl.options.date.getDate() }}</span> <span class="month-year md-headline">{{ widgetCtrl.options.date | formatLongMonth }} {{ widgetCtrl.options.date | formatYear }}</span></div></div>');
+    '<div class="widget-box pip-calendar-widget {{ widgetCtrl.color }} layout-column layout-fill tp0"\n' +
+    '     ng-class="{\n' +
+    '        small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }">\n' +
+    '  <div class="widget-heading layout-row layout-align-end-center flex-none">\n' +
+    '    <pip-menu-widget></pip-menu-widget>\n' +
+    '  </div>\n' +
+    '\n' +
+    '  <div class="widget-content flex-auto layout-row layout-align-center-center"\n' +
+    '       ng-if="widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1">\n' +
+    '    <span class="date lm24 rm12">{{ widgetCtrl.options.date.getDate() }}</span>\n' +
+    '    <div class="flex-auto layout-column">\n' +
+    '      <span class="weekday md-headline">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span>\n' +
+    '      <span class="month-year md-headline">{{ widgetCtrl.options.date | formatLongMonth }} {{ widgetCtrl.options.date | formatYear }}</span>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '\n' +
+    '  <div class="widget-content flex-auto layout-column layout-align-space-around-center"\n' +
+    '       ng-hide="widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1">\n' +
+    '    <span class="weekday md-headline"\n' +
+    '          ng-hide="widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span>\n' +
+    '    <span class="weekday"\n' +
+    '          ng-show="widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span>\n' +
+    '    <span class="date lm12 rm12">{{ widgetCtrl.options.date.getDate() }}</span>\n' +
+    '    <span class="month-year md-headline">{{ widgetCtrl.options.date | formatLongMonth }} {{ widgetCtrl.options.date | formatYear }}</span>\n' +
+    '  </div>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('widgets/menu/WidgetMenu.html',
+    '<md-menu class="widget-menu" md-position-mode="target-right target">\n' +
+    '    <md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu">\n' +
+    '        <md-icon md-svg-icon="icons:vdots"></md-icon>\n' +
+    '    </md-button>\n' +
+    '\n' +
+    '    <md-menu-content width="4">\n' +
+    '        <md-menu-item ng-repeat="item in widgetCtrl.menu">\n' +
+    '            <md-button ng-if="!item.submenu" ng-click="widgetCtrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button>\n' +
+    '\n' +
+    '            <md-menu ng-if="item.submenu">\n' +
+    '                <md-button ng-click="widgetCtrl.callAction(item.action)">{{:: item.title }}</md-button>\n' +
+    '\n' +
+    '                <md-menu-content>\n' +
+    '                    <md-menu-item ng-repeat="subitem in item.submenu">\n' +
+    '                        <md-button ng-click="widgetCtrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button>\n' +
+    '                    </md-menu-item>\n' +
+    '                </md-menu-content>\n' +
+    '            </md-menu>\n' +
+    '        </md-menu-item>\n' +
+    '\n' +
+    '    </md-menu-content>\n' +
+    '</md-menu>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('widgets/event/ConfigDialogExtension.html',
+    '<div class="w-stretch">\n' +
+    '    <md-input-container class="w-stretch bm0">\n' +
+    '        <label>Title:</label>\n' +
+    '        <input type="text" ng-model="vm.title"/>\n' +
+    '    </md-input-container>\n' +
+    '\n' +
+    '    Date:\n' +
+    '    <md-datepicker ng-model="vm.date" class="w-stretch bm8">\n' +
+    '    </md-datepicker>\n' +
+    '\n' +
+    '    <md-input-container class="w-stretch">\n' +
+    '        <label>Description:</label>\n' +
+    '        <textarea type="text" ng-model="vm.text"/>\n' +
+    '    </md-input-container>\n' +
+    '\n' +
+    '    Backdrop\'s opacity:\n' +
+    '    <md-slider aria-label="opacity"  type="number" min="0.1" max="0.9" step="0.01" \n' +
+    '        ng-model="vm.opacity" ng-change="vm.onOpacitytest(vm.opacity)">\n' +
+    '    </md-slider>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('widgets/event/WidgetEvent.html',
+    '<div class="widget-box pip-event-widget {{ widgetCtrl.color }} layout-column layout-fill" ng-class="{\n' +
+    '        small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }" >\n' +
+    '    <img ng-if="widgetCtrl.options.image" ng-src="{{widgetCtrl.options.image}}" alt="{{widgetCtrl.options.title || widgetCtrl.options.name}}"\n' +
+    '    />\n' +
+    '    <div class="text-backdrop" style="background-color: rgba(0, 0, 0, {{ widgetCtrl.opacity }})">\n' +
+    '        <div class="widget-heading layout-row layout-align-start-center flex-none">\n' +
+    '            <span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span>\n' +
+    '            <pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget>\n' +
+    '        </div>\n' +
+    '        <div class="text-container flex-auto pip-scroll">\n' +
+    '            <p class="date flex-none" ng-if="widgetCtrl.options.date">\n' +
+    '                {{ widgetCtrl.options.date | formatShortDate }}\n' +
+    '            </p>\n' +
+    '            <p class="text flex-auto">\n' +
+    '                {{ widgetCtrl.options.text || widgetCtrl.options.description }}\n' +
+    '            </p>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -15576,8 +15774,17 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/notes/ConfigDialogExtension.html',
-    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="vm.title"></md-input-container><md-input-container class="w-stretch tm0"><label>Text:</label> <textarea type="text" ng-model="vm.text">\n' +
-    '    </textarea></md-input-container></div>');
+    '<div class="w-stretch">\n' +
+    '    <md-input-container class="w-stretch bm0">\n' +
+    '        <label>Title:</label>\n' +
+    '        <input type="text" ng-model="vm.title"/>\n' +
+    '    </md-input-container>\n' +
+    '\n' +
+    '    <md-input-container class="w-stretch tm0">\n' +
+    '        <label>Text:</label>\n' +
+    '        <textarea type="text" ng-model="vm.text"/>\n' +
+    '    </md-input-container>\n' +
+    '</div>');
 }]);
 })();
 
@@ -15589,7 +15796,17 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/notes/WidgetNotes.html',
-    '<div class="widget-box pip-notes-widget {{ widgetCtrl.color }} layout-column"><div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="widgetCtrl.options.title || widgetCtrl.options.name"><span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span></div><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget><div class="text-container flex-auto pip-scroll"><p>{{ widgetCtrl.options.text }}</p></div></div>');
+    '<div class="widget-box pip-notes-widget {{ widgetCtrl.color }} layout-column">\n' +
+    '    <div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="widgetCtrl.options.title || widgetCtrl.options.name">\n' +
+    '        <span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span>\n' +
+    '    </div>\n' +
+    '    <pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget>\n' +
+    '    \n' +
+    '    <div class="text-container flex-auto pip-scroll">\n' +
+    '        <p>{{ widgetCtrl.options.text }}</p>\n' +
+    '    </div>\n' +
+    '</div>\n' +
+    '');
 }]);
 })();
 
@@ -15601,7 +15818,36 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/picture_slider/WidgetPictureSlider.html',
-    '<div class="widget-box pip-picture-slider-widget {{ widgetCtrl.color }} layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }" index="{{ widgetCtrl.index }}" group="{{ widgetCtrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ widgetCtrl.options.title }}</span><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="widgetCtrl.animationInterval" ng-if="widgetCtrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in widgetCtrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="widgetCtrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="widgetCtrl.animationInterval" ng-if="widgetCtrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in widgetCtrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="widgetCtrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
+    '<div class="widget-box pip-picture-slider-widget {{ widgetCtrl.color }} layout-column layout-fill" ng-class="{\n' +
+    '        small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }" \n' +
+    '        index=\'{{ widgetCtrl.index }}\' group=\'{{ widgetCtrl.group }}\'>\n' +
+    '\n' +
+    '        <div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none">\n' +
+    '            <span class="flex text-overflow">{{ widgetCtrl.options.title }}</span>\n' +
+    '            <pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget>\n' +
+    '        </div>\n' +
+    '\n' +
+    '        <div class="slider-container">\n' +
+    '            <div pip-image-slider pip-animation-type="\'fading\'" pip-animation-interval="widgetCtrl.animationInterval" \n' +
+    '                ng-if="widgetCtrl.animationType == \'fading\'">\n' +
+    '                <div class="pip-animation-block" ng-repeat="slide in widgetCtrl.options.slides">\n' +
+    '                    <img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="widgetCtrl.onImageLoad($event)"/>\n' +
+    '                    <p class="slide-text" ng-if="slide.text">{{ slide.text }}</p>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '\n' +
+    '            <div pip-image-slider pip-animation-type="\'carousel\'" pip-animation-interval="widgetCtrl.animationInterval" \n' +
+    '                ng-if="widgetCtrl.animationType == \'carousel\'">\n' +
+    '                <div class="pip-animation-block" ng-repeat="slide in widgetCtrl.options.slides">\n' +
+    '                    <img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="widgetCtrl.onImageLoad($event)"/>\n' +
+    '                    <p class="slide-text" ng-if="slide.text">{{ slide.text }}</p>\n' +
+    '                </div>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '        \n' +
+    '</div>');
 }]);
 })();
 
@@ -15613,7 +15859,12 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/position/ConfigDialogExtension.html',
-    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Location name:</label> <input type="text" ng-model="vm.locationName"></md-input-container></div>');
+    '<div class="w-stretch">\n' +
+    '    <md-input-container class="w-stretch bm0">\n' +
+    '        <label>Location name:</label>\n' +
+    '        <input type="text" ng-model="vm.locationName"/>\n' +
+    '    </md-input-container>\n' +
+    '</div>');
 }]);
 })();
 
@@ -15625,7 +15876,25 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/position/WidgetPosition.html',
-    '<div class="pip-position-widget widget-box p0 layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }" index="{{ widgetCtrl.index }}" group="{{ widgetCtrl.group }}"><div class="position-absolute-right-top" ng-if="!widgetCtrl.options.locationName"><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="widgetCtrl.options.locationName"><span class="flex text-overflow">{{ widgetCtrl.options.locationName }}</span><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><pip-location-map class="flex" ng-if="widgetCtrl.showPosition" pip-stretch="true" pip-rebind="true" pip-location-pos="widgetCtrl.options.location"></pip-location-map></div>');
+    '<div class="pip-position-widget widget-box p0 layout-column layout-fill"\n' +
+    '     ng-class="{\n' +
+    '        small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"\n' +
+    '        index=\'{{ widgetCtrl.index }}\' group=\'{{ widgetCtrl.group }}\'>\n' +
+    '    <div class="position-absolute-right-top" ng-if="!widgetCtrl.options.locationName">\n' +
+    '        <pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget>\n' +
+    '    </div>\n' +
+    '\n' +
+    '    <div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="widgetCtrl.options.locationName">\n' +
+    '        <span class="flex text-overflow">{{ widgetCtrl.options.locationName }}</span>\n' +
+    '        <pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget>\n' +
+    '    </div>\n' +
+    '\n' +
+    '    <pip-location-map class="flex" ng-if="widgetCtrl.showPosition" pip-stretch="true" pip-rebind="true"\n' +
+    '        pip-location-pos="widgetCtrl.options.location"></pip-location>\n' +
+    '</div>\n' +
+    '');
 }]);
 })();
 
@@ -15637,7 +15906,25 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/statistics/WidgetStatistics.html',
-    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span><pip-menu-widget></pip-menu-widget></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="widgetCtrl.options.series && !widgetCtrl.reset"><pip-pie-chart pip-series="widgetCtrl.options.series" ng-if="!widgetCtrl.options.chartType || widgetCtrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="widgetCtrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
+    '<div class="widget-box pip-statistics-widget layout-column layout-fill"\n' +
+    '     ng-class="{\n' +
+    '        small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1,\n' +
+    '        big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }">\n' +
+    '    <div class="widget-heading layout-row layout-align-start-center flex-none">\n' +
+    '        <span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span>\n' +
+    '        <pip-menu-widget></pip-menu-widget>\n' +
+    '    </div>\n' +
+    '    <div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="widgetCtrl.options.series && !widgetCtrl.reset">\n' +
+    '        <pip-pie-chart pip-series="widgetCtrl.options.series" ng-if="!widgetCtrl.options.chartType || widgetCtrl.options.chartType == \'pie\'"\n' +
+    '                    pip-donut="true" \n' +
+    '                    pip-pie-size="widgetCtrl.chartSize" \n' +
+    '                    pip-show-total="true" \n' +
+    '                    pip-centered="true">\n' +
+    '        </pip-pie-chart>\n' +
+    '    </div>\n' +
+    '</div>\n' +
+    '');
 }]);
 })();
 
