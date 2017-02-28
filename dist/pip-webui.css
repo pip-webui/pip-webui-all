@@ -8703,6 +8703,9 @@ button:focus {
 .black .pip-page-errors .pip-error-details md-icon {
   color: #ff5252;
 }
+.pip-error-scroll-body {
+  overflow: auto;
+}
 .pip-error-page {
   margin: 0 auto;
   height: calc(100vh - 64px);
@@ -8729,8 +8732,8 @@ button:focus {
 }
 .pip-error-page .pip-pic {
   width: 350px !important;
-  height: 350px !important;
-  min-height: 350px !important;
+  height: 250px !important;
+  min-height: 250px !important;
   margin: 25px 25px 0;
   background-position: 50% 50%;
   background-repeat: no-repeat;
