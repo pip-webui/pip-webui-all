@@ -204,13 +204,13 @@ export interface ITimerService {
 
 declare module pip.buttons {
 
+
 class FabTooltipVisibilityController {
     private _element;
     private _scope;
     private _timeout;
     constructor($mdMedia: angular.material.IMedia, $element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
-
 
 
 
@@ -262,6 +262,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 
 
 
+
+
+
+
+
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -298,12 +304,6 @@ export interface IMediaProvider extends ng.IServiceProvider {
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
-
-
-
-
-
-
 }
 
 declare module pip.split {
@@ -311,8 +311,6 @@ declare module pip.split {
 }
 
 declare module pip.behaviors {
-
-
 
 
 
@@ -400,6 +398,8 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
     localShortcuts: ShortcutItem[];
     defaultOptions: ShortcutOption;
 }
+
+
 
 }
 
@@ -757,6 +757,34 @@ class ErrorDetailsService {
 
 
 
+export class InformationStrings {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    content: any;
+}
+export class InformationParams {
+    ok: string;
+    title: string;
+    message: string;
+    error: string;
+    item: any;
+}
+export class InformationDialogController {
+    $mdDialog: angular.material.IDialogService;
+    theme: string;
+    config: InformationStrings;
+    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
+    onOk(): void;
+    onCancel(): void;
+}
+
+export interface IInformationService {
+    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
 export class OptionsBigData {
     name: string;
     title: string;
@@ -835,105 +863,9 @@ export interface IOptionsService {
     show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
 }
 
-
-export class InformationStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
-export class InformationParams {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    item: any;
-}
-export class InformationDialogController {
-    $mdDialog: angular.material.IDialogService;
-    theme: string;
-    config: InformationStrings;
-    constructor($mdDialog: angular.material.IDialogService, $injector: any, $rootScope: ng.IRootScopeService, params: InformationParams);
-    onOk(): void;
-    onCancel(): void;
-}
-
-export interface IInformationService {
-    show(params: any, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
 }
 
 declare module pip.nav {
-
-
-
-export let AppBarChangedEvent: string;
-export class AppBarConfig {
-    visible: boolean;
-    parts: any;
-    classes: string[];
-}
-export interface IAppBarService {
-    readonly config: AppBarConfig;
-    readonly classes: string[];
-    parts: any;
-    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
-    hide(): void;
-    addShadow(...breakpoints: string[]): void;
-    removeShadow(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAppBarProvider extends ng.IServiceProvider {
-    config: AppBarConfig;
-    parts: any;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): any;
-    showItems(items: BreadcrumbItem[], criteria?: string): any;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
 
 export let ActionsChangedEvent: string;
 export let SecondaryActionsOpenEvent: string;
@@ -986,6 +918,76 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export let AppBarChangedEvent: string;
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
+}
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
+    hide(): void;
+    addShadow(...breakpoints: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
+
+export let BreadcrumbChangedEvent: string;
+export let BreadcrumbBackEvent: string;
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): any;
+    showItems(items: BreadcrumbItem[], criteria?: string): any;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+
+
+
+
 export let NavHeaderChangedEvent: string;
 export class NavHeaderConfig {
     imageUrl: string;
@@ -1019,8 +1021,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 
 
 
-
-
 export let NavIconChangedEvent: string;
 export class NavIconConfig {
     type: string;
@@ -1045,6 +1045,7 @@ export interface INavIconProvider extends ng.IServiceProvider {
     setImage(imageUrl: string, callbackOrEvent?: any): void;
     clear(): void;
 }
+
 
 
 
@@ -1088,7 +1089,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
-
 
 
 
@@ -1162,6 +1162,13 @@ export interface ISideNavProvider extends ng.IServiceProvider {
 
 declare module pip.themes {
 
+function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+function configureBootBarnWarmTheme($mdThemingProvider: any): void;
+
+
 
 export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
@@ -1174,13 +1181,6 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     setRootVar: boolean;
     persist: boolean;
 }
-
-function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -1255,10 +1255,6 @@ declare module pip.locations {
 
 
 
-
-let google: any;
-
-
 class LocationDialogService {
     private _$mdDialog;
     constructor($mdDialog: angular.material.IDialogService);
@@ -1285,33 +1281,32 @@ class LocationEditDialogController {
     onApply(): void;
 }
 
+
+let google: any;
+
+
 }
 
 declare module pip.files {
 
-
-export interface IFileProgressController {
-    name: string;
-    type: string;
-    globalProgress(): string;
-    localProgress(): number;
-    onCancel(): void;
-    onCancel(): void;
-    abort(): void;
+export class ButtonsUpload {
+    title: string;
+    click: Function;
 }
-export class FileProgressController implements IFileProgressController {
-    private _service;
-    private _cancel;
-    private _retry;
+
+
+export interface IFileFailController {
     name: string;
     type: string;
-    constructor($scope: ng.IScope, pipFileSelect: IFileSelectService);
-    globalProgress(): string;
-    errorFail(): string;
-    localProgress(): number;
-    onCancel(): void;
-    onRetry(): void;
-    abort(): void;
+    error: string;
+    buttons: ButtonsUpload[];
+}
+export class FileFailController implements IFileFailController {
+    name: string;
+    type: string;
+    error: string;
+    buttons: ButtonsUpload[];
+    constructor($scope: ng.IScope);
 }
 
 export interface IFileSelectController {
@@ -1326,29 +1321,82 @@ export class FileSelectController implements IFileSelectController {
     onDeleteButtonClick(): void;
 }
 
-export class GlobalProgress {
+export class FileUploadState {
     static All: string[];
     static Start: string;
     static Upload: string;
     static Fail: string;
 }
-export interface IFileSelectService {
+export interface IFileUploadService {
     progress: number;
-    globalProgress: string;
+    state: string;
     error: string;
-    transaction: any;
-    upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
-    abort(): void;
+    upload(url: string, file: any, transaction: any, callback?: (data: any, err: any) => void): void;
 }
-export class FileSelectService implements IFileSelectService {
+export class FileUploadService implements IFileUploadService {
     private _http;
     progress: number;
-    globalProgress: string;
+    state: string;
     error: string;
-    transaction: any;
-    constructor($http: ng.IHttpService, pipTransaction: any);
+    constructor($http: ng.IHttpService);
     upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
-    abort(): void;
+}
+
+export interface IFileStartController {
+    name: string;
+    type: string;
+    progress: number;
+    buttons: ButtonsUpload[];
+}
+export class FileStartController implements IFileStartController {
+    name: string;
+    progress: number;
+    type: string;
+    buttons: ButtonsUpload[];
+    constructor($scope: ng.IScope);
+}
+
+export interface IFileSuccessController {
+    name: string;
+    type: string;
+    buttons: ButtonsUpload[];
+}
+export class FileSuccessController implements IFileSuccessController {
+    name: string;
+    type: string;
+    buttons: ButtonsUpload[];
+    constructor($scope: ng.IScope);
+}
+
+export interface IFileUploadController {
+    name: string;
+    type: string;
+    state: string;
+    progress: number;
+    onCancel(): void;
+    onRetry(): void;
+    onAbort(): void;
+}
+export class FileUploadButtons {
+    retry: Function;
+    cancel: Function;
+    abort: Function;
+}
+export class FileUploadController implements IFileUploadController {
+    private _functions;
+    uploadButtons: ButtonsUpload[];
+    failButtons: ButtonsUpload[];
+    startButtons: ButtonsUpload[];
+    name: string;
+    type: string;
+    state: string;
+    progress: number;
+    buttons: boolean;
+    error: string;
+    constructor($scope: ng.IScope);
+    onCancel(): void;
+    onRetry(): void;
+    onAbort(): void;
 }
 
 }
@@ -1534,13 +1582,13 @@ export class TilesGridService implements ITilesGridService {
 
 
 
+
 export class MenuWidgetService {
     menu: any;
     constructor();
     callAction(actionName: any, params: any, item: any): void;
     changeSize(params: any): void;
 }
-
 
 
 
@@ -1554,12 +1602,6 @@ declare module pip.settings {
 
 
 function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-
-
-
 
 
 
@@ -1593,13 +1635,19 @@ export class SettingsConfig {
     isNavIcon: boolean;
 }
 
+
+
+
+
+
+
 }
 
 declare module pip.help {
 
 
-function configureHelpPageRoutes($stateProvider: any): void;
 
+function configureHelpPageRoutes($stateProvider: any): void;
 
 export class HelpTab {
     state: string;
