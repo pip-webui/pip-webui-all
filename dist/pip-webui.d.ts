@@ -3,6 +3,7 @@ declare module pip.services {
 export let CurrentState: any;
 export let PreviousState: any;
 
+
 let RedirectedStates: any;
 function decorateRedirectStateProvider($delegate: any): any;
 function addRedirectStateProviderDecorator($provide: any): void;
@@ -11,6 +12,47 @@ function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
 
+export let IdentityRootVar: string;
+export let IdentityChangedEvent: string;
+
+export interface IIdentity {
+    id: string;
+    full_name: string;
+    details: string;
+    email: string;
+    photo_url: string;
+    groups: string[];
+}
+
+export interface IIdentityService {
+    identity: any;
+}
+export interface IIdentityProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    identity: any;
+}
+
+
+export interface ISessionService {
+    session: any;
+    isOpened(): boolean;
+    open(session: any): void;
+    close(): void;
+}
+export interface ISessionProvider extends ng.IServiceProvider {
+    setRootVar: boolean;
+    session: any;
+}
+
+export const SessionRootVar = "$session";
+export const SessionOpenedEvent = "pipSessionOpened";
+export const SessionClosedEvent = "pipSessionClosed";
+
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
 
 export class Transaction {
     private _scope;
@@ -47,17 +89,9 @@ export class TransactionError {
     decode(error: any): void;
 }
 
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
 
 
 
-
-
-export let LanguageRootVar: string;
-export let LanguageChangedEvent: string;
 export interface ITranslateService {
     language: string;
     use(language: string): string;
@@ -73,6 +107,11 @@ export interface ITranslateService {
 }
 export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
 }
+
+
+
+export let LanguageRootVar: string;
+export let LanguageChangedEvent: string;
 
 export class Translation {
     protected _language: string;
@@ -109,38 +148,6 @@ export class Translation {
 }
 
 
-export let IdentityRootVar: string;
-export let IdentityChangedEvent: string;
-export interface IIdentity {
-    id: string;
-    full_name: string;
-    details: string;
-    email: string;
-    photo_url: string;
-    groups: string[];
-}
-export interface IIdentityService {
-    identity: any;
-}
-export interface IIdentityProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    identity: any;
-}
-
-export const SessionRootVar = "$session";
-export const SessionOpenedEvent = "pipSessionOpened";
-export const SessionClosedEvent = "pipSessionClosed";
-export interface ISessionService {
-    session: any;
-    isOpened(): boolean;
-    open(session: any): void;
-    close(): void;
-}
-export interface ISessionProvider extends ng.IServiceProvider {
-    setRootVar: boolean;
-    session: any;
-}
-
 
 export interface ICodes {
     hash(value: string): number;
@@ -152,10 +159,7 @@ export interface IFormat {
     sprintf(message: string, ...args: any[]): string;
 }
 
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
+
 export interface IPageResetService {
     reset(): void;
     resetArea(area: string): void;
@@ -194,17 +198,51 @@ export interface ITimerService {
     stop(): void;
 }
 
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+
+
+
+
 
 }
 
 declare module pip.buttons {
 
 
-class FabTooltipVisibilityController {
-    private _element;
-    private _scope;
-    private _timeout;
-    constructor($element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
+interface IRefreshButtonBindings {
+    [key: string]: any;
+    text: any;
+    visible: any;
+    onRefresh: any;
+}
+const RefreshButtonBindings: IRefreshButtonBindings;
+class RefreshButtonChanges implements ng.IOnChangesObject, IRefreshButtonBindings {
+    [key: string]: ng.IChangesObject<any>;
+    onRefresh: ng.IChangesObject<({$event: any}) => ng.IPromise<any>>;
+    text: ng.IChangesObject<string>;
+    visible: ng.IChangesObject<boolean>;
+}
+class RefreshButtonController implements IRefreshButtonBindings {
+    private $scope;
+    private $element;
+    private $attrs;
+    private _textElement;
+    private _buttonElement;
+    private _width;
+    text: string;
+    visible: boolean;
+    onRefresh: (param: {
+        $event: ng.IAngularEvent;
+    }) => ng.IPromise<any>;
+    constructor($scope: ng.IScope, $element: any, $attrs: ng.IAttributes);
+    $postLink(): void;
+    $onChanges(changes: RefreshButtonChanges): void;
+    onClick($event: any): void;
+    private show();
+    private hide();
 }
 
 class ToggleButton {
@@ -261,37 +299,11 @@ class ToggleButtonsController implements IToggleButtonsBindings {
     highlightButton(index: any): boolean;
 }
 
-interface IRefreshButtonBindings {
-    [key: string]: any;
-    text: any;
-    visible: any;
-    onRefresh: any;
-}
-const RefreshButtonBindings: IRefreshButtonBindings;
-class RefreshButtonChanges implements ng.IOnChangesObject, IRefreshButtonBindings {
-    [key: string]: ng.IChangesObject<any>;
-    onRefresh: ng.IChangesObject<({$event: any}) => ng.IPromise<any>>;
-    text: ng.IChangesObject<string>;
-    visible: ng.IChangesObject<boolean>;
-}
-class RefreshButtonController implements IRefreshButtonBindings {
-    private $scope;
-    private $element;
-    private $attrs;
-    private _textElement;
-    private _buttonElement;
-    private _width;
-    text: string;
-    visible: boolean;
-    onRefresh: (param: {
-        $event: ng.IAngularEvent;
-    }) => ng.IPromise<any>;
-    constructor($scope: ng.IScope, $element: any, $attrs: ng.IAttributes);
-    $postLink(): void;
-    $onChanges(changes: RefreshButtonChanges): void;
-    onClick($event: any): void;
-    private show();
-    private hide();
+class FabTooltipVisibilityController {
+    private _element;
+    private _scope;
+    private _timeout;
+    constructor($element: any, $attrs: angular.IAttributes, $scope: angular.IScope, $timeout: ng.ITimeoutService, $parse: any);
 }
 
 }
@@ -341,6 +353,7 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -383,7 +396,6 @@ export function removeResizeListener(element: any, listener: any): void;
 
 
 
-
 }
 
 declare module pip.split {
@@ -391,6 +403,9 @@ declare module pip.split {
 }
 
 declare module pip.behaviors {
+
+
+
 
 
 export class ShortcutOption {
@@ -475,9 +490,6 @@ export interface IShortcutsProvider extends ng.IServiceProvider {
     localShortcuts: ShortcutItem[];
     defaultOptions: ShortcutOption;
 }
-
-
-
 
 
 
@@ -691,19 +703,6 @@ class ToastService implements IToastService {
 declare module pip.lists {
 
 
-interface ITagList {
-    tags: string[];
-    type: string;
-    typeLocal: string;
-}
-class TagListController implements ITagList {
-    private _rebind;
-    tags: string[];
-    type: string;
-    typeLocal: string;
-    constructor($scope: ng.IScope, $element: ng.IRootElementService);
-    private toBoolean(value);
-}
 
 }
 
@@ -817,12 +816,6 @@ export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider
 
 declare module pip.dialogs {
 
-export class ConfirmationParams {
-    ok: string;
-    title?: string;
-    cancel: string;
-    event?: MouseEvent;
-}
 export class ConfirmationDialogController {
     $mdDialog: angular.material.IDialogService;
     theme: string;
@@ -832,9 +825,17 @@ export class ConfirmationDialogController {
     onCancel(): void;
 }
 
+export class ConfirmationParams {
+    ok: string;
+    title?: string;
+    cancel: string;
+    event?: MouseEvent;
+}
+
 export interface IConfirmationService {
     show(params: ConfirmationParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
+
 
 
 export class ErrorStrings {
@@ -977,7 +978,6 @@ export interface IOptionsService {
     show(params: any, successCallback?: (option) => void, cancelCallback?: () => void): any;
 }
 
-
 }
 
 declare module pip.nav {
@@ -1028,65 +1028,10 @@ export interface IActionsProvider extends ng.IServiceProvider {
     secondaryLocalActions: ActionItem[];
 }
 
-class PrimaryActionsController {
-    private _element;
-    private _attrs;
-    private _injector;
-    private _scope;
-    private _log;
-    private _rootScope;
-    private _window;
-    private _location;
-    private _pipActions;
-    private _pipTranslate;
-    config: pip.nav.ActionsConfig;
-    constructor($element: ng.IAugmentedJQuery, $attrs: ng.IAttributes, $injector: ng.auto.IInjectorService, $scope: angular.IScope, $log: ng.ILogService, $rootScope: ng.IRootScopeService, $window: ng.IWindowService, $location: ng.ILocationService, pipActions: pip.nav.IActionsService);
-    private onActionsChanged(event, config);
-    isHidden(action: pip.nav.ActionItem): boolean;
-    actionCount(action: pip.nav.ActionItem): string;
-    clickAction(action: pip.nav.ActionItem, $mdOpenMenu: Function): void;
-}
-
-class SecondaryActionsController {
-    private _element;
-    private _attrs;
-    private _injector;
-    private _scope;
-    private _log;
-    private _rootScope;
-    private _window;
-    private _location;
-    private _pipActions;
-    private _pipTranslate;
-    private _menuFn;
-    config: pip.nav.ActionsConfig;
-    constructor($element: ng.IAugmentedJQuery, $attrs: ng.IAttributes, $injector: ng.auto.IInjectorService, $scope: angular.IScope, $log: ng.ILogService, $rootScope: ng.IRootScopeService, $window: ng.IWindowService, $location: ng.ILocationService, pipActions: pip.nav.IActionsService);
-    getMenu(menuFn: Function): void;
-    onActionsMenuOpen(): void;
-    openMenu($mdOpenMenu: Function, ev: ng.IAngularEvent): void;
-    private onActionsChanged(event, config);
-    isHidden(action: pip.nav.ActionItem): boolean;
-    actionCount(action: pip.nav.ActionItem): string;
-    private calcActions(actions);
-    secondaryActionsVisible(): boolean;
-    secondaryDividerVisible(): boolean;
-    clickAction(action: pip.nav.ActionItem, $mdOpenMenu: Function): void;
-}
 
 
-class AppBarDirectiveController {
-    config: pip.nav.AppBarConfig;
-    constructor($element: ng.IAugmentedJQuery, $scope: angular.IScope, $log: ng.ILogService, $rootScope: ng.IRootScopeService, pipAppBar: pip.nav.IAppBarService);
-    onAppBarChanged(event: ng.IAngularEvent, config: pip.nav.AppBarConfig): void;
-}
 
-class AppBarPartDirectiveController {
-    private _scope;
-    private _partName;
-    private _partValue;
-    constructor($element: ng.IAugmentedJQuery, $attrs: ng.IAttributes, $scope: ng.IScope, $log: ng.ILogService, $rootScope: ng.IRootScopeService, pipAppBar: pip.nav.IAppBarService);
-    private onAppBarChanged(event, config);
-}
+
 
 export let AppBarChangedEvent: string;
 export class AppBarConfig {
@@ -1179,6 +1124,7 @@ class DropdownDirectiveController {
 }
 
 
+
 export let NavHeaderChangedEvent: string;
 export class NavHeaderConfig {
     imageUrl: string;
@@ -1212,7 +1158,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 }
 
 
-export let OpenSideNavEvent: string;
 export let NavIconClickedEvent: string;
 
 export let NavIconChangedEvent: string;
@@ -1240,7 +1185,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
     clear(): void;
 }
 
-
 class LanguagePickerDirectiveController {
     private _element;
     private _attrs;
@@ -1257,6 +1201,7 @@ class LanguagePickerDirectiveController {
     setLanguages(languages: string[]): void;
     onLanguageClick(language: string): void;
 }
+
 
 
 export let NavMenuChangedEvent: string;
@@ -1367,7 +1312,6 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     part(part: string, value: any): void;
 }
 
-
 class Selected {
     activeIndex: number;
     activeTab: number;
@@ -1414,9 +1358,7 @@ function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemi
 function configureBootBarnWarmTheme($mdThemingProvider: any): void;
 
 
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
+
 export interface IThemeService {
     theme: string;
     use(language: string): string;
@@ -1426,6 +1368,9 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     persist: boolean;
 }
 
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
 
 function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
@@ -1447,6 +1392,7 @@ function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvi
 }
 
 declare module pip.errors {
+
 
 
 
@@ -1477,7 +1423,6 @@ export interface IErrorsProvider extends ng.IServiceProvider {
     configureErrors(value: ErrorsConfig): void;
     config: ErrorsConfig;
 }
-
 
 class ClearErrorsLink {
     private _fieldController;
@@ -1535,12 +1480,12 @@ export class ErrorNoConnectionController {
     onRetry(): void;
 }
 
-
 class NoConnectionPanelController {
     private _retry;
     constructor($scope: ng.IScope);
     onRetry(): void;
 }
+
 
 export class PipUnknownErrorDetails {
     code: number;
@@ -1591,6 +1536,7 @@ declare module pip.charts {
 declare module pip.locations {
 
 
+
 class LocationDialogService {
     private _$mdDialog;
     constructor($mdDialog: angular.material.IDialogService);
@@ -1618,7 +1564,6 @@ class LocationEditDialogController {
 }
 
 
-
 let google: any;
 
 
@@ -1630,7 +1575,6 @@ export class ButtonsUpload {
     title: string;
     click: Function;
 }
-
 
 export interface IFileFailController {
     name: string;
@@ -1646,17 +1590,6 @@ export class FileFailController implements IFileFailController {
     constructor($scope: ng.IScope);
 }
 
-export interface IFileSelectController {
-    localFile: any;
-    onUploadButtonClick(): void;
-    onDeleteButtonClick(): void;
-}
-export class FileSelectController implements IFileSelectController {
-    localFile: any;
-    constructor($scope: ng.IScope);
-    onUploadButtonClick(): void;
-    onDeleteButtonClick(): void;
-}
 
 export class FileUploadState {
     static All: string[];
@@ -1677,6 +1610,18 @@ export class FileUploadService implements IFileUploadService {
     error: string;
     constructor($http: ng.IHttpService);
     upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
+}
+
+export interface IFileSelectController {
+    localFile: any;
+    onUploadButtonClick(): void;
+    onDeleteButtonClick(): void;
+}
+export class FileSelectController implements IFileSelectController {
+    localFile: any;
+    constructor($scope: ng.IScope);
+    onUploadButtonClick(): void;
+    onDeleteButtonClick(): void;
 }
 
 export interface IFileStartController {
@@ -1966,6 +1911,7 @@ export class MenuWidgetService {
 
 declare module pip.settings {
 
+
 export class SettingsPageSelectedTab {
     tab: SettingsTab;
     tabIndex: number;
@@ -2018,6 +1964,70 @@ export class SettingsConfig {
 
 
 
+}
+
+declare module pip.help {
+
+
+export class HelpConfig {
+    defaultTab: string;
+    tabs: HelpTab[];
+    titleText: string;
+    titleLogo: string;
+    isNavIcon: boolean;
+}
+
+export class HelpPageSelectedTab {
+    tab: HelpTab;
+    tabIndex: number;
+    tabId: string;
+}
+
+export class HelpStateConfig {
+    url: string;
+    auth: boolean;
+    templateUrl?: string;
+    template?: string;
+}
+
+export class HelpTab {
+    state: string;
+    title: string;
+    index: number;
+    access: Function;
+    visible: boolean;
+    stateConfig: HelpStateConfig;
+}
+
+export interface IHelpProvider extends ng.IServiceProvider {
+    getDefaultTab(): HelpTab;
+    addTab(tabObj: HelpTab): void;
+    setDefaultTab(name: string): void;
+    getFullStateName(state: string): string;
+}
+
+
+function configureHelpPageRoutes($stateProvider: any): void;
+
+export interface IHelpService {
+    getDefaultTab(): HelpTab;
+    showTitleText(newTitleText: string): string;
+    showTitleLogo(newTitleLogo: string): any;
+    setDefaultTab(name: string): void;
+    showNavIcon(value: boolean): boolean;
+    getTabs(): HelpTab[];
+}
+export class HelpService implements IHelpService {
+    private _config;
+    constructor(_config: HelpConfig);
+    private getFullStateName(state);
+    setDefaultTab(name: string): void;
+    getDefaultTab(): HelpTab;
+    showTitleText(newTitleText: string): string;
+    showTitleLogo(newTitleLogo: string): string;
+    showNavIcon(value: boolean): boolean;
+    getTabs(): HelpTab[];
+}
 
 }
 
