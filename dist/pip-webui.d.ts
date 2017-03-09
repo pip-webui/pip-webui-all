@@ -479,26 +479,6 @@ class ImageSliderService {
 
 
 
-var marked: any;
-function Config($injector: any): void;
-class MarkdownController {
-    private _pipTranslate;
-    private _$parse;
-    private _$scope;
-    private _$injector;
-    private _$element;
-    private _$attrs;
-    private _text;
-    private _isList;
-    private _clamp;
-    private _rebind;
-    constructor($scope: angular.IScope, $parse: angular.IParseService, $attrs: any, $element: any, $injector: any);
-    $postLink(): void;
-    $onChanges(changes: any): void;
-    private describeAttachments(array);
-    private bindText(value);
-}
-
 export class PopoverController {
     private _$timeout;
     private _$scope;
@@ -530,6 +510,36 @@ export class PopoverService {
     show(p: any): void;
     hide(): void;
     resize(): void;
+}
+
+class RoutingController {
+    private _image;
+    private _$element;
+    logoUrl: string;
+    showProgress: Function;
+    constructor($scope: ng.IScope, $element: any);
+    $postLink(): void;
+    loadProgressImage(): void;
+}
+
+var marked: any;
+function Config($injector: any): void;
+class MarkdownController {
+    private _pipTranslate;
+    private _$parse;
+    private _$scope;
+    private _$injector;
+    private _$element;
+    private _$attrs;
+    private _text;
+    private _isList;
+    private _clamp;
+    private _rebind;
+    constructor($scope: angular.IScope, $parse: angular.IParseService, $attrs: any, $element: any, $injector: any);
+    $postLink(): void;
+    $onChanges(changes: any): void;
+    private describeAttachments(array);
+    private bindText(value);
 }
 
 interface IPipToast {
@@ -593,46 +603,11 @@ class ToastService implements IToastService {
     clearToasts(type?: string): void;
 }
 
-class RoutingController {
-    private _image;
-    private _$element;
-    logoUrl: string;
-    showProgress: Function;
-    constructor($scope: ng.IScope, $element: any);
-    $postLink(): void;
-    loadProgressImage(): void;
-}
-
 }
 
 declare module pip.lists {
 
-function translate($injector: any): (key: any) => any;
 
-interface ITagList {
-    tags: string[];
-    type: string;
-    typeLocal: string;
-}
-class TagListController implements ITagList {
-    private _rebind;
-    tags: string[];
-    type: string;
-    typeLocal: string;
-    constructor($scope: ng.IScope, $element: ng.IRootElementService);
-    private toBoolean(value);
-}
-function TagList($parse: any): {
-    restrict: string;
-    scope: {
-        pipTags: string;
-        pipType: string;
-        pipTypeLocal: string;
-    };
-    templateUrl: string;
-    controller: typeof TagListController;
-    controllerAs: string;
-};
 
 }
 
@@ -769,6 +744,7 @@ export interface IConfirmationService {
 }
 
 
+
 export class ErrorDetailsDialogController {
     private _injector;
     $mdDialog: ng.material.IDialogService;
@@ -804,7 +780,6 @@ export class ErrorStrings {
     error: string;
     errorText: string;
 }
-
 
 
 export class InformationDialogController {
@@ -929,36 +904,6 @@ export interface IOptionsService {
 
 declare module pip.nav {
 
-
-
-export let AppBarChangedEvent: string;
-export class AppBarConfig {
-    visible: boolean;
-    parts: any;
-    classes: string[];
-}
-export interface IAppBarService {
-    readonly config: AppBarConfig;
-    readonly classes: string[];
-    parts: any;
-    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
-    hide(): void;
-    addShadow(...breakpoints: string[]): void;
-    removeShadow(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAppBarProvider extends ng.IServiceProvider {
-    config: AppBarConfig;
-    parts: any;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
-
 export let ActionsChangedEvent: string;
 export let SecondaryActionsOpenEvent: string;
 export class SimpleActionItem {
@@ -1006,6 +951,36 @@ export interface IActionsProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+export let AppBarChangedEvent: string;
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
+}
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
+    hide(): void;
+    addShadow(...breakpoints: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
 
 
 
@@ -1259,6 +1234,29 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     part(part: string, value: any): void;
 }
 
+export class SideNavStateNames {
+    static Toggle: string;
+    static Small: string;
+    static Large: string;
+    static XLarge: string;
+}
+export class SideNavState {
+    id: SideNavStateNames;
+    addClass: string;
+    isLockedOpen: boolean;
+    showHeader: boolean;
+    expandedButton: boolean;
+    isExpanded: boolean;
+    expand: boolean;
+    showIconTooltype: boolean;
+}
+export class SideNavStateConfig {
+    toggle: SideNavState;
+    small: SideNavState;
+    large: SideNavState;
+    xlarge: SideNavState;
+}
+
 
 class Selected {
     activeIndex: number;
@@ -1401,6 +1399,7 @@ export class ErrorMaintenanceController {
     private appHeader();
 }
 
+
 export class PipNoConnectionError {
     config?: any;
 }
@@ -1416,7 +1415,6 @@ export class ErrorNoConnectionController {
     private appHeader();
     onRetry(): void;
 }
-
 
 class NoConnectionPanelController {
     private _retry;
@@ -1508,11 +1506,25 @@ let google: any;
 
 declare module pip.files {
 
-
 export class ButtonsUpload {
     title: string;
     click: Function;
 }
+
+export interface IFileFailController {
+    name: string;
+    type: string;
+    error: string;
+    buttons: ButtonsUpload[];
+}
+export class FileFailController implements IFileFailController {
+    name: string;
+    type: string;
+    error: string;
+    buttons: ButtonsUpload[];
+    constructor($scope: ng.IScope);
+}
+
 
 export interface IFileSelectController {
     localFile: any;
@@ -1547,19 +1559,20 @@ export class FileUploadService implements IFileUploadService {
     upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
 }
 
-export interface IFileFailController {
+export interface IFileStartController {
     name: string;
     type: string;
-    error: string;
+    progress: number;
     buttons: ButtonsUpload[];
 }
-export class FileFailController implements IFileFailController {
+export class FileStartController implements IFileStartController {
     name: string;
+    progress: number;
     type: string;
-    error: string;
     buttons: ButtonsUpload[];
     constructor($scope: ng.IScope);
 }
+
 
 export interface IFileSuccessController {
     name: string;
@@ -1634,21 +1647,6 @@ export class FileUploadChanges implements ng.IOnChangesObject, IFileUploadBindin
     progress: ng.IChangesObject<number>;
 }
 
-export interface IFileStartController {
-    name: string;
-    type: string;
-    progress: number;
-    buttons: ButtonsUpload[];
-}
-export class FileStartController implements IFileStartController {
-    name: string;
-    progress: number;
-    type: string;
-    buttons: ButtonsUpload[];
-    constructor($scope: ng.IScope);
-}
-
-
 }
 
 declare module pip.dashboard {
@@ -1702,26 +1700,10 @@ export class DragTileService implements IDragTileService {
     setOptions(options: any): any;
 }
 
+
 export interface IWidgetTemplateService {
     getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
     setImageMarginCSS($element: any, image: any): void;
-}
-
-
-export class WidgetConfigDialogController {
-    params: any;
-    $mdDialog: angular.material.IDialogService;
-    colors: string[];
-    sizes: any;
-    sizeId: string;
-    onCancel: Function;
-    constructor(params: any, $mdDialog: angular.material.IDialogService);
-    onApply(updatedData: any): void;
-}
-
-
-export interface IWidgetConfigService {
-    show(params: any, successCallback?: (key) => void, cancelCallback?: () => void): any;
 }
 
 export class widget {
@@ -1748,6 +1730,22 @@ export interface IAddComponentDialogService {
 }
 export interface IAddComponentDialogprovider {
     configWidgetList(list: [widget[]]): void;
+}
+
+export class WidgetConfigDialogController {
+    params: any;
+    $mdDialog: angular.material.IDialogService;
+    colors: string[];
+    sizes: any;
+    sizeId: string;
+    onCancel: Function;
+    constructor(params: any, $mdDialog: angular.material.IDialogService);
+    onApply(updatedData: any): void;
+}
+
+
+export interface IWidgetConfigService {
+    show(params: any, successCallback?: (key) => void, cancelCallback?: () => void): any;
 }
 
 
@@ -1820,13 +1818,13 @@ export class TilesGridService implements ITilesGridService {
 
 
 
+
 export class MenuWidgetService {
     menu: any;
     constructor();
     callAction(actionName: any, params: any, item: any): void;
     changeSize(params: any): void;
 }
-
 
 
 
@@ -1886,6 +1884,7 @@ export class SettingsConfig {
 
 declare module pip.help {
 
+
 export class HelpConfig {
     defaultTab: string;
     tabs: HelpTab[];
@@ -1915,7 +1914,6 @@ export class HelpTab {
     visible: boolean;
     stateConfig: HelpStateConfig;
 }
-
 
 
 
