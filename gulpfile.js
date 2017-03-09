@@ -205,4 +205,5 @@ gulp.task('clean', function () {
 });
 
 gulp.task('build', ['build-dev', 'build-prod', 'build-ts', 'copy']);
+gulp.task('rebuild', ['build']);
 gulp.task('default', ['build']);
