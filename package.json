@@ -1,7 +1,7 @@
 {
     "name":  "pip-webui-all",
     "version":  "2.0.0",
-    "author":  "Digital Living Software Corp. <www.digitallivingsoftware.com>",
+    "author":  "Conceptual Vision Consulting LLC",
     "description":  "Pip.WebUI deployment bundle",
     "contributors":  [
                          {
