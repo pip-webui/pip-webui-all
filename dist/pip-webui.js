@@ -1465,18 +1465,14 @@ require("./PageResetService");
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipButtons', [
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipFabTooltipVisibility'
-    ]);
-})();
+angular.module('pipButtons', [
+    'pipToggleButtons',
+    'pipRefreshButton',
+    'pipFabTooltipVisibility'
+]);
 
 },{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
+{
     ToggleButtonsFilter.$inject = ['$injector'];
     function ToggleButtonsFilter($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
@@ -1486,15 +1482,14 @@ require("./PageResetService");
     }
     angular.module('pipButtons.Translate', [])
         .filter('translate', ToggleButtonsFilter);
-})();
+}
 
 },{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
+{
     pipFabTooltipVisibility.$inject = ['$parse', '$timeout'];
-    var FabTooltipVisibilityController = (function () {
-        FabTooltipVisibilityController.$inject = ['$element', '$attrs', '$scope', '$timeout', '$parse'];
-        function FabTooltipVisibilityController($element, $attrs, $scope, $timeout, $parse) {
+    var FabTooltipVisibilityController_1 = (function () {
+        FabTooltipVisibilityController_1.$inject = ['$element', '$attrs', '$scope', '$timeout', '$parse'];
+        function FabTooltipVisibilityController_1($element, $attrs, $scope, $timeout, $parse) {
             "ngInject";
             var trigGetter = $parse($attrs['pipFabTooltipVisibility']), showGetter = $parse($attrs['pipFabShowTooltip']), showSetter = showGetter.assign;
             $scope.$watch(trigGetter, function (isOpen) {
@@ -1510,23 +1505,22 @@ require("./PageResetService");
                 }
             });
         }
-        return FabTooltipVisibilityController;
+        return FabTooltipVisibilityController_1;
     }());
     function pipFabTooltipVisibility($parse, $timeout) {
         return {
             restrict: 'A',
             scope: false,
-            controller: FabTooltipVisibilityController
+            controller: FabTooltipVisibilityController_1
         };
     }
     angular
         .module('pipFabTooltipVisibility', [])
         .directive('pipFabTooltipVisibility', pipFabTooltipVisibility);
-})();
+}
 
 },{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
+{
     var RefreshButtonBindings = {
         text: '<pipText',
         visible: '<pipVisible',
@@ -1588,11 +1582,10 @@ require("./PageResetService");
     };
     angular.module('pipRefreshButton', ['ngMaterial'])
         .component('pipRefreshButton', RefreshButtonComponent);
-})();
+}
 
 },{}],5:[function(require,module,exports){
-(function () {
-    'use strict';
+{
     var ToggleButton = (function () {
         function ToggleButton() {
         }
@@ -1684,7 +1677,7 @@ require("./PageResetService");
     angular
         .module('pipToggleButtons', ['pipButtons.Templates'])
         .component('pipToggleButtons', ToggleButtons);
-})();
+}
 
 },{}],6:[function(require,module,exports){
 (function(module) {
@@ -4919,8 +4912,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.html',
-    '<div ng-if="vm.templateUrl" class="pip-popover flex layout-column" ng-click="vm.onPopoverClick($event)" ng-include="vm.templateUrl"></div><div ng-if="vm.template" class="pip-popover" ng-click="vm.onPopoverClick($event)"></div>');
+  $templateCache.put('progress/routing_progress.html',
+    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="vm.showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -4931,8 +4924,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="vm.showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('popover/popover.html',
+    '<div ng-if="vm.templateUrl" class="pip-popover flex layout-column" ng-click="vm.onPopoverClick($event)" ng-include="vm.templateUrl"></div><div ng-if="vm.template" class="pip-popover" ng-click="vm.onPopoverClick($event)"></div>');
 }]);
 })();
 
@@ -4956,7 +4949,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
+{
     translate.$inject = ['$injector'];
     function translate($injector) {
         var pipTranslate = $injector.has('pipTranslate')
@@ -4968,7 +4961,7 @@ module.run(['$templateCache', function($templateCache) {
     angular
         .module('pipList.Translate', [])
         .filter('translate', translate);
-})();
+}
 
 },{}],2:[function(require,module,exports){
 "use strict";
@@ -4977,7 +4970,7 @@ require("./dependencies/translate");
 angular.module('pipLists', ['pipTagList']);
 
 },{"./dependencies/translate":1}],3:[function(require,module,exports){
-(function () {
+{
     var TagListController = (function () {
         function TagListController($scope, $element) {
             $element.css('display', 'block');
@@ -5016,7 +5009,7 @@ angular.module('pipLists', ['pipTagList']);
     };
     angular.module('pipTagList', ['pipList.Translate'])
         .component('pipTagList', TagList);
-})();
+}
 
 },{}],4:[function(require,module,exports){
 (function(module) {
@@ -6780,8 +6773,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_directive/date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6792,8 +6785,8 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range_directive/date_range.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
 }]);
 })();
 
@@ -6830,32 +6823,44 @@ module.run(['$templateCache', function($templateCache) {
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ConfirmationParams_1 = require("./ConfirmationParams");
-var ConfirmationDialogController = (function () {
-    ConfirmationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function ConfirmationDialogController($mdDialog, $injector, $rootScope, params) {
+var ConfirmationDialogParams_1 = require("./ConfirmationDialogParams");
+var ConfirmationDialogController = (function (_super) {
+    __extends(ConfirmationDialogController, _super);
+    ConfirmationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function ConfirmationDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.config = new ConfirmationParams_1.ConfirmationParams();
-        this._injector = $injector;
-        this.initTranslate(params);
-        this.$mdDialog = $mdDialog;
-        this.theme = $rootScope['$theme'];
+        var _this = _super.call(this) || this;
+        _this._injector = $injector;
+        _this.initTranslate();
+        _this.$mdDialog = $mdDialog;
+        _this.theme = $rootScope['$theme'];
+        return _this;
     }
-    ConfirmationDialogController.prototype.initTranslate = function (params) {
+    ConfirmationDialogController.prototype.initTranslate = function () {
         var pipTranslate;
         pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'CONFIRM_TITLE': 'Confirm' });
             pipTranslate.translations('ru', { 'CONFIRM_TITLE': 'Подтвердите' });
-            this.config.title = pipTranslate.translate(params.title) || pipTranslate.translate('CONFIRM_TITLE');
-            this.config.ok = pipTranslate.translate(params.ok) || pipTranslate.translate('OK');
-            this.config.cancel = pipTranslate.translate(params.cancel) || ('CANCEL');
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('CONFIRM_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('OK');
+            this.cancel = pipTranslate.translate(this.cancel) || ('CANCEL');
         }
         else {
-            this.config.title = params.title || 'Confirm';
-            this.config.ok = params.ok || 'OK';
-            this.config.cancel = params.cancel || 'Cancel';
+            this.title = this.title || 'Confirm';
+            this.ok = this.ok || 'OK';
+            this.cancel = this.cancel || 'Cancel';
         }
     };
     ConfirmationDialogController.prototype.onOk = function () {
@@ -6865,8 +6870,7 @@ var ConfirmationDialogController = (function () {
         this.$mdDialog.cancel();
     };
     return ConfirmationDialogController;
-}());
-exports.ConfirmationDialogController = ConfirmationDialogController;
+}(ConfirmationDialogParams_1.ConfirmationDialogParams));
 angular
     .module('pipConfirmationDialog', [
     'ngMaterial',
@@ -6875,17 +6879,15 @@ angular
 ])
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
 
-},{"./ConfirmationParams":2}],2:[function(require,module,exports){
+},{"./ConfirmationDialogParams":2}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ConfirmationParams = (function () {
-    function ConfirmationParams() {
-        this.ok = 'OK';
-        this.cancel = 'Cancel';
+var ConfirmationDialogParams = (function () {
+    function ConfirmationDialogParams() {
     }
-    return ConfirmationParams;
+    return ConfirmationDialogParams;
 }());
-exports.ConfirmationParams = ConfirmationParams;
+exports.ConfirmationDialogParams = ConfirmationDialogParams;
 
 },{}],3:[function(require,module,exports){
 "use strict";
@@ -6900,8 +6902,9 @@ var ConfirmationService = (function () {
             targetEvent: params.event,
             templateUrl: 'confirmation/ConfirmationDialog.html',
             controller: 'pipConfirmationDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
             .then(function () {
@@ -6923,11 +6926,11 @@ angular
 },{}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-require("./ConfirmationController");
-require("./ConfirmationService");
-require("./ConfirmationParams");
+require("./ConfirmationDialogController");
+require("./ConfirmationDialogService");
+require("./ConfirmationDialogParams");
 
-},{"./ConfirmationController":1,"./ConfirmationParams":2,"./ConfirmationService":3}],5:[function(require,module,exports){
+},{"./ConfirmationDialogController":1,"./ConfirmationDialogParams":2,"./ConfirmationDialogService":3}],5:[function(require,module,exports){
 (function () {
     'use strict';
     var thisModule = angular.module('pipDialogs.Translate', []);
@@ -6941,7 +6944,7 @@ require("./ConfirmationParams");
 })();
 
 },{}],6:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./error_details");
 require("./information");
@@ -6953,25 +6956,41 @@ angular
     'pipConfirmationDialog',
     'pipOptionsDialog',
     'pipOptionsBigDialog',
-    'pipErrorDetailsDialog',
+    'pipErrorDetailsDialog'
 ]);
 
-},{"./confirmation":4,"./error_details":11,"./information":16,"./options":26}],7:[function(require,module,exports){
+},{"./confirmation":4,"./error_details":11,"./information":16,"./options":27}],7:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ErrorStrings_1 = require("./ErrorStrings");
-var ErrorDetailsDialogController = (function () {
-    ErrorDetailsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function ErrorDetailsDialogController($mdDialog, $injector, $rootScope, params) {
+var ErrorDialogStrings_1 = require("./ErrorDialogStrings");
+var ErrorDialogParams_1 = require("./ErrorDialogParams");
+var ErrorDetailsDialogController = (function (_super) {
+    __extends(ErrorDetailsDialogController, _super);
+    ErrorDetailsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function ErrorDetailsDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.config = new ErrorStrings_1.ErrorStrings();
-        this._injector = $injector;
-        this.initTranslate(params);
-        this.$mdDialog = $mdDialog;
-        this.theme = $rootScope.$theme;
-        this.config.error = params.error;
+        var _this = _super.call(this) || this;
+        _this.strings = new ErrorDialogStrings_1.ErrorDialogStrings();
+        _this._injector = $injector;
+        _this.$mdDialog = $mdDialog;
+        _this.theme = $rootScope.$theme;
+        _this.initTranslate();
+        if (!_this.error) {
+            _this.error = '<none>';
+        }
+        return _this;
     }
-    ErrorDetailsDialogController.prototype.initTranslate = function (params) {
+    ErrorDetailsDialogController.prototype.initTranslate = function () {
         var pipTranslate;
         pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
@@ -6996,35 +7015,46 @@ var ErrorDetailsDialogController = (function () {
                 'METHOD': 'Метод',
                 'MESSAGE': 'Сообщение'
             });
-            this.config.ok = pipTranslate.translate(params.ok) || pipTranslate.translate('OK');
-            this.config.cancel = pipTranslate.translate(params.cancel) || pipTranslate.translate('CANCEL');
-            this.config.errorDetails = pipTranslate.translate('ERROR_DETAILS');
-            this.config.dismissButton = pipTranslate.translate('DISMISS');
-            this.config.errorMessage = pipTranslate.translate('MESSAGE');
-            this.config.errorCode = pipTranslate.translate('CODE');
-            this.config.errorMethod = pipTranslate.translate('METHOD');
-            this.config.errorPath = pipTranslate.translate('PATH');
-            this.config.errorText = pipTranslate.translate('ERROR');
+            this.dismissButton = pipTranslate.translate(this.dismissButton) || pipTranslate.translate('DISMISS');
+            this.strings.errorDetails = pipTranslate.translate('ERROR_DETAILS');
+            this.strings.errorMessage = pipTranslate.translate('MESSAGE');
+            this.strings.errorCode = pipTranslate.translate('CODE');
+            this.strings.errorMethod = pipTranslate.translate('METHOD');
+            this.strings.errorPath = pipTranslate.translate('PATH');
+            this.strings.errorText = pipTranslate.translate('ERROR');
         }
         else {
-            this.config.ok = params.ok || 'Ok';
-            this.config.cancel = params.cancel || 'Cancel';
+            this.dismissButton = this.dismissButton || 'Dismiss';
         }
     };
     ErrorDetailsDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
     };
-    ErrorDetailsDialogController.prototype.onCancel = function () {
-        this.$mdDialog.cancel();
+    ErrorDetailsDialogController.prototype.isString = function (error) {
+        return _.isString(error);
+    };
+    ErrorDetailsDialogController.prototype.getErrorText = function () {
+        var error;
+        if (_.isString(this.error)) {
+            return this.error;
+        }
+        if (this.error && this.error.error) {
+            return this.error.error.toString();
+        }
+        if (this.error && this.error.data && this.error.data.error) {
+            return this.error.data.error.toString();
+        }
+        return '<none>';
     };
     return ErrorDetailsDialogController;
-}());
-exports.ErrorDetailsDialogController = ErrorDetailsDialogController;
+}(ErrorDialogParams_1.ErrorDialogParams));
 angular
     .module('pipErrorDetailsDialog')
     .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
 
-},{"./ErrorStrings":10}],8:[function(require,module,exports){
+},{"./ErrorDialogParams":9,"./ErrorDialogStrings":10}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsService = (function () {
     ErrorDetailsService.$inject = ['$mdDialog'];
     function ErrorDetailsService($mdDialog) {
@@ -7035,8 +7065,9 @@ var ErrorDetailsService = (function () {
             targetEvent: params.event,
             templateUrl: 'error_details/ErrorDetails.html',
             controller: 'pipErrorDetailsDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
             .then(function () {
@@ -7058,35 +7089,28 @@ angular
 },{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ErrorParams = (function () {
-    function ErrorParams() {
-        this.ok = 'OK';
-        this.cancel = 'CANCEL';
-        this.error = 'ERROR';
+var ErrorDialogParams = (function () {
+    function ErrorDialogParams() {
     }
-    return ErrorParams;
+    return ErrorDialogParams;
 }());
-exports.ErrorParams = ErrorParams;
+exports.ErrorDialogParams = ErrorDialogParams;
 
 },{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ErrorStrings = (function () {
-    function ErrorStrings() {
-        this.ok = 'OK';
-        this.cancel = 'Cancel';
+var ErrorDialogStrings = (function () {
+    function ErrorDialogStrings() {
         this.errorDetails = 'Error details';
-        this.dismissButton = 'Dismiss';
         this.errorMessage = 'Message';
         this.errorCode = 'Code';
         this.errorMethod = 'Method';
         this.errorPath = 'Path';
-        this.error = 'Error';
         this.errorText = 'Error';
     }
-    return ErrorStrings;
+    return ErrorDialogStrings;
 }());
-exports.ErrorStrings = ErrorStrings;
+exports.ErrorDialogStrings = ErrorDialogStrings;
 
 },{}],11:[function(require,module,exports){
 "use strict";
@@ -7097,47 +7121,58 @@ angular
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./ErrorParams");
-require("./ErrorStrings");
-require("./ErrorDetailsService");
-require("./ErrorDetailsController");
+require("./ErrorDialogParams");
+require("./ErrorDialogStrings");
+require("./ErrorDetailsDialogService");
+require("./ErrorDetailsDialogController");
 
-},{"./ErrorDetailsController":7,"./ErrorDetailsService":8,"./ErrorParams":9,"./ErrorStrings":10}],12:[function(require,module,exports){
+},{"./ErrorDetailsDialogController":7,"./ErrorDetailsDialogService":8,"./ErrorDialogParams":9,"./ErrorDialogStrings":10}],12:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var InformationStrings_1 = require("./InformationStrings");
-var InformationDialogController = (function () {
-    InformationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function InformationDialogController($mdDialog, $injector, $rootScope, params) {
+var InformationDialogParams_1 = require("./InformationDialogParams");
+var InformationDialogController = (function (_super) {
+    __extends(InformationDialogController, _super);
+    InformationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function InformationDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.config = new InformationStrings_1.InformationStrings();
-        this._injector = $injector;
-        this.initTranslate(params);
-        this.$mdDialog = $mdDialog;
-        this.theme = $rootScope['$theme'];
-        this.config.error = params.error;
+        var _this = _super.call(this) || this;
+        _this._injector = $injector;
+        _this.initTranslate();
+        _this.$mdDialog = $mdDialog;
+        _this.theme = $rootScope['$theme'];
+        return _this;
     }
-    InformationDialogController.prototype.initTranslate = function (params) {
+    InformationDialogController.prototype.initTranslate = function () {
         var pipTranslate;
         pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
-        var content = params.message, item;
+        var content = this.message;
+        var item;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'INFORMATION_TITLE': 'Information' });
             pipTranslate.translations('ru', { 'INFORMATION_TITLE': 'Информация' });
-            this.config.title = pipTranslate.translate(params.title) || pipTranslate.translate('INFORMATION_TITLE');
-            this.config.ok = pipTranslate.translate(params.ok) || pipTranslate.translate('OK');
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('INFORMATION_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('OK');
             content = pipTranslate.translate(content);
         }
         else {
-            this.config.title = params.title || 'Information';
-            this.config.ok = params.ok || 'OK';
+            this.title = this.title || 'Information';
+            this.ok = this.ok || 'OK';
         }
         var pipFormat = this._injector.has('pipFormat') ? this._injector.get('pipFormat') : null;
-        if (params.item && pipFormat) {
-            item = _.truncate(params.item, 25);
+        if (this.item && pipFormat) {
             content = pipFormat.sprintf(content, item);
         }
-        this.config.content = content;
+        this.content = content;
     };
     InformationDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
@@ -7146,22 +7181,20 @@ var InformationDialogController = (function () {
         this.$mdDialog.cancel();
     };
     return InformationDialogController;
-}());
-exports.InformationDialogController = InformationDialogController;
+}(InformationDialogParams_1.InformationDialogParams));
 angular
     .module('pipInformationDialog')
     .controller('pipInformationDialogController', InformationDialogController);
 
-},{"./InformationStrings":15}],13:[function(require,module,exports){
+},{"./InformationDialogParams":13}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var InformationParams = (function () {
-    function InformationParams() {
-        this.ok = 'OK';
+var InformationDialogParams = (function () {
+    function InformationDialogParams() {
     }
-    return InformationParams;
+    return InformationDialogParams;
 }());
-exports.InformationParams = InformationParams;
+exports.InformationDialogParams = InformationDialogParams;
 
 },{}],14:[function(require,module,exports){
 "use strict";
@@ -7176,8 +7209,9 @@ var InformationService = (function () {
             targetEvent: params.event,
             templateUrl: 'information/InformationDialog.html',
             controller: 'pipInformationDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
             .then(function () {
@@ -7195,13 +7229,13 @@ angular
 },{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var InformationStrings = (function () {
-    function InformationStrings() {
+var InformationDialogStrings = (function () {
+    function InformationDialogStrings() {
         this.ok = 'OK';
     }
-    return InformationStrings;
+    return InformationDialogStrings;
 }());
-exports.InformationStrings = InformationStrings;
+exports.InformationDialogStrings = InformationDialogStrings;
 
 },{}],16:[function(require,module,exports){
 "use strict";
@@ -7212,56 +7246,64 @@ angular
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./InformationParams");
-require("./InformationStrings");
-require("./InformationService");
-require("./InformationController");
+require("./InformationDialogParams");
+require("./InformationDialogStrings");
+require("./InformationDialogService");
+require("./InformationDialogController");
 
-},{"./InformationController":12,"./InformationParams":13,"./InformationService":14,"./InformationStrings":15}],17:[function(require,module,exports){
+},{"./InformationDialogController":12,"./InformationDialogParams":13,"./InformationDialogService":14,"./InformationDialogStrings":15}],17:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-
-},{}],18:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsBigParams_1 = require("./OptionsBigParams");
-var OptionsBigData_1 = require("./OptionsBigData");
-var OptionsBigDialogController = (function () {
-    OptionsBigDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function OptionsBigDialogController($mdDialog, $injector, $rootScope, params) {
+var OptionsBigDialogParams_1 = require("./OptionsBigDialogParams");
+var OptionsBigDialogData_1 = require("./OptionsBigDialogData");
+var OptionsBigDialogController = (function (_super) {
+    __extends(OptionsBigDialogController, _super);
+    OptionsBigDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function OptionsBigDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.onSelect = function () {
+        var _this = _super.call(this) || this;
+        _this.onSelect = function () {
             var option;
-            option = _.find(this.config.options, { name: this.config.selectedOptionName }) || new OptionsBigData_1.OptionsBigData();
-            this.$mdDialog.hide({ option: option, deleted: this.config.deleted });
+            option = _.find(this.options, { name: this.selectedOptionName }) || new OptionsBigDialogData_1.OptionsBigDialogData();
+            this.$mdDialog.hide({ option: option });
         };
-        this.$mdDialog = $mdDialog;
-        this.config = new OptionsBigParams_1.OptionsBigParams();
-        this._injector = $injector;
-        this.initTranslate(params);
-        this.theme = $rootScope['$theme'];
-        this.config.options = params.options;
-        this.config.selectedOption = _.find(params.options, { active: true }) || new OptionsBigData_1.OptionsBigData();
-        this.config.selectedOptionName = this.config.selectedOption.name;
-        this.config.deleted = params.deleted;
-        this.config.deletedTitle = params.deletedTitle;
-        this.config.noActions = params.noActions || false;
-        this.config.noTitle = params.noTitle || false;
-        this.config.hint = params.hint || '';
-        setTimeout(this.focusInput, 500);
+        _this.$mdDialog = $mdDialog;
+        _this._injector = $injector;
+        _this.theme = $rootScope['$theme'];
+        _this.initTranslate();
+        _this.selectedOption = _.find(_this.options, { active: true }) || null;
+        var name = _this.selectedOption ? _this.selectedOption.name : _this.selectedOptionName;
+        var index = _.findIndex(_this.options, function (opt) {
+            return opt.name == name;
+        });
+        _this.optionIndex = index == -1 ? 0 : index;
+        _this.selectedOption = _this.options[_this.optionIndex];
+        _this.selectedOptionName = _this.selectedOption.name;
+        setTimeout(_this.focusInput, 500);
+        return _this;
     }
-    OptionsBigDialogController.prototype.initTranslate = function (params) {
+    OptionsBigDialogController.prototype.initTranslate = function () {
         var pipTranslate;
         pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
             pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
-            this.config.title = pipTranslate.translate(params.title) || pipTranslate.translate('OPTIONS_TITLE');
-            this.config.applyButtonTitle = pipTranslate.translate(params.applyButtonTitle) || pipTranslate.translate('SELECT');
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('OPTIONS_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('SELECT');
         }
         else {
-            this.config.title = params.title || 'Choose Option';
-            this.config.applyButtonTitle = params.applyButtonTitle || 'Select';
+            this.title = this.title || 'Choose Option';
+            this.ok = this.ok || 'Select';
         }
     };
     OptionsBigDialogController.prototype.onOk = function () {
@@ -7272,14 +7314,14 @@ var OptionsBigDialogController = (function () {
     };
     OptionsBigDialogController.prototype.onOptionSelect = function (event, option) {
         event.stopPropagation();
-        this.config.selectedOptionName = option.name;
-        if (this.config.noActions) {
+        this.selectedOptionName = option.name;
+        if (this.noActions) {
             this.onSelect();
         }
     };
     OptionsBigDialogController.prototype.onSelected = function () {
-        this.config.selectedOptionName = this.config.options[this.config.optionIndex].name;
-        if (this.config.noActions) {
+        this.selectedOptionName = this.options[this.optionIndex].name;
+        if (this.noActions) {
             this.onSelect();
         }
     };
@@ -7287,8 +7329,8 @@ var OptionsBigDialogController = (function () {
         if (event.keyCode === 32 || event.keyCode === 13) {
             event.stopPropagation();
             event.preventDefault();
-            if (index !== undefined && index > -1 && index < this.config.options.length) {
-                this.config.selectedOptionName = this.config.options[index].name;
+            if (index !== undefined && index > -1 && index < this.options.length) {
+                this.selectedOptionName = this.options[index].name;
                 this.onSelect();
             }
         }
@@ -7299,55 +7341,62 @@ var OptionsBigDialogController = (function () {
         list.focus();
     };
     return OptionsBigDialogController;
-}());
-exports.OptionsBigDialogController = OptionsBigDialogController;
+}(OptionsBigDialogParams_1.OptionsBigDialogParams));
 angular
     .module('pipOptionsBigDialog')
     .controller('pipOptionsBigDialogController', OptionsBigDialogController);
 
-},{"./OptionsBigData":19,"./OptionsBigParams":20}],19:[function(require,module,exports){
+},{"./OptionsBigDialogData":18,"./OptionsBigDialogParams":19}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsBigData = (function () {
-    function OptionsBigData() {
+var OptionsBigDialogData = (function () {
+    function OptionsBigDialogData() {
     }
-    return OptionsBigData;
+    return OptionsBigDialogData;
 }());
-exports.OptionsBigData = OptionsBigData;
+exports.OptionsBigDialogData = OptionsBigDialogData;
+
+},{}],19:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var OptionsBigDialogParams = (function () {
+    function OptionsBigDialogParams() {
+    }
+    return OptionsBigDialogParams;
+}());
+exports.OptionsBigDialogParams = OptionsBigDialogParams;
 
 },{}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsBigParams = (function () {
-    function OptionsBigParams() {
-        this.noTitle = false;
-        this.noActions = false;
-        this.optionIndex = 0;
+var OptionsBigDialogResult = (function () {
+    function OptionsBigDialogResult() {
     }
-    return OptionsBigParams;
+    return OptionsBigDialogResult;
 }());
-exports.OptionsBigParams = OptionsBigParams;
+exports.OptionsBigDialogResult = OptionsBigDialogResult;
 
 },{}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsBigService = (function () {
-    OptionsBigService.$inject = ['$mdDialog'];
-    function OptionsBigService($mdDialog) {
+var OptionsBigDialogService = (function () {
+    OptionsBigDialogService.$inject = ['$mdDialog'];
+    function OptionsBigDialogService($mdDialog) {
         this._mdDialog = $mdDialog;
     }
-    OptionsBigService.prototype.show = function (params, successCallback, cancelCallback) {
+    OptionsBigDialogService.prototype.show = function (params, successCallback, cancelCallback) {
         this._mdDialog.show({
             targetEvent: params.event,
             templateUrl: 'options/OptionsBigDialog.html',
             controller: 'pipOptionsBigDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
-            .then(function (option) {
+            .then(function (result) {
             if (successCallback) {
-                successCallback(option);
+                successCallback(result);
             }
         }, function () {
             if (cancelCallback) {
@@ -7355,42 +7404,62 @@ var OptionsBigService = (function () {
             }
         });
     };
-    return OptionsBigService;
+    return OptionsBigDialogService;
 }());
 angular
     .module('pipOptionsBigDialog')
-    .service('pipOptionsBigDialog', OptionsBigService);
+    .service('pipOptionsBigDialog', OptionsBigDialogService);
 
 },{}],22:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsData_1 = require("./OptionsData");
-var OptionsParams_1 = require("./OptionsParams");
-var OptionsDialogController = (function () {
-    OptionsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function OptionsDialogController($mdDialog, $injector, $rootScope, params) {
+var OptionsDialogParams_1 = require("./OptionsDialogParams");
+var OptionsDialogController = (function (_super) {
+    __extends(OptionsDialogController, _super);
+    OptionsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function OptionsDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.$mdDialog = $mdDialog;
-        this.config = new OptionsParams_1.OptionsParams();
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        var _this = _super.call(this) || this;
+        _this.$mdDialog = $mdDialog;
+        _this._injector = $injector;
+        _this.theme = $rootScope['$theme'];
+        _this.options = _this.options || [];
+        _this.initTranslate();
+        _this.selectedOption = _.find(_this.options, { active: true }) || null;
+        var name = _this.selectedOption ? _this.selectedOption.name : _this.selectedOptionName;
+        var index = _.findIndex(_this.options, function (opt) {
+            return opt.name == name;
+        });
+        _this.optionIndex = index == -1 ? 0 : index;
+        _this.selectedOption = _this.options[_this.optionIndex];
+        _this.selectedOptionName = _this.selectedOption.name;
+        setTimeout(_this.focusInput, 500);
+        return _this;
+    }
+    OptionsDialogController.prototype.initTranslate = function () {
+        var pipTranslate;
+        pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
             pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
-            this.config.title = pipTranslate.translate(params.title) || pipTranslate.translate('OPTIONS_TITLE');
-            this.config.applyButtonTitle = pipTranslate.translate(params.applyButtonTitle) || pipTranslate.translate('SELECT');
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('OPTIONS_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('SELECT');
         }
         else {
-            this.config.title = params.title || 'Choose Option';
-            this.config.applyButtonTitle = params.applyButtonTitle || 'Select';
+            this.title = this.title || 'Choose Option';
+            this.ok = this.ok || 'Select';
         }
-        this.theme = $rootScope['$theme'];
-        this.config.options = params.options;
-        this.config.selectedOption = _.find(params.options, { active: true }) || new OptionsData_1.OptionsData();
-        this.config.selectedOptionName = this.config.selectedOption.name;
-        this.config.deleted = params.deleted;
-        this.config.deletedTitle = params.deletedTitle;
-        setTimeout(this.focusInput, 500);
-    }
+    };
     OptionsDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
     };
@@ -7399,7 +7468,7 @@ var OptionsDialogController = (function () {
     };
     OptionsDialogController.prototype.onOptionSelect = function (event, option) {
         event.stopPropagation();
-        this.config.selectedOptionName = option.name;
+        this.selectedOptionName = option.name;
     };
     OptionsDialogController.prototype.onKeyPress = function (event) {
         if (event.keyCode === 32 || event.keyCode === 13) {
@@ -7410,8 +7479,8 @@ var OptionsDialogController = (function () {
     };
     OptionsDialogController.prototype.onSelect = function () {
         var option;
-        option = _.find(this.config.options, { name: this.config.selectedOptionName });
-        this.$mdDialog.hide({ option: option, deleted: this.config.deleted });
+        option = _.find(this.options, { name: this.selectedOptionName });
+        this.$mdDialog.hide({ option: option, isCheckboxOption: this.isCheckboxOption });
     };
     OptionsDialogController.prototype.focusInput = function () {
         var list;
@@ -7419,54 +7488,64 @@ var OptionsDialogController = (function () {
         list.focus();
     };
     return OptionsDialogController;
-}());
-exports.OptionsDialogController = OptionsDialogController;
+}(OptionsDialogParams_1.OptionsDialogParams));
 angular
     .module('pipOptionsDialog')
     .controller('pipOptionsDialogController', OptionsDialogController);
 
-},{"./OptionsData":23,"./OptionsParams":24}],23:[function(require,module,exports){
+},{"./OptionsDialogParams":24}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsData = (function () {
-    function OptionsData() {
+var OptionsDialogData = (function () {
+    function OptionsDialogData() {
         this.icon = 'star';
         this.active = true;
     }
-    return OptionsData;
+    return OptionsDialogData;
 }());
-exports.OptionsData = OptionsData;
+exports.OptionsDialogData = OptionsDialogData;
 
 },{}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsParams = (function () {
-    function OptionsParams() {
+var OptionsDialogParams = (function () {
+    function OptionsDialogParams() {
     }
-    return OptionsParams;
+    return OptionsDialogParams;
 }());
-exports.OptionsParams = OptionsParams;
+exports.OptionsDialogParams = OptionsDialogParams;
 
 },{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var OptionsService = (function () {
-    OptionsService.$inject = ['$mdDialog'];
-    function OptionsService($mdDialog) {
+var OptionsDialogResult = (function () {
+    function OptionsDialogResult() {
+    }
+    return OptionsDialogResult;
+}());
+exports.OptionsDialogResult = OptionsDialogResult;
+
+},{}],26:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var OptionsDialogService = (function () {
+    OptionsDialogService.$inject = ['$mdDialog'];
+    function OptionsDialogService($mdDialog) {
         this._mdDialog = $mdDialog;
     }
-    OptionsService.prototype.show = function (params, successCallback, cancelCallback) {
+    OptionsDialogService.prototype.show = function (params, successCallback, cancelCallback) {
         this._mdDialog.show({
             targetEvent: params.event,
             templateUrl: 'options/OptionsDialog.html',
             controller: 'pipOptionsDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
-            .then(function (option) {
+            .then(function (result) {
             if (successCallback) {
-                successCallback(option.option);
+                successCallback(result);
             }
         }, function () {
             if (cancelCallback) {
@@ -7474,13 +7553,13 @@ var OptionsService = (function () {
             }
         });
     };
-    return OptionsService;
+    return OptionsDialogService;
 }());
 angular
     .module('pipOptionsDialog')
-    .service('pipOptionsDialog', OptionsService);
+    .service('pipOptionsDialog', OptionsDialogService);
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 angular
@@ -7489,23 +7568,24 @@ angular
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./OptionsService");
-require("./OptionsController");
+require("./OptionsDialogData");
+require("./OptionsDialogParams");
+require("./OptionsDialogResult");
+require("./OptionsDialogService");
+require("./OptionsDialogController");
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./OptionsBigParams");
-require("./OptionsBigData");
-require("./OptionsData");
-require("./OptionsParams");
-require("./IOptionsBigDialogController");
-require("./OptionsBigService");
-require("./OptionsBigController");
+require("./OptionsBigDialogParams");
+require("./OptionsBigDialogData");
+require("./OptionsBigDialogResult");
+require("./OptionsBigDialogService");
+require("./OptionsBigDialogController");
 
-},{"./IOptionsBigDialogController":17,"./OptionsBigController":18,"./OptionsBigData":19,"./OptionsBigParams":20,"./OptionsBigService":21,"./OptionsController":22,"./OptionsData":23,"./OptionsParams":24,"./OptionsService":25}],27:[function(require,module,exports){
+},{"./OptionsBigDialogController":17,"./OptionsBigDialogData":18,"./OptionsBigDialogParams":19,"./OptionsBigDialogResult":20,"./OptionsBigDialogService":21,"./OptionsDialogController":22,"./OptionsDialogData":23,"./OptionsDialogParams":24,"./OptionsDialogResult":25,"./OptionsDialogService":26}],28:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipDialogs.Templates');
@@ -7514,7 +7594,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('confirmation/ConfirmationDialog.html',
-    '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{ ::vm.theme }}"><div class="pip-header"><h3>{{ :: vm.config.title }}</h3></div><div class="pip-footer"><div><md-button ng-click="vm.onCancel()">{{ :: vm.config.cancel }}</md-button><md-button class="md-accent" ng-click="vm.onOk()">{{ :: vm.config.ok }}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{ ::$ctrl.theme }}"><div class="pip-header"><h3>{{ :: $ctrl.title }}</h3></div><div class="pip-footer"><div><md-button ng-click="$ctrl.onCancel()">{{ :: $ctrl.cancel }}</md-button><md-button class="md-accent" ng-click="$ctrl.onOk()">{{ :: $ctrl.ok }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7526,19 +7606,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('error_details/ErrorDetails.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDialogs.Templates');
-} catch (e) {
-  module = angular.module('pipDialogs.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{ $ctrl.theme }}"><div class="pip-body"><div class="pip-header"><h3>{{ ::$ctrl.strings.errorDetails | translate }}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="$ctrl.error.code || ($ctrl.error.data && $ctrl.error.data.code)">{{ ::$ctrl.strings.errorCode | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.code || ($ctrl.error.data && $ctrl.error.data.code)">{{ $ctrl.error.code || $ctrl.error.data.code }}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="$ctrl.error.path || ($ctrl.error.data && $ctrl.error.data.path)">{{ ::$ctrl.strings.errorPath | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.path || ($ctrl.error.data && $ctrl.error.data.path)">{{ $ctrl.error.path || $ctrl.error.data.path }}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="$ctrl.isString($ctrl.error) || $ctrl.error.error || ($ctrl.error.data && $ctrl.error.data.error)">{{ ::$ctrl.strings.errorText | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.error || ($ctrl.error.data && $ctrl.error.data.error)">{{ $ctrl.getErrorText() }}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="$ctrl.error.method || ($ctrl.error.data && $ctrl.error.data.method)">{{ ::$ctrl.strings.errorMethod | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.method || ($ctrl.error.data && $ctrl.error.data.method)">{{ $ctrl.error.method || $ctrl.error.data.method }}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="$ctrl.error.message || ($ctrl.error.data && $ctrl.error.data.message)">{{ ::$ctrl.strings.errorMessage | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.message || ($ctrl.error.data && $ctrl.error.data.message)">{{ $ctrl.error.message || $ctrl.error.data.message }}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="$ctrl.onOk()">{{ ::$ctrl.dismissButton | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7550,7 +7618,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/OptionsBigDialog.html',
-    '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !vm.config.noActions}"><div class="pip-header" ng-class="{\'header-hint\': vm.config.noTitle && vm.config.hint}"><h3 class="m0" ng-if="!vm.config.noTitle">{{::vm.config.title | translate}}</h3><div ng-show="vm.config.noTitle && vm.config.hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{::vm.config.hint | translate}}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="vm.config.optionIndex" index="{{vm.config.optionIndex }}" pip-select="vm.onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="vm.onKeyUp($event, $index)" ng-repeat="option in vm.config.options"><div class="pip-content content-stretch" ng-click="vm.onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{::option.title | translate}}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{::option.subtitle | translate}}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="vm.config.noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!vm.config.noActions"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()" style="margin-right: -6px">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{ $ctrl.theme }}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !$ctrl.noActions}"><div class="pip-header" ng-class="{\'header-hint\': $ctrl.noTitle && $ctrl.hint}"><h3 class="m0" ng-if="!$ctrl.noTitle">{{ ::$ctrl.title | translate }}</h3><div ng-show="$ctrl.noTitle && $ctrl.hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{ ::$ctrl.hint | translate }}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="$ctrl.optionIndex" index="{{ $ctrl.optionIndex }}" pip-select="$ctrl.onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == $ctrl.selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="$ctrl.onKeyUp($event, $index)" ng-repeat="option in $ctrl.options"><div class="pip-content content-stretch" ng-click="$ctrl.onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{ ::option.title | translate }}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{ ::option.subtitle | translate }}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="$ctrl.noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!$ctrl.noActions"><div><md-button class="pip-cancel" ng-click="$ctrl.onCancel()">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="pip-submit md-accent" ng-click="$ctrl.onSelect()" style="margin-right: -6px">{{ ::$ctrl.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7562,19 +7630,31 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/OptionsDialog.html',
-    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{::vm.config.title | translate}}</h3><div ng-show="vm.config.deletedTitle" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::vm.config.deletedTitle | translate}}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="vm.config.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="vm.onKeyPress($event)" tabindex="0"><div ng-repeat="option in vm.config.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'vm.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == vm.config.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{::option.title | translate}}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{::option.title | translate}}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{ $ctrl.theme }}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{ ::$ctrl.title | translate }}</h3><div ng-show="$ctrl.checkboxOptionCaption" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="$ctrl.isCheckboxOption" aria-label="CHECKBOX">{{ ::$ctrl.checkboxOptionCaption | translate }}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="$ctrl.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="$ctrl.onKeyPress($event)" tabindex="0"><div ng-repeat="option in $ctrl.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'$ctrl.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == $ctrl.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{ option.icon }}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{ ::option.title | translate }}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{ ::option.title | translate }}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="$ctrl.onCancel()">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="pip-submit md-accent" ng-click="$ctrl.onSelect()">{{ ::$ctrl.ok | translate }}</md-button></div></div></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{ $ctrl.theme }}"><div class="pip-header"><h3>{{:: $ctrl.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ $ctrl.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="$ctrl.onOk()">{{ $ctrl.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
 
 
-},{}]},{},[27,1,2,3,4,5,6,7,8,9,10,11,16,12,13,14,15,26,17,18,19,20,21,22,23,24,25])(27)
+},{}]},{},[28,1,2,3,4,5,6,7,8,9,10,11,16,12,13,14,15,27,17,18,19,20,21,22,23,24,25,26])(28)
 });
 
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -7775,7 +7855,7 @@ angular
     .provider('pipActions', ActionsProvider);
 
 },{}],2:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var PrimaryActionsController = (function () {
     PrimaryActionsController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$window', '$location', 'pipActions'];
@@ -7887,7 +7967,7 @@ var PrimaryActionsController = (function () {
 })();
 
 },{}],3:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SecondaryActionsController = (function () {
     SecondaryActionsController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$window', '$location', 'pipActions'];
@@ -8019,7 +8099,7 @@ var SecondaryActionsController = (function () {
 })();
 
 },{}],4:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -8031,7 +8111,7 @@ require("./SecondaryActionsDirective");
 __export(require("./ActionsService"));
 
 },{"./ActionsService":1,"./PrimaryActionsDirective":2,"./SecondaryActionsDirective":3}],5:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarDirectiveController = (function () {
     AppBarDirectiveController.$inject = ['$element', '$scope', '$log', '$rootScope', 'pipAppBar'];
@@ -8067,7 +8147,7 @@ var AppBarDirectiveController = (function () {
 })();
 
 },{}],6:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarPartDirectiveController = (function () {
     AppBarPartDirectiveController.$inject = ['$element', '$attrs', '$scope', '$log', '$rootScope', 'pipAppBar'];
@@ -8120,7 +8200,7 @@ var AppBarPartDirectiveController = (function () {
 })();
 
 },{}],7:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppBarChangedEvent = 'pipAppBarChanged';
 var AppBarConfig = (function () {
@@ -8304,7 +8384,7 @@ angular
     .provider('pipAppBar', AppBarProvider);
 
 },{}],8:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -8317,7 +8397,7 @@ require("./AppBarPartDirective");
 __export(require("./AppBarService"));
 
 },{"./AppBarDirective":5,"./AppBarPartDirective":6,"./AppBarService":7}],9:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbService_1 = require("./BreadcrumbService");
 var BreadcrumbService_2 = require("./BreadcrumbService");
@@ -8423,7 +8503,7 @@ var BreadcrumbController = (function () {
 })();
 
 },{"../search/SearchService":27,"./BreadcrumbService":10}],10:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
 exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
@@ -8533,7 +8613,7 @@ angular.module('pipBreadcrumb')
     .provider('pipBreadcrumb', BreadcrumbProvider);
 
 },{}],11:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -8544,7 +8624,7 @@ require("./BreadcrumbService");
 __export(require("./BreadcrumbService"));
 
 },{"./BreadcrumbDirective":9,"./BreadcrumbService":10}],12:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var NavService = (function () {
     NavService.$inject = ['$injector'];
@@ -8586,7 +8666,6 @@ angular
     .service('pipNavService', NavService);
 
 },{}],13:[function(require,module,exports){
-'use strict';
 (function () {
     translateFilter.$inject = ['$injector'];
     function translateFilter($injector) {
@@ -8602,64 +8681,63 @@ angular
 })();
 
 },{}],14:[function(require,module,exports){
-'use strict';
-var DropdownDirectiveController = (function () {
-    DropdownDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$mdMedia', '$timeout'];
-    function DropdownDirectiveController($element, $attrs, $injector, $scope, $log, $rootScope, $mdMedia, $timeout) {
-        "ngInject";
-        this._element = $element;
-        this._attrs = $attrs;
-        this._scope = $scope;
-        this._injector = $injector;
-        this._log = $log;
-        this._rootScope = $rootScope;
-        this._timeout = $timeout;
-        this._pipTheme = $injector.has('pipTheme') ? $injector.get('pipTheme') : null;
-        this._pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        if (this._pipTheme) {
-            this.currentTheme = this._pipTheme.theme;
-        }
-        else if (this._rootScope['$theme']) {
-            this.currentTheme = this._rootScope['$theme'];
-        }
-        this.themeClass = ($attrs.class || '') + ' md-' + this.currentTheme + '-theme';
-        this.media = this._pipMedia !== undefined ? this._pipMedia : $mdMedia;
-        this.actions = ($scope['actions'] && _.isArray($scope['actions'])) ? $scope['actions'] : [];
-        this.activeIndex = $scope['activeIndex'] || 0;
-    }
-    DropdownDirectiveController.prototype.disabled = function () {
-        if (this._scope['ngDisabled']) {
-            return this._scope['ngDisabled']();
-        }
-        else {
-            return false;
-        }
-    };
-    DropdownDirectiveController.prototype.onSelect = function (index) {
-        var _this = this;
-        this.activeIndex = index;
-        this._scope['activeIndex'] = index;
-        if (this._scope['select']) {
-            this._scope['select'](this.actions[index], this.activeIndex);
-        }
-        if (this._scope['pipChange']) {
-            this._timeout(function () {
-                _this._scope['pipChange']();
-            });
-        }
-    };
-    DropdownDirectiveController.prototype.show = function () {
-        var result;
-        if (this._scope['showDropdown']()) {
-            return !!this._scope['showDropdown']();
-        }
-        else {
-            return true;
-        }
-    };
-    return DropdownDirectiveController;
-}());
 (function () {
+    var DropdownDirectiveController = (function () {
+        DropdownDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$mdMedia', '$timeout'];
+        function DropdownDirectiveController($element, $attrs, $injector, $scope, $log, $rootScope, $mdMedia, $timeout) {
+            "ngInject";
+            this._element = $element;
+            this._attrs = $attrs;
+            this._scope = $scope;
+            this._injector = $injector;
+            this._log = $log;
+            this._rootScope = $rootScope;
+            this._timeout = $timeout;
+            this._pipTheme = $injector.has('pipTheme') ? $injector.get('pipTheme') : null;
+            this._pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+            if (this._pipTheme) {
+                this.currentTheme = this._pipTheme.theme;
+            }
+            else if (this._rootScope['$theme']) {
+                this.currentTheme = this._rootScope['$theme'];
+            }
+            this.themeClass = ($attrs.class || '') + ' md-' + this.currentTheme + '-theme';
+            this.media = this._pipMedia !== undefined ? this._pipMedia : $mdMedia;
+            this.actions = ($scope['actions'] && _.isArray($scope['actions'])) ? $scope['actions'] : [];
+            this.activeIndex = $scope['activeIndex'] || 0;
+        }
+        DropdownDirectiveController.prototype.disabled = function () {
+            if (this._scope['ngDisabled']) {
+                return this._scope['ngDisabled']();
+            }
+            else {
+                return false;
+            }
+        };
+        DropdownDirectiveController.prototype.onSelect = function (index) {
+            var _this = this;
+            this.activeIndex = index;
+            this._scope['activeIndex'] = index;
+            if (this._scope['select']) {
+                this._scope['select'](this.actions[index], this.activeIndex);
+            }
+            if (this._scope['pipChange']) {
+                this._timeout(function () {
+                    _this._scope['pipChange']();
+                });
+            }
+        };
+        DropdownDirectiveController.prototype.show = function () {
+            var result;
+            if (this._scope['showDropdown']()) {
+                return !!this._scope['showDropdown']();
+            }
+            else {
+                return true;
+            }
+        };
+        return DropdownDirectiveController;
+    }());
     function dropdownDirective() {
         return {
             restrict: 'E',
@@ -8682,137 +8760,138 @@ var DropdownDirectiveController = (function () {
 })();
 
 },{}],15:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var NavHeaderDirectiveController = (function () {
-    NavHeaderDirectiveController.$inject = ['$element', '$scope', '$log', '$rootScope', '$timeout', 'pipNavHeader', 'navConstant'];
-    function NavHeaderDirectiveController($element, $scope, $log, $rootScope, $timeout, pipNavHeader, navConstant) {
-        "ngInject";
-        var _this = this;
-        this._element = $element;
-        this._scope = $scope;
-        this._log = $log;
-        this._rootScope = $rootScope;
-        this._timeout = $timeout;
-        this._pipNavHeader = pipNavHeader;
-        this._element.addClass('pip-sticky-nav-header');
-        this.initImage();
-        var cleanupNavHeaderChanged = this._rootScope.$on('pipNavHeaderChanged', function ($event, config) {
-            _this.onNavHeaderChanged($event, config);
-        });
-        var cleanupSideNavStateChanged = this._rootScope.$on('pipSideNavStateChanged', function ($event, state) {
-            _this.onStateChanged($event, state);
-        });
-        $scope.$on('$destroy', function () {
-            if (angular.isFunction(cleanupNavHeaderChanged)) {
-                cleanupNavHeaderChanged();
-            }
-            if (angular.isFunction(cleanupSideNavStateChanged)) {
-                cleanupSideNavStateChanged();
-            }
-        });
-    }
-    NavHeaderDirectiveController.prototype.initImage = function () {
-        var _this = this;
-        this.imageBlock = this._element.find('.pip-sticky-nav-header-user');
-        this._timeout(function () {
-            _this.image = _this._element.find('.pip-sticky-nav-header-user-image');
-            if (_this.image[0]) {
-                _this.image[0].onload = (function () { return _this.onImageLoad(); });
-                _this.image[0].onerror = (function () { return _this.onImageError(); });
+(function () {
+    var NavHeaderDirectiveController = (function () {
+        NavHeaderDirectiveController.$inject = ['$element', '$scope', '$log', '$rootScope', '$timeout', 'pipNavHeader', 'navConstant'];
+        function NavHeaderDirectiveController($element, $scope, $log, $rootScope, $timeout, pipNavHeader, navConstant) {
+            "ngInject";
+            var _this = this;
+            this._element = $element;
+            this._scope = $scope;
+            this._log = $log;
+            this._rootScope = $rootScope;
+            this._timeout = $timeout;
+            this._pipNavHeader = pipNavHeader;
+            this._element.addClass('pip-sticky-nav-header');
+            this.initImage();
+            var cleanupNavHeaderChanged = this._rootScope.$on('pipNavHeaderChanged', function ($event, config) {
+                _this.onNavHeaderChanged($event, config);
+            });
+            var cleanupSideNavStateChanged = this._rootScope.$on('pipSideNavStateChanged', function ($event, state) {
+                _this.onStateChanged($event, state);
+            });
+            $scope.$on('$destroy', function () {
+                if (angular.isFunction(cleanupNavHeaderChanged)) {
+                    cleanupNavHeaderChanged();
+                }
+                if (angular.isFunction(cleanupSideNavStateChanged)) {
+                    cleanupSideNavStateChanged();
+                }
+            });
+        }
+        NavHeaderDirectiveController.prototype.initImage = function () {
+            var _this = this;
+            this.imageBlock = this._element.find('.pip-sticky-nav-header-user');
+            this._timeout(function () {
+                _this.image = _this._element.find('.pip-sticky-nav-header-user-image');
+                if (_this.image[0]) {
+                    _this.image[0].onload = (function () { return _this.onImageLoad(); });
+                    _this.image[0].onerror = (function () { return _this.onImageError(); });
+                }
+                else {
+                    _this.image.onload = (function () { return _this.onImageLoad(); });
+                    _this.image.onerror = (function () { return _this.onImageError(); });
+                }
+                _this.onNavHeaderChanged(null, _this._pipNavHeader.config);
+            }, 20);
+        };
+        NavHeaderDirectiveController.prototype.initHeader = function () {
+            if (!this._pipNavHeader.config)
+                return;
+            this.title = this._pipNavHeader.config.title;
+            this.subtitle = this._pipNavHeader.config.subtitle;
+            this.imageUrl = this._pipNavHeader.config.imageUrl;
+            this.imageCss = this._pipNavHeader.config.imageCss;
+        };
+        NavHeaderDirectiveController.prototype.onImageLoad = function () {
+            this.setImageMarginCSS(this.image);
+        };
+        ;
+        NavHeaderDirectiveController.prototype.onImageError = function () {
+            var _this = this;
+            if (this.loadedDefaultImage)
+                return;
+            this._scope.$apply(function () {
+                _this.setImage(_this._pipNavHeader.config, true);
+            });
+        };
+        ;
+        NavHeaderDirectiveController.prototype.onStateChanged = function (event, state) {
+            var _this = this;
+            if (state === undefined)
+                return;
+            if (state.id == 'toggle') {
+                this._timeout(function () {
+                    _this.showHeader = state && state.id == 'toggle';
+                }, 400);
             }
             else {
-                _this.image.onload = (function () { return _this.onImageLoad(); });
-                _this.image.onerror = (function () { return _this.onImageError(); });
+                this.showHeader = false;
             }
-            _this.onNavHeaderChanged(null, _this._pipNavHeader.config);
-        }, 20);
-    };
-    NavHeaderDirectiveController.prototype.initHeader = function () {
-        if (!this._pipNavHeader.config)
-            return;
-        this.title = this._pipNavHeader.config.title;
-        this.subtitle = this._pipNavHeader.config.subtitle;
-        this.imageUrl = this._pipNavHeader.config.imageUrl;
-        this.imageCss = this._pipNavHeader.config.imageCss;
-    };
-    NavHeaderDirectiveController.prototype.onImageLoad = function () {
-        this.setImageMarginCSS(this.image);
-    };
-    ;
-    NavHeaderDirectiveController.prototype.onImageError = function () {
-        var _this = this;
-        if (this.loadedDefaultImage)
-            return;
-        this._scope.$apply(function () {
-            _this.setImage(_this._pipNavHeader.config, true);
-        });
-    };
-    ;
-    NavHeaderDirectiveController.prototype.onStateChanged = function (event, state) {
-        if (state === undefined)
-            return;
-        if (state.id == 'toggle') {
-            this._timeout(function () {
-                this.showHeader = state && state.id == 'toggle';
-            }, 400);
-        }
-        else {
-            this.showHeader = false;
-        }
-    };
-    NavHeaderDirectiveController.prototype.setImageMarginCSS = function (image) {
-        var cssParams = {}, containerWidth = this.imageBlock.width ? this.imageBlock.width() : this.imageBlock.clientWidth, containerHeight = this.imageBlock.height ? this.imageBlock.height() : this.imageBlock.clientHeight, imageWidth = image[0]['naturalWidth'] || image.width, imageHeight = image[0]['naturalHeight'] || image.height, margin = 0;
-        if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
-            margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
-            cssParams['margin-left'] = '' + margin + 'px';
-            cssParams['height'] = '' + containerHeight + 'px';
-            cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
-            cssParams['margin-top'] = '';
-        }
-        else {
-            margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
-            cssParams['margin-top'] = '' + margin + 'px';
-            cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
-            cssParams['width'] = '' + containerWidth + 'px';
-            cssParams['margin-left'] = '';
-        }
-        image.css(cssParams);
-    };
-    ;
-    NavHeaderDirectiveController.prototype.setImage = function (config, loadError) {
-        if (!config)
-            return;
-        var url;
-        if (!loadError && !!config.imageUrl && !this.loadedDefaultImage) {
-            url = config.imageUrl;
-        }
-        else {
-            this.loadedDefaultImage = true;
-            url = config.defaultImageUrl;
-        }
-        if (url && this.image) {
-            this.image.attr('src', url);
-        }
-        else {
-            this.imageBlock.css('display', 'none');
-        }
-    };
-    NavHeaderDirectiveController.prototype.onNavHeaderChanged = function ($event, config) {
-        if (!config)
-            return;
-        this.setImage(config, false);
-        this.title = config.title;
-        this.subtitle = config.subtitle;
-        this.imageUrl = config.imageUrl;
-        this.imageCss = config.imageCss;
-    };
-    NavHeaderDirectiveController.prototype.onUserClick = function () {
-        this._rootScope.$broadcast('pipNavUserClicked');
-    };
-    return NavHeaderDirectiveController;
-}());
-(function () {
+        };
+        NavHeaderDirectiveController.prototype.setImageMarginCSS = function (image) {
+            var cssParams = {}, containerWidth = this.imageBlock.width ? this.imageBlock.width() : this.imageBlock.clientWidth, containerHeight = this.imageBlock.height ? this.imageBlock.height() : this.imageBlock.clientHeight, imageWidth = image[0]['naturalWidth'] || image.width, imageHeight = image[0]['naturalHeight'] || image.height, margin = 0;
+            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
+                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
+                cssParams['margin-left'] = '' + margin + 'px';
+                cssParams['height'] = '' + containerHeight + 'px';
+                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
+                cssParams['margin-top'] = '';
+            }
+            else {
+                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
+                cssParams['margin-top'] = '' + margin + 'px';
+                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
+                cssParams['width'] = '' + containerWidth + 'px';
+                cssParams['margin-left'] = '';
+            }
+            image.css(cssParams);
+        };
+        ;
+        NavHeaderDirectiveController.prototype.setImage = function (config, loadError) {
+            if (!config)
+                return;
+            var url;
+            if (!loadError && !!config.imageUrl && !this.loadedDefaultImage) {
+                url = config.imageUrl;
+            }
+            else {
+                this.loadedDefaultImage = true;
+                url = config.defaultImageUrl;
+            }
+            if (url && this.image) {
+                this.image.attr('src', url);
+            }
+            else {
+                this.imageBlock.css('display', 'none');
+            }
+        };
+        NavHeaderDirectiveController.prototype.onNavHeaderChanged = function ($event, config) {
+            if (!config)
+                return;
+            this.setImage(config, false);
+            this.title = config.title;
+            this.subtitle = config.subtitle;
+            this.imageUrl = config.imageUrl;
+            this.imageCss = config.imageCss;
+        };
+        NavHeaderDirectiveController.prototype.onUserClick = function () {
+            this._rootScope.$broadcast('pipNavUserClicked');
+        };
+        return NavHeaderDirectiveController;
+    }());
     function navHeaderDirective() {
         return {
             restrict: 'EA',
@@ -8828,7 +8907,7 @@ var NavHeaderDirectiveController = (function () {
 })();
 
 },{}],16:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
 var NavHeaderConfig = (function () {
@@ -9047,7 +9126,7 @@ angular
     .provider('pipNavHeader', NavHeaderProvider);
 
 },{}],17:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -9058,7 +9137,7 @@ require("./NavHeaderDirective");
 __export(require("./NavHeaderService"));
 
 },{"./NavHeaderDirective":15,"./NavHeaderService":16}],18:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavEvents_1 = require("../sidenav/SideNavEvents");
 exports.NavIconClickedEvent = 'pipNavIconClicked';
@@ -9121,7 +9200,7 @@ var NavIconDirectiveController = (function () {
 })();
 
 },{"../sidenav/SideNavEvents":30}],19:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NavIconChangedEvent = 'pipNavIconChanged';
 var NavIconConfig = (function () {
@@ -9248,7 +9327,7 @@ angular
     .provider('pipNavIcon', NavIconProvider);
 
 },{}],20:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -9259,7 +9338,7 @@ require("./NavIconDirective");
 __export(require("./NavIconService"));
 
 },{"./NavIconDirective":18,"./NavIconService":19}],21:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -9310,43 +9389,42 @@ __export(require("./menu"));
 __export(require("./header"));
 
 },{"./actions":4,"./appbar":8,"./breadcrumb":11,"./common/NavService":12,"./dependencies/TranslateFilter":13,"./dropdown/DropdownDirective":14,"./header":17,"./icon":20,"./language/LanguagePickerDirective":22,"./menu":25,"./search":28,"./sidenav":34,"./tabs/TabsDirective":35}],22:[function(require,module,exports){
-'use strict';
-var LanguagePickerDirectiveController = (function () {
-    LanguagePickerDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$timeout'];
-    function LanguagePickerDirectiveController($element, $attrs, $injector, $scope, $log, $rootScope, $timeout) {
-        "ngInject";
-        this.languages = ['en', 'ru'];
-        this._element = $element;
-        this._attrs = $attrs;
-        this._scope = $scope;
-        this._injector = $injector;
-        this._log = $log;
-        this._rootScope = $rootScope;
-        this._timeout = $timeout;
-        this._translate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        $element.addClass('pip-language-picker');
-        this.setLanguages($scope['languages']);
-        this.selectedLanguage = $scope['value'] || this.languages[0];
-    }
-    Object.defineProperty(LanguagePickerDirectiveController.prototype, "language", {
-        get: function () {
-            return this._translate ? this._translate.language : null;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    LanguagePickerDirectiveController.prototype.setLanguages = function (languages) {
-        this.languages = languages.length > 0 ? languages : ['en', 'ru'];
-    };
-    LanguagePickerDirectiveController.prototype.onLanguageClick = function (language) {
-        if (this._translate != null) {
-            this.selectedLanguage = language;
-            this._translate.language = this.selectedLanguage;
-        }
-    };
-    return LanguagePickerDirectiveController;
-}());
 (function () {
+    var LanguagePickerDirectiveController = (function () {
+        LanguagePickerDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$timeout'];
+        function LanguagePickerDirectiveController($element, $attrs, $injector, $scope, $log, $rootScope, $timeout) {
+            "ngInject";
+            this.languages = ['en', 'ru'];
+            this._element = $element;
+            this._attrs = $attrs;
+            this._scope = $scope;
+            this._injector = $injector;
+            this._log = $log;
+            this._rootScope = $rootScope;
+            this._timeout = $timeout;
+            this._translate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+            $element.addClass('pip-language-picker');
+            this.setLanguages($scope['languages']);
+            this.selectedLanguage = $scope['value'] || this.languages[0];
+        }
+        Object.defineProperty(LanguagePickerDirectiveController.prototype, "language", {
+            get: function () {
+                return this._translate ? this._translate.language : null;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        LanguagePickerDirectiveController.prototype.setLanguages = function (languages) {
+            this.languages = languages.length > 0 ? languages : ['en', 'ru'];
+        };
+        LanguagePickerDirectiveController.prototype.onLanguageClick = function (language) {
+            if (this._translate != null) {
+                this.selectedLanguage = language;
+                this._translate.language = this.selectedLanguage;
+            }
+        };
+        return LanguagePickerDirectiveController;
+    }());
     function languagePickerDirective() {
         return {
             restrict: 'E',
@@ -9370,152 +9448,178 @@ var LanguagePickerDirectiveController = (function () {
 })();
 
 },{}],23:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 (function () {
-    NavMenuDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu'];
-    function NavMenuDirectiveController($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
-        "ngInject";
-        var animationDuration = 450, pipSideNavElement = $element.parent().parent();
-        $element.addClass('pip-sticky-nav-menu');
-        $scope.sections = $scope.sections || pipNavMenu.sections;
-        setCollapsible();
-        $scope.defaultIcon = pipNavMenu.defaultIcon;
-        onStateChanged(null, pipSideNav.state);
-        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
-        $rootScope.$on('pipSideNavStateChanged', onStateChanged);
-        $scope.itemVisible = isHidden;
-        $scope.clickLink = clickLink;
-        $scope.isSectionEmpty = isSectionEmpty;
-        $scope.onExpand = onExpand;
-        $scope.isActive = isActive;
-        return;
-        function setCollapsible() {
+    var NavMenuDirectiveController = (function () {
+        NavMenuDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$window', '$location', '$rootScope', '$timeout', 'pipSideNav', 'pipNavMenu', 'navConstant'];
+        function NavMenuDirectiveController($element, $attrs, $injector, $scope, $log, $window, $location, $rootScope, $timeout, pipSideNav, pipNavMenu, navConstant) {
+            "ngInject";
+            var _this = this;
+            this._element = $element;
+            this._attrs = $attrs;
+            this._scope = $scope;
+            this._injector = $injector;
+            this._log = $log;
+            this._rootScope = $rootScope;
+            this._timeout = $timeout;
+            this._window = $window;
+            this._location = $location;
+            this._pipSideNav = pipSideNav;
+            this._pipNavMenu = pipNavMenu;
+            this._state = this._injector.has('$state') ? this._injector.get('$state') : null;
+            this._animationDuration = navConstant.SIDENAV_ANIMATION_DURATION,
+                this._pipSideNavElement = $element.parent().parent();
+            this._element.addClass('pip-sticky-nav-menu');
+            this.sections = this._scope['sections'] || this._pipNavMenu.sections;
+            this.setCollapsible();
+            this.defaultIcon = this._pipNavMenu.defaultIcon;
+            this.onStateChanged(null, this._pipSideNav.state);
+            var cleanupNavMenuChanged = this._rootScope.$on('pipNavMenuChanged', function ($event, config) {
+                _this.onConfigChanged($event, config);
+            });
+            var cleanupSideNavStateChanged = this._rootScope.$on('pipSideNavStateChanged', function ($event, state) {
+                _this.onStateChanged($event, state);
+            });
+            this._scope.$on('$destroy', function () {
+                if (angular.isFunction(cleanupNavMenuChanged)) {
+                    cleanupNavMenuChanged();
+                }
+                if (angular.isFunction(cleanupSideNavStateChanged)) {
+                    cleanupSideNavStateChanged();
+                }
+            });
+        }
+        NavMenuDirectiveController.prototype.setCollapsible = function () {
             var collapsed;
-            if (angular.isFunction($scope.collapsed)) {
-                collapsed = $scope.collapsed();
+            if (angular.isFunction(this._scope['collapsed'])) {
+                collapsed = this._scope['collapsed']();
             }
             else {
-                collapsed = $scope.collapsed !== false && $scope.collapsed !== 'false';
+                collapsed = this._scope['collapsed'] !== false && this._scope['collapsed'] !== 'false';
             }
-            $scope.isCollapsed = collapsed;
-        }
-        function onExpand() {
-            if (!$scope.isCollapsed) {
+            this.isCollapsed = collapsed;
+        };
+        NavMenuDirectiveController.prototype.onExpand = function () {
+            if (!this.isCollapsed) {
                 return;
             }
-            $scope.expanded = !$scope.expanded;
-            if ($scope.expanded) {
-                pipSideNavElement.removeClass('pip-sticky-nav-small');
+            this.expanded = !this.expanded;
+            if (this.expanded) {
+                this._pipSideNavElement.removeClass('pip-sticky-nav-small');
             }
             else {
-                pipSideNavElement.addClass('pip-sticky-nav-small');
+                this._pipSideNavElement.addClass('pip-sticky-nav-small');
             }
-            $rootScope.$emit('pipNavExpanded', $scope.expanded);
-        }
-        function isHidden(item) {
+            this._rootScope.$emit('pipNavExpanded', this.expanded);
+        };
+        NavMenuDirectiveController.prototype.isHidden = function (item) {
             return item && item.access && !item.access(item);
-        }
-        function isSectionEmpty(linkCollection) {
+        };
+        NavMenuDirectiveController.prototype.isSectionEmpty = function (linkCollection) {
+            var _this = this;
             var result = true;
             _.each(linkCollection, function (link) {
-                if (!isHidden(link))
+                if (!_this.isHidden(link)) {
                     result = false;
+                }
             });
             return result;
-        }
-        function onConfigChanged(event, config) {
+        };
+        NavMenuDirectiveController.prototype.onConfigChanged = function ($event, config) {
             if (!config)
                 return;
-            $scope.sections = config.sections;
-        }
-        function onStateChanged(event, state) {
+            this.sections = config.sections;
+        };
+        NavMenuDirectiveController.prototype.onStateChanged = function (event, state) {
             if (!state)
                 return;
-            $scope.isCollapsed = state.expand;
-            $scope.expanded = state.isExpanded;
-            $scope.expandedButton = state.expandedButton;
-            $scope.sideNavState = state;
-        }
-        function isActive(link) {
+            this.isCollapsed = state.expand;
+            this.expanded = state.isExpanded;
+            this.expandedButton = state.expandedButton;
+            this.sideNavState = state;
+        };
+        NavMenuDirectiveController.prototype.isActive = function (link) {
             if (link.parentState) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.includes(link.parentState)) {
+                if (this._state != null && this._state.includes(link.parentState)) {
                     return true;
                 }
             }
             else if (link.state) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.includes(link.state)) {
+                if (this._state != null && this._state.includes(link.state)) {
                     return true;
                 }
             }
             else if (link.href) {
-                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
+                if (link.href.split('?')[0] === this._window.location.href.split('?')[0]) {
                     return true;
                 }
             }
             else if (link.url) {
-                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
+                if (link.url.split(/[\s/?]+/)[1] === this._location.url().split(/[\s/?]+/)[1]) {
                     return true;
                 }
             }
             return false;
-        }
-        function clickLink(event, link) {
+        };
+        NavMenuDirectiveController.prototype.clickLink = function (event, link) {
+            var _this = this;
             event.stopPropagation();
             if (!link) {
-                pipSideNav.close();
+                this._pipSideNav.close();
                 return;
             }
             if (link.href) {
-                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
-                    pipSideNav.close();
+                if (link.href.split('?')[0] === this._window.location.href.split('?')[0]) {
+                    this._pipSideNav.close();
                     return;
                 }
-                pipSideNav.close();
-                $timeout(function () {
-                    $window.location.href = link.href;
-                }, animationDuration);
+                this._pipSideNav.close();
+                this._timeout(function () {
+                    _this._window.location.href = link.href;
+                }, this._animationDuration);
                 return;
             }
             else if (link.url) {
-                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
-                    pipSideNav.close();
+                if (link.url.split(/[\s/?]+/)[1] === this._location.url().split(/[\s/?]+/)[1]) {
+                    this._pipSideNav.close();
                     return;
                 }
-                pipSideNav.close();
-                $timeout(function () {
-                    $location.url(link.url);
-                }, animationDuration);
+                this._pipSideNav.close();
+                this._timeout(function () {
+                    _this._location.url(link.url);
+                }, this._animationDuration);
                 return;
             }
             else if (link.state) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.current.name === link.state) {
-                    pipSideNav.close();
+                if (this._state != null && this._state.current.name === link.state) {
+                    this._pipSideNav.close();
                     return;
                 }
-                pipSideNav.close();
-                $timeout(function () {
-                    if ($injector.has('$state')) {
-                        var $state = $injector.get('$state');
-                        $state.go(link.state, link.stateParams);
-                    }
-                }, animationDuration);
+                this._pipSideNav.close();
+                this._timeout(function () {
+                    _this._state.go(link.state, link.stateParams);
+                }, this._animationDuration);
                 return;
             }
-            else if (link.event)
-                $rootScope.$broadcast(link.event, link);
-            pipSideNav.close();
-        }
-    }
+            else if (link.event) {
+                this._rootScope.$broadcast(link.event, link);
+            }
+            this._pipSideNav.close();
+        };
+        return NavMenuDirectiveController;
+    }());
     function navMenuDirective() {
         return {
             restrict: 'EA',
-            scope: {},
+            scope: {
+                sections: '=?pipSections',
+                collapsed: '=?pipCollapsed'
+            },
             replace: false,
             templateUrl: 'menu/NavMenu.html',
-            controller: NavMenuDirectiveController
+            controller: NavMenuDirectiveController,
+            controllerAs: 'vm'
         };
     }
     angular
@@ -9524,7 +9628,7 @@ var LanguagePickerDirectiveController = (function () {
 })();
 
 },{}],24:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NavMenuChangedEvent = 'pipNavMenuChanged';
 var NavMenuLink = (function () {
@@ -9647,7 +9751,7 @@ angular
     .provider('pipNavMenu', NavMenuProvider);
 
 },{}],25:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -9658,7 +9762,7 @@ require("./NavMenuDirective");
 __export(require("./NavMenuService"));
 
 },{"./NavMenuDirective":23,"./NavMenuService":24}],26:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SearchService_1 = require("./SearchService");
 var SearchService_2 = require("./SearchService");
@@ -9756,7 +9860,7 @@ var SearchBarController = (function () {
 })();
 
 },{"./SearchService":27}],27:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OpenSearchEvent = 'pipOpenSearch';
 exports.CloseSearchEvent = 'pipCloseSearch';
@@ -9874,7 +9978,7 @@ angular.module('pipSearchBar')
     .provider('pipSearch', SearchProvider);
 
 },{}],28:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -9885,7 +9989,7 @@ require("./SearchBarDirective");
 __export(require("./SearchService"));
 
 },{"./SearchBarDirective":26,"./SearchService":27}],29:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavState_1 = require("./SideNavState");
 var SideNavDirectiveController = (function () {
@@ -9901,7 +10005,6 @@ var SideNavDirectiveController = (function () {
         this._rootScope = $rootScope;
         this._timeout = $timeout;
         this._pipSideNav = pipSideNav;
-        console.log('this._pipSideNav', this._pipSideNav);
         this._pipMedia = this._injector.has('pipMedia') ? this._injector.get('pipMedia') : null;
         this._mainContainer = navConstant.SIDENAV_CONTAINER;
         this._bigWidth = navConstant.SIDENAV_LARGE_WIDTH;
@@ -9919,18 +10022,18 @@ var SideNavDirectiveController = (function () {
                 _this.setSideNaveState();
             }, 100);
             this.windowResize = _.debounce(function () { _this.setSideNaveState(); }, 10);
-            cleanupMainResized = $rootScope.$on('pipMainResized', function () {
+            cleanupMainResized = this._rootScope.$on('pipMainResized', function () {
                 _this.windowResize();
             });
-            cleanupSideNavState = $rootScope.$on('pipSideNavState', function ($event, state) {
+            cleanupSideNavState = this._rootScope.$on('pipSideNavState', function ($event, state) {
                 _this.onSideNavState($event, state);
             });
         }
         else {
             this._isResizing = false;
-            $scope.sidenavState = null;
-            $timeout(function () {
-                this.setState(SideNavState_1.SideNavStateNames.Toggle);
+            this.sidenavState = null;
+            this._timeout(function () {
+                _this.setState(SideNavState_1.SideNavStateNames.Toggle);
             }, 100);
         }
         var cleanupNavHeaderChanged = this._rootScope.$on('pipNavIconClicked', function () {
@@ -9939,7 +10042,7 @@ var SideNavDirectiveController = (function () {
         var cleanupSideNavChanged = this._rootScope.$on('pipSideNavChanged', function ($event, config) {
             _this.onSideNavChanged($event, config);
         });
-        $scope.$on('$destroy', function () {
+        this._scope.$on('$destroy', function () {
             if (angular.isFunction(cleanupNavHeaderChanged)) {
                 cleanupNavHeaderChanged();
             }
@@ -10063,7 +10166,6 @@ exports.OpenSideNavEvent = 'pipOpenSideNav';
 exports.CloseSideNavEvent = 'pipCloseSideNav';
 
 },{}],31:[function(require,module,exports){
-'use strict';
 (function () {
     SideNavPartDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav'];
     sidenavPartDirective.$inject = ['ngIfDirective'];
@@ -10320,7 +10422,7 @@ var SideNavStateNames = (function () {
     }
     return SideNavStateNames;
 }());
-SideNavStateNames.Toggle = 'toogle';
+SideNavStateNames.Toggle = 'toggle';
 SideNavStateNames.Small = 'small';
 SideNavStateNames.Large = 'large';
 SideNavStateNames.XLarge = 'xlarge';
@@ -10379,7 +10481,7 @@ var SideNavStateConfig = (function () {
 exports.SideNavStateConfig = SideNavStateConfig;
 
 },{}],34:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -10393,142 +10495,139 @@ require("./SideNavDirective");
 __export(require("./SideNavService"));
 
 },{"./SideNavDirective":29,"./SideNavEvents":30,"./SideNavPartDirective":31,"./SideNavService":32,"./SideNavState":33}],35:[function(require,module,exports){
-'use strict';
-var Selected = (function () {
-    function Selected() {
-        this.activeIndex = 0;
-        this.activeTab = 0;
-    }
-    return Selected;
-}());
-var TabsDirectiveController = (function () {
-    TabsDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$mdMedia', '$timeout', 'navConstant'];
-    function TabsDirectiveController($element, $attrs, $injector, $scope, $log, $rootScope, $mdMedia, $timeout, navConstant) {
-        "ngInject";
-        var _this = this;
-        this._element = $element;
-        this._attrs = $attrs;
-        this._scope = $scope;
-        this._injector = $injector;
-        this._log = $log;
-        this._rootScope = $rootScope;
-        this._timeout = $timeout;
-        this.selected = new Selected();
-        this.setTheme();
-        this.setMedia($mdMedia);
-        this.initTabs();
-        this.breakpoints = this._scope['breakpoints'] ? this._scope['breakpoints'] : navConstant.TAB_BREAKPOINT;
-        if (this.toBoolean($attrs['pipRebind'])) {
-            this._scope.$watch(function () { return _this._scope['activeIndex']; }, function (newValue, oldValue) {
-                _this.selected.activeIndex = newValue || 0;
-                _this.selected.activeTab = _this.selected.activeIndex;
-            });
+(function () {
+    var Selected = (function () {
+        function Selected() {
+            this.activeIndex = 0;
+            this.activeTab = 0;
         }
-    }
-    TabsDirectiveController.prototype.setTheme = function () {
-        this._pipTheme = this._injector.has('pipTheme') ? this._injector.get('pipTheme') : null;
-        if (this._pipTheme) {
-            this.currentTheme = this._pipTheme.theme;
+        return Selected;
+    }());
+    var TabsDirectiveController = (function () {
+        TabsDirectiveController.$inject = ['$element', '$attrs', '$injector', '$scope', '$log', '$rootScope', '$mdMedia', '$timeout', 'navConstant'];
+        function TabsDirectiveController($element, $attrs, $injector, $scope, $log, $rootScope, $mdMedia, $timeout, navConstant) {
+            "ngInject";
+            var _this = this;
+            this._element = $element;
+            this._attrs = $attrs;
+            this._scope = $scope;
+            this._injector = $injector;
+            this._log = $log;
+            this._rootScope = $rootScope;
+            this._timeout = $timeout;
+            this.selected = new Selected();
+            this.setTheme();
+            this.setMedia($mdMedia);
+            this.initTabs();
+            this.breakpoints = this._scope['breakpoints'] ? this._scope['breakpoints'] : navConstant.TAB_BREAKPOINT;
+            if (this.toBoolean($attrs['pipRebind'])) {
+                this._scope.$watch(function () { return _this._scope['activeIndex']; }, function (newValue, oldValue) {
+                    _this.selected.activeIndex = newValue || 0;
+                    _this.selected.activeTab = _this.selected.activeIndex;
+                });
+            }
         }
-        else if (this._rootScope['$theme']) {
-            this.currentTheme = this._rootScope['$theme'];
-        }
-        this.themeClass = (this._attrs['class'] || '') + ' md-' + this.currentTheme + '-theme';
-    };
-    TabsDirectiveController.prototype.setMedia = function ($mdMedia) {
-        this._pipMedia = this._injector.has('pipMedia') ? this._injector.get('pipMedia') : null;
-        this.media = this._pipMedia !== undefined ? this._pipMedia : $mdMedia;
-    };
-    TabsDirectiveController.prototype.setTranslate = function () {
-        this._pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
-        if (this._pipTranslate) {
-            if (this.tabs.length > 0 && this.tabs[0].title) {
-                this._pipTranslate.translateObjects(this.tabs, 'title', 'nameLocal');
+        TabsDirectiveController.prototype.setTheme = function () {
+            this._pipTheme = this._injector.has('pipTheme') ? this._injector.get('pipTheme') : null;
+            if (this._pipTheme) {
+                this.currentTheme = this._pipTheme.theme;
+            }
+            else if (this._rootScope['$theme']) {
+                this.currentTheme = this._rootScope['$theme'];
+            }
+            this.themeClass = (this._attrs['class'] || '') + ' md-' + this.currentTheme + '-theme';
+        };
+        TabsDirectiveController.prototype.setMedia = function ($mdMedia) {
+            this._pipMedia = this._injector.has('pipMedia') ? this._injector.get('pipMedia') : null;
+            this.media = this._pipMedia !== undefined ? this._pipMedia : $mdMedia;
+        };
+        TabsDirectiveController.prototype.setTranslate = function () {
+            this._pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
+            if (this._pipTranslate) {
+                if (this.tabs.length > 0 && this.tabs[0].title) {
+                    this._pipTranslate.translateObjects(this.tabs, 'title', 'nameLocal');
+                }
+                else {
+                    this._pipTranslate.translateObjects(this.tabs, 'name', 'nameLocal');
+                }
+            }
+        };
+        TabsDirectiveController.prototype.initTabs = function () {
+            var _this = this;
+            this.tabs = (this._scope['tabs'] && _.isArray(this._scope['tabs'])) ? this._scope['tabs'] : [];
+            this.pipTabIndex = this._attrs['pipTabIndex'] ? parseInt(this._attrs['pipTabIndex']) : 0;
+            this.selected.activeIndex = this._scope['activeIndex'] || 0;
+            this.selected.activeTab = this.selected.activeIndex;
+            if (this.pipTabIndex) {
+                this._timeout(function () {
+                    var a = _this._element.find('md-tabs-canvas');
+                    if (a && a[0]) {
+                        angular.element(a[0]).attr('tabindex', _this.pipTabIndex);
+                    }
+                    a.on('focusout', function () {
+                        var _this = this;
+                        angular.element(a[0]).attr('tabindex', this.pipTabIndex);
+                        this._timeout(function () {
+                            angular.element(a[0]).attr('tabindex', _this.pipTabIndex);
+                        }, 50);
+                    });
+                }, 1000);
+            }
+            this.setTranslate();
+        };
+        TabsDirectiveController.prototype.disabled = function () {
+            if (this._scope['ngDisabled']) {
+                return this._scope['ngDisabled']();
+            }
+            return false;
+        };
+        ;
+        TabsDirectiveController.prototype.tabDisabled = function (index) {
+            return (this.disabled() && this.selected.activeIndex != index);
+        };
+        ;
+        TabsDirectiveController.prototype.onSelect = function (index) {
+            var _this = this;
+            if (this.disabled())
+                return;
+            this.selected.activeIndex = index;
+            this.selected.activeTab = this.selected.activeIndex;
+            this._timeout(function () {
+                _this._scope['activeIndex'] = index;
+                if (_this._scope['select']) {
+                    _this._scope['select'](_this.tabs[_this.selected.activeIndex], _this.selected.activeIndex);
+                }
+            }, 0);
+        };
+        ;
+        TabsDirectiveController.prototype.showShadow = function () {
+            if (this._scope['showTabsShadow']) {
+                return this._scope['showTabsShadow']();
             }
             else {
-                this._pipTranslate.translateObjects(this.tabs, 'name', 'nameLocal');
+                return false;
             }
-        }
-    };
-    TabsDirectiveController.prototype.initTabs = function () {
-        var _this = this;
-        this.tabs = (this._scope['tabs'] && _.isArray(this._scope['tabs'])) ? this._scope['tabs'] : [];
-        this.pipTabIndex = this._attrs['pipTabIndex'] ? parseInt(this._attrs['pipTabIndex']) : 0;
-        this.selected.activeIndex = this._scope['activeIndex'] || 0;
-        this.selected.activeTab = this.selected.activeIndex;
-        if (this.pipTabIndex) {
-            this._timeout(function () {
-                var a = _this._element.find('md-tabs-canvas');
-                if (a && a[0]) {
-                    angular.element(a[0]).attr('tabindex', _this.pipTabIndex);
-                }
-                a.on('focusout', function () {
-                    var _this = this;
-                    angular.element(a[0]).attr('tabindex', this.pipTabIndex);
-                    this._timeout(function () {
-                        angular.element(a[0]).attr('tabindex', _this.pipTabIndex);
-                    }, 50);
-                });
-            }, 1000);
-        }
-        this.setTranslate();
-    };
-    TabsDirectiveController.prototype.disabled = function () {
-        if (this._scope['ngDisabled']) {
-            return this._scope['ngDisabled']();
-        }
-        return false;
-    };
-    ;
-    TabsDirectiveController.prototype.tabDisabled = function (index) {
-        return (this.disabled() && this.selected.activeIndex != index);
-    };
-    ;
-    TabsDirectiveController.prototype.onSelect = function (index) {
-        var _this = this;
-        console.log('onSelect', index);
-        if (this.disabled())
-            return;
-        this.selected.activeIndex = index;
-        this.selected.activeTab = this.selected.activeIndex;
-        this._timeout(function () {
-            _this._scope['activeIndex'] = index;
-            console.log('activeIndex', _this._scope['activeIndex']);
-            if (_this._scope['select']) {
-                _this._scope['select'](_this.tabs[_this.selected.activeIndex], _this.selected.activeIndex);
+        };
+        ;
+        TabsDirectiveController.prototype.show = function () {
+            if (this._scope['showTabs']) {
+                return this._scope['showTabs']();
             }
-        }, 0);
-    };
-    ;
-    TabsDirectiveController.prototype.showShadow = function () {
-        if (this._scope['showTabsShadow']) {
-            return this._scope['showTabsShadow']();
-        }
-        else {
-            return false;
-        }
-    };
-    ;
-    TabsDirectiveController.prototype.show = function () {
-        if (this._scope['showTabs']) {
-            return this._scope['showTabs']();
-        }
-        else {
-            return true;
-        }
-    };
-    ;
-    TabsDirectiveController.prototype.toBoolean = function (value) {
-        if (value == null)
-            return false;
-        if (!value)
-            return false;
-        value = value.toString().toLowerCase();
-        return value == '1' || value == 'true';
-    };
-    return TabsDirectiveController;
-}());
-(function () {
+            else {
+                return true;
+            }
+        };
+        ;
+        TabsDirectiveController.prototype.toBoolean = function (value) {
+            if (value == null)
+                return false;
+            if (!value)
+                return false;
+            value = value.toString().toLowerCase();
+            return value == '1' || value == 'true';
+        };
+        return TabsDirectiveController;
+    }());
     function tabsDirective() {
         return {
             restrict: 'E',
@@ -10559,6 +10658,18 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('appbar/AppBar.html',
+    '<md-toolbar class="{{ vm.config.classes.join(\' \') }}" ng-if="vm.config.visible" ng-transclude=""></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('actions/PrimaryActions.html',
     '<div pip-focused="" pip-focused-tabindex="2"><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in vm.config.primaryLocalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="vm.clickAction(action, $mdOpenMenu);" tabindex="-1" ng-hide="vm.isHidden(action)" aria-label="{{ action.title | translate }}"><div class="pip-primary-actions-badge" ng-show="action.count > 0">{{ vm.actionCount(action) }}</div><md-icon md-svg-icon="{{ action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="vm.isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="vm.clickAction(subAction)">{{ ::subAction.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in vm.config.primaryGlobalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="vm.clickAction(action, $mdOpenMenu);" ng-hide="vm.isHidden(action)" tabindex="-1" aria-label="{{ action.title | translate }}"><div class="pip-primary-actions-badge color-badge-bg" ng-show="action.count > 0">{{ vm.actionCount(action) }}</div><md-icon md-svg-icon="{{ action.icon }}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="vm.isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="vm.clickAction(subAction)">{{ subAction.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div>');
 }]);
@@ -10573,18 +10684,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('actions/SecondaryActions.html',
     '<md-menu ng-if="vm.secondaryActionsVisible()" md-position-mode="target-right target"><md-button class="md-icon-button" tabindex="3" ng-init="vm.getMenu($mdOpenMenu)" ng-click="vm.onSecondaryActionClick(); vm.openMenu($mdOpenMenu, $event);" aria-label="open actions"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="action in vm.config.secondaryLocalActions" ng-if="!action.divider" ng-hide="vm.isHidden(action)"><md-button ng-hide="action.divider" ng-click="vm.clickAction(action)">{{ ::action.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider><md-menu-divider ng-if="vm.secondaryDividerVisible()"></md-menu-divider><md-menu-item ng-repeat-start="action in vm.config.secondaryGlobalActions" ng-if="!action.divider" ng-hide="vm.isHidden(action)"><md-button ng-hide="action.divider" ng-click="vm.clickAction(action)">{{ ::action.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('appbar/AppBar.html',
-    '<md-toolbar class="{{ vm.config.classes.join(\' \') }}" ng-if="vm.config.visible" ng-transclude=""></md-toolbar>');
 }]);
 })();
 
@@ -10655,8 +10754,20 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('sidenav/SideNav.html',
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="vm.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('menu/NavMenu.html',
-    '<div ng-if="sections && sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" tabindex="-1" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{section.icon}}" ng-if="sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" ng-repeat="link in section.links" tabindex="-1" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-click="clickLink($event, link)"><md-tooltip md-visible="showTooltip" md-direction="right">{{::link.tooltipText | translate}}</md-tooltip><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-if="!(sideNavState.showIconTooltype && !link.tooltipText && !expanded)" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"></md-icon><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" ng-if="sideNavState.showIconTooltype && !link.tooltipText && !expanded" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::link.tooltipText || link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{link.count}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
+    '<div ng-if="vm.sections && vm.sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="vm.onExpand()" ng-disabled="!vm.isCollapsed" tabindex="-1" ng-if="vm.expandedButton"><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-left" ng-if="vm.expanded"></md-icon><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-right" ng-if="!vm.expanded"></md-icon></md-list-item><md-divider ng-show="vm.expandedButton"></md-divider><div class="pip-section" ng-repeat="section in vm.sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !vm.isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="vm.expanded" class="pip-sticky-nav-menu-title section-title">{{ ::section.title | translate }}</span><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="!vm.sideNavState.showIconTooltype && !vm.expanded && section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="vm.sideNavState.showIconTooltype && !vm.expanded && section.icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ vm.defaultIcon }}" ng-if="!vm.sideNavState.showIconTooltype && !vm.expanded && !section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ vm.defaultIcon }}" ng-if="vm.sideNavState.showIconTooltype && !vm.expanded && !section.icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" tabindex="-1" ng-repeat="link in section.links" ng-class="{\'active\': vm.isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-click="vm.clickLink($event, link)"><md-tooltip md-visible="showTooltip" md-direction="right">{{ ::link.tooltipText | translate }}</md-tooltip><div class="pip-sticky-nav-menu-icon-block"><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-if="!(vm.sideNavState.showIconTooltype && !link.tooltipText && !vm.expanded)" ng-hide="!link.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-hide="!link.icon" ng-if="vm.sideNavState.showIconTooltype && !link.tooltipText && !vm.expanded"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::link.tooltipText || link.title | translate }}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{ ::link.title | translate }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{ link.count }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
 }]);
 })();
 
@@ -10669,18 +10780,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('search/SearchBar.html',
     '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('sidenav/SideNav.html',
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="vm.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
 }]);
 })();
 
@@ -12161,8 +12260,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="$ctrl.showError && $ctrl.error_details && $ctrl.error_details.message"><div ng-if="$ctrl.error_details.code">Code: {{$ctrl.error_details.code}}</div><div ng-if="$ctrl.error_details.message">Description: {{$ctrl.error_details.message}}</div><div ng-if="$ctrl.error_details.status">HTTP status: {{$ctrl.error_details.status}}</div><div ng-if="$ctrl.error_details.server_stacktrace">Server stacktrace: {{$ctrl.error_details.server_stacktrace}}</div><div ng-if="$ctrl.error_details.client_stacktrace">Client stacktrace stacktrace: {{$ctrl.error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="$ctrl.isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="$ctrl.onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48" ng-if="$ctrl.error_details && $ctrl.error_details.status"><md-button aria-label="DETAILS" class="md-accent" ng-click="$ctrl.onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div></div>');
+  $templateCache.put('unsupported/unsupported.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$ctrl.media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$ctrl.media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div></div>');
 }]);
 })();
 
@@ -12173,8 +12272,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unsupported/unsupported.html',
-    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$ctrl.media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$ctrl.media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div></div>');
+  $templateCache.put('unknown/unknown.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="$ctrl.showError && $ctrl.error_details && $ctrl.error_details.message"><div ng-if="$ctrl.error_details.code">Code: {{$ctrl.error_details.code}}</div><div ng-if="$ctrl.error_details.message">Description: {{$ctrl.error_details.message}}</div><div ng-if="$ctrl.error_details.status">HTTP status: {{$ctrl.error_details.status}}</div><div ng-if="$ctrl.error_details.server_stacktrace">Server stacktrace: {{$ctrl.error_details.server_stacktrace}}</div><div ng-if="$ctrl.error_details.client_stacktrace">Client stacktrace stacktrace: {{$ctrl.error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="$ctrl.isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="$ctrl.onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48" ng-if="$ctrl.error_details && $ctrl.error_details.status"><md-button aria-label="DETAILS" class="md-accent" ng-click="$ctrl.onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div></div>');
 }]);
 })();
 
@@ -13886,10 +13985,6 @@ var FileFailController = (function () {
     function FileFailController($scope) {
         "ngInject";
         var _this = this;
-        this.type = $scope['type'] || 'file';
-        this.name = $scope['name'];
-        this.buttons = $scope['buttons'] || null;
-        this.error = $scope['error'] || null;
         $scope.$watch('error', function (error) {
             _this.error = error;
         });
@@ -13901,12 +13996,39 @@ exports.FileFailController = FileFailController;
 },{}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var FileFailController_1 = require("./FileFailController");
+var FileFailBindings = {
+    buttons: '<?pipButtons',
+    name: '<pipName',
+    type: '<?pipType',
+    error: '<pipError'
+};
+var FileFailChanges = (function () {
+    function FileFailChanges() {
+    }
+    return FileFailChanges;
+}());
+exports.FileFailChanges = FileFailChanges;
+var fileFailComponent = {
+    controller: FileFailController_1.FileFailController,
+    bindings: FileFailBindings,
+    templateUrl: 'fail/FileFail.html'
+};
+(function () {
+    angular
+        .module('pipFiles.FailUpload', [])
+        .component('pipFailUpload', fileFailComponent);
+})();
+
+},{"./FileFailController":3}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileSelectController_1 = require("./select/FileSelectController");
-var FileFailController_1 = require("./fail/FileFailController");
 var FileUploadService_1 = require("./service/FileUploadService");
 require("./success/index");
 require("./upload/index");
 require("./start/index");
+require("./fail/index");
 (function () {
     fileModelDirective.$inject = ['$parse'];
     function fileModelDirective($parse) {
@@ -13936,30 +14058,19 @@ require("./start/index");
             templateUrl: 'select/FileSelect.html'
         };
     }
-    function fileFailDirective() {
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: FileFailController_1.FileFailController,
-            controllerAs: 'vm',
-            scope: {
-                buttons: '=?pipButtons',
-                name: '=pipName',
-                type: '=?pipType',
-                error: '=pipError'
-            },
-            templateUrl: 'fail/FileFail.html'
-        };
-    }
     angular
-        .module('pipFiles', ['pipFiles.SuccessUpload', 'pipFiles.FileUpload', 'pipFiles.StartUpload'])
+        .module('pipFiles', [
+        'pipFiles.SuccessUpload',
+        'pipFiles.FileUpload',
+        'pipFiles.StartUpload',
+        'pipFiles.FailUpload'
+    ])
         .directive('fileModel', fileModelDirective)
         .directive('pipFileSelect', fileSelectDirective)
-        .directive('pipFailUpload', fileFailDirective)
         .service('pipFileUpload', FileUploadService_1.FileUploadService);
 })();
 
-},{"./fail/FileFailController":3,"./select/FileSelectController":5,"./service/FileUploadService":6,"./start/index":8,"./success/index":10,"./upload/index":12}],5:[function(require,module,exports){
+},{"./fail/index":4,"./select/FileSelectController":6,"./service/FileUploadService":7,"./start/index":9,"./success/index":11,"./upload/index":13}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileSelectController = (function () {
@@ -13983,7 +14094,7 @@ var FileSelectController = (function () {
 }());
 exports.FileSelectController = FileSelectController;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState = (function () {
@@ -14033,7 +14144,7 @@ var FileUploadService = (function () {
 }());
 exports.FileUploadService = FileUploadService;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileStartController = (function () {
@@ -14050,7 +14161,7 @@ var FileStartController = (function () {
 }());
 exports.FileStartController = FileStartController;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileStartController_1 = require("./FileStartController");
@@ -14073,7 +14184,7 @@ var FileStartController_1 = require("./FileStartController");
         .component('pipStartUpload', fileStartDirective);
 })();
 
-},{"./FileStartController":7}],9:[function(require,module,exports){
+},{"./FileStartController":8}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileSuccessController = (function () {
@@ -14085,7 +14196,7 @@ var FileSuccessController = (function () {
 }());
 exports.FileSuccessController = FileSuccessController;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileSuccessController_1 = require("./FileSuccessController");
@@ -14108,7 +14219,7 @@ var FileSuccessBindings = {
         .component('pipSuccesUpload', fileSuccessDirective);
 })();
 
-},{"./FileSuccessController":9}],11:[function(require,module,exports){
+},{"./FileSuccessController":10}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadButtons = (function () {
@@ -14161,7 +14272,7 @@ var FileUploadController = (function () {
 }());
 exports.FileUploadController = FileUploadController;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadController_1 = require("./FileUploadController");
@@ -14191,7 +14302,7 @@ var fileUploadDirective = {
         .component('pipFileUpload', fileUploadDirective);
 })();
 
-},{"./FileUploadController":11}],13:[function(require,module,exports){
+},{"./FileUploadController":12}],14:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipFiles.Templates');
@@ -14200,7 +14311,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('fail/FileFail.html',
-    '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon color-badge-bg"><md-icon md-svg-icon="icons:cross"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title">Uploading {{vm.type}} failed with errors!</h3><div class="color-secondary-text pip-subtitle">{{vm.name}}</div><div class="color-error pip-error">{{vm.error}}</div></div></div></div><div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0"><div><md-button class="md-accent" ng-repeat="fail in vm.buttons" ng-click="fail.click()">{{::fail.title}}</md-button></div></div></div>');
+    '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon color-badge-bg"><md-icon md-svg-icon="icons:cross"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title">Uploading {{$ctrl.type}} failed with errors!</h3><div class="color-secondary-text pip-subtitle">{{$ctrl.name}}</div><div class="color-error pip-error">{{$ctrl.error}}</div></div></div></div><div class="pip-footer layout-row layout-align-end-center" ng-if="$ctrl.buttons && $ctrl.buttons.length > 0"><div><md-button class="md-accent" ng-repeat="fail in $ctrl.buttons" ng-click="fail.click()">{{::fail.title}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -14254,7 +14365,7 @@ module.run(['$templateCache', function($templateCache) {
 
 
 
-},{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
+},{}]},{},[14,1,2,3,4,5,6,7,8,9,10,11,12,13])(14)
 });
 
 
@@ -14264,251 +14375,238 @@ module.run(['$templateCache', function($templateCache) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./widgets/Widgets");
 require("./draggable/Draggable");
-(function () {
-    'use strict';
-    angular.module('pipDashboard', [
-        'pipWidget',
-        'pipDragged',
-        'pipWidgetConfigDialog',
-        'pipAddDashboardComponentDialog',
-        'pipDashboard.Templates',
-        'pipLayout',
-        'pipLocations',
-        'pipDateTime',
-        'pipCharts',
-        'pipTranslate',
-        'pipControls'
-    ]);
-})();
+angular.module('pipDashboard', [
+    'pipWidget',
+    'pipDragged',
+    'pipWidgetConfigDialog',
+    'pipAddDashboardComponentDialog',
+    'pipDashboard.Templates',
+    'pipLayout',
+    'pipLocations',
+    'pipDateTime',
+    'pipCharts',
+    'pipTranslate',
+    'pipControls'
+]);
 require("./utility/WidgetTemplateUtility");
 require("./dialogs/widget_config/ConfigDialogController");
 require("./dialogs/add_component/AddComponentDialogController");
-require("./DashboardController");
 require("./DashboardComponent");
 
-},{"./DashboardComponent":2,"./DashboardController":3,"./dialogs/add_component/AddComponentDialogController":4,"./dialogs/widget_config/ConfigDialogController":6,"./draggable/Draggable":9,"./utility/WidgetTemplateUtility":14,"./widgets/Widgets":15}],2:[function(require,module,exports){
-(function () {
-    'use strict';
+},{"./DashboardComponent":2,"./dialogs/add_component/AddComponentDialogController":3,"./dialogs/widget_config/ConfigDialogController":5,"./draggable/Draggable":8,"./utility/WidgetTemplateUtility":13,"./widgets/Widgets":15}],2:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+{
+    var setTranslations = function ($injector) {
+        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
+        if (pipTranslate) {
+            pipTranslate.setTranslations('en', {
+                DROP_TO_CREATE_NEW_GROUP: 'Drop here to create new group',
+            });
+            pipTranslate.setTranslations('ru', {
+                DROP_TO_CREATE_NEW_GROUP: 'Перетащите сюда для создания новой группы'
+            });
+        }
+    };
+    setTranslations.$inject = ['$injector'];
+    var configureAvailableWidgets = function (pipAddComponentDialogProvider) {
+        pipAddComponentDialogProvider.configWidgetList([
+            [{
+                    title: 'Event',
+                    icon: 'document',
+                    name: 'event',
+                    amount: 0
+                },
+                {
+                    title: 'Position',
+                    icon: 'location',
+                    name: 'position',
+                    amount: 0
+                }
+            ],
+            [{
+                    title: 'Calendar',
+                    icon: 'date',
+                    name: 'calendar',
+                    amount: 0
+                },
+                {
+                    title: 'Sticky Notes',
+                    icon: 'note-take',
+                    name: 'notes',
+                    amount: 0
+                },
+                {
+                    title: 'Statistics',
+                    icon: 'tr-statistics',
+                    name: 'statistics',
+                    amount: 0
+                }
+            ]
+        ]);
+    };
+    configureAvailableWidgets.$inject = ['pipAddComponentDialogProvider'];
+    var draggableOptions = (function () {
+        function draggableOptions() {
+        }
+        return draggableOptions;
+    }());
+    var DEFAULT_GRID_OPTIONS_1 = {
+        tileWidth: 150,
+        tileHeight: 150,
+        gutter: 10,
+        inline: false
+    };
+    var DashboardController = (function () {
+        function DashboardController($scope, $rootScope, $attrs, $element, $timeout, $interpolate, pipAddComponentDialog, pipWidgetTemplate) {
+            var _this = this;
+            this.$rootScope = $rootScope;
+            this.$attrs = $attrs;
+            this.$element = $element;
+            this.$timeout = $timeout;
+            this.$interpolate = $interpolate;
+            this.pipAddComponentDialog = pipAddComponentDialog;
+            this.pipWidgetTemplate = pipWidgetTemplate;
+            this.defaultGroupMenuActions = [{
+                    title: 'Add Component',
+                    callback: function (groupIndex) {
+                        _this.addComponent(groupIndex);
+                    }
+                },
+                {
+                    title: 'Remove',
+                    callback: function (groupIndex) {
+                        _this.removeGroup(groupIndex);
+                    }
+                },
+                {
+                    title: 'Configurate',
+                    callback: function (groupIndex) {
+                        console.log('configurate group with index:', groupIndex);
+                    }
+                }
+            ];
+            this._includeTpl = '<pip-{{ type }}-widget group="groupIndex" index="index"' +
+                'pip-options="$parent.$ctrl.groupedWidgets[groupIndex][\'source\'][index].opts">' +
+                '</pip-{{ type }}-widget>';
+            this.groupMenuActions = this.defaultGroupMenuActions;
+            this.removeGroup = function (groupIndex) {
+                console.log('removeGroup', groupIndex);
+                _this.groupedWidgets.splice(groupIndex, 1);
+            };
+            $element.addClass('pip-scroll');
+            this.draggableGridOptions = this.gridOptions || DEFAULT_GRID_OPTIONS_1;
+            if (this.draggableGridOptions.inline === true) {
+                $element.addClass('inline-grid');
+            }
+            if (this.groupAdditionalActions)
+                angular.extend(this.groupMenuActions, this.groupAdditionalActions);
+            this.widgetsContext = $scope;
+            this.compileWidgets();
+            this.$timeout(function () {
+                _this.$element.addClass('visible');
+            }, 700);
+        }
+        DashboardController.prototype.compileWidgets = function () {
+            var _this = this;
+            _.each(this.groupedWidgets, function (group, groupIndex) {
+                group.removedWidgets = group.removedWidgets || [],
+                    group.source = group.source.map(function (widget, index) {
+                        widget.size = widget.size || {
+                            colSpan: 1,
+                            rowSpan: 1
+                        };
+                        widget.index = index;
+                        widget.groupIndex = groupIndex;
+                        widget.menu = widget.menu || {};
+                        angular.extend(widget.menu, [{
+                                title: 'Remove',
+                                click: function (item, params, object) {
+                                    _this.removeWidget(item, params, object);
+                                }
+                            }]);
+                        return {
+                            opts: widget,
+                            template: _this.pipWidgetTemplate.getTemplate(widget, _this._includeTpl)
+                        };
+                    });
+            });
+        };
+        DashboardController.prototype.addComponent = function (groupIndex) {
+            var _this = this;
+            this.pipAddComponentDialog
+                .show(this.groupedWidgets, groupIndex)
+                .then(function (data) {
+                var activeGroup;
+                if (!data) {
+                    return;
+                }
+                if (data.groupIndex !== -1) {
+                    activeGroup = _this.groupedWidgets[data.groupIndex];
+                }
+                else {
+                    activeGroup = {
+                        title: 'New group',
+                        source: []
+                    };
+                }
+                _this.addWidgets(activeGroup.source, data.widgets);
+                if (data.groupIndex === -1) {
+                    _this.groupedWidgets.push(activeGroup);
+                }
+                _this.compileWidgets();
+            });
+        };
+        ;
+        DashboardController.prototype.addWidgets = function (group, widgets) {
+            widgets.forEach(function (widgetGroup) {
+                widgetGroup.forEach(function (widget) {
+                    if (widget.amount) {
+                        Array.apply(null, Array(widget.amount)).forEach(function () {
+                            group.push({
+                                type: widget.name
+                            });
+                        });
+                    }
+                });
+            });
+        };
+        DashboardController.prototype.removeWidget = function (item, params, object) {
+            var _this = this;
+            this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
+            this.groupedWidgets[params.options.groupIndex].removedWidgets.push(params.options.index);
+            this.groupedWidgets[params.options.groupIndex].source.splice(params.options.index, 1);
+            this.$timeout(function () {
+                _this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
+            });
+        };
+        return DashboardController;
+    }());
     var pipDashboard = {
         bindings: {
             gridOptions: '=pipGridOptions',
             groupAdditionalActions: '=pipGroupActions',
             groupedWidgets: '=pipGroups'
         },
-        controller: 'pipDashboardCtrl',
-        controllerAs: 'dashboardCtrl',
+        controller: DashboardController,
         templateUrl: 'Dashboard.html'
     };
     angular
         .module('pipDashboard')
+        .config(configureAvailableWidgets)
+        .config(setTranslations)
         .component('pipDashboard', pipDashboard);
-})();
+}
 
 },{}],3:[function(require,module,exports){
-'use strict';
-configureAvailableWidgets.$inject = ['pipAddComponentDialogProvider'];
-setTranslations.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
-function setTranslations($injector) {
-    var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
-    if (pipTranslate) {
-        pipTranslate.setTranslations('en', {
-            DROP_TO_CREATE_NEW_GROUP: 'Drop here to create new group',
-        });
-        pipTranslate.setTranslations('ru', {
-            DROP_TO_CREATE_NEW_GROUP: 'Перетащите сюда для создания новой группы'
-        });
-    }
-}
-function configureAvailableWidgets(pipAddComponentDialogProvider) {
-    pipAddComponentDialogProvider.configWidgetList([
-        [{
-                title: 'Event',
-                icon: 'document',
-                name: 'event',
-                amount: 0
-            },
-            {
-                title: 'Position',
-                icon: 'location',
-                name: 'position',
-                amount: 0
-            }
-        ],
-        [{
-                title: 'Calendar',
-                icon: 'date',
-                name: 'calendar',
-                amount: 0
-            },
-            {
-                title: 'Sticky Notes',
-                icon: 'note-take',
-                name: 'notes',
-                amount: 0
-            },
-            {
-                title: 'Statistics',
-                icon: 'tr-statistics',
-                name: 'statistics',
-                amount: 0
-            }
-        ]
-    ]);
-}
-var draggableOptions = (function () {
-    function draggableOptions() {
-    }
-    return draggableOptions;
-}());
-var DEFAULT_GRID_OPTIONS = {
-    tileWidth: 150,
-    tileHeight: 150,
-    gutter: 10,
-    inline: false
-};
-var DashboardController = (function () {
-    DashboardController.$inject = ['$scope', '$rootScope', '$attrs', '$element', '$timeout', '$interpolate', 'pipAddComponentDialog', 'pipWidgetTemplate'];
-    function DashboardController($scope, $rootScope, $attrs, $element, $timeout, $interpolate, pipAddComponentDialog, pipWidgetTemplate) {
-        var _this = this;
-        this.defaultGroupMenuActions = [{
-                title: 'Add Component',
-                callback: function (groupIndex) {
-                    _this.addComponent(groupIndex);
-                }
-            },
-            {
-                title: 'Remove',
-                callback: function (groupIndex) {
-                    _this.removeGroup(groupIndex);
-                }
-            },
-            {
-                title: 'Configurate',
-                callback: function (groupIndex) {
-                    console.log('configurate group with index:', groupIndex);
-                }
-            }
-        ];
-        this._includeTpl = '<pip-{{ type }}-widget group="groupIndex" index="index"' +
-            'pip-options="$parent.dashboardCtrl.groupedWidgets[groupIndex][\'source\'][index].opts">' +
-            '</pip-{{ type }}-widget>';
-        this.groupMenuActions = this.defaultGroupMenuActions;
-        this.removeGroup = function (groupIndex) {
-            console.log('removeGroup', groupIndex);
-            _this.groupedWidgets.splice(groupIndex, 1);
-        };
-        this._$scope = $scope;
-        this._$rootScope = $rootScope;
-        this._$attrs = $attrs;
-        this._$element = $element;
-        this._$timeout = $timeout;
-        this._$interpolate = $interpolate;
-        this._pipAddComponentDialog = pipAddComponentDialog;
-        this._pipWidgetTemplate = pipWidgetTemplate;
-        $element.addClass('pip-scroll');
-        this.draggableGridOptions = $scope['gridOptions'] || DEFAULT_GRID_OPTIONS;
-        if (this.draggableGridOptions.inline === true) {
-            $element.addClass('inline-grid');
-        }
-        if ($scope['groupAdditionalActions'])
-            angular.extend(this.groupMenuActions, $scope['groupAdditionalActions']);
-        this.widgetsContext = $scope;
-        this.compileWidgets();
-        this._$timeout(function () {
-            _this._$element.addClass('visible');
-        }, 700);
-    }
-    DashboardController.prototype.compileWidgets = function () {
-        var _this = this;
-        _.each(this.groupedWidgets, function (group, groupIndex) {
-            group.removedWidgets = group.removedWidgets || [],
-                group.source = group.source.map(function (widget, index) {
-                    widget.size = widget.size || {
-                        colSpan: 1,
-                        rowSpan: 1
-                    };
-                    widget.index = index;
-                    widget.groupIndex = groupIndex;
-                    widget.menu = widget.menu || {};
-                    angular.extend(widget.menu, [{
-                            title: 'Remove',
-                            click: function (item, params, object) {
-                                _this.removeWidget(item, params, object);
-                            }
-                        }]);
-                    return {
-                        opts: widget,
-                        template: _this._pipWidgetTemplate.getTemplate(widget, _this._includeTpl)
-                    };
-                });
-        });
-    };
-    DashboardController.prototype.addComponent = function (groupIndex) {
-        var _this = this;
-        this._pipAddComponentDialog
-            .show(this.groupedWidgets, groupIndex)
-            .then(function (data) {
-            var activeGroup;
-            if (!data) {
-                return;
-            }
-            if (data.groupIndex !== -1) {
-                activeGroup = _this.groupedWidgets[data.groupIndex];
-            }
-            else {
-                activeGroup = {
-                    title: 'New group',
-                    source: []
-                };
-            }
-            _this.addWidgets(activeGroup.source, data.widgets);
-            if (data.groupIndex === -1) {
-                _this.groupedWidgets.push(activeGroup);
-            }
-            _this.compileWidgets();
-        });
-    };
-    ;
-    DashboardController.prototype.addWidgets = function (group, widgets) {
-        widgets.forEach(function (widgetGroup) {
-            widgetGroup.forEach(function (widget) {
-                if (widget.amount) {
-                    Array.apply(null, Array(widget.amount)).forEach(function () {
-                        group.push({
-                            type: widget.name
-                        });
-                    });
-                }
-            });
-        });
-    };
-    DashboardController.prototype.removeWidget = function (item, params, object) {
-        var _this = this;
-        this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
-        this.groupedWidgets[params.options.groupIndex].removedWidgets.push(params.options.index);
-        this.groupedWidgets[params.options.groupIndex].source.splice(params.options.index, 1);
-        this._$timeout(function () {
-            _this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
-        });
-    };
-    return DashboardController;
-}());
-angular
-    .module('pipDashboard')
-    .config(configureAvailableWidgets)
-    .config(setTranslations)
-    .controller('pipDashboardCtrl', DashboardController);
-
-},{}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var widget = (function () {
-    function widget() {
+var AddComponentDialogWidget = (function () {
+    function AddComponentDialogWidget() {
     }
-    return widget;
+    return AddComponentDialogWidget;
 }());
-exports.widget = widget;
+exports.AddComponentDialogWidget = AddComponentDialogWidget;
 var AddComponentDialogController = (function () {
     function AddComponentDialogController(groups, activeGroupIndex, widgetList, $mdDialog) {
         this.activeGroupIndex = activeGroupIndex;
@@ -14550,14 +14648,12 @@ angular
     .module('pipAddDashboardComponentDialog', ['ngMaterial']);
 require("./AddComponentProvider");
 
-},{"./AddComponentProvider":5}],5:[function(require,module,exports){
+},{"./AddComponentProvider":4}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var AddComponentDialogController_1 = require("./AddComponentDialogController");
-(function () {
-    'use strict';
-    setTranslations.$inject = ['$injector'];
-    function setTranslations($injector) {
+{
+    var setTranslations = function ($injector) {
         var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
         if (pipTranslate) {
             pipTranslate.setTranslations('en', {
@@ -14571,13 +14667,14 @@ var AddComponentDialogController_1 = require("./AddComponentDialogController");
                 DASHBOARD_ADD_COMPONENT_DIALOG_CREATE_NEW_GROUP: 'Создать новую группу'
             });
         }
-    }
-    var AddComponentDialogService = (function () {
-        function AddComponentDialogService(widgetList, $mdDialog) {
+    };
+    setTranslations.$inject = ['$injector'];
+    var AddComponentDialogService_1 = (function () {
+        function AddComponentDialogService_1(widgetList, $mdDialog) {
             this.widgetList = widgetList;
             this.$mdDialog = $mdDialog;
         }
-        AddComponentDialogService.prototype.show = function (groups, activeGroupIndex) {
+        AddComponentDialogService_1.prototype.show = function (groups, activeGroupIndex) {
             var _this = this;
             return this.$mdDialog
                 .show({
@@ -14600,7 +14697,7 @@ var AddComponentDialogController_1 = require("./AddComponentDialogController");
             });
         };
         ;
-        return AddComponentDialogService;
+        return AddComponentDialogService_1;
     }());
     var AddComponentDialogProvider = (function () {
         function AddComponentDialogProvider() {
@@ -14612,7 +14709,7 @@ var AddComponentDialogController_1 = require("./AddComponentDialogController");
         AddComponentDialogProvider.prototype.$get = ['$mdDialog', function ($mdDialog) {
             "ngInject";
             if (this._service == null)
-                this._service = new AddComponentDialogService(this._widgetList, $mdDialog);
+                this._service = new AddComponentDialogService_1(this._widgetList, $mdDialog);
             return this._service;
         }];
         return AddComponentDialogProvider;
@@ -14621,9 +14718,9 @@ var AddComponentDialogController_1 = require("./AddComponentDialogController");
         .module('pipDashboard')
         .config(setTranslations)
         .provider('pipAddComponentDialog', AddComponentDialogProvider);
-})();
+}
 
-},{"./AddComponentDialogController":4}],6:[function(require,module,exports){
+},{"./AddComponentDialogController":3}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var TileColors = (function () {
@@ -14679,9 +14776,8 @@ angular
 require("./ConfigDialogService");
 require("./ConfigDialogExtendComponent");
 
-},{"./ConfigDialogExtendComponent":7,"./ConfigDialogService":8}],7:[function(require,module,exports){
-(function () {
-    'use strict';
+},{"./ConfigDialogExtendComponent":6,"./ConfigDialogService":7}],6:[function(require,module,exports){
+{
     var WidgetConfigExtendComponentBindings = {
         pipExtensionUrl: '<',
         pipDialogScope: '<',
@@ -14724,16 +14820,14 @@ require("./ConfigDialogExtendComponent");
     angular
         .module('pipWidgetConfigDialog')
         .component('pipWidgetConfigExtendComponent', pipWidgetConfigComponent);
-})();
+}
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var ConfigDialogController_1 = require("./ConfigDialogController");
-(function () {
-    'use strict';
-    setTranslations.$inject = ['$injector'];
-    function setTranslations($injector) {
+{
+    var setTranslations = function ($injector) {
         var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
         if (pipTranslate) {
             pipTranslate.setTranslations('en', {
@@ -14749,7 +14843,8 @@ var ConfigDialogController_1 = require("./ConfigDialogController");
                 DASHBOARD_WIDGET_CONFIG_DIALOG_SIZE_LARGE: 'Большой'
             });
         }
-    }
+    };
+    setTranslations.$inject = ['$injector'];
     var WidgetConfigDialogService = (function () {
         WidgetConfigDialogService.$inject = ['$mdDialog'];
         function WidgetConfigDialogService($mdDialog) {
@@ -14760,9 +14855,10 @@ var ConfigDialogController_1 = require("./ConfigDialogController");
                 targetEvent: params.event,
                 templateUrl: params.templateUrl || 'dialogs/widget_config/ConfigDialog.html',
                 controller: ConfigDialogController_1.WidgetConfigDialogController,
+                bindToController: true,
                 controllerAs: 'vm',
                 locals: {
-                    params: params
+                    params: params.locals
                 },
                 clickOutsideToClose: true
             })
@@ -14782,9 +14878,9 @@ var ConfigDialogController_1 = require("./ConfigDialogController");
         .module('pipWidgetConfigDialog')
         .config(setTranslations)
         .service('pipWidgetConfigDialogService', WidgetConfigDialogService);
-})();
+}
 
-},{"./ConfigDialogController":6}],9:[function(require,module,exports){
+},{"./ConfigDialogController":5}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipDragged', []);
@@ -14793,7 +14889,7 @@ require("./DraggableComponent");
 require("./draggable_group/DraggableTilesGroupService");
 require("./draggable_group/DraggableTilesGroupDirective");
 
-},{"./DraggableComponent":10,"./DraggableTileService":11,"./draggable_group/DraggableTilesGroupDirective":12,"./draggable_group/DraggableTilesGroupService":13}],10:[function(require,module,exports){
+},{"./DraggableComponent":9,"./DraggableTileService":10,"./draggable_group/DraggableTilesGroupDirective":11,"./draggable_group/DraggableTilesGroupService":12}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var DraggableTileService_1 = require("./DraggableTileService");
@@ -14824,8 +14920,8 @@ var DEFAULT_OPTIONS = {
             this.tileGroups = null;
             this.opts = _.merge({
                 mobileBreakpoint: pipMedia.breakpoints.xs
-            }, DEFAULT_OPTIONS, $scope['draggableCtrl'].options);
-            this.groups = $scope['draggableCtrl'].tilesTemplates.map(function (group, groupIndex) {
+            }, DEFAULT_OPTIONS, this.options);
+            this.groups = this.tilesTemplates.map(function (group, groupIndex) {
                 return {
                     title: group.title,
                     editingName: false,
@@ -14840,7 +14936,7 @@ var DEFAULT_OPTIONS = {
                     })
                 };
             });
-            $scope.$watch('draggableCtrl.tilesTemplates', function (newVal) {
+            $scope.$watch('$ctrl.tilesTemplates', function (newVal) {
                 _this.watch(newVal);
             }, true);
             this.initialize();
@@ -14857,7 +14953,7 @@ var DEFAULT_OPTIONS = {
             }, 50));
         }
         DraggableController.prototype.$postLink = function () {
-            this.$scope.$container = this.$element;
+            this.$container = this.$element;
         };
         DraggableController.prototype.watch = function (newVal) {
             var _this = this;
@@ -14919,7 +15015,7 @@ var DEFAULT_OPTIONS = {
             this.$timeout(function () {
                 group.editingName = false;
                 _this.$rootScope.$broadcast(exports.UPDATE_GROUPS_EVENT, _this.groups);
-                _this.$scope.draggableCtrl.tilesTemplates[group.index].title = group.title;
+                _this.tilesTemplates[group.index].title = group.title;
             }, 100);
         };
         DraggableController.prototype.onKyepressTitleInput = function (group, event) {
@@ -14930,8 +15026,8 @@ var DEFAULT_OPTIONS = {
         DraggableController.prototype.updateTilesTemplates = function (updateType, source) {
             switch (updateType) {
                 case 'addGroup':
-                    if (this.groups.length !== this.$scope.draggableCtrl.tilesTemplates.length) {
-                        this.$scope.draggableCtrl.tilesTemplates.push(source);
+                    if (this.groups.length !== this.tilesTemplates.length) {
+                        this.tilesTemplates.push(source);
                     }
                     break;
                 case 'moveTile':
@@ -14941,8 +15037,8 @@ var DEFAULT_OPTIONS = {
                         tileOptions: source.tile.opts.options,
                         fromTileIndex: source.tile.opts.options.index
                     }, fromIndex = _a.fromIndex, toIndex = _a.toIndex, tileOptions = _a.tileOptions, fromTileIndex = _a.fromTileIndex;
-                    this.$scope.draggableCtrl.tilesTemplates[fromIndex].source.splice(fromTileIndex, 1);
-                    this.$scope.draggableCtrl.tilesTemplates[toIndex].source.push({
+                    this.tilesTemplates[fromIndex].source.splice(fromTileIndex, 1);
+                    this.tilesTemplates[toIndex].source.push({
                         opts: tileOptions
                     });
                     this.reIndexTiles(source.from.elem);
@@ -14951,7 +15047,7 @@ var DEFAULT_OPTIONS = {
             }
         };
         DraggableController.prototype.createTileScope = function (tile) {
-            var tileScope = this.$rootScope.$new(false, this.$scope.draggableCtrl.tilesContext);
+            var tileScope = this.$rootScope.$new(false, this.tilesContext);
             tileScope.index = tile.opts.index == undefined ? tile.opts.options.index : tile.opts.index;
             tileScope.groupIndex = tile.opts.groupIndex == undefined ? tile.opts.options.groupIndex : tile.opts.groupIndex;
             return tileScope;
@@ -15069,7 +15165,7 @@ var DEFAULT_OPTIONS = {
             });
         };
         DraggableController.prototype.getContainerWidth = function () {
-            var container = this.$scope.$container || $('body');
+            var container = this.$container || $('body');
             return container.width();
         };
         DraggableController.prototype.getAvailableColumns = function (availableWidth) {
@@ -15259,7 +15355,7 @@ var DEFAULT_OPTIONS = {
                         _this.onDropLeaveListener(event);
                     }
                 });
-                _this.$scope['$container']
+                _this.$container
                     .on('mousedown touchstart', 'md-menu .md-icon-button', function () {
                     interact('.pip-draggable-tile').draggable(false);
                     $(_this).trigger('click');
@@ -15279,15 +15375,14 @@ var DEFAULT_OPTIONS = {
             groupMenuActions: '=pipGroupMenuActions'
         },
         templateUrl: 'draggable/Draggable.html',
-        controllerAs: 'draggableCtrl',
         controller: DraggableController
     };
     angular.module('pipDragged')
         .component('pipDraggableGrid', DragComponent);
 }
 
-},{"./DraggableTileService":11,"./draggable_group/DraggableTilesGroupService":13}],11:[function(require,module,exports){
-'use strict';
+},{"./DraggableTileService":10,"./draggable_group/DraggableTilesGroupService":12}],10:[function(require,module,exports){
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function IDragTileConstructor(constructor, options) {
     return new constructor(options);
@@ -15421,7 +15516,7 @@ angular
     };
 });
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 {
     function DraggableTileLink($scope, $elem, $attr) {
         var docFrag = document.createDocumentFragment(), group = $scope.$eval($attr.pipDraggableTiles);
@@ -15448,7 +15543,7 @@ angular
         .directive('pipDraggableTiles', DraggableTile);
 }
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function ITilesGridConstructor(constructor, tiles, options, columns, elem) {
@@ -15882,7 +15977,7 @@ angular
     };
 });
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 {
@@ -15953,13 +16048,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .directive('pipImageLoad', ImageLoad);
 }
 
+},{}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var DashboardWidget = (function () {
+    function DashboardWidget() {
+    }
+    return DashboardWidget;
+}());
+exports.DashboardWidget = DashboardWidget;
+
 },{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-(function () {
-    'use strict';
-    angular.module('pipWidget', []);
-})();
+angular.module('pipWidget', []);
 require("./calendar/WidgetCalendar");
 require("./event/WidgetEvent");
 require("./menu/WidgetMenuService");
@@ -15986,52 +16088,51 @@ var WidgetMenuService_1 = require("../menu/WidgetMenuService");
 {
     var CalendarWidgetController = (function (_super) {
         __extends(CalendarWidgetController, _super);
-        function CalendarWidgetController(pipWidgetMenu, $scope, pipWidgetConfigDialogService) {
+        function CalendarWidgetController(pipWidgetConfigDialogService) {
             var _this = _super.call(this) || this;
-            _this.color = 'blue';
-            _this._$scope = $scope;
-            _this._configDialog = pipWidgetConfigDialogService;
-            if (_this['options']) {
-                _this.menu = _this['options']['menu'] ? _.union(_this.menu, _this['options']['menu']) : _this.menu;
+            _this.pipWidgetConfigDialogService = pipWidgetConfigDialogService;
+            if (_this.options) {
+                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
                 _this.menu.push({
                     title: 'Configurate',
                     click: function () {
                         _this.onConfigClick();
                     }
                 });
-                _this['options'].date = _this['options'].date || new Date();
-                _this.color = _this['options'].color || _this.color;
+                _this.options.date = _this.options.date || new Date();
+                _this.color = _this.options.color || 'blue';
             }
             return _this;
         }
         CalendarWidgetController.prototype.onConfigClick = function () {
             var _this = this;
-            this._configDialog.show({
+            this.pipWidgetConfigDialogService.show({
                 dialogClass: 'pip-calendar-config',
-                color: this.color,
-                size: this['options'].size,
-                date: this['options'].date,
+                locals: {
+                    color: this.color,
+                    size: this.options.size,
+                    date: this.options.date,
+                },
                 extensionUrl: 'widgets/calendar/ConfigDialogExtension.html'
             }, function (result) {
-                _this.color = result.color;
-                _this['options'].color = result.color;
                 _this.changeSize(result.size);
-                _this['options'].date = result.date;
+                _this.color = result.color;
+                _this.options.color = result.color;
+                _this.options.date = result.date;
             });
         };
         return CalendarWidgetController;
     }(WidgetMenuService_1.MenuWidgetService));
-    var pipCalendarWidget = {
+    var CalendarWidget = {
         bindings: {
             options: '=pipOptions',
         },
         controller: CalendarWidgetController,
-        controllerAs: 'widgetCtrl',
         templateUrl: 'widgets/calendar/WidgetCalendar.html'
     };
     angular
         .module('pipWidget')
-        .component('pipCalendarWidget', pipCalendarWidget);
+        .component('pipCalendarWidget', CalendarWidget);
 }
 
 },{"../menu/WidgetMenuService":19}],17:[function(require,module,exports){
@@ -16048,112 +16149,119 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var WidgetMenuService_1 = require("../menu/WidgetMenuService");
-var EventWidgetController = (function (_super) {
-    __extends(EventWidgetController, _super);
-    function EventWidgetController(pipWidgetMenu, $scope, $element, $timeout, pipWidgetConfigDialogService) {
-        var _this = _super.call(this) || this;
-        _this.color = 'gray';
-        _this.opacity = 0.57;
-        _this._$scope = $scope;
-        _this._$element = $element;
-        _this._$timeout = $timeout;
-        _this._configDialog = pipWidgetConfigDialogService;
-        if (_this['options']) {
-            if (_this['options']['menu'])
-                _this.menu = _.union(_this.menu, _this['options']['menu']);
-        }
-        _this.menu.push({ title: 'Configurate', click: function () {
-                _this.onConfigClick();
-            } });
-        _this.color = _this['options'].color || _this.color;
-        _this.opacity = _this['options'].opacity || _this.opacity;
-        _this.drawImage();
-        $scope.$watch(function () { return $element.is(':visible'); }, function (newVal) {
+{
+    var EventWidgetController = (function (_super) {
+        __extends(EventWidgetController, _super);
+        function EventWidgetController($scope, $element, $timeout, pipWidgetConfigDialogService) {
+            var _this = _super.call(this) || this;
+            _this.$element = $element;
+            _this.$timeout = $timeout;
+            _this.pipWidgetConfigDialogService = pipWidgetConfigDialogService;
+            _this.opacity = 0.57;
+            if (_this.options) {
+                if (_this.options.menu)
+                    _this.menu = _.union(_this.menu, _this.options.menu);
+            }
+            _this.menu.push({
+                title: 'Configurate',
+                click: function () {
+                    _this.onConfigClick();
+                }
+            });
+            _this.color = _this.options.color || 'gray';
+            _this.opacity = _this.options.opacity || _this.opacity;
             _this.drawImage();
-        });
-        return _this;
-    }
-    EventWidgetController.prototype.drawImage = function () {
-        var _this = this;
-        if (this['options'].image) {
-            this._$timeout(function () {
-                _this.onImageLoad(_this._$element.find('img'));
-            }, 500);
+            $scope.$watch(function () {
+                return $element.is(':visible');
+            }, function (newVal) {
+                _this.drawImage();
+            });
+            return _this;
         }
-    };
-    EventWidgetController.prototype.onConfigClick = function () {
-        var _this = this;
-        this._oldOpacity = _.clone(this.opacity);
-        this._configDialog.show({
-            dialogClass: 'pip-calendar-config',
-            color: this.color,
-            size: this['options'].size || { colSpan: 1, rowSpan: 1 },
-            date: this['options'].date,
-            title: this['options'].title,
-            text: this['options'].text,
-            opacity: this.opacity,
-            onOpacitytest: function (opacity) {
-                _this.opacity = opacity;
-            },
-            extensionUrl: 'widgets/event/ConfigDialogExtension.html'
-        }, function (result) {
-            _this.color = result.color;
-            _this['options'].color = result.color;
-            _this.changeSize(result.size);
-            _this['options'].date = result.date;
-            _this['options'].title = result.title;
-            _this['options'].text = result.text;
-            _this['options'].opacity = result.opacity;
-        }, function () {
-            _this.opacity = _this._oldOpacity;
-        });
-    };
-    EventWidgetController.prototype.onImageLoad = function (image) {
-        this.setImageMarginCSS(this._$element.parent(), image);
-    };
-    EventWidgetController.prototype.changeSize = function (params) {
-        var _this = this;
-        this['options'].size.colSpan = params.sizeX;
-        this['options'].size.rowSpan = params.sizeY;
-        if (this['options'].image) {
-            this._$timeout(function () {
-                _this.setImageMarginCSS(_this._$element.parent(), _this._$element.find('img'));
-            }, 500);
-        }
-    };
-    EventWidgetController.prototype.setImageMarginCSS = function ($element, image) {
-        var containerWidth = $element.width ? $element.width() : $element.clientWidth, containerHeight = $element.height ? $element.height() : $element.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0, cssParams = {};
-        if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
-            margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
-            cssParams['margin-left'] = '' + margin + 'px';
-            cssParams['height'] = '' + containerHeight + 'px';
-            cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
-            cssParams['margin-top'] = '';
-        }
-        else {
-            margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
-            cssParams['margin-top'] = '' + margin + 'px';
-            cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
-            cssParams['width'] = '' + containerWidth + 'px';
-            cssParams['margin-left'] = '';
-        }
-        image.css(cssParams);
-    };
-    return EventWidgetController;
-}(WidgetMenuService_1.MenuWidgetService));
-(function () {
-    var pipEventWidget = {
+        EventWidgetController.prototype.drawImage = function () {
+            var _this = this;
+            if (this.options.image) {
+                this.$timeout(function () {
+                    _this.onImageLoad(_this.$element.find('img'));
+                }, 500);
+            }
+        };
+        EventWidgetController.prototype.onConfigClick = function () {
+            var _this = this;
+            this._oldOpacity = _.clone(this.opacity);
+            this.pipWidgetConfigDialogService.show({
+                dialogClass: 'pip-calendar-config',
+                locals: {
+                    color: this.color,
+                    size: this.options.size || {
+                        colSpan: 1,
+                        rowSpan: 1
+                    },
+                    date: this.options.date,
+                    title: this.options.title,
+                    text: this.options.text,
+                    opacity: this.opacity,
+                    onOpacitytest: function (opacity) {
+                        _this.opacity = opacity;
+                    }
+                },
+                extensionUrl: 'widgets/event/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.changeSize(result.size);
+                _this.color = result.color;
+                _this.options.color = result.color;
+                _this.options.date = result.date;
+                _this.options.title = result.title;
+                _this.options.text = result.text;
+                _this.options.opacity = result.opacity;
+            }, function () {
+                _this.opacity = _this._oldOpacity;
+            });
+        };
+        EventWidgetController.prototype.onImageLoad = function (image) {
+            this.setImageMarginCSS(this.$element.parent(), image);
+        };
+        EventWidgetController.prototype.changeSize = function (params) {
+            var _this = this;
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            if (this.options.image) {
+                this.$timeout(function () {
+                    _this.setImageMarginCSS(_this.$element.parent(), _this.$element.find('img'));
+                }, 500);
+            }
+        };
+        EventWidgetController.prototype.setImageMarginCSS = function ($element, image) {
+            var containerWidth = $element.width ? $element.width() : $element.clientWidth, containerHeight = $element.height ? $element.height() : $element.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0, cssParams = {};
+            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
+                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
+                cssParams['margin-left'] = '' + margin + 'px';
+                cssParams['height'] = '' + containerHeight + 'px';
+                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
+                cssParams['margin-top'] = '';
+            }
+            else {
+                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
+                cssParams['margin-top'] = '' + margin + 'px';
+                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
+                cssParams['width'] = '' + containerWidth + 'px';
+                cssParams['margin-left'] = '';
+            }
+            image.css(cssParams);
+        };
+        return EventWidgetController;
+    }(WidgetMenuService_1.MenuWidgetService));
+    var EventWidget = {
         bindings: {
             options: '=pipOptions'
         },
         controller: EventWidgetController,
-        controllerAs: 'widgetCtrl',
         templateUrl: 'widgets/event/WidgetEvent.html'
     };
     angular
         .module('pipWidget')
-        .component('pipEventWidget', pipEventWidget);
-})();
+        .component('pipEventWidget', EventWidget);
+}
 
 },{"../menu/WidgetMenuService":19}],18:[function(require,module,exports){
 (function () {
@@ -16171,12 +16279,24 @@ var EventWidgetController = (function (_super) {
 
 },{}],19:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var MenuWidgetService = (function () {
+var WidgetClass_1 = require("../WidgetClass");
+var MenuWidgetService = (function (_super) {
+    __extends(MenuWidgetService, _super);
     function MenuWidgetService() {
         "ngInject";
-        this.menu = [
-            {
+        var _this = _super.call(this) || this;
+        _this.menu = [{
                 title: 'Change Size',
                 action: angular.noop,
                 submenu: [{
@@ -16204,8 +16324,8 @@ var MenuWidgetService = (function () {
                         }
                     }
                 ]
-            }
-        ];
+            }];
+        return _this;
     }
     MenuWidgetService.prototype.callAction = function (actionName, params, item) {
         if (this[actionName]) {
@@ -16217,33 +16337,32 @@ var MenuWidgetService = (function () {
     };
     ;
     MenuWidgetService.prototype.changeSize = function (params) {
-        this['options'].size.colSpan = params.sizeX;
-        this['options'].size.rowSpan = params.sizeY;
+        this.options.size.colSpan = params.sizeX;
+        this.options.size.rowSpan = params.sizeY;
     };
     ;
     return MenuWidgetService;
-}());
+}(WidgetClass_1.DashboardWidget));
 exports.MenuWidgetService = MenuWidgetService;
-var MenuWidgetProvider = (function () {
-    function MenuWidgetProvider() {
-    }
-    MenuWidgetProvider.prototype.$get = function () {
-        "ngInject";
-        if (this._service == null)
-            this._service = new MenuWidgetService();
-        return this._service;
-    };
-    return MenuWidgetProvider;
-}());
-(function () {
-    'use strict';
+{
+    var MenuWidgetProvider = (function () {
+        function MenuWidgetProvider() {
+        }
+        MenuWidgetProvider.prototype.$get = function () {
+            "ngInject";
+            if (this._service == null)
+                this._service = new MenuWidgetService();
+            return this._service;
+        };
+        return MenuWidgetProvider;
+    }());
     angular
         .module('pipWidget')
         .provider('pipWidgetMenu', MenuWidgetProvider);
-})();
+}
 
-},{}],20:[function(require,module,exports){
-'use strict';
+},{"../WidgetClass":14}],20:[function(require,module,exports){
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -16256,52 +16375,56 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var WidgetMenuService_1 = require("../menu/WidgetMenuService");
-var NotesWidgetController = (function (_super) {
-    __extends(NotesWidgetController, _super);
-    function NotesWidgetController(pipWidgetMenu, $scope, pipWidgetConfigDialogService) {
-        var _this = _super.call(this) || this;
-        _this.color = 'orange';
-        _this._$scope = $scope;
-        _this._configDialog = pipWidgetConfigDialogService;
-        if (_this['options']) {
-            _this.menu = _this['options']['menu'] ? _.union(_this.menu, _this['options']['menu']) : _this.menu;
+{
+    var NotesWidgetController = (function (_super) {
+        __extends(NotesWidgetController, _super);
+        function NotesWidgetController(pipWidgetConfigDialogService) {
+            var _this = _super.call(this) || this;
+            _this.pipWidgetConfigDialogService = pipWidgetConfigDialogService;
+            if (_this.options) {
+                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
+            }
+            _this.menu.push({
+                title: 'Configurate',
+                click: function () {
+                    _this.onConfigClick();
+                }
+            });
+            _this.color = _this.options.color || 'orange';
+            return _this;
         }
-        _this.menu.push({ title: 'Configurate', click: function () {
-                _this.onConfigClick();
-            } });
-        _this.color = _this['options'].color || _this.color;
-        return _this;
-    }
-    NotesWidgetController.prototype.onConfigClick = function () {
-        var _this = this;
-        this._configDialog.show({
-            dialogClass: 'pip-calendar-config',
-            color: this.color,
-            size: this['options'].size,
-            title: this['options'].title,
-            text: this['options'].text,
-            extensionUrl: 'widgets/notes/ConfigDialogExtension.html'
-        }, function (result) {
-            _this.color = result.color;
-            _this['options'].color = result.color;
-            _this.changeSize(result.size);
-            _this['options'].text = result.text;
-            _this['options'].title = result.title;
-        });
+        NotesWidgetController.prototype.onConfigClick = function () {
+            var _this = this;
+            this.pipWidgetConfigDialogService.show({
+                dialogClass: 'pip-calendar-config',
+                locals: {
+                    color: this.color,
+                    size: this.options.size,
+                    title: this.options.title,
+                    text: this.options.text,
+                },
+                extensionUrl: 'widgets/notes/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.color = result.color;
+                _this.options.color = result.color;
+                _this.changeSize(result.size);
+                _this.options.text = result.text;
+                _this.options.title = result.title;
+            });
+        };
+        return NotesWidgetController;
+    }(WidgetMenuService_1.MenuWidgetService));
+    var NotesWidget = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: NotesWidgetController,
+        templateUrl: 'widgets/notes/WidgetNotes.html'
     };
-    return NotesWidgetController;
-}(WidgetMenuService_1.MenuWidgetService));
-var pipNotesWidget = {
-    bindings: {
-        options: '=pipOptions'
-    },
-    controller: NotesWidgetController,
-    controllerAs: 'widgetCtrl',
-    templateUrl: 'widgets/notes/WidgetNotes.html'
-};
-angular
-    .module('pipWidget')
-    .component('pipNotesWidget', pipNotesWidget);
+    angular
+        .module('pipWidget')
+        .component('pipNotesWidget', NotesWidget);
+}
 
 },{"../menu/WidgetMenuService":19}],21:[function(require,module,exports){
 'use strict';
@@ -16317,54 +16440,53 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var WidgetMenuService_1 = require("../menu/WidgetMenuService");
-var PictureSliderController = (function (_super) {
-    __extends(PictureSliderController, _super);
-    function PictureSliderController(pipWidgetMenu, $scope, $element, $timeout, pipWidgetConfigDialogService, pipWidgetTemplate) {
-        var _this = _super.call(this) || this;
-        _this.animationType = 'fading';
-        _this.animationInterval = 5000;
-        _this._$scope = $scope;
-        _this._configDialog = pipWidgetConfigDialogService;
-        _this._widgetUtility = pipWidgetTemplate;
-        _this._$element = $element;
-        _this._$timeout = $timeout;
-        if (_this['options']) {
-            _this.animationType = _this['options'].animationType || _this.animationType;
-            _this.animationInterval = _this['options'].animationInterval || _this.animationInterval;
+{
+    var PictureSliderController = (function (_super) {
+        __extends(PictureSliderController, _super);
+        function PictureSliderController($scope, $element, $timeout, pipWidgetConfigDialogService, pipWidgetTemplate) {
+            var _this = _super.call(this) || this;
+            _this.$scope = $scope;
+            _this.$element = $element;
+            _this.$timeout = $timeout;
+            _this.pipWidgetConfigDialogService = pipWidgetConfigDialogService;
+            _this.pipWidgetTemplate = pipWidgetTemplate;
+            _this.animationType = 'fading';
+            _this.animationInterval = 5000;
+            if (_this.options) {
+                _this.animationType = _this.options.animationType || _this.animationType;
+                _this.animationInterval = _this.options.animationInterval || _this.animationInterval;
+            }
+            return _this;
         }
-        return _this;
-    }
-    PictureSliderController.prototype.onImageLoad = function ($event) {
-        var _this = this;
-        this._$timeout(function () {
-            _this._widgetUtility.setImageMarginCSS(_this._$element.parent(), $event.target);
-        });
-    };
-    PictureSliderController.prototype.changeSize = function (params) {
-        var _this = this;
-        this['options'].size.colSpan = params.sizeX;
-        this['options'].size.rowSpan = params.sizeY;
-        this._$timeout(function () {
-            _.each(_this._$element.find('img'), function (image) {
-                _this._widgetUtility.setImageMarginCSS(_this._$element.parent(), image);
+        PictureSliderController.prototype.onImageLoad = function ($event) {
+            var _this = this;
+            this.$timeout(function () {
+                _this.pipWidgetTemplate.setImageMarginCSS(_this.$element.parent(), $event.target);
             });
-        }, 500);
+        };
+        PictureSliderController.prototype.changeSize = function (params) {
+            var _this = this;
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            this.$timeout(function () {
+                _.each(_this.$element.find('img'), function (image) {
+                    _this.pipWidgetTemplate.setImageMarginCSS(_this.$element.parent(), image);
+                });
+            }, 500);
+        };
+        return PictureSliderController;
+    }(WidgetMenuService_1.MenuWidgetService));
+    var PictureSliderWidget = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: PictureSliderController,
+        templateUrl: 'widgets/picture_slider/WidgetPictureSlider.html'
     };
-    return PictureSliderController;
-}(WidgetMenuService_1.MenuWidgetService));
-var pipPictureSliderWidget = {
-    bindings: {
-        options: '=pipOptions',
-        index: '=',
-        group: '='
-    },
-    controller: PictureSliderController,
-    templateUrl: 'widgets/picture_slider/WidgetPictureSlider.html',
-    controllerAs: 'widgetCtrl'
-};
-angular
-    .module('pipWidget')
-    .component('pipPictureSliderWidget', pipPictureSliderWidget);
+    angular
+        .module('pipWidget')
+        .component('pipPictureSliderWidget', PictureSliderWidget);
+}
 
 },{"../menu/WidgetMenuService":19}],22:[function(require,module,exports){
 "use strict";
@@ -16380,93 +16502,98 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var WidgetMenuService_1 = require("../menu/WidgetMenuService");
-var PositionWidgetController = (function (_super) {
-    __extends(PositionWidgetController, _super);
-    function PositionWidgetController(pipWidgetMenu, $scope, $timeout, $element, pipWidgetConfigDialogService, pipLocationEditDialog) {
-        var _this = _super.call(this) || this;
-        _this.showPosition = true;
-        _this._$scope = $scope;
-        _this._$timeout = $timeout;
-        _this._configDialog = pipWidgetConfigDialogService;
-        _this._locationDialog = pipLocationEditDialog;
-        if (_this['options']) {
-            if (_this['options']['menu'])
-                _this.menu = _.union(_this.menu, _this['options']['menu']);
-        }
-        _this.menu.push({
-            title: 'Configurate',
-            click: function () {
-                _this.onConfigClick();
-            }
-        });
-        _this.menu.push({
-            title: 'Change location',
-            click: function () {
-                _this.openLocationEditDialog();
-            }
-        });
-        _this['options'].location = _this['options'].location || _this['options'].position;
-        $scope.$watch('widgetCtrl.options.location', function () {
-            _this.reDrawPosition();
-        });
-        $scope.$watch(function () { return $element.is(':visible'); }, function (newVal) {
-            if (newVal == true)
-                _this.reDrawPosition();
-        });
-        return _this;
-    }
-    PositionWidgetController.prototype.onConfigClick = function () {
-        var _this = this;
-        this._configDialog.show({
-            dialogClass: 'pip-position-config',
-            size: this['options'].size,
-            locationName: this['options'].locationName,
-            hideColors: true,
-            extensionUrl: 'widgets/position/ConfigDialogExtension.html'
-        }, function (result) {
-            _this.changeSize(result.size);
-            _this['options'].locationName = result.locationName;
-        });
-    };
-    PositionWidgetController.prototype.changeSize = function (params) {
-        this['options'].size.colSpan = params.sizeX;
-        this['options'].size.rowSpan = params.sizeY;
-        this.reDrawPosition();
-    };
-    PositionWidgetController.prototype.openLocationEditDialog = function () {
-        var _this = this;
-        this._locationDialog.show({
-            locationName: this['options'].locationName,
-            locationPos: this['options'].location
-        }, function (newPosition) {
-            if (newPosition) {
-                _this['options'].location = newPosition.location;
-                _this['options'].locationName = newPosition.locatioName;
-            }
-        });
-    };
-    PositionWidgetController.prototype.reDrawPosition = function () {
-        var _this = this;
-        this.showPosition = false;
-        this._$timeout(function () {
+{
+    var PositionWidgetController = (function (_super) {
+        __extends(PositionWidgetController, _super);
+        function PositionWidgetController($scope, $timeout, $element, pipWidgetConfigDialogService, pipLocationEditDialog) {
+            var _this = _super.call(this) || this;
+            _this.$timeout = $timeout;
+            _this.$element = $element;
+            _this.pipWidgetConfigDialogService = pipWidgetConfigDialogService;
+            _this.pipLocationEditDialog = pipLocationEditDialog;
             _this.showPosition = true;
-        }, 50);
+            if (_this.options) {
+                if (_this.options.menu)
+                    _this.menu = _.union(_this.menu, _this.options.menu);
+            }
+            _this.menu.push({
+                title: 'Configurate',
+                click: function () {
+                    _this.onConfigClick();
+                }
+            });
+            _this.menu.push({
+                title: 'Change location',
+                click: function () {
+                    _this.openLocationEditDialog();
+                }
+            });
+            _this.options.location = _this.options.location || _this.options.position;
+            $scope.$watch('widgetCtrl.options.location', function () {
+                _this.reDrawPosition();
+            });
+            $scope.$watch(function () {
+                return $element.is(':visible');
+            }, function (newVal) {
+                if (newVal == true)
+                    _this.reDrawPosition();
+            });
+            return _this;
+        }
+        PositionWidgetController.prototype.onConfigClick = function () {
+            var _this = this;
+            this.pipWidgetConfigDialogService.show({
+                dialogClass: 'pip-position-config',
+                locals: {
+                    size: this.options.size,
+                    locationName: this.options.locationName,
+                    hideColors: true,
+                },
+                extensionUrl: 'widgets/position/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.changeSize(result.size);
+                _this.options.locationName = result.locationName;
+            });
+        };
+        PositionWidgetController.prototype.changeSize = function (params) {
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            this.reDrawPosition();
+        };
+        PositionWidgetController.prototype.openLocationEditDialog = function () {
+            var _this = this;
+            this.pipLocationEditDialog.show({
+                locationName: this.options.locationName,
+                locationPos: this.options.location
+            }, function (newPosition) {
+                if (newPosition) {
+                    _this.options.location = newPosition.location;
+                    _this.options.locationName = newPosition.locatioName;
+                }
+            });
+        };
+        PositionWidgetController.prototype.reDrawPosition = function () {
+            var _this = this;
+            this.showPosition = false;
+            this.$timeout(function () {
+                _this.showPosition = true;
+            }, 50);
+        };
+        return PositionWidgetController;
+    }(WidgetMenuService_1.MenuWidgetService));
+    var PositionWidget = {
+        bindings: {
+            options: '=pipOptions',
+            index: '=',
+            group: '='
+        },
+        controller: PositionWidgetController,
+        templateUrl: 'widgets/position/WidgetPosition.html'
     };
-    return PositionWidgetController;
-}(WidgetMenuService_1.MenuWidgetService));
-var pipPositionWidget = {
-    bindings: {
-        options: '=pipOptions',
-        index: '=',
-        group: '='
-    },
-    controller: PositionWidgetController,
-    controllerAs: 'widgetCtrl',
-    templateUrl: 'widgets/position/WidgetPosition.html'
-};
-angular
-    .module('pipWidget')
-    .component('pipPositionWidget', pipPositionWidget);
+    angular
+        .module('pipWidget')
+        .component('pipPositionWidget', PositionWidget);
+}
 
 },{"../menu/WidgetMenuService":19}],23:[function(require,module,exports){
 "use strict";
@@ -16482,52 +16609,49 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var WidgetMenuService_1 = require("../menu/WidgetMenuService");
-var SMALL_CHART = 70;
-var BIG_CHART = 250;
-var StatisticsWidgetController = (function (_super) {
-    __extends(StatisticsWidgetController, _super);
-    function StatisticsWidgetController(pipWidgetMenu, $scope, $timeout) {
-        var _this = _super.call(this) || this;
-        _this.reset = false;
-        _this.chartSize = SMALL_CHART;
-        _this._$scope = $scope;
-        _this._$timeout = $timeout;
-        if (_this['options']) {
-            _this.menu = _this['options']['menu'] ? _.union(_this.menu, _this['options']['menu']) : _this.menu;
-        }
-        _this.setChartSize();
-        return _this;
-    }
-    StatisticsWidgetController.prototype.changeSize = function (params) {
-        var _this = this;
-        this['options'].size.colSpan = params.sizeX;
-        this['options'].size.rowSpan = params.sizeY;
-        this.reset = true;
-        this.setChartSize();
-        this._$timeout(function () {
+{
+    var SMALL_CHART_1 = 70;
+    var BIG_CHART_1 = 250;
+    var StatisticsWidgetController = (function (_super) {
+        __extends(StatisticsWidgetController, _super);
+        function StatisticsWidgetController(pipWidgetMenu, $scope, $timeout) {
+            var _this = _super.call(this) || this;
             _this.reset = false;
-        }, 500);
-    };
-    StatisticsWidgetController.prototype.setChartSize = function () {
-        this.chartSize = this['options'].size.colSpan == 2 && this['options'].size.rowSpan == 2 ? BIG_CHART : SMALL_CHART;
-    };
-    return StatisticsWidgetController;
-}(WidgetMenuService_1.MenuWidgetService));
-(function () {
-    'use strict';
-    var pipStatisticsWidget = {
+            _this.chartSize = SMALL_CHART_1;
+            _this._$scope = $scope;
+            _this._$timeout = $timeout;
+            if (_this.options) {
+                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
+            }
+            _this.setChartSize();
+            return _this;
+        }
+        StatisticsWidgetController.prototype.changeSize = function (params) {
+            var _this = this;
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            this.reset = true;
+            this.setChartSize();
+            this._$timeout(function () {
+                _this.reset = false;
+            }, 500);
+        };
+        StatisticsWidgetController.prototype.setChartSize = function () {
+            this.chartSize = this.options.size.colSpan == 2 && this.options.size.rowSpan == 2 ? BIG_CHART_1 : SMALL_CHART_1;
+        };
+        return StatisticsWidgetController;
+    }(WidgetMenuService_1.MenuWidgetService));
+    var StatisticsWidget = {
         bindings: {
             options: '=pipOptions'
         },
-        bindToController: true,
         controller: StatisticsWidgetController,
-        controllerAs: 'widgetCtrl',
         templateUrl: 'widgets/statistics/WidgetStatistics.html'
     };
     angular
         .module('pipWidget')
-        .component('pipStatisticsWidget', pipStatisticsWidget);
-})();
+        .component('pipStatisticsWidget', StatisticsWidget);
+}
 
 },{"../menu/WidgetMenuService":19}],24:[function(require,module,exports){
 (function(module) {
@@ -16538,7 +16662,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('Dashboard.html',
-    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="dashboardCtrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="dashboardCtrl.groupedWidgets" pip-tiles-context="dashboardCtrl.widgetsContext" pip-draggable-grid="dashboardCtrl.draggableGridOptions" pip-group-menu-actions="dashboardCtrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
+    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="$ctrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="$ctrl.groupedWidgets" pip-tiles-context="$ctrl.widgetsContext" pip-draggable-grid="$ctrl.draggableGridOptions" pip-group-menu-actions="$ctrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
 }]);
 })();
 
@@ -16550,7 +16674,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('draggable/Draggable.html',
-    '<div class="pip-draggable-holder"><div class="pip-draggable-group" ng-repeat="group in draggableCtrl.groups" data-group-id="{{ $index }}" pip-draggable-tiles="group.source"><div class="pip-draggable-group-title layout-row layout-align-start-center"><div class="title-input-container" ng-click="draggableCtrl.onTitleClick(group, $event)"><input ng-if="group.editingName" ng-blur="draggableCtrl.onBlurTitleInput(group)" ng-keypress="draggableCtrl.onKyepressTitleInput(group, $event)" ng-model="group.title"><div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div></div><md-button class="md-icon-button flex-none layout-align-center-center" ng-show="group.editingName" ng-click="draggableCtrl.cancelEditing(group)" aria-label="Cancel"><md-icon md-svg-icon="icons:cross"></md-icon></md-button><md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName"><md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu"><md-icon md-svg-icon="icons:dots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="action in draggableCtrl.groupMenuActions"><md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button></md-menu-item></md-menu-content></md-menu></div></div><div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16"><div class="fict-group-text-container"><md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}</div></div></div>');
+    '<div class="pip-draggable-holder"><div class="pip-draggable-group" ng-repeat="group in $ctrl.groups" data-group-id="{{ $index }}" pip-draggable-tiles="group.source"><div class="pip-draggable-group-title layout-row layout-align-start-center"><div class="title-input-container" ng-click="$ctrl.onTitleClick(group, $event)"><input ng-if="group.editingName" ng-blur="$ctrl.onBlurTitleInput(group)" ng-keypress="$ctrl.onKyepressTitleInput(group, $event)" ng-model="group.title"><div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div></div><md-button class="md-icon-button flex-none layout-align-center-center" ng-show="group.editingName" ng-click="$ctrl.cancelEditing(group)" aria-label="Cancel"><md-icon md-svg-icon="icons:cross"></md-icon></md-button><md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName"><md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu"><md-icon md-svg-icon="icons:dots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="action in $ctrl.groupMenuActions"><md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button></md-menu-item></md-menu-content></md-menu></div></div><div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16"><div class="fict-group-text-container"><md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}</div></div></div>');
 }]);
 })();
 
@@ -16610,7 +16734,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/calendar/WidgetCalendar.html',
-    '<div class="widget-box pip-calendar-widget {{ widgetCtrl.color }} layout-column layout-fill tp0" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-end-center flex-none"><pip-menu-widget></pip-menu-widget></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1"><span class="date lm24 rm12">{{ widgetCtrl.options.date.getDate() }}</span><div class="flex-auto layout-column"><span class="weekday md-headline">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span> <span class="month-year md-headline">{{ widgetCtrl.options.date | formatLongMonth }} {{ widgetCtrl.options.date | formatYear }}</span></div></div><div class="widget-content flex-auto layout-column layout-align-space-around-center" ng-hide="widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1"><span class="weekday md-headline" ng-hide="widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span> <span class="weekday" ng-show="widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1">{{ widgetCtrl.options.date | formatLongDayOfWeek }}</span> <span class="date lm12 rm12">{{ widgetCtrl.options.date.getDate() }}</span> <span class="month-year md-headline">{{ widgetCtrl.options.date | formatLongMonth }} {{ widgetCtrl.options.date | formatYear }}</span></div></div>');
+    '<div class="widget-box pip-calendar-widget {{ $ctrl.color }} layout-column layout-fill tp0" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-end-center flex-none"><pip-menu-widget></pip-menu-widget></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="date lm24 rm12">{{ $ctrl.options.date.getDate() }}</span><div class="flex-auto layout-column"><span class="weekday md-headline">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div><div class="widget-content flex-auto layout-column layout-align-space-around-center" ng-hide="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="weekday md-headline" ng-hide="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="weekday" ng-show="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="date lm12 rm12">{{ $ctrl.options.date.getDate() }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div>');
 }]);
 })();
 
@@ -16635,7 +16759,19 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/event/WidgetEvent.html',
-    '<div class="widget-box pip-event-widget {{ widgetCtrl.color }} layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"><img ng-if="widgetCtrl.options.image" ng-src="{{widgetCtrl.options.image}}" alt="{{widgetCtrl.options.title || widgetCtrl.options.name}}"><div class="text-backdrop" style="background-color: rgba(0, 0, 0, {{ widgetCtrl.opacity }})"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><div class="text-container flex-auto pip-scroll"><p class="date flex-none" ng-if="widgetCtrl.options.date">{{ widgetCtrl.options.date | formatShortDate }}</p><p class="text flex-auto">{{ widgetCtrl.options.text || widgetCtrl.options.description }}</p></div></div></div>');
+    '<div class="widget-box pip-event-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><img ng-if="$ctrl.options.image" ng-src="{{$ctrl.options.image}}" alt="{{$ctrl.options.title || $ctrl.options.name}}"><div class="text-backdrop" style="background-color: rgba(0, 0, 0, {{ $ctrl.opacity }})"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-menu-widget ng-if="!$ctrl.options.hideMenu"></pip-menu-widget></div><div class="text-container flex-auto pip-scroll"><p class="date flex-none" ng-if="$ctrl.options.date">{{ $ctrl.options.date | formatShortDate }}</p><p class="text flex-auto">{{ $ctrl.options.text || $ctrl.options.description }}</p></div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('widgets/menu/WidgetMenu.html',
+    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -16660,19 +16796,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/notes/WidgetNotes.html',
-    '<div class="widget-box pip-notes-widget {{ widgetCtrl.color }} layout-column"><div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="widgetCtrl.options.title || widgetCtrl.options.name"><span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span></div><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget><div class="text-container flex-auto pip-scroll"><p>{{ widgetCtrl.options.text }}</p></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('widgets/menu/WidgetMenu.html',
-    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in widgetCtrl.menu"><md-button ng-if="!item.submenu" ng-click="widgetCtrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="widgetCtrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="widgetCtrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
+    '<div class="widget-box pip-notes-widget {{ $ctrl.color }} layout-column"><div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="$ctrl.options.title || $ctrl.options.name"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span></div><pip-menu-widget ng-if="!$ctrl.options.hideMenu"></pip-menu-widget><div class="text-container flex-auto pip-scroll"><p>{{ $ctrl.options.text }}</p></div></div>');
 }]);
 })();
 
@@ -16684,7 +16808,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/picture_slider/WidgetPictureSlider.html',
-    '<div class="widget-box pip-picture-slider-widget {{ widgetCtrl.color }} layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }" index="{{ widgetCtrl.index }}" group="{{ widgetCtrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ widgetCtrl.options.title }}</span><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="widgetCtrl.animationInterval" ng-if="widgetCtrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in widgetCtrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="widgetCtrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="widgetCtrl.animationInterval" ng-if="widgetCtrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in widgetCtrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="widgetCtrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
+    '<div class="widget-box pip-picture-slider-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ $ctrl.options.title }}</span><pip-menu-widget ng-if="!$ctrl.options.hideMenu"></pip-menu-widget></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
 }]);
 })();
 
@@ -16708,7 +16832,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/position/WidgetPosition.html',
-    '<div class="pip-position-widget widget-box p0 layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }" index="{{ widgetCtrl.index }}" group="{{ widgetCtrl.group }}"><div class="position-absolute-right-top" ng-if="!widgetCtrl.options.locationName"><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="widgetCtrl.options.locationName"><span class="flex text-overflow">{{ widgetCtrl.options.locationName }}</span><pip-menu-widget ng-if="!widgetCtrl.options.hideMenu"></pip-menu-widget></div><pip-location-map class="flex" ng-if="widgetCtrl.showPosition" pip-stretch="true" pip-rebind="true" pip-location-pos="widgetCtrl.options.location"></pip-location-map></div>');
+    '<div class="pip-position-widget widget-box p0 layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="position-absolute-right-top" ng-if="!$ctrl.options.locationName"><pip-menu-widget ng-if="!$ctrl.options.hideMenu"></pip-menu-widget></div><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="$ctrl.options.locationName"><span class="flex text-overflow">{{ $ctrl.options.locationName }}</span><pip-menu-widget ng-if="!$ctrl.options.hideMenu"></pip-menu-widget></div><pip-location-map class="flex" ng-if="$ctrl.showPosition" pip-stretch="true" pip-rebind="true" pip-location-pos="$ctrl.options.location"></pip-location-map></div>');
 }]);
 })();
 
@@ -16720,13 +16844,13 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('widgets/statistics/WidgetStatistics.html',
-    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: widgetCtrl.options.size.colSpan == 1 && widgetCtrl.options.size.rowSpan == 1, medium: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 1, big: widgetCtrl.options.size.colSpan == 2 && widgetCtrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ widgetCtrl.options.title || widgetCtrl.options.name }}</span><pip-menu-widget></pip-menu-widget></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="widgetCtrl.options.series && !widgetCtrl.reset"><pip-pie-chart pip-series="widgetCtrl.options.series" ng-if="!widgetCtrl.options.chartType || widgetCtrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="widgetCtrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
+    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-menu-widget></pip-menu-widget></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.series && !$ctrl.reset"><pip-pie-chart pip-series="$ctrl.options.series" ng-if="!$ctrl.options.chartType || $ctrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="$ctrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
 }]);
 })();
 
 
 
-},{}]},{},[24,1,2,3,4,5,6,7,8,12,13,9,10,11,14,16,17,18,19,20,21,22,23,15])(24)
+},{}]},{},[24,1,2,3,4,5,6,7,11,12,8,9,10,13,16,17,18,19,20,21,22,23,14,15])(24)
 });
 
 
@@ -16734,113 +16858,23 @@ module.run(['$templateCache', function($templateCache) {
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-require("./settings_service/index");
-require("./settings_page/index");
+require("./common/SettingsService");
+require("./page/index");
 angular.module('pipSettings', [
     'pipSettings.Service',
     'pipSettings.Page'
 ]);
 
-},{"./settings_page/index":4,"./settings_service/index":7}],2:[function(require,module,exports){
+},{"./common/SettingsService":5,"./page/index":8}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var SettingsPageSelectedTab = (function () {
-    function SettingsPageSelectedTab() {
-        this.tabIndex = 0;
-    }
-    return SettingsPageSelectedTab;
-}());
-exports.SettingsPageSelectedTab = SettingsPageSelectedTab;
-(function () {
-    var SettingsPageController = (function () {
-        SettingsPageController.$inject = ['$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
-        function SettingsPageController($state, pipNavService, pipSettings, $rootScope, $timeout) {
-            var _this = this;
-            this.$state = $state;
-            this.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-                if (tab.visible === true && (tab.access ? tab.access($rootScope['$user'], tab) : true)) {
-                    return tab;
-                }
-            });
-            this.tabs = _.sortBy(this.tabs, 'index');
-            this.selected = new SettingsPageSelectedTab();
-            if (this.$state.current.name !== 'settings') {
-                this.initSelect(this.$state.current.name);
-            }
-            else if (this.$state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-                this.initSelect(pipSettings.getDefaultTab().state);
-            }
-            else {
-                $timeout(function () {
-                    if (pipSettings.getDefaultTab()) {
-                        _this.initSelect(pipSettings.getDefaultTab().state);
-                    }
-                    if (!pipSettings.getDefaultTab() && _this.tabs.length > 0) {
-                        _this.initSelect(_this.tabs[0].state);
-                    }
-                });
-            }
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = "Settings";
-            pipNavService.actions.hide();
-            pipNavService.appbar.removeShadow();
-            this.onDropdownSelect = function (state) {
-                _this.onNavigationSelect(state.state);
-            };
-        }
-        SettingsPageController.prototype.initSelect = function (state) {
-            this.selected.tab = _.find(this.tabs, function (tab) {
-                return tab.state === state;
-            });
-            this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
-            this.selected.tabId = state;
-        };
-        SettingsPageController.prototype.onNavigationSelect = function (state) {
-            this.initSelect(state);
-            if (this.selected.tab) {
-                this.$state.go(state);
-            }
-        };
-        return SettingsPageController;
-    }());
-    angular.module('pipSettings.Page')
-        .controller('pipSettingsPageController', SettingsPageController);
-})();
 
 },{}],3:[function(require,module,exports){
-'use strict';
-configureSettingsPageRoutes.$inject = ['$stateProvider'];
-function configureSettingsPageRoutes($stateProvider) {
-    $stateProvider
-        .state('settings', {
-        url: '/settings?party_id',
-        auth: true,
-        controllerAs: 'vm',
-        controller: 'pipSettingsPageController',
-        templateUrl: 'settings_page/SettingsPage.html'
-    });
-}
-angular.module('pipSettings.Page')
-    .config(configureSettingsPageRoutes);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 
 },{}],4:[function(require,module,exports){
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-angular.module('pipSettings.Page', [
-    'ui.router',
-    'pipSettings.Service',
-    'pipNav',
-    'pipSelected',
-    'pipTranslate',
-    'pipSettings.Templates'
-]);
-require("./SettingsPageController");
-require("./SettingsPageRoutes");
-
-},{"./SettingsPageController":2,"./SettingsPageRoutes":3}],5:[function(require,module,exports){
-
-},{}],6:[function(require,module,exports){
-'use strict';
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsTab = (function () {
     function SettingsTab() {
@@ -16855,6 +16889,13 @@ var SettingsStateConfig = (function () {
     return SettingsStateConfig;
 }());
 exports.SettingsStateConfig = SettingsStateConfig;
+var SettingsPageSelectedTab = (function () {
+    function SettingsPageSelectedTab() {
+        this.tabIndex = 0;
+    }
+    return SettingsPageSelectedTab;
+}());
+exports.SettingsPageSelectedTab = SettingsPageSelectedTab;
 var SettingsConfig = (function () {
     function SettingsConfig() {
         this.tabs = [];
@@ -16865,6 +16906,11 @@ var SettingsConfig = (function () {
     return SettingsConfig;
 }());
 exports.SettingsConfig = SettingsConfig;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsConfig_1 = require("./SettingsConfig");
 var SettingsService = (function () {
     SettingsService.$inject = ['config'];
     function SettingsService(config) {
@@ -16918,7 +16964,7 @@ var SettingsProvider = (function () {
     SettingsProvider.$inject = ['$stateProvider'];
     function SettingsProvider($stateProvider) {
         this.$stateProvider = $stateProvider;
-        this._config = new SettingsConfig();
+        this._config = new SettingsConfig_1.SettingsConfig();
     }
     SettingsProvider.prototype.getFullStateName = function (state) {
         return 'settings.' + state;
@@ -17004,16 +17050,101 @@ var SettingsProvider = (function () {
     return SettingsProvider;
 }());
 angular
-    .module('pipSettings.Service')
+    .module('pipSettings.Service', [])
     .provider('pipSettings', SettingsProvider);
 
-},{}],7:[function(require,module,exports){
+},{"./SettingsConfig":4}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsConfig_1 = require("../common/SettingsConfig");
+(function () {
+    var SettingsPageController = (function () {
+        SettingsPageController.$inject = ['$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
+        function SettingsPageController($state, pipNavService, pipSettings, $rootScope, $timeout) {
+            var _this = this;
+            this.$state = $state;
+            this.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+                if (tab.visible === true && (tab.access ? tab.access($rootScope['$user'], tab) : true)) {
+                    return tab;
+                }
+            });
+            this.tabs = _.sortBy(this.tabs, 'index');
+            this.selected = new SettingsConfig_1.SettingsPageSelectedTab();
+            if (this.$state.current.name !== 'settings') {
+                this.initSelect(this.$state.current.name);
+            }
+            else if (this.$state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+                this.initSelect(pipSettings.getDefaultTab().state);
+            }
+            else {
+                $timeout(function () {
+                    if (pipSettings.getDefaultTab()) {
+                        _this.initSelect(pipSettings.getDefaultTab().state);
+                    }
+                    if (!pipSettings.getDefaultTab() && _this.tabs.length > 0) {
+                        _this.initSelect(_this.tabs[0].state);
+                    }
+                });
+            }
+            pipNavService.icon.showMenu();
+            pipNavService.breadcrumb.text = "Settings";
+            pipNavService.actions.hide();
+            pipNavService.appbar.removeShadow();
+            this.onDropdownSelect = function (state) {
+                _this.onNavigationSelect(state.state);
+            };
+        }
+        SettingsPageController.prototype.initSelect = function (state) {
+            this.selected.tab = _.find(this.tabs, function (tab) {
+                return tab.state === state;
+            });
+            this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
+            this.selected.tabId = state;
+        };
+        SettingsPageController.prototype.onNavigationSelect = function (state) {
+            this.initSelect(state);
+            if (this.selected.tab) {
+                this.$state.go(state);
+            }
+        };
+        return SettingsPageController;
+    }());
+    angular.module('pipSettings.Page')
+        .controller('pipSettingsPageController', SettingsPageController);
+})();
+
+},{"../common/SettingsConfig":4}],7:[function(require,module,exports){
+{
+    configureSettingsPageRoutes.$inject = ['$stateProvider'];
+    function configureSettingsPageRoutes($stateProvider) {
+        $stateProvider
+            .state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controllerAs: 'vm',
+            controller: 'pipSettingsPageController',
+            templateUrl: 'page/SettingsPage.html'
+        });
+    }
+    angular.module('pipSettings.Page')
+        .config(configureSettingsPageRoutes);
+}
+
+},{}],8:[function(require,module,exports){
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-angular.module('pipSettings.Service', []);
-require("./SettingsService");
+angular.module('pipSettings.Page', [
+    'ui.router',
+    'pipSettings.Service',
+    'pipNav',
+    'pipSelected',
+    'pipTranslate',
+    'pipSettings.Templates'
+]);
+require("./SettingsPageController");
+require("./SettingsPageRoutes");
 
-},{"./SettingsService":6}],8:[function(require,module,exports){
+},{"./SettingsPageController":6,"./SettingsPageRoutes":7}],9:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipSettings.Templates');
@@ -17021,34 +17152,19 @@ try {
   module = angular.module('pipSettings.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('settings_page/SettingsPage.html',
+  $templateCache.put('page/SettingsPage.html',
     '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-settings"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" ng-if="vm.$party.id == vm.$user.id || tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\' || tab.state ==\'settings.blacklist\'" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
 }]);
 })();
 
 
 
-},{}]},{},[8,4,5,2,3,7,6,1])(8)
+},{}]},{},[9,2,3,4,5,8,6,7,1])(9)
 });
 
 
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    filter.$inject = ['$injector'];
-    function filter($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
-        return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }
-    angular.module('pipHelp.Translate', [])
-        .filter('translate', filter);
-})();
-
-},{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var HelpConfig = (function () {
@@ -17061,20 +17177,12 @@ var HelpConfig = (function () {
     return HelpConfig;
 }());
 exports.HelpConfig = HelpConfig;
-
-},{}],3:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var HelpPageSelectedTab = (function () {
-    function HelpPageSelectedTab() {
+var HelpTab = (function () {
+    function HelpTab() {
     }
-    return HelpPageSelectedTab;
+    return HelpTab;
 }());
-exports.HelpPageSelectedTab = HelpPageSelectedTab;
-
-},{}],4:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.HelpTab = HelpTab;
 var HelpStateConfig = (function () {
     function HelpStateConfig() {
         this.auth = false;
@@ -17082,109 +17190,67 @@ var HelpStateConfig = (function () {
     return HelpStateConfig;
 }());
 exports.HelpStateConfig = HelpStateConfig;
-
-},{}],5:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var HelpTab = (function () {
-    function HelpTab() {
+var HelpPageSelectedTab = (function () {
+    function HelpPageSelectedTab() {
     }
-    return HelpTab;
+    return HelpPageSelectedTab;
 }());
-exports.HelpTab = HelpTab;
+exports.HelpPageSelectedTab = HelpPageSelectedTab;
 
-},{}],6:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var HelpPageSelectedTab_1 = require("../help_common/HelpPageSelectedTab");
-var HelpPageController = (function () {
-    HelpPageController.$inject = ['$log', '$state', '$rootScope', '$timeout', 'pipNavService', 'pipHelp'];
-    function HelpPageController($log, $state, $rootScope, $timeout, pipNavService, pipHelp) {
+var HelpConfig_1 = require("../common/HelpConfig");
+var HelpService = (function () {
+    HelpService.$inject = ['_config'];
+    function HelpService(_config) {
+        "ngInject";
+        this._config = _config;
+    }
+    HelpService.prototype.getFullStateName = function (state) {
+        return 'help.' + state;
+    };
+    HelpService.prototype.setDefaultTab = function (name) {
+        if (!_.find(this._config.tabs, function (tab) {
+            return tab.state === 'help.' + name;
+        })) {
+            throw new Error('Tab with state name "' + name + '" is not registered');
+        }
+        this._config.defaultTab = this.getFullStateName(name);
+    };
+    HelpService.prototype.getDefaultTab = function () {
         var _this = this;
-        this.$log = $log;
-        this.$state = $state;
-        this.tabs = _.filter(pipHelp.getTabs(), function (tab) {
-            if (tab.visible === true) {
-                return tab;
-            }
+        var defaultTab;
+        defaultTab = _.find(this._config.tabs, function (p) {
+            return p.state === _this._config.defaultTab;
         });
-        this.tabs = _.sortBy(this.tabs, 'index');
-        this.selected = new HelpPageSelectedTab_1.HelpPageSelectedTab();
-        if (this.$state.current.name !== 'help') {
-            this.initSelect(this.$state.current.name);
-        }
-        else if (this.$state.current.name === 'help' && pipHelp.getDefaultTab()) {
-            this.initSelect(pipHelp.getDefaultTab().state);
-        }
-        else {
-            $timeout(function () {
-                if (pipHelp.getDefaultTab()) {
-                    _this.initSelect(pipHelp.getDefaultTab().state);
-                }
-                if (!pipHelp.getDefaultTab() && _this.tabs && _this.tabs.length > 0) {
-                    _this.initSelect(_this.tabs[0].state);
-                }
-            });
-        }
-        pipNavService.icon.showMenu();
-        pipNavService.breadcrumb.text = "Help";
-        pipNavService.actions.hide();
-        pipNavService.appbar.removeShadow();
-        this.onDropdownSelect = function (state) {
-            _this.onNavigationSelect(state.state);
-        };
-    }
-    HelpPageController.prototype.initSelect = function (state) {
-        this.selected.tab = _.find(this.tabs, function (tab) {
-            return tab.state === state;
-        });
-        this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
-        this.selected.tabId = state;
+        return _.cloneDeep(defaultTab);
     };
-    HelpPageController.prototype.onNavigationSelect = function (state) {
-        this.initSelect(state);
-        if (this.selected.tab) {
-            this.$state.go(state);
+    HelpService.prototype.showTitleText = function (newTitleText) {
+        if (newTitleText) {
+            this._config.titleText = newTitleText;
+            this._config.titleLogo = null;
         }
+        return this._config.titleText;
     };
-    return HelpPageController;
+    HelpService.prototype.showTitleLogo = function (newTitleLogo) {
+        if (newTitleLogo) {
+            this._config.titleLogo = newTitleLogo;
+            this._config.titleText = null;
+        }
+        return this._config.titleLogo;
+    };
+    HelpService.prototype.showNavIcon = function (value) {
+        if (value !== null && value !== undefined) {
+            this._config.isNavIcon = !!value;
+        }
+        return this._config.isNavIcon;
+    };
+    HelpService.prototype.getTabs = function () {
+        return _.cloneDeep(this._config.tabs);
+    };
+    return HelpService;
 }());
-(function () {
-    angular.module('pipHelp.Page', [
-        'ui.router',
-        'pipHelp.Service',
-        'pipNav',
-        'pipSelected',
-        'pipTranslate',
-        'pipHelp.Templates'
-    ])
-        .controller('pipHelpPageController', HelpPageController);
-})();
-require("./HelpPageRoutes");
-
-},{"../help_common/HelpPageSelectedTab":3,"./HelpPageRoutes":7}],7:[function(require,module,exports){
-'use strict';
-(function () {
-    configureHelpPageRoutes.$inject = ['$stateProvider'];
-    function configureHelpPageRoutes($stateProvider) {
-        $stateProvider
-            .state('help', {
-            url: '/help?party_id',
-            auth: true,
-            controllerAs: '$ctrl',
-            controller: 'pipHelpPageController',
-            templateUrl: 'help_page/HelpPage.html'
-        });
-    }
-    angular.module('pipHelp.Page')
-        .config(configureHelpPageRoutes);
-})();
-
-},{}],8:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var HelpConfig_1 = require("../help_common/HelpConfig");
-var HelpService_1 = require("../help_service/HelpService");
 var HelpProvider = (function () {
     HelpProvider.$inject = ['$stateProvider'];
     function HelpProvider($stateProvider) {
@@ -17269,7 +17335,7 @@ var HelpProvider = (function () {
     HelpProvider.prototype.$get = function () {
         "ngInject";
         if (_.isNull(this._service) || _.isUndefined(this._service)) {
-            this._service = new HelpService_1.HelpService(this._config);
+            this._service = new HelpService(this._config);
         }
         return this._service;
     };
@@ -17279,76 +17345,125 @@ angular
     .module('pipHelp.Service', [])
     .provider('pipHelp', HelpProvider);
 
-},{"../help_common/HelpConfig":2,"../help_service/HelpService":9}],9:[function(require,module,exports){
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-var HelpService = (function () {
-    HelpService.$inject = ['_config'];
-    function HelpService(_config) {
-        "ngInject";
-        this._config = _config;
-    }
-    HelpService.prototype.getFullStateName = function (state) {
-        return 'help.' + state;
-    };
-    HelpService.prototype.setDefaultTab = function (name) {
-        if (!_.find(this._config.tabs, function (tab) {
-            return tab.state === 'help.' + name;
-        })) {
-            throw new Error('Tab with state name "' + name + '" is not registered');
-        }
-        this._config.defaultTab = this.getFullStateName(name);
-    };
-    HelpService.prototype.getDefaultTab = function () {
-        var _this = this;
-        var defaultTab;
-        defaultTab = _.find(this._config.tabs, function (p) {
-            return p.state === _this._config.defaultTab;
-        });
-        return _.cloneDeep(defaultTab);
-    };
-    HelpService.prototype.showTitleText = function (newTitleText) {
-        if (newTitleText) {
-            this._config.titleText = newTitleText;
-            this._config.titleLogo = null;
-        }
-        return this._config.titleText;
-    };
-    HelpService.prototype.showTitleLogo = function (newTitleLogo) {
-        if (newTitleLogo) {
-            this._config.titleLogo = newTitleLogo;
-            this._config.titleText = null;
-        }
-        return this._config.titleLogo;
-    };
-    HelpService.prototype.showNavIcon = function (value) {
-        if (value !== null && value !== undefined) {
-            this._config.isNavIcon = !!value;
-        }
-        return this._config.isNavIcon;
-    };
-    HelpService.prototype.getTabs = function () {
-        return _.cloneDeep(this._config.tabs);
-    };
-    return HelpService;
-}());
-exports.HelpService = HelpService;
-
-},{}],10:[function(require,module,exports){
+},{"../common/HelpConfig":1}],3:[function(require,module,exports){
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-require("./help_provider/HelpProvider");
-require("./help_page/HelpPageController");
+
+},{}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},{}],5:[function(require,module,exports){
+{
+    filter.$inject = ['$injector'];
+    function filter($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }
+    angular.module('pipHelp.Translate', [])
+        .filter('translate', filter);
+}
+
+},{}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var HelpConfig_1 = require("../common/HelpConfig");
+var HelpPageController = (function () {
+    HelpPageController.$inject = ['$log', '$state', '$rootScope', '$timeout', 'pipNavService', 'pipHelp'];
+    function HelpPageController($log, $state, $rootScope, $timeout, pipNavService, pipHelp) {
+        var _this = this;
+        this.$log = $log;
+        this.$state = $state;
+        this.tabs = _.filter(pipHelp.getTabs(), function (tab) {
+            if (tab.visible === true) {
+                return tab;
+            }
+        });
+        this.tabs = _.sortBy(this.tabs, 'index');
+        this.selected = new HelpConfig_1.HelpPageSelectedTab();
+        if (this.$state.current.name !== 'help') {
+            this.initSelect(this.$state.current.name);
+        }
+        else if (this.$state.current.name === 'help' && pipHelp.getDefaultTab()) {
+            this.initSelect(pipHelp.getDefaultTab().state);
+        }
+        else {
+            $timeout(function () {
+                if (pipHelp.getDefaultTab()) {
+                    _this.initSelect(pipHelp.getDefaultTab().state);
+                }
+                if (!pipHelp.getDefaultTab() && _this.tabs && _this.tabs.length > 0) {
+                    _this.initSelect(_this.tabs[0].state);
+                }
+            });
+        }
+        pipNavService.icon.showMenu();
+        pipNavService.breadcrumb.text = "Help";
+        pipNavService.actions.hide();
+        pipNavService.appbar.removeShadow();
+        this.onDropdownSelect = function (state) {
+            _this.onNavigationSelect(state.state);
+        };
+    }
+    HelpPageController.prototype.initSelect = function (state) {
+        this.selected.tab = _.find(this.tabs, function (tab) {
+            return tab.state === state;
+        });
+        this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
+        this.selected.tabId = state;
+    };
+    HelpPageController.prototype.onNavigationSelect = function (state) {
+        this.initSelect(state);
+        if (this.selected.tab) {
+            this.$state.go(state);
+        }
+    };
+    return HelpPageController;
+}());
+(function () {
+    angular.module('pipHelp.Page', [
+        'ui.router',
+        'pipHelp.Service',
+        'pipNav',
+        'pipSelected',
+        'pipTranslate',
+        'pipHelp.Templates'
+    ])
+        .controller('pipHelpPageController', HelpPageController);
+})();
+require("./HelpPageRoutes");
+
+},{"../common/HelpConfig":1,"./HelpPageRoutes":7}],7:[function(require,module,exports){
+{
+    configureHelpPageRoutes.$inject = ['$stateProvider'];
+    function configureHelpPageRoutes($stateProvider) {
+        $stateProvider
+            .state('help', {
+            url: '/help?party_id',
+            auth: true,
+            controllerAs: '$ctrl',
+            controller: 'pipHelpPageController',
+            templateUrl: 'page/HelpPage.html'
+        });
+    }
+    angular.module('pipHelp.Page')
+        .config(configureHelpPageRoutes);
+}
+
+},{}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./common/HelpService");
+require("./page/HelpPageController");
 angular.module('pipHelp', [
     'pipHelp.Service',
     'pipHelp.Page'
 ]);
-__export(require("./help_service/HelpService"));
 
-},{"./help_page/HelpPageController":6,"./help_provider/HelpProvider":8,"./help_service/HelpService":9}],11:[function(require,module,exports){
+},{"./common/HelpService":2,"./page/HelpPageController":6}],9:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -17356,14 +17471,14 @@ try {
   module = angular.module('pipHelp.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('help_page/HelpPage.html',
+  $templateCache.put('page/HelpPage.html',
     '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-help"><div class="pip-menu-container" ng-hide="$ctrl.manager === false || !$ctrl.tabs || $ctrl.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="$ctrl.selected.tabIndex" pip-selected-watch="$ctrl.selected.navId" pip-select="$ctrl.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in $ctrl.tabs track by tab.state" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="$ctrl.tabs" pip-dropdown-select="$ctrl.onDropdownSelect" pip-active-index="$ctrl.selected.tabIndex"></pip-dropdown><div class="pip-body p0 layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="$ctrl.manager === false || !$ctrl.tabs || $ctrl.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
 }]);
 })();
 
 
 
-},{}]},{},[11,1,2,3,4,5,6,7,8,9,10])(11)
+},{}]},{},[9,1,2,3,4,5,6,7,8])(9)
 });
 
 
