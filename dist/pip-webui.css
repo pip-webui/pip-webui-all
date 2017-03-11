@@ -4129,7 +4129,7 @@ th {
 input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:focus, md-autocomplete:focus, span:focus, button:focus {
   outline-width: 0 !important; }
 
-.pip-dialog .pip-ref-item {
+.pip-ref-item {
   display: -webkit-box;
   display: -moz-box;
   display: -webkit-flex;
@@ -4151,39 +4151,39 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
   -ms-flex-pack: start;
   justify-content: flex-start;
   height: 72px; }
-  .pip-dialog .pip-ref-item img.pip-pic, .pip-dialog .pip-ref-item img.pip-pic-sm {
+  .pip-ref-item img.pip-pic, .pip-ref-item img.pip-pic-sm {
     border-radius: 50%; }
-  .pip-dialog .pip-ref-item .pip-pic {
+  .pip-ref-item .pip-pic {
     margin-right: 16px;
     height: 40px;
     width: 40px; }
-  .pip-dialog .pip-ref-item .md-no-style {
+  .pip-ref-item .md-no-style {
     height: 100%;
     padding-right: 0px; }
-  .pip-dialog .pip-ref-item .pip-pic-sm {
+  .pip-ref-item .pip-pic-sm {
     margin: 3px 26px 3px 0;
     height: 30px;
     width: 30px; }
-  .pip-dialog .pip-ref-item .pip-content {
+  .pip-ref-item .pip-content {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: initial !important; }
-    .pip-dialog .pip-ref-item .pip-content .pip-title,
-    .pip-dialog .pip-ref-item .pip-content .pip-subtitle {
+    .pip-ref-item .pip-content .pip-title,
+    .pip-ref-item .pip-content .pip-subtitle {
       margin: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }
-    .pip-dialog .pip-ref-item .pip-content .pip-title {
+    .pip-ref-item .pip-content .pip-title {
       -webkit-user-select: auto;
       font: normal 500 16px Roboto, "Helvetica Neue", sans-serif;
       margin-top: 1px !important;
       margin-bottom: 4px !important; }
-    .pip-dialog .pip-ref-item .pip-content .pip-subtitle {
+    .pip-ref-item .pip-content .pip-subtitle {
       font: normal 400 14px Roboto, "Helvetica Neue", sans-serif;
       color: rgba(0, 0, 0, 0.54); }
-    .pip-dialog .pip-ref-item .pip-content .pip-icon {
+    .pip-ref-item .pip-content .pip-icon {
       width: 15px;
       height: 15px;
       min-height: 15px;
@@ -4191,27 +4191,27 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
       vertical-align: middle;
       margin-top: -1px; }
 
-.pip-dialog .pip-ref-item::before .md-list-item-inner {
+.pip-ref-item::before .md-list-item-inner {
   content: none; }
 
-.pip-dialog .pip-ref-item::before .md-list-item-inner::before {
+.pip-ref-item::before .md-list-item-inner::before {
   content: none; }
 
-.pip-dialog .pip-ref-list .pip-ref-list-item {
+.pip-ref-list .pip-ref-list-item {
   padding-right: 0;
   max-width: 100%;
   width: 100%; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item > button.md-ink-ripple {
+  .pip-ref-list .pip-ref-list-item > button.md-ink-ripple {
     padding: 0; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item > button.md-ink-ripple .md-ripple-container {
+    .pip-ref-list .pip-ref-list-item > button.md-ink-ripple .md-ripple-container {
       display: none;
       width: 0;
       height: 0; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item p {
+  .pip-ref-list .pip-ref-list-item p {
     margin: 0; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item pip-markdown p {
+  .pip-ref-list .pip-ref-list-item pip-markdown p {
     margin: 0 !important; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item .pip-pic {
+  .pip-ref-list .pip-ref-list-item .pip-pic {
     margin-top: 16px;
     margin-right: 16px;
     cursor: pointer;
@@ -4220,13 +4220,13 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
     -webkit-flex: 0 0 auto;
     -ms-flex: 0 0 auto;
     flex: 0 0 auto; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item img.pip-pic, .pip-dialog .pip-ref-list .pip-ref-list-item img.pip-pic-sm {
+  .pip-ref-list .pip-ref-list-item img.pip-pic, .pip-ref-list .pip-ref-list-item img.pip-pic-sm {
     border-radius: 50%; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item .pip-pic {
+  .pip-ref-list .pip-ref-list-item .pip-pic {
     font-size: 16px;
     height: 40px;
     width: 40px; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item .pip-pic-sm {
+  .pip-ref-list .pip-ref-list-item .pip-pic-sm {
     margin-top: 20px;
     margin-right: 26px;
     -webkit-box-flex: 0 0 auto;
@@ -4234,11 +4234,11 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
     -webkit-flex: 0 0 auto;
     -ms-flex: 0 0 auto;
     flex: 0 0 auto; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item .pip-pic-sm {
+  .pip-ref-list .pip-ref-list-item .pip-pic-sm {
     font-size: 14px;
     height: 30px;
     width: 30px; }
-  .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content {
+  .pip-ref-list .pip-ref-list-item .pip-content {
     width: 100%;
     -webkit-box-flex: 1 1 auto;
     -moz-box-flex: 1 1 auto;
@@ -4249,30 +4249,30 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
     padding-bottom: 13px;
     padding-top: 16px;
     line-height: normal; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title {
       line-height: 1.5em;
       margin-right: 8px; }
-      .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title .pip-title, .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title .pip-subtitle {
+      .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title .pip-title, .pip-ref-list .pip-ref-list-item .pip-content .pip-details-title .pip-subtitle {
         min-height: 0;
         padding-right: 0 !important; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-title, .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold, .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-title, .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold, .pip-ref-list .pip-ref-list-item .pip-content .pip-text {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }
-      .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-title.pip-markdown p, .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold.pip-markdown p, .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text.pip-markdown p {
+      .pip-ref-list .pip-ref-list-item .pip-content .pip-title.pip-markdown p, .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold.pip-markdown p, .pip-ref-list .pip-ref-list-item .pip-content .pip-text.pip-markdown p {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-title {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-title {
       font: normal 500 16px Roboto, "Helvetica Neue", sans-serif;
       margin-top: 1px !important;
       margin-bottom: 0 !important; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-subtitle {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-subtitle {
       font: normal 400 14px Roboto, "Helvetica Neue", sans-serif;
       color: rgba(0, 0, 0, 0.54);
       height: 17px;
       margin-bottom: 4px !important; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-text-bold {
       -webkit-box-flex: 1 1 auto;
       -moz-box-flex: 1 1 auto;
       -webkit-flex: 1 1 auto;
@@ -4280,67 +4280,67 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
       flex: 1 1 auto;
       font: normal 500 14px Roboto, "Helvetica Neue", sans-serif;
       margin-bottom: 4px !important; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-text {
       font: normal 400 14px Roboto, "Helvetica Neue", sans-serif;
       max-height: 1.5em;
       line-height: 1.5em;
       margin-right: 16px; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-text-lg {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-text-lg {
       font: normal 400 14px Roboto, "Helvetica Neue", sans-serif;
       margin-right: 16px;
       overflow: hidden; }
-    .pip-dialog .pip-ref-list .pip-ref-list-item .pip-content .pip-icon {
+    .pip-ref-list .pip-ref-list-item .pip-content .pip-icon {
       width: 15px;
       height: 15px;
       vertical-align: middle;
       margin-top: -1px; }
 
-.pip-dialog .pip-ref-item::before .md-list-item-inner {
+.pip-ref-item::before .md-list-item-inner {
   content: none; }
 
-.pip-dialog .pip-ref-item::before .md-list-item-inner::before {
+.pip-ref-item::before .md-list-item-inner::before {
   content: none; }
 
-.pip-dialog md-list-item.pip-selectable button {
+md-list-item.pip-selectable button {
   border-left: none !important;
   padding-left: 21px !important; }
 
-.pip-dialog md-list-item.pip-selectable.selected button {
+md-list-item.pip-selectable.selected button {
   padding-left: 16px !important;
   background-color: rgba(158, 158, 158, 0.2);
   border-left: 5px solid rgba(33, 150, 243, 0.5) !important; }
 
-.pip-dialog md-list-item.pip-selectable-tree button {
+md-list-item.pip-selectable-tree button {
   border-left: none !important; }
 
-.pip-dialog md-list-item.pip-selectable-tree.selected > button {
+md-list-item.pip-selectable-tree.selected > button {
   background-color: rgba(158, 158, 158, 0.2);
   border-left: 5px solid #03a9f4 !important; }
 
-.pip-dialog md-list-item.pip-selectable-tree > button {
+md-list-item.pip-selectable-tree > button {
   padding-right: 0; }
 
-.pip-dialog md-list-item.pip-selectable.pip-simple-list-item {
+md-list-item.pip-selectable.pip-simple-list-item {
   border-left: none !important;
   padding-left: 21px !important; }
-  .pip-dialog md-list-item.pip-selectable.pip-simple-list-item.selected {
+  md-list-item.pip-selectable.pip-simple-list-item.selected {
     padding-left: 16px !important;
     background-color: rgba(158, 158, 158, 0.2);
     border-left: 5px solid rgba(33, 150, 243, 0.5) !important; }
 
-.pip-dialog md-list-item.pip-selectable.pip-ref-list-item {
+md-list-item.pip-selectable.pip-ref-list-item {
   border-left: none !important;
   padding-left: 21px !important; }
-  .pip-dialog md-list-item.pip-selectable.pip-ref-list-item.selected {
+  md-list-item.pip-selectable.pip-ref-list-item.selected {
     padding-left: 16px !important;
     background-color: rgba(158, 158, 158, 0.2);
     border-left: 5px solid rgba(33, 150, 243, 0.5) !important; }
 
-.pip-dialog md-list-item.pip-list-no-click.pip-selectable .md-no-style {
+md-list-item.pip-list-no-click.pip-selectable .md-no-style {
   border-left: none !important;
   padding-left: 21px !important; }
 
-.pip-dialog md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
+md-list-item.pip-list-no-click.pip-selectable.selected .md-no-style {
   padding-left: 16px !important;
   background-color: rgba(158, 158, 158, 0.2);
   border-left: 5px solid rgba(33, 150, 243, 0.5) !important; }
