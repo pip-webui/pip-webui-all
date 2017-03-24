@@ -3,6 +3,7 @@ declare module pip.services {
 export let CurrentState: any;
 export let PreviousState: any;
 
+
 let RedirectedStates: any;
 function decorateRedirectStateProvider($delegate: any): any;
 function addRedirectStateProviderDecorator($provide: any): void;
@@ -11,6 +12,8 @@ function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
 
+export let IdentityRootVar: string;
+export let IdentityChangedEvent: string;
 
 export interface IIdentity {
     id: string;
@@ -29,6 +32,7 @@ export interface IIdentityProvider extends ng.IServiceProvider {
     identity: any;
 }
 
+
 export interface ISessionService {
     session: any;
     isOpened(): boolean;
@@ -39,9 +43,6 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
-
-export let IdentityRootVar: string;
-export let IdentityChangedEvent: string;
 
 export const SessionRootVar = "$session";
 export const SessionOpenedEvent = "pipSessionOpened";
@@ -105,6 +106,8 @@ export interface ITranslateService {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
 }
 export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
 }
 
 
@@ -148,7 +151,6 @@ export class Translation {
 
 
 
-
 export interface ICodes {
     hash(value: string): number;
     verification(): string;
@@ -158,6 +160,7 @@ export interface IFormat {
     sample(value: string, maxLength: number): string;
     sprintf(message: string, ...args: any[]): string;
 }
+
 
 export interface IPageResetService {
     reset(): void;
@@ -206,7 +209,6 @@ export let ResetAreaRootVar: string;
 
 
 
-
 }
 
 declare module pip.buttons {
@@ -221,10 +223,11 @@ declare module pip.layouts {
 
 
 
-export let AuxPanelChangedEvent: string;
-export let AuxPanelStateChangedEvent: string;
-export let OpenAuxPanelEvent: string;
-export let CloseAuxPanelEvent: string;
+
+export const AuxPanelChangedEvent = "pipAuxPanelChanged";
+export const AuxPanelStateChangedEvent = "pipAuxPanelStateChanged";
+export const OpenAuxPanelEvent = "pipOpenAuxPanel";
+export const CloseAuxPanelEvent = "pipCloseAuxPanel";
 export class AuxPanelConfig {
     parts: any;
     classes: string[];
@@ -258,6 +261,14 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
+export const MainResizedEvent = "pipMainResized";
+export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
     constructor(xs: number, sm: number, md: number, lg: number);
     xs: number;
@@ -278,10 +289,6 @@ export class MediaBreakpointStatuses {
     'xl': boolean;
     update(breakpoints: MediaBreakpoints, width: number): void;
 }
-export let MainResizedEvent: string;
-export let LayoutResizedEvent: string;
-export let MainBreakpoints: MediaBreakpoints;
-export let MainBreakpointStatuses: MediaBreakpointStatuses;
 export interface IMediaService {
     (breakpoint: string): boolean;
     breakpoints: MediaBreakpoints;
@@ -291,15 +298,12 @@ export interface IMediaProvider extends ng.IServiceProvider {
     breakpoints: MediaBreakpoints;
 }
 
+
+export let MainBreakpoints: MediaBreakpoints;
+export let MainBreakpointStatuses: MediaBreakpointStatuses;
+
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
-
 
 }
 
@@ -307,57 +311,29 @@ declare module pip.behaviors {
 
 
 
+export interface IDraggableService {
+    inputEvent(event: any): any;
+}
 
-export class ShortcutOption {
-    Type: KeyboardEvent;
-    Propagate: boolean;
-    DisableInInput: boolean;
-    Target: any;
-    Keycode: number;
-}
-export class KeyboardEvent {
-    static Keydown: string;
-    static Keyup: string;
-    static Keypress: string;
-}
-export class KeyboardShortcut {
-    private shift_nums;
-    private special_keys;
-    private modifiers;
-    eventCallback: Function;
-    target: any;
-    event: KeyboardEvent;
-    option: ShortcutOption;
-    shorcut: string;
-    callback: Function;
-    constructor(element: any, shorcutCombination: string, option: ShortcutOption, callback: (e?: JQueryEventObject) => void);
-}
+
+
+
+
+
+
 
 export interface IKeyboardShortcuts {
-    [key: string]: KeyboardShortcut;
+    [key: string]: Shortcut;
 }
-export interface IShortcutsRegisterService {
-    add(shorcutName: string, callback: () => void, options: ShortcutOption): void;
-    remove(shorcutName: string): void;
-    shorcuts: IKeyboardShortcuts;
+export interface IShortcutBindingService {
+    shortcuts: IKeyboardShortcuts;
+    add(shortcut: string, callback: () => void, options: ShortcutOptions): void;
+    remove(shortcut: string): void;
 }
-export interface IShortcutsRegisterProvider extends ng.IServiceProvider {
-    option: ShortcutOption;
-}
-export class ShortcutsRegister implements IShortcutsRegisterService {
-    private _log;
-    private _defaultOption;
-    private _shortcuts;
-    constructor($log: ng.ILogService, option: ShortcutOption);
-    private getDefaultOption();
-    private checkAddShortcut(element, shorcutCombination, callback);
-    readonly shorcuts: IKeyboardShortcuts;
-    add(shorcutName: string, callback: (e: JQueryEventObject) => void, option: ShortcutOption): void;
-    remove(shorcutName: string): void;
+export interface IShortcutBindingProvider extends ng.IServiceProvider {
+    option: ShortcutOptions;
 }
 
-
-export let ShortcutsChangedEvent: string;
 export class ShortcutItem {
     shortcut: string;
     target?: any;
@@ -369,90 +345,61 @@ export class ShortcutItem {
     stateParams?: any;
     event?: string;
     keypress?: (event: JQueryEventObject) => void;
-    options?: ShortcutOption;
+    options?: ShortcutOptions;
 }
 export class ShortcutsConfig {
     globalShortcuts: ShortcutItem[];
     localShortcuts: ShortcutItem[];
-    defaultOptions: ShortcutOption;
+    defaultOptions: ShortcutOptions;
 }
 export interface IShortcutsService {
     readonly config: ShortcutsConfig;
     globalShortcuts: ShortcutItem[];
     localShortcuts: ShortcutItem[];
-    on(globalShortcuts?: ShortcutItem[], localShortcuts?: ShortcutItem[]): void;
-    onLocal(localShortcuts?: ShortcutItem[]): void;
-    off(): void;
 }
 export interface IShortcutsProvider extends ng.IServiceProvider {
     config: ShortcutsConfig;
     globalShortcuts: ShortcutItem[];
-    localShortcuts: ShortcutItem[];
-    defaultOptions: ShortcutOption;
+    defaultOptions: ShortcutOptions;
+}
+
+export class KeyboardEvent {
+    static Keydown: string;
+    static Keyup: string;
+    static Keypress: string;
+}
+export class ShortcutOptions {
+    Type: KeyboardEvent;
+    Propagate: boolean;
+    DisableInInput: boolean;
+    Target: any;
+    Keycode: number;
+}
+export class Shortcut {
+    private shift_nums;
+    private special_keys;
+    private modifiers;
+    eventCallback: Function;
+    target: any;
+    event: KeyboardEvent;
+    option: ShortcutOptions;
+    shorcut: string;
+    callback: Function;
+    constructor(element: any, shorcutCombination: string, option: ShortcutOptions, callback: (e?: JQueryEventObject) => void);
 }
 
 
+
+export let ShortcutsChangedEvent: string;
 
 
 }
 
 declare module pip.controls {
 
-export interface IColorPicker {
-    class: string;
-    colors: string[];
-    currentColor: string;
-    currentColorIndex: number;
-    ngDisabled: Function;
-    colorChange: Function;
-    enterSpacePress(event: any): void;
-    disabled(): boolean;
-    selectColor(index: number): any;
-}
-export class ColorPickerController implements IColorPicker {
-    private _$timeout;
-    private _$scope;
-    class: string;
-    colors: string[];
-    currentColor: string;
-    currentColorIndex: number;
-    ngDisabled: Function;
-    colorChange: Function;
-    constructor($scope: ng.IScope, $element: any, $attrs: any, $timeout: any);
-    $onChanges(changes: any): void;
-    disabled(): boolean;
-    selectColor(index: number): void;
-    enterSpacePress(event: any): void;
-}
 
 
-class pipImageSliderController {
-    private _$attrs;
-    private _$interval;
-    private _$scope;
-    private _blocks;
-    private _index;
-    private _newIndex;
-    private _direction;
-    private _type;
-    private DEFAULT_INTERVAL;
-    private _interval;
-    private _timePromises;
-    private _throttled;
-    swipeStart: number;
-    sliderIndex: number;
-    slideTo: Function;
-    constructor($scope: ng.IScope, $element: any, $attrs: any, $parse: ng.IParseService, $timeout: angular.ITimeoutService, $interval: angular.IIntervalService, pipImageSlider: any);
-    nextBlock(): void;
-    prevBlock(): void;
-    private slideToPrivate(nextIndex);
-    private setIndex();
-    private startInterval();
-    private stopInterval();
-    private restartInterval();
-}
-
-interface IImageSliderService {
+export interface IImageSliderService {
     registerSlider(sliderId: string, sliderScope: any): void;
     removeSlider(sliderId: string): void;
     getSliderScope(sliderId: string): any;
@@ -460,85 +407,41 @@ interface IImageSliderService {
     prevCarousel(nextBlock: any, prevBlock: any): void;
     toBlock(type: string, blocks: any[], oldIndex: number, nextIndex: number, direction: string): void;
 }
-class ImageSliderService {
-    private _$timeout;
-    private ANIMATION_DURATION;
-    private _sliders;
-    constructor($timeout: angular.ITimeoutService);
-    registerSlider(sliderId: string, sliderScope: any): void;
-    removeSlider(sliderId: string): void;
-    getSliderScope(sliderId: string): any;
-    nextCarousel(nextBlock: any, prevBlock: any): void;
-    prevCarousel(nextBlock: any, prevBlock: any): void;
-    toBlock(type: string, blocks: any[], oldIndex: number, nextIndex: number, direction: string): void;
-}
+
+
+
 
 
 
 var marked: any;
-function Config($injector: any): void;
-class MarkdownController {
-    private _pipTranslate;
-    private _$parse;
-    private _$scope;
-    private _$injector;
-    private _$element;
-    private _$attrs;
-    private _text;
-    private _isList;
-    private _clamp;
-    private _rebind;
-    constructor($scope: angular.IScope, $parse: angular.IParseService, $attrs: any, $element: any, $injector: any);
-    $postLink(): void;
-    $onChanges(changes: any): void;
-    private describeAttachments(array);
-    private bindText(value);
-}
 
-export class PopoverController {
-    private _$timeout;
-    private _$scope;
-    timeout: any;
-    backdropElement: any;
-    content: any;
-    element: any;
-    calcH: boolean;
-    templateUrl: any;
-    template: any;
-    cancelCallback: Function;
-    constructor($scope: ng.IScope, $rootScope: any, $element: any, $timeout: any, $compile: any);
-    backdropClick(): void;
-    closePopover(): void;
-    onPopoverClick($e: any): void;
-    private init();
-    private position();
-    private onResize();
-    private calcHeight();
-}
 
-export class PopoverService {
-    private _$timeout;
-    private _$scope;
-    private _$compile;
-    private _$rootScope;
-    popoverTemplate: string;
-    constructor($compile: any, $rootScope: any, $timeout: any);
-    show(p: any): void;
+export interface IPopoverService {
+    show(p: Object): void;
     hide(): void;
     resize(): void;
 }
 
-class RoutingController {
-    private _image;
-    private _$element;
-    logoUrl: string;
-    showProgress: Function;
-    constructor($scope: ng.IScope, $element: any);
-    $postLink(): void;
-    loadProgressImage(): void;
+
+
+
+
+export interface IToastService {
+    showNextToast(): void;
+    showToast(toast: Toast): void;
+    addToast(toast: any): void;
+    removeToasts(type: string): void;
+    getToastById(id: string): Toast;
+    removeToastsById(id: string): void;
+    onClearToasts(): void;
+    showNotification(message: string, actions: string[], successCallback: any, cancelCallback: any, id: string): any;
+    showMessage(message: string, successCallback: any, cancelCallback: any, id?: string): any;
+    showError(message: string, successCallback: any, cancelCallback: any, id: string, error: any): any;
+    hideAllToasts(): void;
+    clearToasts(type?: string): any;
 }
 
-interface IPipToast {
+export class Toast {
     type: string;
     id: string;
     error: any;
@@ -548,56 +451,7 @@ interface IPipToast {
     successCallback: Function;
     cancelCallback: Function;
 }
-class ToastController {
-    private _$mdToast;
-    private _pipErrorDetailsDialog;
-    message: string;
-    actions: string[];
-    toast: IPipToast;
-    actionLenght: number;
-    showDetails: boolean;
-    constructor($mdToast: angular.material.IToastService, toast: IPipToast, $injector: any);
-    onDetails(): void;
-    onAction(action: any): void;
-}
-interface IToastService {
-    showNextToast(): void;
-    showToast(toast: IPipToast): void;
-    addToast(toast: any): void;
-    removeToasts(type: string): void;
-    getToastById(id: string): IPipToast;
-    removeToastsById(id: string): void;
-    onClearToasts(): void;
-    showNotification(message: string, actions: string[], successCallback: any, cancelCallback: any, id: string): any;
-    showMessage(message: string, successCallback: any, cancelCallback: any, id?: string): any;
-    showError(message: string, successCallback: any, cancelCallback: any, id: string, error: any): any;
-    hideAllToasts(): void;
-    clearToasts(type?: string): any;
-}
-class ToastService implements IToastService {
-    private SHOW_TIMEOUT;
-    private SHOW_TIMEOUT_NOTIFICATIONS;
-    private toasts;
-    private currentToast;
-    private sounds;
-    private _$mdToast;
-    constructor($rootScope: ng.IRootScopeService, $mdToast: angular.material.IToastService);
-    showNextToast(): void;
-    showToast(toast: IPipToast): void;
-    private showToastCancelResult(action);
-    private showToastOkResult(action);
-    addToast(toast: any): void;
-    removeToasts(type: string): void;
-    removeToastsById(id: string): void;
-    getToastById(id: string): IPipToast;
-    onStateChangeSuccess(): void;
-    onClearToasts(): void;
-    showNotification(message: string, actions: string[], successCallback: any, cancelCallback: any, id: string): void;
-    showMessage(message: string, successCallback: any, cancelCallback: any, id?: string): void;
-    showError(message: string, successCallback: any, cancelCallback: any, id: string, error: any): void;
-    hideAllToasts(): void;
-    clearToasts(type?: string): void;
-}
+
 
 }
 
@@ -611,49 +465,35 @@ declare module pip.dates {
 
 
 
-function formatTimeFilter(pipDateTime: any): (value: any, format: string) => string;
-function formatDateOptionalFilter(pipDateTime: any): (value: any, format: string) => string;
-function formatLongDateFilter(pipDateTime: any): (value: any) => string;
-function formatShortDateFilter(pipDateTime: any): (value: any) => string;
-function formatMiddleDateFilter(pipDateTime: any): (value: any) => string;
-function formatMonthFilter(pipDateTime: any): (value: any) => any;
-function formatLongMonthFilter(pipDateTime: any): (value: any) => string;
-function formatYearFilter(pipDateTime: any): (value: any) => string;
-function formatWeekFilter(pipDateTime: any): (value: any) => string;
-function formatShortWeekFilter(pipDateTime: any): (value: any) => string;
-function formatShortDateTimeFilter(pipDateTime: any): (value: any) => string;
-function formatMiddleDateTimeFilter(pipDateTime: any): (value: any) => string;
-function formatLongDateTimeFilter(pipDateTime: any): (value: any) => string;
-function formatShortDateLongTimeFilter(pipDateTime: any): (value: any, firstTime: boolean) => string;
-function formatMiddleDateLongTimeFilter(pipDateTime: any): (value: any, firstTime: boolean) => string;
-function formatLongDateLongTimeFilter(pipDateTime: any): (value: any, firstTime: boolean) => string;
-function bbFormatDateLongTimeFilter(pipDateTime: any): (value: any, firstTime: boolean) => string;
-function formatFullDateTimeFilter(pipDateTime: any): (value: any) => string;
-function formatShortTimeFilter(pipDateTime: any): (value: any) => string;
-function formatLongTimeFilter(pipDateTime: any): (value: any) => string;
-function formatShortDayOfWeekFilter(pipDateTime: any): (value: any) => string;
-function formatLongDayOfWeekFilter(pipDateTime: any): (value: any) => string;
-function formatLongMonthDayFilter(pipDateTime: any): (value: any) => string;
-function formatShortMonthDayFilter(pipDateTime: any): (value: any) => string;
-function formatDateRangeFilter(pipDateTime: any): (value1: any, value2: any) => string;
-function formatDateTimeRangeFilter(pipDateTime: any): (value1: any, value2: any) => string;
-function formatISOWeekFilter(pipDateTime: any): (value: any) => string;
-function formatShortISOWeekFilter(pipDateTime: any): (value: any) => string;
-function formatISOWeekOrdinalFilter(pipDateTime: any): (value: any) => string;
-function formatDateYFilter(pipDateTime: any): (value: any) => string;
-function formatLongDateYFilter(pipDateTime: any): (value: any) => string;
-function formatTodayDateLongTimeLongFilter(pipDateTime: any): (value: any) => string;
-function formatTodayDateShortTimeLongFilter(pipDateTime: any): (value: any) => string;
-function formatTodayDateLongTimeShortFilter(pipDateTime: any): (value: any) => string;
-function formatTodayDateShortTimeShortFilter(pipDateTime: any): (value: any) => string;
-function formatMillisecondsToSecondsFilter(pipDateTime: any): (value: any) => string;
-function formatElapsedIntervalFilter(pipDateTime: any): (value: any, start: any) => string;
-function getDateJSONFilter(pipDateTime: any): (value: any) => string;
+
 
 export class DateTimeConfig {
     timeZone: number;
 }
-export interface IDateTimeService {
+export interface IDateConvertService {
+    readonly config: DateTimeConfig;
+    useTimeZone(offset: number): any;
+    getDateJSON(date: any): string;
+    getNextStart(value: any, category: string): Date;
+    getPrevStart(value: any, category: string): Date;
+    getNowStart(category: string): Date;
+    addHours(value: any, hours: number): Date;
+    toStartDay(value: any): Date;
+    toEndDay(value: any, offset: number): Date;
+    toStartWeek(value: any): Date;
+    toEndWeek(value: any, offset: number): Date;
+    toStartMonth(value: any): Date;
+    toEndMonth(value: any, offset: number): Date;
+    toStartYear(value: any): Date;
+    toEndYear(value: any, offset: number): Date;
+}
+export interface IDateConvertProvider extends IDateConvertService, ng.IServiceProvider {
+}
+
+export class DateTimeConfig {
+    timeZone: number;
+}
+export interface IDateFormatService {
     readonly config: DateTimeConfig;
     useTimeZone(offset: number): any;
     bbFormatDateLongTime(value: any, firstTime?: boolean): string;
@@ -693,25 +533,18 @@ export interface IDateTimeService {
     formatTodayDateShortTimeShort(value: any): string;
     formatMillisecondsToSeconds(value: any): string;
     formatElapsedInterval(value: any, start: any): string;
-    getDateJSON(date: any): string;
-    getNextStart(value: any, category: string): any;
-    getPrevStart(value: any, category: string): any;
-    getNowStart(category: string): any;
-    addHours(value: any, hours: number): any;
-    toStartDay(value: any): any;
-    toEndDay(value: any, offset: number): any;
-    toStartWeek(value: any): any;
-    toEndWeek(value: any, offset: number): any;
-    toStartMonth(value: any): any;
-    toEndMonth(value: any, offset: number): any;
-    toStartYear(value: any): any;
-    toEndYear(value: any, offset: number): any;
 }
-export interface IDateTimeProvider extends IDateTimeService, ng.IServiceProvider {
+export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
 
 
 
+
+
+export const IntervalTimeRange = 30;
+export const MinutesInHour = 60;
+export const HoursInDay = 24;
+export const MillisecondsInSecond = 1000;
 
 }
 
@@ -732,17 +565,24 @@ export interface IConfirmationDialogService {
 
 
 
+
+export class ErrorDetailsDialogParams {
+    event?: MouseEvent;
+    dismissButton?: string;
+    error: any;
+}
+
+
+export interface IErrorDetailsDialogService {
+    show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
 export interface IInformationDialogService {
     show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
-export class InformationDialogStrings {
-    ok: string;
-    title: string;
-    message: string;
-    error: string;
-    content: any;
-}
+
 
 export class InformationDialogParams {
     event?: MouseEvent;
@@ -784,19 +624,6 @@ export class OptionsDialogResult {
 
 
 
-
-export class ErrorDetailsDialogParams {
-    event?: MouseEvent;
-    dismissButton?: string;
-    error: any;
-}
-
-
-export interface IErrorDetailsDialogService {
-    show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
 export interface IOptionsBigDialogService {
     show(params: OptionsBigDialogParams, successCallback?: (result: OptionsBigDialogResult) => void, cancelCallback?: () => void): any;
 }
@@ -826,13 +653,13 @@ export class OptionsBigDialogResult {
 }
 
 
-
 }
 
 declare module pip.nav {
 
-export let ActionsChangedEvent: string;
-export let SecondaryActionsOpenEvent: string;
+
+export const ActionsChangedEvent: string;
+export const SecondaryActionsOpenEvent: string;
 export class SimpleActionItem {
     name: string;
     title?: string;
@@ -881,39 +708,15 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export let BreadcrumbChangedEvent: string;
-export let BreadcrumbBackEvent: string;
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
-
-export let AppBarChangedEvent: string;
 export class AppBarConfig {
     visible: boolean;
     parts: any;
     classes: string[];
 }
+
+
+export const AppBarChangedEvent: string;
+
 export interface IAppBarService {
     readonly config: AppBarConfig;
     readonly classes: string[];
@@ -936,6 +739,34 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -951,16 +782,6 @@ export interface INavService {
 
 
 
-export let NavHeaderChangedEvent: string;
-export class NavHeaderConfig {
-    imageUrl: string;
-    defaultImageUrl: string;
-    title: string;
-    subtitle: string;
-    imageCss: string;
-    click: () => void;
-    event: string;
-}
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
     imageUrl: string;
@@ -984,16 +805,19 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 }
 
 
-export let NavIconClickedEvent: string;
 
-export let NavIconChangedEvent: string;
-export class NavIconConfig {
-    type: string;
+export class NavHeaderConfig {
     imageUrl: string;
-    icon: string;
+    defaultImageUrl: string;
+    title: string;
+    subtitle: string;
+    imageCss: string;
     click: () => void;
     event: string;
 }
+
+export let NavHeaderChangedEvent: string;
+
 export interface INavIconService {
     readonly config: NavIconConfig;
     showMenu(callbackOrEvent?: any): void;
@@ -1013,8 +837,32 @@ export interface INavIconProvider extends ng.IServiceProvider {
 
 
 
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
 
-export let NavMenuChangedEvent: string;
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
+
+
+export interface INavMenuService {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+    updateCount(link: string, count: number): void;
+    updateBadgeStyle(link: string, style: string): void;
+    clearCounts(): void;
+}
+export interface INavMenuProvider extends ng.IServiceProvider {
+    sections: NavMenuSection[];
+    defaultIcon: string;
+}
+
+
+
 export class NavMenuLink {
     name: string;
     title: string;
@@ -1043,31 +891,10 @@ export class NavMenuConfig {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
-export interface INavMenuService {
-    sections: NavMenuSection[];
-    defaultIcon: string;
-    updateCount(link: string, count: number): void;
-    updateBadgeStyle(link: string, style: string): void;
-    clearCounts(): void;
-}
-export interface INavMenuProvider extends ng.IServiceProvider {
-    sections: NavMenuSection[];
-    defaultIcon: string;
-}
+
+export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
-
-export let OpenSearchEvent: string;
-export let CloseSearchEvent: string;
-export let SearchChangedEvent: string;
-export let SearchActivatedEvent: string;
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
 export interface ISearchService {
     config: SearchConfig;
     criteria: string;
@@ -1084,25 +911,27 @@ export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
-
-export let SideNavChangedEvent: string;
-export let SideNavStateChangedEvent: string;
-export let OpenSideNavEvent: string;
-export let CloseSideNavEvent: string;
-
-
-export class SideNavConfig {
-    parts: any;
-    classes: string[];
-    state: any;
-    type: string;
+export class SearchConfig {
     visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
 }
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
+
+
 export interface ISideNavService {
     readonly config: SideNavConfig;
     readonly classes: string[];
     parts: any;
     state: any;
+    type: string;
+    backdrop: boolean;
     open(): void;
     close(): void;
     toggle(): void;
@@ -1116,12 +945,20 @@ export interface ISideNavProvider extends ng.IServiceProvider {
     config: SideNavConfig;
     parts: any;
     type: string;
+    backdrop: boolean;
     visible: boolean;
     classes: string[];
     addClass(...classes: string[]): void;
     removeClass(...classes: string[]): void;
     part(part: string, value: any): void;
 }
+
+
+
+export const SideNavChangedEvent = "pipSideNavChanged";
+export const SideNavStateChangedEvent = "pipSideNavStateChanged";
+export const OpenSideNavEvent = "pipOpenSideNav";
+export const CloseSideNavEvent = "pipCloseSideNav";
 
 export class SideNavStateNames {
     static Toggle: string;
@@ -1145,8 +982,21 @@ export class SideNavStateConfig {
     large: SideNavState;
     xlarge: SideNavState;
 }
+export class SideNavConfig {
+    parts: any;
+    classes: string[];
+    state: SideNavState;
+    type: string;
+    backdrop: boolean;
+    visible: boolean;
+}
 
-
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
+}
 
 }
 
@@ -1183,11 +1033,7 @@ export let ThemeResetPage: string;
 
 declare module pip.errors {
 
-
-
-
-
-export class ErrorStateItem {
+export class ErrorPageConfig {
     Active: boolean;
     Name: string;
     Event: string;
@@ -1197,126 +1043,71 @@ export class ErrorStateItem {
     Image: string;
     Params?: any;
 }
-export class ErrorsConfig {
-    Maintenance: ErrorStateItem;
-    MissingRoute: ErrorStateItem;
-    NoConnection: ErrorStateItem;
-    Unknown: ErrorStateItem;
-    Unsupported: ErrorStateItem;
+export class ErrorPageConfigs {
+    Maintenance: ErrorPageConfig;
+    MissingRoute: ErrorPageConfig;
+    NoConnection: ErrorPageConfig;
+    Unknown: ErrorPageConfig;
+    Unsupported: ErrorPageConfig;
 }
-export interface IErrorsService {
-    getErrorItemByKey(errorName: string): ErrorStateItem;
-    config: ErrorsConfig;
-}
-export interface IErrorsProvider extends ng.IServiceProvider {
-    configureErrorByKey(errorName: string, errorParams: ErrorStateItem): void;
-    configureErrors(value: ErrorsConfig): void;
-    config: ErrorsConfig;
+export class SupportedBrowsers {
+    edge: number;
+    ie: number;
+    firefox: number;
+    opera: number;
+    chrome: number;
 }
 
-class ClearErrorsLink {
-    private _fieldController;
-    private _formController;
-    constructor($scope: ng.IScope, $element: ng.IRootElementService, $attrs: ng.IAttributes, $ctrls: any);
-    private clearFieldErrors();
-    private clearFormErrors();
+
+export interface IErrorPageConfigService {
+    getErrorPageConfig(pageName: string): ErrorPageConfig;
+    configs: ErrorPageConfigs;
+}
+export interface IErrorPageConfigProvider extends ng.IServiceProvider {
+    setErrorPageConfig(pageName: string, config: ErrorPageConfig): void;
+    setAllErrorPageConfigs(configs: ErrorPageConfigs): void;
+    setSupportedBrowsers(browsers: SupportedBrowsers): void;
+    configs: ErrorPageConfigs;
 }
 
-class FormErrors {
-    private $rootScope;
-    constructor($rootScope: ng.IRootScopeService);
+
+
+
+export interface IFormErrorsService {
     errorsWithHint(field: any): any;
     touchedErrorsWithHint(form: ng.IFormController, field: any): any;
     resetFormErrors(form: ng.IFormController, errors?: boolean): void;
     resetFieldsErrors(form: ng.IFormController, field: any): void;
     setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
-    private goToUnhandledErrorPage(error);
-}
-
-export class PipMaintenanceError {
-    config?: PipMaintenanceErrorConfig;
-}
-export class PipMaintenanceErrorConfig {
-    params?: PipMaintenanceErrorParams;
-}
-export class PipMaintenanceErrorParams {
-    interval?: number;
-}
-export class ErrorMaintenanceController {
-    private _errorKey;
-    private pipNavService;
-    errorConfig: ErrorStateItem;
-    isCordova: boolean;
-    media: any;
-    error: PipMaintenanceError;
-    timeoutInterval: number;
-    constructor($scope: ng.IScope, $state: ng.ui.IStateService, $rootScope: ng.IRootScopeService, $mdMedia: angular.material.IMedia, $injector: angular.auto.IInjectorService, pipErrorsService: IErrorsService);
-    private appHeader();
+    goToUnhandledErrorPage(error: any): any;
 }
 
 
-export class PipNoConnectionError {
-    config?: any;
-}
-export class ErrorNoConnectionController {
-    private $window;
-    private _errorKey;
-    private pipNavService;
-    errorConfig: ErrorStateItem;
-    isCordova: boolean;
-    media: any;
-    error: PipNoConnectionError;
-    constructor($window: ng.IWindowService, $scope: ng.IScope, $state: ng.ui.IStateService, $rootScope: ng.IRootScopeService, $mdMedia: angular.material.IMedia, $injector: angular.auto.IInjectorService, pipErrorsService: IErrorsService);
-    private appHeader();
-    onRetry(): void;
-}
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
 
-export class PipUnsupportedError {
-    config?: any;
-}
-export class ErrorUnsupportedController {
-    private _errorKey;
-    private pipNavService;
-    errorConfig: ErrorStateItem;
-    isCordova: boolean;
-    media: any;
-    error: PipUnsupportedError;
-    constructor($scope: ng.IScope, $state: ng.ui.IStateService, $rootScope: ng.IRootScopeService, $mdMedia: angular.material.IMedia, $injector: angular.auto.IInjectorService, pipErrorsService: IErrorsService);
-    private appHeader();
-}
+export let ErrorsMissingRouteState: string;
+export let StateNotFoundEvent: string;
 
-export class PipUnknownErrorDetails {
-    code: number;
-    message: string;
-    status: string;
-    server_stacktrace: Function;
-    client_stacktrace: Function;
-}
-export class ErrorUnknownController {
-    private _errorKey;
-    private pipNavService;
-    errorConfig: ErrorStateItem;
-    isCordova: boolean;
-    media: any;
-    error: PipUnknownErrorDetails;
-    error_details: PipUnknownErrorDetails;
-    showError: boolean;
-    constructor($scope: ng.IScope, $state: ng.ui.IStateService, $rootScope: ng.IRootScopeService, $mdMedia: angular.material.IMedia, $injector: angular.auto.IInjectorService, pipErrorsService: IErrorsService);
-    private appHeader();
-    private parseError();
-    onDetails(): void;
-}
+export let ErrorsConnectionState: string;
+export let ErrorsConnectionEvent: string;
 
-class NoConnectionPanelController {
-    private _retry;
-    constructor($scope: ng.IScope);
-    onRetry(): void;
-}
+
+export let ErrorsUnknownState: string;
+export let ErrorsUnknownEvent: string;
+
 
 }
 
 declare module pip.charts {
 
+
+
+export interface IChartColorsService {
+    getMaterialColor(index: number, colors: string[]): string;
+    materialColorToRgba(color: string): string;
+    generateMaterialColors(): string[];
+}
 
 
 
@@ -1326,32 +1117,17 @@ declare module pip.charts {
 declare module pip.locations {
 
 
+export interface ILocationDialogService {
+    show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
+}
 
-class LocationDialogService {
-    private _$mdDialog;
-    constructor($mdDialog: angular.material.IDialogService);
-    show(params: any, successCallback: any, cancelCallback: any): void;
-}
-class LocationEditDialogController {
-    private _map;
-    private _marker;
-    private _$scope;
-    private _$mdDialog;
-    theme: string;
+
+export class LocationDialogParams {
     locationPos: any;
-    locationName: any;
-    supportSet: boolean;
-    constructor($scope: ng.IScope, $rootScope: ng.IRootScopeService, $timeout: angular.ITimeoutService, $mdDialog: angular.material.IDialogService, locationPos: any, locationName: any);
-    createMarker(coordinates: any): any;
-    changeLocation(coordinates: any, tid: any): void;
-    onAddPin(): void;
-    onRemovePin(): void;
-    onZoomIn(): void;
-    onZoomOut(): void;
-    onSetLocation: () => void;
-    onCancel(): void;
-    onApply(): void;
+    locationName: string;
 }
+
+
 
 
 let google: any;
@@ -1366,156 +1142,23 @@ export class ButtonsUpload {
     click: Function;
 }
 
-export interface IFileFailController {
-    name: string;
-    type: string;
-    error: string;
-    buttons: ButtonsUpload[];
-}
-export class FileFailController implements IFileFailController, IFileFailBindings {
-    name: string;
-    type: string;
-    error: string;
-    buttons: ButtonsUpload[];
-    constructor($scope: ng.IScope);
-}
-
-export interface IFileFailBindings {
-    [key: string]: any;
-    buttons: any;
-    name: any;
-    type: any;
-    error: any;
-}
-export class FileFailChanges implements ng.IOnChangesObject, IFileFailBindings {
-    [key: string]: ng.IChangesObject<any>;
-    buttons: ng.IChangesObject<ButtonsUpload[]>;
-    error: ng.IChangesObject<string>;
-    name: ng.IChangesObject<string>;
-    type: ng.IChangesObject<string>;
-}
 
 
-export interface IFileSelectController {
-    localFile: any;
-    onUploadButtonClick(): void;
-    onDeleteButtonClick(): void;
-}
-export class FileSelectController implements IFileSelectController {
-    localFile: any;
-    constructor($scope: ng.IScope);
-    onUploadButtonClick(): void;
-    onDeleteButtonClick(): void;
-}
-
-export interface IFileStartController {
-    name: string;
-    type: string;
-    progress: number;
-    buttons: ButtonsUpload[];
-}
-export class FileStartController implements IFileStartController {
-    name: string;
-    progress: number;
-    type: string;
-    buttons: ButtonsUpload[];
-    constructor($scope: ng.IScope);
-}
 
 
-export class FileUploadState {
-    static All: string[];
-    static Start: string;
-    static Upload: string;
-    static Fail: string;
+
+export enum FileUploadState {
+    Uploading = 0,
+    Completed = 1,
+    Failed = 2,
 }
+
 export interface IFileUploadService {
-    progress: number;
-    state: string;
-    error: string;
-    upload(url: string, file: any, transaction: any, callback?: (data: any, err: any) => void): void;
-}
-export class FileUploadService implements IFileUploadService {
-    private $http;
-    progress: number;
-    state: string;
-    error: string;
-    constructor($http: ng.IHttpService);
-    upload(url: string, file: any, callback?: (data: any, err: any) => void): void;
+    upload(file: any, url: string, resultCallback?: (data: any, err: any) => void, progressCallback?: (state: FileUploadState, progress: number) => void): any;
 }
 
-export interface IFileSuccessController {
-    name: string;
-    type: string;
-    buttons: ButtonsUpload[];
-}
-export class FileSuccessController implements IFileSuccessController, IFileSuccessBindings {
-    name: string;
-    type: string;
-    buttons: ButtonsUpload[];
-    constructor();
-    $onChanges(changes: any): void;
-}
 
-export interface IFileSuccessBindings {
-    [key: string]: any;
-    type: any;
-    buttons: any;
-    name: any;
-}
 
-export interface IFileUploadController {
-    name: string;
-    type: string;
-    state: string;
-    progress: number;
-    onCancel(): void;
-    onRetry(): void;
-    onAbort(): void;
-}
-export class FileUploadButtons {
-    retry: Function;
-    cancel: Function;
-    abort: Function;
-}
-export class FileUploadController implements IFileUploadController {
-    buttonFunction: FileUploadButtons;
-    uploadButtons: ButtonsUpload[];
-    failButtons: ButtonsUpload[];
-    startButtons: ButtonsUpload[];
-    name: string;
-    type: string;
-    state: string;
-    progress: number;
-    buttons: boolean;
-    error: string;
-    constructor($scope: ng.IScope);
-    $onChanges(changes: FileUploadChanges): void;
-    onCancel(): void;
-    onRetry(): void;
-    onAbort(): void;
-}
-
-export interface IFileUploadBindings {
-    [key: string]: any;
-    buttonFunction: any;
-    buttons: any;
-    error: any;
-    name: any;
-    state: any;
-    type: any;
-    progress: any;
-}
-export class FileUploadChanges implements ng.IOnChangesObject, IFileUploadBindings {
-    [key: string]: ng.IChangesObject<any>;
-    buttonFunction: ng.IChangesObject<FileUploadButtons>;
-    buttons: ng.IChangesObject<boolean>;
-    error: ng.IChangesObject<string>;
-    name: ng.IChangesObject<string>;
-    state: ng.IChangesObject<string>;
-    type: ng.IChangesObject<string>;
-    progress: ng.IChangesObject<number>;
-}
 
 }
 
@@ -1722,6 +1365,7 @@ declare module pip.settings {
 
 
 
+
 export interface ISettingsService {
     getDefaultTab(): SettingsTab;
     showTitleText(newTitleText: string): void;
@@ -1768,10 +1412,12 @@ export class SettingsTab {
     stateConfig: SettingsStateConfig;
 }
 
-
 }
 
 declare module pip.help {
+
+
+
 
 
 export class HelpConfig {
@@ -1819,9 +1465,6 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
-
-
-
 
 
 }
