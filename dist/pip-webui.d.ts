@@ -1,7 +1,7 @@
 declare module pip.services {
 
-export let CurrentState: any;
-export let PreviousState: any;
+export let StateVar: string;
+export let PrevStateVar: string;
 
 
 let RedirectedStates: any;
@@ -261,12 +261,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
-
-
-
-
-
-
 export const MainResizedEvent = "pipMainResized";
 export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
@@ -305,6 +299,12 @@ export let MainBreakpointStatuses: MediaBreakpointStatuses;
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
+
+
+
+
+
+
 }
 
 declare module pip.behaviors {
@@ -314,6 +314,7 @@ declare module pip.behaviors {
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
+
 
 
 
@@ -392,7 +393,6 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
-
 }
 
 declare module pip.controls {
@@ -425,7 +425,6 @@ export interface IPopoverService {
 
 
 
-
 export interface IToastService {
     showNextToast(): void;
     showToast(toast: Toast): void;
@@ -453,6 +452,7 @@ export class Toast {
 }
 
 
+
 }
 
 declare module pip.lists {
@@ -474,18 +474,18 @@ export interface IDateConvertService {
     readonly config: DateTimeConfig;
     useTimeZone(offset: number): any;
     getDateJSON(date: any): string;
-    getNextStart(value: any, category: string): Date;
-    getPrevStart(value: any, category: string): Date;
+    getNextStart(date: any, category: string): Date;
+    getPrevStart(date: any, category: string): Date;
     getNowStart(category: string): Date;
-    addHours(value: any, hours: number): Date;
-    toStartDay(value: any): Date;
-    toEndDay(value: any, offset: number): Date;
-    toStartWeek(value: any): Date;
-    toEndWeek(value: any, offset: number): Date;
-    toStartMonth(value: any): Date;
-    toEndMonth(value: any, offset: number): Date;
-    toStartYear(value: any): Date;
-    toEndYear(value: any, offset: number): Date;
+    addHours(date: any, hours: number): Date;
+    toStartDay(date: any): Date;
+    toEndDay(date: any, offset: number): Date;
+    toStartWeek(date: any): Date;
+    toEndWeek(date: any, offset: number): Date;
+    toStartMonth(date: any): Date;
+    toEndMonth(date: any, offset: number): Date;
+    toStartYear(date: any): Date;
+    toEndYear(date: any, offset: number): Date;
 }
 export interface IDateConvertProvider extends IDateConvertService, ng.IServiceProvider {
 }
@@ -578,21 +578,6 @@ export interface IErrorDetailsDialogService {
 }
 
 
-export interface IInformationDialogService {
-    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-
-export class InformationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    message: string;
-    item?: any;
-}
-
-
 
 export interface IOptionsDialogService {
     show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
@@ -653,6 +638,21 @@ export class OptionsBigDialogResult {
 }
 
 
+export interface IInformationDialogService {
+    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
+
+export class InformationDialogParams {
+    event?: MouseEvent;
+    ok?: string;
+    title?: string;
+    message: string;
+    item?: any;
+}
+
+
 }
 
 declare module pip.nav {
@@ -708,6 +708,34 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 export class AppBarConfig {
     visible: boolean;
     parts: any;
@@ -740,33 +768,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 
 
 
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-
-export const BreadcrumbChangedEvent: string;
-export const BreadcrumbBackEvent: string;
-
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -781,6 +782,35 @@ export interface INavService {
 
 
 
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
 
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
@@ -817,36 +847,6 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
-
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
-
-
-
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-
-export const NavIconClickedEvent: string;
-export const NavIconChangedEvent: string;
 
 
 export interface INavMenuService {
@@ -924,6 +924,13 @@ export const CloseSearchEvent = "pipCloseSearch";
 export const SearchChangedEvent = "pipSearchChanged";
 export const SearchActivatedEvent = "pipSearchActivated";
 
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
+}
+
 
 export interface ISideNavService {
     readonly config: SideNavConfig;
@@ -991,16 +998,10 @@ export class SideNavConfig {
     visible: boolean;
 }
 
-export class PipTab {
-    id: string;
-    name?: string;
-    count: number;
-    title: string;
-}
-
 }
 
 declare module pip.themes {
+
 
 
 
@@ -1028,10 +1029,10 @@ export let ThemeResetPage: string;
 
 
 
-
 }
 
 declare module pip.errors {
+
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1072,7 +1073,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
 
 
 
-
 export interface IFormErrorsService {
     errorsWithHint(field: any): any;
     touchedErrorsWithHint(form: ng.IFormController, field: any): any;
@@ -1089,9 +1089,9 @@ export let MaintenanceErrorEvent: string;
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
 
+
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
-
 
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
@@ -1117,17 +1117,17 @@ export interface IChartColorsService {
 declare module pip.locations {
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
+
 
 
 export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
-
-
 
 
 let google: any;
@@ -1147,6 +1147,7 @@ export class ButtonsUpload {
 
 
 
+
 export enum FileUploadState {
     Uploading = 0,
     Completed = 1,
@@ -1156,7 +1157,6 @@ export enum FileUploadState {
 export interface IFileUploadService {
     upload(file: any, url: string, resultCallback?: (data: any, err: any) => void, progressCallback?: (state: FileUploadState, progress: number) => void): any;
 }
-
 
 
 
@@ -1230,6 +1230,53 @@ export class DashboardWidget implements IDashboardWidget {
 }
 
 
+export class AddComponentDialogWidget {
+    title: string;
+    icon: string;
+    name: string;
+    amount: number;
+}
+export class AddComponentDialogController implements ng.IController {
+    activeGroupIndex: number;
+    $mdDialog: angular.material.IDialogService;
+    defaultWidgets: [AddComponentDialogWidget[]];
+    groups: any;
+    totalWidgets: number;
+    constructor(groups: any, activeGroupIndex: number, widgetList: [AddComponentDialogWidget[]], $mdDialog: angular.material.IDialogService);
+    add(): void;
+    cancel(): void;
+    encrease(groupIndex: number, widgetIndex: number): void;
+    decrease(groupIndex: number, widgetIndex: number): void;
+}
+
+export interface IAddComponentDialogService {
+    show(groups: any, activeGroupIndex: any): angular.IPromise<any>;
+}
+export interface IAddComponentDialogprovider {
+    configWidgetList(list: [AddComponentDialogWidget[]]): void;
+}
+
+export class WidgetConfigDialogController {
+    params: any;
+    $mdDialog: angular.material.IDialogService;
+    colors: string[];
+    sizes: any;
+    sizeId: string;
+    onCancel: Function;
+    constructor(params: any, $mdDialog: angular.material.IDialogService);
+    onApply(updatedData: any): void;
+}
+
+
+export interface IWidgetConfigService {
+    show(params: IWidgetConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
+}
+export interface IWidgetConfigDialogOptions extends angular.material.IDialogOptions {
+    dialogClass?: string;
+    extensionUrl?: string;
+    event?: any;
+}
+
 
 export interface TilesGridConstructor {
     new (tiles: any, options: any, columns: any, elem: any): any;
@@ -1295,53 +1342,6 @@ export class TilesGridService implements ITilesGridService {
     swapTiles(movedTile: any, beforeTile: any): any;
     removeTile(removeTile: any): any;
     updateTileOptions(opts: any): any;
-}
-
-export class AddComponentDialogWidget {
-    title: string;
-    icon: string;
-    name: string;
-    amount: number;
-}
-export class AddComponentDialogController implements ng.IController {
-    activeGroupIndex: number;
-    $mdDialog: angular.material.IDialogService;
-    defaultWidgets: [AddComponentDialogWidget[]];
-    groups: any;
-    totalWidgets: number;
-    constructor(groups: any, activeGroupIndex: number, widgetList: [AddComponentDialogWidget[]], $mdDialog: angular.material.IDialogService);
-    add(): void;
-    cancel(): void;
-    encrease(groupIndex: number, widgetIndex: number): void;
-    decrease(groupIndex: number, widgetIndex: number): void;
-}
-
-export interface IAddComponentDialogService {
-    show(groups: any, activeGroupIndex: any): angular.IPromise<any>;
-}
-export interface IAddComponentDialogprovider {
-    configWidgetList(list: [AddComponentDialogWidget[]]): void;
-}
-
-export class WidgetConfigDialogController {
-    params: any;
-    $mdDialog: angular.material.IDialogService;
-    colors: string[];
-    sizes: any;
-    sizeId: string;
-    onCancel: Function;
-    constructor(params: any, $mdDialog: angular.material.IDialogService);
-    onApply(updatedData: any): void;
-}
-
-
-export interface IWidgetConfigService {
-    show(params: IWidgetConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
-}
-export interface IWidgetConfigDialogOptions extends angular.material.IDialogOptions {
-    dialogClass?: string;
-    extensionUrl?: string;
-    event?: any;
 }
 
 
