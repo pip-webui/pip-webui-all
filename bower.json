@@ -1,51 +1,51 @@
 {
-    "name": "pip-webui",
-    "version": "2.0.0",
-    "description": "Pip.WebUI deployment bundle",
-    "main": "",
-    "authors": [
-        {
-            "name": "Sergey Seroukhov",
-            "email": "seroukhov@gmail.com"
-        },
-        {
-            "name": "Mark Zontak",
-            "email": "mark@zontak.me"
-        },
-        {
-            "name": "Alexey Dvoikin",
-            "email": "94dvoikin@gmail.com"
-        },
-        {
-            "name": "Anastas Fonotov",
-            "email": "anastasf@gmail.com"
-        },
-        {
-            "name": "Katerina Negrienko",
-            "email": "katya@negrienko.com"
-        }
-    ],
-    "license": "MIT",
-    "keywords": [
-        "pip",
-        "html5",
-        "web",
-        "framework",
-        "controls",
-        "css",
-        "styles"
-    ],
-    "homepage": "https://github.com/pip-webui/pip-webui-all",
-    "ignore": [
-        ".gitignore",
-        "node_modules",
-        "bower_components",
-        "src",
-        "tests",
-        "samples",
-        "scripts",
-        "build.*",
-        "gulpfile.js",
-        "karma.conf.js"
-    ]
+    "name":  "pip-webui",
+    "version":  "2.0.1",
+    "description":  "Pip.WebUI deployment bundle",
+    "main":  "",
+    "authors":  [
+                    {
+                        "name":  "Sergey Seroukhov",
+                        "email":  "seroukhov@gmail.com"
+                    },
+                    {
+                        "name":  "Mark Zontak",
+                        "email":  "mark@zontak.me"
+                    },
+                    {
+                        "name":  "Alexey Dvoikin",
+                        "email":  "94dvoikin@gmail.com"
+                    },
+                    {
+                        "name":  "Anastas Fonotov",
+                        "email":  "anastasf@gmail.com"
+                    },
+                    {
+                        "name":  "Katerina Negrienko",
+                        "email":  "katya@negrienko.com"
+                    }
+                ],
+    "license":  "MIT",
+    "keywords":  [
+                     "pip",
+                     "html5",
+                     "web",
+                     "framework",
+                     "controls",
+                     "css",
+                     "styles"
+                 ],
+    "homepage":  "https://github.com/pip-webui/pip-webui-all",
+    "ignore":  [
+                   ".gitignore",
+                   "node_modules",
+                   "bower_components",
+                   "src",
+                   "tests",
+                   "samples",
+                   "scripts",
+                   "build.*",
+                   "gulpfile.js",
+                   "karma.conf.js"
+               ]
 }

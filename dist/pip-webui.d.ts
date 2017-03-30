@@ -3,7 +3,6 @@ declare module pip.services {
 export let StateVar: string;
 export let PrevStateVar: string;
 
-
 let RedirectedStates: any;
 function decorateRedirectStateProvider($delegate: any): any;
 function addRedirectStateProviderDecorator($provide: any): void;
@@ -12,8 +11,6 @@ function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
 
-export let IdentityRootVar: string;
-export let IdentityChangedEvent: string;
 
 export interface IIdentity {
     id: string;
@@ -32,7 +29,6 @@ export interface IIdentityProvider extends ng.IServiceProvider {
     identity: any;
 }
 
-
 export interface ISessionService {
     session: any;
     isOpened(): boolean;
@@ -43,6 +39,9 @@ export interface ISessionProvider extends ng.IServiceProvider {
     setRootVar: boolean;
     session: any;
 }
+
+export let IdentityRootVar: string;
+export let IdentityChangedEvent: string;
 
 export const SessionRootVar = "$session";
 export const SessionOpenedEvent = "pipSessionOpened";
@@ -151,6 +150,7 @@ export class Translation {
 
 
 
+
 export interface ICodes {
     hash(value: string): number;
     verification(): string;
@@ -160,7 +160,6 @@ export interface IFormat {
     sample(value: string, maxLength: number): string;
     sprintf(message: string, ...args: any[]): string;
 }
-
 
 export interface IPageResetService {
     reset(): void;
@@ -204,6 +203,7 @@ export let ResetPageEvent: string;
 export let ResetAreaEvent: string;
 export let ResetRootVar: string;
 export let ResetAreaRootVar: string;
+
 
 
 
@@ -261,6 +261,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export const MainResizedEvent = "pipMainResized";
 export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
@@ -292,17 +298,11 @@ export interface IMediaProvider extends ng.IServiceProvider {
     breakpoints: MediaBreakpoints;
 }
 
-
 export let MainBreakpoints: MediaBreakpoints;
-export let MainBreakpointStatuses: MediaBreakpointStatuses;
+export const MainBreakpointStatuses: MediaBreakpointStatuses;
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
 
 
 }
@@ -311,13 +311,11 @@ declare module pip.behaviors {
 
 
 
-
-
-
-
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
+
+
 
 
 
@@ -393,9 +391,12 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
+
+
 }
 
 declare module pip.controls {
+
 
 
 export interface IImageSliderService {
@@ -414,13 +415,11 @@ export interface IImageSliderService {
 
 var marked: any;
 
-
 export interface IPopoverService {
     show(p: Object): void;
     hide(): void;
     resize(): void;
 }
-
 
 
 
@@ -451,6 +450,7 @@ export class Toast {
     successCallback: Function;
     cancelCallback: Function;
 }
+
 
 
 }
@@ -583,13 +583,42 @@ export interface IInformationDialogService {
 }
 
 
-
 export class InformationDialogParams {
     event?: MouseEvent;
     ok?: string;
     title?: string;
     message: string;
     item?: any;
+}
+
+
+
+export interface IOptionsDialogService {
+    show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
+}
+
+
+export class OptionsDialogData {
+    icon: string;
+    name: string;
+    title: string;
+    active: boolean;
+}
+
+export class OptionsDialogParams {
+    event?: MouseEvent;
+    title?: string;
+    ok?: string;
+    options?: OptionsDialogData[];
+    selectedOption?: OptionsDialogData;
+    selectedOptionName?: string;
+    isCheckboxOption?: boolean;
+    checkboxOptionCaption?: string;
+}
+
+export class OptionsDialogResult {
+    option: OptionsDialogData;
+    isCheckboxOption: boolean;
 }
 
 
@@ -622,35 +651,6 @@ export class OptionsBigDialogResult {
     isCheckboxOption: boolean;
 }
 
-
-
-export interface IOptionsDialogService {
-    show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
-}
-
-
-export class OptionsDialogData {
-    icon: string;
-    name: string;
-    title: string;
-    active: boolean;
-}
-
-export class OptionsDialogParams {
-    event?: MouseEvent;
-    title?: string;
-    ok?: string;
-    options?: OptionsDialogData[];
-    selectedOption?: OptionsDialogData;
-    selectedOptionName?: string;
-    isCheckboxOption?: boolean;
-    checkboxOptionCaption?: string;
-}
-
-export class OptionsDialogResult {
-    option: OptionsDialogData;
-    isCheckboxOption: boolean;
-}
 
 
 }
@@ -805,7 +805,6 @@ export interface INavHeaderProvider extends ng.IServiceProvider {
 }
 
 
-
 export class NavHeaderConfig {
     imageUrl: string;
     defaultImageUrl: string;
@@ -817,6 +816,7 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
+
 
 export interface INavIconService {
     readonly config: NavIconConfig;
@@ -836,7 +836,6 @@ export interface INavIconProvider extends ng.IServiceProvider {
 }
 
 
-
 export class NavIconConfig {
     type: string;
     imageUrl: string;
@@ -847,6 +846,7 @@ export class NavIconConfig {
 
 export const NavIconClickedEvent: string;
 export const NavIconChangedEvent: string;
+
 
 
 export interface INavMenuService {
@@ -860,7 +860,6 @@ export interface INavMenuProvider extends ng.IServiceProvider {
     sections: NavMenuSection[];
     defaultIcon: string;
 }
-
 
 
 export class NavMenuLink {
@@ -991,6 +990,7 @@ export class SideNavConfig {
     visible: boolean;
 }
 
+
 export class PipTab {
     id: string;
     name?: string;
@@ -1001,7 +1001,6 @@ export class PipTab {
 }
 
 declare module pip.themes {
-
 
 
 
@@ -1029,10 +1028,10 @@ export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
 export let ThemeResetPage: string;
 
+
 }
 
 declare module pip.errors {
-
 
 
 export class ErrorPageConfig {
@@ -1083,18 +1082,19 @@ export interface IFormErrorsService {
     goToUnhandledErrorPage(error: any): any;
 }
 
+
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
-
-export let ErrorsConnectionState: string;
-export let ErrorsConnectionEvent: string;
 
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
 
+export let ErrorsConnectionState: string;
+export let ErrorsConnectionEvent: string;
+
+
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
-
 
 
 }
@@ -1118,20 +1118,20 @@ declare module pip.locations {
 
 
 
-
-let google: any;
-
-
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
-
 
 
 export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
+
+
+
+let google: any;
+
 
 }
 
@@ -1147,9 +1147,6 @@ export class ButtonsUpload {
 
 
 
-
-
-
 export enum FileUploadState {
     Uploading = 0,
     Completed = 1,
@@ -1159,6 +1156,9 @@ export enum FileUploadState {
 export interface IFileUploadService {
     upload(file: any, url: string, resultCallback?: (data: any, err: any) => void, progressCallback?: (state: FileUploadState, progress: number) => void): any;
 }
+
+
+
 
 }
 
@@ -1203,6 +1203,30 @@ export class DashboardTile implements IDashboardTile {
     size: Object | string | number;
     constructor();
 }
+
+export class TileConfigDialogController {
+    params: any;
+    extensionUrl: any;
+    $mdDialog: angular.material.IDialogService;
+    colors: string[];
+    sizes: any;
+    sizeId: string;
+    onCancel: Function;
+    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
+    onApply(updatedData: any): void;
+}
+
+
+export interface ITileConfigService {
+    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
+}
+export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
+    dialogClass?: string;
+    extensionUrl?: string;
+    event?: any;
+}
+
+
 
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
@@ -1252,31 +1276,6 @@ export class DragTileService implements IDragTileService {
 
 
 
-export class TileConfigDialogController {
-    params: any;
-    extensionUrl: any;
-    $mdDialog: angular.material.IDialogService;
-    colors: string[];
-    sizes: any;
-    sizeId: string;
-    onCancel: Function;
-    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
-    onApply(updatedData: any): void;
-}
-
-
-export interface ITileConfigService {
-    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
-}
-export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
-    dialogClass?: string;
-    extensionUrl?: string;
-    event?: any;
-}
-
-
-
-
 
 export class MenuTileService extends DashboardTile {
     menu: any;
@@ -1289,6 +1288,11 @@ export class MenuTileService extends DashboardTile {
 
 
 
+
+export interface ITileTemplateService {
+    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
+    setImageMarginCSS($element: any, image: any): void;
+}
 
 
 export interface TilesGridConstructor {
@@ -1357,15 +1361,10 @@ export class TilesGridService implements ITilesGridService {
     updateTileOptions(opts: any): any;
 }
 
-export interface ITileTemplateService {
-    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
-    setImageMarginCSS($element: any, image: any): void;
-}
 
 }
 
 declare module pip.settings {
-
 
 
 
@@ -1416,9 +1415,11 @@ export class SettingsTab {
     stateConfig: SettingsStateConfig;
 }
 
+
 }
 
 declare module pip.help {
+
 
 
 
@@ -1468,7 +1469,6 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
-
 
 
 }
