@@ -1,7 +1,7 @@
 var
     gulp = require('gulp'),
     concat = require('gulp-concat'),
-    less = require('gulp-less'),
+    sass = require('gulp-sass'),
     rename = require('gulp-rename'),
     minifyCss = require('gulp-minify-css'),
     minifyJs = require('gulp-uglify'),
@@ -156,7 +156,7 @@ gulp.task('build-css-prod', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build-scss', function () {
+gulp.task('build-sass', function () {
     return gulp.src([
         '../pip-webui-css/dist/pip-webui-css.scss'
     ])
@@ -164,7 +164,7 @@ gulp.task('build-scss', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build-dev', ['build-js-dev', 'build-css-dev', 'build-scss']);
+gulp.task('build-dev', ['build-js-dev', 'build-css-dev', 'build-sass']);
 gulp.task('build-prod', ['build-js-prod', 'build-css-prod']);
 
 gulp.task('copy-images', function () {
