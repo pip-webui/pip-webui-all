@@ -156,15 +156,15 @@ gulp.task('build-css-prod', function () {
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build-less', function () {
+gulp.task('build-scss', function () {
     return gulp.src([
-        '../pip-webui-css/dist/pip-webui-css.less'
+        '../pip-webui-css/dist/pip-webui-css.scss'
     ])
-    .pipe(concat('pip-webui.less'))
+    .pipe(concat('pip-webui.scss'))
     .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('build-dev', ['build-js-dev', 'build-css-dev', 'build-less']);
+gulp.task('build-dev', ['build-js-dev', 'build-css-dev', 'build-scss']);
 gulp.task('build-prod', ['build-js-prod', 'build-css-prod']);
 
 gulp.task('copy-images', function () {
