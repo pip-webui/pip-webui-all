@@ -311,16 +311,6 @@ declare module pip.behaviors {
 
 
 
-export interface IDraggableService {
-    inputEvent(event: any): any;
-}
-
-
-
-
-
-
-
 export interface IKeyboardShortcuts {
     [key: string]: Shortcut;
 }
@@ -390,6 +380,16 @@ export class Shortcut {
 
 
 export let ShortcutsChangedEvent: string;
+
+
+
+
+export interface IDraggableService {
+    inputEvent(event: any): any;
+}
+
+
+
 
 
 
@@ -578,21 +578,6 @@ export interface IErrorDetailsDialogService {
 }
 
 
-export interface IInformationDialogService {
-    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-export class InformationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    message: string;
-    item?: any;
-}
-
-
-
 export interface IOptionsDialogService {
     show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
 }
@@ -619,6 +604,21 @@ export class OptionsDialogParams {
 export class OptionsDialogResult {
     option: OptionsDialogData;
     isCheckboxOption: boolean;
+}
+
+
+
+export interface IInformationDialogService {
+    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
+export class InformationDialogParams {
+    event?: MouseEvent;
+    ok?: string;
+    title?: string;
+    message: string;
+    item?: any;
 }
 
 
@@ -782,6 +782,36 @@ export interface INavService {
 
 
 
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
+
+
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
     imageUrl: string;
@@ -816,36 +846,6 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
-
-
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
-
-
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-
-export const NavIconClickedEvent: string;
-export const NavIconChangedEvent: string;
 
 
 
@@ -1006,15 +1006,6 @@ declare module pip.themes {
 
 
 
-
-
-
-
-
-
-
-
-
 export interface IThemeService {
     theme: string;
     use(language: string): string;
@@ -1029,10 +1020,18 @@ export let ThemeChangedEvent: string;
 export let ThemeResetPage: string;
 
 
+
+
+
+
+
+
+
+
+
 }
 
 declare module pip.errors {
-
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1073,6 +1072,7 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
 
 
 
+
 export interface IFormErrorsService {
     errorsWithHint(field: any): any;
     touchedErrorsWithHint(form: ng.IFormController, field: any): any;
@@ -1083,18 +1083,18 @@ export interface IFormErrorsService {
 }
 
 
-export let ErrorsMaintenanceState: string;
-export let MaintenanceErrorEvent: string;
-
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
+
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
 
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
 
-
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
+
 
 
 }
@@ -1102,12 +1102,12 @@ export let ErrorsUnknownEvent: string;
 declare module pip.charts {
 
 
+
 export interface IChartColorsService {
     getMaterialColor(index: number, colors: string[]): string;
     materialColorToRgba(color: string): string;
     generateMaterialColors(): string[];
 }
-
 
 
 
@@ -1129,8 +1129,8 @@ export class LocationDialogParams {
 }
 
 
-
 let google: any;
+
 
 
 }
@@ -1228,6 +1228,7 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
 
 
 
+
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
 export const UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
@@ -1276,7 +1277,6 @@ export class DragTileService implements IDragTileService {
 
 
 
-
 export class MenuTileService extends DashboardTile {
     menu: any;
     constructor();
@@ -1288,11 +1288,6 @@ export class MenuTileService extends DashboardTile {
 
 
 
-
-export interface ITileTemplateService {
-    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
-    setImageMarginCSS($element: any, image: any): void;
-}
 
 
 export interface TilesGridConstructor {
@@ -1361,6 +1356,11 @@ export class TilesGridService implements ITilesGridService {
     updateTileOptions(opts: any): any;
 }
 
+
+export interface ITileTemplateService {
+    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
+    setImageMarginCSS($element: any, image: any): void;
+}
 
 }
 
