@@ -1418,180 +1418,220 @@ __export(require("./PageResetService"));
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipButtons', [
-        'pipToggleButtons',
-        'pipRefreshButton',
-        'pipFabTooltipVisibility'
-    ]);
-})();
-},{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipButtons.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
+{
+    translate.$inject = ['$injector'];
+    function translate($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
+            return pipTranslate ? pipTranslate['translate'](key) || key : key;
         };
-    }]);
-})();
-},{}],3:[function(require,module,exports){
-var FabTooltipVisibilityController = (function () {
-    FabTooltipVisibilityController.$inject = ['$mdMedia', '$element', '$attrs', '$scope', '$timeout', '$parse'];
-    function FabTooltipVisibilityController($mdMedia, $element, $attrs, $scope, $timeout, $parse) {
-        "ngInject";
-        var trigGetter = $parse($attrs['pipFabTooltipVisibility']), showGetter = $parse($attrs['pipFabShowTooltip']), showSetter = showGetter.assign;
-        $scope.$watch(trigGetter, function (isOpen) {
-            if (isOpen) {
-                $timeout(function () {
-                    showSetter($scope, isOpen);
-                }, 600);
-            }
-            else {
-                showSetter($scope, isOpen);
-            }
-        });
     }
-    return FabTooltipVisibilityController;
-}());
-(function () {
+    angular.module('pipButtons.Translate', [])
+        .filter('translate', translate);
+}
+},{}],2:[function(require,module,exports){
+{
     pipFabTooltipVisibility.$inject = ['$parse', '$timeout'];
+    var FabTooltipVisibilityController_1 = (function () {
+        FabTooltipVisibilityController_1.$inject = ['$element', '$attrs', '$scope', '$timeout', '$parse'];
+        function FabTooltipVisibilityController_1($element, $attrs, $scope, $timeout, $parse) {
+            "ngInject";
+            var trigGetter = $parse($attrs['pipFabTooltipVisibility']), showGetter = $parse($attrs['pipFabShowTooltip']), showSetter = showGetter.assign;
+            $scope.$watch(trigGetter, function (isOpen) {
+                if (!_.isFunction(showSetter))
+                    return;
+                if (isOpen) {
+                    $timeout(function () {
+                        showSetter($scope, isOpen);
+                    }, 600);
+                }
+                else {
+                    showSetter($scope, isOpen);
+                }
+            });
+        }
+        return FabTooltipVisibilityController_1;
+    }());
     function pipFabTooltipVisibility($parse, $timeout) {
         return {
             restrict: 'A',
             scope: false,
-            controller: FabTooltipVisibilityController
+            controller: FabTooltipVisibilityController_1
         };
     }
     angular
         .module('pipFabTooltipVisibility', [])
         .directive('pipFabTooltipVisibility', pipFabTooltipVisibility);
-})();
-},{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipRefreshButton', ['ngMaterial']);
-    thisModule.directive('pipRefreshButton', ['$parse', function ($parse) {
-        return {
-            restrict: 'EA',
-            scope: false,
-            template: String() +
-                '<md-button class="pip-refresh-button" tabindex="-1" ng-click="onClick($event)" aria-label="REFRESH">' +
-                '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
-                '<span class="pip-refresh-text"></span>' +
-                '</md-button>',
-            replace: false,
-            link: function ($scope, $element, $attrs) {
-                var width, text, show, textGetter = $parse($attrs.pipText), visibleGetter = $parse($attrs.pipVisible), refreshGetter = $parse($attrs.pipRefresh), $button = $element.children('.md-button'), $text = $button.children('.pip-refresh-text');
-                show = function () {
-                    text = textGetter($scope);
-                    $text.text(text);
-                    $button.show();
-                    width = $button.width();
-                    $button.css('margin-left', '-' + width / 2 + 'px');
-                };
-                function hide() {
-                    $button.hide();
-                }
-                $scope.onClick = function () {
-                    refreshGetter($scope);
-                };
-                $scope.$watch(visibleGetter, function (newValue) {
-                    if (newValue) {
-                        show();
-                    }
-                    else {
-                        hide();
-                    }
-                });
-                $scope.$watch(textGetter, function (newValue) {
-                    $text.text(newValue);
+}
+},{}],3:[function(require,module,exports){
+"use strict";
+require("./refresh_button/RefreshButton");
+require("./toggle_buttons/ToggleButtons");
+require("./fabs/FabTooltipVisibility");
+angular.module('pipButtons', [
+    'pipToggleButtons',
+    'pipRefreshButton',
+    'pipFabTooltipVisibility'
+]);
+},{"./fabs/FabTooltipVisibility":2,"./refresh_button/RefreshButton":4,"./toggle_buttons/ToggleButtons":5}],4:[function(require,module,exports){
+{
+    var RefreshButtonBindings = {
+        text: '<pipText',
+        visible: '<pipVisible',
+        onRefresh: '&?pipRefresh'
+    };
+    var RefreshButtonChanges = (function () {
+        function RefreshButtonChanges() {
+        }
+        return RefreshButtonChanges;
+    }());
+    var RefreshButtonController = (function () {
+        function RefreshButtonController($scope, $element, $attrs) {
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+        }
+        RefreshButtonController.prototype.$postLink = function () {
+            this._buttonElement = this.$element.children('.md-button');
+            this._textElement = this._buttonElement.children('.pip-refresh-text');
+            this.show();
+        };
+        RefreshButtonController.prototype.$onChanges = function (changes) {
+            if (changes.visible.currentValue === true) {
+                this.text = changes.text.currentValue;
+                this.show();
+            }
+            else {
+                this.hide();
+            }
+        };
+        RefreshButtonController.prototype.onClick = function ($event) {
+            if (this.onRefresh) {
+                this.onRefresh({
+                    $event: $event
                 });
             }
         };
-    }]);
-})();
+        RefreshButtonController.prototype.show = function () {
+            if (this._textElement === undefined || this._buttonElement === undefined) {
+                return;
+            }
+            this._textElement.text(this.text);
+            this._buttonElement.show();
+            var width = this._buttonElement.width();
+            this._buttonElement.css('margin-left', '-' + width / 2 + 'px');
+        };
+        RefreshButtonController.prototype.hide = function () {
+            this._buttonElement.hide();
+        };
+        return RefreshButtonController;
+    }());
+    var RefreshButtonComponent = {
+        bindings: RefreshButtonBindings,
+        controller: RefreshButtonController,
+        template: '<md-button class="pip-refresh-button" tabindex="-1" ng-click="$ctrl.onClick($event)" aria-label="REFRESH">' +
+            '<md-icon md-svg-icon="icons:refresh"></md-icon>' +
+            '<span class="pip-refresh-text"></span>' +
+            '</md-button>'
+    };
+    angular
+        .module('pipRefreshButton', ['ngMaterial'])
+        .component('pipRefreshButton', RefreshButtonComponent);
+}
 },{}],5:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipToggleButtons', ['pipButtons.Templates']);
-    thisModule.directive('pipToggleButtons', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                ngDisabled: '&',
-                buttons: '=pipButtons',
-                currentButtonValue: '=ngModel',
-                currentButton: '=?pipButtonObject',
-                multiselect: '=?pipMultiselect',
-                change: '&ngChange',
-                onlyToggle: '=?pipOnlyToggle'
-            },
-            templateUrl: 'toggle_buttons/toggle_buttons.html',
-            controller: ['$scope', '$element', '$attrs', '$mdMedia', '$timeout', function ($scope, $element, $attrs, $mdMedia, $timeout) {
-                var index;
-                $scope.$mdMedia = $mdMedia;
-                $scope.class = $attrs.class || '';
-                $scope.multiselect = $scope.multiselect || false;
-                if (!$scope.buttons || _.isArray($scope.buttons) && $scope.buttons.length === 0) {
-                    $scope.buttons = [];
-                }
-                index = _.indexOf($scope.buttons, _.find($scope.buttons, { id: $scope.currentButtonValue }));
-                $scope.currentButtonIndex = index < 0 ? 0 : index;
-                $scope.currentButton = $scope.buttons.length > 0 ? $scope.buttons[$scope.currentButtonIndex]
-                    : $scope.currentButton;
-                $scope.buttonSelected = function (index) {
-                    if ($scope.disabled()) {
-                        return;
-                    }
-                    if ($scope.buttons[index].diselectable === true && index === $scope.currentButtonIndex
-                        && $scope.buttons[index].level !== undefined) {
-                        var curLevel_1 = $scope.buttons[index].level, tmp = void 0;
-                        curLevel_1--;
-                        tmp = _.findIndex($scope.buttons, function (b) { return b['level'] === curLevel_1; });
-                        index = tmp > -1 ? tmp : index;
-                    }
-                    $scope.currentButtonIndex = index;
-                    $scope.currentButton = $scope.buttons[$scope.currentButtonIndex];
-                    $scope.currentButtonValue = $scope.currentButton.id || index;
-                    $timeout(function () {
-                        if ($scope.change) {
-                            $scope.change();
-                        }
-                    });
-                };
-                $scope.enterSpacePress = function (event) {
-                    $scope.buttonSelected(event.index);
-                };
-                $scope.disabled = function () {
-                    if ($scope.ngDisabled) {
-                        return $scope.ngDisabled();
-                    }
-                };
-                $scope.highlightButton = function (index) {
-                    if ($scope.multiselect && $scope.currentButton.level !== undefined && $scope.buttons[index].level !== undefined) {
-                        return $scope.currentButton.level >= $scope.buttons[index].level;
-                    }
-                    else {
-                        return $scope.currentButtonIndex == index;
-                    }
-                };
-            }],
-            link: function (scope, elem) {
-                elem
-                    .on('focusin', function () {
-                    elem.addClass('focused-container');
-                })
-                    .on('focusout', function () {
-                    elem.removeClass('focused-container');
-                });
-            }
+{
+    var ToggleButton = (function () {
+        function ToggleButton() {
+        }
+        return ToggleButton;
+    }());
+    var ToggleButtonsBindings = {
+        ngDisabled: '<?',
+        buttons: '<pipButtons',
+        currentButtonValue: '=ngModel',
+        currentButton: '=?pipButtonObject',
+        multiselect: '<?pipMultiselect',
+        change: '&ngChange',
+        onlyToggle: '<?pipOnlyToggle'
+    };
+    var ToggleButtonsChanges = (function () {
+        function ToggleButtonsChanges() {
+        }
+        return ToggleButtonsChanges;
+    }());
+    var ToggleButtonsController = (function () {
+        ToggleButtonsController.$inject = ['$element', '$attrs', '$scope', '$timeout', '$injector'];
+        function ToggleButtonsController($element, $attrs, $scope, $timeout, $injector) {
+            "ngInject";
+            this.$element = $element;
+            this.$attrs = $attrs;
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this.pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+            this.class = $attrs['class'] || '';
+            var index = _.indexOf(this.buttons, _.find(this.buttons, {
+                id: this.currentButtonValue
+            }));
+            this.currentButtonIndex = index < 0 ? 0 : index;
+            this.currentButton = this.buttons.length > 0 ? this.buttons[this.currentButtonIndex] : this.currentButton;
+        }
+        ToggleButtonsController.prototype.$onChanges = function (changes) {
+            this.multiselect = changes.multiselect ? changes.multiselect.currentValue : false;
+            this.disabled = changes.ngDisabled ? changes.ngDisabled.currentValue : false;
+            this.onlyToggle = changes.onlyToggle ? changes.onlyToggle.currentValue : false;
+            this.buttons = !changes.buttons || _.isArray(changes.buttons.currentValue) && changes.buttons.currentValue.length === 0 ? [] : changes.buttons.currentValue;
+            var index = _.indexOf(this.buttons, _.find(this.buttons, {
+                id: this.currentButtonValue
+            }));
+            this.currentButtonIndex = index < 0 ? 0 : index;
+            this.currentButton = this.buttons.length > 0 ? this.buttons[this.currentButtonIndex] : this.currentButton;
         };
-    });
-})();
+        ToggleButtonsController.prototype.$postLink = function () {
+            var _this = this;
+            this.$element
+                .on('focusin', function () {
+                _this.$element.addClass('focused-container');
+            })
+                .on('focusout', function () {
+                _this.$element.removeClass('focused-container');
+            });
+        };
+        ToggleButtonsController.prototype.buttonSelected = function (index) {
+            var _this = this;
+            if (this.disabled) {
+                return;
+            }
+            this.currentButtonIndex = index;
+            this.currentButton = this.buttons[this.currentButtonIndex];
+            this.currentButtonValue = this.currentButton.id || index;
+            this.$timeout(function () {
+                if (_this.change) {
+                    _this.change();
+                }
+            });
+        };
+        ToggleButtonsController.prototype.enterSpacePress = function (event) {
+            this.buttonSelected(event.index);
+        };
+        ToggleButtonsController.prototype.highlightButton = function (index) {
+            if (this.multiselect &&
+                !_.isUndefined(this.currentButton.level) &&
+                !_.isUndefined(this.buttons[index].level)) {
+                return this.currentButton.level >= this.buttons[index].level;
+            }
+            return this.currentButtonIndex == index;
+        };
+        return ToggleButtonsController;
+    }());
+    var ToggleButtons = {
+        bindings: ToggleButtonsBindings,
+        templateUrl: 'toggle_buttons/ToggleButtons.html',
+        controller: ToggleButtonsController
+    };
+    angular
+        .module('pipToggleButtons', ['pipButtons.Templates'])
+        .component('pipToggleButtons', ToggleButtons);
+}
 },{}],6:[function(require,module,exports){
 (function(module) {
 try {
@@ -1600,8 +1640,31 @@ try {
   module = angular.module('pipButtons.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toggle_buttons/toggle_buttons.html',
-    '<div class="pip-toggle-buttons layout-row {{class}}" pip-selected="bufButtonIndex" pip-enter-space-press="enterSpacePress($event)" ng-if="$mdMedia(\'gt-xs\') || onlyToggle"><md-button tabindex="-1" ng-repeat="button in buttons" ng-class="{\'md-accent md-raised selected color-accent-bg\' : highlightButton($index)}" ng-attr-style="{{ \'background-color:\' + (highlightButton($index) ? button.backgroundColor : \'\') + \'!important\' }}" class="pip-selectable pip-chip-button flex" ng-click="buttonSelected($index, $event)" ng-disabled="button.disabled || disabled()">{{button.name || button.title | translate}} <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span></md-button></div><md-input-container class="md-block" ng-if="$mdMedia(\'xs\') && !onlyToggle"><md-select ng-model="currentButtonIndex" ng-disabled="disabled()" aria-label="DROPDOWN" md-on-close="buttonSelected(currentButtonIndex)"><md-option ng-repeat="action in buttons" value="{{ ::$index }}">{{ (action.title || action.name) | translate }} <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span></md-option></md-select></md-input-container>');
+  $templateCache.put('toggle_buttons/ToggleButtons.html',
+    '<div class="pip-toggle-buttons layout-row {{$ctrl.class}}" \n' +
+    '     pip-selected="$ctrl.bufButtonIndex" \n' +
+    '     pip-enter-space-press="$ctrl.enterSpacePress($event)"\n' +
+    '     ng-if="!$ctrl.pipMedia(\'xs\') || $ctrl.onlyToggle">\n' +
+    '    <md-button tabindex="-1" ng-repeat="button in $ctrl.buttons"\n' +
+    '               ng-class="{\'md-accent md-raised selected color-accent-bg\' : $ctrl.highlightButton($index)}"\n' +
+    '               ng-attr-style="{{ \'background-color:\' + ($ctrl.highlightButton($index) ? button.backgroundColor : \'\') + \'!important\' }}"\n' +
+    '               class="pip-selectable pip-chip-button flex" ng-click="$ctrl.buttonSelected($index, $event)"\n' +
+    '               ng-disabled="button.disabled || $ctrl.disabled">\n' +
+    '        {{button.name || button.title | translate}}\n' +
+    '        <span ng-if="button.checked || button.complete || button.filled" class="pip-tagged">*</span>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<md-input-container class="md-block" ng-if="$ctrl.pipMedia(\'xs\') && !$ctrl.onlyToggle">\n' +
+    '    <md-select ng-model="$ctrl.currentButtonIndex" ng-disabled="$ctrl.disabled" aria-label="DROPDOWN" \n' +
+    '              md-on-close="$ctrl.buttonSelected($ctrl.currentButtonIndex)">\n' +
+    '        <md-option ng-repeat="action in $ctrl.buttons" value="{{ ::$index }}">\n' +
+    '            {{ (action.title || action.name) | translate }}\n' +
+    '            <span ng-if="action.checked || action.complete || action.filled" class="pip-tagged">*</span>\n' +
+    '        </md-option>\n' +
+    '    </md-select>\n' +
+    '</md-input-container>\n' +
+    '');
 }]);
 })();
 
@@ -1611,62 +1674,61 @@ module.run(['$templateCache', function($templateCache) {
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
+"use strict";
 var MediaService_1 = require("../media/MediaService");
-(function () {
+{
     var AuxPanelDirectiveController = (function () {
-        AuxPanelDirectiveController.$inject = ['pipAuxPanel'];
         function AuxPanelDirectiveController(pipAuxPanel) {
+            this.pipAuxPanel = pipAuxPanel;
             this.normalSize = 320;
             this.largeSize = 480;
-            this._pipAuxPanel = pipAuxPanel;
         }
         AuxPanelDirectiveController.prototype.isGtxs = function () {
-            return Number($('body').width()) > MediaService_1.MainBreakpoints.xs && this._pipAuxPanel.isOpen();
+            return Number($('body').width()) > MediaService_1.MainBreakpoints.xs && this.pipAuxPanel.isOpen();
         };
         AuxPanelDirectiveController.prototype.isGtlg = function () {
             return Number($('body').width()) > (MediaService_1.MainBreakpoints.lg + this.largeSize);
         };
         return AuxPanelDirectiveController;
     }());
-    function AuxPanelDirective() {
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: AuxPanelDirectiveController,
-            transclude: true,
-            controllerAs: 'vm',
-            template: '<md-sidenav class="md-sidenav-right md-whiteframe-z2 pip-auxpanel color-content-bg" ng-class="{\'pip-large\': vm.isGtlg()}"' +
-                'md-component-id="pip-auxpanel" md-is-locked-open="vm.isGtxs()" pip-focused ng-transclude>' +
-                '</md-sidenav>'
-        };
-    }
+    var AuxPanel = {
+        controller: AuxPanelDirectiveController,
+        transclude: true,
+        template: '<md-sidenav class="md-sidenav-right md-whiteframe-z2 pip-auxpanel color-content-bg" ng-class="{\'pip-large\': $ctrl.isGtlg()}"' +
+            'md-component-id="pip-auxpanel" md-is-locked-open="$ctrl.isGtxs()" pip-focused ng-transclude>' +
+            '</md-sidenav>'
+    };
     angular
         .module('pipAuxPanel')
-        .directive('pipAuxPanel', AuxPanelDirective);
-})();
-},{"../media/MediaService":12}],2:[function(require,module,exports){
-'use strict';
-(function () {
-    AuxPanelPartDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipAuxPanel'];
+        .component('pipAuxPanel', AuxPanel);
+}
+},{"../media/MediaService":14}],2:[function(require,module,exports){
+{
     AuxPanelPartDirective.$inject = ['ngIfDirective'];
-    function AuxPanelPartDirectiveController($scope, $element, $attrs, $rootScope, pipAuxPanel) {
-        "ngInject";
-        var partName = '' + $attrs.pipAuxPanelPart;
-        var partValue = null;
-        var pos = partName.indexOf(':');
-        if (pos > 0) {
-            partValue = partName.substr(pos + 1);
-            partName = partName.substr(0, pos);
+    var AuxPanelPartController_1 = (function () {
+        AuxPanelPartController_1.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipAuxPanel'];
+        function AuxPanelPartController_1($scope, $element, $attrs, $rootScope, pipAuxPanel) {
+            "ngInject";
+            var _this = this;
+            this.$scope = $scope;
+            this.partName = '' + $attrs.pipAuxPanelPart;
+            this.pos = this.partName.indexOf(':');
+            if (this.pos > 0) {
+                this.partValue = this.partName.substr(this.pos + 1);
+                this.partName = this.partName.substr(0, this.pos);
+            }
+            this.onAuxPanelChanged(null, pipAuxPanel.config);
+            $rootScope.$on('pipAuxPanelChanged', function (event, config) {
+                _this.onAuxPanelChanged(event, config);
+            });
         }
-        onAuxPanelChanged(null, pipAuxPanel.config);
-        $rootScope.$on('pipAuxPanelChanged', onAuxPanelChanged);
-        function onAuxPanelChanged(event, config) {
+        AuxPanelPartController_1.prototype.onAuxPanelChanged = function (event, config) {
             var parts = config.parts || {};
-            var currentPartValue = config[partName];
-            $scope.visible = partValue ? currentPartValue == partValue : currentPartValue;
-        }
-    }
+            var currentPartValue = config[this.partName];
+            this.$scope['visible'] = this.partValue ? currentPartValue == this.partValue : currentPartValue;
+        };
+        return AuxPanelPartController_1;
+    }());
     function AuxPanelPartDirective(ngIfDirective) {
         "ngInject";
         var ngIf = ngIfDirective[0];
@@ -1677,31 +1739,25 @@ var MediaService_1 = require("../media/MediaService");
             restrict: ngIf.restrict,
             scope: true,
             link: function ($scope, $element, $attrs) {
-                $attrs.ngIf = function () { return $scope.visible; };
+                $attrs.ngIf = function () { return $scope['visible']; };
                 ngIf.link.apply(ngIf);
             },
-            controller: AuxPanelPartDirectiveController
+            controller: AuxPanelPartController_1
         };
     }
     angular
         .module('pipAuxPanel')
         .directive('pipAuxPanelPart', AuxPanelPartDirective);
-})();
+}
 },{}],3:[function(require,module,exports){
-'use strict';
+"use strict";
 hookAuxPanelEvents.$inject = ['$rootScope', 'pipAuxPanel'];
-exports.AuxPanelChangedEvent = 'pipAuxPanelChanged';
-exports.AuxPanelStateChangedEvent = 'pipAuxPanelStateChanged';
-exports.OpenAuxPanelEvent = 'pipOpenAuxPanel';
-exports.CloseAuxPanelEvent = 'pipCloseAuxPanel';
-var AuxPanelConfig = (function () {
-    function AuxPanelConfig() {
-    }
-    return AuxPanelConfig;
-}());
-exports.AuxPanelConfig = AuxPanelConfig;
+var IAuxPanelService_1 = require("./IAuxPanelService");
+var IAuxPanelService_2 = require("./IAuxPanelService");
 var AuxPanelService = (function () {
+    AuxPanelService.$inject = ['config', '$rootScope', '$mdSidenav'];
     function AuxPanelService(config, $rootScope, $mdSidenav) {
+        "ngInject";
         this.id = 'pip-auxpanel';
         this._config = config;
         this._rootScope = $rootScope;
@@ -1738,7 +1794,7 @@ var AuxPanelService = (function () {
         },
         set: function (value) {
             this._state = value || {};
-            this._rootScope.$broadcast(exports.AuxPanelStateChangedEvent, value);
+            this._rootScope.$broadcast(IAuxPanelService_1.AuxPanelStateChangedEvent, value);
         },
         enumerable: true,
         configurable: true
@@ -1782,7 +1838,7 @@ var AuxPanelService = (function () {
         this.sendConfigEvent();
     };
     AuxPanelService.prototype.sendConfigEvent = function () {
-        this._rootScope.$emit(exports.AuxPanelChangedEvent, this._config);
+        this._rootScope.$emit(IAuxPanelService_1.AuxPanelChangedEvent, this._config);
     };
     return AuxPanelService;
 }());
@@ -1800,7 +1856,7 @@ var AuxPanelProvider = (function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new AuxPanelConfig();
+            this._config = value || new IAuxPanelService_2.AuxPanelConfig();
         },
         enumerable: true,
         configurable: true
@@ -1876,25 +1932,37 @@ var AuxPanelProvider = (function () {
     return AuxPanelProvider;
 }());
 function hookAuxPanelEvents($rootScope, pipAuxPanel) {
-    $rootScope.$on(exports.OpenAuxPanelEvent, function () { pipAuxPanel.open(); });
-    $rootScope.$on(exports.CloseAuxPanelEvent, function () { pipAuxPanel.close(); });
+    $rootScope.$on(IAuxPanelService_1.OpenAuxPanelEvent, function () { pipAuxPanel.open(); });
+    $rootScope.$on(IAuxPanelService_1.CloseAuxPanelEvent, function () { pipAuxPanel.close(); });
 }
 angular
     .module('pipAuxPanel')
     .provider('pipAuxPanel', AuxPanelProvider)
     .run(hookAuxPanelEvents);
-},{}],4:[function(require,module,exports){
-'use strict';
+},{"./IAuxPanelService":4}],4:[function(require,module,exports){
+"use strict";
+exports.AuxPanelChangedEvent = 'pipAuxPanelChanged';
+exports.AuxPanelStateChangedEvent = 'pipAuxPanelStateChanged';
+exports.OpenAuxPanelEvent = 'pipOpenAuxPanel';
+exports.CloseAuxPanelEvent = 'pipCloseAuxPanel';
+var AuxPanelConfig = (function () {
+    function AuxPanelConfig() {
+    }
+    return AuxPanelConfig;
+}());
+exports.AuxPanelConfig = AuxPanelConfig;
+},{}],5:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipAuxPanel', ['ngMaterial']);
 require("./AuxPanelService");
-require("./AuxPanelPartDirective");
-require("./AuxPanelDirective");
-__export(require("./AuxPanelService"));
-},{"./AuxPanelDirective":1,"./AuxPanelPartDirective":2,"./AuxPanelService":3}],5:[function(require,module,exports){
-'use strict';
+require("./AuxPanelPart");
+require("./AuxPanel");
+__export(require("./IAuxPanelService"));
+},{"./AuxPanel":1,"./AuxPanelPart":2,"./AuxPanelService":3,"./IAuxPanelService":4}],6:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -1908,26 +1976,30 @@ require("./layouts/SimpleDirective");
 require("./layouts/TilesDirective");
 require("./auxpanel/index");
 __export(require("./media/index"));
-},{"./auxpanel/index":4,"./layouts/CardDirective":6,"./layouts/DialogDirective":7,"./layouts/DocumentDirective":8,"./layouts/MainDirective":9,"./layouts/SimpleDirective":10,"./layouts/TilesDirective":11,"./media/index":14}],6:[function(require,module,exports){
-'use strict';
+},{"./auxpanel/index":5,"./layouts/CardDirective":7,"./layouts/DialogDirective":8,"./layouts/DocumentDirective":9,"./layouts/MainDirective":10,"./layouts/SimpleDirective":11,"./layouts/TilesDirective":12,"./media/index":16}],7:[function(require,module,exports){
+"use strict";
+var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
 (function () {
     cardDirective.$inject = ['$rootScope'];
     var CardDirectiveLink = (function () {
+        CardDirectiveLink.$inject = ['$rootScope', '$element', '$attrs'];
         function CardDirectiveLink($rootScope, $element, $attrs) {
+            "ngInject";
             var _this = this;
-            this._element = $element;
-            this._rootScope = $rootScope;
-            this._attrs = $attrs;
+            this.$rootScope = $rootScope;
+            this.$element = $element;
+            this.$attrs = $attrs;
             $element.addClass('pip-card');
             var listener = function () { _this.resize(); };
-            $rootScope.$on(MediaService_1.MainResizedEvent, listener);
+            $rootScope.$on(IMediaService_1.MainResizedEvent, listener);
             this.resize();
             setTimeout(listener, 100);
         }
         CardDirectiveLink.prototype.resize = function () {
             var _this = this;
-            var $mainBody = $('.pip-main-body'), cardContainer = $('.pip-card-container'), windowWidth = $('pip-main').width(), maxWidth = $mainBody.width(), maxHeight = $mainBody.height(), minWidth = this._attrs.minWidth ? Math.floor(this._attrs.minWidth) : null, minHeight = this._attrs.minHeight ? Math.floor(this._attrs.minHeight) : null, width = this._attrs.width ? Math.floor(this._attrs.width) : null, height = this._attrs.height ? Math.floor(this._attrs.height) : null, left, top;
+            var $mainBody = $('.pip-main-body'), cardContainer = $('.pip-card-container'), windowWidth = $('pip-main').width();
+            var maxWidth = $mainBody.width(), maxHeight = $mainBody.height(), minWidth = this.$attrs.minWidth ? Math.floor(Number(this.$attrs.minWidth)) : null, minHeight = this.$attrs.minHeight ? Math.floor(Number(this.$attrs.minHeight)) : null, width = this.$attrs.width ? Math.floor(Number(this.$attrs.width)) : null, height = this.$attrs.height ? Math.floor(Number(this.$attrs.height)) : null, left, top;
             if (MediaService_1.MainBreakpointStatuses.xs) {
                 minWidth = null;
                 minHeight = null;
@@ -1945,14 +2017,15 @@ var MediaService_1 = require("../media/MediaService");
                 width = width ? Math.min(width, maxWidth) : null;
                 height = height ? Math.min(height, maxHeight) : null;
             }
-            this._element.css('max-width', maxWidth ? maxWidth + 'px' : '');
-            this._element.css('min-width', minWidth ? minWidth + 'px' : '');
-            this._element.css('width', width ? width + 'px' : '');
-            this._element.css('height', height ? height + 'px' : '');
+            this.$element.css('max-width', maxWidth ? maxWidth + 'px' : '');
+            this.$element.css('min-width', minWidth ? minWidth + 'px' : '');
+            this.$element.css('width', width ? width + 'px' : '');
+            this.$element.css('height', height ? height + 'px' : '');
             if (!cardContainer.hasClass('pip-outer-scroll')) {
-                this._element.css('max-height', maxHeight ? maxHeight + 'px' : '');
-                this._element.css('min-height', minHeight ? minHeight + 'px' : '');
-                var $header = this._element.find('.pip-header:visible'), $footer = this._element.find('.pip-footer:visible'), $body = this._element.find('.pip-body'), maxBodyHeight = maxHeight || $mainBody.height();
+                this.$element.css('max-height', maxHeight ? maxHeight + 'px' : '');
+                this.$element.css('min-height', minHeight ? minHeight + 'px' : '');
+                var $header = this.$element.find('.pip-header:visible'), $footer = this.$element.find('.pip-footer:visible'), $body = this.$element.find('.pip-body');
+                var maxBodyHeight = maxHeight || $mainBody.height();
                 if ($header.length > 0)
                     maxBodyHeight -= $header.outerHeight(true);
                 if ($footer.length > 0)
@@ -1966,14 +2039,14 @@ var MediaService_1 = require("../media/MediaService");
                     top = 0;
                 }
                 else {
-                    left = cardContainer.width() / 2 - this._element.width() / 2 - 16;
-                    top = Math.max(cardContainer.height() / 2 - this._element.height() / 2 - 16, 0);
+                    left = cardContainer.width() / 2 - this.$element.width() / 2 - 16;
+                    top = Math.max(cardContainer.height() / 2 - this.$element.height() / 2 - 16, 0);
                 }
-                this._element.css('left', left);
-                this._element.css('top', top);
-                setTimeout(function () { _this._element.css('display', 'flex'); }, 100);
+                this.$element.css('left', left);
+                this.$element.css('top', top);
+                setTimeout(function () { _this.$element.css('display', 'flex'); }, 100);
             }
-            this._rootScope.$emit('pipLayoutResized');
+            this.$rootScope.$emit('pipLayoutResized');
         };
         return CardDirectiveLink;
     }());
@@ -1990,8 +2063,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipCard', cardDirective);
 })();
-},{"../media/MediaService":12}],7:[function(require,module,exports){
-'use strict';
+},{"../media/IMediaService":13,"../media/MediaService":14}],8:[function(require,module,exports){
 (function () {
     function dialogDirective() {
         return {
@@ -2005,8 +2077,7 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipDialog', dialogDirective);
 })();
-},{}],8:[function(require,module,exports){
-'use strict';
+},{}],9:[function(require,module,exports){
 (function () {
     function documentDirective() {
         return {
@@ -2020,18 +2091,21 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipDocument', documentDirective);
 })();
-},{}],9:[function(require,module,exports){
-'use strict';
+},{}],10:[function(require,module,exports){
+"use strict";
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
+var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
 (function () {
     var MainDirectiveController = (function () {
         MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout', '$attrs'];
         function MainDirectiveController($scope, $element, $rootScope, $timeout, $attrs) {
             var _this = this;
-            this._element = $element;
-            this._rootScope = $rootScope;
-            this._timeout = $timeout;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$rootScope = $rootScope;
+            this.$timeout = $timeout;
+            this.$attrs = $attrs;
             this._container = $attrs.pipContainer ? $($attrs.pipContainer) : $element;
             $element.addClass('pip-main');
             var listener = function () { _this.resize(); };
@@ -2047,16 +2121,17 @@ var MediaService_1 = require("../media/MediaService");
             var body = $('body');
             MediaService_1.MainBreakpointStatuses.update(MediaService_1.MainBreakpoints, width);
             $.each(MediaService_1.MainBreakpointStatuses, function (breakpoint, status) {
-                if (_.isBoolean(status))
+                if (_.isBoolean(status)) {
                     body[status ? 'addClass' : 'removeClass']('pip-' + breakpoint);
+                }
             });
-            this._timeout(function () {
-                _this._rootScope.$apply();
+            this.$timeout(function () {
+                _this.$rootScope.$apply();
             });
         };
         MainDirectiveController.prototype.resize = function () {
             this.updateBreakpointStatuses();
-            this._rootScope.$emit(MediaService_1.MainResizedEvent, MediaService_1.MainBreakpointStatuses);
+            this.$rootScope.$emit(IMediaService_1.MainResizedEvent, MediaService_1.MainBreakpointStatuses);
         };
         return MainDirectiveController;
     }());
@@ -2084,8 +2159,7 @@ var MediaService_1 = require("../media/MediaService");
         .directive('pipMain', mainDirective)
         .directive('pipMainBody', mainBodyDirective);
 })();
-},{"../media/MediaService":12,"../media/ResizeFunctions":13}],10:[function(require,module,exports){
-'use strict';
+},{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],11:[function(require,module,exports){
 (function () {
     function simpleDirective() {
         return {
@@ -2099,18 +2173,24 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipSimple', simpleDirective);
 })();
-},{}],11:[function(require,module,exports){
-'use strict';
+},{}],12:[function(require,module,exports){
+"use strict";
 tilesDirective.$inject = ['$rootScope'];
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
+var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
+var TilesOptions = (function () {
+    function TilesOptions() {
+    }
+    return TilesOptions;
+}());
 var TilesDirectiveLink = (function () {
-    function TilesDirectiveLink($scope, $element, $rootScope, $attrs) {
+    function TilesDirectiveLink($scope, $element, $attrs, $rootScope) {
         var _this = this;
-        this._element = $element;
-        this._rootScope = $rootScope;
-        this._attrs = $attrs;
-        this._columnWidth = $attrs.columnWidth ? Math.floor($attrs.columnWidth) : 440,
+        this.$element = $element;
+        this.$attrs = $attrs;
+        this.$rootScope = $rootScope;
+        this._columnWidth = $attrs.columnWidth ? Math.floor(Number($attrs.columnWidth)) : 440,
             this._container = $element.children('.pip-tiles-container'),
             this._prevContainerWidth = null,
             this._masonry = Masonry.data(this._container[0]);
@@ -2122,13 +2202,11 @@ var TilesDirectiveLink = (function () {
         });
         this._sizer = $('<div class="pip-tile-sizer"></div>');
         this._sizer.appendTo(this._container);
-        $rootScope.$on(MediaService_1.MainResizedEvent, function () { _this.resize(false); });
+        $rootScope.$on(IMediaService_1.MainResizedEvent, function () { _this.resize(false); });
         this.resize(true);
     }
     TilesDirectiveLink.prototype.resize = function (force) {
-        var width = this._element.parent().width();
-        var containerWidth;
-        console.log();
+        var width = this.$element.parent().width(), containerWidth;
         if (MediaService_1.MainBreakpointStatuses['gt-xs'] && (width - 36) > this._columnWidth) {
             width = width - 24 * 2;
             var columns = Math.floor(width / this._columnWidth);
@@ -2157,7 +2235,7 @@ var TilesDirectiveLink = (function () {
         if (this._prevContainerWidth != containerWidth || force) {
             this._prevContainerWidth = containerWidth;
             this._masonry.layout();
-            this._rootScope.$emit(MediaService_1.LayoutResizedEvent);
+            this.$rootScope.$emit(IMediaService_1.LayoutResizedEvent);
         }
     };
     return TilesDirectiveLink;
@@ -2202,15 +2280,17 @@ function tilesDirective($rootScope) {
             };
         }],
         link: function ($scope, $element, $attrs) {
-            new TilesDirectiveLink($scope, $element, $rootScope, $attrs);
+            new TilesDirectiveLink($scope, $element, $attrs, $rootScope);
         }
     };
 }
 angular
     .module('pipLayout')
     .directive('pipTiles', tilesDirective);
-},{"../media/MediaService":12,"../media/ResizeFunctions":13}],12:[function(require,module,exports){
-'use strict';
+},{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],13:[function(require,module,exports){
+"use strict";
+exports.MainResizedEvent = 'pipMainResized';
+exports.LayoutResizedEvent = 'pipLayoutResized';
 var MediaBreakpoints = (function () {
     function MediaBreakpoints(xs, sm, md, lg) {
         this.xs = xs;
@@ -2225,7 +2305,7 @@ var MediaBreakpointStatuses = (function () {
     function MediaBreakpointStatuses() {
     }
     MediaBreakpointStatuses.prototype.update = function (breakpoints, width) {
-        if (breakpoints == null)
+        if (breakpoints == null || width == null)
             return;
         this.width = width;
         this['xs'] = width <= breakpoints.xs;
@@ -2241,10 +2321,11 @@ var MediaBreakpointStatuses = (function () {
     return MediaBreakpointStatuses;
 }());
 exports.MediaBreakpointStatuses = MediaBreakpointStatuses;
-exports.MainResizedEvent = 'pipMainResized';
-exports.LayoutResizedEvent = 'pipLayoutResized';
-exports.MainBreakpoints = new MediaBreakpoints(639, 716, 1024, 1439);
-exports.MainBreakpointStatuses = new MediaBreakpointStatuses();
+},{}],14:[function(require,module,exports){
+"use strict";
+var IMediaService_1 = require("./IMediaService");
+exports.MainBreakpoints = new IMediaService_1.MediaBreakpoints(639, 716, 1024, 1439);
+exports.MainBreakpointStatuses = new IMediaService_1.MediaBreakpointStatuses();
 var MediaProvider = (function () {
     function MediaProvider() {
     }
@@ -2265,7 +2346,7 @@ var MediaProvider = (function () {
         Object.defineProperty(service, 'breakpoints', {
             get: function () { return exports.MainBreakpoints; },
             set: function (value) {
-                exports.MainBreakpoints = value || new MediaBreakpoints(639, 716, 1024, 1439);
+                exports.MainBreakpoints = value || new IMediaService_1.MediaBreakpoints(639, 716, 1024, 1439);
                 exports.MainBreakpointStatuses.update(exports.MainBreakpoints, exports.MainBreakpointStatuses.width);
             }
         });
@@ -2281,8 +2362,8 @@ var MediaProvider = (function () {
 angular
     .module('pipMedia')
     .provider('pipMedia', MediaProvider);
-},{}],13:[function(require,module,exports){
-'use strict';
+},{"./IMediaService":13}],15:[function(require,module,exports){
+"use strict";
 var attachEvent = document.attachEvent;
 var isIE = navigator.userAgent.match(/Trident/);
 function requestFrame(callback) {
@@ -2315,8 +2396,10 @@ function resizeListener(event) {
     });
 }
 function loadListener(event) {
-    this.contentDocument.defaultView.__resizeTrigger__ = this.__resizeElement__;
-    this.contentDocument.defaultView.addEventListener('resize', resizeListener);
+    if (this.contentDocument) {
+        this.contentDocument.defaultView.__resizeTrigger__ = this.__resizeElement__;
+        this.contentDocument.defaultView.addEventListener('resize', resizeListener);
+    }
 }
 function addResizeListener(element, listener) {
     if (!element.__resizeListeners__) {
@@ -2350,23 +2433,26 @@ function removeResizeListener(element, listener) {
         if (attachEvent)
             element.detachEvent('onresize', resizeListener);
         else {
-            element.__resizeTrigger__.contentDocument.defaultView.removeEventListener('resize', resizeListener);
-            element.__resizeTrigger__ = !element.removeChild(element.__resizeTrigger__);
+            if (element.__resizeTrigger__.contentDocument) {
+                element.__resizeTrigger__.contentDocument.defaultView.removeEventListener('resize', resizeListener);
+                element.__resizeTrigger__ = !element.removeChild(element.__resizeTrigger__);
+            }
         }
     }
 }
 exports.removeResizeListener = removeResizeListener;
-},{}],14:[function(require,module,exports){
-'use strict';
+},{}],16:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipMedia', []);
 require("./MediaService");
 require("./ResizeFunctions");
+__export(require("./IMediaService"));
 __export(require("./MediaService"));
 __export(require("./ResizeFunctions"));
-},{"./MediaService":12,"./ResizeFunctions":13}]},{},[5])(5)
+},{"./IMediaService":13,"./MediaService":14,"./ResizeFunctions":15}]},{},[6])(6)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -2422,594 +2508,952 @@ __export(require("./ResizeFunctions"));
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipBehaviors', [
-        'pipFocused',
-        'pipSelected',
-        'pipInfiniteScroll',
-        'pipUnsavedChanges',
-        'pipDraggable',
-        'pipShortcuts'
-    ]);
-})();
-},{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipDraggable", []);
-    thisModule.service('pipDraggable', function () {
-        var scope = this;
-        scope.inputEvent = function (event) {
-            if (angular.isDefined(event.touches)) {
-                return event.touches[0];
-            }
-            else if (angular.isDefined(event.originalEvent) && angular.isDefined(event.originalEvent.touches)) {
-                return event.originalEvent.touches[0];
-            }
-            return event;
-        };
-    });
-    thisModule.directive('pipDrag', ['$rootScope', '$parse', '$document', '$window', 'pipDraggable', function ($rootScope, $parse, $document, $window, pipDraggable) {
+{
+    var CancelDragLink_1 = (function () {
+        function CancelDragLink_1($element) {
+            $element.find('*').attr('pip-cancel-drag', 'pip-cancel-drag');
+        }
+        return CancelDragLink_1;
+    }());
+    var CancelDrag = function () {
         return {
             restrict: 'A',
-            link: function (scope, element, attrs) {
-                scope.value = attrs.ngDrag;
-                var LONG_PRESS = 50;
-                var offset, _centerAnchor = false, _mx, _my, _tx, _ty, _mrx, _mry;
-                var _hasTouch = ('ontouchstart' in window) || window.DocumentTouch;
-                var _pressEvents = 'touchstart mousedown';
-                var _moveEvents = 'touchmove mousemove';
-                var _releaseEvents = 'touchend mouseup';
-                var _dragHandle;
-                var _myid = scope.$id;
-                var _data = null;
-                var _dragOffset = null;
-                var _dragEnabled = false;
-                var _pressTimer = null;
-                var _elementStyle = {};
-                var onDragStartCallback = $parse(attrs.pipDragStart) || null;
-                var onDragStopCallback = $parse(attrs.pipDragStop) || null;
-                var onDragSuccessCallback = $parse(attrs.pipDragSuccess) || null;
-                var allowTransform = angular.isDefined(attrs.allowTransform) ? scope.$eval(attrs.allowTransform) : false;
-                var getDragData = $parse(attrs.pipDragData);
-                var verticalScroll = toBoolean(attrs.pipVerticalScroll) || true, horizontalScroll = toBoolean(attrs.pipHorizontalScroll) || true, activationDistance = parseFloat(attrs.pipActivationDistance) || 75, scrollDistance = parseFloat(attrs.pipScrollDistance) || 50, scrollParent = false, scrollContainer = angular.element(window), scrollContainerGetter = $parse(attrs.pipScrollContainer);
-                var _deregisterRootMoveListener = angular.noop;
-                initialize();
-                return;
-                function initialize() {
-                    element.attr('pip-draggable', 'false');
-                    var dragHandles;
-                    if (element[0].querySelectorAll) {
-                        dragHandles = angular.element(element[0].querySelectorAll('[pip-drag-handle]'));
-                    }
-                    else {
-                        dragHandles = element.find('[pip-drag-handle]');
-                    }
-                    if (dragHandles.length) {
-                        _dragHandle = dragHandles;
-                    }
-                    toggleListeners(true);
-                    if (scrollParent) {
-                        scrollContainer = angular.element(element.parent());
-                    }
-                    else if (attrs.pipScrollContainer) {
-                        scrollContainer = angular.element(scrollContainerGetter(scope));
-                    }
-                    else {
-                        scrollContainer = angular.element(window);
-                    }
-                }
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                function toggleListeners(enable) {
-                    if (!enable)
-                        return;
-                    scope.$on('$destroy', onDestroy);
-                    scope.$watch(attrs.pipDrag, onEnableChange);
-                    scope.$watch(attrs.pipCenterAnchor, onCenterAnchor);
-                    if (_dragHandle) {
-                        _dragHandle.on(_pressEvents, onpress);
-                    }
-                    else {
-                        element.on(_pressEvents, onpress);
-                    }
-                    if (!_hasTouch && element[0].nodeName.toLowerCase() == "img") {
-                        element.on('mousedown', function () {
-                            return false;
-                        });
-                    }
-                }
-                function onDestroy(enable) {
-                    toggleListeners(false);
-                }
-                function onEnableChange(newVal, oldVal) {
-                    _dragEnabled = (newVal);
-                }
-                function onCenterAnchor(newVal, oldVal) {
-                    if (angular.isDefined(newVal))
-                        _centerAnchor = (newVal || 'true');
-                }
-                function isClickableElement(evt) {
-                    return (angular.isDefined(angular.element(evt.target).attr("pip-cancel-drag")));
-                }
-                function onpress(evt) {
-                    if (!_dragEnabled)
-                        return;
-                    if (isClickableElement(evt)) {
-                        return;
-                    }
-                    if (evt.type == "mousedown" && evt.button != 0) {
-                        return;
-                    }
-                    saveElementStyles();
-                    if (_hasTouch) {
-                        cancelPress();
-                        _pressTimer = setTimeout(function () {
-                            cancelPress();
-                            onlongpress(evt);
-                        }, LONG_PRESS);
-                        $document.on(_moveEvents, cancelPress);
-                        $document.on(_releaseEvents, cancelPress);
-                    }
-                    else {
-                        onlongpress(evt);
-                    }
-                }
-                function saveElementStyles() {
-                    _elementStyle.left = element.css('css') || 0;
-                    _elementStyle.top = element.css('top') || 0;
-                    _elementStyle.position = element.css('position');
-                    _elementStyle.width = element.css('width');
-                }
-                function cancelPress() {
-                    clearTimeout(_pressTimer);
-                    $document.off(_moveEvents, cancelPress);
-                    $document.off(_releaseEvents, cancelPress);
-                }
-                function onlongpress(evt) {
-                    if (!_dragEnabled)
-                        return;
-                    evt.preventDefault();
-                    offset = element[0].getBoundingClientRect();
-                    if (allowTransform)
-                        _dragOffset = offset;
-                    else {
-                        _dragOffset = { left: document.body.scrollLeft, top: document.body.scrollTop };
-                    }
-                    element.centerX = element[0].offsetWidth / 2;
-                    element.centerY = element[0].offsetHeight / 2;
-                    _mx = pipDraggable.inputEvent(evt).pageX;
-                    _my = pipDraggable.inputEvent(evt).pageY;
-                    _mrx = _mx - offset.left;
-                    _mry = _my - offset.top;
-                    if (_centerAnchor) {
-                        _tx = _mx - element.centerX - $window.pageXOffset;
-                        _ty = _my - element.centerY - $window.pageYOffset;
-                    }
-                    else {
-                        _tx = _mx - _mrx - $window.pageXOffset;
-                        _ty = _my - _mry - $window.pageYOffset;
-                    }
-                    $document.on(_moveEvents, onmove);
-                    $document.on(_releaseEvents, onrelease);
-                    _deregisterRootMoveListener = $rootScope.$on('draggable:_triggerHandlerMove', function (event, origEvent) {
-                        onmove(origEvent);
-                    });
-                }
-                function onmove(evt) {
-                    if (!_dragEnabled)
-                        return;
-                    evt.preventDefault();
-                    if (!element.hasClass('pip-dragging')) {
-                        _data = getDragData(scope);
-                        element.addClass('pip-dragging');
-                        $rootScope.$broadcast('draggable:start', {
-                            x: _mx,
-                            y: _my,
-                            tx: _tx,
-                            ty: _ty,
-                            event: evt,
-                            element: element,
-                            data: _data
-                        });
-                        if (onDragStartCallback) {
-                            scope.$apply(function () {
-                                onDragStartCallback(scope, { $data: _data, $event: evt });
-                            });
-                        }
-                    }
-                    _mx = pipDraggable.inputEvent(evt).pageX;
-                    _my = pipDraggable.inputEvent(evt).pageY;
-                    if (horizontalScroll || verticalScroll) {
-                        dragToScroll();
-                    }
-                    if (_centerAnchor) {
-                        _tx = _mx - element.centerX - _dragOffset.left;
-                        _ty = _my - element.centerY - _dragOffset.top;
-                    }
-                    else {
-                        _tx = _mx - _mrx - _dragOffset.left;
-                        _ty = _my - _mry - _dragOffset.top;
-                    }
-                    moveElement(_tx, _ty);
-                    $rootScope.$broadcast('draggable:move', {
-                        x: _mx,
-                        y: _my,
-                        tx: _tx,
-                        ty: _ty,
-                        event: evt,
-                        element: element,
-                        data: _data,
-                        uid: _myid,
-                        dragOffset: _dragOffset
-                    });
-                }
-                function onrelease(evt) {
-                    if (!_dragEnabled)
-                        return;
-                    evt.preventDefault();
-                    $rootScope.$broadcast('draggable:end', {
-                        x: _mx,
-                        y: _my,
-                        tx: _tx,
-                        ty: _ty,
-                        event: evt,
-                        element: element,
-                        data: _data,
-                        callback: onDragComplete,
-                        uid: _myid
-                    });
-                    element.removeClass('pip-dragging');
-                    element.parent().find('.pip-drag-enter').removeClass('pip-drag-enter');
-                    reset();
-                    $document.off(_moveEvents, onmove);
-                    $document.off(_releaseEvents, onrelease);
-                    if (onDragStopCallback) {
-                        scope.$apply(function () {
-                            onDragStopCallback(scope, { $data: _data, $event: evt });
-                        });
-                    }
-                    _deregisterRootMoveListener();
-                }
-                function onDragComplete(evt) {
-                    if (!onDragSuccessCallback)
-                        return;
-                    scope.$apply(function () {
-                        onDragSuccessCallback(scope, { $data: _data, $event: evt });
-                    });
-                }
-                function reset() {
-                    if (allowTransform)
-                        element.css({ transform: '', 'z-index': '', '-webkit-transform': '', '-ms-transform': '' });
-                    else {
-                        element.css({ 'position': _elementStyle.position, top: _elementStyle.top, left: _elementStyle.left, 'z-index': '', width: _elementStyle.width });
-                    }
-                }
-                function moveElement(x, y) {
-                    var eWidth = element.css('width');
-                    if (allowTransform) {
-                        element.css({
-                            transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
-                            'z-index': 99999,
-                            '-webkit-transform': 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
-                            '-ms-transform': 'matrix(1, 0, 0, 1, ' + x + ', ' + y + ')'
-                        });
-                    }
-                    else {
-                        element.css({
-                            'left': x + 'px',
-                            'top': y + 'px',
-                            'position': 'fixed',
-                            'z-index': 100,
-                            width: eWidth
-                        });
-                    }
-                }
-                function dragToScroll() {
-                    var scrollX = 0, scrollY = 0, offset = function (element) {
-                        return element.offset() || { left: 0, top: 0 };
-                    };
-                    if (horizontalScroll) {
-                        var containerLeft = offset(scrollContainer).left, containerWidth = scrollContainer.innerWidth(), containerRight = containerLeft + containerWidth;
-                        if ((_mx - containerLeft) < activationDistance) {
-                            scrollX = -scrollDistance;
-                        }
-                        else if ((containerRight - _mx) < activationDistance) {
-                            scrollX = scrollDistance;
-                        }
-                    }
-                    if (verticalScroll) {
-                        var containerTop = offset(scrollContainer).top, containerHeight = scrollContainer.innerHeight(), containerBottom = containerTop + containerHeight;
-                        if ((_my - containerTop) < activationDistance) {
-                            scrollY = -scrollDistance + 30;
-                        }
-                        else if ((containerBottom - _my) < activationDistance) {
-                            scrollY = scrollDistance - 30;
-                        }
-                    }
-                    if (scrollX !== 0 || scrollY !== 0) {
-                        var containerScrollLeft = scrollContainer.scrollLeft(), containerScrollTop = scrollContainer.scrollTop();
-                        scrollContainer.scrollLeft(containerScrollLeft + scrollX);
-                        scrollContainer.scrollTop(containerScrollTop + scrollY);
-                    }
-                }
-            }
-        };
-    }]);
-    thisModule.directive('pipDrop', ['$parse', '$timeout', '$window', '$document', 'pipDraggable', function ($parse, $timeout, $window, $document, pipDraggable) {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                scope.value = attrs.pipDrop;
-                scope.isTouching = false;
-                var _lastDropTouch = null;
-                var _myid = scope.$id;
-                var _dropEnabled = false;
-                var onDropCallback = $parse(attrs.pipDropSuccess);
-                var onDragStartCallback = $parse(attrs.pipDragStart);
-                var onDragStopCallback = $parse(attrs.pipDragStop);
-                var onDragMoveCallback = $parse(attrs.pipDragMove);
-                initialize();
-                return;
-                function initialize() {
-                    toggleListeners(true);
-                }
-                function toggleListeners(enable) {
-                    if (!enable)
-                        return;
-                    scope.$watch(attrs.pipDrop, onEnableChange);
-                    scope.$on('$destroy', onDestroy);
-                    scope.$on('draggable:start', onDragStart);
-                    scope.$on('draggable:move', onDragMove);
-                    scope.$on('draggable:end', onDragEnd);
-                }
-                function onDestroy(enable) {
-                    toggleListeners(false);
-                }
-                function onEnableChange(newVal, oldVal) {
-                    _dropEnabled = newVal;
-                }
-                function onDragStart(evt, obj) {
-                    if (!_dropEnabled)
-                        return;
-                    isTouching(obj.x, obj.y, obj.element);
-                    if (attrs.pipDragStart) {
-                        $timeout(function () {
-                            onDragStartCallback(scope, { $data: obj.data, $event: obj });
-                        });
-                    }
-                }
-                function onDragMove(evt, obj) {
-                    if (!_dropEnabled)
-                        return;
-                    isTouching(obj.x, obj.y, obj.element);
-                    if (attrs.pipDragMove) {
-                        $timeout(function () {
-                            onDragMoveCallback(scope, { $data: obj.data, $event: obj });
-                        });
-                    }
-                }
-                function onDragEnd(evt, obj) {
-                    if (!_dropEnabled || _myid === obj.uid) {
-                        updateDragStyles(false, obj.element);
-                        return;
-                    }
-                    if (isTouching(obj.x, obj.y, obj.element)) {
-                        if (obj.callback) {
-                            obj.callback(obj);
-                        }
-                        if (attrs.pipDropSuccess) {
-                            $timeout(function () {
-                                onDropCallback(scope, {
-                                    $data: obj.data,
-                                    $event: obj,
-                                    $target: scope.$eval(scope.value)
-                                });
-                            });
-                        }
-                    }
-                    if (attrs.pipDragStop) {
-                        $timeout(function () {
-                            onDragStopCallback(scope, { $data: obj.data, $event: obj });
-                        });
-                    }
-                    updateDragStyles(false, obj.element);
-                }
-                function isTouching(mouseX, mouseY, dragElement) {
-                    var touching = hitTest(mouseX, mouseY);
-                    scope.isTouching = touching;
-                    if (touching) {
-                        _lastDropTouch = element;
-                    }
-                    updateDragStyles(touching, dragElement);
-                    return touching;
-                }
-                function updateDragStyles(touching, dragElement) {
-                    if (touching) {
-                        element.addClass('pip-drag-enter');
-                        dragElement.addClass('pip-drag-over');
-                    }
-                    else if (_lastDropTouch == element) {
-                        _lastDropTouch = null;
-                        element.removeClass('pip-drag-enter');
-                        dragElement.removeClass('pip-drag-over');
-                    }
-                }
-                ;
-                function hitTest(x, y) {
-                    var bounds = element[0].getBoundingClientRect();
-                    x -= $document[0].body.scrollLeft + $document[0].documentElement.scrollLeft;
-                    y -= $document[0].body.scrollTop + $document[0].documentElement.scrollTop;
-                    return x >= bounds.left
-                        && x <= bounds.right
-                        && y <= bounds.bottom
-                        && y >= bounds.top;
-                }
-            }
-        };
-    }]);
-    thisModule.directive('pipPreventDrag', ['$parse', '$timeout', function ($parse, $timeout) {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                initialize();
-                return;
-                function initialize() {
-                    element.attr('pip-draggable', 'false');
-                    toggleListeners(true);
-                }
-                function toggleListeners(enable) {
-                    if (!enable)
-                        return;
-                    element.on('mousedown touchstart touchmove touchend touchcancel', absorbEvent_);
-                }
-                function absorbEvent_(event) {
-                    var e = event.originalEvent;
-                    e.preventDefault && e.preventDefault();
-                    e.stopPropagation && e.stopPropagation();
-                    e.cancelBubble = true;
-                    e.returnValue = false;
-                    return false;
-                }
-            }
-        };
-    }]);
-    thisModule.directive('pipCancelDrag', function () {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                element.find('*').attr('pip-cancel-drag', 'pip-cancel-drag');
-            }
-        };
-    });
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipFocused", []);
-    thisModule.directive('pipFocused', ['$timeout', '$mdConstant', '$window', function ($timeout, $mdConstant, $window) {
-        return {
-            require: "?ngModel",
             link: function ($scope, $element, $attrs) {
-                var controls, controlsLength, withHidden = $attrs.pipWithHidden, opacityDelta = 0.4, opacityLimit = 0.5, _color, focusedColor = $attrs.pipFocusedColor ? $attrs.pipFocusedColor : null, reInit = $attrs.pipFocusedRebind ? $attrs.pipFocusedRebind : null, focusedTabindex = $attrs.pipFocusedTabindex ? parseInt($attrs.pipFocusedTabindex) || 0 : 0, isOpacity = $attrs.pipFocusedOpacity ? toBoolean($attrs.pipFocusedOpacity) : false;
-                $timeout(init);
-                $element.on('keydown', keydownListener);
-                if ($attrs.ngModel) {
-                    $scope.$watch($attrs.ngModel, function () {
-                        $timeout(init);
-                    }, true);
-                }
-                if ($attrs.pipFocusedData) {
-                    $attrs.$observe('pipFocusedData', function () {
-                        $timeout(init);
-                    }, true);
-                }
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                ;
-                function rgba(color) {
-                    if (focusedColor) {
-                        return focusedColor;
-                    }
-                    var arr = color.split("(")[1].split(")")[0].split(",");
-                    if (!arr || arr.length < 3) {
-                        return '';
-                    }
-                    var red, blue, green, opacity;
-                    opacity = arr.length == 3 ? 1 : parseFloat(arr[3]);
-                    red = arr[0];
-                    blue = arr[1];
-                    green = arr[2];
-                    if (opacity < opacityLimit) {
-                        opacity += opacityDelta;
-                    }
-                    else {
-                        opacity -= opacityDelta;
-                    }
-                    return 'rgba(' + red + ', ' + blue + ', ' + green + ', ' + opacity + ')';
-                }
-                function setTabindex(element, value) {
-                    element.attr('tabindex', value);
-                }
-                function checkTabindex(controls) {
-                    var index = _.findIndex(controls, function (c) {
-                        return c['tabindex'] > -1;
+                new CancelDragLink_1($element);
+            }
+        };
+    };
+    angular
+        .module("pipDraggable")
+        .directive('pipCancelDrag', CancelDrag);
+}
+},{}],2:[function(require,module,exports){
+"use strict";
+{
+    var DragLink_1 = (function () {
+        function DragLink_1($rootScope, $parse, $document, $window, pipDraggable, $scope, $element, $attrs) {
+            this.$rootScope = $rootScope;
+            this.$parse = $parse;
+            this.$document = $document;
+            this.$window = $window;
+            this.pipDraggable = pipDraggable;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+            this.LONG_PRESS = 50;
+            this._centerAnchor = false;
+            this._hasTouch = ('ontouchstart' in window) || window.DocumentTouch;
+            this._pressEvents = 'touchstart mousedown';
+            this._moveEvents = 'touchmove mousemove';
+            this._releaseEvents = 'touchend mouseup';
+            this._data = null;
+            this._dragOffset = null;
+            this._dragEnabled = false;
+            this._pressTimer = null;
+            this._elementStyle = {};
+            this.scrollParent = false;
+            this.scrollContainer = angular.element(window);
+            this._deregisterRootMoveListener = angular.noop;
+            $scope.value = $attrs.ngDrag;
+            this._myid = $scope.$id;
+            this.onDragStartCallback = $parse($attrs.pipDragStart) || null;
+            this.onDragStopCallback = $parse($attrs.pipDragStop) || null;
+            this.onDragSuccessCallback = $parse($attrs.pipDragSuccess) || null;
+            this.allowTransform = angular.isDefined($attrs.allowTransform) ? $scope.$eval($attrs.allowTransform) : false;
+            this.getDragData = $parse($attrs.pipDragData);
+            this.verticalScroll = $attrs.pipVerticalScroll || true;
+            this.horizontalScroll = $attrs.pipHorizontalScroll || true;
+            this.activationDistance = parseFloat($attrs.pipActivationDistance) || 75;
+            this.scrollDistance = parseFloat($attrs.pipActivationDistance) || 50;
+            this.scrollContainerGetter = $parse($attrs.pipScrollContainer);
+            this.$element.css('cursor', 'move');
+            this.initialize();
+        }
+        DragLink_1.prototype.initialize = function () {
+            this.$element.attr('pip-draggable', 'false');
+            var dragHandles;
+            if (this.$element[0].querySelectorAll) {
+                dragHandles = angular.element(this.$element[0].querySelectorAll('[pip-drag-handle]'));
+            }
+            else {
+                dragHandles = this.$element.find('[pip-drag-handle]');
+            }
+            if (dragHandles.length) {
+                this._dragHandle = dragHandles;
+            }
+            this.toggleListeners(true);
+            if (this.scrollParent) {
+                this.scrollContainer = angular.element(this.$element.parent());
+            }
+            else if (this.$attrs.pipScrollContainer) {
+                this.scrollContainer = angular.element(this.scrollContainerGetter(this.$scope));
+            }
+            else {
+                this.scrollContainer = angular.element(window);
+            }
+        };
+        DragLink_1.prototype.toggleListeners = function (enable) {
+            var _this = this;
+            if (!enable)
+                return;
+            this.$scope.$on('$destroy', function () {
+                _this.onDestroy(enable);
+            });
+            this.$scope.$watch(this.$attrs.pipDrag, function (newVal, oldVal) {
+                _this.onEnableChange(newVal, oldVal);
+            });
+            this.$scope.$watch(this.$attrs.pipCenterAnchor, function (newVal, oldVal) {
+                _this.onCenterAnchor(newVal, oldVal);
+            });
+            if (this._dragHandle) {
+                this._dragHandle.on(this._pressEvents, function (event) {
+                    _this.onpress(event);
+                });
+            }
+            else {
+                this.$element.on(this._pressEvents, function (event) {
+                    _this.onpress(event);
+                });
+            }
+            if (!this._hasTouch && this.$element[0].nodeName.toLowerCase() == "img") {
+                this.$element.on('mousedown', function () {
+                    return false;
+                });
+            }
+        };
+        DragLink_1.prototype.onDestroy = function (enable) {
+            this.toggleListeners(false);
+        };
+        DragLink_1.prototype.onEnableChange = function (newVal, oldVal) {
+            this._dragEnabled = (newVal);
+        };
+        DragLink_1.prototype.onCenterAnchor = function (newVal, oldVal) {
+            if (angular.isDefined(newVal))
+                this._centerAnchor = (newVal || 'true');
+        };
+        DragLink_1.prototype.isClickableElement = function (evt) {
+            return (angular.isDefined(angular.element(evt.target).attr("pip-cancel-drag")));
+        };
+        DragLink_1.prototype.onpress = function (evt) {
+            var _this = this;
+            if (!this._dragEnabled)
+                return;
+            if (this.isClickableElement(evt)) {
+                return;
+            }
+            if (evt.type == "mousedown" && evt.button != 0) {
+                return;
+            }
+            this.saveElementStyles();
+            if (this._hasTouch) {
+                this.cancelPress();
+                this._pressTimer = setTimeout(function () {
+                    _this.cancelPress();
+                    _this.onlongpress(evt);
+                }, this.LONG_PRESS);
+                this.$document.on(this._moveEvents, function () {
+                    _this.cancelPress();
+                });
+                this.$document.on(this._releaseEvents, function () {
+                    _this.cancelPress();
+                });
+            }
+            else {
+                this.onlongpress(evt);
+            }
+        };
+        DragLink_1.prototype.saveElementStyles = function () {
+            this._elementStyle.left = this.$element.css('css') || 0;
+            this._elementStyle.top = this.$element.css('top') || 0;
+            this._elementStyle.position = this.$element.css('position');
+            this._elementStyle.width = this.$element.css('width');
+        };
+        DragLink_1.prototype.cancelPress = function () {
+            var _this = this;
+            clearTimeout(this._pressTimer);
+            this.$document.off(this._moveEvents, function () {
+                _this.cancelPress();
+            });
+            this.$document.off(this._releaseEvents, function () {
+                _this.cancelPress();
+            });
+        };
+        DragLink_1.prototype.onlongpress = function (evt) {
+            var _this = this;
+            if (!this._dragEnabled)
+                return;
+            evt.preventDefault();
+            this.offset = this.$element[0].getBoundingClientRect();
+            if (this.allowTransform)
+                this._dragOffset = this.offset;
+            else {
+                this._dragOffset = {
+                    left: document.body.scrollLeft,
+                    top: document.body.scrollTop
+                };
+            }
+            this.$element.centerX = this.$element[0].offsetWidth / 2;
+            this.$element.centerY = this.$element[0].offsetHeight / 2;
+            this._mx = this.pipDraggable.inputEvent(evt).pageX;
+            this._my = this.pipDraggable.inputEvent(evt).pageY;
+            this._mrx = this._mx - this.offset.left;
+            this._mry = this._my - this.offset.top;
+            if (this._centerAnchor) {
+                this._tx = this._mx - this.$element.centerX - this.$window.pageXOffset;
+                this._ty = this._my - this.$element.centerY - this.$window.pageYOffset;
+            }
+            else {
+                this._tx = this._mx - this._mrx - this.$window.pageXOffset;
+                this._ty = this._my - this._mry - this.$window.pageYOffset;
+            }
+            this.$document.on(this._moveEvents, function (event) {
+                _this.onmove(event);
+            });
+            this.$document.on(this._releaseEvents, function (event) {
+                _this.onrelease(event);
+            });
+            this._deregisterRootMoveListener = this.$rootScope.$on('draggable:_triggerHandlerMove', function (event, origEvent) {
+                _this.onmove(origEvent);
+            });
+        };
+        DragLink_1.prototype.onmove = function (evt) {
+            var _this = this;
+            if (!this._dragEnabled)
+                return;
+            evt.preventDefault();
+            if (!this.$element.hasClass('pip-dragging')) {
+                this._data = this.getDragData(this.$scope);
+                this.$element.addClass('pip-dragging');
+                this.$rootScope.$broadcast('draggable:start', {
+                    x: this._mx,
+                    y: this._my,
+                    tx: this._tx,
+                    ty: this._ty,
+                    event: evt,
+                    element: this.$element,
+                    data: this._data
+                });
+                if (this.onDragStartCallback) {
+                    this.$scope.$apply(function () {
+                        _this.onDragStartCallback(_this.$scope, {
+                            $data: _this._data,
+                            $event: evt
+                        });
                     });
-                    if (index == -1 && controls.length > 0) {
-                        setTabindex(angular.element(controls[0]), focusedTabindex);
-                    }
                 }
-                function init() {
-                    var selector = withHidden ? '.pip-focusable' : '.pip-focusable:visible';
-                    controls = $element.find(selector);
-                    controlsLength = controls.length;
-                    checkTabindex(controls);
-                    controls.on('focus', function () {
-                        if ($(this).hasClass('md-focused')) {
-                            return;
-                        }
-                        if (reInit) {
-                            init();
-                        }
-                        $element.addClass('pip-focused-container');
-                        if (isOpacity) {
-                            var ell = angular.element($(this)[0]);
-                            _color = $(this).css('backgroundColor');
-                            $(this).css('backgroundColor', rgba(_color));
-                            $(this).addClass('md-focused');
-                        }
-                        else {
-                            $(this).addClass('md-focused md-focused-opacity');
-                        }
-                    }).on('focusout', function () {
-                        if (!$(this).hasClass('md-focused')) {
-                            return;
-                        }
-                        $element.removeClass('pip-focused-container');
-                        if (isOpacity) {
-                            $(this).css('backgroundColor', "");
-                            $(this).removeClass('md-focused md-focused-opacity');
-                        }
-                        else {
-                            $(this).removeClass('md-focused');
-                        }
+            }
+            this._mx = this.pipDraggable.inputEvent(evt).pageX;
+            this._my = this.pipDraggable.inputEvent(evt).pageY;
+            if (this.horizontalScroll || this.verticalScroll) {
+                this.dragToScroll();
+            }
+            if (this._centerAnchor) {
+                this._tx = this._mx - this.$element.centerX - this._dragOffset.left;
+                this._ty = this._my - this.$element.centerY - this._dragOffset.top;
+            }
+            else {
+                this._tx = this._mx - this._mrx - this._dragOffset.left;
+                this._ty = this._my - this._mry - this._dragOffset.top;
+            }
+            this.moveElement(this._tx, this._ty);
+            this.$rootScope.$broadcast('draggable:move', {
+                x: this._mx,
+                y: this._my,
+                tx: this._tx,
+                ty: this._ty,
+                event: evt,
+                element: this.$element,
+                data: this._data,
+                uid: this._myid,
+                dragOffset: this._dragOffset
+            });
+        };
+        DragLink_1.prototype.onrelease = function (evt) {
+            var _this = this;
+            if (!this._dragEnabled)
+                return;
+            evt.preventDefault();
+            this.$rootScope.$broadcast('draggable:end', {
+                x: this._mx,
+                y: this._my,
+                tx: this._tx,
+                ty: this._ty,
+                event: evt,
+                element: this.$element,
+                data: this._data,
+                callback: this.onDragComplete,
+                uid: this._myid
+            });
+            this.$element.removeClass('pip-dragging');
+            this.$element.parent().find('.pip-drag-enter').removeClass('pip-drag-enter');
+            this.reset();
+            this.$document.off(this._moveEvents);
+            this.$document.off(this._releaseEvents);
+            if (this.onDragStopCallback) {
+                this.$scope.$apply(function () {
+                    _this.onDragStopCallback(_this.$scope, {
+                        $data: _this._data,
+                        $event: evt
+                    });
+                });
+            }
+            this._deregisterRootMoveListener();
+        };
+        DragLink_1.prototype.onDragComplete = function (evt) {
+            var _this = this;
+            if (!this.onDragSuccessCallback)
+                return;
+            this.$scope.$apply(function () {
+                _this.onDragSuccessCallback(_this.$scope, {
+                    $data: _this._data,
+                    $event: evt
+                });
+            });
+        };
+        DragLink_1.prototype.reset = function () {
+            if (this.allowTransform)
+                this.$element.css({
+                    transform: '',
+                    'z-index': '',
+                    '-webkit-transform': '',
+                    '-ms-transform': ''
+                });
+            else {
+                this.$element.css({
+                    position: this._elementStyle.position,
+                    top: this._elementStyle.top,
+                    left: this._elementStyle.left,
+                    'z-index': '',
+                    width: this._elementStyle.width
+                });
+            }
+        };
+        DragLink_1.prototype.moveElement = function (x, y) {
+            var eWidth = this.$element.css('width');
+            if (this.allowTransform) {
+                this.$element.css({
+                    transform: 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
+                    'z-index': 99999,
+                    '-webkit-transform': 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, ' + x + ', ' + y + ', 0, 1)',
+                    '-ms-transform': 'matrix(1, 0, 0, 1, ' + x + ', ' + y + ')'
+                });
+            }
+            else {
+                this.$element.css({
+                    'left': x + 'px',
+                    'top': y + 'px',
+                    'position': 'fixed',
+                    'z-index': 100,
+                    width: eWidth
+                });
+            }
+        };
+        DragLink_1.prototype.dragToScroll = function () {
+            var scrollX = 0, scrollY = 0, offset = function (element) {
+                return element.offset() || {
+                    left: 0,
+                    top: 0
+                };
+            };
+            if (this.horizontalScroll) {
+                var containerLeft = offset(this.scrollContainer).left, containerWidth = this.scrollContainer.innerWidth(), containerRight = containerLeft + containerWidth;
+                if ((this._mx - containerLeft) < this.activationDistance) {
+                    scrollX = -this.scrollDistance;
+                }
+                else if ((containerRight - this._mx) < this.activationDistance) {
+                    scrollX = this.scrollDistance;
+                }
+            }
+            if (this.verticalScroll) {
+                var containerTop = offset(this.scrollContainer).top, containerHeight = this.scrollContainer.innerHeight(), containerBottom = containerTop + containerHeight;
+                if ((this._my - containerTop) < this.activationDistance) {
+                    scrollY = -this.scrollDistance + 30;
+                }
+                else if ((containerBottom - this._my) < this.activationDistance) {
+                    scrollY = this.scrollDistance - 30;
+                }
+            }
+            if (scrollX !== 0 || scrollY !== 0) {
+                var containerScrollLeft = this.scrollContainer.scrollLeft(), containerScrollTop = this.scrollContainer.scrollTop();
+                this.scrollContainer.scrollLeft(containerScrollLeft + scrollX);
+                this.scrollContainer.scrollTop(containerScrollTop + scrollY);
+            }
+        };
+        return DragLink_1;
+    }());
+    var Drag = function ($rootScope, $parse, $document, $window, pipDraggable) {
+        return {
+            restrict: 'A',
+            link: function ($scope, $element, $attrs) {
+                new DragLink_1($rootScope, $parse, $document, $window, pipDraggable, $scope, $element, $attrs);
+            }
+        };
+    };
+    Drag.$inject = ['$rootScope', '$parse', '$document', '$window', 'pipDraggable'];
+    angular
+        .module("pipDraggable")
+        .directive('pipDrag', Drag);
+}
+},{}],3:[function(require,module,exports){
+"use strict";
+var DraggableService = (function () {
+    function DraggableService() {
+    }
+    DraggableService.prototype.inputEvent = function (event) {
+        if (angular.isDefined(event.touches)) {
+            return event.touches[0];
+        }
+        else if (angular.isDefined(event.originalEvent) && angular.isDefined(event.originalEvent.touches)) {
+            return event.originalEvent.touches[0];
+        }
+        return event;
+    };
+    ;
+    return DraggableService;
+}());
+angular
+    .module("pipDraggable")
+    .service('pipDraggable', DraggableService);
+},{}],4:[function(require,module,exports){
+"use strict";
+{
+    var DropLink_1 = (function () {
+        function DropLink_1($parse, $document, $timeout, pipDraggable, $scope, $element, $attrs) {
+            this.$parse = $parse;
+            this.$document = $document;
+            this.$timeout = $timeout;
+            this.pipDraggable = pipDraggable;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+            $scope.value = $attrs.pipDrop;
+            $scope.isTouching = false;
+            this._myid = $scope.$id;
+            this.onDropCallback = $parse($attrs.pipDropSuccess);
+            this.onDragStartCallback = $parse($attrs.pipDragStart);
+            this.onDragStopCallback = $parse($attrs.pipDragStop);
+            this.onDragMoveCallback = $parse($attrs.pipDragMove);
+            this.initialize();
+        }
+        DropLink_1.prototype.initialize = function () {
+            this.toggleListeners(true);
+        };
+        DropLink_1.prototype.toggleListeners = function (enable) {
+            var _this = this;
+            if (!enable)
+                return;
+            this.$scope.$watch(this.$attrs.pipDrop, function (newVal, oldVal) {
+                _this.onEnableChange(newVal, oldVal);
+            });
+            this.$scope.$on('$destroy', function (event) {
+                _this.onDestroy(event);
+            });
+            this.$scope.$on('draggable:start', function (evt, obj) {
+                _this.onDragStart(evt, obj);
+            });
+            this.$scope.$on('draggable:move', function (evt, obj) {
+                _this.onDragMove(evt, obj);
+            });
+            this.$scope.$on('draggable:end', function (evt, obj) {
+                _this.onDragEnd(evt, obj);
+            });
+        };
+        DropLink_1.prototype.onDestroy = function (enable) {
+            this.toggleListeners(false);
+        };
+        DropLink_1.prototype.onEnableChange = function (newVal, oldVal) {
+            this._dropEnabled = newVal;
+        };
+        DropLink_1.prototype.onDragStart = function (evt, obj) {
+            var _this = this;
+            if (!this._dropEnabled)
+                return;
+            this.isTouching(obj.x, obj.y, obj.element);
+            if (this.$attrs.pipDragStart) {
+                this.$timeout(function () {
+                    _this.onDragStartCallback(_this.$scope, {
+                        $data: obj.data,
+                        $event: obj
+                    });
+                });
+            }
+        };
+        DropLink_1.prototype.onDragMove = function (evt, obj) {
+            var _this = this;
+            if (!this._dropEnabled)
+                return;
+            this.isTouching(obj.x, obj.y, obj.element);
+            if (this.$attrs.pipDragMove) {
+                this.$timeout(function () {
+                    _this.onDragMoveCallback(_this.$scope, {
+                        $data: obj.data,
+                        $event: obj
+                    });
+                });
+            }
+        };
+        DropLink_1.prototype.onDragEnd = function (evt, obj) {
+            var _this = this;
+            if (!this._dropEnabled || this._myid === obj.uid) {
+                this.updateDragStyles(false, obj.element);
+                return;
+            }
+            if (this.isTouching(obj.x, obj.y, obj.element)) {
+                if (obj.callback) {
+                    obj.callback(obj);
+                }
+                if (this.$attrs.pipDropSuccess) {
+                    this.$timeout(function () {
+                        _this.onDropCallback(_this.$scope, {
+                            $data: obj.data,
+                            $event: obj,
+                            $target: _this.$scope.$eval(_this.$scope.value)
+                        });
                     });
                 }
-                function keydownListener(e) {
-                    var keyCode = e.which || e.keyCode;
-                    if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.UP_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
-                        e.preventDefault();
-                        var increment = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1, moveToControl = controls.index(controls.filter(".md-focused")) + increment;
-                        if (moveToControl >= 0 && moveToControl < controlsLength) {
-                            controls[moveToControl].focus();
-                        }
-                    }
+            }
+            if (this.$attrs.pipDragStop) {
+                this.$timeout(function () {
+                    _this.onDragStopCallback(_this.$scope, {
+                        $data: obj.data,
+                        $event: obj
+                    });
+                });
+            }
+            this.updateDragStyles(false, obj.element);
+        };
+        DropLink_1.prototype.isTouching = function (mouseX, mouseY, dragElement) {
+            var touching = this.hitTest(mouseX, mouseY);
+            this.$scope.isTouching = touching;
+            if (touching) {
+                this._lastDropTouch = this.$element;
+            }
+            this.updateDragStyles(touching, dragElement);
+            return touching;
+        };
+        DropLink_1.prototype.updateDragStyles = function (touching, dragElement) {
+            if (touching) {
+                this.$element.addClass('pip-drag-enter');
+                dragElement.addClass('pip-drag-over');
+            }
+            else if (this._lastDropTouch == this.$element) {
+                this._lastDropTouch = null;
+                this.$element.removeClass('pip-drag-enter');
+                dragElement.removeClass('pip-drag-over');
+            }
+        };
+        ;
+        DropLink_1.prototype.hitTest = function (x, y) {
+            var bounds = this.$element[0].getBoundingClientRect();
+            x -= this.$document[0].body.scrollLeft + this.$document[0].documentElement.scrollLeft;
+            y -= this.$document[0].body.scrollTop + this.$document[0].documentElement.scrollTop;
+            return x >= bounds.left &&
+                x <= bounds.right &&
+                y <= bounds.bottom &&
+                y >= bounds.top;
+        };
+        return DropLink_1;
+    }());
+    var Drop = function ($parse, $document, $timeout, pipDraggable) {
+        return {
+            restrict: 'A',
+            link: function ($scope, $element, $attrs) {
+                new DropLink_1($parse, $document, $timeout, pipDraggable, $scope, $element, $attrs);
+            }
+        };
+    };
+    Drop.$inject = ['$parse', '$document', '$timeout', 'pipDraggable'];
+    angular
+        .module("pipDraggable")
+        .directive('pipDrop', Drop);
+}
+},{}],5:[function(require,module,exports){
+{
+    var PreventDragLink_1 = (function () {
+        function PreventDragLink_1($element) {
+            this.$element = $element;
+            this.initialize();
+        }
+        PreventDragLink_1.prototype.initialize = function () {
+            this.$element.attr('pip-draggable', 'false');
+            this.toggleListeners(true);
+        };
+        PreventDragLink_1.prototype.toggleListeners = function (enable) {
+            var _this = this;
+            if (!enable)
+                return;
+            this.$element.on('mousedown touchstart touchmove touchend touchcancel', function (event) { _this.absorbEvent_(event); });
+        };
+        PreventDragLink_1.prototype.absorbEvent_ = function (event) {
+            var e = event.originalEvent;
+            e.preventDefault && e.preventDefault();
+            e.stopPropagation && e.stopPropagation();
+            e.cancelBubble = true;
+            e.returnValue = false;
+            return false;
+        };
+        return PreventDragLink_1;
+    }());
+    var PreventDrag = function () {
+        return {
+            restrict: 'A',
+            link: function ($scope, $element, $attrs) {
+                new PreventDragLink_1($element);
+            }
+        };
+    };
+    angular
+        .module("pipDraggable")
+        .directive('pipPreventDrag', PreventDrag);
+}
+},{}],6:[function(require,module,exports){
+"use strict";
+angular.module("pipDraggable", []);
+require("./DraggableService");
+require("./Drag");
+require("./Drop");
+require("./PreventDrag");
+require("./CancelDrag");
+},{"./CancelDrag":1,"./Drag":2,"./DraggableService":3,"./Drop":4,"./PreventDrag":5}],7:[function(require,module,exports){
+{
+    var FocusedLink_1 = (function () {
+        function FocusedLink_1($scope, $element, $attrs, $timeout, $mdConstant, $window) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$timeout = $timeout;
+            this.$mdConstant = $mdConstant;
+            this.$window = $window;
+            this.opacityDelta = 0.4;
+            this.opacityLimit = 0.5;
+            $element.on('keydown', function (e) {
+                _this.keydownListener(e);
+            });
+            $timeout(function () {
+                _this.init();
+            });
+            if ($attrs.ngModel) {
+                $scope.$watch('ngModel', function () {
+                    $timeout(this.init);
+                }, true);
+            }
+            if ($attrs.pipFocusedData) {
+                $scope.$watch('pipFocusedData', function () {
+                    $timeout(this.init);
+                }, true);
+            }
+        }
+        FocusedLink_1.prototype.init = function () {
+            var _this = this;
+            var selector = this.$scope.pipWithHidden && this.$scope.pipWithHidden() ? '.pip-focusable' : '.pip-focusable:visible';
+            this.onFocusClass = this.$scope.pipFocusedClass ? this.$scope.pipFocusedClass() : '';
+            this.controls = this.$element.find(selector);
+            this.controlsLength = this.controls.length;
+            this.checkTabindex(this.controls);
+            this.controls.on('focus', function (event) {
+                var target = event.currentTarget;
+                if ($(target).hasClass('md-focused')) {
+                    return;
+                }
+                if (_this.$scope.pipRebind && _this.$scope.pipRebind()) {
+                    _this.init();
+                }
+                _this.$element.addClass('pip-focused-container');
+                $(target).addClass(_this.onFocusClass);
+                if (!_this.$scope.pipFocusedOpacity || !_this.$scope.pipFocusedOpacity()) {
+                    _this.color = $(target).css('backgroundColor');
+                    _this.oldBackgroundColor = _this.color;
+                    $(target).css('backgroundColor', _this.rgba(_this.color));
+                    $(target).addClass('md-focused');
+                }
+                else {
+                    $(target).addClass('md-focused md-focused-opacity');
+                }
+            }).on('focusout', function (event) {
+                var target = event.currentTarget;
+                if (!$(target).hasClass('md-focused')) {
+                    return;
+                }
+                _this.$element.removeClass('pip-focused-container');
+                $(target).removeClass(_this.onFocusClass);
+                if (!_this.$scope.pipFocusedOpacity || !_this.$scope.pipFocusedOpacity()) {
+                    $(target).css('backgroundColor', _this.oldBackgroundColor);
+                    $(target).removeClass('md-focused md-focused-opacity');
+                }
+                else {
+                    $(target).removeClass('md-focused');
+                }
+            });
+        };
+        FocusedLink_1.prototype.rgba = function (color) {
+            if (this.$scope.pipFocusedColor && this.$scope.pipFocusedColor()) {
+                return this.$scope.pipFocusedColor();
+            }
+            var arr = color.split("(")[1].split(")")[0].split(",");
+            if (!arr || arr.length < 3) {
+                return '';
+            }
+            var red, blue, green, opacity;
+            opacity = arr.length == 3 ? 1 : parseFloat(arr[3]);
+            red = arr[0];
+            blue = arr[1];
+            green = arr[2];
+            if (opacity < this.opacityLimit) {
+                opacity += this.opacityDelta;
+            }
+            else {
+                opacity -= this.opacityDelta;
+            }
+            return 'rgba(' + red + ', ' + blue + ', ' + green + ', ' + opacity + ')';
+        };
+        FocusedLink_1.prototype.setTabindex = function (element, value) {
+            element.attr('tabindex', value);
+        };
+        FocusedLink_1.prototype.checkTabindex = function (controls) {
+            var index = _.findIndex(controls, function (c) {
+                return c['tabindex'] > -1;
+            });
+            if (index == -1 && controls.length > 0 && this.$scope.pipFocusedTabindex) {
+                this.setTabindex(angular.element(controls[0]), this.$scope.pipFocusedTabindex());
+            }
+        };
+        FocusedLink_1.prototype.keydownListener = function (e) {
+            var keyCode = e.which || e.keyCode;
+            if (keyCode == this.$mdConstant.KEY_CODE.LEFT_ARROW ||
+                keyCode == this.$mdConstant.KEY_CODE.UP_ARROW ||
+                keyCode == this.$mdConstant.KEY_CODE.RIGHT_ARROW ||
+                keyCode == this.$mdConstant.KEY_CODE.DOWN_ARROW) {
+                e.preventDefault();
+                var increment = (keyCode == this.$mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == this.$mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1, moveToControl = this.controls.index(this.controls.filter(".md-focused")) + increment;
+                if (moveToControl >= 0 && moveToControl < this.controlsLength) {
+                    this.controls[moveToControl].focus();
                 }
             }
         };
-    }]);
-})();
-},{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipInfiniteScroll", []);
-    thisModule.directive('pipInfiniteScroll', ['$rootScope', '$window', '$interval', '$parse', function ($rootScope, $window, $interval, $parse) {
-        var THROTTLE_MILLISECONDS = 500;
+        return FocusedLink_1;
+    }());
+    var Focused = function ($timeout, $mdConstant, $window) {
+        return {
+            scope: {
+                pipFocusedColor: '&?',
+                pipFocusedClass: '&?',
+                pipFocusedRebind: '&?',
+                pipFocusedTabindex: '&?',
+                pipFocusedOpacity: '&?',
+                pipFocusedData: '&?',
+                pipWithHidden: '&?',
+                pipRebind: '&?'
+            },
+            link: function ($scope, $element, $attrs) {
+                new FocusedLink_1($scope, $element, $attrs, $timeout, $mdConstant, $window);
+            }
+        };
+    };
+    Focused.$inject = ['$timeout', '$mdConstant', '$window'];
+    angular
+        .module("pipFocused", [])
+        .directive('pipFocused', Focused);
+}
+},{}],8:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+require("./unsaved_changes/unsavedChanges");
+require("./shortcuts/index");
+require("./focused/focused");
+require("./draggable/index");
+require("./selected/selected");
+require("./infinite_scroll/infiniteScroll");
+angular.module('pipBehaviors', [
+    'pipFocused',
+    'pipSelected',
+    'pipInfiniteScroll',
+    'pipUnsavedChanges',
+    'pipDraggable',
+    'pipShortcuts'
+]);
+__export(require("./shortcuts/index"));
+},{"./draggable/index":6,"./focused/focused":7,"./infinite_scroll/infiniteScroll":9,"./selected/selected":10,"./shortcuts/index":16,"./unsaved_changes/unsavedChanges":17}],9:[function(require,module,exports){
+{
+    var InfiniteScrollLink_1 = (function () {
+        function InfiniteScrollLink_1($rootScope, $window, $interval, $scope, $element, $attrs) {
+            var _this = this;
+            this.$rootScope = $rootScope;
+            this.$window = $window;
+            this.$interval = $interval;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+            this.THROTTLE_MILLISECONDS = 500;
+            this.checkWhenEnabled = null;
+            this.scrollContainer = null;
+            this.immediateCheck = true;
+            this.scrollDistance = null;
+            this.scrollEnabled = null;
+            this.unregisterEventListener = null;
+            this.useDocumentBottom = false;
+            this.windowElement = null;
+            this.windowElement = angular.element($window);
+            this.onContainerScrollThrottle = _.throttle(function () {
+                _this.onContainerScroll();
+            }, this.THROTTLE_MILLISECONDS);
+            $scope.$on('$destroy', function () {
+                _this.scrollContainer.unbind('scroll', function () {
+                    _this.onContainerScrollThrottle();
+                });
+                if (_this.unregisterEventListener !== null) {
+                    _this.unregisterEventListener();
+                    return _this.unregisterEventListener = null;
+                }
+            });
+            $scope.$watch('pipScrollDistance', function (v) {
+                _this.handleScrollDistance(v);
+            });
+            this.handleScrollDistance($scope.pipScrollDistance);
+            $scope.$watch('pipScrollDisabled', function (v) {
+                _this.handleScrollDisabled(v);
+            });
+            this.handleScrollDisabled($scope.pipScrollDisabled);
+            $scope.$watch('pipScrollUseDocumentBottom', function (v) {
+                _this.handleScrollUseDocumentBottom(v);
+            });
+            this.handleScrollUseDocumentBottom($scope.pipScrollUseDocumentBottom);
+            this.changeContainer(this.windowElement);
+            if ($scope.pipScrollListenForEvent) {
+                this.unregisterEventListener = $rootScope.$on($scope.pipScrollListenForEvent, function () {
+                    _this.onContainerScrollThrottle();
+                });
+            }
+            $scope.$watch('pipScrollContainer', function (newContainer) {
+                if (newContainer != _this.scrollContainer)
+                    _this.handleScrollContainer(newContainer);
+            });
+            this.handleScrollContainer($scope.pipScrollContainer || []);
+            if ($attrs.pipScrollParent !== null) {
+                this.changeContainer(angular.element($element.parent()));
+            }
+            if ($attrs.pipScrolImmediateCheck !== null) {
+                this.immediateCheck = $scope.$eval($attrs.pipScrolImmediateCheck);
+            }
+            $interval((function () {
+                if (this.immediateCheck) {
+                    return this.onContainerScrollThrottle();
+                }
+            }), 0, 1);
+        }
+        InfiniteScrollLink_1.prototype.height = function (element) {
+            element = element[0] || element;
+            if (isNaN(element.offsetHeight)) {
+                return element.document.documentElement.clientHeight;
+            }
+            else {
+                return element.offsetHeight;
+            }
+        };
+        InfiniteScrollLink_1.prototype.offsetTop = function (element) {
+            if (!element[0].getBoundingClientRect || element.css('none')) {
+                return;
+            }
+            return element[0].getBoundingClientRect().top + this.pageYOffset(element);
+        };
+        InfiniteScrollLink_1.prototype.pageYOffset = function (element) {
+            element = element[0] || element;
+            if (isNaN(window.pageYOffset)) {
+                return element.document.documentElement.scrollTop;
+            }
+            else {
+                return element.ownerDocument.defaultView.pageYOffset;
+            }
+        };
+        InfiniteScrollLink_1.prototype.onContainerScroll = function () {
+            var _this = this;
+            var containerBottom, containerTopOffset, elementBottom, remaining, shouldScroll;
+            if (this.scrollContainer === this.windowElement) {
+                containerBottom = this.height(this.scrollContainer) + this.pageYOffset(this.scrollContainer[0].document.documentElement);
+                elementBottom = this.offsetTop(this.$element) + this.height(this.$element);
+            }
+            else {
+                containerBottom = this.height(this.scrollContainer);
+                containerTopOffset = 0;
+                if (this.offsetTop(this.scrollContainer) !== void 0) {
+                    containerTopOffset = this.offsetTop(this.scrollContainer);
+                }
+                elementBottom = this.offsetTop(this.$element) - containerTopOffset + this.height(this.$element);
+            }
+            if (this.useDocumentBottom) {
+                elementBottom = this.height((this.$element[0].ownerDocument || this.$element[0].document).documentElement);
+            }
+            remaining = elementBottom - containerBottom;
+            shouldScroll = remaining <= this.height(this.scrollContainer) * this.scrollDistance + 1;
+            if (shouldScroll) {
+                this.checkWhenEnabled = true;
+                if (this.scrollEnabled) {
+                    if (this.$scope.$$phase || this.$rootScope.$$phase) {
+                        return this.$scope.pipInfiniteScroll();
+                    }
+                    else {
+                        return this.$scope.$apply(function () {
+                            _this.$scope.pipInfiniteScroll();
+                        });
+                    }
+                }
+            }
+            else {
+                return this.checkWhenEnabled = false;
+            }
+        };
+        InfiniteScrollLink_1.prototype.handleScrollDistance = function (v) {
+            return this.scrollDistance = parseFloat(v) || 0;
+        };
+        InfiniteScrollLink_1.prototype.handleScrollDisabled = function (v) {
+            this.scrollEnabled = !v;
+            if (this.scrollEnabled && this.checkWhenEnabled) {
+                this.checkWhenEnabled = false;
+                this.onContainerScrollThrottle();
+            }
+        };
+        InfiniteScrollLink_1.prototype.handleScrollUseDocumentBottom = function (v) {
+            return this.useDocumentBottom = v;
+        };
+        InfiniteScrollLink_1.prototype.changeContainer = function (newContainer) {
+            var _this = this;
+            if (this.scrollContainer) {
+                this.scrollContainer.unbind('scroll', function () {
+                    _this.onContainerScrollThrottle();
+                });
+            }
+            this.scrollContainer = newContainer;
+            if (newContainer) {
+                return this.scrollContainer.bind('scroll', function () {
+                    _this.onContainerScrollThrottle();
+                });
+            }
+        };
+        InfiniteScrollLink_1.prototype.handleScrollContainer = function (newContainer) {
+            if ((newContainer == null) || newContainer.length === 0) {
+                return;
+            }
+            if (newContainer instanceof HTMLElement) {
+                newContainer = angular.element(newContainer);
+            }
+            else if (typeof newContainer.append === 'function') {
+                newContainer = angular.element(newContainer[newContainer.length - 1]);
+            }
+            else if (typeof newContainer === 'string') {
+                newContainer = this.$element.parents().find(newContainer);
+            }
+            if (newContainer != null && (!Array.isArray(newContainer) ||
+                (Array.isArray(newContainer) && newContainer.length > 0))) {
+                return this.changeContainer(newContainer);
+            }
+            else {
+                throw new Error("Invalid pip-scroll-container attribute.");
+            }
+        };
+        return InfiniteScrollLink_1;
+    }());
+    var InfiniteScroll = function ($rootScope, $window, $interval) {
         return {
             scope: {
                 pipInfiniteScroll: '&',
@@ -3020,164 +3464,334 @@ __export(require("./ResizeFunctions"));
                 pipScrollListenForEvent: '@'
             },
             link: function ($scope, $element, $attrs) {
-                var checkWhenEnabled = null, scrollContainer, immediateCheck = true, scrollDistance = null, scrollEnabled = null, unregisterEventListener = null, useDocumentBottom = false, windowElement = angular.element($window);
-                function height(element) {
-                    element = element[0] || element;
-                    if (isNaN(element.offsetHeight)) {
-                        return element.document.documentElement.clientHeight;
-                    }
-                    else {
-                        return element.offsetHeight;
-                    }
-                }
-                ;
-                function offsetTop(element) {
-                    if (!element[0].getBoundingClientRect || element.css('none')) {
-                        return;
-                    }
-                    return element[0].getBoundingClientRect().top + pageYOffset(element);
-                }
-                ;
-                function pageYOffset(element) {
-                    element = element[0] || element;
-                    if (isNaN(window.pageYOffset)) {
-                        return element.document.documentElement.scrollTop;
-                    }
-                    else {
-                        return element.ownerDocument.defaultView.pageYOffset;
-                    }
-                }
-                ;
-                var onContainerScroll = function () {
-                    var containerBottom, containerTopOffset, elementBottom, remaining, shouldScroll;
-                    if (scrollContainer === windowElement) {
-                        containerBottom = height(scrollContainer) + pageYOffset(scrollContainer[0].document.documentElement);
-                        elementBottom = offsetTop($element) + height($element);
-                    }
-                    else {
-                        containerBottom = height(scrollContainer);
-                        containerTopOffset = 0;
-                        if (offsetTop(scrollContainer) !== void 0) {
-                            containerTopOffset = offsetTop(scrollContainer);
-                        }
-                        elementBottom = offsetTop($element) - containerTopOffset + height($element);
-                    }
-                    if (useDocumentBottom) {
-                        elementBottom = height(($element[0].ownerDocument || $element[0].document).documentElement);
-                    }
-                    remaining = elementBottom - containerBottom;
-                    shouldScroll = remaining <= height(scrollContainer) * scrollDistance + 1;
-                    if (shouldScroll) {
-                        checkWhenEnabled = true;
-                        if (scrollEnabled) {
-                            if ($scope.$$phase || $rootScope.$$phase) {
-                                return $scope.pipInfiniteScroll();
-                            }
-                            else {
-                                return $scope.$apply($scope.pipInfiniteScroll);
-                            }
-                        }
-                    }
-                    else {
-                        return checkWhenEnabled = false;
-                    }
-                };
-                if (THROTTLE_MILLISECONDS != null) {
-                    onContainerScroll = _.throttle(onContainerScroll, THROTTLE_MILLISECONDS);
-                }
-                $scope.$on('$destroy', function () {
-                    scrollContainer.unbind('scroll', onContainerScroll);
-                    if (unregisterEventListener != null) {
-                        unregisterEventListener();
-                        return unregisterEventListener = null;
-                    }
-                });
-                function handleScrollDistance(v) {
-                    return scrollDistance = parseFloat(v) || 0;
-                }
-                ;
-                $scope.$watch('pipScrollDistance', handleScrollDistance);
-                handleScrollDistance($scope.pipScrollDistance);
-                function handleScrollDisabled(v) {
-                    scrollEnabled = !v;
-                    if (scrollEnabled && checkWhenEnabled) {
-                        checkWhenEnabled = false;
-                        return onContainerScroll();
-                    }
-                }
-                ;
-                $scope.$watch('pipScrollDisabled', handleScrollDisabled);
-                handleScrollDisabled($scope.pipScrollDisabled);
-                function handleScrollUseDocumentBottom(v) {
-                    return useDocumentBottom = v;
-                }
-                ;
-                $scope.$watch('pipScrollUseDocumentBottom', handleScrollUseDocumentBottom);
-                handleScrollUseDocumentBottom($scope.pipScrollUseDocumentBottom);
-                function changeContainer(newContainer) {
-                    if (scrollContainer != null) {
-                        scrollContainer.unbind('scroll', onContainerScroll);
-                    }
-                    scrollContainer = newContainer;
-                    if (newContainer != null) {
-                        return scrollContainer.bind('scroll', onContainerScroll);
-                    }
-                }
-                ;
-                changeContainer(windowElement);
-                if ($scope.pipScrollListenForEvent) {
-                    unregisterEventListener = $rootScope.$on($scope.pipScrollListenForEvent, onContainerScroll);
-                }
-                function handleScrollContainer(newContainer) {
-                    if ((newContainer == null) || newContainer.length === 0) {
-                        return;
-                    }
-                    if (newContainer instanceof HTMLElement) {
-                        newContainer = angular.element(newContainer);
-                    }
-                    else if (typeof newContainer.append === 'function') {
-                        newContainer = angular.element(newContainer[newContainer.length - 1]);
-                    }
-                    else if (typeof newContainer === 'string') {
-                        newContainer = $element.parents().find(newContainer);
-                    }
-                    if (newContainer != null && (!Array.isArray(newContainer) ||
-                        (Array.isArray(newContainer) && newContainer.length > 0))) {
-                        return changeContainer(newContainer);
-                    }
-                    else {
-                        throw new Error("Invalid pip-scroll-container attribute.");
-                    }
-                }
-                ;
-                $scope.$watch('pipScrollContainer', function (newContainer) {
-                    if (newContainer !== scrollContainer)
-                        handleScrollContainer(newContainer);
-                });
-                handleScrollContainer($scope.pipScrollContainer || []);
-                if ($attrs.pipScrollParent != null) {
-                    changeContainer(angular.element($element.parent()));
-                }
-                if ($attrs.pipScrolImmediateCheck != null) {
-                    immediateCheck = $scope.$eval($attrs.pipScrolImmediateCheck);
-                }
-                return $interval((function () {
-                    if (immediateCheck) {
-                        return onContainerScroll();
-                    }
-                }), 0, 1);
+                new InfiniteScrollLink_1($rootScope, $window, $interval, $scope, $element, $attrs);
             }
         };
-    }]);
-})();
-},{}],5:[function(require,module,exports){
-'use strict';
-var ShortcutOption = (function () {
-    function ShortcutOption() {
+    };
+    InfiniteScroll.$inject = ['$rootScope', '$window', '$interval'];
+    angular
+        .module("pipInfiniteScroll", [])
+        .directive('pipInfiniteScroll', InfiniteScroll);
+}
+},{}],10:[function(require,module,exports){
+{
+    var SelectedLink_1 = (function () {
+        function SelectedLink_1($parse, $mdConstant, $timeout, $scope, $element, $attrs) {
+            var _this = this;
+            this.$mdConstant = $mdConstant;
+            this.$timeout = $timeout;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+            this.touchBoundary = 10;
+            this.tapdelay = 200;
+            this.tapTimeout = 700;
+            this.indexGetter = $attrs.pipSelected ? $parse($attrs.pipSelected) : null;
+            this.indexSetter = this.indexGetter ? this.indexGetter.assign : null;
+            this.idGetter = $attrs.pipSelectedId ? $parse($attrs.pipSelectedId) : null;
+            this.idSetter = this.idGetter ? this.idGetter.assign : null;
+            this.changeGetter = $attrs.pipSelect ? $parse($attrs.pipSelect) : null;
+            this.enterSpaceGetter = $attrs.pipEnterSpacePress ? $parse($attrs.pipEnterSpacePress) : null;
+            this.noScroll = $attrs.pipNoScroll;
+            this.modifier = $attrs.pipSkipHidden ? ':visible' : '';
+            this.className = $attrs.pipTreeList ? '.pip-selectable-tree' : '.pip-selectable';
+            this.selectedIndex = this.indexGetter($scope);
+            this.currentElementTabinex = $element.attr('tabindex');
+            this.pipSelectedWatch = $attrs.pipSelectedWatch;
+            this.isScrolled = false;
+            $element.attr('tabindex', this.currentElementTabinex || 0);
+            $element.on('click', this.className, function (event) {
+                _this.onClickEvent(event);
+            });
+            $element.on('touchstart', this.className, function (event) {
+                _this.onTouchStart(event);
+            });
+            $element.on('touchmove', this.className, function (event) {
+                _this.onTouchMove(event);
+            });
+            $element.on('touchend', this.className, function (event) {
+                _this.onTouchEnd(event);
+            });
+            $element.on('touchcancel', this.className, function (event) {
+                _this.onTouchCancel(event);
+            });
+            $element.on('keydown', function (event) {
+                _this.onKeyDown(event);
+            });
+            $element.on('focusin', function (event) {
+                _this.onFocusIn(event);
+            });
+            $element.on('focusout', function (event) {
+                _this.onFocusOut(event);
+            });
+            if (!$attrs.pipTreeList) {
+                $scope.$watch(this.indexGetter, function (newSelectedIndex) {
+                    _this.selectItem({
+                        itemIndex: newSelectedIndex
+                    });
+                });
+            }
+            else {
+                $scope.$watch(this.idGetter, function (newSelectedId) {
+                    $timeout(function () {
+                        _this.selectItem({
+                            itemId: newSelectedId,
+                            raiseEvent: true
+                        });
+                    }, 0);
+                });
+            }
+            if (this.pipSelectedWatch) {
+                $scope.$watch(this.pipSelectedWatch, function () {
+                    $timeout(function () {
+                        _this.selectedIndex = _this.indexGetter($scope);
+                        _this.selectItem({
+                            itemIndex: _this.selectedIndex
+                        });
+                    }, 100);
+                });
+            }
+            this.selectItem({
+                itemIndex: this.selectedIndex,
+                items: $element.find(this.className)
+            });
+        }
+        SelectedLink_1.prototype.selectItem = function (itemParams) {
+            if (this.isScrolled)
+                return;
+            var itemIndex = itemParams.itemIndex, itemId = itemParams.itemId, items = itemParams.items || this.$element.find(this.className + this.modifier), itemsLength = items.length, item = function () {
+                if (itemParams.item)
+                    return itemParams.item;
+                if (itemIndex === undefined && itemIndex === -1) {
+                    itemIndex = items.index(items.filter('[pip-id=' + itemId + ']'));
+                }
+                if (itemIndex >= 0 && itemIndex < itemsLength) {
+                    return items[itemIndex];
+                }
+                return false;
+            }, raiseEvent = itemParams.raiseEvent;
+            item = item();
+            if (item) {
+                this.$element.find(this.className).removeClass('selected md-focused');
+                item = angular.element(item)
+                    .addClass('selected md-focused')
+                    .focus();
+                if (!this.noScroll)
+                    this.scrollToItem(item);
+                if (raiseEvent)
+                    this.defineSelectedIndex(items);
+            }
+        };
+        ;
+        SelectedLink_1.prototype.defineSelectedIndex = function (items) {
+            var _this = this;
+            var oldSelectedIndex = this.selectedIndex;
+            this.selectedIndex = -1;
+            for (var index = 0; index < items.length; index++) {
+                if ($(items[index]).hasClass('selected')) {
+                    this.selectedIndex = index;
+                    break;
+                }
+            }
+            var updateIndex = function () {
+                var selectedItem = angular.element(items[_this.selectedIndex]), selectedId = selectedItem.attr('pip-id');
+                if (_this.indexSetter)
+                    _this.indexSetter(_this.$scope, _this.selectedIndex);
+                if (_this.idSetter)
+                    _this.idSetter(_this.$scope, selectedId);
+                onSelect();
+            };
+            var onSelect = function () {
+                var selectedItem = angular.element(items[_this.selectedIndex]), selectedId = selectedItem.attr('pip-id');
+                if (_this.changeGetter) {
+                    _this.changeGetter(_this.$scope, {
+                        $event: {
+                            target: _this.$element,
+                            item: selectedItem,
+                            index: _this.selectedIndex,
+                            id: selectedId,
+                            newIndex: _this.selectedIndex,
+                            oldIndex: oldSelectedIndex
+                        }
+                    });
+                }
+            };
+            if (oldSelectedIndex != this.selectedIndex && this.selectedIndex !== -1) {
+                this.$scope.$apply(function () { updateIndex(); });
+            }
+            else {
+                this.$scope.$apply(function () { onSelect(); });
+            }
+        };
+        ;
+        SelectedLink_1.prototype.scrollToItem = function ($item) {
+            var _this = this;
+            if (this.noScroll || !$item.offset())
+                return;
+            var containerTop = this.$element.offset().top, containerHeight = this.$element.height(), containerBottom = containerTop + containerHeight, itemTop = $item.offset().top, itemHeight = $item.outerHeight(true), itemBottom = itemTop + itemHeight, containerScrollTop = this.$element.scrollTop();
+            this.isScrolled = true;
+            this.$timeout(function () {
+                _this.isScrolled = false;
+            }, 100);
+            if (containerTop > itemTop) {
+                this.$element.scrollTop(containerScrollTop + itemTop - containerTop);
+            }
+            else if (containerBottom < itemBottom) {
+                this.$element.scrollTop(containerScrollTop + itemBottom - containerBottom);
+            }
+        };
+        ;
+        SelectedLink_1.prototype.getTargetElementFromEventTarget = function (eventTarget) {
+            if (eventTarget.nodeType === Node.TEXT_NODE) {
+                return eventTarget.parentNode;
+            }
+            return eventTarget;
+        };
+        ;
+        SelectedLink_1.prototype.touchHasMoved = function (event) {
+            var touch = event.changedTouches[0], boundary = this.touchBoundary;
+            if (Math.abs(touch.pageX - this.touchStartX) > boundary || Math.abs(touch.pageY - this.touchStartY) > boundary) {
+                return true;
+            }
+            return false;
+        };
+        ;
+        SelectedLink_1.prototype.onClickEvent = function (event) {
+            this.selectItem({
+                item: event.currentTarget,
+                raiseEvent: true
+            });
+        };
+        SelectedLink_1.prototype.onTouchStart = function (event) {
+            var ev = event.originalEvent;
+            if (ev['targetTouches'].length > 1) {
+                return true;
+            }
+            var targetElement = this.getTargetElementFromEventTarget(ev.target), touch = ev['targetTouches'][0];
+            this.trackingClick = true;
+            this.trackingClickStart = ev.timeStamp;
+            this.targetElement = targetElement;
+            this.touchStartX = touch.pageX;
+            this.touchStartY = touch.pageY;
+            return true;
+        };
+        SelectedLink_1.prototype.onTouchMove = function (event) {
+            if (!this.trackingClick) {
+                return true;
+            }
+            var ev = event.originalEvent;
+            if (this.targetElement !== this.getTargetElementFromEventTarget(ev.target) || this.touchHasMoved(ev)) {
+                this.trackingClick = false;
+                this.targetElement = null;
+            }
+            return true;
+        };
+        SelectedLink_1.prototype.onTouchEnd = function (event) {
+            var forElement, newTrackingClickStart, targetTagName, scrollParent, touch, newtargetElement = this.targetElement;
+            if (!this.trackingClick) {
+                return true;
+            }
+            var ev = event.originalEvent;
+            if ((ev.timeStamp - this.lastClickTime) < this.tapdelay) {
+                this.cancelNextClick = true;
+                return true;
+            }
+            if ((ev.timeStamp - this.trackingClickStart) > this.tapTimeout) {
+                return true;
+            }
+            this.cancelNextClick = false;
+            this.lastClickTime = event.timeStamp;
+            newTrackingClickStart = this.trackingClickStart;
+            this.trackingClick = false;
+            this.trackingClickStart = 0;
+            this.selectItem({
+                item: event.currentTarget,
+                raiseEvent: true
+            });
+            return false;
+        };
+        SelectedLink_1.prototype.onTouchCancel = function (event) {
+            this.trackingClick = false;
+            this.targetElement = null;
+        };
+        SelectedLink_1.prototype.onKeyDown = function (event) {
+            var keyCode = event.which || event.keyCode;
+            if (keyCode == this.$mdConstant.KEY_CODE.ENTER || keyCode == this.$mdConstant.KEY_CODE.SPACE) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (this.enterSpaceGetter) {
+                    this.enterSpaceGetter(this.$scope, {
+                        $event: {
+                            target: this.$element,
+                            index: this.selectedIndex,
+                            item: this.$element.find('.selected')
+                        }
+                    });
+                }
+            }
+            else if (keyCode == this.$mdConstant.KEY_CODE.LEFT_ARROW || keyCode == this.$mdConstant.KEY_CODE.RIGHT_ARROW ||
+                keyCode == this.$mdConstant.KEY_CODE.UP_ARROW || keyCode == this.$mdConstant.KEY_CODE.DOWN_ARROW) {
+                event.preventDefault();
+                event.stopPropagation();
+                var items = this.$element.find(this.className + this.modifier), inc = (keyCode == this.$mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == this.$mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1, newSelectedIndex = this.selectedIndex + inc;
+                this.selectItem({
+                    itemIndex: newSelectedIndex,
+                    items: items,
+                    raiseEvent: true
+                });
+            }
+        };
+        SelectedLink_1.prototype.onFocusIn = function (event) {
+            var items, selectedItem = this.$element.find(this.className + '.selected');
+            selectedItem.addClass('md-focused');
+            if (selectedItem.length === 0) {
+                this.selectedIndex = this.indexGetter(this.$scope);
+                items = this.$element.find(this.className + this.modifier);
+                this.selectItem({
+                    itemIndex: this.selectedIndex || 0,
+                    items: items,
+                    raiseEvent: true
+                });
+            }
+        };
+        SelectedLink_1.prototype.onFocusOut = function (event) {
+            this.$element.find(this.className + '.md-focused' + this.modifier).removeClass('md-focused');
+        };
+        return SelectedLink_1;
+    }());
+    var Selected = function ($parse, $mdConstant, $timeout) {
+        return {
+            restrict: 'A',
+            scope: false,
+            link: function ($scope, $element, $attrs) {
+                new SelectedLink_1($parse, $mdConstant, $timeout, $scope, $element, $attrs);
+            }
+        };
+    };
+    Selected.$inject = ['$parse', '$mdConstant', '$timeout'];
+    angular
+        .module("pipSelected", [])
+        .directive('pipSelected', Selected);
+}
+},{}],11:[function(require,module,exports){
+"use strict";
+var ShortcutItem = (function () {
+    function ShortcutItem() {
     }
-    return ShortcutOption;
+    return ShortcutItem;
 }());
-exports.ShortcutOption = ShortcutOption;
+exports.ShortcutItem = ShortcutItem;
+var ShortcutsConfig = (function () {
+    function ShortcutsConfig() {
+        this.globalShortcuts = [];
+        this.localShortcuts = [];
+        this.defaultOptions = null;
+    }
+    return ShortcutsConfig;
+}());
+exports.ShortcutsConfig = ShortcutsConfig;
+},{}],12:[function(require,module,exports){
+"use strict";
 var KeyboardEvent = (function () {
     function KeyboardEvent() {
     }
@@ -3187,9 +3801,15 @@ KeyboardEvent.Keydown = 'keydown';
 KeyboardEvent.Keyup = 'keyup';
 KeyboardEvent.Keypress = 'keypress';
 exports.KeyboardEvent = KeyboardEvent;
-var KeyboardShortcut = (function () {
-    KeyboardShortcut.$inject = ['element', 'shorcutCombination', 'option', 'callback'];
-    function KeyboardShortcut(element, shorcutCombination, option, callback) {
+var ShortcutOptions = (function () {
+    function ShortcutOptions() {
+    }
+    return ShortcutOptions;
+}());
+exports.ShortcutOptions = ShortcutOptions;
+var Shortcut = (function () {
+    Shortcut.$inject = ['element', 'shorcutCombination', 'option', 'callback'];
+    function Shortcut(element, shorcutCombination, option, callback) {
         "ngInject";
         var _this = this;
         this.shift_nums = {
@@ -3371,151 +3991,144 @@ var KeyboardShortcut = (function () {
             _this.modifiers.meta.pressed = false;
         };
     }
-    return KeyboardShortcut;
+    return Shortcut;
 }());
-exports.KeyboardShortcut = KeyboardShortcut;
-},{}],6:[function(require,module,exports){
-'use strict';
-var KeyboardShortcut_1 = require("./KeyboardShortcut");
-var ShortcutsRegister = (function () {
-    ShortcutsRegister.$inject = ['$log', 'option'];
-    function ShortcutsRegister($log, option) {
-        "ngInject";
-        this._log = $log;
-        this._defaultOption = option ? _.defaults(option, this.getDefaultOption()) : this.getDefaultOption();
-        this._shortcuts = {};
-    }
-    ShortcutsRegister.prototype.getDefaultOption = function () {
-        var defaultOption = {
-            Type: KeyboardShortcut_1.KeyboardEvent.Keydown,
-            Propagate: false,
-            DisableInInput: false,
-            Target: document,
-            Keycode: null
+exports.Shortcut = Shortcut;
+},{}],13:[function(require,module,exports){
+"use strict";
+var Shortcut_1 = require("./Shortcut");
+{
+    var ShortcutBindingService_1 = (function () {
+        ShortcutBindingService_1.$inject = ['$log', 'option'];
+        function ShortcutBindingService_1($log, option) {
+            "ngInject";
+            this._shortcuts = {};
+            this._log = $log;
+            this._defaultOption = option ? _.defaults(option, this.getDefaultOption()) : this.getDefaultOption();
+        }
+        ShortcutBindingService_1.prototype.getDefaultOption = function () {
+            var defaultOption = {
+                Type: Shortcut_1.KeyboardEvent.Keydown,
+                Propagate: false,
+                DisableInInput: false,
+                Target: document,
+                Keycode: null
+            };
+            return defaultOption;
         };
-        return defaultOption;
-    };
-    ShortcutsRegister.prototype.checkAddShortcut = function (element, shorcutCombination, callback) {
-        if (!element) {
-            this._log.error('Register shortcut: element undentified!');
-            return false;
+        Object.defineProperty(ShortcutBindingService_1.prototype, "shortcuts", {
+            get: function () {
+                return this._shortcuts;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ShortcutBindingService_1.prototype.add = function (shortcut, callback, option) {
+            this.remove(shortcut);
+            var shortcutOption = option ? _.defaults(option, this._defaultOption) : this._defaultOption;
+            var shortcutCombination = shortcut.toLowerCase();
+            var element = shortcutOption.Target;
+            if (typeof shortcutOption.Target == 'string') {
+                element = document.getElementById(shortcutOption.Target);
+            }
+            else {
+                element = shortcutOption.Target;
+            }
+            if (!element) {
+                this._log.error('Register shortcut: element undentified!');
+                return;
+            }
+            if (!shortcutCombination) {
+                this._log.error('Register shortcut: shortcut combination undentified!');
+                return;
+            }
+            if (!callback) {
+                this._log.error('Register shortcut: shorcut callback undentified!');
+                return;
+            }
+            var newKeyboardShortcut = new Shortcut_1.Shortcut(element, shortcutCombination, shortcutOption, callback);
+            this._shortcuts[shortcutCombination] = newKeyboardShortcut;
+            if (element.addEventListener) {
+                element.addEventListener(shortcutOption.Type, newKeyboardShortcut.eventCallback, false);
+            }
+            else if (element.attachEvent) {
+                element.attachEvent('on' + shortcutOption.Type, newKeyboardShortcut.eventCallback);
+            }
+            else {
+                element.on(shortcutOption.Type, newKeyboardShortcut.eventCallback);
+            }
+        };
+        ShortcutBindingService_1.prototype.remove = function (shorcut) {
+            var shortcutCombination = shorcut.toLowerCase();
+            var binding = this._shortcuts[shortcutCombination];
+            delete (this._shortcuts[shortcutCombination]);
+            if (!binding)
+                return;
+            var type = binding.event;
+            var element = binding.target;
+            var callback = binding.eventCallback;
+            if (element.detachEvent) {
+                element.detachEvent('on' + type, callback);
+            }
+            else if (element.removeEventListener) {
+                element.removeEventListener(type, callback, false);
+            }
+            else {
+                element.off(type, callback);
+            }
+        };
+        return ShortcutBindingService_1;
+    }());
+    var ShortcutBindingProvider = (function () {
+        function ShortcutBindingProvider() {
         }
-        if (!shorcutCombination) {
-            this._log.error('Register shortcut: shorcut combination undentified!');
-            return false;
-        }
-        if (!callback) {
-            this._log.error('Register shortcut: shorcut callback undentified!');
-            return false;
-        }
-        return true;
-    };
-    Object.defineProperty(ShortcutsRegister.prototype, "shorcuts", {
-        get: function () {
-            return this._shortcuts;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ShortcutsRegister.prototype.add = function (shorcutName, callback, option) {
-        this.remove(shorcutName);
-        var shorcutOption = option ? _.defaults(option, this._defaultOption) : this._defaultOption;
-        var shorcutCombination = shorcutName.toLowerCase();
-        var element = shorcutOption.Target;
-        if (typeof shorcutOption.Target == 'string') {
-            element = document.getElementById(shorcutOption.Target);
-        }
-        else {
-            element = shorcutOption.Target;
-        }
-        if (!this.checkAddShortcut(element, shorcutCombination, callback)) {
-            return;
-        }
-        var newKeyboardShortcut = new KeyboardShortcut_1.KeyboardShortcut(element, shorcutCombination, shorcutOption, callback);
-        this._shortcuts[shorcutCombination] = newKeyboardShortcut;
-        if (element.addEventListener) {
-            element.addEventListener(shorcutOption.Type, newKeyboardShortcut.eventCallback, false);
-        }
-        else if (element.attachEvent) {
-            element.attachEvent('on' + shorcutOption.Type, newKeyboardShortcut.eventCallback);
-        }
-        else {
-            element.on(shorcutOption.Type, newKeyboardShortcut.eventCallback);
-        }
-    };
-    ShortcutsRegister.prototype.remove = function (shorcutName) {
-        var shortcutCombination = shorcutName.toLowerCase();
-        var binding = this._shortcuts[shortcutCombination];
-        delete (this._shortcuts[shortcutCombination]);
-        if (!binding)
-            return;
-        var type = binding.event;
-        var element = binding.target;
-        var callback = binding.eventCallback;
-        if (element.detachEvent) {
-            element.detachEvent('on' + type, callback);
-        }
-        else if (element.removeEventListener) {
-            element.removeEventListener(type, callback, false);
-        }
-        else {
-            element.off(type, callback);
-        }
-    };
-    return ShortcutsRegister;
-}());
-exports.ShortcutsRegister = ShortcutsRegister;
-var ShortcutsRegisterProvider = (function () {
-    function ShortcutsRegisterProvider() {
-    }
-    Object.defineProperty(ShortcutsRegisterProvider.prototype, "option", {
-        get: function () {
-            return this._option;
-        },
-        set: function (value) {
-            this._option = value || new KeyboardShortcut_1.ShortcutOption();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ShortcutsRegisterProvider.prototype.$get = ['$log', function ($log) {
-        "ngInject";
-        if (this._service == null)
-            this._service = new ShortcutsRegister($log, this._option);
-        return this._service;
-    }];
-    return ShortcutsRegisterProvider;
-}());
-angular
-    .module('pipShortcuts')
-    .provider('pipShortcutsRegister', ShortcutsRegisterProvider);
-},{"./KeyboardShortcut":5}],7:[function(require,module,exports){
-'use strict';
+        Object.defineProperty(ShortcutBindingProvider.prototype, "option", {
+            get: function () {
+                return this._option;
+            },
+            set: function (value) {
+                this._option = value || new Shortcut_1.ShortcutOptions();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ShortcutBindingProvider.prototype.$get = ['$log', function ($log) {
+            "ngInject";
+            if (this._service == null)
+                this._service = new ShortcutBindingService_1($log, this._option);
+            return this._service;
+        }];
+        return ShortcutBindingProvider;
+    }());
+    angular
+        .module('pipShortcuts')
+        .provider('pipShortcutBinding', ShortcutBindingProvider);
+}
+},{"./Shortcut":12}],14:[function(require,module,exports){
+"use strict";
 var ShortcutController = (function () {
-    ShortcutController.$inject = ['$element', '$attrs', '$scope', '$log', '$parse', 'pipShortcutsRegister'];
-    function ShortcutController($element, $attrs, $scope, $log, $parse, pipShortcutsRegister) {
+    ShortcutController.$inject = ['$element', '$attrs', '$scope', '$log', '$parse', 'pipShortcutBinding'];
+    function ShortcutController($element, $attrs, $scope, $log, $parse, pipShortcutBinding) {
         "ngInject";
         var _this = this;
-        this._log = $log;
         if ($attrs.pipShortcutAction) {
             this.actionShortcuts = $parse($attrs.pipShortcutAction);
-            var a1 = $attrs.pipShortcutAction;
             this.actionShortcuts($scope, { $event: {} });
         }
         else {
-            this._log.error('Shorcunt action does not set.');
+            $log.error('Shortcut action does not set.');
             return;
         }
         if ($attrs.pipShortcutName && _.isString($attrs.pipShortcutName)) {
             this.nameShortcuts = $attrs.pipShortcutName;
         }
         else {
-            this._log.error('Shorcunt name does not set.');
+            $log.error('Shortcut name does not set.');
             return;
         }
         this.options = $attrs.pipShorcutOptions ? $attrs.pipShorcutOptions : {};
         this.options.Target = $element;
-        pipShortcutsRegister.add(this.nameShortcuts, function (e) {
+        pipShortcutBinding.add(this.nameShortcuts, function (e) {
             _this.actionShortcuts($scope, { $event: { 'e': e } });
         }, this.options);
     }
@@ -3524,104 +4137,89 @@ var ShortcutController = (function () {
     };
     return ShortcutController;
 }());
-(function () {
-    shortcutsDirective.$inject = ['$parse'];
-    function shortcutsDirective($parse) {
+{
+    var shortcutsDirective = function () {
         return {
             restrict: 'A',
             scope: false,
             controller: ShortcutController
         };
-    }
+    };
     angular
         .module('pipShortcuts')
         .directive('pipShortcut', shortcutsDirective);
-})();
-},{}],8:[function(require,module,exports){
-'use strict';
+}
+},{}],15:[function(require,module,exports){
+"use strict";
+var IShortcutsService_1 = require("./IShortcutsService");
 exports.ShortcutsChangedEvent = 'pipShortcutsChanged';
-var ShortcutItem = (function () {
-    function ShortcutItem() {
-    }
-    return ShortcutItem;
-}());
-exports.ShortcutItem = ShortcutItem;
-var ShortcutsConfig = (function () {
-    function ShortcutsConfig() {
-        this.globalShortcuts = [];
-        this.localShortcuts = [];
-        this.defaultOptions = null;
-    }
-    return ShortcutsConfig;
-}());
-exports.ShortcutsConfig = ShortcutsConfig;
 var ShortcutsService = (function () {
-    function ShortcutsService(config, $rootScope, $window, $location, $injector, pipShortcutsRegister) {
+    function ShortcutsService(config, $rootScope, $window, $location, $injector, pipShortcutBinding) {
+        this.$rootScope = $rootScope;
+        this.$window = $window;
+        this.$location = $location;
+        this.$injector = $injector;
+        this.pipShortcutBinding = pipShortcutBinding;
         this._config = config;
         this._oldConfig = _.cloneDeep(this._config);
-        this._rootScope = $rootScope;
-        this._window = $window;
-        this._location = $location;
-        this._injector = $injector;
-        this._pipShortcutsRegister = pipShortcutsRegister;
         this.addShortcuts(this._config.globalShortcuts);
         this.addShortcuts(this._config.localShortcuts);
     }
     ShortcutsService.prototype.sendChangeEvent = function () {
         this.removeShortcuts(this._oldConfig.globalShortcuts);
         this.removeShortcuts(this._oldConfig.localShortcuts);
-        this.addShortcuts(this._config.globalShortcuts);
-        this.addShortcuts(this._config.localShortcuts);
-        this._rootScope.$emit(exports.ShortcutsChangedEvent, this._config);
-        this._oldConfig = _.cloneDeep(this._config);
+        this.addShortcuts(this.config.globalShortcuts);
+        this.addShortcuts(this.config.localShortcuts);
+        this.$rootScope.$emit(exports.ShortcutsChangedEvent, this.config);
+        this._oldConfig = _.cloneDeep(this.config);
     };
     ShortcutsService.prototype.removeShortcuts = function (collection) {
         var _this = this;
         _.each(collection, function (k) {
-            _this._pipShortcutsRegister.remove(k.shortcut);
+            _this.pipShortcutBinding.remove(k.shortcut);
         });
     };
-    ShortcutsService.prototype.keypressShortcut = function (shorcut, event) {
-        if (shorcut.access && _.isFunction(shorcut.access)) {
-            if (!shorcut.access(event)) {
+    ShortcutsService.prototype.keypressShortcut = function (item, event) {
+        if (item.access && _.isFunction(item.access)) {
+            if (!item.access(event)) {
                 return;
             }
         }
-        if (shorcut.keypress) {
-            shorcut.keypress(event);
+        if (item.keypress) {
+            item.keypress(event);
             return;
         }
-        if (shorcut.href) {
-            this._window.location.href = shorcut.href;
+        if (item.href) {
+            this.$window.location.href = item.href;
             return;
         }
-        if (shorcut.url) {
-            this._location.url(shorcut.url);
+        if (item.url) {
+            this.$location.url(item.url);
             return;
         }
-        if (shorcut.state) {
-            if (this._injector.has('$state')) {
-                var $state = this._injector.get('$state');
-                $state['go'](shorcut.state, shorcut.stateParams);
+        if (item.state) {
+            if (this.$injector.has('$state')) {
+                var $state = this.$injector.get('$state');
+                $state['go'](item.state, item.stateParams);
             }
             return;
         }
-        if (shorcut.event) {
-            this._rootScope.$broadcast(shorcut.event);
+        if (item.event) {
+            this.$rootScope.$broadcast(item.event);
         }
         else {
-            this._rootScope.$broadcast('pipShortcutKeypress', shorcut.shortcut);
+            this.$rootScope.$broadcast('pipShortcutKeypress', item.shortcut);
         }
     };
     ShortcutsService.prototype.addShortcuts = function (collection) {
         var _this = this;
-        var generalOptions = this._config.defaultOptions ? this._config.defaultOptions : {};
+        var generalOptions = this.config.defaultOptions ? this.config.defaultOptions : {};
         _.each(collection, function (k) {
             var option = k.options ? k.options : generalOptions;
             var target;
             target = k.target ? k.target : k.targetId;
             option.Target = target;
-            _this._pipShortcutsRegister.add(k.shortcut, function (e) {
+            _this.pipShortcutBinding.add(k.shortcut, function (e) {
                 _this.keypressShortcut(k, e);
             }, option);
         });
@@ -3666,38 +4264,18 @@ var ShortcutsService = (function () {
         enumerable: true,
         configurable: true
     });
-    ShortcutsService.prototype.on = function (globalShortcuts, localShortcuts) {
-        if (globalShortcuts && _.isArray(globalShortcuts)) {
-            this._config.globalShortcuts = globalShortcuts;
-        }
-        if (localShortcuts && _.isArray(localShortcuts)) {
-            this._config.localShortcuts = localShortcuts;
-        }
-        this.sendChangeEvent();
-    };
-    ShortcutsService.prototype.onLocal = function (localShortcuts) {
-        if (localShortcuts && _.isArray(localShortcuts)) {
-            this._config.localShortcuts = localShortcuts;
-        }
-        this.sendChangeEvent();
-    };
-    ShortcutsService.prototype.off = function () {
-        this._config.globalShortcuts = [];
-        this._config.localShortcuts = [];
-        this.sendChangeEvent();
-    };
     return ShortcutsService;
 }());
 var ShortcutsProvider = (function () {
     function ShortcutsProvider() {
-        this._config = new ShortcutsConfig();
+        this._config = new IShortcutsService_1.ShortcutsConfig();
     }
     Object.defineProperty(ShortcutsProvider.prototype, "config", {
         get: function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new ShortcutsConfig();
+            this._config = value || new IShortcutsService_1.ShortcutsConfig();
         },
         enumerable: true,
         configurable: true
@@ -3722,20 +4300,10 @@ var ShortcutsProvider = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ShortcutsProvider.prototype, "localShortcuts", {
-        get: function () {
-            return this._config.localShortcuts;
-        },
-        set: function (value) {
-            this._config.localShortcuts = value || [];
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ShortcutsProvider.prototype.$get = ['$rootScope', '$window', '$location', '$injector', 'pipShortcutsRegister', function ($rootScope, $window, $location, $injector, pipShortcutsRegister) {
+    ShortcutsProvider.prototype.$get = ['$rootScope', '$window', '$location', '$injector', 'pipShortcutBinding', function ($rootScope, $window, $location, $injector, pipShortcutBinding) {
         "ngInject";
         if (this._service == null)
-            this._service = new ShortcutsService(this._config, $rootScope, $window, $location, $injector, pipShortcutsRegister);
+            this._service = new ShortcutsService(this._config, $rootScope, $window, $location, $injector, pipShortcutBinding);
         return this._service;
     }];
     return ShortcutsProvider;
@@ -3743,264 +4311,43 @@ var ShortcutsProvider = (function () {
 angular
     .module('pipShortcuts')
     .provider('pipShortcuts', ShortcutsProvider);
-},{}],9:[function(require,module,exports){
-'use strict';
+},{"./IShortcutsService":11}],16:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipShortcuts', ['ngMaterial', 'ui.router']);
-require("./ShorcutsRegisterService");
+require("./ShortcutBindingService");
 require("./ShortcutsService");
 require("./ShortcutDirective");
+__export(require("./IShortcutsService"));
 __export(require("./ShortcutsService"));
-__export(require("./ShorcutsRegisterService"));
-},{"./ShorcutsRegisterService":6,"./ShortcutDirective":7,"./ShortcutsService":8}],10:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipSelected", []);
-    thisModule.directive('pipSelected', ['$parse', '$mdConstant', '$timeout', function ($parse, $mdConstant, $timeout) {
-        return {
-            restrict: 'A',
-            scope: false,
-            link: function ($scope, $element, $attrs) {
-                var indexGetter = $attrs.pipSelected ? $parse($attrs.pipSelected) : null, indexSetter = indexGetter ? indexGetter.assign : null, idGetter = $attrs.pipSelectedId ? $parse($attrs.pipSelectedId) : null, idSetter = idGetter ? idGetter.assign : null, changeGetter = $attrs.pipSelect ? $parse($attrs.pipSelect) : null, enterSpaceGetter = $attrs.pipEnterSpacePress ? $parse($attrs.pipEnterSpacePress) : null, noScroll = toBoolean($attrs.pipNoScroll), modifier = toBoolean($attrs.pipSkipHidden) ? ':visible' : '', className = toBoolean($attrs.pipTreeList) ? '.pip-selectable-tree' : '.pip-selectable', selectedIndex = indexGetter($scope), currentElementTabinex = $element.attr('tabindex'), pipSelectedWatch = $attrs.pipSelectedWatch, isScrolled = false;
-                var touchStartX, touchStartY, trackingClick, trackingClickStart, targetElement, lastClickTime, cancelNextClick;
-                var touchBoundary = 10, tapdelay = 200, tapTimeout = 700;
-                $element.attr('tabindex', currentElementTabinex || 0);
-                $element.on('click', className, onClickEvent);
-                $element.on('touchstart', className, onTouchStart);
-                $element.on('touchmove', className, onTouchMove);
-                $element.on('touchend', className, onTouchEnd);
-                $element.on('touchcancel', className, onTouchCancel);
-                $element.on('keydown', onKeyDown);
-                $element.on('focusin', onFocusIn);
-                $element.on('focusout', onFocusOut);
-                if (!toBoolean($attrs.pipTreeList)) {
-                    $scope.$watch(indexGetter, function (newSelectedIndex) {
-                        selectItem({ itemIndex: newSelectedIndex });
-                    });
+},{"./IShortcutsService":11,"./ShortcutBindingService":13,"./ShortcutDirective":14,"./ShortcutsService":15}],17:[function(require,module,exports){
+{
+    var UnsavedChangesLink_1 = (function () {
+        function UnsavedChangesLink_1($scope, $window) {
+            $window.onbeforeunload = function () {
+                if ($scope.unsavedChangesAvailable()) {
+                    return $scope.unsavedChangesMessage;
+                }
+            };
+            var unbindFunc = $scope.$on('$stateChangeStart', function (event) {
+                if ($scope.unsavedChangesAvailable() && !$window.confirm($scope.unsavedChangesMessage)) {
+                    _.isFunction($scope.cancelLeave) && $scope.cancelLeave();
+                    event.preventDefault();
                 }
                 else {
-                    $scope.$watch(idGetter, function (newSelectedId) {
-                        setTimeout(function () {
-                            selectItem({ itemId: newSelectedId, raiseEvent: true });
-                        }, 0);
-                    });
+                    _.isFunction($scope.afterLeave) && $scope.afterLeave();
                 }
-                if (pipSelectedWatch) {
-                    $scope.$watch(pipSelectedWatch, function () {
-                        setTimeout(function () {
-                            selectedIndex = indexGetter($scope);
-                            selectItem({ itemIndex: selectedIndex });
-                        }, 100);
-                    });
-                }
-                selectItem({ itemIndex: selectedIndex, items: $element.find(className) });
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                ;
-                function selectItem(itemParams) {
-                    if (isScrolled)
-                        return;
-                    var itemIndex = itemParams.itemIndex, itemId = itemParams.itemId, items = itemParams.items || $element.find(className + modifier), itemsLength = items.length, item = (function () {
-                        if (itemParams.item)
-                            return itemParams.item;
-                        if (itemIndex === undefined && itemIndex === -1) {
-                            itemIndex = items.index(items.filter('[pip-id=' + itemId + ']'));
-                        }
-                        if (itemIndex >= 0 && itemIndex < itemsLength) {
-                            return items[itemIndex];
-                        }
-                    }()), raiseEvent = itemParams.raiseEvent;
-                    if (item) {
-                        $element.find(className).removeClass('selected md-focused');
-                        item = angular.element(item)
-                            .addClass('selected md-focused')
-                            .focus();
-                        if (!noScroll)
-                            scrollToItem(item);
-                        if (raiseEvent)
-                            defineSelectedIndex(items);
-                    }
-                }
-                ;
-                function defineSelectedIndex(items) {
-                    var oldSelectedIndex = selectedIndex;
-                    selectedIndex = -1;
-                    for (var index = 0; index < items.length; index++) {
-                        if ($(items[index]).hasClass('selected')) {
-                            selectedIndex = index;
-                            break;
-                        }
-                    }
-                    if (oldSelectedIndex != selectedIndex && selectedIndex !== -1) {
-                        $scope.$apply(updateIndex);
-                    }
-                    else {
-                        $scope.$apply(onSelect);
-                    }
-                    function updateIndex() {
-                        var selectedItem = angular.element(items[selectedIndex]), selectedId = selectedItem.attr('pip-id');
-                        if (indexSetter)
-                            indexSetter($scope, selectedIndex);
-                        if (idSetter)
-                            idSetter($scope, selectedId);
-                        onSelect();
-                    }
-                    ;
-                    function onSelect() {
-                        var selectedItem = angular.element(items[selectedIndex]), selectedId = selectedItem.attr('pip-id');
-                        if (changeGetter) {
-                            changeGetter($scope, {
-                                $event: {
-                                    target: $element,
-                                    item: selectedItem,
-                                    index: selectedIndex,
-                                    id: selectedId,
-                                    newIndex: selectedIndex,
-                                    oldIndex: oldSelectedIndex
-                                }
-                            });
-                        }
-                    }
-                }
-                ;
-                function scrollToItem($item) {
-                    if (noScroll)
-                        return;
-                    var containerTop = $element.offset().top, containerHeight = $element.height(), containerBottom = containerTop + containerHeight, itemTop = $item.offset().top, itemHeight = $item.outerHeight(true), itemBottom = itemTop + itemHeight, containerScrollTop = $element.scrollTop();
-                    isScrolled = true;
-                    setTimeout(function () {
-                        isScrolled = false;
-                    }, 100);
-                    if (containerTop > itemTop) {
-                        $element.scrollTop(containerScrollTop + itemTop - containerTop);
-                    }
-                    else if (containerBottom < itemBottom) {
-                        $element.scrollTop(containerScrollTop + itemBottom - containerBottom);
-                    }
-                }
-                ;
-                function getTargetElementFromEventTarget(eventTarget) {
-                    if (eventTarget.nodeType === Node.TEXT_NODE) {
-                        return eventTarget.parentNode;
-                    }
-                    return eventTarget;
-                }
-                ;
-                function touchHasMoved(event) {
-                    var touch = event.changedTouches[0], boundary = touchBoundary;
-                    if (Math.abs(touch.pageX - touchStartX) > boundary || Math.abs(touch.pageY - touchStartY) > boundary) {
-                        return true;
-                    }
-                    return false;
-                }
-                ;
-                function onClickEvent(event) {
-                    selectItem({ item: event.currentTarget, raiseEvent: true });
-                }
-                function onTouchStart(ev) {
-                    var event = ev.originalEvent;
-                    if (event['targetTouches'].length > 1) {
-                        return true;
-                    }
-                    var targetElement = getTargetElementFromEventTarget(event.target);
-                    var touch = event['targetTouches'][0];
-                    trackingClick = true;
-                    trackingClickStart = event.timeStamp;
-                    targetElement = targetElement;
-                    touchStartX = touch.pageX;
-                    touchStartY = touch.pageY;
-                    if ((event.timeStamp - lastClickTime) < tapdelay) {
-                    }
-                    return true;
-                }
-                function onTouchMove(ev) {
-                    if (!trackingClick) {
-                        return true;
-                    }
-                    var event = ev.originalEvent;
-                    if (targetElement !== getTargetElementFromEventTarget(event.target) || touchHasMoved(event)) {
-                        trackingClick = false;
-                        targetElement = null;
-                    }
-                    return true;
-                }
-                function onTouchEnd(ev) {
-                    var forElement, newTrackingClickStart, targetTagName, scrollParent, touch, newtargetElement = targetElement;
-                    if (!trackingClick) {
-                        return true;
-                    }
-                    event = ev.originalEvent;
-                    if ((event.timeStamp - lastClickTime) < tapdelay) {
-                        cancelNextClick = true;
-                        return true;
-                    }
-                    if ((event.timeStamp - trackingClickStart) > tapTimeout) {
-                        return true;
-                    }
-                    cancelNextClick = false;
-                    lastClickTime = event.timeStamp;
-                    newTrackingClickStart = trackingClickStart;
-                    trackingClick = false;
-                    trackingClickStart = 0;
-                    selectItem({ item: ev.currentTarget, raiseEvent: true });
-                    return false;
-                }
-                function onTouchCancel(ev) {
-                    trackingClick = false;
-                    targetElement = null;
-                }
-                function onKeyDown(e) {
-                    var keyCode = e.which || e.keyCode;
-                    if (keyCode == $mdConstant.KEY_CODE.ENTER || keyCode == $mdConstant.KEY_CODE.SPACE) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (enterSpaceGetter) {
-                            enterSpaceGetter($scope, {
-                                $event: {
-                                    target: $element,
-                                    index: selectedIndex,
-                                    item: $element.find('.selected')
-                                }
-                            });
-                        }
-                    }
-                    else if (keyCode == $mdConstant.KEY_CODE.LEFT_ARROW || keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW ||
-                        keyCode == $mdConstant.KEY_CODE.UP_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var items = $element.find(className + modifier), inc = (keyCode == $mdConstant.KEY_CODE.RIGHT_ARROW || keyCode == $mdConstant.KEY_CODE.DOWN_ARROW) ? 1 : -1, newSelectedIndex = selectedIndex + inc;
-                        selectItem({ itemIndex: newSelectedIndex, items: items, raiseEvent: true });
-                    }
-                }
-                function onFocusIn(event) {
-                    var items, selectedItem = $element.find(className + '.selected');
-                    selectedItem.addClass('md-focused');
-                    if (selectedItem.length === 0) {
-                        selectedIndex = indexGetter($scope);
-                        items = $element.find(className + modifier);
-                        selectItem({ itemIndex: selectedIndex || 0, items: items, raiseEvent: true });
-                    }
-                }
-                function onFocusOut(event) {
-                    $element.find(className + '.md-focused' + modifier).removeClass('md-focused');
-                }
-            }
-        };
-    }]);
-})();
-},{}],11:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipUnsavedChanges", []);
-    thisModule.directive("pipUnsavedChanges", ['$window', '$rootScope', function ($window, $rootScope) {
+            });
+            $scope.$on('$destroy', function () {
+                $window.onbeforeunload = null;
+                unbindFunc();
+            });
+        }
+        return UnsavedChangesLink_1;
+    }());
+    var UnsavedChanges = function ($window) {
         return {
             restrict: 'AE',
             scope: {
@@ -4010,330 +4357,345 @@ __export(require("./ShorcutsRegisterService"));
                 cancelLeave: '&pipUnsavedChangesCancelLeave'
             },
             link: function ($scope) {
-                $window.onbeforeunload = function () {
-                    if ($scope.unsavedChangesAvailable()) {
-                        $rootScope.$routing = false;
-                        return $scope.unsavedChangesMessage;
-                    }
-                };
-                var unbindFunc = $scope.$on('$stateChangeStart', function (event) {
-                    if ($scope.unsavedChangesAvailable() && !$window.confirm($scope.unsavedChangesMessage)) {
-                        $rootScope.$routing = false;
-                        _.isFunction($scope.cancelLeave) && $scope.cancelLeave();
-                        event.preventDefault();
-                    }
-                    else {
-                        _.isFunction($scope.afterLeave) && $scope.afterLeave();
-                    }
-                });
-                $scope.$on('$destroy', function () {
-                    $window.onbeforeunload = null;
-                    unbindFunc();
-                });
+                new UnsavedChangesLink_1($scope, $window);
             }
         };
-    }]);
-})();
-},{}]},{},[1,2,3,4,9,5,6,7,8,10,11])(11)
+    };
+    UnsavedChanges.$inject = ['$window'];
+    angular
+        .module("pipUnsavedChanges", [])
+        .directive("pipUnsavedChanges", UnsavedChanges);
+}
+},{}]},{},[8])(8)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
-var ColorPickerController = (function () {
-    ColorPickerController.$inject = ['$scope', '$element', '$attrs', '$timeout'];
-    function ColorPickerController($scope, $element, $attrs, $timeout) {
-        var DEFAULT_COLORS = ['purple', 'lightgreen', 'green', 'darkred', 'pink', 'yellow', 'cyan'];
-        this._$timeout = $timeout;
-        this._$scope = $scope;
-        this.class = $attrs.class || '';
-        this.colors = !$scope['colors'] || _.isArray($scope['colors']) && $scope['colors'].length === 0 ? DEFAULT_COLORS : $scope['colors'];
-        this.colorChange = $scope['colorChange'] || null;
-        this.currentColor = $scope['currentColor'] || this.colors[0];
-        this.currentColorIndex = this.colors.indexOf(this.currentColor);
-        this.ngDisabled = $scope['ngDisabled'];
-    }
-    ColorPickerController.prototype.disabled = function () {
-        if (this.ngDisabled) {
-            return this.ngDisabled();
-        }
-        return true;
+{
+    var ColorPickerBindings = {
+        ngDisabled: '<?ngDisabled',
+        colors: '<pipColors',
+        currentColor: '=ngModel',
+        colorChange: '&?ngChange'
     };
-    ;
-    ColorPickerController.prototype.selectColor = function (index) {
-        var _this = this;
-        if (this.disabled()) {
-            return;
+    var ColorPickerChanges = (function () {
+        function ColorPickerChanges() {
         }
-        this.currentColorIndex = index;
-        this.currentColor = this.colors[this.currentColorIndex];
-        this._$timeout(function () {
-            _this._$scope.$apply();
-        });
-        if (this.colorChange) {
-            this.colorChange();
+        return ColorPickerChanges;
+    }());
+    var DEFAULT_COLORS_1 = ['purple', 'lightgreen', 'green', 'darkred', 'pink', 'yellow', 'cyan'];
+    var ColorPickerController = (function () {
+        function ColorPickerController($scope, $element, $attrs, $timeout) {
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$timeout = $timeout;
+            this.class = $attrs.class || '';
         }
-    };
-    ;
-    ColorPickerController.prototype.enterSpacePress = function (event) {
-        this.selectColor(event.index);
-    };
-    ;
-    return ColorPickerController;
-}());
-exports.ColorPickerController = ColorPickerController;
-(function () {
-    pipColorPicker.$inject = ['$parse'];
-    function pipColorPicker($parse) {
-        "ngInject";
-        return {
-            restrict: 'EA',
-            scope: {
-                ngDisabled: '&',
-                colors: '=pipColors',
-                currentColor: '=ngModel',
-                colorChange: '&ngChange'
-            },
-            templateUrl: 'color_picker/color_picker.html',
-            controller: ColorPickerController,
-            controllerAs: 'vm'
+        ColorPickerController.prototype.$onChanges = function (changes) {
+            this.colors = changes.colors && _.isArray(changes.colors.currentValue) && changes.colors.currentValue.length !== 0 ?
+                changes.colors.currentValue : DEFAULT_COLORS_1;
+            this.currentColor = this.currentColor || this.colors[0];
+            this.currentColorIndex = this.colors.indexOf(this.currentColor);
+            this.ngDisabled = changes.ngDisabled.currentValue;
         };
-    }
+        ColorPickerController.prototype.selectColor = function (index) {
+            var _this = this;
+            if (this.ngDisabled) {
+                return;
+            }
+            this.currentColorIndex = index;
+            this.currentColor = this.colors[this.currentColorIndex];
+            this.$timeout(function () {
+                _this.$scope.$apply();
+            });
+            if (this.colorChange) {
+                this.colorChange();
+            }
+        };
+        ;
+        ColorPickerController.prototype.enterSpacePress = function (event) {
+            this.selectColor(event.index);
+        };
+        ;
+        return ColorPickerController;
+    }());
+    var pipColorPicker = {
+        bindings: ColorPickerBindings,
+        templateUrl: 'color_picker/ColorPicker.html',
+        controller: ColorPickerController
+    };
     angular
         .module('pipColorPicker', ['pipControls.Templates'])
-        .directive('pipColorPicker', pipColorPicker);
-})();
+        .component('pipColorPicker', pipColorPicker);
+}
 },{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipControls', [
-        'pipMarkdown',
-        'pipColorPicker',
-        'pipRoutingProgress',
-        'pipPopover',
-        'pipImageSlider',
-        'pipToasts',
-        'pipControls.Translate'
-    ]);
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipControls.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
+{
+    translateFilter.$inject = ['$injector'];
+    function translateFilter($injector) {
+        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }]);
-})();
-},{}],4:[function(require,module,exports){
-var pipImageSliderController = (function () {
-    pipImageSliderController.$inject = ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', '$pipImageSlider'];
-    function pipImageSliderController($scope, $element, $attrs, $parse, $timeout, $interval, $pipImageSlider) {
-        var _this = this;
-        this._index = 0;
-        this.DEFAULT_INTERVAL = 4500;
-        this.swipeStart = 0;
-        this.sliderIndex = $scope['sliderIndex'];
-        console.log($scope, $attrs);
-        this._type = $parse($attrs.pipAnimationType)($scope);
-        this._interval = $parse($attrs.pipAnimationInterval)($scope);
-        this._$attrs = $attrs;
-        this._$interval = $interval;
-        $scope['slideTo'] = this.slideToPrivate;
-        $element.addClass('pip-image-slider');
-        $element.addClass('pip-animation-' + this._type);
-        this.setIndex();
-        $timeout(function () {
-            _this._blocks = $element.find('.pip-animation-block');
-            if (_this._blocks.length > 0) {
-                $(_this._blocks[0]).addClass('pip-show');
-            }
-        });
-        this.startInterval();
-        this._throttled = _.throttle(function () {
-            $pipImageSlider.toBlock(_this._type, _this._blocks, _this._index, _this._newIndex, _this._direction);
-            _this._index = _this._newIndex;
-            ;
-            $scope['selectIndex'] = _this._index;
-            _this.setIndex();
-        }, 700);
-        if ($attrs.id) {
-            $pipImageSlider.registerSlider($attrs.id, $scope);
-        }
-        $element.on('$destroy', function () {
-            _this.stopInterval();
-            $pipImageSlider.removeSlider($attrs.id);
-        });
-    }
-    pipImageSliderController.prototype.nextBlock = function () {
-        this.restartInterval();
-        this._newIndex = this._index + 1 === this._blocks.length ? 0 : this._index + 1;
-        this._direction = 'next';
-        this._throttled();
-    };
-    pipImageSliderController.prototype.prevBlock = function () {
-        this.restartInterval();
-        this._newIndex = this._index - 1 < 0 ? this._blocks.length - 1 : this._index - 1;
-        this._direction = 'prev';
-        this._throttled();
-    };
-    pipImageSliderController.prototype.slideToPrivate = function (nextIndex) {
-        console.log(this);
-        if (nextIndex === this._index || nextIndex > this._blocks.length - 1) {
-            return;
-        }
-        this.restartInterval();
-        this._newIndex = nextIndex;
-        this._direction = nextIndex > this._index ? 'next' : 'prev';
-        this._throttled();
-    };
-    pipImageSliderController.prototype.setIndex = function () {
-        if (this._$attrs.pipImageIndex)
-            this.sliderIndex = this._index;
-    };
-    pipImageSliderController.prototype.startInterval = function () {
-        var _this = this;
-        this._timePromises = this._$interval(function () {
-            _this._newIndex = _this._index + 1 === _this._blocks.length ? 0 : _this._index + 1;
-            _this._direction = 'next';
-            _this._throttled();
-        }, this._interval || this.DEFAULT_INTERVAL);
-    };
-    pipImageSliderController.prototype.stopInterval = function () {
-        this._$interval.cancel(this._timePromises);
-    };
-    pipImageSliderController.prototype.restartInterval = function () {
-        this.stopInterval();
-        this.startInterval();
-    };
-    return pipImageSliderController;
-}());
-(function () {
-    function pipImageSlider() {
-        return {
-            scope: {
-                sliderIndex: '=pipImageIndex'
-            },
-            controller: pipImageSliderController,
-            controllerAs: 'vm'
+            return pipTranslate ? pipTranslate['translate'](key) || key : key;
         };
     }
     angular
-        .module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service'])
-        .directive('pipImageSlider', pipImageSlider);
-})();
-},{}],5:[function(require,module,exports){
-var ImageSliderService = (function () {
-    ImageSliderService.$inject = ['$timeout'];
-    function ImageSliderService($timeout) {
-        this.ANIMATION_DURATION = 550;
-        this._sliders = {};
-        this._$timeout = $timeout;
-    }
-    ImageSliderService.prototype.registerSlider = function (sliderId, sliderScope) {
-        console.log('reg', sliderScope);
-        this._sliders[sliderId] = sliderScope;
+        .module('pipControls.Translate', [])
+        .filter('translate', translateFilter);
+}
+},{}],3:[function(require,module,exports){
+"use strict";
+{
+    var pipImageSliderController_1 = (function () {
+        pipImageSliderController_1.$inject = ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', 'pipImageSlider'];
+        function pipImageSliderController_1($scope, $element, $attrs, $parse, $timeout, $interval, pipImageSlider) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+            this.$parse = $parse;
+            this.$timeout = $timeout;
+            this.$interval = $interval;
+            this.pipImageSlider = pipImageSlider;
+            this._index = 0;
+            this.DEFAULT_INTERVAL = 4500;
+            this.swipeStart = 0;
+            this._type = this.type();
+            this._interval = this.interval();
+            this.slideTo = this.slideToPrivate;
+            $element.addClass('pip-image-slider');
+            $element.addClass('pip-animation-' + this._type);
+            this.setIndex();
+            $timeout(function () {
+                _this._blocks = $element.find('.pip-animation-block');
+                if (_this._blocks.length > 0) {
+                    $(_this._blocks[0]).addClass('pip-show');
+                }
+            });
+            this.startInterval();
+            this._throttled = _.throttle(function () {
+                pipImageSlider.toBlock(_this._type, _this._blocks, _this._index, _this._newIndex, _this._direction);
+                _this._index = _this._newIndex;
+                _this.setIndex();
+            }, 700);
+            if ($attrs.id) {
+                pipImageSlider.registerSlider($attrs.id, $scope);
+            }
+            $scope.$on('$destroy', function () {
+                _this.stopInterval();
+                pipImageSlider.removeSlider($attrs.id);
+            });
+        }
+        pipImageSliderController_1.prototype.nextBlock = function () {
+            this.restartInterval();
+            this._newIndex = this._index + 1 === this._blocks.length ? 0 : this._index + 1;
+            this._direction = 'next';
+            this._throttled();
+        };
+        pipImageSliderController_1.prototype.prevBlock = function () {
+            this.restartInterval();
+            this._newIndex = this._index - 1 < 0 ? this._blocks.length - 1 : this._index - 1;
+            this._direction = 'prev';
+            this._throttled();
+        };
+        pipImageSliderController_1.prototype.slideToPrivate = function (nextIndex) {
+            if (nextIndex === this._index || nextIndex > this._blocks.length - 1) {
+                return;
+            }
+            this.restartInterval();
+            this._newIndex = nextIndex;
+            this._direction = nextIndex > this._index ? 'next' : 'prev';
+            this._throttled();
+        };
+        pipImageSliderController_1.prototype.setIndex = function () {
+            if (this.$attrs.pipImageIndex)
+                this.sliderIndex = this._index;
+        };
+        pipImageSliderController_1.prototype.startInterval = function () {
+            var _this = this;
+            this._timePromises = this.$interval(function () {
+                _this._newIndex = _this._index + 1 === _this._blocks.length ? 0 : _this._index + 1;
+                _this._direction = 'next';
+                _this._throttled();
+            }, Number(this._interval || this.DEFAULT_INTERVAL));
+        };
+        pipImageSliderController_1.prototype.stopInterval = function () {
+            this.$interval.cancel(this._timePromises);
+        };
+        pipImageSliderController_1.prototype.restartInterval = function () {
+            this.stopInterval();
+            this.startInterval();
+        };
+        return pipImageSliderController_1;
+    }());
+    var ImageSlider = function () {
+        return {
+            scope: {
+                sliderIndex: '=pipImageIndex',
+                type: '&pipAnimationType',
+                interval: '&pipAnimationInterval'
+            },
+            bindToController: true,
+            controller: pipImageSliderController_1,
+            controllerAs: 'vm'
+        };
     };
-    ImageSliderService.prototype.removeSlider = function (sliderId) {
-        delete this._sliders[sliderId];
-    };
-    ImageSliderService.prototype.getSliderScope = function (sliderId) {
-        console.log('ggg', this._sliders, 'jjj');
-        return this._sliders[sliderId];
-    };
-    ImageSliderService.prototype.nextCarousel = function (nextBlock, prevBlock) {
-        nextBlock.addClass('pip-next');
-        this._$timeout(function () {
-            nextBlock.addClass('animated').addClass('pip-show').removeClass('pip-next');
-            prevBlock.addClass('animated').removeClass('pip-show');
-        }, 100);
-    };
-    ImageSliderService.prototype.prevCarousel = function (nextBlock, prevBlock) {
-        this._$timeout(function () {
-            nextBlock.addClass('animated').addClass('pip-show');
-            prevBlock.addClass('animated').addClass('pip-next').removeClass('pip-show');
-        }, 100);
-    };
-    ImageSliderService.prototype.toBlock = function (type, blocks, oldIndex, nextIndex, direction) {
-        var prevBlock = $(blocks[oldIndex]), blockIndex = nextIndex, nextBlock = $(blocks[blockIndex]);
-        if (type === 'carousel') {
-            $(blocks).removeClass('pip-next').removeClass('pip-prev').removeClass('animated');
-            if (direction && (direction === 'prev' || direction === 'next')) {
-                if (direction === 'prev') {
-                    this.prevCarousel(nextBlock, prevBlock);
+    angular.module('pipImageSlider')
+        .directive('pipImageSlider', ImageSlider);
+}
+},{}],4:[function(require,module,exports){
+"use strict";
+{
+    var ImageSliderService = (function () {
+        ImageSliderService.$inject = ['$timeout'];
+        function ImageSliderService($timeout) {
+            this.$timeout = $timeout;
+            this.ANIMATION_DURATION = 550;
+            this._sliders = {};
+        }
+        ImageSliderService.prototype.registerSlider = function (sliderId, sliderScope) {
+            this._sliders[sliderId] = sliderScope;
+        };
+        ImageSliderService.prototype.removeSlider = function (sliderId) {
+            delete this._sliders[sliderId];
+        };
+        ImageSliderService.prototype.getSliderScope = function (sliderId) {
+            return this._sliders[sliderId];
+        };
+        ImageSliderService.prototype.nextCarousel = function (nextBlock, prevBlock) {
+            nextBlock.addClass('pip-next');
+            this.$timeout(function () {
+                nextBlock.addClass('animated').addClass('pip-show').removeClass('pip-next');
+                prevBlock.addClass('animated').removeClass('pip-show');
+            }, 100);
+        };
+        ImageSliderService.prototype.prevCarousel = function (nextBlock, prevBlock) {
+            this.$timeout(function () {
+                nextBlock.addClass('animated').addClass('pip-show');
+                prevBlock.addClass('animated').addClass('pip-next').removeClass('pip-show');
+            }, 100);
+        };
+        ImageSliderService.prototype.toBlock = function (type, blocks, oldIndex, nextIndex, direction) {
+            var prevBlock = $(blocks[oldIndex]), blockIndex = nextIndex, nextBlock = $(blocks[blockIndex]);
+            if (type === 'carousel') {
+                $(blocks).removeClass('pip-next').removeClass('pip-prev').removeClass('animated');
+                if (direction && (direction === 'prev' || direction === 'next')) {
+                    if (direction === 'prev') {
+                        this.prevCarousel(nextBlock, prevBlock);
+                    }
+                    else {
+                        this.nextCarousel(nextBlock, prevBlock);
+                    }
                 }
                 else {
-                    this.nextCarousel(nextBlock, prevBlock);
+                    if (nextIndex && nextIndex < oldIndex) {
+                        this.prevCarousel(nextBlock, prevBlock);
+                    }
+                    else {
+                        this.nextCarousel(nextBlock, prevBlock);
+                    }
                 }
             }
             else {
-                if (nextIndex && nextIndex < oldIndex) {
-                    this.prevCarousel(nextBlock, prevBlock);
-                }
-                else {
-                    this.nextCarousel(nextBlock, prevBlock);
-                }
+                prevBlock.addClass('animated').removeClass('pip-show');
+                nextBlock.addClass('animated').addClass('pip-show');
             }
-        }
-        else {
-            prevBlock.addClass('animated').removeClass('pip-show');
-            nextBlock.addClass('animated').addClass('pip-show');
-        }
-    };
-    return ImageSliderService;
-}());
-(function () {
-    'use strict';
+        };
+        return ImageSliderService;
+    }());
     angular
         .module('pipImageSlider.Service', [])
-        .service('$pipImageSlider', ImageSliderService);
-})();
+        .service('pipImageSlider', ImageSliderService);
+}
+},{}],5:[function(require,module,exports){
+"use strict";
+{
+    var SliderButtonController_1 = (function () {
+        SliderButtonController_1.$inject = ['$element', 'pipImageSlider'];
+        function SliderButtonController_1($element, pipImageSlider) {
+            var _this = this;
+            $element.on('click', function () {
+                if (!_this.sliderId() || !_this.direction()) {
+                    return;
+                }
+                pipImageSlider.getSliderScope(_this.sliderId()).vm[_this.direction() + 'Block']();
+            });
+        }
+        return SliderButtonController_1;
+    }());
+    var SliderButton = function () {
+        return {
+            scope: {
+                direction: '&pipButtonType',
+                sliderId: '&pipSliderId'
+            },
+            controllerAs: '$ctlr',
+            bindToController: true,
+            controller: SliderButtonController_1
+        };
+    };
+    angular
+        .module('pipSliderButton', [])
+        .directive('pipSliderButton', SliderButton);
+}
 },{}],6:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSliderButton', []);
-    thisModule.directive('pipSliderButton', function () {
+"use strict";
+{
+    var SliderIndicatorController_1 = (function () {
+        SliderIndicatorController_1.$inject = ['$element', 'pipImageSlider'];
+        function SliderIndicatorController_1($element, pipImageSlider) {
+            var _this = this;
+            $element.css('cursor', 'pointer');
+            $element.on('click', function () {
+                if (!_this.sliderId() || _this.slideTo() === undefined) {
+                    return;
+                }
+                pipImageSlider.getSliderScope(_this.sliderId()).vm.slideTo(_this.slideTo());
+            });
+        }
+        return SliderIndicatorController_1;
+    }());
+    var SliderIndicator = function () {
         return {
-            scope: {},
-            controller: ['$scope', '$element', '$parse', '$attrs', '$pipImageSlider', function ($scope, $element, $parse, $attrs, $pipImageSlider) {
-                var type = $parse($attrs.pipButtonType)($scope), sliderId = $parse($attrs.pipSliderId)($scope);
-                $element.on('click', function () {
-                    if (!sliderId || !type) {
-                        return;
-                    }
-                    $pipImageSlider.getSliderScope(sliderId).vm[type + 'Block']();
-                });
-            }]
+            scope: {
+                slideTo: '&pipSlideTo',
+                sliderId: '&pipSliderId'
+            },
+            controllerAs: '$ctlr',
+            bindToController: true,
+            controller: SliderIndicatorController_1
         };
-    });
-})();
+    };
+    angular
+        .module('pipSliderIndicator', [])
+        .directive('pipSliderIndicator', SliderIndicator);
+}
 },{}],7:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSliderIndicator', []);
-    thisModule.directive('pipSliderIndicator', function () {
-        return {
-            scope: false,
-            controller: ['$scope', '$element', '$parse', '$attrs', '$pipImageSlider', function ($scope, $element, $parse, $attrs, $pipImageSlider) {
-                var sliderId = $parse($attrs.pipSliderId)($scope), slideTo = $parse($attrs.pipSlideTo)($scope);
-                $element.css('cursor', 'pointer');
-                $element.on('click', function () {
-                    if (!sliderId || slideTo && slideTo < 0) {
-                        return;
-                    }
-                    $pipImageSlider.getSliderScope(sliderId).vm.slideToPrivate(slideTo);
-                });
-            }]
-        };
-    });
-})();
-},{}],8:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipMarkdown', ['ngSanitize']);
-    thisModule.run(['$injector', function ($injector) {
+"use strict";
+angular
+    .module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service']);
+require("./ImageSlider");
+require("./ImageSliderService");
+require("./SliderButton");
+require("./SliderIndicator");
+},{"./ImageSlider":3,"./ImageSliderService":4,"./SliderButton":5,"./SliderIndicator":6}],8:[function(require,module,exports){
+"use strict";
+require("./dependencies/TranslateFilter");
+require("./color_picker/ColorPicker");
+require("./image_slider");
+require("./markdown/Markdown");
+require("./popover");
+require("./progress/RoutingProgress");
+require("./toast");
+angular.module('pipControls', [
+    'pipMarkdown',
+    'pipColorPicker',
+    'pipRoutingProgress',
+    'pipPopover',
+    'pipImageSlider',
+    'pipToasts',
+    'pipControls.Translate'
+]);
+},{"./color_picker/ColorPicker":1,"./dependencies/TranslateFilter":2,"./image_slider":7,"./markdown/Markdown":9,"./popover":12,"./progress/RoutingProgress":13,"./toast":16}],9:[function(require,module,exports){
+{
+    var ConfigTranslations = function ($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.setTranslations('en', {
@@ -4353,431 +4715,471 @@ var ImageSliderService = (function () {
                 'time': 'Время'
             });
         }
-    }]);
-    thisModule.directive('pipMarkdown', ['$parse', '$injector', function ($parse, $injector) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        return {
-            restrict: 'EA',
-            scope: false,
-            link: function ($scope, $element, $attrs) {
-                var textGetter = $parse($attrs.pipText), listGetter = $parse($attrs.pipList), clampGetter = $parse($attrs.pipLineCount);
-                function describeAttachments(array) {
-                    var attachString = '', attachTypes = [];
-                    _.each(array, function (attach) {
-                        if (attach.type && attach.type !== 'text') {
-                            if (attachString.length === 0 && pipTranslate) {
-                                attachString = pipTranslate.translate('MARKDOWN_ATTACHMENTS');
-                            }
-                            if (attachTypes.indexOf(attach.type) < 0) {
-                                attachTypes.push(attach.type);
-                                attachString += attachTypes.length > 1 ? ', ' : ' ';
-                                if (pipTranslate)
-                                    attachString += pipTranslate.translate(attach.type);
-                            }
-                        }
-                    });
-                    return attachString;
-                }
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                function bindText(value) {
-                    var textString, isClamped, height, options, obj;
-                    if (_.isArray(value)) {
-                        obj = _.find(value, function (item) {
-                            return item.type === 'text' && item.text;
-                        });
-                        textString = obj ? obj.text : describeAttachments(value);
+    };
+    ConfigTranslations.$inject = ['$injector'];
+    var MarkdownBindings = {
+        text: '<pipText',
+        isList: '<?pipList',
+        clamp: '<?pipLineCount',
+        rebind: '<?pipRebind'
+    };
+    var MarkdownChanges = (function () {
+        function MarkdownChanges() {
+        }
+        return MarkdownChanges;
+    }());
+    var MarkdownController = (function () {
+        function MarkdownController($scope, $element, $injector) {
+            this.$scope = $scope;
+            this.$element = $element;
+            this._pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        }
+        MarkdownController.prototype.$postLink = function () {
+            this.bindText(this.text);
+            this.$scope.$on('pipWindowResized', function () {
+                if (this.bindText)
+                    this.bindText(this._text(this._$scope));
+            });
+            this.$element.addClass('pip-markdown');
+        };
+        MarkdownController.prototype.$onChanges = function (changes) {
+            var newText = changes.text.currentValue;
+            if (this.rebind) {
+                this.text = newText;
+                this.bindText(this.text);
+            }
+        };
+        MarkdownController.prototype.describeAttachments = function (array) {
+            var attachString = '', attachTypes = [];
+            _.each(array, function (attach) {
+                if (attach.type && attach.type !== 'text') {
+                    if (attachString.length === 0 && this._pipTranslate) {
+                        attachString = this._pipTranslate.translate('MARKDOWN_ATTACHMENTS');
                     }
-                    else {
-                        textString = value;
-                    }
-                    isClamped = $attrs.pipLineCount && _.isNumber(clampGetter());
-                    isClamped = isClamped && textString && textString.length > 0;
-                    options = {
-                        gfm: true,
-                        tables: true,
-                        breaks: true,
-                        sanitize: true,
-                        pedantic: true,
-                        smartLists: true,
-                        smartypents: false
-                    };
-                    textString = marked(textString || '', options);
-                    if (isClamped) {
-                        height = 1.5 * clampGetter();
-                    }
-                    $element.html('<div' + (isClamped ? listGetter() ? 'class="pip-markdown-content ' +
-                        'pip-markdown-list" style="max-height: ' + height + 'em">'
-                        : ' class="pip-markdown-content" style="max-height: ' + height + 'em">' : listGetter()
-                        ? ' class="pip-markdown-list">' : '>') + textString + '</div>');
-                    $element.find('a').attr('target', 'blank');
-                    if (!listGetter() && isClamped) {
-                        $element.append('<div class="pip-gradient-block"></div>');
+                    if (attachTypes.indexOf(attach.type) < 0) {
+                        attachTypes.push(attach.type);
+                        attachString += attachTypes.length > 1 ? ', ' : ' ';
+                        if (this._pipTranslate)
+                            attachString += this._pipTranslate.translate(attach.type);
                     }
                 }
-                bindText(textGetter($scope));
-                if (toBoolean($attrs.pipRebind)) {
-                    $scope.$watch(textGetter, function (newValue) {
-                        bindText(newValue);
-                    });
-                }
-                $scope.$on('pipWindowResized', function () {
-                    bindText(textGetter($scope));
+            });
+            return attachString;
+        };
+        MarkdownController.prototype.bindText = function (value) {
+            var textString, isClamped, height, options, obj;
+            if (_.isArray(value)) {
+                obj = _.find(value, function (item) {
+                    return item.type === 'text' && item.text;
                 });
-                $element.addClass('pip-markdown');
+                textString = obj ? obj.text : this.describeAttachments(value);
+            }
+            else {
+                textString = value;
+            }
+            isClamped = this.clamp && _.isNumber(this.clamp);
+            isClamped = isClamped && textString && textString.length > 0;
+            options = {
+                gfm: true,
+                tables: true,
+                breaks: true,
+                sanitize: true,
+                pedantic: true,
+                smartLists: true,
+                smartypents: false
+            };
+            textString = marked(textString || '', options);
+            if (isClamped) {
+                height = 1.5 * Number(this.clamp);
+            }
+            this.$element.html('<div' + (isClamped ? this.isList ? 'class="pip-markdown-content ' +
+                'pip-markdown-list" style="max-height: ' + height + 'em">' :
+                ' class="pip-markdown-content" style="max-height: ' + height + 'em">' : this.isList ?
+                ' class="pip-markdown-list">' : '>') + textString + '</div>');
+            this.$element.find('a').attr('target', 'blank');
+            if (!this.isList && isClamped) {
+                this.$element.append('<div class="pip-gradient-block"></div>');
             }
         };
-    }]);
-})();
-},{}],9:[function(require,module,exports){
-"use strict";
-var PopoverController = (function () {
-    PopoverController.$inject = ['$scope', '$rootScope', '$element', '$timeout', '$compile'];
-    function PopoverController($scope, $rootScope, $element, $timeout, $compile) {
-        var _this = this;
-        this._$timeout = $timeout;
-        this.templateUrl = $scope['params'].templateUrl;
-        this.template = $scope['params'].template;
-        this.timeout = $scope['params'].timeout;
-        this.element = $scope['params'].element;
-        this.calcH = $scope['params'].calcHeight;
-        this.cancelCallback = $scope['params'].cancelCallback;
-        this.backdropElement = $('.pip-popover-backdrop');
-        this.backdropElement.on('click keydown scroll', function () { _this.backdropClick(); });
-        this.backdropElement.addClass($scope['params'].responsive !== false ? 'pip-responsive' : '');
-        $timeout(function () {
-            _this.position();
-            if ($scope['params'].template) {
-                _this.content = $compile($scope['params'].template)($scope);
-                $element.find('.pip-popover').append(_this.content);
-            }
-            _this.init();
-        });
-        $timeout(function () { _this.calcHeight(); }, 200);
-        $rootScope.$on('pipPopoverResize', function () { _this.onResize(); });
-        $(window).resize(function () { _this.onResize(); });
-    }
-    PopoverController.prototype.backdropClick = function () {
-        if (this.cancelCallback) {
-            this.cancelCallback();
-        }
-        this.closePopover();
+        return MarkdownController;
+    }());
+    var MarkdownComponent = {
+        controller: MarkdownController,
+        bindings: MarkdownBindings
     };
-    PopoverController.prototype.closePopover = function () {
-        var _this = this;
-        this.backdropElement.removeClass('opened');
-        this._$timeout(function () {
-            _this.backdropElement.remove();
-        }, 100);
-    };
-    PopoverController.prototype.onPopoverClick = function ($e) {
-        $e.stopPropagation();
-    };
-    PopoverController.prototype.init = function () {
-        this.backdropElement.addClass('opened');
-        $('.pip-popover-backdrop').focus();
-        if (this.timeout) {
-            this._$timeout(function () {
-                this.closePopover();
-            }, this.timeout);
-        }
-    };
-    PopoverController.prototype.position = function () {
-        if (this.element) {
-            var element = $(this.element), pos = element.offset(), width = element.width(), height = element.height(), docWidth = $(document).width(), docHeight = $(document).height(), popover = this.backdropElement.find('.pip-popover');
-            if (pos) {
-                popover
-                    .css('max-width', docWidth - (docWidth - pos.left))
-                    .css('max-height', docHeight - (pos.top + height) - 32, 0)
-                    .css('left', pos.left - popover.width() + width / 2)
-                    .css('top', pos.top + height + 16);
-            }
-        }
-    };
-    PopoverController.prototype.onResize = function () {
-        this.backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
-        this.position();
-        this.calcHeight();
-    };
-    PopoverController.prototype.calcHeight = function () {
-        if (this.calcH === false) {
-            return;
-        }
-        var popover = this.backdropElement.find('.pip-popover'), title = popover.find('.pip-title'), footer = popover.find('.pip-footer'), content = popover.find('.pip-content'), contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
-        content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
-    };
-    return PopoverController;
-}());
-exports.PopoverController = PopoverController;
-(function () {
-    pipPopover.$inject = ['$parse'];
-    function pipPopover($parse) {
-        "ngInject";
-        return {
-            restrict: 'EA',
-            scope: true,
-            templateUrl: 'popover/popover.html',
-            controller: PopoverController,
-            controllerAs: 'vm'
-        };
-    }
     angular
-        .module('pipPopover', ['pipPopover.Service'])
-        .directive('pipPopover', pipPopover);
-})();
+        .module('pipMarkdown', ['ngSanitize'])
+        .run(ConfigTranslations)
+        .component('pipMarkdown', MarkdownComponent);
+}
 },{}],10:[function(require,module,exports){
-"use strict";
-var PopoverService = (function () {
-    PopoverService.$inject = ['$compile', '$rootScope', '$timeout'];
-    function PopoverService($compile, $rootScope, $timeout) {
-        this._$compile = $compile;
-        this._$rootScope = $rootScope;
-        this._$timeout = $timeout;
-        this.popoverTemplate = "<div class='pip-popover-backdrop {{ params.class }}' ng-controller='params.controller'" +
-            " tabindex='1'> <pip-popover pip-params='params'> </pip-popover> </div>";
-    }
-    PopoverService.prototype.show = function (p) {
-        var element, scope, params, content;
-        element = $('body');
-        if (element.find('md-backdrop').length > 0) {
-            return;
+{
+    var PopoverBindings = {
+        params: '<pipParams'
+    };
+    var PopoverController = (function () {
+        function PopoverController($scope, $rootScope, $element, $timeout, $compile, $templateRequest) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this.$compile = $compile;
+            this.$templateRequest = $templateRequest;
+            this.backdropElement = $('.pip-popover-backdrop');
+            this.backdropElement.on('click keydown scroll', function () {
+                _this.backdropClick();
+            });
+            this.backdropElement.addClass(this.params.responsive !== false ? 'pip-responsive' : '');
+            $timeout(function () {
+                _this.position();
+                angular.extend($scope, _this.params.locals);
+                if (_this.params.template) {
+                    _this.content = $compile(_this.params.template)($scope);
+                    $element.find('.pip-popover').append(_this.content);
+                    _this.init();
+                }
+                else {
+                    _this.$templateRequest(_this.params.templateUrl, false).then(function (html) {
+                        _this.content = $compile(html)($scope);
+                        $element.find('.pip-popover').append(_this.content);
+                        _this.init();
+                    });
+                }
+            });
+            $timeout(function () {
+                _this.calcHeight();
+            }, 200);
+            $rootScope.$on('pipPopoverResize', function () {
+                _this.onResize();
+            });
+            $(window).resize(function () {
+                _this.onResize();
+            });
         }
-        this.hide();
-        scope = this._$rootScope.$new();
-        params = p && _.isObject(p) ? p : {};
-        scope['params'] = params;
-        scope['locals'] = params.locals;
-        content = this._$compile(this.popoverTemplate)(scope);
-        element.append(content);
+        PopoverController.prototype.backdropClick = function () {
+            if (this.params.cancelCallback) {
+                this.params.cancelCallback();
+            }
+            this.closePopover();
+        };
+        PopoverController.prototype.closePopover = function () {
+            var _this = this;
+            this.backdropElement.removeClass('opened');
+            this.$timeout(function () {
+                _this.backdropElement.remove();
+            }, 100);
+        };
+        PopoverController.prototype.onPopoverClick = function (event) {
+            event.stopPropagation();
+        };
+        PopoverController.prototype.init = function () {
+            this.backdropElement.addClass('opened');
+            $('.pip-popover-backdrop').focus();
+            if (this.params.timeout) {
+                this.$timeout(function () {
+                    this.closePopover();
+                }, this.params.timeout);
+            }
+        };
+        PopoverController.prototype.position = function () {
+            if (this.params.element) {
+                var element = $(this.params.element), pos = element.offset(), width = element.width(), height = element.height(), docWidth = $(document).width(), docHeight = $(document).height(), popover = this.backdropElement.find('.pip-popover');
+                if (pos) {
+                    popover
+                        .css('max-width', docWidth - (docWidth - pos.left))
+                        .css('max-height', docHeight - (pos.top + height) - 32, 0)
+                        .css('left', pos.left - popover.width() + width / 2)
+                        .css('top', pos.top + height + 16);
+                }
+            }
+        };
+        PopoverController.prototype.onResize = function () {
+            this.backdropElement.find('.pip-popover').find('.pip-content').css('max-height', '100%');
+            this.position();
+            this.calcHeight();
+        };
+        PopoverController.prototype.calcHeight = function () {
+            if (this.params.calcHeight === false) {
+                return;
+            }
+            var popover = this.backdropElement.find('.pip-popover'), title = popover.find('.pip-title'), footer = popover.find('.pip-footer'), content = popover.find('.pip-content'), contentHeight = popover.height() - title.outerHeight(true) - footer.outerHeight(true);
+            content.css('max-height', Math.max(contentHeight, 0) + 'px').css('box-sizing', 'border-box');
+        };
+        return PopoverController;
+    }());
+    var Popover = {
+        bindings: PopoverBindings,
+        templateUrl: 'popover/Popover.html',
+        controller: PopoverController
     };
-    PopoverService.prototype.hide = function () {
-        var backdropElement = $('.pip-popover-backdrop');
-        backdropElement.removeClass('opened');
-        this._$timeout(function () {
-            backdropElement.remove();
-        }, 100);
-    };
-    PopoverService.prototype.resize = function () {
-        this._$rootScope.$broadcast('pipPopoverResize');
-    };
-    return PopoverService;
-}());
-exports.PopoverService = PopoverService;
-(function () {
+    angular
+        .module('pipPopover')
+        .component('pipPopover', Popover);
+}
+},{}],11:[function(require,module,exports){
+"use strict";
+{
+    var PopoverService = (function () {
+        PopoverService.$inject = ['$compile', '$rootScope', '$timeout'];
+        function PopoverService($compile, $rootScope, $timeout) {
+            this.$compile = $compile;
+            this.$rootScope = $rootScope;
+            this.$timeout = $timeout;
+            this.popoverTemplate = "<div class='pip-popover-backdrop {{ params.class }}' ng-controller='params.controller'" +
+                " tabindex='1'> <pip-popover pip-params='params'> </pip-popover> </div>";
+        }
+        PopoverService.prototype.show = function (p) {
+            var element, scope, params, content;
+            element = $('body');
+            if (element.find('md-backdrop').length > 0) {
+                return;
+            }
+            this.hide();
+            scope = this.$rootScope.$new();
+            params = p && _.isObject(p) ? p : {};
+            scope.params = params;
+            scope.locals = params.locals;
+            content = this.$compile(this.popoverTemplate)(scope);
+            element.append(content);
+        };
+        PopoverService.prototype.hide = function () {
+            var backdropElement = $('.pip-popover-backdrop');
+            backdropElement.removeClass('opened');
+            this.$timeout(function () {
+                backdropElement.remove();
+            }, 100);
+        };
+        PopoverService.prototype.resize = function () {
+            this.$rootScope.$broadcast('pipPopoverResize');
+        };
+        return PopoverService;
+    }());
     angular
         .module('pipPopover.Service', [])
         .service('pipPopoverService', PopoverService);
-})();
-},{}],11:[function(require,module,exports){
-var RoutingController = (function () {
-    RoutingController.$inject = ['$scope', '$element'];
-    function RoutingController($scope, $element) {
-        this._image = $element.children('img');
-        this.showProgress = $scope['showProgress'];
-        this.logoUrl = $scope['logoUrl'];
-        this.loadProgressImage();
-    }
-    RoutingController.prototype.loadProgressImage = function () {
-        if (this.logoUrl) {
-            this._image.attr('src', this.logoUrl);
-        }
+}
+},{}],12:[function(require,module,exports){
+"use strict";
+angular.module('pipPopover', ['pipPopover.Service']);
+require("./Popover");
+require("./PopoverService");
+},{"./Popover":10,"./PopoverService":11}],13:[function(require,module,exports){
+{
+    var RoutingBindings = {
+        showProgress: '&',
+        logoUrl: '@'
     };
-    return RoutingController;
-}());
-(function () {
-    function RoutingProgress() {
-        return {
-            restrict: 'EA',
-            replace: true,
-            scope: {
-                showProgress: '&',
-                logoUrl: '@'
-            },
-            templateUrl: 'progress/routing_progress.html',
-            controller: RoutingController,
-            controllerAs: 'vm'
+    var RoutingController = (function () {
+        function RoutingController($scope, $element) {
+            this.$element = $element;
+        }
+        RoutingController.prototype.$postLink = function () {
+            this._image = this.$element.find('img');
+            this.loadProgressImage();
         };
-    }
+        RoutingController.prototype.loadProgressImage = function () {
+            if (this.logoUrl) {
+                this._image.attr('src', this.logoUrl);
+            }
+        };
+        return RoutingController;
+    }());
+    var RoutingProgress = {
+        bindings: RoutingBindings,
+        templateUrl: 'progress/RoutingProgress.html',
+        controller: RoutingController
+    };
     angular
         .module('pipRoutingProgress', ['ngMaterial'])
-        .directive('pipRoutingProgress', RoutingProgress);
-})();
-},{}],12:[function(require,module,exports){
-var ToastController = (function () {
-    function ToastController($mdToast, toast, $injector) {
-        this._pipErrorDetailsDialog = $injector.has('pipErrorDetailsDialog')
-            ? $injector.get('pipErrorDetailsDialog') : null;
-        this._$mdToast = $mdToast;
-        this.message = toast.message;
-        this.actions = toast.actions;
-        this.toast = toast;
-        if (toast.actions.length === 0) {
-            this.actionLenght = 0;
-        }
-        else {
-            this.actionLenght = toast.actions.length === 1 ? toast.actions[0].toString().length : null;
-        }
-        this.showDetails = this._pipErrorDetailsDialog != null;
+        .component('pipRoutingProgress', RoutingProgress);
+}
+},{}],14:[function(require,module,exports){
+"use strict";
+var Toast = (function () {
+    function Toast() {
     }
-    ToastController.prototype.onDetails = function () {
-        this._$mdToast.hide();
-        if (this._pipErrorDetailsDialog) {
-            this._pipErrorDetailsDialog.show({
-                error: this.toast.error,
-                ok: 'Ok'
-            }, angular.noop, angular.noop);
-        }
-    };
-    ToastController.prototype.onAction = function (action) {
-        this._$mdToast.hide({
-            action: action,
-            id: this.toast.id,
-            message: this.message
-        });
-    };
-    return ToastController;
+    return Toast;
 }());
-var ToastService = (function () {
-    ToastService.$inject = ['$rootScope', '$mdToast'];
-    function ToastService($rootScope, $mdToast) {
-        var _this = this;
-        this.SHOW_TIMEOUT = 20000;
-        this.SHOW_TIMEOUT_NOTIFICATIONS = 20000;
-        this.toasts = [];
-        this.sounds = {};
-        this._$mdToast = $mdToast;
-        $rootScope.$on('$stateChangeSuccess', function () { _this.onStateChangeSuccess(); });
-        $rootScope.$on('pipSessionClosed', function () { _this.onClearToasts(); });
-        $rootScope.$on('pipIdentityChanged', function () { _this.onClearToasts(); });
-    }
-    ToastService.prototype.showNextToast = function () {
-        var toast;
-        if (this.toasts.length > 0) {
-            toast = this.toasts[0];
-            this.toasts.splice(0, 1);
-            this.showToast(toast);
-        }
-    };
-    ToastService.prototype.showToast = function (toast) {
-        var _this = this;
-        this.currentToast = toast;
-        this._$mdToast.show({
-            templateUrl: 'toast/toast.html',
-            hideDelay: toast.duration || this.SHOW_TIMEOUT,
-            position: 'bottom left',
-            controller: ToastController,
-            controllerAs: 'vm',
-            locals: {
-                toast: this.currentToast,
-                sounds: this.sounds
+exports.Toast = Toast;
+},{}],15:[function(require,module,exports){
+"use strict";
+{
+    var ToastController_1 = (function () {
+        function ToastController_1($mdToast, toast, $injector) {
+            this.$mdToast = $mdToast;
+            this.toast = toast;
+            this._pipErrorDetailsDialog = $injector.has('pipErrorDetailsDialog') ?
+                $injector.get('pipErrorDetailsDialog') : null;
+            this.message = toast.message;
+            this.actions = toast.actions;
+            if (toast.actions.length === 0) {
+                this.actionLenght = 0;
             }
-        })
-            .then(function (action) {
-            _this.showToastOkResult(action);
-        }, function (action) {
-            _this.showToastCancelResult(action);
-        });
-    };
-    ToastService.prototype.showToastCancelResult = function (action) {
-        if (this.currentToast.cancelCallback) {
-            this.currentToast.cancelCallback(action);
-        }
-        this.currentToast = null;
-        this.showNextToast();
-    };
-    ToastService.prototype.showToastOkResult = function (action) {
-        if (this.currentToast.successCallback) {
-            this.currentToast.successCallback(action);
-        }
-        this.currentToast = null;
-        this.showNextToast();
-    };
-    ToastService.prototype.addToast = function (toast) {
-        if (this.currentToast && toast.type !== 'error') {
-            this.toasts.push(toast);
-        }
-        else {
-            this.showToast(toast);
-        }
-    };
-    ToastService.prototype.removeToasts = function (type) {
-        var result = [];
-        _.each(this.toasts, function (toast) {
-            if (!toast.type || toast.type !== type) {
-                result.push(toast);
+            else {
+                this.actionLenght = toast.actions.length === 1 ? toast.actions[0].toString().length : null;
             }
-        });
-        this.toasts = _.cloneDeep(result);
-    };
-    ToastService.prototype.removeToastsById = function (id) {
-        _.remove(this.toasts, { id: id });
-    };
-    ToastService.prototype.getToastById = function (id) {
-        return _.find(this.toasts, { id: id });
-    };
-    ToastService.prototype.onStateChangeSuccess = function () { };
-    ToastService.prototype.onClearToasts = function () {
-        this.clearToasts(null);
-    };
-    ToastService.prototype.showNotification = function (message, actions, successCallback, cancelCallback, id) {
-        this.addToast({
-            id: id || null,
-            type: 'notification',
-            message: message,
-            actions: actions || ['ok'],
-            successCallback: successCallback,
-            cancelCallback: cancelCallback,
-            duration: this.SHOW_TIMEOUT_NOTIFICATIONS
-        });
-    };
-    ToastService.prototype.showMessage = function (message, successCallback, cancelCallback, id) {
-        this.addToast({
-            id: id || null,
-            type: 'message',
-            message: message,
-            actions: ['ok'],
-            successCallback: successCallback,
-            cancelCallback: cancelCallback
-        });
-    };
-    ToastService.prototype.showError = function (message, successCallback, cancelCallback, id, error) {
-        this.addToast({
-            id: id || null,
-            error: error,
-            type: 'error',
-            message: message || 'Unknown error.',
-            actions: ['ok'],
-            successCallback: successCallback,
-            cancelCallback: cancelCallback
-        });
-    };
-    ToastService.prototype.hideAllToasts = function () {
-        this._$mdToast.cancel();
-        this.toasts = [];
-    };
-    ToastService.prototype.clearToasts = function (type) {
-        if (type) {
-            this.removeToasts(type);
+            this.showDetails = this._pipErrorDetailsDialog != null;
         }
-        else {
-            this._$mdToast.cancel();
+        ToastController_1.prototype.onDetails = function () {
+            this.$mdToast.hide();
+            if (this._pipErrorDetailsDialog) {
+                this._pipErrorDetailsDialog.show({
+                    error: this.toast.error,
+                    ok: 'Ok'
+                }, angular.noop, angular.noop);
+            }
+        };
+        ToastController_1.prototype.onAction = function (action) {
+            this.$mdToast.hide({
+                action: action,
+                id: this.toast.id,
+                message: this.message
+            });
+        };
+        return ToastController_1;
+    }());
+    var ToastService = (function () {
+        ToastService.$inject = ['$rootScope', '$mdToast'];
+        function ToastService($rootScope, $mdToast) {
+            var _this = this;
+            this.$mdToast = $mdToast;
+            this.SHOW_TIMEOUT = 20000;
+            this.SHOW_TIMEOUT_NOTIFICATIONS = 20000;
             this.toasts = [];
+            this.sounds = {};
+            $rootScope.$on('$stateChangeSuccess', function () { _this.onStateChangeSuccess(); });
+            $rootScope.$on('pipSessionClosed', function () { _this.onClearToasts(); });
+            $rootScope.$on('pipIdentityChanged', function () { _this.onClearToasts(); });
         }
-    };
-    return ToastService;
-}());
-(function () {
+        ToastService.prototype.showNextToast = function () {
+            var toast;
+            if (this.toasts.length > 0) {
+                toast = this.toasts[0];
+                this.toasts.splice(0, 1);
+                this.showToast(toast);
+            }
+        };
+        ToastService.prototype.showToast = function (toast) {
+            var _this = this;
+            this.currentToast = toast;
+            this.$mdToast.show({
+                templateUrl: 'toast/Toast.html',
+                hideDelay: toast.duration || this.SHOW_TIMEOUT,
+                position: 'bottom left',
+                controller: ToastController_1,
+                controllerAs: 'vm',
+                locals: {
+                    toast: this.currentToast,
+                    sounds: this.sounds
+                }
+            })
+                .then(function (action) {
+                _this.showToastOkResult(action);
+            }, function (action) {
+                _this.showToastCancelResult(action);
+            });
+        };
+        ToastService.prototype.showToastCancelResult = function (action) {
+            if (this.currentToast.cancelCallback) {
+                this.currentToast.cancelCallback(action);
+            }
+            this.currentToast = null;
+            this.showNextToast();
+        };
+        ToastService.prototype.showToastOkResult = function (action) {
+            if (this.currentToast.successCallback) {
+                this.currentToast.successCallback(action);
+            }
+            this.currentToast = null;
+            this.showNextToast();
+        };
+        ToastService.prototype.addToast = function (toast) {
+            if (this.currentToast && toast.type !== 'error') {
+                this.toasts.push(toast);
+            }
+            else {
+                this.showToast(toast);
+            }
+        };
+        ToastService.prototype.removeToasts = function (type) {
+            var result = [];
+            _.each(this.toasts, function (toast) {
+                if (!toast.type || toast.type !== type) {
+                    result.push(toast);
+                }
+            });
+            this.toasts = _.cloneDeep(result);
+        };
+        ToastService.prototype.removeToastsById = function (id) {
+            _.remove(this.toasts, {
+                id: id
+            });
+        };
+        ToastService.prototype.getToastById = function (id) {
+            return _.find(this.toasts, {
+                id: id
+            });
+        };
+        ToastService.prototype.onStateChangeSuccess = function () { };
+        ToastService.prototype.onClearToasts = function () {
+            this.clearToasts(null);
+        };
+        ToastService.prototype.showNotification = function (message, actions, successCallback, cancelCallback, id) {
+            this.addToast({
+                id: id || null,
+                type: 'notification',
+                message: message,
+                actions: actions || ['ok'],
+                successCallback: successCallback,
+                cancelCallback: cancelCallback,
+                duration: this.SHOW_TIMEOUT_NOTIFICATIONS
+            });
+        };
+        ToastService.prototype.showMessage = function (message, successCallback, cancelCallback, id) {
+            this.addToast({
+                id: id || null,
+                type: 'message',
+                message: message,
+                actions: ['ok'],
+                successCallback: successCallback,
+                cancelCallback: cancelCallback
+            });
+        };
+        ToastService.prototype.showError = function (message, successCallback, cancelCallback, id, error) {
+            this.addToast({
+                id: id || null,
+                error: error,
+                type: 'error',
+                message: message || 'Unknown error.',
+                actions: ['ok'],
+                successCallback: successCallback,
+                cancelCallback: cancelCallback
+            });
+        };
+        ToastService.prototype.hideAllToasts = function () {
+            this.$mdToast.cancel();
+            this.toasts = [];
+        };
+        ToastService.prototype.clearToasts = function (type) {
+            if (type) {
+                this.removeToasts(type);
+            }
+            else {
+                this.$mdToast.cancel();
+                this.toasts = [];
+            }
+        };
+        return ToastService;
+    }());
     angular
-        .module('pipToasts', ['ngMaterial', 'pipControls.Translate'])
+        .module('pipToasts')
         .service('pipToasts', ToastService);
-})();
-},{}],13:[function(require,module,exports){
+}
+},{}],16:[function(require,module,exports){
+"use strict";
+angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
+require("./ToastService");
+require("./Toast");
+},{"./Toast":14,"./ToastService":15}],17:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipControls.Templates');
@@ -4785,8 +5187,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('color_picker/color_picker.html',
-    '<ul class="pip-color-picker {{vm.class}}" pip-selected="vm.currentColorIndex" pip-enter-space-press="vm.enterSpacePress($event)"><li tabindex="-1" ng-repeat="color in vm.colors track by color"><md-button tabindex="-1" class="md-icon-button pip-selectable" ng-click="vm.selectColor($index)" aria-label="color" ng-disabled="vm.disabled()"><md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == vm.currentColor ? \'circle\' : \'radio-off\' }}"></md-icon></md-button></li></ul>');
+  $templateCache.put('color_picker/ColorPicker.html',
+    '<ul class="pip-color-picker {{$ctrl.class}}" pip-selected="$ctrl.currentColorIndex" pip-enter-space-press="$ctrl.enterSpacePress($event)"><li tabindex="-1" ng-repeat="color in $ctrl.colors track by color"><md-button tabindex="-1" class="md-icon-button pip-selectable" ng-click="$ctrl.selectColor($index)" aria-label="color" ng-disabled="$ctrl.ngDisabled"><md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == $ctrl.currentColor ? \'circle\' : \'radio-off\' }}"></md-icon></md-button></li></ul>');
 }]);
 })();
 
@@ -4797,8 +5199,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/popover.html',
-    '<div ng-if="vm.templateUrl" class="pip-popover flex layout-column" ng-click="vm.onPopoverClick($event)" ng-include="vm.templateUrl"></div><div ng-if="vm.template" class="pip-popover" ng-click="vm.onPopoverClick($event)"></div>');
+  $templateCache.put('popover/Popover.html',
+    '<div class="pip-popover" ng-click="$ctrl.params.onPopoverClick($event)"></div>');
 }]);
 })();
 
@@ -4809,8 +5211,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/routing_progress.html',
-    '<div class="pip-routing-progress layout-column layout-align-center-center" ng-show="vm.showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('progress/RoutingProgress.html',
+    '<div class="layout-column layout-align-center-center" ng-show="$ctrl.showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -4821,14 +5223,14 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/toast.html',
+  $templateCache.put('toast/Toast.html',
     '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': vm.toast.type==\'error\', \'pip-column-toast\': vm.toast.actions.length > 1 || vm.actionLenght > 4, \'pip-no-action-toast\': vm.actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="vm.message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="vm.actions.length > 0 || (vm.toast.type==\'error\' && vm.toast.error)"><div class="flex" ng-if="vm.toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="vm.toast.type==\'error\' && vm.toast.error && vm.showDetails" ng-click="vm.onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="vm.onAction(action)" ng-repeat="action in vm.actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
 }]);
 })();
 
 
 
-},{}]},{},[13,1,2,3,5,4,6,7,8,10,9,11,12])(13)
+},{}]},{},[17,8])(17)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -4905,280 +5307,635 @@ module.run(['$templateCache', function($templateCache) {
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-angular.module('pipDateTime', [
-    'pipDateTime.Service', 'pipDateTime.Filter'
-]);
+(function () {
+    var DateBindings = {
+        timeMode: '@pipTimeMode',
+        disabled: '&ngDisabled',
+        model: '<ngModel',
+        ngChange: '<'
+    };
+    var DateChanges = (function () {
+        function DateChanges() {
+        }
+        return DateChanges;
+    }());
+    var DateController = (function () {
+        function DateController($injector, $scope) {
+            this.localeDate = moment.localeData();
+            this.momentMonths = angular.isArray(this.localeDate['_months']) ? this.localeDate['_months'] : this.localeDate['_months'].format;
+            this.momentDays = angular.isArray(this.localeDate['_weekdays']) ? this.localeDate['_weekdays'] : this.localeDate['_weekdays'].format;
+            this.momentShortDays = this.localeDate['_weekdaysMin'];
+            this.momentFirstDayOfWeek = this.localeDate['_week'].dow;
+            var value = this.model ? _.isDate(this.model) ? this.model : new Date(this.model) : null;
+            this.day = value ? value.getDate() : null;
+            this.month = value ? value.getMonth() + 1 : null;
+            this.year = value ? value.getFullYear() : null;
+            this.days = this.dayList(this.month, this.year);
+            this.months = this.monthList();
+            this.years = this.yearList();
+            this.disableControls = this.disabled ? this.disabled() : false;
+        }
+        DateController.prototype.$onChanges = function (changes) {
+            if (changes.model && changes.model.currentValue) {
+                this.model = changes.model.currentValue;
+                this.getValue(this.model);
+            }
+        };
+        DateController.prototype.dayList = function (month, year) {
+            var count = 31, days = [];
+            if (month === 4 || month === 6 || month === 9 || month === 11) {
+                count = 30;
+            }
+            else {
+                if (month === 2) {
+                    if (year) {
+                        count = year % 4 === 0 ? 29 : 28;
+                    }
+                    else {
+                        count = 28;
+                    }
+                }
+            }
+            for (var i = 1; i <= count; i++) {
+                days.push(i);
+            }
+            return days;
+        };
+        DateController.prototype.monthList = function () {
+            var months = [];
+            for (var i = 1; i <= 12; i++) {
+                months.push({
+                    id: i,
+                    name: this.momentMonths[i - 1]
+                });
+            }
+            return months;
+        };
+        DateController.prototype.yearList = function () {
+            var currentYear = new Date().getFullYear(), startYear = this.timeMode === 'future' ? currentYear : currentYear - 100, endYear = this.timeMode === 'past' ? currentYear : currentYear + 100, years = [];
+            if (this.timeMode === 'past') {
+                for (var i = endYear; i >= startYear; i--) {
+                    years.push(i);
+                }
+            }
+            else {
+                for (var i = startYear; i <= endYear; i++) {
+                    years.push(i);
+                }
+            }
+            return years;
+        };
+        DateController.prototype.adjustDay = function () {
+            var days = this.dayList(this.month, this.year);
+            if (this.days.length !== days.length) {
+                if (this.day > days.length) {
+                    this.day = days.length;
+                }
+                this.days = days;
+            }
+        };
+        DateController.prototype.getValue = function (v) {
+            var value = v ? _.isDate(v) ? v : new Date(v) : null, day = value ? value.getDate() : null, month = value ? value.getMonth() + 1 : null, year = value ? value.getFullYear() : null;
+            if (this.month !== month && this.year !== year) {
+                this.days = this.dayList(this.month, this.year);
+            }
+            this.day = day;
+            this.month = month;
+            this.year = year;
+        };
+        DateController.prototype.setValue = function () {
+            var value;
+            if (this.day && this.month && this.year) {
+                value = new Date(this.year, this.month - 1, this.day, 0, 0, 0, 0);
+                this.model = value;
+                this.ngChange(this.model);
+            }
+        };
+        DateController.prototype.onMonthChanged = function () {
+            this.adjustDay();
+            this.setValue();
+        };
+        DateController.prototype.onYearChanged = function () {
+            this.adjustDay();
+            this.setValue();
+        };
+        return DateController;
+    }());
+    var DateComponent = {
+        bindings: DateBindings,
+        templateUrl: 'date/Date.html',
+        controller: DateController
+    };
+    angular
+        .module('pipDate', ['pipDates.Templates'])
+        .component('pipDate', DateComponent);
+})();
 },{}],2:[function(require,module,exports){
-'use strict';
-formatTimeFilter.$inject = ['pipDateTime'];
-formatDateOptionalFilter.$inject = ['pipDateTime'];
-formatLongDateFilter.$inject = ['pipDateTime'];
-formatShortDateFilter.$inject = ['pipDateTime'];
-formatMiddleDateFilter.$inject = ['pipDateTime'];
-formatMonthFilter.$inject = ['pipDateTime'];
-formatLongMonthFilter.$inject = ['pipDateTime'];
-formatYearFilter.$inject = ['pipDateTime'];
-formatWeekFilter.$inject = ['pipDateTime'];
-formatShortWeekFilter.$inject = ['pipDateTime'];
-formatShortDateTimeFilter.$inject = ['pipDateTime'];
-formatMiddleDateTimeFilter.$inject = ['pipDateTime'];
-formatLongDateTimeFilter.$inject = ['pipDateTime'];
-formatShortDateLongTimeFilter.$inject = ['pipDateTime'];
-formatMiddleDateLongTimeFilter.$inject = ['pipDateTime'];
-formatLongDateLongTimeFilter.$inject = ['pipDateTime'];
-bbFormatDateLongTimeFilter.$inject = ['pipDateTime'];
-formatFullDateTimeFilter.$inject = ['pipDateTime'];
-formatShortTimeFilter.$inject = ['pipDateTime'];
-formatLongTimeFilter.$inject = ['pipDateTime'];
-formatShortDayOfWeekFilter.$inject = ['pipDateTime'];
-formatLongDayOfWeekFilter.$inject = ['pipDateTime'];
-formatLongMonthDayFilter.$inject = ['pipDateTime'];
-formatShortMonthDayFilter.$inject = ['pipDateTime'];
-formatDateRangeFilter.$inject = ['pipDateTime'];
-formatDateTimeRangeFilter.$inject = ['pipDateTime'];
-formatISOWeekFilter.$inject = ['pipDateTime'];
-formatShortISOWeekFilter.$inject = ['pipDateTime'];
-formatISOWeekOrdinalFilter.$inject = ['pipDateTime'];
-formatDateYFilter.$inject = ['pipDateTime'];
-formatLongDateYFilter.$inject = ['pipDateTime'];
-formatTodayDateLongTimeLongFilter.$inject = ['pipDateTime'];
-formatTodayDateShortTimeLongFilter.$inject = ['pipDateTime'];
-formatTodayDateLongTimeShortFilter.$inject = ['pipDateTime'];
-formatTodayDateShortTimeShortFilter.$inject = ['pipDateTime'];
-formatMillisecondsToSecondsFilter.$inject = ['pipDateTime'];
-formatElapsedIntervalFilter.$inject = ['pipDateTime'];
-getDateJSONFilter.$inject = ['pipDateTime'];
-function formatTimeFilter(pipDateTime) {
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var IDateConvertService_1 = require("./IDateConvertService");
+(function () {
+    var DateConvert = (function () {
+        function DateConvert() {
+            this._momentRanged = IDateConvertService_1.DateRangeType.All;
+            this._defaultFormat = 'LL';
+        }
+        Object.defineProperty(DateConvert.prototype, "defaultTimeZoneOffset", {
+            get: function () {
+                return this._defaultTimeZoneOffset;
+            },
+            set: function (value) {
+                this._defaultTimeZoneOffset = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DateConvert.prototype.isUndefinedOrNull = function (date) {
+            return angular.isUndefined(date) || date === null;
+        };
+        DateConvert.prototype.getRange = function (date) {
+            if (this.isUndefinedOrNull(date)) {
+                return IDateConvertService_1.DateRangeType.Day;
+            }
+            var index = this._momentRanged.indexOf(date);
+            if (index < 0) {
+                return IDateConvertService_1.DateRangeType.Day;
+            }
+            return this._momentRanged[index];
+        };
+        DateConvert.prototype.getOperationRange = function (date) {
+            if (this.isUndefinedOrNull(date)) {
+                return IDateConvertService_1.DateRangeType.Day;
+            }
+            var range = date == IDateConvertService_1.DateRangeType.WeekFromSunday ? IDateConvertService_1.DateRangeType.Week : date, index = this._momentRanged.indexOf(range);
+            if (index < 0) {
+                return IDateConvertService_1.DateRangeType.Day;
+            }
+            return this._momentRanged[index];
+        };
+        DateConvert.prototype.toStartRange = function (date, range) {
+            var localDate;
+            if (this.isUndefinedOrNull(date)) {
+                throw new Error('toStartRange - date is undefined or null');
+            }
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null) {
+                localDate = moment(date).utcOffset(this._defaultTimeZoneOffset);
+            }
+            else {
+                localDate = moment(date);
+            }
+            if (!localDate.isValid()) {
+                throw new Error('toStartRange - localDate is invalid');
+            }
+            return localDate.startOf(range).toDate();
+        };
+        DateConvert.prototype.toEndRange = function (date, range, offset) {
+            var localDate, result, mssOffset;
+            if (this.isUndefinedOrNull(date)) {
+                return '';
+            }
+            if (!angular.isNumber(offset)) {
+                mssOffset = 0;
+            }
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null) {
+                localDate = moment(date).utcOffset(this._defaultTimeZoneOffset);
+            }
+            else {
+                localDate = moment(date);
+            }
+            if (!localDate.isValid()) {
+                return '';
+            }
+            if (mssOffset) {
+                result = localDate.startOf(range).add(mssOffset, 'milliseconds');
+            }
+            else {
+                result = localDate.startOf(range);
+            }
+            return localDate.startOf(range).toDate();
+        };
+        DateConvert.prototype.toJson = function (date) {
+            return JSON.stringify(moment(date));
+        };
+        DateConvert.prototype.toNextRange = function (date, type) {
+            var localDate, range, result;
+            if (this.isUndefinedOrNull(date)) {
+                return '';
+            }
+            localDate = moment(date);
+            if (!localDate.isValid()) {
+                return '';
+            }
+            range = this.getRange(type);
+            result = moment(localDate).startOf(range).add(this.getOperationRange(range));
+            return result.toDate();
+        };
+        DateConvert.prototype.toPrevRange = function (date, type) {
+            var localDate, range, result;
+            if (this.isUndefinedOrNull(date)) {
+                throw new Error('toPrevRange- date is undefined or null');
+            }
+            localDate = moment(date);
+            if (!localDate.isValid()) {
+                throw new Error('toPrevRange - localDate is invalid');
+            }
+            range = this.getRange(type);
+            result = moment(localDate).startOf(range).add(-1, this.getOperationRange(range));
+            return result.toDate();
+        };
+        DateConvert.prototype.toCurrentRange = function (type) {
+            var localDate, range, result;
+            localDate = moment();
+            if (!localDate.isValid()) {
+                throw new Error('toCurrentRange - localDate is invalid');
+            }
+            range = this.getRange(type);
+            result = moment(localDate).startOf(range);
+            return result.toDate();
+        };
+        DateConvert.prototype.addHours = function (date, hours) {
+            var localDate;
+            if (this.isUndefinedOrNull(date) || !angular.isNumber(hours)) {
+                throw new Error('addHours - date is undefined or null or hours is not a number');
+            }
+            localDate = moment(date);
+            if (!localDate.isValid()) {
+                throw new Error('addHours - localDate is invalid');
+            }
+            return localDate.add(hours, 'hours').toDate();
+        };
+        DateConvert.prototype.toStartDay = function (date) {
+            return this.toStartRange(date, IDateConvertService_1.DateRangeType.Day);
+        };
+        DateConvert.prototype.toEndDay = function (date, offset) {
+            return this.toEndRange(date, IDateConvertService_1.DateRangeType.Day, offset);
+        };
+        DateConvert.prototype.toStartWeek = function (date) {
+            return this.toStartRange(date, IDateConvertService_1.DateRangeType.Week);
+        };
+        DateConvert.prototype.toEndWeek = function (date, offset) {
+            return this.toEndRange(date, IDateConvertService_1.DateRangeType.Week, offset);
+        };
+        DateConvert.prototype.toStartMonth = function (date) {
+            return this.toStartRange(date, IDateConvertService_1.DateRangeType.Month);
+        };
+        DateConvert.prototype.toEndMonth = function (date, offset) {
+            return this.toEndRange(date, IDateConvertService_1.DateRangeType.Month, offset);
+        };
+        DateConvert.prototype.toStartYear = function (date) {
+            return this.toStartRange(date, IDateConvertService_1.DateRangeType.Year);
+        };
+        DateConvert.prototype.toEndYear = function (date, offset) {
+            return this.toEndRange(date, IDateConvertService_1.DateRangeType.Year, offset);
+        };
+        return DateConvert;
+    }());
+    var DateConvertService = (function () {
+        function DateConvertService(convert) {
+            this._convert = convert;
+        }
+        Object.defineProperty(DateConvertService.prototype, "defaultTimeZoneOffset", {
+            get: function () {
+                return this._convert.defaultTimeZoneOffset;
+            },
+            set: function (value) {
+                this._convert.defaultTimeZoneOffset = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DateConvertService.prototype.toJSON = function (date) {
+            return this._convert.toJson(date);
+        };
+        DateConvertService.prototype.toNextRange = function (date, type) {
+            return this._convert.toNextRange(date, type);
+        };
+        DateConvertService.prototype.toPrevRange = function (date, type) {
+            return this._convert.toPrevRange(date, type);
+        };
+        DateConvertService.prototype.toCurrentRange = function (type) {
+            return this._convert.toCurrentRange(type);
+        };
+        DateConvertService.prototype.addHours = function (date, hours) {
+            return this._convert.addHours(date, hours);
+        };
+        DateConvertService.prototype.toStartDay = function (date) {
+            return this._convert.toStartDay(date);
+        };
+        DateConvertService.prototype.toEndDay = function (date, offset) {
+            return this._convert.toEndDay(date, offset);
+        };
+        DateConvertService.prototype.toStartWeek = function (date) {
+            return this._convert.toStartWeek(date);
+        };
+        DateConvertService.prototype.toEndWeek = function (date, offset) {
+            return this._convert.toEndWeek(date, offset);
+        };
+        DateConvertService.prototype.toStartMonth = function (date) {
+            return this._convert.toStartMonth(date);
+        };
+        DateConvertService.prototype.toEndMonth = function (date, offset) {
+            return this._convert.toEndMonth(date, offset);
+        };
+        DateConvertService.prototype.toStartYear = function (date) {
+            return this._convert.toStartYear(date);
+        };
+        DateConvertService.prototype.toEndYear = function (date, offset) {
+            return this._convert.toEndYear(date, offset);
+        };
+        return DateConvertService;
+    }());
+    var DateConvertProvider = (function (_super) {
+        __extends(DateConvertProvider, _super);
+        function DateConvertProvider() {
+            return _super.apply(this, arguments) || this;
+        }
+        DateConvertProvider.prototype.$get = function () {
+            "ngInject";
+            if (this._service == null)
+                this._service = new DateConvertService(this);
+            return this._service;
+        };
+        return DateConvertProvider;
+    }(DateConvert));
+    angular
+        .module('pipDate.Convert', [])
+        .provider('pipDateConvert', DateConvertProvider);
+})();
+},{"./IDateConvertService":5}],3:[function(require,module,exports){
+"use strict";
+formatTimeFilter.$inject = ['pipDateFormat'];
+formatDateOptionalFilter.$inject = ['pipDateFormat'];
+formatLongDateFilter.$inject = ['pipDateFormat'];
+formatShortDateFilter.$inject = ['pipDateFormat'];
+formatMiddleDateFilter.$inject = ['pipDateFormat'];
+formatMonthFilter.$inject = ['pipDateFormat'];
+formatLongMonthFilter.$inject = ['pipDateFormat'];
+formatYearFilter.$inject = ['pipDateFormat'];
+formatWeekFilter.$inject = ['pipDateFormat'];
+formatShortWeekFilter.$inject = ['pipDateFormat'];
+formatShortDateTimeFilter.$inject = ['pipDateFormat'];
+formatMiddleDateTimeFilter.$inject = ['pipDateFormat'];
+formatLongDateTimeFilter.$inject = ['pipDateFormat'];
+formatShortDateLongTimeFilter.$inject = ['pipDateFormat'];
+formatMiddleDateLongTimeFilter.$inject = ['pipDateFormat'];
+formatLongDateLongTimeFilter.$inject = ['pipDateFormat'];
+bbFormatDateLongTimeFilter.$inject = ['pipDateFormat'];
+formatFullDateTimeFilter.$inject = ['pipDateFormat'];
+formatShortTimeFilter.$inject = ['pipDateFormat'];
+formatLongTimeFilter.$inject = ['pipDateFormat'];
+formatShortDayOfWeekFilter.$inject = ['pipDateFormat'];
+formatLongDayOfWeekFilter.$inject = ['pipDateFormat'];
+formatLongMonthDayFilter.$inject = ['pipDateFormat'];
+formatShortMonthDayFilter.$inject = ['pipDateFormat'];
+formatDateRangeFilter.$inject = ['pipDateFormat'];
+formatDateTimeRangeFilter.$inject = ['pipDateFormat'];
+formatISOWeekFilter.$inject = ['pipDateFormat'];
+formatShortISOWeekFilter.$inject = ['pipDateFormat'];
+formatISOWeekOrdinalFilter.$inject = ['pipDateFormat'];
+formatDateYFilter.$inject = ['pipDateFormat'];
+formatLongDateYFilter.$inject = ['pipDateFormat'];
+formatTodayDateLongTimeLongFilter.$inject = ['pipDateFormat'];
+formatTodayDateShortTimeLongFilter.$inject = ['pipDateFormat'];
+formatTodayDateLongTimeShortFilter.$inject = ['pipDateFormat'];
+formatTodayDateShortTimeShortFilter.$inject = ['pipDateFormat'];
+formatMillisecondsToSecondsFilter.$inject = ['pipDateFormat'];
+formatElapsedIntervalFilter.$inject = ['pipDateFormat'];
+getDateJSONFilter.$inject = ['pipDateConvert'];
+function formatTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, format) {
-        return pipDateTime.formatTime(value, format);
+        return pipDateFormat.formatTime(value, format);
     };
 }
-function formatDateOptionalFilter(pipDateTime) {
+function formatDateOptionalFilter(pipDateFormat) {
     "ngInject";
     return function (value, format) {
-        return pipDateTime.formatDateOptional(value, format);
+        return pipDateFormat.formatDateOptional(value, format);
     };
 }
-function formatLongDateFilter(pipDateTime) {
+function formatLongDateFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongDate(value);
+        return pipDateFormat.formatLongDate(value);
     };
 }
-function formatShortDateFilter(pipDateTime) {
+function formatShortDateFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortDate(value);
+        return pipDateFormat.formatShortDate(value);
     };
 }
-function formatMiddleDateFilter(pipDateTime) {
+function formatMiddleDateFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatMiddleDate(value);
+        return pipDateFormat.formatMiddleDate(value);
     };
 }
-function formatMonthFilter(pipDateTime) {
+function formatMonthFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatMonth(value);
+        return pipDateFormat.formatMonth(value);
     };
 }
-function formatLongMonthFilter(pipDateTime) {
+function formatLongMonthFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongMonth(value);
+        return pipDateFormat.formatLongMonth(value);
     };
 }
-function formatYearFilter(pipDateTime) {
+function formatYearFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatYear(value);
+        return pipDateFormat.formatYear(value);
     };
 }
-function formatWeekFilter(pipDateTime) {
+function formatWeekFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatWeek(value);
+        return pipDateFormat.formatWeek(value);
     };
 }
-function formatShortWeekFilter(pipDateTime) {
+function formatShortWeekFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortWeek(value);
+        return pipDateFormat.formatShortWeek(value);
     };
 }
-function formatShortDateTimeFilter(pipDateTime) {
+function formatShortDateTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortDateTime(value);
+        return pipDateFormat.formatShortDateTime(value);
     };
 }
-function formatMiddleDateTimeFilter(pipDateTime) {
+function formatMiddleDateTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatMiddleDateTime(value);
+        return pipDateFormat.formatMiddleDateTime(value);
     };
 }
-function formatLongDateTimeFilter(pipDateTime) {
+function formatLongDateTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongDateTime(value);
+        return pipDateFormat.formatLongDateTime(value);
     };
 }
-function formatShortDateLongTimeFilter(pipDateTime) {
+function formatShortDateLongTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, firstTime) {
-        return pipDateTime.formatShortDateLongTime(value, firstTime);
+        return pipDateFormat.formatShortDateLongTime(value, firstTime);
     };
 }
-function formatMiddleDateLongTimeFilter(pipDateTime) {
+function formatMiddleDateLongTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, firstTime) {
-        return pipDateTime.formatMiddleDateLongTime(value, firstTime);
+        return pipDateFormat.formatMiddleDateLongTime(value, firstTime);
     };
 }
-function formatLongDateLongTimeFilter(pipDateTime) {
+function formatLongDateLongTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, firstTime) {
-        return pipDateTime.formatLongDateLongTime(value, firstTime);
+        return pipDateFormat.formatLongDateLongTime(value, firstTime);
     };
 }
-function bbFormatDateLongTimeFilter(pipDateTime) {
+function bbFormatDateLongTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, firstTime) {
-        return pipDateTime.bbFormatDateLongTime(value, firstTime);
+        return pipDateFormat.bbFormatDateLongTime(value, firstTime);
     };
 }
-function formatFullDateTimeFilter(pipDateTime) {
+function formatFullDateTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatFullDateTime(value);
+        return pipDateFormat.formatFullDateTime(value);
     };
 }
-function formatShortTimeFilter(pipDateTime) {
+function formatShortTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortTime(value);
+        return pipDateFormat.formatShortTime(value);
     };
 }
-function formatLongTimeFilter(pipDateTime) {
+function formatLongTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongTime(value);
+        return pipDateFormat.formatLongTime(value);
     };
 }
-function formatShortDayOfWeekFilter(pipDateTime) {
+function formatShortDayOfWeekFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortDayOfWeek(value);
+        return pipDateFormat.formatShortDayOfWeek(value);
     };
 }
-function formatLongDayOfWeekFilter(pipDateTime) {
+function formatLongDayOfWeekFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongDayOfWeek(value);
+        return pipDateFormat.formatLongDayOfWeek(value);
     };
 }
-function formatLongMonthDayFilter(pipDateTime) {
+function formatLongMonthDayFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongMonthDay(value);
+        return pipDateFormat.formatLongMonthDay(value);
     };
 }
-function formatShortMonthDayFilter(pipDateTime) {
+function formatShortMonthDayFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortMonthDay(value);
+        return pipDateFormat.formatShortMonthDay(value);
     };
 }
-function formatDateRangeFilter(pipDateTime) {
+function formatDateRangeFilter(pipDateFormat) {
     "ngInject";
     return function (value1, value2) {
-        return pipDateTime.formatDateRange(value1, value2);
+        return pipDateFormat.formatDateRange(value1, value2);
     };
 }
-function formatDateTimeRangeFilter(pipDateTime) {
+function formatDateTimeRangeFilter(pipDateFormat) {
     "ngInject";
     return function (value1, value2) {
-        return pipDateTime.formatDateTimeRange(value1, value2);
+        return pipDateFormat.formatDateTimeRange(value1, value2);
     };
 }
-function formatISOWeekFilter(pipDateTime) {
+function formatISOWeekFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatISOWeek(value);
+        return pipDateFormat.formatISOWeek(value);
     };
 }
-function formatShortISOWeekFilter(pipDateTime) {
+function formatShortISOWeekFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatShortISOWeek(value);
+        return pipDateFormat.formatShortISOWeek(value);
     };
 }
-function formatISOWeekOrdinalFilter(pipDateTime) {
+function formatISOWeekOrdinalFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatISOWeekOrdinal(value);
+        return pipDateFormat.formatISOWeekOrdinal(value);
     };
 }
-function formatDateYFilter(pipDateTime) {
+function formatDateYFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatDateY(value);
+        return pipDateFormat.formatDateY(value);
     };
 }
-function formatLongDateYFilter(pipDateTime) {
+function formatLongDateYFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatLongDateY(value);
+        return pipDateFormat.formatLongDateY(value);
     };
 }
-function formatTodayDateLongTimeLongFilter(pipDateTime) {
+function formatTodayDateLongTimeLongFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatTodayDateLongTimeLong(value);
+        return pipDateFormat.formatTodayDateLongTimeLong(value);
     };
 }
-function formatTodayDateShortTimeLongFilter(pipDateTime) {
+function formatTodayDateShortTimeLongFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatTodayDateShortTimeLong(value);
+        return pipDateFormat.formatTodayDateShortTimeLong(value);
     };
 }
-function formatTodayDateLongTimeShortFilter(pipDateTime) {
+function formatTodayDateLongTimeShortFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatTodayDateLongTimeShort(value);
+        return pipDateFormat.formatTodayDateLongTimeShort(value);
     };
 }
-function formatTodayDateShortTimeShortFilter(pipDateTime) {
+function formatTodayDateShortTimeShortFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatTodayDateShortTimeShort(value);
+        return pipDateFormat.formatTodayDateShortTimeShort(value);
     };
 }
-function formatMillisecondsToSecondsFilter(pipDateTime) {
+function formatMillisecondsToSecondsFilter(pipDateFormat) {
     "ngInject";
     return function (value) {
-        return pipDateTime.formatMillisecondsToSeconds(value);
+        return pipDateFormat.formatMillisecondsToSeconds(value);
     };
 }
-function formatElapsedIntervalFilter(pipDateTime) {
+function formatElapsedIntervalFilter(pipDateFormat) {
     "ngInject";
     return function (value, start) {
-        return pipDateTime.formatElapsedInterval(value, start);
+        return pipDateFormat.formatElapsedInterval(value, start);
     };
 }
-function getDateJSONFilter(pipDateTime) {
+function getDateJSONFilter(pipDateConvert) {
     "ngInject";
     return function (value) {
-        return pipDateTime.getDateJSON(value);
+        return pipDateConvert.toJson(value);
     };
 }
 angular
-    .module('pipDateTime.Filter', [])
+    .module('pipDate.Filter', [])
     .filter('formatTime', formatTimeFilter)
     .filter('formatDateOptional', formatDateOptionalFilter)
     .filter('bbFormatDateLongTime', bbFormatDateLongTimeFilter)
@@ -5216,961 +5973,668 @@ angular
     .filter('formatTodayDateShortTimeShort', formatTodayDateShortTimeShortFilter)
     .filter('formatMillisecondsToSeconds', formatMillisecondsToSecondsFilter)
     .filter('formatElapsedInterval', formatElapsedIntervalFilter);
-},{}],3:[function(require,module,exports){
-'use strict';
+},{}],4:[function(require,module,exports){
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var DateTimeConfig = (function () {
-    function DateTimeConfig() {
-    }
-    return DateTimeConfig;
-}());
-exports.DateTimeConfig = DateTimeConfig;
-var DateTime = (function () {
-    function DateTime(config) {
-        this._momentRanged = new Array('year', 'month', 'week', 'isoweek', 'day');
-        this._defaultFormat = 'LL';
-        this._config = config || { timeZone: null };
-    }
-    DateTime.prototype.isUndefinedOrNull = function (value) {
-        return angular.isUndefined(value) || value === null;
-    };
-    DateTime.prototype.getRange = function (value) {
-        if (this.isUndefinedOrNull(value)) {
-            return 'day';
+var IDateConvertService_1 = require("./IDateConvertService");
+(function () {
+    var DateFormat = (function () {
+        function DateFormat() {
+            this._momentRanged = IDateConvertService_1.DateRangeType.All;
+            this._defaultFormat = 'LL';
         }
-        var index = this._momentRanged.indexOf(value);
-        if (index < 0) {
-            return 'day';
-        }
-        else {
-            return this._momentRanged[index];
-        }
-    };
-    DateTime.prototype.getOperationRange = function (value) {
-        if (this.isUndefinedOrNull(value)) {
-            return 'day';
-        }
-        var range = value == 'isoweek' ? 'week' : value, index = this._momentRanged.indexOf(range);
-        if (index < 0) {
-            return 'day';
-        }
-        else {
-            return this._momentRanged[index];
-        }
-    };
-    DateTime.prototype.formatDateTime = function (value, basicFormat) {
-        var date, formatTpl;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        formatTpl = basicFormat ? basicFormat : this._defaultFormat;
-        return date.format(formatTpl);
-    };
-    DateTime.prototype.formatDateTimeY = function (value, basicFormat) {
-        var date, nowDate, formatMoment;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        nowDate = moment();
-        formatMoment = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat);
-        if (nowDate.year() == date.year()) {
-            formatMoment = formatMoment.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
-        }
-        return date.format(formatMoment);
-    };
-    DateTime.prototype.formatDay = function (value, basicFormat) {
-        var date, format = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat), formatMonthYearless = format.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '').replace(/M/g, '');
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        return date.format(formatMonthYearless);
-    };
-    DateTime.prototype.formatMonthDay = function (value, basicFormat) {
-        var date, format = basicFormat ? basicFormat : this._defaultFormat, formatLL = moment.localeData().longDateFormat(format), formatYearlessLL = formatLL.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        return date.format(formatYearlessLL);
-    };
-    DateTime.prototype.formatRange = function (value1, value2, basicFormat) {
-        var dateStart, dateEnd, format = basicFormat ? basicFormat : this._defaultFormat;
-        if (this.isUndefinedOrNull(value1)) {
-            dateStart = null;
-        }
-        else {
-            dateStart = (this._config.timeZone != undefined && this._config.timeZone != null) ? moment(value1).utcOffset(this._config.timeZone) : moment(value1);
-        }
-        if (this.isUndefinedOrNull(value2)) {
-            dateEnd = null;
-        }
-        else {
-            dateEnd = (this._config.timeZone != undefined && this._config.timeZone != null) ? moment(value2).utcOffset(this._config.timeZone) : moment(value2);
-        }
-        if (dateStart === null && dateEnd === null)
-            return '';
-        if (dateStart === null) {
-            return dateEnd.format(basicFormat);
-        }
-        else if (dateEnd === null || dateStart.isSame(dateEnd)) {
-            return dateStart.format(basicFormat);
+        Object.defineProperty(DateFormat.prototype, "defaultTimeZoneOffset", {
+            get: function () {
+                return this._defaultTimeZoneOffset;
+            },
+            set: function (value) {
+                this._defaultTimeZoneOffset = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DateFormat.prototype.isUndefinedOrNull = function (value) {
+            return angular.isUndefined(value) || value === null;
+        };
+        DateFormat.prototype.formatDateTime = function (value, basicFormat) {
+            var date;
+            var formatTpl;
+            if (this.isUndefinedOrNull(value))
+                return '';
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                date = moment(value).utcOffset(this._defaultTimeZoneOffset);
+            else
+                date = moment(value);
+            if (!date.isValid())
+                return '';
+            formatTpl = basicFormat ? basicFormat : this._defaultFormat;
+            return date.format(formatTpl);
+        };
+        DateFormat.prototype.formatDateTimeY = function (value, basicFormat) {
+            var date;
+            var nowDate;
+            var formatMoment;
+            if (this.isUndefinedOrNull(value))
+                return '';
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                date = moment(value).utcOffset(this._defaultTimeZoneOffset);
+            else
+                date = moment(value);
+            if (!date.isValid())
+                return '';
+            nowDate = moment();
+            formatMoment = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat);
+            if (nowDate.year() == date.year())
+                formatMoment = formatMoment.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
+            return date.format(formatMoment);
+        };
+        DateFormat.prototype.formatDay = function (value, basicFormat) {
+            var date;
+            var format = moment.localeData().longDateFormat(basicFormat ? basicFormat : this._defaultFormat);
+            var formatMonthYearless = format.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '').replace(/M/g, '');
+            if (this.isUndefinedOrNull(value))
+                return '';
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                date = moment(value).utcOffset(this._defaultTimeZoneOffset);
+            else
+                date = moment(value);
+            if (!date.isValid())
+                return '';
+            return date.format(formatMonthYearless);
+        };
+        DateFormat.prototype.formatMonthDay = function (value, basicFormat) {
+            var date;
+            var format = basicFormat ? basicFormat : this._defaultFormat;
+            var formatLL = moment.localeData().longDateFormat(format);
+            var formatYearlessLL = formatLL.replace(/Y/g, '').replace(/^\W|\W$|\W\W/, '');
+            if (this.isUndefinedOrNull(value))
+                return '';
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                date = moment(value).utcOffset(this._defaultTimeZoneOffset);
+            else
+                date = moment(value);
+            if (!date.isValid())
+                return '';
+            return date.format(formatYearlessLL);
+        };
+        DateFormat.prototype.formatRange = function (value1, value2, basicFormat) {
+            var dateStart;
+            var dateEnd;
+            var format = basicFormat ? basicFormat : this._defaultFormat;
+            if (this.isUndefinedOrNull(value1))
+                dateStart = null;
+            else
+                dateStart = (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                    ? moment(value1).utcOffset(this._defaultTimeZoneOffset) : moment(value1);
+            if (this.isUndefinedOrNull(value2))
+                dateEnd = null;
+            else
+                dateEnd = (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                    ? moment(value2).utcOffset(this._defaultTimeZoneOffset) : moment(value2);
+            if (dateStart === null && dateEnd === null)
+                return '';
+            if (dateStart === null)
+                return dateEnd.format(basicFormat);
+            if (dateEnd === null || dateStart.isSame(dateEnd))
+                return dateStart.format(basicFormat);
             ;
-        }
-        if (dateStart.isAfter(dateEnd)) {
-            throw new Error('Date range error. Start date is more than end date.');
-        }
-        if (dateStart.year() == dateEnd.year()) {
-            if (dateStart.month() == dateEnd.month()) {
-                return this.formatDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
-            }
-            else {
+            if (dateStart.isAfter(dateEnd))
+                throw new Error('Date range error. Start date is more than end date.');
+            if (dateStart.year() == dateEnd.year()) {
+                if (dateStart.month() == dateEnd.month())
+                    return this.formatDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
                 return this.formatMonthDay(dateStart, basicFormat) + '-' + dateEnd.format(basicFormat);
             }
-        }
-        else {
             return dateStart.format(basicFormat) + '-' + dateEnd.format(basicFormat);
-        }
-    };
-    DateTime.prototype.toStartRange = function (value, range) {
-        var date;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        return date.startOf(range).toDate();
-    };
-    DateTime.prototype.toEndRange = function (value, range, offset) {
-        var date, result, mssOffset;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (!angular.isNumber(offset)) {
-            mssOffset = 0;
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        if (mssOffset) {
-            result = date.startOf(range).add(mssOffset, 'milliseconds');
-        }
-        else {
-            result = date.startOf(range);
-        }
-        return date.startOf(range).toDate();
-    };
-    DateTime.prototype.toDateWithTime = function (value, formatDate, formatTime, firstTime) {
-        var date, result, nowDate;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        nowDate = moment();
-        if (firstTime) {
-            result = date.format(formatTime) + ' ' + date.format(formatDate);
-        }
-        else {
-            result = date.format(formatDate) + ' ' + date.format(formatTime);
-        }
-        return result;
-    };
-    DateTime.prototype.toTodayDate = function (value, formatDate, formatTime) {
-        var date, result, nowDate;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this._config.timeZone != undefined && this._config.timeZone != null) {
-            date = moment(value).utcOffset(this._config.timeZone);
-        }
-        else {
-            date = moment(value);
-        }
-        if (!date.isValid()) {
-            return '';
-        }
-        nowDate = moment();
-        if (nowDate.year() == date.year() && nowDate.month() == date.month() && nowDate.day() == date.day()) {
-            result = date.format(formatTime);
-        }
-        else {
-            result = date.format(formatDate) + ' ' + date.format(formatTime);
-        }
-        return result;
-    };
-    ;
-    Object.defineProperty(DateTime.prototype, "config", {
-        get: function () {
-            return this._config;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    DateTime.prototype.useTimeZone = function (offset) {
-        this._config.timeZone = offset;
-    };
-    DateTime.prototype.formatTime = function (value, format) {
-        return this.formatDateTime(value, 'LLL');
-    };
-    DateTime.prototype.formatDateOptional = function (value, format) {
-        return this.formatDateTime(value, 'L');
-    };
-    DateTime.prototype.formatShortDate = function (value) {
-        return this.formatDateTime(value, 'L');
-    };
-    DateTime.prototype.bbFormatDateLongTime = function (value, firstTime) {
-        return this.toDateWithTime(value, 'MM/DD/YY', 'LTS', firstTime);
-    };
-    DateTime.prototype.formatMiddleDate = function (value) {
-        return this.formatDateTime(value, 'll');
-    };
-    DateTime.prototype.formatLongDate = function (value) {
-        return this.formatDateTime(value, 'LL');
-    };
-    DateTime.prototype.formatMonth = function (value) {
-        return this.formatDateTime(value, 'MM');
-    };
-    DateTime.prototype.formatLongMonth = function (value) {
-        return this.formatDateTime(value, 'MMMM');
-    };
-    DateTime.prototype.formatYear = function (value) {
-        return this.formatDateTime(value, 'YYYY');
-    };
-    DateTime.prototype.formatWeek = function (value) {
-        return this.formatDateTime(value, 'ww');
-    };
-    DateTime.prototype.formatShortWeek = function (value) {
-        return this.formatDateTime(value, 'w');
-    };
-    DateTime.prototype.formatShortDateTime = function (value) {
-        return this.toDateWithTime(value, 'L', 'LT');
-    };
-    DateTime.prototype.formatMiddleDateTime = function (value) {
-        return this.formatDateTime(value, 'lll');
-    };
-    DateTime.prototype.formatLongDateTime = function (value) {
-        return this.formatDateTime(value, 'LLL');
-    };
-    DateTime.prototype.formatFullDateTime = function (value) {
-        return this.formatDateTime(value, 'LLLL');
-    };
-    DateTime.prototype.formatShortDateLongTime = function (value, firstTime) {
-        return this.toDateWithTime(value, 'L', 'LTS', firstTime);
-    };
-    DateTime.prototype.formatMiddleDateLongTime = function (value, firstTime) {
-        return this.toDateWithTime(value, 'll', 'LTS', firstTime);
-    };
-    DateTime.prototype.formatLongDateLongTime = function (value, firstTime) {
-        return this.toDateWithTime(value, 'LL', 'LTS', firstTime);
-    };
-    DateTime.prototype.formatShortTime = function (value) {
-        return this.formatDateTime(value, 'LT');
-    };
-    DateTime.prototype.formatLongTime = function (value) {
-        return this.formatDateTime(value, 'LTS');
-    };
-    DateTime.prototype.formatShortDayOfWeek = function (value) {
-        return this.formatDateTime(value, 'dd');
-    };
-    DateTime.prototype.formatLongDayOfWeek = function (value) {
-        return this.formatDateTime(value, 'dddd');
-    };
-    DateTime.prototype.formatLongMonthDay = function (value) {
-        return this.formatMonthDay(value, 'LL');
-    };
-    DateTime.prototype.formatShortMonthDay = function (value) {
-        return this.formatMonthDay(value, 'L');
-    };
-    DateTime.prototype.formatDateRange = function (value1, value2) {
-        return this.formatRange(value1, value2, 'LL');
-    };
-    DateTime.prototype.formatDateTimeRange = function (value1, value2) {
-        return this.formatRange(value1, value2, 'LLL');
-    };
-    DateTime.prototype.formatISOWeek = function (value) {
-        return this.formatDateTime(value, 'WW');
-    };
-    DateTime.prototype.formatShortISOWeek = function (value) {
-        return this.formatDateTime(value, 'W');
-    };
-    DateTime.prototype.formatISOWeekOrdinal = function (value) {
-        return this.formatDateTime(value, 'Wo');
-    };
-    DateTime.prototype.formatDateY = function (value) {
-        return this.formatDateTimeY(value, 'L');
-    };
-    DateTime.prototype.formatLongDateY = function (value) {
-        return this.formatDateTimeY(value, 'LL');
-    };
-    DateTime.prototype.formatTodayDateLongTimeLong = function (value) {
-        return this.toTodayDate(value, 'LL', 'LTS');
-    };
-    DateTime.prototype.formatTodayDateShortTimeLong = function (value) {
-        return this.toTodayDate(value, 'LL', 'LTS');
-    };
-    DateTime.prototype.formatTodayDateLongTimeShort = function (value) {
-        return this.toTodayDate(value, 'LL', 'LT');
-    };
-    DateTime.prototype.formatTodayDateShortTimeShort = function (value) {
-        return this.toTodayDate(value, 'll', 'LT');
-    };
-    DateTime.prototype.formatMillisecondsToSeconds = function (value) {
-        return '';
-    };
-    DateTime.prototype.formatElapsedInterval = function (value, start) {
-        var date, nowDate;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        if (this.isUndefinedOrNull(start)) {
+        };
+        DateFormat.prototype.toDateWithTime = function (value, formatDate, formatTime, firstTime) {
+            var date;
+            var result;
+            var nowDate;
+            if (this.isUndefinedOrNull(value))
+                return '';
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                date = moment(value).utcOffset(this._defaultTimeZoneOffset);
+            else
+                date = moment(value);
+            if (!date.isValid())
+                return '';
             nowDate = moment();
-        }
-        else {
-            nowDate = moment(start);
-        }
-        date = moment(value);
-        if (!date.isValid() || !nowDate.isValid()) {
-            return '';
-        }
-        return moment(date).fromNow(nowDate);
-    };
-    DateTime.prototype.getDateJSON = function (date) {
-        return JSON.stringify(moment(date));
-    };
-    DateTime.prototype.getNextStart = function (value, category) {
-        var date, range, result;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        date = moment(value);
-        if (!date.isValid()) {
-            return '';
-        }
-        range = this.getRange(category);
-        result = moment(date).startOf(range).add(this.getOperationRange(range));
-        return result.toDate();
-    };
-    DateTime.prototype.getPrevStart = function (value, category) {
-        var date, range, result;
-        if (this.isUndefinedOrNull(value)) {
-            return '';
-        }
-        date = moment(value);
-        if (!date.isValid()) {
-            return '';
-        }
-        range = this.getRange(category);
-        result = moment(date).startOf(range).add(-1, this.getOperationRange(range));
-        return result.toDate();
-    };
-    DateTime.prototype.getNowStart = function (category) {
-        var date, range, result;
-        date = moment();
-        if (!date.isValid()) {
-            return '';
-        }
-        range = this.getRange(category);
-        result = moment(date).startOf(range);
-        return result.toDate();
-    };
-    DateTime.prototype.addHours = function (value, hours) {
-        var date;
-        if (this.isUndefinedOrNull(value) || !angular.isNumber(hours)) {
-            return '';
-        }
-        date = moment(value);
-        if (!date.isValid()) {
-            return '';
-        }
-        return date.add(hours, 'hours').toDate();
-    };
-    DateTime.prototype.toStartDay = function (value) {
-        return this.toStartRange(value, 'day');
-    };
-    DateTime.prototype.toEndDay = function (value, offset) {
-        return this.toEndRange(value, 'day', offset);
-    };
-    DateTime.prototype.toStartWeek = function (value) {
-        return this.toStartRange(value, 'week');
-    };
-    DateTime.prototype.toEndWeek = function (value, offset) {
-        return this.toEndRange(value, 'week', offset);
-    };
-    DateTime.prototype.toStartMonth = function (value) {
-        return this.toStartRange(value, 'month');
-    };
-    DateTime.prototype.toEndMonth = function (value, offset) {
-        return this.toEndRange(value, 'month', offset);
-    };
-    DateTime.prototype.toStartYear = function (value) {
-        return this.toStartRange(value, 'year');
-    };
-    DateTime.prototype.toEndYear = function (value, offset) {
-        return this.toEndRange(value, 'year', offset);
-    };
-    return DateTime;
-}());
-var DateTimeService = (function () {
-    function DateTimeService(datetime) {
-        this._config = { timeZone: null };
-        this._datetime = datetime;
-    }
-    DateTimeService.prototype.useTimeZone = function (offset) {
-        return this._datetime.useTimeZone(offset);
-    };
-    DateTimeService.prototype.formatTime = function (value, format) {
-        return this._datetime.formatTime(value, format);
-    };
-    DateTimeService.prototype.formatDateOptional = function (value, format) {
-        return this._datetime.formatDateOptional(value, format);
-    };
-    DateTimeService.prototype.formatShortDate = function (value) {
-        return this._datetime.formatShortDate(value);
-    };
-    DateTimeService.prototype.formatMiddleDate = function (value) {
-        return this._datetime.formatMiddleDate(value);
-    };
-    DateTimeService.prototype.formatLongDate = function (value) {
-        return this._datetime.formatLongDate(value);
-    };
-    DateTimeService.prototype.formatMonth = function (value) {
-        return this._datetime.formatMonth(value);
-    };
-    DateTimeService.prototype.formatLongMonth = function (value) {
-        return this._datetime.formatLongMonth(value);
-    };
-    DateTimeService.prototype.formatYear = function (value) {
-        return this._datetime.formatYear(value);
-    };
-    DateTimeService.prototype.formatWeek = function (value) {
-        return this._datetime.formatWeek(value);
-    };
-    DateTimeService.prototype.formatShortWeek = function (value) {
-        return this._datetime.formatShortWeek(value);
-    };
-    DateTimeService.prototype.formatShortDateTime = function (value) {
-        return this._datetime.formatShortDateTime(value);
-    };
-    DateTimeService.prototype.formatMiddleDateTime = function (value) {
-        return this._datetime.formatMiddleDateTime(value);
-    };
-    DateTimeService.prototype.formatLongDateTime = function (value) {
-        return this._datetime.formatLongDateTime(value);
-    };
-    DateTimeService.prototype.formatFullDateTime = function (value) {
-        return this._datetime.formatFullDateTime(value);
-    };
-    DateTimeService.prototype.formatShortDateLongTime = function (value, firstTime) {
-        return this._datetime.formatShortDateLongTime(value, firstTime);
-    };
-    DateTimeService.prototype.formatMiddleDateLongTime = function (value, firstTime) {
-        return this._datetime.formatMiddleDateLongTime(value, firstTime);
-    };
-    DateTimeService.prototype.formatLongDateLongTime = function (value, firstTime) {
-        return this._datetime.formatLongDateLongTime(value, firstTime);
-    };
-    DateTimeService.prototype.bbFormatDateLongTime = function (value, firstTime) {
-        return this._datetime.bbFormatDateLongTime(value, firstTime);
-    };
-    DateTimeService.prototype.formatShortTime = function (value) {
-        return this._datetime.formatShortTime(value);
-    };
-    DateTimeService.prototype.formatLongTime = function (value) {
-        return this._datetime.formatLongTime(value);
-    };
-    DateTimeService.prototype.formatShortDayOfWeek = function (value) {
-        return this._datetime.formatShortDayOfWeek(value);
-    };
-    DateTimeService.prototype.formatLongDayOfWeek = function (value) {
-        return this._datetime.formatLongDayOfWeek(value);
-    };
-    DateTimeService.prototype.formatLongMonthDay = function (value) {
-        return this._datetime.formatLongMonthDay(value);
-    };
-    DateTimeService.prototype.formatShortMonthDay = function (value) {
-        return this._datetime.formatShortMonthDay(value);
-    };
-    DateTimeService.prototype.formatDateRange = function (value1, value2) {
-        return this._datetime.formatDateRange(value1, value2);
-    };
-    DateTimeService.prototype.formatDateTimeRange = function (value1, value2) {
-        return this._datetime.formatDateTimeRange(value1, value2);
-    };
-    DateTimeService.prototype.formatISOWeek = function (value) {
-        return this._datetime.formatISOWeek(value);
-    };
-    DateTimeService.prototype.formatShortISOWeek = function (value) {
-        return this._datetime.formatShortISOWeek(value);
-    };
-    DateTimeService.prototype.formatISOWeekOrdinal = function (value) {
-        return this._datetime.formatISOWeekOrdinal(value);
-    };
-    DateTimeService.prototype.formatDateY = function (value) {
-        return this._datetime.formatDateY(value);
-    };
-    DateTimeService.prototype.formatLongDateY = function (value) {
-        return this._datetime.formatLongDateY(value);
-    };
-    DateTimeService.prototype.formatTodayDateLongTimeLong = function (value) {
-        return this._datetime.formatTodayDateLongTimeLong(value);
-    };
-    DateTimeService.prototype.formatTodayDateShortTimeLong = function (value) {
-        return this._datetime.formatTodayDateShortTimeLong(value);
-    };
-    DateTimeService.prototype.formatTodayDateLongTimeShort = function (value) {
-        return this._datetime.formatTodayDateLongTimeShort(value);
-    };
-    DateTimeService.prototype.formatTodayDateShortTimeShort = function (value) {
-        return this._datetime.formatTodayDateShortTimeShort(value);
-    };
-    DateTimeService.prototype.formatMillisecondsToSeconds = function (value) {
-        return this._datetime.formatMillisecondsToSeconds(value);
-    };
-    DateTimeService.prototype.formatElapsedInterval = function (value, start) {
-        return this._datetime.formatElapsedInterval(value, start);
-    };
-    DateTimeService.prototype.getDateJSON = function (date) {
-        return this._datetime.getDateJSON(date);
-    };
-    DateTimeService.prototype.getNextStart = function (value, category) {
-        return this._datetime.getNextStart(value, category);
-    };
-    DateTimeService.prototype.getPrevStart = function (value, category) {
-        return this._datetime.getPrevStart(value, category);
-    };
-    DateTimeService.prototype.getNowStart = function (category) {
-        return this._datetime.getNowStart(category);
-    };
-    DateTimeService.prototype.addHours = function (value, hours) {
-        return this._datetime.addHours(value, hours);
-    };
-    DateTimeService.prototype.toStartDay = function (value) {
-        return this._datetime.toStartDay(value);
-    };
-    DateTimeService.prototype.toEndDay = function (value, offset) {
-        return this._datetime.toEndDay(value, offset);
-    };
-    DateTimeService.prototype.toStartWeek = function (value) {
-        return this._datetime.toStartWeek(value);
-    };
-    DateTimeService.prototype.toEndWeek = function (value, offset) {
-        return this._datetime.toEndWeek(value, offset);
-    };
-    DateTimeService.prototype.toStartMonth = function (value) {
-        return this._datetime.toStartMonth(value);
-    };
-    DateTimeService.prototype.toEndMonth = function (value, offset) {
-        return this._datetime.toEndMonth(value, offset);
-    };
-    DateTimeService.prototype.toStartYear = function (value) {
-        return this._datetime.toStartYear(value);
-    };
-    DateTimeService.prototype.toEndYear = function (value, offset) {
-        return this._datetime.toEndYear(value, offset);
-    };
-    return DateTimeService;
-}());
-var DateTimeProvider = (function (_super) {
-    __extends(DateTimeProvider, _super);
-    function DateTimeProvider() {
-        return _super.call(this, { timeZone: null }) || this;
-    }
-    DateTimeProvider.prototype.$get = function () {
-        "ngInject";
-        if (this._service == null)
-            this._service = new DateTimeService(this);
-        return this._service;
-    };
-    return DateTimeProvider;
-}(DateTime));
-angular
-    .module('pipDateTime.Service', [])
-    .provider('pipDateTime', DateTimeProvider);
-},{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipDate', ['pipDates.Templates']);
-    thisModule.directive('pipDate', function () {
-        return {
-            restrict: 'EA',
-            require: 'ngModel',
-            scope: {
-                timeMode: '@pipTimeMode',
-                disabled: '&ngDisabled',
-                model: '=ngModel',
-                ngChange: '&'
-            },
-            templateUrl: 'date_directive/date.html',
-            controller: 'pipDateController'
+            if (firstTime)
+                result = date.format(formatTime) + ' ' + date.format(formatDate);
+            else
+                result = date.format(formatDate) + ' ' + date.format(formatTime);
+            return result;
         };
-    });
-    thisModule.controller('pipDateController', ['$scope', '$element', '$injector', function ($scope, $element, $injector) {
-        var value, localeDate = moment.localeData(), momentMonths = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format, momentDays = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format, momentShortDays = localeDate._weekdaysMin, momentFirstDayOfWeek = localeDate._week.dow;
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                DAY: 'Day',
-                MONTH: 'Month',
-                YEAR: 'Year'
-            });
-            pipTranslate.setTranslations('ru', {
-                DAY: 'День',
-                MONTH: 'Месяц',
-                YEAR: 'Год'
-            });
-            $scope.dayLabel = pipTranslate.translate('DAY');
-            $scope.monthLabel = pipTranslate.translate('MONTH');
-            $scope.yearLabel = pipTranslate.translate('YEAR');
-        }
-        else {
-            $scope.dayLabel = 'Day';
-            $scope.monthLabel = 'Month';
-            $scope.yearLabel = 'Year';
-        }
-        function dayList(month, year) {
-            var count = 31, days = [], i;
-            if (month === 4 || month === 6 || month === 9 || month === 11) {
-                count = 30;
+        DateFormat.prototype.toTodayDate = function (value, formatDate, formatTime) {
+            var date;
+            var result;
+            var nowDate;
+            if (this.isUndefinedOrNull(value))
+                return '';
+            if (this._defaultTimeZoneOffset != undefined && this._defaultTimeZoneOffset != null)
+                date = moment(value).utcOffset(this._defaultTimeZoneOffset);
+            else
+                date = moment(value);
+            if (!date.isValid())
+                return '';
+            nowDate = moment();
+            if (nowDate.year() == date.year() && nowDate.month() == date.month() && nowDate.day() == date.day())
+                result = date.format(formatTime);
+            else
+                result = date.format(formatDate) + ' ' + date.format(formatTime);
+            return result;
+        };
+        DateFormat.prototype.formatTime = function (value, format) {
+            return this.formatDateTime(value, 'LLL');
+        };
+        DateFormat.prototype.formatDateOptional = function (value, format) {
+            return this.formatDateTime(value, 'L');
+        };
+        DateFormat.prototype.formatShortDate = function (value) {
+            return this.formatDateTime(value, 'L');
+        };
+        DateFormat.prototype.bbFormatDateLongTime = function (value, firstTime) {
+            return this.toDateWithTime(value, 'MM/DD/YY', 'LTS', firstTime);
+        };
+        DateFormat.prototype.formatMiddleDate = function (value) {
+            return this.formatDateTime(value, 'll');
+        };
+        DateFormat.prototype.formatLongDate = function (value) {
+            return this.formatDateTime(value, 'LL');
+        };
+        DateFormat.prototype.formatMonth = function (value) {
+            return this.formatDateTime(value, 'MM');
+        };
+        DateFormat.prototype.formatLongMonth = function (value) {
+            return this.formatDateTime(value, 'MMMM');
+        };
+        DateFormat.prototype.formatYear = function (value) {
+            return this.formatDateTime(value, 'YYYY');
+        };
+        DateFormat.prototype.formatWeek = function (value) {
+            return this.formatDateTime(value, 'ww');
+        };
+        DateFormat.prototype.formatShortWeek = function (value) {
+            return this.formatDateTime(value, 'w');
+        };
+        DateFormat.prototype.formatShortDateTime = function (value) {
+            return this.toDateWithTime(value, 'L', 'LT');
+        };
+        DateFormat.prototype.formatMiddleDateTime = function (value) {
+            return this.formatDateTime(value, 'lll');
+        };
+        DateFormat.prototype.formatLongDateTime = function (value) {
+            return this.formatDateTime(value, 'LLL');
+        };
+        DateFormat.prototype.formatFullDateTime = function (value) {
+            return this.formatDateTime(value, 'LLLL');
+        };
+        DateFormat.prototype.formatShortDateLongTime = function (value, firstTime) {
+            return this.toDateWithTime(value, 'L', 'LTS', firstTime);
+        };
+        DateFormat.prototype.formatMiddleDateLongTime = function (value, firstTime) {
+            return this.toDateWithTime(value, 'll', 'LTS', firstTime);
+        };
+        DateFormat.prototype.formatLongDateLongTime = function (value, firstTime) {
+            return this.toDateWithTime(value, 'LL', 'LTS', firstTime);
+        };
+        DateFormat.prototype.formatShortTime = function (value) {
+            return this.formatDateTime(value, 'LT');
+        };
+        DateFormat.prototype.formatLongTime = function (value) {
+            return this.formatDateTime(value, 'LTS');
+        };
+        DateFormat.prototype.formatShortDayOfWeek = function (value) {
+            return this.formatDateTime(value, 'dd');
+        };
+        DateFormat.prototype.formatLongDayOfWeek = function (value) {
+            return this.formatDateTime(value, 'dddd');
+        };
+        DateFormat.prototype.formatLongMonthDay = function (value) {
+            return this.formatMonthDay(value, 'LL');
+        };
+        DateFormat.prototype.formatShortMonthDay = function (value) {
+            return this.formatMonthDay(value, 'L');
+        };
+        DateFormat.prototype.formatDateRange = function (value1, value2) {
+            return this.formatRange(value1, value2, 'LL');
+        };
+        DateFormat.prototype.formatDateTimeRange = function (value1, value2) {
+            return this.formatRange(value1, value2, 'LLL');
+        };
+        DateFormat.prototype.formatISOWeek = function (value) {
+            return this.formatDateTime(value, 'WW');
+        };
+        DateFormat.prototype.formatShortISOWeek = function (value) {
+            return this.formatDateTime(value, 'W');
+        };
+        DateFormat.prototype.formatISOWeekOrdinal = function (value) {
+            return this.formatDateTime(value, 'Wo');
+        };
+        DateFormat.prototype.formatDateY = function (value) {
+            return this.formatDateTimeY(value, 'L');
+        };
+        DateFormat.prototype.formatLongDateY = function (value) {
+            return this.formatDateTimeY(value, 'LL');
+        };
+        DateFormat.prototype.formatTodayDateLongTimeLong = function (value) {
+            return this.toTodayDate(value, 'LL', 'LTS');
+        };
+        DateFormat.prototype.formatTodayDateShortTimeLong = function (value) {
+            return this.toTodayDate(value, 'LL', 'LTS');
+        };
+        DateFormat.prototype.formatTodayDateLongTimeShort = function (value) {
+            return this.toTodayDate(value, 'LL', 'LT');
+        };
+        DateFormat.prototype.formatTodayDateShortTimeShort = function (value) {
+            return this.toTodayDate(value, 'll', 'LT');
+        };
+        DateFormat.prototype.formatMillisecondsToSeconds = function (value) {
+            return '';
+        };
+        DateFormat.prototype.formatElapsedInterval = function (value, start) {
+            var date, nowDate;
+            if (this.isUndefinedOrNull(value)) {
+                return '';
             }
-            else if (month === 2) {
-                if (year) {
-                    count = year % 4 === 0 ? 29 : 28;
-                }
-                else {
-                    count = 28;
-                }
-            }
-            for (i = 1; i <= count; i++) {
-                days.push(i);
-            }
-            return days;
-        }
-        function monthList() {
-            var months = [], i;
-            for (i = 1; i <= 12; i++) {
-                months.push({
-                    id: i,
-                    name: momentMonths[i - 1]
-                });
-            }
-            return months;
-        }
-        function yearList() {
-            var i, currentYear = new Date().getFullYear(), startYear = $scope.timeMode === 'future' ? currentYear : currentYear - 100, endYear = $scope.timeMode === 'past' ? currentYear : currentYear + 100, years = [];
-            if ($scope.timeMode === 'past') {
-                for (i = endYear; i >= startYear; i--) {
-                    years.push(i);
-                }
+            if (this.isUndefinedOrNull(start)) {
+                nowDate = moment();
             }
             else {
-                for (i = startYear; i <= endYear; i++) {
-                    years.push(i);
-                }
+                nowDate = moment(start);
             }
-            return years;
-        }
-        function adjustDay() {
-            var days = dayList($scope.month, $scope.year);
-            if ($scope.days.length !== days.length) {
-                if ($scope.day > days.length) {
-                    $scope.day = days.length;
-                }
-                $scope.days = days;
+            date = moment(value);
+            if (!date.isValid() || !nowDate.isValid()) {
+                return '';
             }
-        }
-        function getValue(v) {
-            var value = v ? _.isDate(v) ? v : new Date(v) : null, day = value ? value.getDate() : null, month = value ? value.getMonth() + 1 : null, year = value ? value.getFullYear() : null;
-            if ($scope.month !== month && $scope.year !== year) {
-                $scope.days = dayList($scope.month, $scope.year);
-            }
-            $scope.day = day;
-            $scope.month = month;
-            $scope.year = year;
-        }
-        function setValue() {
-            var value;
-            if ($scope.day && $scope.month && $scope.year) {
-                value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
-                $scope.model = value;
-                $scope.ngChange();
-            }
-        }
-        $scope.onDayChanged = function () {
-            setValue();
+            return moment(date).fromNow(nowDate);
         };
-        $scope.onMonthChanged = function () {
-            adjustDay();
-            setValue();
+        DateFormat.prototype.getDateJSON = function (date) {
+            return JSON.stringify(moment(date));
         };
-        $scope.onYearChanged = function () {
-            adjustDay();
-            setValue();
-        };
-        value = $scope.model ? _.isDate($scope.model) ? $scope.model : new Date($scope.model) : null;
-        $scope.day = value ? value.getDate() : null;
-        $scope.month = value ? value.getMonth() + 1 : null;
-        $scope.year = value ? value.getFullYear() : null;
-        $scope.days = dayList($scope.month, $scope.year);
-        $scope.months = monthList();
-        $scope.years = yearList();
-        $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-        $scope.$watch('model', function (newValue) {
-            getValue(newValue);
+        return DateFormat;
+    }());
+    var DateFormatService = (function () {
+        function DateFormatService(_format) {
+            this._format = _format;
+        }
+        Object.defineProperty(DateFormatService.prototype, "defaultTimeZoneOffset", {
+            get: function () {
+                return this._format.defaultTimeZoneOffset;
+            },
+            set: function (value) {
+                this._format.defaultTimeZoneOffset = value;
+            },
+            enumerable: true,
+            configurable: true
         });
-        $scope.$watch($scope.disabled, function (newValue) {
-            $scope.disableControls = newValue;
-        });
-    }]);
+        DateFormatService.prototype.formatTime = function (value, format) {
+            return this._format.formatTime(value, format);
+        };
+        DateFormatService.prototype.formatDateOptional = function (value, format) {
+            return this._format.formatDateOptional(value, format);
+        };
+        DateFormatService.prototype.formatShortDate = function (value) {
+            return this._format.formatShortDate(value);
+        };
+        DateFormatService.prototype.formatMiddleDate = function (value) {
+            return this._format.formatMiddleDate(value);
+        };
+        DateFormatService.prototype.formatLongDate = function (value) {
+            return this._format.formatLongDate(value);
+        };
+        DateFormatService.prototype.formatMonth = function (value) {
+            return this._format.formatMonth(value);
+        };
+        DateFormatService.prototype.formatLongMonth = function (value) {
+            return this._format.formatLongMonth(value);
+        };
+        DateFormatService.prototype.formatYear = function (value) {
+            return this._format.formatYear(value);
+        };
+        DateFormatService.prototype.formatWeek = function (value) {
+            return this._format.formatWeek(value);
+        };
+        DateFormatService.prototype.formatShortWeek = function (value) {
+            return this._format.formatShortWeek(value);
+        };
+        DateFormatService.prototype.formatShortDateTime = function (value) {
+            return this._format.formatShortDateTime(value);
+        };
+        DateFormatService.prototype.formatMiddleDateTime = function (value) {
+            return this._format.formatMiddleDateTime(value);
+        };
+        DateFormatService.prototype.formatLongDateTime = function (value) {
+            return this._format.formatLongDateTime(value);
+        };
+        DateFormatService.prototype.formatFullDateTime = function (value) {
+            return this._format.formatFullDateTime(value);
+        };
+        DateFormatService.prototype.formatShortDateLongTime = function (value, firstTime) {
+            return this._format.formatShortDateLongTime(value, firstTime);
+        };
+        DateFormatService.prototype.formatMiddleDateLongTime = function (value, firstTime) {
+            return this._format.formatMiddleDateLongTime(value, firstTime);
+        };
+        DateFormatService.prototype.formatLongDateLongTime = function (value, firstTime) {
+            return this._format.formatLongDateLongTime(value, firstTime);
+        };
+        DateFormatService.prototype.bbFormatDateLongTime = function (value, firstTime) {
+            return this._format.bbFormatDateLongTime(value, firstTime);
+        };
+        DateFormatService.prototype.formatShortTime = function (value) {
+            return this._format.formatShortTime(value);
+        };
+        DateFormatService.prototype.formatLongTime = function (value) {
+            return this._format.formatLongTime(value);
+        };
+        DateFormatService.prototype.formatShortDayOfWeek = function (value) {
+            return this._format.formatShortDayOfWeek(value);
+        };
+        DateFormatService.prototype.formatLongDayOfWeek = function (value) {
+            return this._format.formatLongDayOfWeek(value);
+        };
+        DateFormatService.prototype.formatLongMonthDay = function (value) {
+            return this._format.formatLongMonthDay(value);
+        };
+        DateFormatService.prototype.formatShortMonthDay = function (value) {
+            return this._format.formatShortMonthDay(value);
+        };
+        DateFormatService.prototype.formatDateRange = function (value1, value2) {
+            return this._format.formatDateRange(value1, value2);
+        };
+        DateFormatService.prototype.formatDateTimeRange = function (value1, value2) {
+            return this._format.formatDateTimeRange(value1, value2);
+        };
+        DateFormatService.prototype.formatISOWeek = function (value) {
+            return this._format.formatISOWeek(value);
+        };
+        DateFormatService.prototype.formatShortISOWeek = function (value) {
+            return this._format.formatShortISOWeek(value);
+        };
+        DateFormatService.prototype.formatISOWeekOrdinal = function (value) {
+            return this._format.formatISOWeekOrdinal(value);
+        };
+        DateFormatService.prototype.formatDateY = function (value) {
+            return this._format.formatDateY(value);
+        };
+        DateFormatService.prototype.formatLongDateY = function (value) {
+            return this._format.formatLongDateY(value);
+        };
+        DateFormatService.prototype.formatTodayDateLongTimeLong = function (value) {
+            return this._format.formatTodayDateLongTimeLong(value);
+        };
+        DateFormatService.prototype.formatTodayDateShortTimeLong = function (value) {
+            return this._format.formatTodayDateShortTimeLong(value);
+        };
+        DateFormatService.prototype.formatTodayDateLongTimeShort = function (value) {
+            return this._format.formatTodayDateLongTimeShort(value);
+        };
+        DateFormatService.prototype.formatTodayDateShortTimeShort = function (value) {
+            return this._format.formatTodayDateShortTimeShort(value);
+        };
+        DateFormatService.prototype.formatMillisecondsToSeconds = function (value) {
+            return this._format.formatMillisecondsToSeconds(value);
+        };
+        DateFormatService.prototype.formatElapsedInterval = function (value, start) {
+            return this._format.formatElapsedInterval(value, start);
+        };
+        DateFormatService.prototype.getDateJSON = function (date) {
+            return this._format.getDateJSON(date);
+        };
+        return DateFormatService;
+    }());
+    var DateFormatProvider = (function (_super) {
+        __extends(DateFormatProvider, _super);
+        function DateFormatProvider() {
+            return _super.apply(this, arguments) || this;
+        }
+        DateFormatProvider.prototype.$get = function () {
+            "ngInject";
+            if (this._service == null)
+                this._service = new DateFormatService(this);
+            return this._service;
+        };
+        return DateFormatProvider;
+    }(DateFormat));
+    angular
+        .module('pipDate.Format', [])
+        .provider('pipDateFormat', DateFormatProvider);
 })();
-},{}],5:[function(require,module,exports){
+},{"./IDateConvertService":5}],5:[function(require,module,exports){
+"use strict";
+var DateRangeType = (function () {
+    function DateRangeType() {
+    }
+    return DateRangeType;
+}());
+DateRangeType.Year = 'year';
+DateRangeType.Month = 'month';
+DateRangeType.Week = 'week';
+DateRangeType.WeekFromSunday = 'isoweek';
+DateRangeType.Day = 'day';
+DateRangeType.All = ['year', 'month', 'week', 'isoweek', 'day'];
+exports.DateRangeType = DateRangeType;
+},{}],6:[function(require,module,exports){
+"use strict";
+},{}],7:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+angular.module('pipDate.Common', [
+    'pipDate.Convert',
+    'pipDate.Format',
+    'pipDate.Filter'
+]);
+require("./DateConvertService");
+require("./DateFormatFilter");
+require("./DateFormatService");
+require("./IDateConvertService");
+require("./IDateFormatService");
+__export(require("./IDateConvertService"));
+},{"./DateConvertService":2,"./DateFormatFilter":3,"./DateFormatService":4,"./IDateConvertService":5,"./IDateFormatService":6}],8:[function(require,module,exports){
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipDateRange', ['pipDates.Templates']);
-    thisModule.directive('pipDateRange', function () {
-        return {
-            restrict: 'EA',
-            require: 'ngModel',
-            scope: {
-                timeMode: '@pipTimeMode',
-                disabled: '&ngDisabled',
-                model: '=ngModel',
-                pipChanged: '&',
-                pipDateRangeType: '@',
-                pipDateFormat: '@',
-                pipNoLine: '@'
-            },
-            templateUrl: 'date_range_directive/date_range.html',
-            controller: 'pipDateRangeController'
+    var DateRangeBindings = {
+        timeMode: '@pipTimeMode',
+        disabled: '&ngDisabled',
+        model: '=ngModel',
+        pipChanged: '&',
+        type: '@pipDateRangeType',
+        pipDateFormat: '@',
+        pipNoLine: '@'
+    };
+    var DateRangeChanges = (function () {
+        function DateRangeChanges() {
+        }
+        return DateRangeChanges;
+    }());
+    var DateRangeController = (function () {
+        function DateRangeController($mdMedia, $timeout, $scope, $element, $rootScope, $injector) {
+            var _this = this;
+            this.$mdMedia = $mdMedia;
+            this.$timeout = $timeout;
+            this.prevState = {};
+            this.currentState = {};
+            this.localeDate = moment.localeData();
+            this.momentMonths = angular.isArray(this.localeDate._months) ? this.localeDate._months : this.localeDate._months.standalone;
+            this.momentDays = angular.isArray(this.localeDate._weekdays) ? this.localeDate._weekdays : this.localeDate._weekdays.format;
+            this.momentShortDays = this.localeDate._weekdaysMin;
+            this.momentFirstDayOfWeek = this.localeDate._week.dow;
+            this.currentDate = new Date();
+            this.currentYear = this.currentDate.getUTCFullYear();
+            this.currentMonth = this.currentDate.getUTCMonth() + 1;
+            this.currentDay = this.currentDate.getUTCDate();
+            this.init();
+            this.disableControls = this.disabled ? this.disabled() : false;
+            $scope.$watch('$ctrl.type', function (newValue, oldValue) {
+                if (newValue !== oldValue && oldValue) {
+                    _this.init();
+                }
+            });
+        }
+        DateRangeController.prototype.$onChanges = function (changes) {
+            if (changes.type && changes.type.currentValue) {
+                this.type = changes.type.currentValue;
+                this.init();
+            }
         };
-    });
-    thisModule.controller('pipDateRangeController', ['$scope', '$element', '$mdMedia', '$rootScope', '$injector', '$timeout', function ($scope, $element, $mdMedia, $rootScope, $injector, $timeout) {
-        var currentDate, currentYear, currentMonth, currentDay, prevState = {}, currentState = {}, localeDate = moment.localeData(), momentMonths = angular.isArray(localeDate._months) ? localeDate._months : localeDate._months.format, momentDays = angular.isArray(localeDate._weekdays) ? localeDate._weekdays : localeDate._weekdays.format, momentShortDays = localeDate._weekdaysMin, momentFirstDayOfWeek = localeDate._week.dow;
-        currentDate = new Date();
-        currentYear = currentDate.getUTCFullYear();
-        currentMonth = currentDate.getUTCMonth() + 1;
-        currentDay = currentDate.getUTCDate();
-        $scope.onDayChanged = function () {
-            setValue();
-        };
-        $scope.onMonthChanged = function () {
-            if ($scope.pipDateRangeType === 'weekly') {
-                var date, dayOfWeek;
-                date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
+        DateRangeController.prototype.onMonthChanged = function () {
+            if (this.type === 'weekly') {
+                var date = void 0, dayOfWeek = void 0;
+                date = new Date(Date.UTC(this.year, this.month - 1, 1));
                 dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
-                $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
-                correctWeek();
-                adjustWeek();
+                this.week = this.getWeekByDate(dayOfWeek, this.month - 1, this.year);
+                this.correctWeek();
+                this.adjustWeek();
             }
             else {
-                adjustDay();
+                this.adjustDay();
             }
-            setValue();
+            this.setValue();
         };
-        $scope.onYearChanged = function () {
+        DateRangeController.prototype.onYearChanged = function () {
             var date, dayOfWeek;
-            date = new Date(Date.UTC($scope.year, $scope.month - 1, 1));
+            date = new Date(Date.UTC(this.year, this.month - 1, 1));
             dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
-            if ($scope.pipDateRangeType === 'weekly') {
-                $scope.week = getWeekByDate(dayOfWeek, $scope.month - 1, $scope.year);
-                adjustWeek();
-                correctWeek();
+            if (this.type === 'weekly') {
+                this.week = this.getWeekByDate(dayOfWeek, this.month - 1, this.year);
+                this.adjustWeek();
+                this.correctWeek();
             }
             else {
-                adjustDay();
+                this.adjustDay();
             }
-            setValue();
+            this.setValue();
         };
-        $scope.onWeekChange = function () {
-            if ($scope.pipDateRangeType === 'weekly') {
-                adjustWeek();
-                correctWeek();
+        ;
+        DateRangeController.prototype.onWeekChange = function () {
+            if (this.type === 'weekly') {
+                this.adjustWeek();
+                this.correctWeek();
             }
             else {
-                adjustDay();
+                this.adjustDay();
             }
-            setValue();
+            this.setValue();
         };
-        $scope.isDay = function () {
-            return $scope.pipDateRangeType === 'daily';
+        ;
+        DateRangeController.prototype.isDay = function () {
+            return this.type === 'daily';
         };
-        $scope.isWeek = function () {
-            return $scope.pipDateRangeType === 'weekly';
+        ;
+        DateRangeController.prototype.isWeek = function () {
+            return this.type === 'weekly';
         };
-        $scope.isMonth = function () {
-            return $scope.pipDateRangeType === 'daily' ||
-                $scope.pipDateRangeType === 'weekly' ||
-                $scope.pipDateRangeType === 'monthly';
+        ;
+        DateRangeController.prototype.isMonth = function () {
+            return this.type === 'daily' ||
+                this.type === 'weekly' ||
+                this.type === 'monthly';
         };
-        $scope.onChange = function () {
-            if ($scope.pipChanged) {
-                $timeout(function () {
-                    $scope.pipChanged();
+        ;
+        DateRangeController.prototype.onChange = function () {
+            var _this = this;
+            if (this.pipChanged) {
+                this.$timeout(function () {
+                    _this.pipChanged();
                 }, 0);
             }
         };
-        function setCurrent() {
-            currentState.day = $scope.day;
-            currentState.month = $scope.month;
-            currentState.year = $scope.year;
-            currentState.week = $scope.week;
-            currentState.dateRangeType = $scope.pipDateRangeType;
-            currentState.model = $scope.model;
-        }
-        function fillLists() {
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.weeks = weekList($scope.month, $scope.year);
-            $scope.months = monthList();
-            $scope.shortMonths = monthList();
-            $scope.years = yearList();
-        }
-        function correctWeek() {
-            if (!prevState.model || prevState.model && prevState.model.getTime() >= $scope.model.getTime()) {
-                if ($scope.weeks && $scope.weeks[$scope.week] && $scope.weeks[$scope.week].id <= 0) {
-                    if ($scope.month < 12) {
-                        $scope.month += 1;
+        ;
+        DateRangeController.prototype.setCurrent = function () {
+            this.currentState.day = this.day;
+            this.currentState.month = this.month;
+            this.currentState.year = this.year;
+            this.currentState.week = this.week;
+            this.currentState.dateRangeType = this.type;
+            this.currentState.model = this.model;
+        };
+        DateRangeController.prototype.fillLists = function () {
+            this.days = this.dayList(this.month, this.year);
+            this.weeks = this.weekList(this.month, this.year);
+            this.months = this.monthList();
+            this.shortMonths = this.monthList();
+            this.years = this.yearList();
+        };
+        DateRangeController.prototype.correctWeek = function () {
+            if (!this.prevState.model || this.prevState.model && this.prevState.model.getTime() >= this.model.getTime()) {
+                if (this.weeks && this.weeks[this.week] && this.weeks[this.week].id <= 0) {
+                    if (this.month < 12) {
+                        this.month += 1;
                     }
                     else {
-                        $scope.month = 1;
-                        $scope.year += 1;
+                        this.month = 1;
+                        this.year += 1;
                     }
-                    fillLists();
+                    this.fillLists();
                 }
             }
-        }
-        function init() {
+        };
+        DateRangeController.prototype.init = function () {
             var value;
-            value = $scope.model ? new Date($scope.model) : null;
-            $scope.day = value ? value.getUTCDate() : null;
-            $scope.month = value ? value.getUTCMonth() + 1 : null;
-            $scope.year = value ? value.getUTCFullYear() : null;
-            $scope.week = value ? getWeekByDate($scope.day, $scope.month - 1, $scope.year) : null;
-            fillLists();
-            if ($scope.pipDateRangeType === 'weekly') {
-                correctWeek();
-                adjustWeek();
+            value = this.model ? new Date(this.model) : null;
+            this.day = value ? value.getUTCDate() : null;
+            this.month = value ? value.getUTCMonth() + 1 : null;
+            this.year = value ? value.getUTCFullYear() : null;
+            this.week = value ? this.getWeekByDate(this.day, this.month - 1, this.year) : null;
+            this.fillLists();
+            if (this.type === 'weekly') {
+                this.correctWeek();
             }
-            else {
-                adjustDay();
-            }
-            setValue();
-        }
-        $scope.$mdMedia = $mdMedia;
-        init();
-        $scope.disableControls = $scope.disabled ? $scope.disabled() : false;
-        $scope.$watch('model', function (newValue, oldValue) {
-            if (newValue !== oldValue) {
-                getValue(newValue);
-            }
-        });
-        $scope.$watch($scope.disabled, function (newValue) {
-            $scope.disableControls = newValue;
-        });
-        $scope.$watch('pipDateRangeType', function (newValue, oldValue) {
-            if (newValue !== oldValue && oldValue) {
-                init();
-            }
-        });
-        $scope.onYearClick = function () {
-            if (!$scope.year) {
-                $scope.year = currentYear;
+            this.adjustWeek();
+            this.setValue();
+        };
+        DateRangeController.prototype.onYearClick = function () {
+            if (!this.year) {
+                this.year = this.currentYear;
             }
         };
-        $scope.onMonthClick = function () {
-            if (!$scope.month) {
-                $scope.month = currentMonth;
+        ;
+        DateRangeController.prototype.onMonthClick = function () {
+            if (!this.month) {
+                this.month = this.currentMonth;
             }
         };
-        $scope.onDayClick = function () {
-            if (!$scope.year) {
-                $scope.day = currentDay;
+        ;
+        DateRangeController.prototype.onDayClick = function () {
+            if (!this.year) {
+                this.day = this.currentDay;
             }
         };
-        function getCountDay(month, year) {
+        ;
+        DateRangeController.prototype.getCountDay = function (month, year) {
             var count = 31;
             if (month === 4 || month === 6 || month === 9 || month === 11) {
                 count = 30;
+                return count;
             }
-            else if (month === 2) {
+            if (month === 2) {
                 if (year) {
                     count = year % 4 === 0 ? 29 : 28;
+                    return count;
                 }
-                else {
-                    count = 28;
-                }
+                count = 28;
             }
             return count;
-        }
-        function dayList(month, year) {
-            var count, days, i, ln;
-            count = getCountDay(month, year);
-            $scope.nameDays = [];
+        };
+        DateRangeController.prototype.dayList = function (month, year) {
+            var count, days;
+            count = this.getCountDay(month, year);
+            this.nameDays = [];
             days = [];
-            for (i = 1; i <= count; i++) {
+            for (var i = 1; i <= count; i++) {
                 days.push(i);
-                $scope.nameDays.push(momentShortDays[moment([year, month - 1, i]).weekday()]);
+                this.nameDays.push(this.momentShortDays[moment([year, month - 1, i]).weekday()]);
             }
             return days;
-        }
-        function getWeekByDate(day, month, year) {
+        };
+        DateRangeController.prototype.getWeekByDate = function (day, month, year) {
             var date, dayOfWeek, startWeek;
             date = new Date(Date.UTC(year, month, day));
             dayOfWeek = date.getUTCDay() ? date.getUTCDay() : 7;
@@ -6181,456 +6645,488 @@ angular
                 startWeek = day + 1 - dayOfWeek;
             }
             return startWeek;
-        }
-        function getWeek(day, countDay, countPrevMonthDay) {
+        };
+        DateRangeController.prototype.getWeek = function (day, countDay, countPrevMonthDay) {
             var endDay, startDay;
             endDay = day + 6 > countDay ? countDay - day - 6 : day + 6;
             startDay = day > 0 ? day : countPrevMonthDay + day;
             return startDay.toString() + ' - ' + (Math.abs(endDay)).toString();
-        }
-        function weekList(month, year) {
+        };
+        DateRangeController.prototype.weekList = function (month, year) {
             var weeks, countDay, countPrevMonthDay, startWeek;
             weeks = [];
-            countDay = getCountDay(month, year);
-            startWeek = getWeekByDate(1, month - 1, year);
-            countPrevMonthDay = month - 1 ? getCountDay(month - 1, year) : getCountDay(12, year - 1);
+            countDay = this.getCountDay(month, year);
+            startWeek = this.getWeekByDate(1, month - 1, year);
+            countPrevMonthDay = month - 1 ? this.getCountDay(month - 1, year) : this.getCountDay(12, year - 1);
             while (startWeek < countDay + 1) {
                 weeks.push({
                     id: startWeek,
-                    name: getWeek(startWeek, countDay, countPrevMonthDay)
+                    name: this.getWeek(startWeek, countDay, countPrevMonthDay)
                 });
                 startWeek = startWeek + 7;
             }
             return weeks;
-        }
-        function monthList() {
-            var months = [], i;
-            for (i = 1; i <= 12; i++) {
+        };
+        DateRangeController.prototype.monthList = function () {
+            var months = [];
+            for (var i = 1; i <= 12; i++) {
                 months.push({
                     id: i,
-                    name: momentMonths[i - 1]
+                    name: this.momentMonths[i - 1]
                 });
             }
             return months;
-        }
-        function yearList() {
-            var startYear, i, endYear, years = [];
-            switch ($scope.timeMode) {
+        };
+        DateRangeController.prototype.yearList = function () {
+            var startYear, endYear, years = [];
+            switch (this.timeMode) {
                 case 'future':
-                    startYear = currentYear;
-                    endYear = currentYear + 100;
+                    startYear = this.currentYear;
+                    endYear = this.currentYear + 100;
                     break;
                 case 'past':
-                    startYear = currentYear - 100;
-                    endYear = currentYear;
+                    startYear = this.currentYear - 100;
+                    endYear = this.currentYear;
                     break;
                 case 'now':
-                    startYear = currentYear - 50;
-                    endYear = currentYear + 100;
+                    startYear = this.currentYear - 50;
+                    endYear = this.currentYear + 100;
                     break;
                 default:
-                    startYear = currentYear - 50;
-                    endYear = currentYear + 50;
+                    startYear = this.currentYear - 50;
+                    endYear = this.currentYear + 50;
                     break;
             }
-            if ($scope.timeMode === 'future') {
-                for (i = startYear; i <= endYear; i++) {
+            if (this.timeMode === 'future') {
+                for (var i = startYear; i <= endYear; i++) {
                     years.push(i);
                 }
             }
             else {
-                for (i = endYear; i >= startYear; i--) {
+                for (var i = endYear; i >= startYear; i--) {
                     years.push(i);
                 }
             }
             return years;
-        }
-        function adjustDay() {
-            var days = dayList($scope.month, $scope.year);
-            switch ($scope.pipDateRangeType) {
+        };
+        DateRangeController.prototype.adjustDay = function () {
+            var days = this.dayList(this.month, this.year);
+            switch (this.type) {
                 case 'monthly':
-                    $scope.day = 1;
+                    this.day = 1;
                     break;
                 case 'yearly':
-                    $scope.month = 1;
-                    $scope.day = 1;
+                    this.month = 1;
+                    this.day = 1;
                     break;
                 default:
-                    if ($scope.days.length !== days.length) {
-                        if ($scope.day > days.length) {
-                            $scope.day = days.length;
+                    if (this.days.length !== days.length) {
+                        if (this.day > days.length) {
+                            this.day = days.length;
                         }
                     }
                     break;
             }
-            $scope.days = days;
-        }
-        function adjustWeek() {
-            var weeks;
-            weeks = weekList($scope.month, $scope.year);
-            $scope.week = getWeekByDate($scope.week, $scope.month - 1, $scope.year);
-            $scope.weeks = weeks;
-        }
-        function getValue(v) {
+            this.days = days;
+        };
+        DateRangeController.prototype.adjustWeek = function () {
+            var weeks = this.weekList(this.month, this.year);
+            this.week = this.getWeekByDate(this.week, this.month - 1, this.year);
+            this.weeks = weeks;
+        };
+        DateRangeController.prototype.getValue = function (v) {
             var value, day, month, year, week;
             value = v ? new Date(v) : null;
             day = value ? value.getUTCDate() : null;
             month = value ? value.getUTCMonth() + 1 : null;
             year = value ? value.getUTCFullYear() : null;
-            week = value ? getWeekByDate(day, month - 1, year) : null;
-            if ($scope.day === day && $scope.month === month && $scope.year === year && $scope.week === week) {
+            week = value ? this.getWeekByDate(day, month - 1, year) : null;
+            if (this.day === day && this.month === month && this.year === year && this.week === week) {
                 return;
             }
-            $scope.day = day;
-            $scope.month = month;
-            $scope.year = year;
-            $scope.week = week;
-            $scope.days = dayList($scope.month, $scope.year);
-            $scope.weeks = weekList($scope.month, $scope.year);
-        }
-        function setValue() {
+            this.day = day;
+            this.month = month;
+            this.year = year;
+            this.week = week;
+            this.days = this.dayList(this.month, this.year);
+            this.weeks = this.weekList(this.month, this.year);
+        };
+        DateRangeController.prototype.setValue = function () {
             var value;
-            if ($scope.pipDateRangeType === 'weekly') {
-                value = new Date($scope.year, $scope.month - 1, $scope.week, 0, 0, 0, 0);
+            if (this.type === 'weekly') {
+                value = new Date(this.year, this.month - 1, this.week, 0, 0, 0, 0);
                 value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
-                $scope.model = value;
+                this.model = value;
             }
             else {
-                value = new Date($scope.year, $scope.month - 1, $scope.day, 0, 0, 0, 0);
+                value = new Date(this.year, this.month - 1, this.day, 0, 0, 0, 0);
                 value = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
-                $scope.model = value;
+                this.model = value;
             }
-            prevState = _.cloneDeep(currentState);
-            setCurrent();
-            $scope.onChange();
-        }
-    }]);
+            this.prevState = _.cloneDeep(this.currentState);
+            this.setCurrent();
+            this.onChange();
+        };
+        return DateRangeController;
+    }());
+    var daterange = {
+        bindings: DateRangeBindings,
+        templateUrl: 'date_range/DateRange.html',
+        controller: DateRangeController
+    };
+    angular
+        .module('pipDateRange', ['pipDates.Templates'])
+        .component('pipDateRange', daterange);
 })();
-},{}],6:[function(require,module,exports){
-'use strict';
+},{}],9:[function(require,module,exports){
+{
+    translateFilter.$inject = ['$injector'];
+    function translateFilter($injector) {
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
+        return function (key) {
+            return pipTranslate ? pipTranslate.translate(key) || key : key;
+        };
+    }
+    angular
+        .module('pipDates.Translate', [])
+        .filter('translate', translateFilter);
+}
+},{}],10:[function(require,module,exports){
 angular.module('pipDates', [
     'pipDate',
+    'pipDate.Common',
     'pipTimeRange',
-    'pipDateTime',
     'pipTimeRangeEdit',
     'pipDateRange',
     'pipDates.Translate'
 ]);
-},{}],7:[function(require,module,exports){
-/**
- * @file Optional filter to translate string resources
- * @copyright Digital Living Software Corp. 2014-2016
- */
- 
-/* global angular */
-
+},{}],11:[function(require,module,exports){
 (function () {
-    'use strict';
-
-    var thisModule = angular.module('pipDates.Translate', []);
-
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') 
-            ? $injector.get('pipTranslate') : null;
-
-        return function (key) {
-            return pipTranslate  ? pipTranslate.translate(key) || key : key;
+    var TimeRangeData = (function () {
+        function TimeRangeData() {
         }
-    }]);
-
-})();
-
-},{}],8:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipTimeRange', []);
-    thisModule.directive('pipTimeRange', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipStartDate: '=',
-                pipEndDate: '='
-            },
-            templateUrl: 'time_range_directive/time_range.html',
-            link: function ($scope, $element, $attrs) {
-                function getDateJSON(value) {
-                    return value ? new Date(value) : null;
-                }
-                function defineStartDate() {
-                    if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                        $scope.data.start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate
-                            : getDateJSON($scope.pipStartDate);
-                    }
-                }
-                function defineEndDate() {
-                    if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                        $scope.data.end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate
-                            : getDateJSON($scope.pipEndDate);
-                    }
-                }
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                $scope.data = {};
-                $scope.data.start = null;
-                $scope.data.end = null;
-                defineStartDate();
-                defineEndDate();
-                if (toBoolean($attrs.pipRebind)) {
-                    $scope.$watch('pipStartDate', function () {
-                        $scope.data.start = null;
-                        defineStartDate();
-                    });
-                    $scope.$watch('pipEndDate', function () {
-                        $scope.data.end = null;
-                        defineEndDate();
-                    });
-                }
-                $element.addClass('pip-time-range');
+        return TimeRangeData;
+    }());
+    var TimeRangeBindings = {
+        start: '<?pipStartDate',
+        end: '<?pipEndDate'
+    };
+    var TimeRangeChanges = (function () {
+        function TimeRangeChanges() {
+        }
+        return TimeRangeChanges;
+    }());
+    var TimeRangeController = (function () {
+        function TimeRangeController($scope, $attrs, $element) {
+            this.data = new TimeRangeData();
+            this.defineStartDate();
+            this.defineEndDate();
+            $element.addClass('pip-time-range');
+        }
+        TimeRangeController.prototype.$onChanges = function (changes) {
+            if (changes.start && changes.start.currentValue) {
+                this.data.start = null;
+                this.defineStartDate();
+            }
+            if (changes.end && changes.end.currentValue) {
+                this.data.end = null;
+                this.defineEndDate();
             }
         };
-    });
-})();
-},{}],9:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipTimeRangeEdit', []);
-    thisModule.directive('pipTimeRangeEdit', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipStartDate: '=',
-                pipChanged: '&',
-                pipEndDate: '=',
-                pipStartLabel: '@',
-                pipEndLabel: '@',
-                disabled: '&ngDisabled',
-                pipHideTime: '=',
-                pipSize: '='
-            },
-            templateUrl: 'time_range_edit_directive/time_range_edit.html',
-            controller: 'pipTimeRangeEditController'
-        };
-    });
-    thisModule.controller('pipTimeRangeEditController', ['$scope', '$element', '$attrs', '$injector', 'pipDateTime', function ($scope, $element, $attrs, $injector, pipDateTime) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                EVENT_NEW_START_TIME: 'Start time',
-                EVENT_NEW_END_TIME: 'End time'
-            });
-            pipTranslate.setTranslations('ru', {
-                EVENT_NEW_START_TIME: 'Начало',
-                EVENT_NEW_END_TIME: 'Конец'
-            });
-            $scope.startLabel = $scope.pipStartLabel ? pipTranslate.translate($scope.pipStartLabel)
-                : pipTranslate.translate('EVENT_NEW_START_TIME');
-            $scope.endLabel = $scope.pipEndLabel ? pipTranslate.translate($scope.pipEndLabel)
-                : pipTranslate.translate('EVENT_NEW_END_TIME');
-        }
-        else {
-            $scope.startLabel = $scope.pipStartLabel ? $scope.pipStartLabel : 'Start time';
-            $scope.endLabel = $scope.pipEndLabel ? $scope.pipEndLabel : 'End time';
-        }
-        function getDateJSON(value) {
+        TimeRangeController.prototype.getDateJSON = function (value) {
             return value ? new Date(value) : null;
-        }
-        function setDuration() {
-            var start, end;
-            if (!$scope.data.startDate || !$scope.data.endDate) {
-                return null;
+        };
+        TimeRangeController.prototype.defineStartDate = function () {
+            if (this.start !== null && this.start !== undefined) {
+                this.data.start = _.isDate(this.start) ? this.start
+                    : this.getDateJSON(this.start);
             }
-            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-            end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-            return end - start;
-        }
-        function validateStartDate() {
-            var date, start, end;
-            if (!$scope.data.startDate) {
-                $scope.data.startTime = null;
-                return;
+        };
+        TimeRangeController.prototype.defineEndDate = function () {
+            if (this.end !== null && this.end !== undefined) {
+                this.data.end = _.isDate(this.end) ? this.end
+                    : this.getDateJSON(this.end);
             }
-            if ($scope.data.startTime === undefined || $scope.data.startTime === null) {
-                if (!$scope.data.endTime) {
-                    date = new Date();
-                    date = date.getTime() - pipDateTime.toStartDay(date);
-                    $scope.data.startTime = Math.floor(date / (30 * 60 * 1000)) * 30;
-                }
-                else {
-                    $scope.data.startTime = $scope.data.endTime === 0 ? 0 : $scope.data.endTime - 30;
-                }
-            }
-            if (!$scope.data.endDate) {
-                $scope.data.endTime = null;
-                return;
-            }
-            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-            if ($scope.data.duration) {
-                end = new Date(start.getTime() + $scope.data.duration);
-                $scope.data.endDate = pipDateTime.toStartDay(end);
-                end = end.getTime() - $scope.data.endDate.getTime();
-                $scope.data.endTime = Math.floor(end / (30 * 60 * 1000)) * 30;
-            }
-            else {
-                end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-                if (start >= end) {
-                    $scope.data.endDate = pipDateTime.toStartDay(new Date(start.getTime() + 30 * 60000));
-                    $scope.data.endTime = ($scope.data.startTime + 30) % 1440;
-                }
-            }
-        }
-        function validateEndDate() {
-            var date, start, end;
-            if (!$scope.data.endDate) {
-                $scope.data.endTime = null;
-                return;
-            }
-            if ($scope.data.endTime === undefined || $scope.data.endTime === null) {
-                if (!$scope.data.startTime) {
-                    date = new Date();
-                    date = date.getTime() - pipDateTime.toStartDay(date);
-                    $scope.data.endTime = Math.floor(date / (30 * 60 * 1000)) * 30;
-                }
-                else {
-                    $scope.data.endTime = $scope.data.startTime === 1410 ? 1410 : $scope.data.startTime + 30;
-                }
-            }
-            if (!$scope.data.startDate) {
-                $scope.data.startTime = null;
-                return;
-            }
-            start = new Date($scope.data.startDate.getTime() + $scope.data.startTime * 60 * 1000);
-            end = new Date($scope.data.endDate.getTime() + $scope.data.endTime * 60 * 1000);
-            if (start >= end) {
-                $scope.data.startDate = pipDateTime.toStartDay(new Date(end.getTime() - 30 * 60000));
-                $scope.data.startTime = $scope.data.endTime % 1440 === 0 ? 1410 : $scope.data.endTime - 30;
-            }
-            $scope.data.duration = setDuration();
-        }
-        function setDate() {
-            var time;
-            $scope.data.bind = false;
-            if ($scope.data.startDate) {
-                time = $scope.data.startTime ? $scope.data.startTime * 60 * 1000 : 0;
-                console.log('time', $scope.data.startTime);
-                $scope.pipStartDate = new Date($scope.data.startDate.getTime() + time);
-            }
-            if ($scope.data.endDate) {
-                time = $scope.data.endTime ? $scope.data.endTime * 60 * 1000 : 0;
-                $scope.pipEndDate = new Date($scope.data.endDate.getTime() + time);
-            }
-            $scope.data.bind = true;
-        }
-        function defineDate() {
-            var start, end;
-            if ($scope.pipStartDate !== null && $scope.pipStartDate !== undefined) {
-                start = _.isDate($scope.pipStartDate) ? $scope.pipStartDate : null;
-                if (!start) {
-                    start = getDateJSON($scope.pipStartDate);
-                }
-                $scope.data.startDate = pipDateTime.toStartDay(start);
-                $scope.data.startTime = (new Date(start) - $scope.data.startDate) / (60 * 1000);
-            }
-            if ($scope.pipEndDate !== null && $scope.pipEndDate !== undefined) {
-                end = _.isDate($scope.pipEndDate) ? $scope.pipEndDate : null;
-                if (!start) {
-                    end = getDateJSON($scope.pipEndDate);
-                }
-                $scope.data.endDate = pipDateTime.toStartDay(end);
-                $scope.data.endTime = (new Date(end) - $scope.data.endDate) / (60 * 1000);
-            }
-            validateStartDate();
-            $scope.data.duration = setDuration();
-            setDate();
-        }
-        function getTimeInterval() {
-            var result, i, j, minutes;
-            result = [];
-            for (i = 0; i < 24; i++) {
-                for (j = 0; j < 2; j++) {
-                    minutes = j * 30;
-                    result.push({
-                        id: i * 60 + minutes,
-                        time: _.pad(i.toString(), 3, '0').substr(0, 2) + ':' + _.pad(minutes.toString(), 2, '0')
-                    });
-                }
-            }
-            return result;
-        }
-        function toBoolean(value) {
+        };
+        TimeRangeController.prototype.toBoolean = function (value) {
             if (value == null)
                 return false;
             if (!value)
                 return false;
             value = value.toString().toLowerCase();
             return value == '1' || value == 'true';
+        };
+        return TimeRangeController;
+    }());
+    var TimeRangeComponent = {
+        bindings: TimeRangeBindings,
+        templateUrl: 'time_range/TimeRange.html',
+        controller: TimeRangeController
+    };
+    angular.module('pipTimeRange', [])
+        .component('pipTimeRange', TimeRangeComponent);
+})();
+},{}],12:[function(require,module,exports){
+"use strict";
+exports.IntervalTimeRange = 30;
+exports.MinutesInHour = 60;
+exports.HoursInDay = 24;
+exports.MillisecondsInSecond = 1000;
+{
+    var TimeRangeEditData_1 = (function () {
+        function TimeRangeEditData_1() {
+            this.bind = false;
         }
-        function initDate() {
-            $scope.data.startDate = null;
-            $scope.data.startTime = null;
-            $scope.data.endDate = null;
-            $scope.data.endTime = null;
-            $scope.data.duration = null;
-            $scope.showTime = !toBoolean($scope.pipHideTime);
+        return TimeRangeEditData_1;
+    }());
+    var TimeRangeEditBindings = {
+        pipStartDate: '<',
+        pipChanged: '=',
+        pipEndDate: '<',
+        pipStartLabel: '@',
+        pipEndLabel: '@',
+        disabled: '&ngDisabled',
+        pipHideTime: '=',
+        pipSize: '='
+    };
+    var TimeRangeEditChanges = (function () {
+        function TimeRangeEditChanges() {
         }
-        $scope.intervalTimeCollection = getTimeInterval();
-        $scope.data = {};
-        initDate();
-        defineDate();
-        $scope.onChangeStartDate = function (newV) {
-            validateStartDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
-        };
-        $scope.onChangeEndDate = function () {
-            validateEndDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
-        };
-        $scope.onChangeStartTime = function () {
-            if (!$scope.data.startDate) {
-                $scope.data.startDate = pipDateTime.toStartDay(new Date());
+        return TimeRangeEditChanges;
+    }());
+    var TimeRangeEditController = (function () {
+        function TimeRangeEditController($injector, pipDateConvert, $scope, $element) {
+            this.$injector = $injector;
+            this.pipDateConvert = pipDateConvert;
+            this.$scope = $scope;
+            this.startLabel = 'Start time';
+            this.endLabel = 'End time';
+            this.translate();
+            this.intervalTimeCollection = this.getTimeInterval();
+            this.data = new TimeRangeEditData_1();
+            this.initDate();
+            this.defineDate();
+            $element.addClass('pip-time-range-edit');
+        }
+        TimeRangeEditController.prototype.$onChanges = function (changes) {
+            if (changes.pipStartDate && changes.pipStartDate.currentValue) {
+                this.pipStartDate = changes.pipStartDate.currentValue;
+                this.initDate();
+                this.defineDate();
             }
-            validateStartDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
-        };
-        $scope.onChangeEndTime = function () {
-            if (!$scope.data.endDate) {
-                $scope.data.endDate = pipDateTime.toStartDay(new Date());
+            if (changes.pipEndDate && changes.pipEndDate.currentValue) {
+                this.pipEndDate = changes.pipEndDate.currentValue;
+                this.initDate();
+                this.defineDate();
             }
-            validateEndDate();
-            $scope.data.duration = setDuration();
-            setDate();
-            $scope.pipChanged();
         };
-        $scope.isDisabled = function () {
-            if ($scope.disabled) {
-                return $scope.disabled();
+        TimeRangeEditController.prototype.translate = function () {
+            var pipTranslate = this.$injector.has('pipTranslate') ? this.$injector.get('pipTranslate') : null;
+            if (pipTranslate) {
+                pipTranslate.setTranslations('en', {
+                    EVENT_NEW_START_TIME: 'Start time',
+                    EVENT_NEW_END_TIME: 'End time'
+                });
+                pipTranslate.setTranslations('ru', {
+                    EVENT_NEW_START_TIME: 'Начало',
+                    EVENT_NEW_END_TIME: 'Конец'
+                });
+                this.startLabel = this.pipStartLabel ? pipTranslate.translate(this.pipStartLabel)
+                    : pipTranslate.translate('EVENT_NEW_START_TIME');
+                this.endLabel = this.pipEndLabel ? pipTranslate.translate(this.pipEndLabel)
+                    : pipTranslate.translate('EVENT_NEW_END_TIME');
+            }
+        };
+        TimeRangeEditController.prototype.getDateJSON = function (value) {
+            return value ? new Date(value) : null;
+        };
+        TimeRangeEditController.prototype.setDuration = function () {
+            var start, end;
+            if (!this.data.startDate || !this.data.endDate) {
+                return null;
+            }
+            start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            return end - start;
+        };
+        TimeRangeEditController.prototype.validateStartDate = function () {
+            var date, start, end, endTime, startTime;
+            if (!this.data.startDate) {
+                this.data.startTime = null;
+                return;
+            }
+            if (_.isUndefined(this.data.startTime) || _.isNull(this.data.startTime)) {
+                if (!this.data.endTime) {
+                    start = new Date();
+                    startTime = date.getTime() - this.pipDateConvert.toStartDay(date);
+                    this.data.startTime = Math.floor(startTime / (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)) * exports.IntervalTimeRange;
+                }
+                else {
+                    this.data.startTime = this.data.endTime === 0 ? 0 : this.data.endTime - exports.IntervalTimeRange;
+                }
+            }
+            start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            if (this.data.duration) {
+                end = new Date(start.getTime() + this.data.duration);
+                this.data.endDate = this.pipDateConvert.toStartDay(end);
+                endTime = end.getTime() - this.data.endDate.getTime();
+                this.data.endTime = Math.floor(endTime / (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)) * exports.IntervalTimeRange;
+            }
+            else {
+                end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+                if (start >= end) {
+                    this.data.endDate = this.pipDateConvert.toStartDay(new Date(start.getTime() + (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)));
+                    this.data.endTime = (this.data.startTime + exports.IntervalTimeRange) % (exports.HoursInDay * exports.MinutesInHour);
+                }
+            }
+            this.data.startTime = Math.round(this.data.startTime / exports.IntervalTimeRange) * exports.IntervalTimeRange;
+        };
+        TimeRangeEditController.prototype.validateEndDate = function () {
+            var date, start, end;
+            if (!this.data.endDate) {
+                this.data.endTime = null;
+                return;
+            }
+            if (_.isUndefined(this.data.endTime) || _.isNull(this.data.endTime)) {
+                if (!this.data.startTime) {
+                    date = new Date();
+                    date = date.getTime() - this.pipDateConvert.toStartDay(date);
+                    this.data.endTime = Math.floor(date / (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)) * exports.IntervalTimeRange;
+                }
+                else {
+                    this.data.endTime = this.data.startTime === (exports.HoursInDay * exports.MinutesInHour - exports.IntervalTimeRange) ? (exports.HoursInDay * exports.MinutesInHour - exports.IntervalTimeRange) : this.data.startTime + exports.IntervalTimeRange;
+                }
+            }
+            start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            if (start >= end) {
+                this.data.startDate = this.pipDateConvert.toStartDay(new Date(end.getTime() - exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond));
+                this.data.startTime = this.data.endTime % (exports.HoursInDay * exports.MinutesInHour) === 0 ? (exports.HoursInDay * exports.MinutesInHour - exports.IntervalTimeRange) : this.data.endTime - exports.IntervalTimeRange;
+            }
+            this.data.endTime = Math.round(this.data.endTime / exports.IntervalTimeRange) * exports.IntervalTimeRange;
+            this.data.duration = this.setDuration();
+        };
+        TimeRangeEditController.prototype.setDate = function () {
+            var time;
+            if (!this.data)
+                this.data = new TimeRangeEditData_1();
+            this.data.bind = false;
+            if (this.data.startDate) {
+                time = this.data.startTime ? this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond : 0;
+                this.pipStartDate = new Date(this.data.startDate.getTime() + time);
+            }
+            if (this.data.endDate) {
+                time = this.data.endTime ? this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond : 0;
+                this.pipEndDate = new Date(this.data.endDate.getTime() + time);
+            }
+            this.data.bind = true;
+        };
+        TimeRangeEditController.prototype.defineDate = function () {
+            var start, end;
+            if (this.pipStartDate !== null && this.pipStartDate !== undefined) {
+                start = _.isDate(this.pipStartDate) ? this.pipStartDate : null;
+                if (!start) {
+                    start = this.getDateJSON(this.pipStartDate);
+                }
+                this.data.startDate = this.pipDateConvert.toStartDay(start);
+                this.data.startTime = (new Date(start) - this.data.startDate) / (exports.MinutesInHour * exports.MillisecondsInSecond);
+            }
+            if (this.pipEndDate !== null && this.pipEndDate !== undefined) {
+                end = _.isDate(this.pipEndDate) ? this.pipEndDate : null;
+                if (!end) {
+                    end = this.getDateJSON(this.pipEndDate);
+                }
+                this.data.endDate = this.pipDateConvert.toStartDay(end);
+                this.data.endTime = (new Date(end) - this.data.endDate) / (exports.MinutesInHour * exports.MillisecondsInSecond);
+            }
+            this.validateStartDate();
+            this.validateEndDate();
+            this.data.duration = this.setDuration();
+            this.setDate();
+        };
+        TimeRangeEditController.prototype.getTimeInterval = function () {
+            var result, minutes;
+            result = [];
+            for (var i = 0; i < 24; i++) {
+                for (var j = 0; j < 2; j++) {
+                    minutes = j * exports.IntervalTimeRange;
+                    result.push({
+                        id: i * exports.MinutesInHour + minutes,
+                        time: _.pad(i.toString(), 3, '0').substr(0, 2) + ':' + _.pad(minutes.toString(), 2, '0')
+                    });
+                }
+            }
+            return result;
+        };
+        TimeRangeEditController.prototype.toBoolean = function (value) {
+            if (value == null)
+                return false;
+            if (!value)
+                return false;
+            value = value.toString().toLowerCase();
+            return value == '1' || value == 'true';
+        };
+        TimeRangeEditController.prototype.initDate = function () {
+            this.data.startDate = null;
+            this.data.startTime = null;
+            this.data.endDate = null;
+            this.data.endTime = null;
+            this.data.duration = null;
+            this.showTime = !this.toBoolean(this.pipHideTime);
+        };
+        TimeRangeEditController.prototype.onChangeStartDate = function (newV) {
+            this.validateStartDate();
+            this.data.duration = this.setDuration();
+            this.setDate();
+            this.pipChanged(this.pipStartDate, this.pipEndDate);
+        };
+        ;
+        TimeRangeEditController.prototype.onChangeEndDate = function () {
+            this.validateEndDate();
+            this.data.duration = this.setDuration();
+            this.setDate();
+            this.pipChanged(this.pipStartDate, this.pipEndDate);
+        };
+        ;
+        TimeRangeEditController.prototype.onChangeStartTime = function () {
+            if (!this.data.startDate) {
+                this.data.startDate = this.pipDateConvert.toStartDay(new Date());
+            }
+            this.validateStartDate();
+            this.data.duration = this.setDuration();
+            this.setDate();
+            this.pipChanged(this.pipStartDate, this.pipEndDate);
+        };
+        ;
+        TimeRangeEditController.prototype.onChangeEndTime = function () {
+            if (!this.data.endDate) {
+                this.data.endDate = this.pipDateConvert.toStartDay(new Date());
+            }
+            this.validateEndDate();
+            this.data.duration = this.setDuration();
+            this.setDate();
+            this.pipChanged(this.pipStartDate, this.pipEndDate);
+        };
+        ;
+        TimeRangeEditController.prototype.isDisabled = function () {
+            if (this.disabled) {
+                return this.disabled();
             }
             return false;
         };
-        $scope.$watchGroup([$scope.pipStartDate, $scope.pipEndDate], function () {
-            if ($scope.data.bind) {
-                initDate();
-                defineDate();
-            }
-        });
-        $scope.$watch($scope.disabled, function (newValue) {
-            $scope.disableControls = newValue;
-        });
-        $element.addClass('pip-time-range-edit');
-    }]);
-})();
-},{}],10:[function(require,module,exports){
+        ;
+        return TimeRangeEditController;
+    }());
+    var TimeRangeEditComponent = {
+        bindings: TimeRangeEditBindings,
+        templateUrl: 'time_range_edit/TimeRangeEdit.html',
+        controller: TimeRangeEditController
+    };
+    angular.module('pipTimeRangeEdit', [])
+        .component('pipTimeRangeEdit', TimeRangeEditComponent);
+}
+},{}],13:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipDates.Templates');
@@ -6638,8 +7134,30 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_range_directive/date_range.html',
-    '<div class="pip-date-range layout-row flex" tabindex="-1"><md-input-container ng-show="isDay()" class="input-container pip-day flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-day" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onDayClick()" ng-model="day" ng-change="onDayChanged()" placeholder="{{dayLabel}}" aria-label="DAY"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{nameDays[$index]}} {{ opt }}</md-option></md-select></md-input-container><md-input-container ng-show="isWeek()" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-week" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" ng-model="week" ng-change="onWeekChange()" placeholder="{{weekLabel}}" aria-label="WEEK"><md-option ng-value="opt.id" ng-repeat="opt in weeks track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isDay() || isWeek()"></div><md-input-container ng-show="isMonth() && !monthFormatShort" class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><md-input-container ng-show="isMonth() && monthFormatShort" class="flex input-container" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-month" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onMonthClick()" ng-model="month" ng-change="onMonthChanged()" placeholder="{{monthLabel}}" aria-label="MONTH"><md-option ng-value="opt.id" ng-repeat="opt in shortMonths track by opt.id">{{ opt.name }}</md-option></md-select></md-input-container><div class="flex-fixed" ng-class="{\'space16\': $mdMedia(\'gt-xs\'), \'space8\': $mdMedia(\'xs\')}" ng-show="isMonth()"></div><md-input-container class="input-container flex" ng-class="{\'flex-fixed\' : $mdMedia(\'gt-xs\')}"><md-select class="select-year" ng-class="{\'pip-no-line\' : pipNoLine}" ng-disable="{{disableControls}}" md-on-open="onYearClick()" ng-model="year" ng-change="onYearChanged()" placeholder="{{yearLabel}}" aria-label="YEAR"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{ opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date/Date.html',
+    '<div class="pip-date layout-row flex" tabindex="-1">\n' +
+    '	<md-input-container class="input-container flex">\n' +
+    '		<md-select class="pip-date-day flex" ng-disabled="$ctrl.disableControls"\n' +
+    '				   ng-model="$ctrl.day" placeholder="{{$ctrl.dayLabel}}" ng-change="$ctrl.setValue()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in $ctrl.days track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="input-container-separator flex-fixed"></div>\n' +
+    '	<md-input-container class="input-container flex">\n' +
+    '		<md-select class="pip-date-monthflex" ng-disabled="$ctrl.disableControls"\n' +
+    '				   ng-model="$ctrl.month" placeholder="{{$ctrl.monthLabel}}" ng-change="$ctrl.onMonthChanged()">\n' +
+    '			<md-option ng-value="opt.id" ng-repeat="opt in $ctrl.months track by opt.id">{{:: opt.name }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '	<div class="input-container-separator flex-fixed"></div>\n' +
+    '	<md-input-container class="input-container flex">\n' +
+    '		<md-select class="pip-date-year flex" ng-disabled="$ctrl.disableControls"\n' +
+    '				   ng-model="$ctrl.year" placeholder="{{$ctrl.yearLabel}}" ng-change="$ctrl.onYearChanged()">\n' +
+    '			<md-option ng-value="opt" ng-repeat="opt in $ctrl.years track by opt">{{:: opt }}</md-option>\n' +
+    '		</md-select>\n' +
+    '	</md-input-container>\n' +
+    '</div>\n' +
+    '					');
 }]);
 })();
 
@@ -6650,8 +7168,96 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('date_directive/date.html',
-    '<div class="pip-date layout-row flex" tabindex="-1"><md-input-container class="input-container flex"><md-select class="pip-date-day flex" ng-disabled="disableControls" ng-model="day" placeholder="{{dayLabel}}" ng-change="onDayChanged()"><md-option ng-value="opt" ng-repeat="opt in days track by opt">{{:: opt }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-monthflex" ng-disabled="disableControls" ng-model="month" placeholder="{{monthLabel}}" ng-change="onMonthChanged()"><md-option ng-value="opt.id" ng-repeat="opt in months track by opt.id">{{:: opt.name }}</md-option></md-select></md-input-container><div class="input-container-separator flex-fixed"></div><md-input-container class="input-container flex"><md-select class="pip-date-year flex" ng-disabled="disableControls" ng-model="year" placeholder="{{yearLabel}}" ng-change="onYearChanged()"><md-option ng-value="opt" ng-repeat="opt in years track by opt">{{:: opt }}</md-option></md-select></md-input-container></div>');
+  $templateCache.put('date_range/DateRange.html',
+    '<div class="pip-date-range layout-row flex" tabindex="-1">\n' +
+    '    <md-input-container ng-show="$ctrl.isDay()" class="input-container pip-day flex"\n' +
+    '            ng-class="{\'flex-fixed\' : $ctrl.$mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-day"\n' +
+    '                   ng-class="{\'pip-no-line\' : $ctrl.pipNoLine}"\n' +
+    '                   ng-disable="{{$ctrl.disableControls}}"\n' +
+    '                   md-on-open="$ctrl.onDayClick()"\n' +
+    '                   ng-model="$ctrl.day"\n' +
+    '                   ng-change="$ctrl.setValue()"\n' +
+    '                   placeholder="{{$ctrl.dayLabel}}"\n' +
+    '                   aria-label="DAY">\n' +
+    '\n' +
+    '            <md-option ng-value="opt" ng-repeat="opt in $ctrl.days track by opt ">\n' +
+    '               {{$ctrl.nameDays[$index]}} {{ opt }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '    <md-input-container ng-show="$ctrl.isWeek()" class="input-container flex"\n' +
+    '                        ng-class="{\'flex-fixed\' : $ctrl.$mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-week"\n' +
+    '                   ng-class="{\'pip-no-line\' : $ctrl.pipNoLine}"\n' +
+    '                   ng-disable="{{$ctrl.disableControls}}"\n' +
+    '                   ng-model="$ctrl.week"\n' +
+    '                   ng-change="$ctrl.onWeekChange()"\n' +
+    '                   placeholder="{{$ctrl.weekLabel}}"\n' +
+    '                   aria-label="WEEK">\n' +
+    '\n' +
+    '            <md-option ng-value="opt.id" ng-repeat="opt in $ctrl.weeks track by opt.id">\n' +
+    '                {{ opt.name }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container >\n' +
+    '    <div class="flex-fixed"\n' +
+    '         ng-class="{\'space16\': $ctrl.$mdMedia(\'gt-xs\'), \'space8\':  $ctrl.$mdMedia(\'xs\')}"\n' +
+    '         ng-show="$ctrl.isDay() || $ctrl.isWeek()">\n' +
+    '    </div>\n' +
+    '    <md-input-container ng-show="$ctrl.isMonth() && !$ctrl.monthFormatShort " class="input-container flex"\n' +
+    '                        ng-class="{\'flex-fixed\' : $ctrl.$mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-month"\n' +
+    '                   ng-class="{\'pip-no-line\' : $ctrl.pipNoLine}"\n' +
+    '                   ng-disable="{{$ctrl.disableControls}}"\n' +
+    '                   md-on-open="$ctrl.onMonthClick()"\n' +
+    '                   ng-model="$ctrl.month"\n' +
+    '                   ng-change="$ctrl.onMonthChanged()"\n' +
+    '                   placeholder="{{$ctrl.monthLabel}}"\n' +
+    '                   aria-label="MONTH">\n' +
+    '\n' +
+    '            <md-option ng-value="opt.id" ng-repeat="opt in $ctrl.months track by opt.id">\n' +
+    '                {{ opt.name }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '    <md-input-container ng-show="$ctrl.isMonth() && $ctrl.monthFormatShort" class="flex input-container"\n' +
+    '                        ng-class="{\'flex-fixed\' : $ctrl.$mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-month"\n' +
+    '                   ng-class="{\'pip-no-line\' : $ctrl.pipNoLine}"\n' +
+    '                   ng-disable="{{$ctrl.disableControls}}"\n' +
+    '                   md-on-open="$ctrl.onMonthClick()"\n' +
+    '                   ng-model="$ctrl.month"\n' +
+    '                   ng-change="$ctrl.onMonthChanged()"\n' +
+    '                   placeholder="{{$ctrl.monthLabel}}"\n' +
+    '                   aria-label="MONTH">\n' +
+    '\n' +
+    '            <md-option ng-value="opt.id" ng-repeat="opt in $ctrl.shortMonths track by opt.id">\n' +
+    '                {{ opt.name }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '    <div class="flex-fixed"\n' +
+    '         ng-class="{\'space16\': $ctrl.$mdMedia(\'gt-xs\'), \'space8\':  $ctrl.$mdMedia(\'xs\')}"\n' +
+    '         ng-show="$ctrl.isMonth()">\n' +
+    '    </div>\n' +
+    '    <md-input-container class="input-container flex"\n' +
+    '                        ng-class="{\'flex-fixed\' : $ctrl.$mdMedia(\'gt-xs\')}">\n' +
+    '        <md-select class="select-year"\n' +
+    '                   ng-class="{\'pip-no-line\' : $ctrl.pipNoLine}"\n' +
+    '                   ng-disable="{{$ctrl.disableControls}}"\n' +
+    '                   md-on-open="$ctrl.onYearClick()"\n' +
+    '                   ng-model="$ctrl.year"\n' +
+    '                   ng-change="$ctrl.onYearChanged()"\n' +
+    '                   placeholder="{{$ctrl.yearLabel}}"\n' +
+    '                   aria-label="YEAR">\n' +
+    '\n' +
+    '            <md-option ng-value="opt" ng-repeat="opt in $ctrl.years track by opt">\n' +
+    '                {{ opt }}\n' +
+    '            </md-option>\n' +
+    '        </md-select>\n' +
+    '    </md-input-container>\n' +
+    '</div>');
 }]);
 })();
 
@@ -6662,8 +7268,12 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_edit_directive/time_range_edit.html',
-    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start"><div flex="47" class="start-time-container"><p class="text-caption text-grey">{{startLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container" flex="49"><md-datepicker ng-model="data.startDate" xmd-placeholder="{{startLabel}}" ng-change="onChangeStartDate()" ng-disabled="isDisabled()" aria-label="START-DATE"></md-datepicker></div><div flex="" ng-if="showTime"><md-input-container class="input-container"><md-select aria-label="START-TIME" ng-model="data.startTime" ng-disabled="isDisabled()" ng-change="onChangeStartTime(data.startTime)"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div><div flex="47" class="end-time-container"><p class="text-caption text-grey">{{endLabel}}</p><div class="layout-row layout-align-space-between-center"><div class="pip-datepicker-container flex-49"><md-datepicker ng-model="data.endDate" xmd-placeholder="{{endLabel}}" ng-disabled="isDisabled()" ng-change="onChangeEndDate()" aria-label="END-DATE"></md-datepicker></div><div flex="" ng-if="showTime"><md-input-container class="input-container"><md-select aria-label="END-TIME" ng-model="data.endTime" ng-change="onChangeEndTime()" ng-disabled="isDisabled()"><md-option ng-value="opt.id" ng-repeat="opt in intervalTimeCollection track by opt.id">{{ opt.time }}</md-option></md-select></md-input-container></div></div></div></div>');
+  $templateCache.put('time_range/TimeRange.html',
+    '<p>\n' +
+    '    <span ng-if="$ctrl.data.start != null">{{$ctrl.data.start | formatLongDateTime}}</span>\n' +
+    '    <span  class="separator" ng-if="$ctrl.data.start && $ctrl.data.end"> - </span>\n' +
+    '    <span ng-if="$ctrl.data.end != null">{{$ctrl.data.end | formatLongDateTime}}</span>\n' +
+    '</p>');
 }]);
 })();
 
@@ -6674,47 +7284,102 @@ try {
   module = angular.module('pipDates.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('time_range_directive/time_range.html',
-    '<p><span ng-if="data.start != null">{{data.start | formatLongDateTime}}</span> <span class="separator" ng-if="data.start && data.end">-</span> <span ng-if="data.end != null">{{data.end | formatLongDateTime}}</span></p>');
+  $templateCache.put('time_range_edit/TimeRangeEdit.html',
+    '<div class="event-edit layout-row layout-xs-column flex layout-align-start-start">\n' +
+    '    <div flex="47" class="start-time-container ">\n' +
+    '        <p class="text-caption text-grey">{{$ctrl.startLabel}}</p>\n' +
+    '\n' +
+    '        <div class="layout-row layout-align-space-between-center">\n' +
+    '            <div class="pip-datepicker-container" flex="49">\n' +
+    '                <md-datepicker ng-model="$ctrl.data.startDate"\n' +
+    '                               xmd-placeholder="{{$ctrl.startLabel}}"\n' +
+    '                               ng-change="$ctrl.onChangeStartDate()"\n' +
+    '                               ng-disabled="$ctrl.isDisabled()"\n' +
+    '                               aria-label="START-DATE">\n' +
+    '                </md-datepicker>\n' +
+    '            </div>\n' +
+    '            <div flex ng-if="$ctrl.showTime">\n' +
+    '                <md-input-container class="input-container">\n' +
+    '                    <md-select aria-label="START-TIME" ng-model="$ctrl.data.startTime" ng-disabled="$ctrl.isDisabled()"\n' +
+    '                               ng-change="$ctrl.onChangeStartTime($ctrl.data.startTime)">\n' +
+    '                        <md-option ng-value="opt.id" ng-repeat="opt in $ctrl.intervalTimeCollection track by opt.id">{{ opt.time }}\n' +
+    '                        </md-option>\n' +
+    '                    </md-select>\n' +
+    '                </md-input-container>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div flex="47" class="end-time-container">\n' +
+    '        <p class="text-caption text-grey">{{$ctrl.endLabel}}</p>\n' +
+    '\n' +
+    '        <div class="layout-row layout-align-space-between-center">\n' +
+    '            <div class="pip-datepicker-container flex-49">\n' +
+    '                <md-datepicker ng-model="$ctrl.data.endDate"\n' +
+    '                               xmd-placeholder="{{$ctrl.endLabel}}"\n' +
+    '                               ng-disabled="$ctrl.isDisabled()"\n' +
+    '                               ng-change="$ctrl.onChangeEndDate()"\n' +
+    '                               aria-label="END-DATE">\n' +
+    '                </md-datepicker>\n' +
+    '            </div>\n' +
+    '            <div flex ng-if="$ctrl.showTime">\n' +
+    '                <md-input-container class="input-container">\n' +
+    '                    <md-select aria-label="END-TIME" ng-model="$ctrl.data.endTime" ng-change="$ctrl.onChangeEndTime()"\n' +
+    '                               ng-disabled="$ctrl.isDisabled()">\n' +
+    '                        <md-option ng-value="opt.id" ng-repeat="opt in $ctrl.intervalTimeCollection track by opt.id">\n' +
+    '                            {{ opt.time }}\n' +
+    '                        </md-option>\n' +
+    '                    </md-select>\n' +
+    '                </md-input-container>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>\n' +
+    '');
 }]);
 })();
 
 
 
-},{}]},{},[10,7,4,5,2,3,1,6,8,9])(10)
+},{}]},{},[13,2,3,4,5,6,7,8,1,9,10,12,11])(13)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-var ConfirmationParams = (function () {
-    function ConfirmationParams() {
-        this.ok = 'OK';
-        this.cancel = 'Cancel';
-    }
-    return ConfirmationParams;
-}());
-exports.ConfirmationParams = ConfirmationParams;
-var ConfirmationDialogController = (function () {
-    ConfirmationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function ConfirmationDialogController($mdDialog, $injector, $rootScope, params) {
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var ConfirmationDialogParams_1 = require("./ConfirmationDialogParams");
+var ConfirmationDialogController = (function (_super) {
+    __extends(ConfirmationDialogController, _super);
+    ConfirmationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function ConfirmationDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.config = new ConfirmationParams();
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        var _this = _super.call(this) || this;
+        _this._injector = $injector;
+        _this.initTranslate();
+        _this.$mdDialog = $mdDialog;
+        _this.theme = $rootScope['$theme'];
+        return _this;
+    }
+    ConfirmationDialogController.prototype.initTranslate = function () {
+        var pipTranslate;
+        pipTranslate = this._injector.has('pipTranslate')
+            ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'CONFIRM_TITLE': 'Confirm' });
             pipTranslate.translations('ru', { 'CONFIRM_TITLE': 'Подтвердите' });
-            this.config.title = params.title || 'CONFIRM_TITLE';
-            this.config.ok = params.ok || 'OK';
-            this.config.cancel = params.cancel || 'CANCEL';
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('CONFIRM_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('OK');
+            this.cancel = pipTranslate.translate(this.cancel) || ('CANCEL');
         }
         else {
-            this.config.title = params.title || 'Confirm';
-            this.config.ok = params.ok || 'OK';
-            this.config.cancel = params.cancel || 'Cancel';
+            this.title = this.title || 'Confirm';
+            this.ok = this.ok || 'OK';
+            this.cancel = this.cancel || 'Cancel';
         }
-        this.$mdDialog = $mdDialog;
-        this.theme = $rootScope['$theme'];
-    }
+    };
     ConfirmationDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
     };
@@ -6722,29 +7387,33 @@ var ConfirmationDialogController = (function () {
         this.$mdDialog.cancel();
     };
     return ConfirmationDialogController;
-}());
-exports.ConfirmationDialogController = ConfirmationDialogController;
+}(ConfirmationDialogParams_1.ConfirmationDialogParams));
 angular
-    .module('pipConfirmationDialog', [
-    'ngMaterial',
-    'pipDialogs.Translate',
-    'pipDialogs.Templates'
-])
+    .module('pipConfirmationDialog')
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
-},{}],2:[function(require,module,exports){
+},{"./ConfirmationDialogParams":2}],2:[function(require,module,exports){
 "use strict";
-var ConfirmationService = (function () {
-    ConfirmationService.$inject = ['$mdDialog'];
-    function ConfirmationService($mdDialog) {
+var ConfirmationDialogParams = (function () {
+    function ConfirmationDialogParams() {
+    }
+    return ConfirmationDialogParams;
+}());
+exports.ConfirmationDialogParams = ConfirmationDialogParams;
+},{}],3:[function(require,module,exports){
+"use strict";
+var ConfirmationDialogService = (function () {
+    ConfirmationDialogService.$inject = ['$mdDialog'];
+    function ConfirmationDialogService($mdDialog) {
         this._mdDialog = $mdDialog;
     }
-    ConfirmationService.prototype.show = function (params, successCallback, cancelCallback) {
+    ConfirmationDialogService.prototype.show = function (params, successCallback, cancelCallback) {
         this._mdDialog.show({
             targetEvent: params.event,
             templateUrl: 'confirmation/ConfirmationDialog.html',
             controller: 'pipConfirmationDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
             .then(function () {
@@ -6757,76 +7426,82 @@ var ConfirmationService = (function () {
             }
         });
     };
-    return ConfirmationService;
+    return ConfirmationDialogService;
 }());
 angular
     .module('pipConfirmationDialog')
-    .service('pipConfirmationDialog', ConfirmationService);
-},{}],3:[function(require,module,exports){
-'use strict';
-require("./ConfirmationController");
-require("./ConfirmationService");
-},{"./ConfirmationController":1,"./ConfirmationService":2}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipDialogs.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
+    .service('pipConfirmationDialog', ConfirmationDialogService);
+},{}],4:[function(require,module,exports){
+"use strict";
+},{}],5:[function(require,module,exports){
+"use strict";
+angular
+    .module('pipConfirmationDialog', [
+    'ngMaterial',
+    'pipDialogs.Translate',
+    'pipDialogs.Templates'
+]);
+require("./ConfirmationDialogParams");
+require("./ConfirmationDialogController");
+require("./IConfirmationDialogService");
+require("./ConfirmationDialogService");
+},{"./ConfirmationDialogController":1,"./ConfirmationDialogParams":2,"./ConfirmationDialogService":3,"./IConfirmationDialogService":4}],6:[function(require,module,exports){
+{
+    translate.$inject = ['$injector'];
+    function translate($injector) {
         var pipTranslate = $injector.has('pipTranslate')
             ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
-    }]);
-})();
-},{}],5:[function(require,module,exports){
-'use strict';
-require("./error_details");
-require("./information");
-require("./options");
-require("./confirmation");
-angular
-    .module('pipDialogs', [
-    'pipInformationDialog',
-    'pipConfirmationDialog',
-    'pipOptionsDialog',
-    'pipOptionsBigDialog',
-    'pipErrorDetailsDialog',
-]);
-},{"./confirmation":3,"./error_details":8,"./information":11,"./options":16}],6:[function(require,module,exports){
-'use strict';
-var ErrorStrings = (function () {
-    function ErrorStrings() {
-        this.ok = 'OK';
-        this.cancel = 'Cancel';
+    }
+    angular
+        .module('pipDialogs.Translate', [])
+        .filter('translate', translate);
+}
+},{}],7:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var ErrorDetailsDialogParams_1 = require("./ErrorDetailsDialogParams");
+var ErrorDialogStrings = (function () {
+    function ErrorDialogStrings() {
         this.errorDetails = 'Error details';
-        this.dismissButton = 'Dismiss';
         this.errorMessage = 'Message';
         this.errorCode = 'Code';
         this.errorMethod = 'Method';
         this.errorPath = 'Path';
-        this.error = 'Error';
         this.errorText = 'Error';
     }
-    return ErrorStrings;
+    return ErrorDialogStrings;
 }());
-exports.ErrorStrings = ErrorStrings;
-var ErrorParams = (function () {
-    function ErrorParams() {
-        this.ok = 'OK';
-        this.cancel = 'CANCEL';
-        this.error = 'ERROR';
-    }
-    return ErrorParams;
-}());
-exports.ErrorParams = ErrorParams;
-var ErrorDetailsDialogController = (function () {
-    ErrorDetailsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function ErrorDetailsDialogController($mdDialog, $injector, $rootScope, params) {
+var ErrorDetailsDialogController = (function (_super) {
+    __extends(ErrorDetailsDialogController, _super);
+    ErrorDetailsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function ErrorDetailsDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.config = new ErrorStrings();
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        var _this = _super.call(this) || this;
+        _this.strings = new ErrorDialogStrings();
+        _this._injector = $injector;
+        _this.$mdDialog = $mdDialog;
+        _this.theme = $rootScope['$theme'];
+        _this.initTranslate();
+        if (!_this.error) {
+            _this.error = '<none>';
+        }
+        return _this;
+    }
+    ErrorDetailsDialogController.prototype.initTranslate = function () {
+        var pipTranslate;
+        pipTranslate = this._injector.has('pipTranslate')
+            ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', {
+                'OK': 'Ok',
+                'CANCEL': 'Cancel',
                 'ERROR_DETAILS': 'Error details',
                 'CODE': 'Error code',
                 'PATH': 'Path',
@@ -6836,6 +7511,8 @@ var ErrorDetailsDialogController = (function () {
                 'DISMISS': 'Dismiss'
             });
             pipTranslate.translations('ru', {
+                'OK': 'Ок',
+                'CANCEL': 'Отмена',
                 'ERROR_DETAILS': 'Детали ошибки',
                 'CODE': 'Код ошибки',
                 'PATH': 'Путь',
@@ -6843,49 +7520,65 @@ var ErrorDetailsDialogController = (function () {
                 'METHOD': 'Метод',
                 'MESSAGE': 'Сообщение'
             });
-            this.config.ok = params.ok;
-            this.config.cancel = params.cancel;
-            this.config.errorDetails = 'ERROR_DETAILS';
-            this.config.dismissButton = 'DISMISS';
-            this.config.errorMessage = 'MESSAGE';
-            this.config.errorCode = 'CODE';
-            this.config.errorMethod = 'METHOD';
-            this.config.errorPath = 'PATH';
-            this.config.errorText = 'ERROR';
+            this.dismissButton = pipTranslate.translate(this.dismissButton) || pipTranslate.translate('DISMISS');
+            this.strings.errorDetails = pipTranslate.translate('ERROR_DETAILS');
+            this.strings.errorMessage = pipTranslate.translate('MESSAGE');
+            this.strings.errorCode = pipTranslate.translate('CODE');
+            this.strings.errorMethod = pipTranslate.translate('METHOD');
+            this.strings.errorPath = pipTranslate.translate('PATH');
+            this.strings.errorText = pipTranslate.translate('ERROR');
         }
         else {
-            this.config.ok = params.ok;
-            this.config.cancel = params.cancel;
+            this.dismissButton = this.dismissButton || 'Dismiss';
         }
-        this.$mdDialog = $mdDialog;
-        this.theme = $rootScope.$theme;
-        this.config.error = params.error;
-    }
+    };
     ErrorDetailsDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
     };
-    ErrorDetailsDialogController.prototype.onCancel = function () {
-        this.$mdDialog.cancel();
+    ErrorDetailsDialogController.prototype.isString = function (error) {
+        return _.isString(error);
+    };
+    ErrorDetailsDialogController.prototype.getErrorText = function () {
+        var error;
+        if (_.isString(this.error)) {
+            return this.error;
+        }
+        if (this.error && this.error.error) {
+            return this.error.error.toString();
+        }
+        if (this.error && this.error.data && this.error.data.error) {
+            return this.error.data.error.toString();
+        }
+        return '<none>';
     };
     return ErrorDetailsDialogController;
-}());
-exports.ErrorDetailsDialogController = ErrorDetailsDialogController;
+}(ErrorDetailsDialogParams_1.ErrorDetailsDialogParams));
 angular
     .module('pipErrorDetailsDialog')
     .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
-},{}],7:[function(require,module,exports){
-var ErrorDetailsService = (function () {
-    ErrorDetailsService.$inject = ['$mdDialog'];
-    function ErrorDetailsService($mdDialog) {
+},{"./ErrorDetailsDialogParams":8}],8:[function(require,module,exports){
+"use strict";
+var ErrorDetailsDialogParams = (function () {
+    function ErrorDetailsDialogParams() {
+    }
+    return ErrorDetailsDialogParams;
+}());
+exports.ErrorDetailsDialogParams = ErrorDetailsDialogParams;
+},{}],9:[function(require,module,exports){
+"use strict";
+var ErrorDetailsDialogService = (function () {
+    ErrorDetailsDialogService.$inject = ['$mdDialog'];
+    function ErrorDetailsDialogService($mdDialog) {
         this._mdDialog = $mdDialog;
     }
-    ErrorDetailsService.prototype.show = function (params, successCallback, cancelCallback) {
+    ErrorDetailsDialogService.prototype.show = function (params, successCallback, cancelCallback) {
         this._mdDialog.show({
             targetEvent: params.event,
-            templateUrl: 'error_details/ErrorDetails.html',
+            templateUrl: 'error_details/ErrorDetailsDialog.html',
             controller: 'pipErrorDetailsDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
             .then(function () {
@@ -6898,66 +7591,93 @@ var ErrorDetailsService = (function () {
             }
         });
     };
-    return ErrorDetailsService;
+    return ErrorDetailsDialogService;
 }());
 angular
     .module('pipErrorDetailsDialog')
-    .service('pipErrorDetailsDialog', ErrorDetailsService);
-},{}],8:[function(require,module,exports){
-'use strict';
+    .service('pipErrorDetailsDialog', ErrorDetailsDialogService);
+},{}],10:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 angular
     .module('pipErrorDetailsDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./ErrorDetailsService");
-require("./ErrorDetailsController");
-},{"./ErrorDetailsController":6,"./ErrorDetailsService":7}],9:[function(require,module,exports){
-'use strict';
-var InformationStrings = (function () {
-    function InformationStrings() {
-        this.ok = 'OK';
-    }
-    return InformationStrings;
-}());
-exports.InformationStrings = InformationStrings;
-var InformationParams = (function () {
-    function InformationParams() {
-        this.ok = 'OK';
-    }
-    return InformationParams;
-}());
-exports.InformationParams = InformationParams;
-var InformationDialogController = (function () {
-    InformationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function InformationDialogController($mdDialog, $injector, $rootScope, params) {
+require("./ErrorDetailsDialogParams");
+require("./ErrorDetailsDialogService");
+require("./ErrorDetailsDialogController");
+__export(require("./ErrorDetailsDialogParams"));
+},{"./ErrorDetailsDialogController":7,"./ErrorDetailsDialogParams":8,"./ErrorDetailsDialogService":9}],11:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+require("./dependencies/TranslateFilter");
+require("./error_details");
+require("./information");
+require("./options");
+require("./options_big");
+require("./confirmation");
+angular
+    .module('pipDialogs', [
+    'pipInformationDialog',
+    'pipConfirmationDialog',
+    'pipOptionsDialog',
+    'pipOptionsBigDialog',
+    'pipErrorDetailsDialog'
+]);
+__export(require("./error_details"));
+__export(require("./information"));
+__export(require("./options"));
+__export(require("./options_big"));
+},{"./confirmation":5,"./dependencies/TranslateFilter":6,"./error_details":10,"./information":15,"./options":21,"./options_big":27}],12:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var InformationDialogParams_1 = require("./InformationDialogParams");
+var InformationDialogController = (function (_super) {
+    __extends(InformationDialogController, _super);
+    InformationDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function InformationDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.config = new InformationStrings();
-        var content = params.message, item;
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        var _this = _super.call(this) || this;
+        _this._injector = $injector;
+        _this.initTranslate();
+        _this.$mdDialog = $mdDialog;
+        _this.theme = $rootScope['$theme'];
+        return _this;
+    }
+    InformationDialogController.prototype.initTranslate = function () {
+        var pipTranslate;
+        pipTranslate = this._injector.has('pipTranslate')
+            ? this._injector.get('pipTranslate') : null;
+        var content = this.message;
+        var item;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'INFORMATION_TITLE': 'Information' });
             pipTranslate.translations('ru', { 'INFORMATION_TITLE': 'Информация' });
-            this.config.title = params.title || 'INFORMATION_TITLE';
-            this.config.ok = params.ok || 'OK';
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('INFORMATION_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('OK');
             content = pipTranslate.translate(content);
         }
         else {
-            this.config.title = params.title || 'Information';
-            this.config.ok = params.ok || 'OK';
+            this.title = this.title || 'Information';
+            this.ok = this.ok || 'OK';
         }
-        var pipFormat = $injector.has('pipFormat') ? $injector.get('pipFormat') : null;
-        if (params.item && pipFormat) {
-            item = _.truncate(params.item, 25);
+        var pipFormat = this._injector.has('pipFormat')
+            ? this._injector.get('pipFormat') : null;
+        if (this.item && pipFormat) {
             content = pipFormat.sprintf(content, item);
-            console.log('content2', content);
         }
-        this.config.content = content;
-        this.$mdDialog = $mdDialog;
-        this.theme = $rootScope['$theme'];
-        this.config.error = params.error;
-    }
+        this.content = content;
+    };
     InformationDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
     };
@@ -6965,25 +7685,33 @@ var InformationDialogController = (function () {
         this.$mdDialog.cancel();
     };
     return InformationDialogController;
-}());
-exports.InformationDialogController = InformationDialogController;
+}(InformationDialogParams_1.InformationDialogParams));
 angular
     .module('pipInformationDialog')
     .controller('pipInformationDialogController', InformationDialogController);
-},{}],10:[function(require,module,exports){
+},{"./InformationDialogParams":13}],13:[function(require,module,exports){
 "use strict";
-var InformationService = (function () {
-    InformationService.$inject = ['$mdDialog'];
-    function InformationService($mdDialog) {
+var InformationDialogParams = (function () {
+    function InformationDialogParams() {
+    }
+    return InformationDialogParams;
+}());
+exports.InformationDialogParams = InformationDialogParams;
+},{}],14:[function(require,module,exports){
+"use strict";
+var InformationDialogService = (function () {
+    InformationDialogService.$inject = ['$mdDialog'];
+    function InformationDialogService($mdDialog) {
         this._mdDialog = $mdDialog;
     }
-    InformationService.prototype.show = function (params, successCallback, cancelCallback) {
+    InformationDialogService.prototype.show = function (params, successCallback, cancelCallback) {
         this._mdDialog.show({
             targetEvent: params.event,
             templateUrl: 'information/InformationDialog.html',
             controller: 'pipInformationDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
             .then(function () {
@@ -6992,183 +7720,70 @@ var InformationService = (function () {
             }
         });
     };
-    return InformationService;
+    return InformationDialogService;
 }());
 angular
     .module('pipInformationDialog')
-    .service('pipInformationDialog', InformationService);
-},{}],11:[function(require,module,exports){
-'use strict';
+    .service('pipInformationDialog', InformationDialogService);
+},{}],15:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 angular
     .module('pipInformationDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./InformationService");
-require("./InformationController");
-},{"./InformationController":9,"./InformationService":10}],12:[function(require,module,exports){
-'use strict';
-var OptionsBigData = (function () {
-    function OptionsBigData() {
-    }
-    return OptionsBigData;
-}());
-exports.OptionsBigData = OptionsBigData;
-var OptionsBigParams = (function () {
-    function OptionsBigParams() {
-        this.noTitle = false;
-        this.noActions = false;
-        this.optionIndex = 0;
-    }
-    return OptionsBigParams;
-}());
-exports.OptionsBigParams = OptionsBigParams;
-var OptionsBigDialogController = (function () {
-    OptionsBigDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function OptionsBigDialogController($mdDialog, $injector, $rootScope, params) {
-        "ngInject";
-        this.onSelect = function () {
-            var option;
-            option = _.find(this.config.options, { name: this.config.selectedOptionName }) || new OptionsBigData();
-            this.$mdDialog.hide({ option: option, deleted: this.config.deleted });
-        };
-        this.$mdDialog = $mdDialog;
-        this.config = new OptionsBigParams();
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
-            pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
-            this.config.title = params.title || 'OPTIONS_TITLE';
-            this.config.applyButtonTitle = params.applyButtonTitle || 'SELECT';
-        }
-        else {
-            this.config.title = params.title || 'Choose Option';
-            this.config.applyButtonTitle = params.applyButtonTitle || 'Select';
-        }
-        this.theme = $rootScope['$theme'];
-        this.config.options = params.options;
-        this.config.selectedOption = _.find(params.options, { active: true }) || new OptionsBigData();
-        this.config.selectedOptionName = this.config.selectedOption.name;
-        this.config.deleted = params.deleted;
-        this.config.deletedTitle = params.deletedTitle;
-        this.config.noActions = params.noActions || false;
-        this.config.noTitle = params.noTitle || false;
-        this.config.hint = params.hint || '';
-        setTimeout(this.focusInput, 500);
-    }
-    OptionsBigDialogController.prototype.onOk = function () {
-        this.$mdDialog.hide();
-    };
-    OptionsBigDialogController.prototype.onCancel = function () {
-        this.$mdDialog.cancel();
-    };
-    OptionsBigDialogController.prototype.onOptionSelect = function (event, option) {
-        event.stopPropagation();
-        this.config.selectedOptionName = option.name;
-        if (this.config.noActions) {
-            this.onSelect();
-        }
-    };
-    OptionsBigDialogController.prototype.onSelected = function () {
-        this.config.selectedOptionName = this.config.options[this.config.optionIndex].name;
-        if (this.config.noActions) {
-            this.onSelect();
-        }
-    };
-    OptionsBigDialogController.prototype.onKeyUp = function (event, index) {
-        if (event.keyCode === 32 || event.keyCode === 13) {
-            event.stopPropagation();
-            event.preventDefault();
-            if (index !== undefined && index > -1 && index < this.config.options.length) {
-                this.config.selectedOptionName = this.config.options[index].name;
-                this.onSelect();
-            }
-        }
-    };
-    OptionsBigDialogController.prototype.focusInput = function () {
-        var list;
-        list = $('.pip-options-dialog .pip-list');
-        list.focus();
-    };
-    return OptionsBigDialogController;
-}());
-exports.OptionsBigDialogController = OptionsBigDialogController;
-angular
-    .module('pipOptionsBigDialog')
-    .controller('pipOptionsBigDialogController', OptionsBigDialogController);
-},{}],13:[function(require,module,exports){
+require("./InformationDialogParams");
+require("./InformationDialogController");
+require("./InformationDialogService");
+__export(require("./InformationDialogParams"));
+},{"./InformationDialogController":12,"./InformationDialogParams":13,"./InformationDialogService":14}],16:[function(require,module,exports){
 "use strict";
-var OptionsBigService = (function () {
-    OptionsBigService.$inject = ['$mdDialog'];
-    function OptionsBigService($mdDialog) {
-        this._mdDialog = $mdDialog;
-    }
-    OptionsBigService.prototype.show = function (params, successCallback, cancelCallback) {
-        this._mdDialog.show({
-            targetEvent: params.event,
-            templateUrl: 'options/OptionsBigDialog.html',
-            controller: 'pipOptionsBigDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
-            clickOutsideToClose: true
-        })
-            .then(function (option) {
-            if (successCallback) {
-                successCallback(option);
-            }
-        }, function () {
-            if (cancelCallback) {
-                cancelCallback();
-            }
-        });
-    };
-    return OptionsBigService;
-}());
-angular
-    .module('pipOptionsBigDialog')
-    .service('pipOptionsBigDialog', OptionsBigService);
-},{}],14:[function(require,module,exports){
-'use strict';
-var OptionsData = (function () {
-    function OptionsData() {
-        this.icon = 'star';
-        this.active = true;
-    }
-    return OptionsData;
-}());
-exports.OptionsData = OptionsData;
-var OptionsParams = (function () {
-    function OptionsParams() {
-    }
-    return OptionsParams;
-}());
-exports.OptionsParams = OptionsParams;
-var OptionsDialogController = (function () {
-    OptionsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope', 'params'];
-    function OptionsDialogController($mdDialog, $injector, $rootScope, params) {
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var OptionsDialogParams_1 = require("./OptionsDialogParams");
+var OptionsDialogController = (function (_super) {
+    __extends(OptionsDialogController, _super);
+    OptionsDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function OptionsDialogController($mdDialog, $injector, $rootScope) {
         "ngInject";
-        this.$mdDialog = $mdDialog;
-        this.config = new OptionsParams();
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        var _this = _super.call(this) || this;
+        _this.$mdDialog = $mdDialog;
+        _this._injector = $injector;
+        _this.theme = $rootScope['$theme'];
+        _this.options = _this.options || [];
+        _this.initTranslate();
+        _this.selectedOption = _.find(_this.options, { active: true }) || null;
+        var name = _this.selectedOption ? _this.selectedOption.name : _this.selectedOptionName;
+        var index = _.findIndex(_this.options, function (opt) {
+            return opt.name == name;
+        });
+        _this.optionIndex = index == -1 ? 0 : index;
+        _this.selectedOption = _this.options[_this.optionIndex];
+        _this.selectedOptionName = _this.selectedOption.name;
+        setTimeout(_this.focusInput, 500);
+        return _this;
+    }
+    OptionsDialogController.prototype.initTranslate = function () {
+        var pipTranslate;
+        pipTranslate = this._injector.has('pipTranslate') ? this._injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
             pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
-            this.config.title = params.title || 'OPTIONS_TITLE';
-            this.config.applyButtonTitle = params.applyButtonTitle || 'SELECT';
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('OPTIONS_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('SELECT');
         }
         else {
-            this.config.title = params.title || 'Choose Option';
-            this.config.applyButtonTitle = params.applyButtonTitle || 'Select';
+            this.title = this.title || 'Choose Option';
+            this.ok = this.ok || 'Select';
         }
-        this.theme = $rootScope['$theme'];
-        this.config.options = params.options;
-        this.config.selectedOption = _.find(params.options, { active: true }) || new OptionsData();
-        this.config.selectedOptionName = this.config.selectedOption.name;
-        this.config.deleted = params.deleted;
-        this.config.deletedTitle = params.deletedTitle;
-        setTimeout(this.focusInput, 500);
-    }
+    };
     OptionsDialogController.prototype.onOk = function () {
         this.$mdDialog.hide();
     };
@@ -7177,7 +7792,7 @@ var OptionsDialogController = (function () {
     };
     OptionsDialogController.prototype.onOptionSelect = function (event, option) {
         event.stopPropagation();
-        this.config.selectedOptionName = option.name;
+        this.selectedOptionName = option.name;
     };
     OptionsDialogController.prototype.onKeyPress = function (event) {
         if (event.keyCode === 32 || event.keyCode === 13) {
@@ -7188,9 +7803,8 @@ var OptionsDialogController = (function () {
     };
     OptionsDialogController.prototype.onSelect = function () {
         var option;
-        option = _.find(this.config.options, { name: this.config.selectedOptionName });
-        console.log(option);
-        this.$mdDialog.hide({ option: option, deleted: this.config.deleted });
+        option = _.find(this.options, { name: this.selectedOptionName });
+        this.$mdDialog.hide({ option: option, isCheckboxOption: this.isCheckboxOption });
     };
     OptionsDialogController.prototype.focusInput = function () {
         var list;
@@ -7198,30 +7812,56 @@ var OptionsDialogController = (function () {
         list.focus();
     };
     return OptionsDialogController;
-}());
-exports.OptionsDialogController = OptionsDialogController;
+}(OptionsDialogParams_1.OptionsDialogParams));
 angular
     .module('pipOptionsDialog')
     .controller('pipOptionsDialogController', OptionsDialogController);
-},{}],15:[function(require,module,exports){
+},{"./OptionsDialogParams":18}],17:[function(require,module,exports){
 "use strict";
-var OptionsService = (function () {
-    OptionsService.$inject = ['$mdDialog'];
-    function OptionsService($mdDialog) {
+var OptionsDialogData = (function () {
+    function OptionsDialogData() {
+        this.icon = 'star';
+        this.active = true;
+    }
+    return OptionsDialogData;
+}());
+exports.OptionsDialogData = OptionsDialogData;
+},{}],18:[function(require,module,exports){
+"use strict";
+var OptionsDialogParams = (function () {
+    function OptionsDialogParams() {
+    }
+    return OptionsDialogParams;
+}());
+exports.OptionsDialogParams = OptionsDialogParams;
+},{}],19:[function(require,module,exports){
+"use strict";
+var OptionsDialogResult = (function () {
+    function OptionsDialogResult() {
+    }
+    return OptionsDialogResult;
+}());
+exports.OptionsDialogResult = OptionsDialogResult;
+},{}],20:[function(require,module,exports){
+"use strict";
+var OptionsDialogService = (function () {
+    OptionsDialogService.$inject = ['$mdDialog'];
+    function OptionsDialogService($mdDialog) {
         this._mdDialog = $mdDialog;
     }
-    OptionsService.prototype.show = function (params, successCallback, cancelCallback) {
+    OptionsDialogService.prototype.show = function (params, successCallback, cancelCallback) {
         this._mdDialog.show({
             targetEvent: params.event,
             templateUrl: 'options/OptionsDialog.html',
             controller: 'pipOptionsDialogController',
-            controllerAs: 'vm',
-            locals: { params: params },
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
             clickOutsideToClose: true
         })
-            .then(function (option) {
+            .then(function (result) {
             if (successCallback) {
-                successCallback(option.option);
+                successCallback(result);
             }
         }, function () {
             if (cancelCallback) {
@@ -7229,30 +7869,195 @@ var OptionsService = (function () {
             }
         });
     };
-    return OptionsService;
+    return OptionsDialogService;
 }());
 angular
     .module('pipOptionsDialog')
-    .service('pipOptionsDialog', OptionsService);
-},{}],16:[function(require,module,exports){
-'use strict';
+    .service('pipOptionsDialog', OptionsDialogService);
+},{}],21:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 angular
     .module('pipOptionsDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./OptionsService");
-require("./OptionsController");
+require("./OptionsDialogData");
+require("./OptionsDialogParams");
+require("./OptionsDialogResult");
+require("./OptionsDialogController");
+require("./OptionsDialogService");
+__export(require("./OptionsDialogData"));
+__export(require("./OptionsDialogParams"));
+__export(require("./OptionsDialogResult"));
+},{"./OptionsDialogController":16,"./OptionsDialogData":17,"./OptionsDialogParams":18,"./OptionsDialogResult":19,"./OptionsDialogService":20}],22:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var OptionsBigDialogParams_1 = require("./OptionsBigDialogParams");
+var OptionsBigDialogData_1 = require("./OptionsBigDialogData");
+var OptionsBigDialogController = (function (_super) {
+    __extends(OptionsBigDialogController, _super);
+    OptionsBigDialogController.$inject = ['$mdDialog', '$injector', '$rootScope'];
+    function OptionsBigDialogController($mdDialog, $injector, $rootScope) {
+        "ngInject";
+        var _this = _super.call(this) || this;
+        _this.onSelect = function () {
+            var option;
+            option = _.find(this.options, { name: this.selectedOptionName }) || new OptionsBigDialogData_1.OptionsBigDialogData();
+            this.$mdDialog.hide({ option: option });
+        };
+        _this.$mdDialog = $mdDialog;
+        _this._injector = $injector;
+        _this.theme = $rootScope['$theme'];
+        _this.initTranslate();
+        _this.selectedOption = _.find(_this.options, { active: true }) || null;
+        var name = _this.selectedOption ? _this.selectedOption.name : _this.selectedOptionName;
+        var index = _.findIndex(_this.options, function (opt) {
+            return opt.name == name;
+        });
+        _this.optionIndex = index == -1 ? 0 : index;
+        _this.selectedOption = _this.options[_this.optionIndex];
+        _this.selectedOptionName = _this.selectedOption.name;
+        setTimeout(_this.focusInput, 500);
+        return _this;
+    }
+    OptionsBigDialogController.prototype.initTranslate = function () {
+        var pipTranslate;
+        pipTranslate = this._injector.has('pipTranslate')
+            ? this._injector.get('pipTranslate') : null;
+        if (pipTranslate) {
+            pipTranslate.translations('en', { 'OPTIONS_TITLE': 'Choose Option' });
+            pipTranslate.translations('ru', { 'OPTIONS_TITLE': 'Выберите опцию' });
+            this.title = pipTranslate.translate(this.title) || pipTranslate.translate('OPTIONS_TITLE');
+            this.ok = pipTranslate.translate(this.ok) || pipTranslate.translate('SELECT');
+        }
+        else {
+            this.title = this.title || 'Choose Option';
+            this.ok = this.ok || 'Select';
+        }
+    };
+    OptionsBigDialogController.prototype.onOk = function () {
+        this.$mdDialog.hide();
+    };
+    OptionsBigDialogController.prototype.onCancel = function () {
+        this.$mdDialog.cancel();
+    };
+    OptionsBigDialogController.prototype.onOptionSelect = function (event, option) {
+        event.stopPropagation();
+        this.selectedOptionName = option.name;
+        if (this.noActions) {
+            this.onSelect();
+        }
+    };
+    OptionsBigDialogController.prototype.onSelected = function () {
+        this.selectedOptionName = this.options[this.optionIndex].name;
+        if (this.noActions) {
+            this.onSelect();
+        }
+    };
+    OptionsBigDialogController.prototype.onKeyUp = function (event, index) {
+        if (event.keyCode === 32 || event.keyCode === 13) {
+            event.stopPropagation();
+            event.preventDefault();
+            if (index !== undefined && index > -1 && index < this.options.length) {
+                this.selectedOptionName = this.options[index].name;
+                this.onSelect();
+            }
+        }
+    };
+    OptionsBigDialogController.prototype.focusInput = function () {
+        var list;
+        list = $('.pip-options-dialog .pip-list');
+        list.focus();
+    };
+    return OptionsBigDialogController;
+}(OptionsBigDialogParams_1.OptionsBigDialogParams));
+angular
+    .module('pipOptionsBigDialog')
+    .controller('pipOptionsBigDialogController', OptionsBigDialogController);
+},{"./OptionsBigDialogData":23,"./OptionsBigDialogParams":24}],23:[function(require,module,exports){
+"use strict";
+var OptionsBigDialogData = (function () {
+    function OptionsBigDialogData() {
+    }
+    return OptionsBigDialogData;
+}());
+exports.OptionsBigDialogData = OptionsBigDialogData;
+},{}],24:[function(require,module,exports){
+"use strict";
+var OptionsBigDialogParams = (function () {
+    function OptionsBigDialogParams() {
+    }
+    return OptionsBigDialogParams;
+}());
+exports.OptionsBigDialogParams = OptionsBigDialogParams;
+},{}],25:[function(require,module,exports){
+"use strict";
+var OptionsBigDialogResult = (function () {
+    function OptionsBigDialogResult() {
+    }
+    return OptionsBigDialogResult;
+}());
+exports.OptionsBigDialogResult = OptionsBigDialogResult;
+},{}],26:[function(require,module,exports){
+"use strict";
+var OptionsBigDialogService = (function () {
+    OptionsBigDialogService.$inject = ['$mdDialog'];
+    function OptionsBigDialogService($mdDialog) {
+        this._mdDialog = $mdDialog;
+    }
+    OptionsBigDialogService.prototype.show = function (params, successCallback, cancelCallback) {
+        this._mdDialog.show({
+            targetEvent: params.event,
+            templateUrl: 'options_big/OptionsBigDialog.html',
+            controller: 'pipOptionsBigDialogController',
+            controllerAs: '$ctrl',
+            locals: params,
+            bindToController: true,
+            clickOutsideToClose: true
+        })
+            .then(function (result) {
+            if (successCallback) {
+                successCallback(result);
+            }
+        }, function () {
+            if (cancelCallback) {
+                cancelCallback();
+            }
+        });
+    };
+    return OptionsBigDialogService;
+}());
+angular
+    .module('pipOptionsBigDialog')
+    .service('pipOptionsBigDialog', OptionsBigDialogService);
+},{}],27:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
     'pipDialogs.Translate',
     'pipDialogs.Templates'
 ]);
-require("./OptionsBigService");
-require("./OptionsBigController");
-},{"./OptionsBigController":12,"./OptionsBigService":13,"./OptionsController":14,"./OptionsService":15}],17:[function(require,module,exports){
+require("./OptionsBigDialogParams");
+require("./OptionsBigDialogData");
+require("./OptionsBigDialogResult");
+require("./OptionsBigDialogController");
+require("./OptionsBigDialogService");
+__export(require("./OptionsBigDialogParams"));
+__export(require("./OptionsBigDialogData"));
+__export(require("./OptionsBigDialogResult"));
+},{"./OptionsBigDialogController":22,"./OptionsBigDialogData":23,"./OptionsBigDialogParams":24,"./OptionsBigDialogResult":25,"./OptionsBigDialogService":26}],28:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipDialogs.Templates');
@@ -7261,7 +8066,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('confirmation/ConfirmationDialog.html',
-    '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{::vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title}}</h3></div><div class="pip-footer"><div><md-button ng-click="vm.onCancel()">{{:: vm.config.cancel}}</md-button><md-button class="md-accent" ng-click="vm.onOk()">{{:: vm.config.ok}}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-confirmation-dialog layout-column" width="400" md-theme="{{ ::$ctrl.theme }}"><div class="pip-header"><h3>{{ :: $ctrl.title }}</h3></div><div class="pip-footer"><div><md-button ng-click="$ctrl.onCancel()">{{ :: $ctrl.cancel }}</md-button><md-button class="md-accent" ng-click="$ctrl.onOk()">{{ :: $ctrl.ok }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7272,8 +8077,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('error_details/ErrorDetails.html',
-    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-body"><div class="pip-header"><h3>{{::vm.config.errorDetails | translate}}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.code || (vm.config.error.data && error.data.code)">{{::vm.config.errorCode | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.code || (vm.config.error.data && vm.config.error.data.code)">{{vm.config.error.code || vm.config.error.data.code}}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{::vm.config.errorPath | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.path || (vm.config.error.data && vm.config.error.data.path)">{{vm.config.error.path || vm.config.error.data.path}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{::vm.config.errorText | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.error || (vm.config.error.data && vm.config.error.data.error)">{{vm.config.error.error || vm.config.error.data.error}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{::vm.config.errorMethod | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.method || (vm.config.error.data && vm.config.error.data.method)">{{vm.config.error.method || vm.config.error.data.method}}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{::vm.config.errorMessage | translate}}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="vm.config.error.message || (vm.config.error.data && vm.config.error.data.message)">{{vm.config.error.message || vm.config.error.data.message}}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="vm.onOk()">{{::vm.config.dismissButton | translate}}</md-button></div></div></md-dialog>');
+  $templateCache.put('error_details/ErrorDetailsDialog.html',
+    '<md-dialog class="pip-dialog pip-error-details-dialog layout-column" width="400" md-theme="{{ $ctrl.theme }}"><div class="pip-body"><div class="pip-header"><h3>{{ ::$ctrl.strings.errorDetails | translate }}</h3></div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="$ctrl.error.code || ($ctrl.error.data && $ctrl.error.data.code)">{{ ::$ctrl.strings.errorCode | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.code || ($ctrl.error.data && $ctrl.error.data.code)">{{ $ctrl.error.code || $ctrl.error.data.code }}</div><div class="layout-row layout-align-start-center error-section text-body2 color-secondary-text" ng-if="$ctrl.error.path || ($ctrl.error.data && $ctrl.error.data.path)">{{ ::$ctrl.strings.errorPath | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.path || ($ctrl.error.data && $ctrl.error.data.path)">{{ $ctrl.error.path || $ctrl.error.data.path }}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="$ctrl.isString($ctrl.error) || $ctrl.error.error || ($ctrl.error.data && $ctrl.error.data.error)">{{ ::$ctrl.strings.errorText | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.error || ($ctrl.error.data && $ctrl.error.data.error)">{{ $ctrl.getErrorText() }}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="$ctrl.error.method || ($ctrl.error.data && $ctrl.error.data.method)">{{ ::$ctrl.strings.errorMethod | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.method || ($ctrl.error.data && $ctrl.error.data.method)">{{ $ctrl.error.method || $ctrl.error.data.method }}</div><div class="error-section text-body2 color-secondary-text layout-row layout-align-start-center" ng-if="$ctrl.error.message || ($ctrl.error.data && $ctrl.error.data.message)">{{ ::$ctrl.strings.errorMessage | translate }}</div><div class="layout-row layout-align-start-center text-subhead1" ng-if="$ctrl.error.message || ($ctrl.error.data && $ctrl.error.data.message)">{{ $ctrl.error.message || $ctrl.error.data.message }}</div></div><div class="pip-footer"><div><md-button class="md-accent m0" ng-click="$ctrl.onOk()">{{ ::$ctrl.dismissButton | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7285,19 +8090,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{vm.theme}}"><div class="pip-header"><h3>{{:: vm.config.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ vm.config.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="vm.onOk()">{{ vm.config.ok | translate }}</md-button></div></div></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDialogs.Templates');
-} catch (e) {
-  module = angular.module('pipDialogs.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('options/OptionsBigDialog.html',
-    '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !vm.config.noActions}"><div class="pip-header" ng-class="{\'header-hint\': vm.config.noTitle && vm.config.hint}"><h3 class="m0" ng-if="!vm.config.noTitle">{{::vm.config.title | translate}}</h3><div ng-show="vm.config.noTitle && vm.config.hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{::vm.config.hint | translate}}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="vm.config.optionIndex" index="{{vm.config.optionIndex }}" pip-select="vm.onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="vm.onKeyUp($event, $index)" ng-repeat="option in vm.config.options"><div class="pip-content content-stretch" ng-click="vm.onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{::option.title | translate}}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{::option.subtitle | translate}}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="vm.config.noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!vm.config.noActions"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()" style="margin-right: -6px">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{ $ctrl.theme }}"><div class="pip-header"><h3>{{:: $ctrl.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ $ctrl.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="$ctrl.onOk()">{{ $ctrl.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -7309,48 +8102,32 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('options/OptionsDialog.html',
-    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{vm.theme}}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{::vm.config.title | translate}}</h3><div ng-show="vm.config.deletedTitle" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="deleted" aria-label="CHECKBOX">{{::vm.config.deletedTitle | translate}}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="vm.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="vm.onKeyPress($event)" tabindex="0"><div ng-repeat="option in vm.config.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'vm.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == vm.config.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{option.icon}}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{::option.title | translate}}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{::option.title | translate}}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="vm.onCancel()">{{::\'CANCEL\' | translate}}</md-button><md-button class="pip-submit md-accent" ng-click="vm.onSelect()">{{::vm.config.applyButtonTitle | translate}}</md-button></div></div></md-dialog>');
+    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{ $ctrl.theme }}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{ ::$ctrl.title | translate }}</h3><div ng-show="$ctrl.checkboxOptionCaption" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="$ctrl.isCheckboxOption" aria-label="CHECKBOX">{{ ::$ctrl.checkboxOptionCaption | translate }}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="$ctrl.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="$ctrl.onKeyPress($event)" tabindex="0"><div ng-repeat="option in $ctrl.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'$ctrl.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == $ctrl.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{ option.icon }}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{ ::option.title | translate }}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{ ::option.title | translate }}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="$ctrl.onCancel()">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="pip-submit md-accent" ng-click="$ctrl.onSelect()">{{ ::$ctrl.ok | translate }}</md-button></div></div></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDialogs.Templates');
+} catch (e) {
+  module = angular.module('pipDialogs.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('options_big/OptionsBigDialog.html',
+    '<md-dialog class="pip-dialog pip-options-dialog-big layout-column" min-width="400" md-theme="{{ $ctrl.theme }}"><md-dialog-content class="pip-body pip-scroll" ng-class="{\'bp24\': !$ctrl.noActions}"><div class="pip-header" ng-class="{\'header-hint\': $ctrl.noTitle && $ctrl.hint}"><h3 class="m0" ng-if="!$ctrl.noTitle">{{ ::$ctrl.title | translate }}</h3><div ng-show="$ctrl.noTitle && $ctrl.hint" class="dialog-hint layout-row layout-align-start-center"><div class="hint-icon-container flex-fixed"><md-icon md-svg-icon="icons:info-circle-outline"></md-icon></div><div>{{ ::$ctrl.hint | translate }}</div></div></div><div class="content-divider" ng-if="!noTitle"></div><div class="pip-content"><div class="spacer8" ng-if="noTitle && hint"></div><md-list class="pip-menu pip-ref-list" pip-selected="$ctrl.optionIndex" index="{{ $ctrl.optionIndex }}" pip-select="$ctrl.onSelected($event)"><md-list-item class="pip-ref-list-item pip-selectable layout-row layout-align-start-center" ng-class="{\'selected md-focused\' : option.name == $ctrl.selectedOptionName, \'divider-bottom\': $index != options.length - 1}" md-ink-ripple="" ng-keyup="$ctrl.onKeyUp($event, $index)" ng-repeat="option in $ctrl.options"><div class="pip-content content-stretch" ng-click="$ctrl.onOptionSelect($event, option)"><p class="pip-title spacer-right" ng-if="option.title" style="margin-bottom: 4px !important;">{{ ::option.title | translate }}</p><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.subtitle">{{ ::option.subtitle | translate }}</div><div class="pip-subtitle spacer-right" style="height: inherit" ng-if="option.text" ng-bind-html="option.text | translate"></div></div></md-list-item></md-list></div><div class="spacer8" ng-if="$ctrl.noActions"></div></md-dialog-content><div class="pip-footer" ng-if="!$ctrl.noActions"><div><md-button class="pip-cancel" ng-click="$ctrl.onCancel()">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="pip-submit md-accent" ng-click="$ctrl.onSelect()" style="margin-right: -6px">{{ ::$ctrl.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
 
 
-},{}]},{},[17,1,2,3,4,5,6,7,8,11,9,10,16,12,13,14,15])(17)
+},{}]},{},[28,11])(28)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-exports.ActionsChangedEvent = 'pipActionsChanged';
-exports.SecondaryActionsOpenEvent = 'pipSecondaryActionsOpen';
-var SimpleActionItem = (function () {
-    function SimpleActionItem() {
-    }
-    return SimpleActionItem;
-}());
-exports.SimpleActionItem = SimpleActionItem;
-var ActionItem = (function (_super) {
-    __extends(ActionItem, _super);
-    function ActionItem() {
-        return _super.apply(this, arguments) || this;
-    }
-    return ActionItem;
-}(SimpleActionItem));
-exports.ActionItem = ActionItem;
-var ActionsConfig = (function () {
-    function ActionsConfig() {
-        this.primaryGlobalActions = [];
-        this.primaryLocalActions = [];
-        this.secondaryGlobalActions = [];
-        this.secondaryLocalActions = [];
-    }
-    return ActionsConfig;
-}());
-exports.ActionsConfig = ActionsConfig;
+"use strict";
+var IActionsService_1 = require("./IActionsService");
+var IActionsService_2 = require("./IActionsService");
+var IActionsService_3 = require("./IActionsService");
 var ActionsService = (function () {
     function ActionsService(config, $rootScope) {
         this._config = config;
@@ -7440,23 +8217,23 @@ var ActionsService = (function () {
         this.sendChangeEvent();
     };
     ActionsService.prototype.sendChangeEvent = function () {
-        this._rootScope.$emit(exports.ActionsChangedEvent, this._config);
+        this._rootScope.$emit(IActionsService_2.ActionsChangedEvent, this._config);
     };
     ActionsService.prototype.openMenuEvent = function () {
-        this._rootScope.$emit(exports.SecondaryActionsOpenEvent);
+        this._rootScope.$emit(IActionsService_3.SecondaryActionsOpenEvent);
     };
     return ActionsService;
 }());
 var ActionsProvider = (function () {
     function ActionsProvider() {
-        this._config = new ActionsConfig();
+        this._config = new IActionsService_1.ActionsConfig();
     }
     Object.defineProperty(ActionsProvider.prototype, "config", {
         get: function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new ActionsConfig();
+            this._config = value || new IActionsService_1.ActionsConfig();
         },
         enumerable: true,
         configurable: true
@@ -7512,286 +8289,359 @@ var ActionsProvider = (function () {
 angular
     .module('pipActions')
     .provider('pipActions', ActionsProvider);
-},{}],2:[function(require,module,exports){
-'use strict';
-(function () {
-    PrimaryActionsController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions'];
-    function PrimaryActionsController($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions) {
-        $element.addClass('pip-primary-actions');
-        if ($scope.localActions)
-            pipActions.primaryLocalActions = $scope.localActions;
-        if ($scope.globalActions)
-            pipActions.primaryGlobalActions = $scope.globalActions;
-        $scope.config = pipActions.config;
-        $rootScope.$on('pipActionsChanged', onActionsChanged);
-        $scope.isHidden = isHidden;
-        $scope.actionCount = actionCount;
-        $scope.clickAction = clickAction;
-        return;
-        function onActionsChanged(event, config) {
-            $scope.config = config;
-        }
-        function isHidden(action) {
-            return action.access && !action.access(action);
-        }
-        function actionCount(action) {
-            if (action.count === null || action.count <= 0) {
-                return '';
-            }
-            if (action.count > 99) {
-                return '!';
-            }
-            return action.count;
-        }
-        function calcActions(actions) {
-            var count = 0;
-            _.each(actions, function (action) {
-                if (!isHidden(action)) {
-                    count++;
-                }
-            });
-            return count;
-        }
-        function secondaryActionsVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
-                calcActions($scope.config.secondaryLocalActions) > 0;
-        }
-        function secondaryDividerVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
-                calcActions($scope.config.secondaryLocalActions) > 0;
-        }
-        function clickAction(action, $mdOpenMenu) {
-            if (!action || action.divider) {
-                return;
-            }
-            if (action.close) {
-                $scope.originatorEv = null;
-            }
-            if (action.menu) {
-                $mdOpenMenu($scope.originatorEv);
-                return;
-            }
-            if (action.click) {
-                action.click();
-                return;
-            }
-            if (action.href) {
-                $window.location.href = action.href;
-                return;
-            }
-            if (action.url) {
-                $location.url(action.url);
-                return;
-            }
-            if (action.state) {
-                if ($injector.has('$state')) {
-                    var $state = $injector.get('$state');
-                    $state.go(action.state, action.stateParams);
-                }
-                return;
-            }
-            if (action.event) {
-                $rootScope.$broadcast(action.event);
-            }
-            else {
-                $rootScope.$broadcast('pipActionClicked', action.name);
-            }
-        }
+},{"./IActionsService":2}],2:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+exports.ActionsChangedEvent = 'pipActionsChanged';
+exports.SecondaryActionsOpenEvent = 'pipSecondaryActionsOpen';
+var SimpleActionItem = (function () {
+    function SimpleActionItem() {
     }
-    function primaryActionsDirective() {
-        return {
-            restrict: 'E',
-            scope: {
-                localActions: '=pipLocalActions',
-                globalActions: '=pipGlobalActions'
-            },
-            replace: false,
-            templateUrl: 'actions/PrimaryActions.html',
-            controller: PrimaryActionsController
-        };
+    return SimpleActionItem;
+}());
+exports.SimpleActionItem = SimpleActionItem;
+var ActionItem = (function (_super) {
+    __extends(ActionItem, _super);
+    function ActionItem() {
+        return _super.apply(this, arguments) || this;
     }
-    angular
-        .module('pipActions')
-        .directive('pipPrimaryActions', primaryActionsDirective);
-})();
+    return ActionItem;
+}(SimpleActionItem));
+exports.ActionItem = ActionItem;
+var ActionsConfig = (function () {
+    function ActionsConfig() {
+        this.primaryGlobalActions = [];
+        this.primaryLocalActions = [];
+        this.secondaryGlobalActions = [];
+        this.secondaryLocalActions = [];
+    }
+    return ActionsConfig;
+}());
+exports.ActionsConfig = ActionsConfig;
 },{}],3:[function(require,module,exports){
-'use strict';
-(function () {
-    SecondaryActionsController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', '$location', '$injector', 'pipActions', '$timeout'];
-    function SecondaryActionsController($scope, $element, $attrs, $rootScope, $window, $location, $injector, pipActions, $timeout) {
-        $element.addClass('pip-secondary-actions');
-        if ($scope.localActions)
-            pipActions.secondaryLocalActions = $scope.localActions;
-        if ($scope.globalActions)
-            pipActions.secondaryGlobalActions = $scope.globalActions;
-        $scope.config = pipActions.config;
-        $rootScope.$on('pipActionsChanged', onActionsChanged);
-        $rootScope.$on('pipSecondaryActionsOpen', onActionsMenuOpen);
-        $scope.isHidden = isHidden;
-        $scope.actionCount = actionCount;
-        $scope.secondaryActionsVisible = secondaryActionsVisible;
-        $scope.secondaryDividerVisible = secondaryDividerVisible;
-        $scope.clickAction = clickAction;
-        $scope.getMenu = function (menuFn) {
-            $scope.menuFn = menuFn;
-        };
-        $scope.openMenu = openMenu;
-        return;
-        function onActionsMenuOpen() {
-            $scope.menuFn();
-        }
-        function openMenu($mdOpenMenu, ev) {
-            $scope.originatorEv = ev;
-            $mdOpenMenu(ev);
-        }
-        function onActionsChanged(event, config) {
-            $scope.config = config;
-        }
-        function isHidden(action) {
-            return action.access && !action.access(action);
-        }
-        function actionCount(action) {
-            if (action.count === null || action.count <= 0) {
-                return '';
-            }
-            if (action.count > 99) {
-                return '!';
-            }
-            return action.count;
-        }
-        function calcActions(actions) {
-            var count = 0;
-            _.each(actions, function (action) {
-                if (!isHidden(action)) {
-                    count++;
-                }
+"use strict";
+var PrimaryActionsController = (function () {
+    PrimaryActionsController.$inject = ['$element', '$injector', '$scope', '$rootScope', '$window', '$location', 'pipActions', '$log', '$attrs'];
+    function PrimaryActionsController($element, $injector, $scope, $rootScope, $window, $location, pipActions, $log, $attrs) {
+        "ngInject";
+        var _this = this;
+        this.$element = $element;
+        this.$injector = $injector;
+        this.$scope = $scope;
+        this.$rootScope = $rootScope;
+        this.$window = $window;
+        this.$location = $location;
+        this.pipActions = pipActions;
+        this._pipTranslate = this.$injector.has('pipTranslate') ? this.$injector.get('pipTranslate') : null;
+        if (this._pipTranslate && this._pipTranslate.setTranslations) {
+            this._pipTranslate.setTranslations('en', {
+                DOCUMENTS_ATTACHED: 'document(s) attached',
+                ERROR_DOCUMENTS_LOADED: 'Error: <%= error_number %> document(s) are not loaded'
             });
-            return count;
+            this._pipTranslate.setTranslations('ru', {
+                DOCUMENTS_ATTACHED: 'документов добавлено',
+                ERROR_DOCUMENTS_LOADED: 'Ошибка: <%= error_number %> документ(ов) не загружено'
+            });
         }
-        function secondaryActionsVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 ||
-                calcActions($scope.config.secondaryLocalActions) > 0;
+        this.$element.addClass('pip-primary-actions');
+        this.$rootScope.$on('pipActionsChanged', function (event, config) {
+            _this.onActionsChanged(event, config);
+        });
+    }
+    PrimaryActionsController.prototype.$onInit = function () {
+        if (this.localActions) {
+            this.pipActions.primaryLocalActions = this.localActions;
         }
-        function secondaryDividerVisible() {
-            return calcActions($scope.config.secondaryGlobalActions) > 0 &&
-                calcActions($scope.config.secondaryLocalActions) > 0;
+        if (this.globalActions) {
+            this.pipActions.primaryGlobalActions = this.globalActions;
         }
-        function clickAction(action, $mdOpenMenu) {
-            if (!action || action.divider) {
-                return;
-            }
-            if (action.close) {
-                $scope.originatorEv = null;
-            }
-            if (action.menu) {
-                $mdOpenMenu($scope.originatorEv);
-                return;
-            }
-            if (action.click) {
-                action.click();
-                return;
-            }
-            if (action.href) {
-                $window.location.href = action.href;
-                return;
-            }
-            if (action.url) {
-                $location.url(action.url);
-                return;
-            }
-            if (action.state) {
-                if ($injector.has('$state')) {
-                    var $state = $injector.get('$state');
-                    $state.go(action.state, action.stateParams);
+        this.config = this.pipActions.config;
+    };
+    PrimaryActionsController.prototype.onActionsChanged = function (event, config) {
+        this.config = config;
+    };
+    PrimaryActionsController.prototype.isHidden = function (action) {
+        return action.access && !action.access(action);
+    };
+    PrimaryActionsController.prototype.actionCount = function (action) {
+        if (action.count === null || action.count <= 0) {
+            return '';
+        }
+        if (action.count > 99) {
+            return '!';
+        }
+        return String(action.count);
+    };
+    PrimaryActionsController.prototype.clickAction = function (action, $mdOpenMenu) {
+        if (!action || action.divider) {
+            return;
+        }
+        if (action.subActions) {
+            $mdOpenMenu(this.originatorEv);
+            return;
+        }
+        if (_.isFunction(action.click)) {
+            action.click(action);
+            return;
+        }
+        if (action.href) {
+            this.$window.location.href = action.href;
+            return;
+        }
+        if (action.url) {
+            this.$location.url(action.url);
+            return;
+        }
+        if (action.state) {
+            if (this.$injector.has('this._state')) {
+                var _state = this.$injector.has('pipTranslate') ? this.$injector.get('$state') : null;
+                if (_state) {
+                    _state.go(action.state, action.stateParams);
                 }
-                return;
             }
-            if (action.event) {
-                $rootScope.$broadcast(action.event);
-            }
-            else {
-                $rootScope.$broadcast('pipActionClicked', action.name);
-            }
+            return;
         }
+        if (action.event) {
+            this.$rootScope.$broadcast(action.event);
+        }
+        else {
+            this.$rootScope.$broadcast('pipActionClicked', action.name);
+        }
+    };
+    return PrimaryActionsController;
+}());
+var PrimaryActionsBindings = {
+    localActions: '<pipLocalActions',
+    globalActions: '<pipGlobalActions',
+    originatorEv: '<?pipOriginatorEv'
+};
+var PrimaryActionsChanges = (function () {
+    function PrimaryActionsChanges() {
     }
-    function secondaryActionsDirective() {
-        return {
-            restrict: 'E',
-            scope: {
-                localActions: '=pipLocalActions',
-                globalActions: '=pipGlobalActions'
-            },
-            replace: false,
-            templateUrl: 'actions/SecondaryActions.html',
-            controller: SecondaryActionsController
-        };
-    }
+    return PrimaryActionsChanges;
+}());
+(function () {
+    var primaryActions = {
+        bindings: PrimaryActionsBindings,
+        templateUrl: 'actions/PrimaryActions.html',
+        controller: PrimaryActionsController
+    };
     angular
         .module('pipActions')
-        .directive('pipSecondaryActions', secondaryActionsDirective);
+        .component('pipPrimaryActions', primaryActions);
 })();
 },{}],4:[function(require,module,exports){
-'use strict';
+"use strict";
+var SecondaryActionsController = (function () {
+    SecondaryActionsController.$inject = ['$attrs', '$injector', '$log', '$rootScope', '$window', '$location', 'pipActions', '$element'];
+    function SecondaryActionsController($attrs, $injector, $log, $rootScope, $window, $location, pipActions, $element) {
+        "ngInject";
+        var _this = this;
+        this.$attrs = $attrs;
+        this.$injector = $injector;
+        this.$log = $log;
+        this.$rootScope = $rootScope;
+        this.$window = $window;
+        this.$location = $location;
+        this.pipActions = pipActions;
+        $element.addClass('pip-secondary-actions');
+        if (this.localActions) {
+            pipActions.secondaryLocalActions = this.localActions;
+        }
+        if (this.globalActions) {
+            pipActions.secondaryGlobalActions = this.globalActions;
+        }
+        this.config = pipActions.config;
+        this.$rootScope.$on('pipActionsChanged', function (event, config) {
+            _this.onActionsChanged(event, config);
+        });
+        this.$rootScope.$on('pipSecondaryActionsOpen', function () {
+            _this.onActionsMenuOpen();
+        });
+    }
+    SecondaryActionsController.prototype.getMenu = function (menuFn) {
+        this._menuFn = menuFn;
+    };
+    SecondaryActionsController.prototype.onActionsMenuOpen = function () {
+        this._menuFn();
+    };
+    SecondaryActionsController.prototype.openMenu = function ($mdOpenMenu, ev) {
+        this.originatorEv = ev;
+        $mdOpenMenu(ev);
+    };
+    SecondaryActionsController.prototype.onActionsChanged = function (event, config) {
+        this.config = config;
+    };
+    SecondaryActionsController.prototype.isHidden = function (action) {
+        return action.access && !action.access(action);
+    };
+    SecondaryActionsController.prototype.actionCount = function (action) {
+        if (action.count === null || action.count <= 0) {
+            return '';
+        }
+        if (action.count > 99) {
+            return '!';
+        }
+        return String(action.count);
+    };
+    SecondaryActionsController.prototype.calcActions = function (actions) {
+        var _this = this;
+        var count = 0;
+        _.each(actions, function (action) {
+            if (!_this.isHidden(action)) {
+                count++;
+            }
+        });
+        return count;
+    };
+    SecondaryActionsController.prototype.secondaryActionsVisible = function () {
+        return this.calcActions(this.config.secondaryGlobalActions) > 0 ||
+            this.calcActions(this.config.secondaryLocalActions) > 0;
+    };
+    SecondaryActionsController.prototype.secondaryDividerVisible = function () {
+        return this.calcActions(this.config.secondaryGlobalActions) > 0 &&
+            this.calcActions(this.config.secondaryLocalActions) > 0;
+    };
+    SecondaryActionsController.prototype.clickAction = function (action, $mdOpenMenu) {
+        if (!action || action.divider) {
+            return;
+        }
+        if (action.subActions) {
+            $mdOpenMenu(this.originatorEv);
+            return;
+        }
+        if (action.click) {
+            action.click(action);
+            return;
+        }
+        if (action.href) {
+            this.$window.location.href = action.href;
+            return;
+        }
+        if (action.url) {
+            this.$location.url(action.url);
+            return;
+        }
+        if (action.state) {
+            if (this.$injector.has('this._state')) {
+                var _state = this.$injector.has('pipTranslate') ? this.$injector.get('$state') : null;
+                if (_state) {
+                    _state.go(action.state, action.stateParams);
+                }
+            }
+            return;
+        }
+        if (action.event) {
+            this.$rootScope.$broadcast(action.event);
+        }
+        else {
+            this.$rootScope.$broadcast('pipActionClicked', action.name);
+        }
+    };
+    return SecondaryActionsController;
+}());
+var SecondaryActionsBindings = {
+    localActions: '<pipLocalActions',
+    globalActions: '<pipGlobalActions'
+};
+var SecondaryActionsChanges = (function () {
+    function SecondaryActionsChanges() {
+    }
+    return SecondaryActionsChanges;
+}());
+(function () {
+    var secondaryActions = {
+        bindings: SecondaryActionsBindings,
+        templateUrl: 'actions/SecondaryActions.html',
+        controller: SecondaryActionsController
+    };
+    angular
+        .module('pipActions')
+        .component('pipSecondaryActions', secondaryActions);
+})();
+},{}],5:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipActions', ['ngMaterial', 'pipNav.Templates', 'ui.router']);
 require("./ActionsService");
-require("./PrimaryActionsDirective");
-require("./SecondaryActionsDirective");
-__export(require("./ActionsService"));
-},{"./ActionsService":1,"./PrimaryActionsDirective":2,"./SecondaryActionsDirective":3}],5:[function(require,module,exports){
-'use strict';
-(function () {
-    AppBarDirectiveController.$inject = ['$scope', '$element', '$rootScope', 'pipAppBar'];
-    function AppBarDirectiveController($scope, $element, $rootScope, pipAppBar) {
+require("./PrimaryActions");
+require("./SecondaryActions");
+__export(require("./IActionsService"));
+},{"./ActionsService":1,"./IActionsService":2,"./PrimaryActions":3,"./SecondaryActions":4}],6:[function(require,module,exports){
+"use strict";
+var AppBarController = (function () {
+    AppBarController.$inject = ['$element', '$rootScope', 'pipAppBar'];
+    function AppBarController($element, $rootScope, pipAppBar) {
         "ngInject";
+        var _this = this;
         $element.addClass('pip-appbar');
         $element.addClass('color-primary-bg');
-        $scope.config = pipAppBar.config;
-        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
-        function onAppBarChanged(event, config) {
-            $scope.config = config;
-        }
+        this.config = pipAppBar.config;
+        $rootScope.$on('pipAppBarChanged', function (event, config) {
+            _this.onAppBarChanged(event, config);
+        });
     }
-    function appbarDirective() {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: true,
-            templateUrl: 'appbar/AppBar.html',
-            controller: AppBarDirectiveController
-        };
-    }
+    AppBarController.prototype.onAppBarChanged = function (event, config) {
+        this.config = config;
+    };
+    return AppBarController;
+}());
+{
+    var appbar = {
+        transclude: true,
+        templateUrl: 'appbar/AppBar.html',
+        controller: AppBarController
+    };
     angular
         .module('pipAppBar')
-        .directive('pipAppbar', appbarDirective);
-})();
-},{}],6:[function(require,module,exports){
-'use strict';
-(function () {
-    AppBarPartDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipAppBar'];
-    appbarPartDirective.$inject = ['ngIfDirective'];
-    function AppBarPartDirectiveController($scope, $element, $attrs, $rootScope, pipAppBar) {
-        "ngInject";
-        var partName = '' + $attrs.pipAppbarPart;
-        var partValue = null;
-        var pos = partName.indexOf(':');
-        if (pos > 0) {
-            partValue = partName.substr(pos + 1);
-            partName = partName.substr(0, pos);
-        }
-        onAppBarChanged(null, pipAppBar.config);
-        $rootScope.$on('pipAppBarChanged', onAppBarChanged);
-        function onAppBarChanged(event, config) {
-            var parts = config.parts || {};
-            var currentPartValue = parts[partName];
-            var visible = !!(partValue ? currentPartValue == partValue : currentPartValue);
-            if (visible != $scope.visible)
-                $scope.visible = visible;
-        }
+        .component('pipAppbar', appbar);
+}
+},{}],7:[function(require,module,exports){
+"use strict";
+var AppBarConfig = (function () {
+    function AppBarConfig() {
     }
-    function appbarPartDirective(ngIfDirective) {
+    return AppBarConfig;
+}());
+exports.AppBarConfig = AppBarConfig;
+},{}],8:[function(require,module,exports){
+"use strict";
+var AppBarPartController = (function () {
+    AppBarPartController.$inject = ['$scope', '$element', '$attrs', '$log', '$rootScope', 'pipAppBar'];
+    function AppBarPartController($scope, $element, $attrs, $log, $rootScope, pipAppBar) {
+        "ngInject";
+        var _this = this;
+        this.$scope = $scope;
+        this._partName = String($attrs['pipAppbarPart']);
+        this._partValue = null;
+        var pos = this._partName.indexOf(':');
+        if (pos > 0) {
+            this._partValue = this._partName.substr(pos + 1);
+            this._partName = this._partName.substr(0, pos);
+        }
+        this.onAppBarChanged(null, pipAppBar.config);
+        $rootScope.$on('pipAppBarChanged', function (event, config) {
+            _this.onAppBarChanged(null, config);
+        });
+    }
+    AppBarPartController.prototype.onAppBarChanged = function (event, config) {
+        var parts = config.parts || {};
+        var currentPartValue = parts[this._partName];
+        var visible = !!(this._partValue ? currentPartValue == this._partValue : currentPartValue);
+        if (visible != this.$scope['visible'])
+            this.$scope['visible'] = visible;
+    };
+    return AppBarPartController;
+}());
+(function () {
+    appbarPart.$inject = ['ngIfDirective'];
+    function appbarPart(ngIfDirective) {
         "ngInject";
         var ngIf = ngIfDirective[0];
         return {
@@ -7801,30 +8651,25 @@ __export(require("./ActionsService"));
             restrict: ngIf.restrict,
             scope: true,
             link: function linkFunction($scope, $element, $attrs) {
-                $attrs.ngIf = function () {
-                    return $scope.visible;
+                $attrs['ngIf'] = function () {
+                    return $scope['visible'];
                 };
                 ngIf.link.apply(ngIf, arguments);
             },
-            controller: AppBarPartDirectiveController
+            controller: AppBarPartController
         };
     }
     angular.module('pipAppBar')
-        .directive('pipAppbarPart', appbarPartDirective);
+        .directive('pipAppbarPart', appbarPart);
 })();
-},{}],7:[function(require,module,exports){
-'use strict';
+},{}],9:[function(require,module,exports){
+"use strict";
+var AppBarConfig_1 = require("./AppBarConfig");
 exports.AppBarChangedEvent = 'pipAppBarChanged';
-var AppBarConfig = (function () {
-    function AppBarConfig() {
-    }
-    return AppBarConfig;
-}());
-exports.AppBarConfig = AppBarConfig;
 var AppBarService = (function () {
     function AppBarService(config, $rootScope) {
+        this.$rootScope = $rootScope;
         this._config = config;
-        this._rootScope = $rootScope;
     }
     Object.defineProperty(AppBarService.prototype, "config", {
         get: function () {
@@ -7855,8 +8700,9 @@ var AppBarService = (function () {
         this._config.visible = true;
         this._config.parts = parts || this._config.parts || {};
         this._config.classes = classes || this._config.classes || [];
-        if (shadowBreakpoints)
+        if (shadowBreakpoints) {
             this.setShadow(shadowBreakpoints);
+        }
         this.sendConfigEvent();
     };
     AppBarService.prototype.hide = function () {
@@ -7917,7 +8763,7 @@ var AppBarService = (function () {
         this.sendConfigEvent();
     };
     AppBarService.prototype.sendConfigEvent = function () {
-        this._rootScope.$broadcast(exports.AppBarChangedEvent, this._config);
+        this.$rootScope.$broadcast(exports.AppBarChangedEvent, this._config);
     };
     return AppBarService;
 }());
@@ -7934,7 +8780,7 @@ var AppBarProvider = (function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new AppBarConfig();
+            this._config = value || new AppBarConfig_1.AppBarConfig();
         },
         enumerable: true,
         configurable: true
@@ -7993,122 +8839,123 @@ var AppBarProvider = (function () {
 angular
     .module('pipAppBar')
     .provider('pipAppBar', AppBarProvider);
-},{}],8:[function(require,module,exports){
-'use strict';
+},{"./AppBarConfig":7}],10:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular
     .module('pipAppBar', ['ngMaterial', 'pipNav.Templates']);
+require("./AppBarConfig");
 require("./AppBarService");
-require("./AppBarDirective");
-require("./AppBarPartDirective");
+require("./AppBar");
+require("./AppBarPart");
 __export(require("./AppBarService"));
-},{"./AppBarDirective":5,"./AppBarPartDirective":6,"./AppBarService":7}],9:[function(require,module,exports){
-'use strict';
+},{"./AppBar":6,"./AppBarConfig":7,"./AppBarPart":8,"./AppBarService":9}],11:[function(require,module,exports){
+"use strict";
 var BreadcrumbService_1 = require("./BreadcrumbService");
 var BreadcrumbService_2 = require("./BreadcrumbService");
 var SearchService_1 = require("../search/SearchService");
-(function () {
-    var BreadcrumbController = (function () {
-        BreadcrumbController.$inject = ['$element', '$rootScope', '$window', '$state', '$location', '$injector', 'pipBreadcrumb', '$mdMedia'];
-        function BreadcrumbController($element, $rootScope, $window, $state, $location, $injector, pipBreadcrumb, $mdMedia) {
-            "ngInject";
-            var _this = this;
-            this._rootScope = $rootScope;
-            this._window = $window;
-            this._location = $location;
-            this._injector = $injector;
-            $element.addClass('pip-breadcrumb');
-            this.config = pipBreadcrumb.config;
-            $rootScope.$on(BreadcrumbService_1.BreadcrumbChangedEvent, function (event, config) { _this.onBreadcrumbChanged(event, config); });
-            $rootScope.$on(BreadcrumbService_2.BreadcrumbBackEvent, function () { _this.onBreadcrumbBack(); });
-            var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-            this._media = pipMedia !== undefined ? pipMedia : $mdMedia;
-        }
-        BreadcrumbController.prototype.onBreadcrumbChanged = function (event, config) {
-            this.config = config;
-        };
-        BreadcrumbController.prototype.onBreadcrumbBack = function () {
-            var items = this.config.items;
-            if (_.isArray(items) && items.length > 0) {
-                var item = items[items.length - 1];
-                var backCallback = item.click;
-                if (_.isFunction(backCallback))
-                    backCallback(item);
-                else
-                    this._window.history.back();
-            }
-            else
-                this._window.history.back();
-        };
-        BreadcrumbController.prototype.onClick = function (item) {
-            if (_.isFunction(item.click))
+var BreadcrumbController = (function () {
+    BreadcrumbController.$inject = ['$rootScope', '$window', '$location', '$injector', 'pipBreadcrumb', '$mdMedia', '$state', '$element'];
+    function BreadcrumbController($rootScope, $window, $location, $injector, pipBreadcrumb, $mdMedia, $state, $element) {
+        "ngInject";
+        var _this = this;
+        this.$rootScope = $rootScope;
+        this.$window = $window;
+        this.$location = $location;
+        this.$injector = $injector;
+        $element.addClass('pip-breadcrumb');
+        this.config = pipBreadcrumb.config;
+        $rootScope.$on(BreadcrumbService_1.BreadcrumbChangedEvent, function (event, config) {
+            _this.onBreadcrumbChanged(event, config);
+        });
+        $rootScope.$on(BreadcrumbService_2.BreadcrumbBackEvent, function () { _this.onBreadcrumbBack(); });
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        this._media = pipMedia !== undefined ? pipMedia : $mdMedia;
+    }
+    BreadcrumbController.prototype.onBreadcrumbChanged = function (event, config) {
+        this.config = config;
+    };
+    BreadcrumbController.prototype.onBreadcrumbBack = function () {
+        var items = this.config.items;
+        if (_.isArray(items) && items.length > 0) {
+            var item = items[items.length - 1];
+            if (_.isFunction(item.click)) {
                 item.click(item);
-        };
-        BreadcrumbController.prototype.openSearch = function () {
-            this._rootScope.$broadcast(SearchService_1.OpenSearchEvent);
-        };
-        BreadcrumbController.prototype.actionsVisible = function (item) {
-            return angular.isArray(item.subActions) && item.subActions.length > 1;
-        };
-        BreadcrumbController.prototype.onOpenMenu = function ($mdOpenMenu, event) {
-            this.originatorEv = event;
-            $mdOpenMenu(this.originatorEv);
-        };
-        BreadcrumbController.prototype.onSubActionClick = function (action) {
-            if (!action || action.divider) {
-                return;
-            }
-            if (action.click) {
-                action.click(action);
-                return;
-            }
-            if (action.href) {
-                this._window.location.href = action.href;
-                return;
-            }
-            if (action.url) {
-                this._location.url(action.url);
-                return;
-            }
-            if (action.state) {
-                if (this._injector.has('$state')) {
-                    var $state = this._injector.get('$state');
-                    $state.go(action.state, action.stateParams);
-                }
-                return;
-            }
-            if (action.event) {
-                this._rootScope.$broadcast(action.event);
-                this.originatorEv = null;
             }
             else {
-                this._rootScope.$broadcast('pipActionClicked', action.name);
-                this.originatorEv = null;
+                this.$window.history.back();
             }
-        };
-        return BreadcrumbController;
-    }());
-    function breadcrumbDirective() {
-        return {
-            restrict: 'E',
-            scope: {},
-            replace: false,
-            templateUrl: 'breadcrumb/Breadcrumb.html',
-            controller: BreadcrumbController,
-            controllerAs: 'vm'
-        };
-    }
-    angular.module('pipBreadcrumb')
-        .directive('pipBreadcrumb', breadcrumbDirective);
-})();
-},{"../search/SearchService":27,"./BreadcrumbService":10}],10:[function(require,module,exports){
-'use strict';
-exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
-exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
+        }
+        else {
+            this.$window.history.back();
+        }
+    };
+    BreadcrumbController.prototype.onClick = function (item) {
+        if (_.isFunction(item.click)) {
+            item.click(item);
+        }
+    };
+    BreadcrumbController.prototype.openSearch = function () {
+        this.$rootScope.$broadcast(SearchService_1.OpenSearchEvent);
+    };
+    BreadcrumbController.prototype.actionsVisible = function (item) {
+        return angular.isArray(item.subActions) && item.subActions.length > 1;
+    };
+    BreadcrumbController.prototype.onOpenMenu = function ($mdOpenMenu, event) {
+        this.originatorEv = event;
+        $mdOpenMenu(this.originatorEv);
+    };
+    BreadcrumbController.prototype.onSubActionClick = function (action) {
+        if (!action || action.divider) {
+            return;
+        }
+        if (_.isFunction(action.click)) {
+            action.click(action);
+            return;
+        }
+        if (action.href) {
+            this.$window.location.href = action.href;
+            return;
+        }
+        if (action.url) {
+            this.$location.url(action.url);
+            return;
+        }
+        if (action.state) {
+            if (this.$injector.has('$state')) {
+                var _state = this.$injector.get('$state');
+                _state.go(action.state, action.stateParams);
+            }
+            return;
+        }
+        if (action.event) {
+            this.$rootScope.$broadcast(action.event);
+            this.originatorEv = null;
+        }
+        else {
+            this.$rootScope.$broadcast('pipActionClicked', action.name);
+            this.originatorEv = null;
+        }
+    };
+    return BreadcrumbController;
+}());
+var breadcrumb = {
+    bindings: {},
+    templateUrl: 'breadcrumb/Breadcrumb.html',
+    controller: BreadcrumbController
+};
+angular
+    .module('pipBreadcrumb')
+    .component('pipBreadcrumb', breadcrumb);
+},{"../search/SearchService":35,"./BreadcrumbService":13}],12:[function(require,module,exports){
+"use strict";
 var BreadcrumbItem = (function () {
     function BreadcrumbItem() {
+        this.title = null;
+        this.click = null;
+        this.subActions = null;
     }
     return BreadcrumbItem;
 }());
@@ -8119,10 +8966,15 @@ var BreadcrumbConfig = (function () {
     return BreadcrumbConfig;
 }());
 exports.BreadcrumbConfig = BreadcrumbConfig;
+},{}],13:[function(require,module,exports){
+"use strict";
+var BreadcrumbConfig_1 = require("./BreadcrumbConfig");
+exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
+exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
 var BreadcrumbService = (function () {
-    function BreadcrumbService(config, $rootScope) {
+    function BreadcrumbService($rootScope, config) {
+        this.$rootScope = $rootScope;
         this._config = config;
-        this._rootScope = $rootScope;
     }
     Object.defineProperty(BreadcrumbService.prototype, "config", {
         get: function () {
@@ -8179,17 +9031,13 @@ var BreadcrumbService = (function () {
         this.sendConfigEvent();
     };
     BreadcrumbService.prototype.sendConfigEvent = function () {
-        this._rootScope.$broadcast(exports.BreadcrumbChangedEvent, this._config);
+        this.$rootScope.$broadcast(exports.BreadcrumbChangedEvent, this._config);
     };
     return BreadcrumbService;
 }());
 var BreadcrumbProvider = (function () {
     function BreadcrumbProvider() {
-        this._config = {
-            text: null,
-            items: null,
-            criteria: null
-        };
+        this._config = new BreadcrumbConfig_1.BreadcrumbConfig();
     }
     Object.defineProperty(BreadcrumbProvider.prototype, "text", {
         get: function () {
@@ -8204,24 +9052,25 @@ var BreadcrumbProvider = (function () {
     BreadcrumbProvider.prototype.$get = ['$rootScope', function ($rootScope) {
         "ngInject";
         if (this._service == null)
-            this._service = new BreadcrumbService(this._config, $rootScope);
+            this._service = new BreadcrumbService($rootScope, this._config);
         return this._service;
     }];
     return BreadcrumbProvider;
 }());
-angular.module('pipBreadcrumb')
+angular
+    .module('pipBreadcrumb')
     .provider('pipBreadcrumb', BreadcrumbProvider);
-},{}],11:[function(require,module,exports){
-'use strict';
+},{"./BreadcrumbConfig":12}],14:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate']);
-require("./BreadcrumbDirective");
+require("./Breadcrumb");
 require("./BreadcrumbService");
 __export(require("./BreadcrumbService"));
-},{"./BreadcrumbDirective":9,"./BreadcrumbService":10}],12:[function(require,module,exports){
-'use strict';
+},{"./Breadcrumb":11,"./BreadcrumbService":13}],15:[function(require,module,exports){
+"use strict";
 var NavService = (function () {
     NavService.$inject = ['$injector'];
     function NavService($injector) {
@@ -8236,31 +9085,37 @@ var NavService = (function () {
         this.menu = $injector.has('pipNavMenu') ? $injector.get('pipNavMenu') : null;
     }
     NavService.prototype.reset = function () {
-        if (this.appbar)
+        if (this.appbar) {
             this.appbar.show();
-        if (this.icon)
+        }
+        if (this.icon) {
             this.icon.showMenu();
-        if (this.breadcrumb)
+        }
+        if (this.breadcrumb) {
             this.breadcrumb.showText(null);
-        if (this.actions)
+        }
+        if (this.actions) {
             this.actions.show();
-        if (this.search)
+        }
+        if (this.search) {
             this.search.set(null);
-        if (this.sidenav)
+        }
+        if (this.sidenav) {
             this.sidenav.show();
+        }
     };
     return NavService;
 }());
 angular
     .module('pipNavService', [])
     .service('pipNavService', NavService);
-},{}],13:[function(require,module,exports){
-'use strict';
-(function () {
+},{}],16:[function(require,module,exports){
+{
     translateFilter.$inject = ['$injector'];
     function translateFilter($injector) {
         "ngInject";
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+        var pipTranslate = $injector.has('pipTranslate')
+            ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
@@ -8268,133 +9123,164 @@ angular
     angular
         .module('pipNav.Translate', [])
         .filter('translate', translateFilter);
-})();
-},{}],14:[function(require,module,exports){
-'use strict';
-(function () {
-    DropdownDirectiveController.$inject = ['$scope', '$element', '$attrs', '$injector', '$rootScope', '$mdMedia', '$timeout'];
-    function DropdownDirectiveController($scope, $element, $attrs, $injector, $rootScope, $mdMedia, $timeout) {
-        "ngInject";
-        var pipTheme = $injector.has('pipTheme') ? $injector.get('pipTheme') : null;
-        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        var currentTheme = 'default';
-        if (pipTheme)
-            currentTheme = pipTheme.use();
-        else if ($rootScope.$theme)
-            currentTheme = $rootScope.$theme;
-        $scope.class = ($attrs.class || '') + ' md-' + currentTheme + '-theme';
-        $scope.media = pipMedia !== undefined ? pipMedia : $mdMedia;
-        $scope.actions = ($scope.actions && _.isArray($scope.actions)) ? $scope.actions : [];
-        $scope.activeIndex = $scope.activeIndex || 0;
-        $scope.disabled = function () {
-            if ($scope.ngDisabled()) {
-                return $scope.ngDisabled();
+}
+},{}],17:[function(require,module,exports){
+{
+    var DropdownController = (function () {
+        DropdownController.$inject = ['$scope', '$timeout', '$element', '$attrs', '$injector', '$log', '$rootScope', '$mdMedia'];
+        function DropdownController($scope, $timeout, $element, $attrs, $injector, $log, $rootScope, $mdMedia) {
+            "ngInject";
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this._pipTheme = $injector.has('pipTheme') ? $injector.get('pipTheme') : null;
+            this._pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+            if (this._pipTheme) {
+                this.currentTheme = this._pipTheme.theme;
+            }
+            else if ($rootScope['$theme']) {
+                this.currentTheme = $rootScope['$theme'];
+            }
+            this.themeClass = ($attrs['class'] || '') + ' md-' + this.currentTheme + '-theme';
+            this.media = !_.isUndefined(this._pipMedia) ? this._pipMedia : $mdMedia;
+            this.actions = (this.actions && _.isArray(this.actions)) ? this.actions : [];
+            this.activeIndex = this.activeIndex || 0;
+        }
+        DropdownController.prototype.disabled = function () {
+            if (this.ngDisabled) {
+                return this.ngDisabled();
             }
             else {
                 return false;
             }
         };
-        $scope.onSelect = function (index) {
-            $scope.activeIndex = index;
-            if ($scope.select) {
-                $scope.select($scope.actions[index], $scope.activeIndex);
+        DropdownController.prototype.onSelect = function (index) {
+            var _this = this;
+            this.activeIndex = index;
+            if (this.select) {
+                this.select(this.actions[index], this.activeIndex);
             }
-            if ($scope.pipChange) {
-                $timeout(function () {
-                    $scope.pipChange();
+            if (this.pipChange) {
+                this.$timeout(function () {
+                    _this.pipChange();
                 });
             }
         };
-        $scope.show = function () {
-            if ($scope.showDropdown()) {
-                return $scope.showDropdown();
+        DropdownController.prototype.show = function () {
+            var result;
+            if (this.showDropdown()) {
+                return !!this.showDropdown();
             }
             else {
                 return true;
             }
         };
-    }
-    function dropdownDirective() {
-        return {
-            restrict: 'E',
-            scope: {
-                ngDisabled: '&',
-                actions: '=pipActions',
-                showDropdown: '&pipShow',
-                activeIndex: '=pipActiveIndex',
-                select: '=pipDropdownSelect',
-                pipChange: '&'
-            },
-            templateUrl: 'dropdown/Dropdown.html',
-            controller: DropdownDirectiveController
-        };
-    }
+        return DropdownController;
+    }());
+    var DropdownBindings = {
+        ngDisabled: '&',
+        actions: '=pipActions',
+        showDropdown: '&pipShow',
+        activeIndex: '=pipActiveIndex',
+        select: '=pipDropdownSelect',
+        pipChange: '&'
+    };
+    var DropdownChanges = (function () {
+        function DropdownChanges() {
+        }
+        return DropdownChanges;
+    }());
+    var dropdown = {
+        bindings: DropdownBindings,
+        templateUrl: 'dropdown/Dropdown.html',
+        controller: DropdownController
+    };
     angular
         .module('pipDropdown', ['pipNav.Templates'])
-        .directive('pipDropdown', dropdownDirective);
-})();
-},{}],15:[function(require,module,exports){
-'use strict';
-(function () {
-    NavHeaderDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout', 'pipNavHeader'];
-    function NavHeaderDirectiveController($scope, $element, $rootScope, $timeout, pipNavHeader) {
-        "ngInject";
-        var image = null, imageBlock = $element.find('.pip-sticky-nav-header-user'), $image, currentState, loadedDefaultImage = false;
-        $element.addClass('pip-sticky-nav-header');
-        $scope.onUserClick = onUserClick;
-        $scope.onImageError = onImageError;
-        $scope.onImageLoad = onImageLoad;
-        $timeout(function () {
-            $image = $element.find('.pip-sticky-nav-header-user-image');
-            if ($image[0]) {
-                $image[0].onload = onImageLoad;
-                $image[0].onerror = onImageError;
-            }
-            else {
-                $image.onload = onImageLoad;
-                $image.onerror = onImageError;
-            }
-            onNavHeaderChanged(null, pipNavHeader.config);
-        }, 20);
-        $rootScope.$on('pipNavHeaderChanged', onNavHeaderChanged);
-        $rootScope.$on('pipSideNavStateChanged', onStateChanged);
-        return;
-        function initHeader() {
-            if (!pipNavHeader.config)
-                return;
-            $scope.title = pipNavHeader.config.title;
-            $scope.subtitle = pipNavHeader.config.subtitle;
-            $scope.imageUrl = pipNavHeader.config.imageUrl;
-            $scope.imageCss = pipNavHeader.config.imageCss;
-        }
-        function onImageLoad($event) {
-            var image = $($event.target);
-            setImageMarginCSS(imageBlock, image);
-        }
-        ;
-        function onImageError($event) {
-            if (loadedDefaultImage)
-                return;
-            $scope.$apply(function () {
-                setImage(pipNavHeader.config, true);
+        .component('pipDropdown', dropdown);
+}
+},{}],18:[function(require,module,exports){
+"use strict";
+{
+    var NavHeaderController = (function () {
+        NavHeaderController.$inject = ['$element', '$scope', '$log', '$rootScope', '$timeout', 'pipNavHeader', 'navConstant'];
+        function NavHeaderController($element, $scope, $log, $rootScope, $timeout, pipNavHeader, navConstant) {
+            "ngInject";
+            var _this = this;
+            this.$element = $element;
+            this.$scope = $scope;
+            this.$rootScope = $rootScope;
+            this.$timeout = $timeout;
+            this.pipNavHeader = pipNavHeader;
+            this.imageUrl = null;
+            $element.addClass('pip-sticky-nav-header');
+            this.initImage();
+            this.cleanupNavHeaderChanged = $rootScope.$on('pipNavHeaderChanged', function ($event, config) {
+                _this.onNavHeaderChanged($event, config);
+            });
+            this.cleanupSideNavStateChanged = $rootScope.$on('pipSideNavStateChanged', function ($event, state) {
+                _this.onStateChanged($event, state);
             });
         }
+        NavHeaderController.prototype.$onDestroy = function () {
+            if (angular.isFunction(this.cleanupNavHeaderChanged)) {
+                this.cleanupNavHeaderChanged();
+            }
+            if (angular.isFunction(this.cleanupSideNavStateChanged)) {
+                this.cleanupSideNavStateChanged();
+            }
+        };
+        NavHeaderController.prototype.initImage = function () {
+            var _this = this;
+            this.imageBlock = this.$element.find('.pip-sticky-nav-header-user');
+            this.$timeout(function () {
+                _this.image = _this.$element.find('.pip-sticky-nav-header-user-image');
+                if (_this.image[0]) {
+                    _this.image[0].onload = (function () { return _this.onImageLoad(); });
+                    _this.image[0].onerror = (function () { return _this.onImageError(); });
+                }
+                else {
+                    _this.image.onload = (function () { return _this.onImageLoad(); });
+                    _this.image.onerror = (function () { return _this.onImageError(); });
+                }
+                _this.onNavHeaderChanged(null, _this.pipNavHeader.config);
+            }, 20);
+        };
+        NavHeaderController.prototype.initHeader = function () {
+            if (!this.pipNavHeader.config)
+                return;
+            this.title = this.pipNavHeader.config.title;
+            this.subtitle = this.pipNavHeader.config.subtitle;
+            this.imageUrl = this.pipNavHeader.config.imageUrl;
+            this.imageCss = this.pipNavHeader.config.imageCss;
+        };
+        NavHeaderController.prototype.onImageLoad = function () {
+            this.setImageMarginCSS(this.image);
+        };
         ;
-        function onStateChanged(event, state) {
+        NavHeaderController.prototype.onImageError = function () {
+            var _this = this;
+            if (this.loadedDefaultImage)
+                return;
+            this.$scope.$apply(function () {
+                _this.setImage(_this.pipNavHeader.config, true);
+            });
+        };
+        ;
+        NavHeaderController.prototype.onStateChanged = function (event, state) {
+            var _this = this;
             if (state === undefined)
                 return;
-            currentState = state;
             if (state.id == 'toggle') {
-                $timeout(function () {
-                    $scope.showHeader = currentState && currentState.id == 'toggle';
+                this.$timeout(function () {
+                    _this.showHeader = state && state.id == 'toggle';
                 }, 400);
             }
             else {
-                $scope.showHeader = false;
+                this.showHeader = false;
             }
-        }
-        function setImageMarginCSS(container, image) {
-            var cssParams = {}, containerWidth = container.width ? container.width() : container.clientWidth, containerHeight = container.height ? container.height() : container.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0;
+        };
+        NavHeaderController.prototype.setImageMarginCSS = function (image) {
+            var cssParams = {}, containerWidth = this.imageBlock.width ? this.imageBlock.width() : this.imageBlock.clientWidth, containerHeight = this.imageBlock.height ? this.imageBlock.height() : this.imageBlock.clientHeight, imageWidth = image[0]['naturalWidth'] || image.width, imageHeight = image[0]['naturalHeight'] || image.height, margin = 0;
             if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
                 margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
                 cssParams['margin-left'] = '' + margin + 'px';
@@ -8410,55 +9296,50 @@ angular
                 cssParams['margin-left'] = '';
             }
             image.css(cssParams);
-        }
+        };
         ;
-        function setImage(config, loadError) {
+        NavHeaderController.prototype.setImage = function (config, loadError) {
             if (!config)
                 return;
             var url;
-            if (!loadError && !!config.imageUrl && !loadedDefaultImage) {
+            if (!loadError && !!config.imageUrl) {
                 url = config.imageUrl;
             }
             else {
-                loadedDefaultImage = true;
+                this.loadedDefaultImage = true;
                 url = config.defaultImageUrl;
             }
-            if (url && $image) {
-                $image.attr('src', url);
+            if (url && this.image) {
+                this.image.attr('src', url);
             }
             else {
-                imageBlock.css('display', 'none');
+                this.imageBlock.css("display", "none");
             }
-        }
-        function onNavHeaderChanged($event, config) {
+        };
+        NavHeaderController.prototype.onNavHeaderChanged = function ($event, config) {
             if (!config)
                 return;
-            setImage(config, false);
-            $scope.title = config.title;
-            $scope.subtitle = config.subtitle;
-            $scope.imageUrl = config.imageUrl;
-            $scope.imageCss = config.imageCss;
-        }
-        function onUserClick() {
-            $rootScope.$broadcast('pipNavUserClicked');
-        }
-    }
-    function navHeaderDirective() {
-        return {
-            restrict: 'EA',
-            scope: {},
-            replace: false,
-            templateUrl: 'header/NavHeader.html',
-            controller: NavHeaderDirectiveController
+            this.title = config.title;
+            this.subtitle = config.subtitle;
+            this.imageUrl = config.imageUrl;
+            this.imageCss = config.imageCss;
+            this.setImage(config, false);
         };
-    }
+        NavHeaderController.prototype.onUserClick = function () {
+            this.$rootScope.$broadcast('pipNavUserClicked');
+        };
+        return NavHeaderController;
+    }());
+    var navHeader = {
+        templateUrl: 'header/NavHeader.html',
+        controller: NavHeaderController
+    };
     angular
         .module('pipNavHeader')
-        .directive('pipNavHeader', navHeaderDirective);
-})();
-},{}],16:[function(require,module,exports){
-'use strict';
-exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
+        .component('pipNavHeader', navHeader);
+}
+},{}],19:[function(require,module,exports){
+"use strict";
 var NavHeaderConfig = (function () {
     function NavHeaderConfig() {
     }
@@ -8466,10 +9347,14 @@ var NavHeaderConfig = (function () {
 }());
 exports.NavHeaderConfig = NavHeaderConfig;
 ;
+},{}],20:[function(require,module,exports){
+"use strict";
+var NavHeaderConfig_1 = require("./NavHeaderConfig");
+exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
 var NavHeaderService = (function () {
     function NavHeaderService(config, $rootScope) {
+        this.$rootScope = $rootScope;
         this._config = config;
-        this._rootScope = $rootScope;
     }
     Object.defineProperty(NavHeaderService.prototype, "config", {
         get: function () {
@@ -8537,14 +9422,18 @@ var NavHeaderService = (function () {
         this._config.title = title;
         this._config.subtitle = subtitle;
         this._config.imageUrl = imageUrl;
-        if (_.isFunction(callbackOrEvent))
+        if (_.isFunction(callbackOrEvent)) {
             this._config.click = callbackOrEvent;
-        else
+        }
+        else {
             this._config.click = null;
-        if (_.isString(callbackOrEvent))
+        }
+        if (_.isString(callbackOrEvent)) {
             this._config.event = callbackOrEvent;
-        else
+        }
+        else {
             this._config.event = null;
+        }
         this.sendConfigEvent();
     };
     NavHeaderService.prototype.hide = function () {
@@ -8556,20 +9445,20 @@ var NavHeaderService = (function () {
         this.sendConfigEvent();
     };
     NavHeaderService.prototype.sendConfigEvent = function () {
-        this._rootScope.$emit(exports.NavHeaderChangedEvent, this._config);
+        this.$rootScope.$emit(exports.NavHeaderChangedEvent, this._config);
     };
     return NavHeaderService;
 }());
 var NavHeaderProvider = (function () {
     function NavHeaderProvider() {
-        this._config = new NavHeaderConfig();
+        this._config = new NavHeaderConfig_1.NavHeaderConfig();
     }
     Object.defineProperty(NavHeaderProvider.prototype, "config", {
         get: function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new NavHeaderConfig();
+            this._config = value || new NavHeaderConfig_1.NavHeaderConfig();
         },
         enumerable: true,
         configurable: true
@@ -8638,14 +9527,18 @@ var NavHeaderProvider = (function () {
         this._config.title = title;
         this._config.subtitle = subtitle;
         this._config.imageUrl = imageUrl;
-        if (_.isFunction(callbackOrEvent))
+        if (_.isFunction(callbackOrEvent)) {
             this._config.click = callbackOrEvent;
-        else
+        }
+        else {
             this._config.click = null;
-        if (_.isString(callbackOrEvent))
+        }
+        if (_.isString(callbackOrEvent)) {
             this._config.event = callbackOrEvent;
-        else
+        }
+        else {
             this._config.event = null;
+        }
     };
     NavHeaderProvider.prototype.clear = function () {
         this._config.title = null;
@@ -8665,67 +9558,92 @@ var NavHeaderProvider = (function () {
 angular
     .module('pipNavHeader')
     .provider('pipNavHeader', NavHeaderProvider);
-},{}],17:[function(require,module,exports){
-'use strict';
+},{"./NavHeaderConfig":19}],21:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
 require("./NavHeaderService");
-require("./NavHeaderDirective");
+require("./NavHeader");
 __export(require("./NavHeaderService"));
-},{"./NavHeaderDirective":15,"./NavHeaderService":16}],18:[function(require,module,exports){
-'use strict';
-(function () {
-    NavIconDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$window', 'pipNavIcon'];
-    function NavIconDirectiveController($scope, $element, $attrs, $rootScope, $window, pipNavIcon) {
+},{"./NavHeader":18,"./NavHeaderService":20}],22:[function(require,module,exports){
+"use strict";
+},{}],23:[function(require,module,exports){
+"use strict";
+var SideNavService_1 = require("../sidenav/SideNavService");
+var NavIconService_1 = require("./NavIconService");
+var NavIconBindings = {
+    type: '<?pipType',
+    imageUrl: '<?pipImageUrl',
+    icon: '<?pipIcon'
+};
+var NavIconChanges = (function () {
+    function NavIconChanges() {
+    }
+    return NavIconChanges;
+}());
+var NavIconController = (function () {
+    NavIconController.$inject = ['$rootScope', '$window', '$element', '$scope', '$log', 'pipNavIcon'];
+    function NavIconController($rootScope, $window, $element, $scope, $log, pipNavIcon) {
         "ngInject";
+        var _this = this;
+        this.$rootScope = $rootScope;
+        this.$window = $window;
         $element.addClass('pip-nav-icon');
-        $scope.config = pipNavIcon.config;
-        $rootScope.$on('pipNavIconChanged', onNavIconChanged);
-        $scope.onNavIconClick = onNavIconClick;
-        function onNavIconChanged(event, config) {
-            $scope.config = config;
-        }
-        function onNavIconClick() {
-            var breadcrumb, backCallback;
-            if (_.isFunction($scope.config.click)) {
-                $scope.config.click();
-            }
-            else if ($scope.config.event) {
-                $rootScope.$broadcast($scope.config.event);
-            }
-            else if ($scope.config.type == 'menu') {
-                $rootScope.$broadcast('pipOpenSideNav');
-            }
-            else if ($scope.config.type == 'back') {
-                $window.history.back();
-            }
-            else {
-                $rootScope.$broadcast('pipNavIconClicked');
-            }
-        }
+        this.config = pipNavIcon.config;
+        this.clearFn = $rootScope.$on('pipNavIconChanged', function (event, config) {
+            _this.onNavIconChanged(event, config);
+        });
     }
-    function navIconDirective() {
-        return {
-            restrict: 'E',
-            scope: {
-                type: '=pipType',
-                imageUrl: '=pipImageUrl',
-                icon: '=pipIcon'
-            },
-            replace: false,
-            templateUrl: 'icon/NavIcon.html',
-            controller: NavIconDirectiveController
-        };
-    }
-    angular
-        .module('pipNavIcon')
-        .directive('pipNavIcon', navIconDirective);
-})();
-},{}],19:[function(require,module,exports){
-'use strict';
-exports.NavIconChangedEvent = 'pipNavIconChanged';
+    NavIconController.prototype.$onInit = function () {
+        if (this.type) {
+            this.config.type = this.type;
+        }
+        if (this.imageUrl) {
+            this.config.imageUrl = this.imageUrl;
+        }
+        if (this.icon) {
+            this.config.icon = this.icon;
+        }
+    };
+    NavIconController.prototype.$onDestroy = function () {
+        if (_.isFunction(this.clearFn)) {
+            this.clearFn();
+        }
+    };
+    NavIconController.prototype.onNavIconChanged = function (event, config) {
+        this.config = config;
+    };
+    NavIconController.prototype.onNavIconClick = function () {
+        if (_.isFunction(this.config.click)) {
+            this.config.click();
+        }
+        else if (this.config.event) {
+            this.$rootScope.$broadcast(this.config.event);
+        }
+        else if (this.config.type == 'menu') {
+            this.$rootScope.$broadcast(SideNavService_1.OpenSideNavEvent);
+        }
+        else if (this.config.type == 'back') {
+            this.$window.history.back();
+        }
+        else {
+            this.$rootScope.$broadcast(NavIconService_1.NavIconClickedEvent);
+        }
+    };
+    return NavIconController;
+}());
+var NavIcon = {
+    bindings: NavIconBindings,
+    templateUrl: 'icon/NavIcon.html',
+    controller: NavIconController
+};
+angular
+    .module('pipNavIcon')
+    .component('pipNavIcon', NavIcon);
+},{"../sidenav/SideNavService":39,"./NavIconService":25}],24:[function(require,module,exports){
+"use strict";
 var NavIconConfig = (function () {
     function NavIconConfig() {
     }
@@ -8733,10 +9651,15 @@ var NavIconConfig = (function () {
 }());
 exports.NavIconConfig = NavIconConfig;
 ;
+},{}],25:[function(require,module,exports){
+"use strict";
+var NavIconConfig_1 = require("./NavIconConfig");
+exports.NavIconClickedEvent = 'pipNavIconClicked';
+exports.NavIconChangedEvent = 'pipNavIconChanged';
 var NavIconService = (function () {
     function NavIconService(config, $rootScope) {
+        this.$rootScope = $rootScope;
         this._config = config;
-        this._rootScope = $rootScope;
     }
     Object.defineProperty(NavIconService.prototype, "config", {
         get: function () {
@@ -8787,20 +9710,20 @@ var NavIconService = (function () {
         this.sendConfigEvent();
     };
     NavIconService.prototype.sendConfigEvent = function () {
-        this._rootScope.$broadcast(exports.NavIconChangedEvent, this._config);
+        this.$rootScope.$broadcast(exports.NavIconChangedEvent, this._config);
     };
     return NavIconService;
 }());
 var NavIconProvider = (function () {
     function NavIconProvider() {
-        this._config = new NavIconConfig();
+        this._config = new NavIconConfig_1.NavIconConfig();
     }
     Object.defineProperty(NavIconProvider.prototype, "config", {
         get: function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new NavIconConfig();
+            this._config = value || new NavIconConfig_1.NavIconConfig();
         },
         enumerable: true,
         configurable: true
@@ -8848,24 +9771,27 @@ var NavIconProvider = (function () {
 angular
     .module('pipNavIcon')
     .provider('pipNavIcon', NavIconProvider);
-},{}],20:[function(require,module,exports){
-'use strict';
+},{"./NavIconConfig":24}],26:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
+require("./NavIconConfig");
+require("./INavIconService");
 require("./NavIconService");
-require("./NavIconDirective");
+require("./NavIcon");
+__export(require("./NavIconConfig"));
 __export(require("./NavIconService"));
-},{"./NavIconDirective":18,"./NavIconService":19}],21:[function(require,module,exports){
-'use strict';
+},{"./INavIconService":22,"./NavIcon":23,"./NavIconConfig":24,"./NavIconService":25}],27:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 require("./dependencies/TranslateFilter");
 require("./language/LanguagePickerDirective");
-require("./dropdown/DropdownDirective");
-require("./tabs/TabsDirective");
+require("./dropdown/Dropdown");
+require("./tabs/Tabs");
 require("./actions");
 require("./appbar");
 require("./search");
@@ -8884,32 +9810,38 @@ angular
     'pipSearchBar',
     'pipNavIcon',
     'pipBreadcrumb',
+    'pipLanguagePicker',
     'pipActions',
     'pipSideNav',
     'pipNavMenu',
     'pipNavHeader'
-]);
+])
+    .constant('navConstant', {
+    'TAB_BREAKPOINT': 'gt-sm',
+    'SIDENAV_CONTAINER': '.pip-main',
+    'SIDENAV_LARGE_WIDTH': 320,
+    'SIDENAV_MIDDLE_WIDTH': 240,
+    'SIDENAV_SMALL_WIDTH': 72,
+    'SIDENAV_ANIMATION_DURATION': 600
+});
 __export(require("./actions"));
 __export(require("./appbar"));
 __export(require("./breadcrumb"));
-__export(require("./search"));
 __export(require("./sidenav"));
 __export(require("./icon"));
-__export(require("./menu"));
 __export(require("./header"));
-},{"./actions":4,"./appbar":8,"./breadcrumb":11,"./common/NavService":12,"./dependencies/TranslateFilter":13,"./dropdown/DropdownDirective":14,"./header":17,"./icon":20,"./language/LanguagePickerDirective":22,"./menu":25,"./search":28,"./sidenav":32,"./tabs/TabsDirective":33}],22:[function(require,module,exports){
-'use strict';
-(function () {
+},{"./actions":5,"./appbar":10,"./breadcrumb":14,"./common/NavService":15,"./dependencies/TranslateFilter":16,"./dropdown/Dropdown":17,"./header":21,"./icon":26,"./language/LanguagePickerDirective":28,"./menu":31,"./search":36,"./sidenav":41,"./tabs/Tabs":42}],28:[function(require,module,exports){
+{
     var LanguagePickerDirectiveController = (function () {
-        LanguagePickerDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', '$timeout', '$injector'];
-        function LanguagePickerDirectiveController($scope, $element, $attrs, $rootScope, $timeout, $injector) {
+        LanguagePickerDirectiveController.$inject = ['$element', '$injector', '$rootScope'];
+        function LanguagePickerDirectiveController($element, $injector, $rootScope) {
             "ngInject";
             this.languages = ['en', 'ru'];
-            this._timeout = $timeout;
+            this.value = null;
             this._translate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
             $element.addClass('pip-language-picker');
-            this.languages = $scope.languages;
-            $rootScope.$on('pipSetLanguages', this.setLanguages);
+            this.setLanguages(this.languages);
+            this.value = this.value || this.languages[0];
         }
         Object.defineProperty(LanguagePickerDirectiveController.prototype, "language", {
             get: function () {
@@ -8918,213 +9850,210 @@ __export(require("./header"));
             enumerable: true,
             configurable: true
         });
-        LanguagePickerDirectiveController.prototype.setLanguages = function (lang) {
-            this.languages = lang.length > 0 ? lang : ['en', 'ru'];
+        LanguagePickerDirectiveController.prototype.setLanguages = function (languages) {
+            this.languages = languages.length > 0 ? languages : ['en', 'ru'];
         };
         LanguagePickerDirectiveController.prototype.onLanguageClick = function (language) {
-            var _this = this;
             if (this._translate != null) {
-                this._timeout(function () {
-                    _this._translate.language = _this.language;
-                }, 0);
+                this.value = language;
+                this._translate.language = this.value;
             }
         };
         return LanguagePickerDirectiveController;
     }());
-    function languagePickerDirective() {
-        return {
-            restrict: 'E',
-            scope: {
-                languages: '=languages',
-            },
-            replace: false,
-            templateUrl: function (element, attr) {
-                return 'language/LanguagePicker.html';
-            },
-            controller: LanguagePickerDirectiveController,
-            controllerAs: 'vm'
-        };
-    }
+    var LanguagePickerBindings = {
+        languages: '<languages',
+        value: '=?value'
+    };
+    var languagePickerDirective = {
+        bindings: LanguagePickerBindings,
+        templateUrl: 'language/LanguagePicker.html',
+        controller: LanguagePickerDirectiveController
+    };
     angular
         .module('pipLanguagePicker', [
         'ngMaterial', 'pipNav.Translate', 'pipNav.Templates'
     ])
-        .directive('pipLanguagePicker', languagePickerDirective);
-})();
-},{}],23:[function(require,module,exports){
-'use strict';
+        .component('pipLanguagePicker', languagePickerDirective);
+}
+},{}],29:[function(require,module,exports){
+"use strict";
 (function () {
-    NavMenuDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$window', '$location', '$timeout', '$injector', 'pipSideNav', 'pipNavMenu'];
-    function NavMenuDirectiveController($scope, $element, $rootScope, $window, $location, $timeout, $injector, pipSideNav, pipNavMenu) {
-        "ngInject";
-        var animationDuration = 450, pipSideNavElement = $element.parent().parent();
-        $element.addClass('pip-sticky-nav-menu');
-        $scope.sections = $scope.sections || pipNavMenu.sections;
-        setCollapsible();
-        $scope.defaultIcon = pipNavMenu.defaultIcon;
-        onStateChanged(null, pipSideNav.state);
-        $rootScope.$on('pipNavMenuChanged', onConfigChanged);
-        $rootScope.$on('pipSideNavStateChanged', onStateChanged);
-        $scope.itemVisible = isHidden;
-        $scope.clickLink = clickLink;
-        $scope.isSectionEmpty = isSectionEmpty;
-        $scope.onExpand = onExpand;
-        $scope.isActive = isActive;
-        return;
-        function setCollapsible() {
+    var NavMenuController = (function () {
+        NavMenuController.$inject = ['$scope', '$window', '$location', '$rootScope', '$timeout', 'pipSideNav', 'pipNavMenu', '$element', '$injector', 'navConstant'];
+        function NavMenuController($scope, $window, $location, $rootScope, $timeout, pipSideNav, pipNavMenu, $element, $injector, navConstant) {
+            "ngInject";
+            var _this = this;
+            this.$scope = $scope;
+            this.$window = $window;
+            this.$location = $location;
+            this.$rootScope = $rootScope;
+            this.$timeout = $timeout;
+            this.pipSideNav = pipSideNav;
+            this.pipNavMenu = pipNavMenu;
+            this._state = $injector.has('$state') ? $injector.get('$state') : null;
+            this._animationDuration = navConstant.SIDENAV_ANIMATION_DURATION,
+                this._pipSideNavElement = $element.parent().parent();
+            $element.addClass('pip-sticky-nav-menu');
+            this.sections = this.$scope['sections'] || this.pipNavMenu.sections;
+            this.setCollapsible();
+            this.defaultIcon = this.pipNavMenu.defaultIcon;
+            this.onStateChanged(null, this.pipSideNav.state);
+            var cleanupNavMenuChanged = this.$rootScope.$on('pipNavMenuChanged', function ($event, config) {
+                _this.onConfigChanged($event, config);
+            });
+            var cleanupSideNavStateChanged = this.$rootScope.$on('pipSideNavStateChanged', function ($event, state) {
+                _this.onStateChanged($event, state);
+            });
+            this.$scope.$on('$destroy', function () {
+                if (angular.isFunction(cleanupNavMenuChanged)) {
+                    cleanupNavMenuChanged();
+                }
+                if (angular.isFunction(cleanupSideNavStateChanged)) {
+                    cleanupSideNavStateChanged();
+                }
+            });
+        }
+        NavMenuController.prototype.setCollapsible = function () {
             var collapsed;
-            if (angular.isFunction($scope.collapsed)) {
-                collapsed = $scope.collapsed();
+            if (angular.isFunction(this.$scope['collapsed'])) {
+                collapsed = this.$scope['collapsed']();
             }
             else {
-                collapsed = $scope.collapsed !== false && $scope.collapsed !== 'false';
+                collapsed = this.$scope['collapsed'] !== false && this.$scope['collapsed'] !== 'false';
             }
-            $scope.isCollapsed = collapsed;
-        }
-        function onExpand() {
-            if (!$scope.isCollapsed) {
+            this.isCollapsed = collapsed;
+        };
+        NavMenuController.prototype.onExpand = function () {
+            if (!this.isCollapsed) {
                 return;
             }
-            $scope.expanded = !$scope.expanded;
-            if ($scope.expanded) {
-                pipSideNavElement.removeClass('pip-sticky-nav-small');
+            this.expanded = !this.expanded;
+            if (this.expanded) {
+                this._pipSideNavElement.removeClass('pip-sticky-nav-small');
             }
             else {
-                pipSideNavElement.addClass('pip-sticky-nav-small');
+                this._pipSideNavElement.addClass('pip-sticky-nav-small');
             }
-            $rootScope.$emit('pipNavExpanded', $scope.expanded);
-        }
-        function isHidden(item) {
+            this.$rootScope.$emit('pipNavExpanded', this.expanded);
+        };
+        NavMenuController.prototype.isHidden = function (item) {
             return item && item.access && !item.access(item);
-        }
-        function isSectionEmpty(linkCollection) {
+        };
+        NavMenuController.prototype.isSectionEmpty = function (linkCollection) {
+            var _this = this;
             var result = true;
             _.each(linkCollection, function (link) {
-                if (!isHidden(link))
+                if (!_this.isHidden(link)) {
                     result = false;
+                }
             });
             return result;
-        }
-        function onConfigChanged(event, config) {
+        };
+        NavMenuController.prototype.onConfigChanged = function ($event, config) {
             if (!config)
                 return;
-            $scope.sections = config.sections;
-        }
-        function onStateChanged(event, state) {
+            this.sections = config.sections;
+        };
+        NavMenuController.prototype.onStateChanged = function (event, state) {
             if (!state)
                 return;
-            $scope.isCollapsed = state.expand;
-            $scope.expanded = state.isExpanded;
-            $scope.expandedButton = state.expandedButton;
-            $scope.sideNavState = state;
-        }
-        function isActive(link) {
+            this.isCollapsed = state.expand;
+            this.expanded = state.isExpanded;
+            this.expandedButton = state.expandedButton;
+            this.sideNavState = state;
+        };
+        NavMenuController.prototype.isActive = function (link) {
             if (link.parentState) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.includes(link.parentState)) {
+                if (this._state != null && this._state.includes(link.parentState)) {
                     return true;
                 }
             }
             else if (link.state) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.includes(link.state)) {
+                if (this._state != null && this._state.includes(link.state)) {
                     return true;
                 }
             }
             else if (link.href) {
-                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
+                if (link.href.split('?')[0] === this.$window.location.href.split('?')[0]) {
                     return true;
                 }
             }
             else if (link.url) {
-                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
+                if (link.url.split(/[\s/?]+/)[1] === this.$location.url().split(/[\s/?]+/)[1]) {
                     return true;
                 }
             }
             return false;
-        }
-        function clickLink(event, link) {
+        };
+        NavMenuController.prototype.clickLink = function (event, link) {
+            var _this = this;
             event.stopPropagation();
             if (!link) {
-                pipSideNav.close();
+                this.pipSideNav.close();
                 return;
             }
             if (link.href) {
-                if (link.href.split('?')[0] === $window.location.href.split('?')[0]) {
-                    pipSideNav.close();
+                if (link.href.split('?')[0] === this.$window.location.href.split('?')[0]) {
+                    this.pipSideNav.close();
                     return;
                 }
-                pipSideNav.close();
-                $timeout(function () {
-                    $window.location.href = link.href;
-                }, animationDuration);
+                this.pipSideNav.close();
+                this.$timeout(function () {
+                    _this.$window.location.href = link.href;
+                }, this._animationDuration);
                 return;
             }
             else if (link.url) {
-                if (link.url.split(/[\s/?]+/)[1] === $location.url().split(/[\s/?]+/)[1]) {
-                    pipSideNav.close();
+                if (link.url.split(/[\s/?]+/)[1] === this.$location.url().split(/[\s/?]+/)[1]) {
+                    this.pipSideNav.close();
                     return;
                 }
-                pipSideNav.close();
-                $timeout(function () {
-                    $location.url(link.url);
-                }, animationDuration);
+                this.pipSideNav.close();
+                this.$timeout(function () {
+                    _this.$location.url(link.url);
+                }, this._animationDuration);
                 return;
             }
             else if (link.state) {
-                var $state = $injector.has('$state') ? $injector.get('$state') : null;
-                if ($state != null && $state.current.name === link.state) {
-                    pipSideNav.close();
+                if (this._state != null && this._state.current.name === link.state) {
+                    this.pipSideNav.close();
                     return;
                 }
-                pipSideNav.close();
-                $timeout(function () {
-                    if ($injector.has('$state')) {
-                        var $state = $injector.get('$state');
-                        $state.go(link.state, link.stateParams);
-                    }
-                }, animationDuration);
+                this.pipSideNav.close();
+                this.$timeout(function () {
+                    _this._state.go(link.state, link.stateParams);
+                }, this._animationDuration);
                 return;
             }
-            else if (link.event)
-                $rootScope.$broadcast(link.event, link);
-            pipSideNav.close();
-        }
-    }
+            else if (link.event) {
+                this.$rootScope.$broadcast(link.event, link);
+            }
+            this.pipSideNav.close();
+        };
+        return NavMenuController;
+    }());
+    var NavMenuBindings = {
+        sections: '=?pipSections',
+        collapsed: '=?pipCollapsed'
+    };
     function navMenuDirective() {
         return {
             restrict: 'EA',
-            scope: {},
+            scope: NavMenuBindings,
             replace: false,
             templateUrl: 'menu/NavMenu.html',
-            controller: NavMenuDirectiveController
+            controller: NavMenuController,
+            controllerAs: '$ctrl'
         };
     }
     angular
         .module('pipNavMenu')
         .directive('pipNavMenu', navMenuDirective);
 })();
-},{}],24:[function(require,module,exports){
-'use strict';
+},{}],30:[function(require,module,exports){
+"use strict";
 exports.NavMenuChangedEvent = 'pipNavMenuChanged';
-var NavMenuLink = (function () {
-    function NavMenuLink() {
-    }
-    return NavMenuLink;
-}());
-exports.NavMenuLink = NavMenuLink;
-var NavMenuSection = (function () {
-    function NavMenuSection() {
-    }
-    return NavMenuSection;
-}());
-exports.NavMenuSection = NavMenuSection;
-var NavMenuConfig = (function () {
-    function NavMenuConfig() {
-    }
-    return NavMenuConfig;
-}());
-exports.NavMenuConfig = NavMenuConfig;
 var NavMenuService = (function () {
     function NavMenuService(config, $rootScope) {
         this._config = config;
@@ -9225,126 +10154,126 @@ var NavMenuProvider = (function () {
 angular
     .module('pipNavMenu')
     .provider('pipNavMenu', NavMenuProvider);
-},{}],25:[function(require,module,exports){
-'use strict';
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
+},{}],31:[function(require,module,exports){
+"use strict";
 angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavMenuService");
-require("./NavMenuDirective");
-__export(require("./NavMenuService"));
-},{"./NavMenuDirective":23,"./NavMenuService":24}],26:[function(require,module,exports){
-'use strict';
+require("./NavMenu");
+},{"./NavMenu":29,"./NavMenuService":30}],32:[function(require,module,exports){
+"use strict";
+},{}],33:[function(require,module,exports){
+"use strict";
 var SearchService_1 = require("./SearchService");
-var SearchService_2 = require("./SearchService");
-(function () {
-    var SearchBarController = (function () {
-        SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
-        function SearchBarController($element, $rootScope, pipSearch) {
-            "ngInject";
-            var _this = this;
-            this.enabled = false;
-            this.search = { text: '' };
-            this._rootScope = $rootScope;
-            this._element = $element;
-            $element.addClass('pip-search-bar');
-            this.config = pipSearch.config;
-            this.stateChange();
-            $rootScope.$on(SearchService_1.SearchChangedEvent, function (event, config) {
-                _this.onSearchChanged(event, config);
-            });
-        }
-        SearchBarController.prototype.stateChange = function () {
-            if (this.enabled) {
-                this._element.addClass('w-stretch');
-                this._element.parent().addClass('pip-search-active');
-            }
-            else {
-                this._element.removeClass('w-stretch');
-                this._element.parent().removeClass('pip-search-active');
-            }
-        };
-        SearchBarController.prototype.onSearchChanged = function (event, config) {
-            this.config = config;
-            this.enabled = false;
-            this.search.text = '';
-            this.stateChange();
-        };
-        SearchBarController.prototype.focusText = function () {
-            setTimeout(function () {
-                var element = $('.pip-search-text');
-                if (element.length > 0)
-                    element.focus();
-            }, 0);
-        };
-        SearchBarController.prototype.enable = function () {
-            this.search.text = this.config.criteria;
-            this.enabled = true;
-            this.focusText();
-            this.stateChange();
-        };
-        SearchBarController.prototype.onClick = function () {
-            var search = this.search.text;
-            this.search.text = '';
-            this.enabled = false;
-            this.stateChange();
-            if (this.config.callback)
-                this.config.callback(search);
-            else
-                this._rootScope.$broadcast(SearchService_2.SearchActivatedEvent, search);
-        };
-        SearchBarController.prototype.clear = function () {
-            if (this.search.text) {
-                this.search.text = '';
-                this.focusText();
-            }
-            else {
-                this.enabled = false;
-                this.stateChange();
-                this.onClick();
-            }
-        };
-        SearchBarController.prototype.onKeyDown = function (event) {
-            if (event.keyCode === 13)
-                this.onClick();
-            else if (event.keyCode === 27) {
-                this.enabled = false;
-                this.stateChange();
-            }
-        };
-        return SearchBarController;
-    }());
-    function searchBarDirective() {
-        return {
-            restrict: 'E',
-            scope: {},
-            replace: false,
-            templateUrl: 'search/SearchBar.html',
-            controller: SearchBarController,
-            controllerAs: 'vm'
-        };
+var SearchBarController = (function () {
+    SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
+    function SearchBarController($element, $rootScope, pipSearch) {
+        "ngInject";
+        var _this = this;
+        this.$element = $element;
+        this.$rootScope = $rootScope;
+        this.enabled = false;
+        this.search = { text: '' };
+        $element.addClass('pip-search-bar');
+        this.config = pipSearch.config;
+        this.stateChange();
+        this.clearFn = $rootScope.$on(SearchService_1.SearchChangedEvent, function (event, config) {
+            _this.onSearchChanged(event, config);
+        });
     }
-    angular.module('pipSearchBar')
-        .directive('pipSearchBar', searchBarDirective);
-})();
-},{"./SearchService":27}],27:[function(require,module,exports){
-'use strict';
-exports.OpenSearchEvent = 'pipOpenSearch';
-exports.CloseSearchEvent = 'pipCloseSearch';
-exports.SearchChangedEvent = 'pipSearchChanged';
-exports.SearchActivatedEvent = 'pipSearchActivated';
+    SearchBarController.prototype.$onDestroy = function () {
+        if (_.isFunction(this.clearFn)) {
+            this.clearFn();
+        }
+    };
+    SearchBarController.prototype.stateChange = function () {
+        if (this.enabled) {
+            this.$element.addClass('w-stretch');
+            this.$element.parent().addClass('pip-search-active');
+        }
+        else {
+            this.$element.removeClass('w-stretch');
+            this.$element.parent().removeClass('pip-search-active');
+        }
+    };
+    SearchBarController.prototype.onSearchChanged = function (event, config) {
+        this.config = config;
+        this.enabled = false;
+        this.search.text = '';
+        this.stateChange();
+    };
+    SearchBarController.prototype.focusText = function () {
+        setTimeout(function () {
+            var element = $('.pip-search-text');
+            if (element.length > 0)
+                element.focus();
+        }, 0);
+    };
+    SearchBarController.prototype.enable = function () {
+        this.search.text = this.config.criteria;
+        this.enabled = true;
+        this.focusText();
+        this.stateChange();
+    };
+    SearchBarController.prototype.onClick = function () {
+        var search = this.search.text;
+        this.search.text = '';
+        this.enabled = false;
+        this.stateChange();
+        if (this.config.callback) {
+            this.config.callback(search);
+        }
+        else {
+            this.$rootScope.$broadcast(SearchService_1.SearchActivatedEvent, search);
+        }
+    };
+    SearchBarController.prototype.clear = function () {
+        if (this.search.text) {
+            this.search.text = '';
+            this.focusText();
+        }
+        else {
+            this.enabled = false;
+            this.stateChange();
+            this.onClick();
+        }
+    };
+    SearchBarController.prototype.onKeyDown = function (event) {
+        if (event.keyCode === 13)
+            this.onClick();
+        else if (event.keyCode === 27) {
+            this.enabled = false;
+            this.stateChange();
+        }
+    };
+    return SearchBarController;
+}());
+var SearchBar = {
+    templateUrl: 'search/SearchBar.html',
+    controller: SearchBarController
+};
+angular
+    .module('pipSearchBar')
+    .component('pipSearchBar', SearchBar);
+},{"./SearchService":35}],34:[function(require,module,exports){
+"use strict";
 var SearchConfig = (function () {
     function SearchConfig() {
     }
     return SearchConfig;
 }());
 exports.SearchConfig = SearchConfig;
+},{}],35:[function(require,module,exports){
+"use strict";
+var SearchConfig_1 = require("./SearchConfig");
+exports.OpenSearchEvent = 'pipOpenSearch';
+exports.CloseSearchEvent = 'pipCloseSearch';
+exports.SearchChangedEvent = 'pipSearchChanged';
+exports.SearchActivatedEvent = 'pipSearchActivated';
 var SearchService = (function () {
     function SearchService(config, $rootScope) {
         var _this = this;
+        this.$rootScope = $rootScope;
         this._config = config;
-        this._rootScope = $rootScope;
         $rootScope.$on(exports.OpenSearchEvent, function () { _this.open; });
         $rootScope.$on(exports.CloseSearchEvent, function () { _this.close; });
     }
@@ -9425,13 +10354,13 @@ var SearchService = (function () {
         this.sendConfigEvent();
     };
     SearchService.prototype.sendConfigEvent = function () {
-        this._rootScope.$broadcast(exports.SearchChangedEvent, this._config);
+        this.$rootScope.$broadcast(exports.SearchChangedEvent, this._config);
     };
     return SearchService;
 }());
 var SearchProvider = (function () {
     function SearchProvider() {
-        this._config = new SearchConfig();
+        this._config = new SearchConfig_1.SearchConfig();
         this._service = null;
     }
     SearchProvider.prototype.$get = ['$rootScope', function ($rootScope) {
@@ -9444,209 +10373,207 @@ var SearchProvider = (function () {
 }());
 angular.module('pipSearchBar')
     .provider('pipSearch', SearchProvider);
-},{}],28:[function(require,module,exports){
-'use strict';
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
+},{"./SearchConfig":34}],36:[function(require,module,exports){
+"use strict";
 angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
+require("./SearchConfig");
+require("./ISearchService");
 require("./SearchService");
-require("./SearchBarDirective");
-__export(require("./SearchService"));
-},{"./SearchBarDirective":26,"./SearchService":27}],29:[function(require,module,exports){
-'use strict';
-(function () {
-    SideNavDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$injector', '$mdMedia', '$timeout', 'pipSideNav'];
-    function SideNavDirectiveController($scope, $element, $rootScope, $injector, $mdMedia, $timeout, pipSideNav) {
+require("./SearchBar");
+},{"./ISearchService":32,"./SearchBar":33,"./SearchConfig":34,"./SearchService":35}],37:[function(require,module,exports){
+"use strict";
+var SideNavState_1 = require("./SideNavState");
+var SideNavController = (function () {
+    SideNavController.$inject = ['$element', '$attrs', '$injector', '$scope', '$rootScope', '$timeout', 'pipSideNav', 'navConstant'];
+    function SideNavController($element, $attrs, $injector, $scope, $rootScope, $timeout, pipSideNav, navConstant) {
         "ngInject";
-        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null, pipSystemInfo = $injector.has('pipSystemInfo') ? $injector.get('pipSystemInfo') : null, mainContainer = '.pip-main', bigWidth = 320, middleWidth = 240, smallWidth = 72, isResizing = false, animationDuration = 600, mediaBreakpoints;
-        pipMedia = pipMedia !== undefined ? pipMedia : $mdMedia;
-        $scope.navState = {
-            toggle: {
-                id: 'toggle',
-                addClass: 'sidenav-mobile',
-                showHeader: true,
-                isLockedOpen: false,
-                expandedButton: false,
-                isExpanded: true,
-                expand: true,
-                showIconTooltype: false
-            },
-            small: {
-                id: 'small',
-                addClass: 'pip-sticky-nav-small sidenav-smalldesktop',
-                showHeader: false,
-                isLockedOpen: true,
-                expandedButton: false,
-                isExpanded: false,
-                expand: false,
-                showIconTooltype: true
-            },
-            large: {
-                id: 'large',
-                addClass: 'sidenav-smalldesktop',
-                showHeader: false,
-                isLockedOpen: true,
-                expandedButton: true,
-                isExpanded: true,
-                expand: true,
-                showIconTooltype: true
-            },
-            xlarge: {
-                id: 'xlarge',
-                addClass: 'sidenav-desktop',
-                showHeader: false,
-                isLockedOpen: true,
-                expandedButton: false,
-                isExpanded: true,
-                expand: true,
-                showIconTooltype: false
-            }
-        };
-        mediaBreakpoints = setBreakpoints();
-        $element.addClass('pip-sticky-sidenav');
-        checkSafari();
-        if (pipSideNav.config && pipSideNav.config.type != 'popup') {
-            $timeout(function () {
-                setSideNaveState();
+        var _this = this;
+        this.$element = $element;
+        this.$scope = $scope;
+        this.$rootScope = $rootScope;
+        this.$timeout = $timeout;
+        this.pipSideNav = pipSideNav;
+        this._pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        this._mainContainer = navConstant.SIDENAV_CONTAINER;
+        this._bigWidth = navConstant.SIDENAV_LARGE_WIDTH;
+        this._middleWidth = navConstant.SIDENAV_MIDDLE_WIDTH;
+        this._smallWidth = navConstant.SIDENAV_SMALL_WIDTH;
+        this._isResizing = false;
+        this._animationDuration = navConstant.SIDENAV_ANIMATION_DURATION;
+        this._navState = new SideNavState_1.SideNavStateConfig();
+        this._mediaBreakpoints = this.setBreakpoints();
+        this.$element.addClass('pip-sticky-sidenav');
+        if (this.pipSideNav.config && this.pipSideNav.config.type != 'popup') {
+            this.$timeout(function () {
+                _this.setSideNaveState();
             }, 100);
-            var windowResize = _.debounce(setSideNaveState, 10);
-            $rootScope.$on('pipMainResized', windowResize);
-            $rootScope.$on('pipSideNavState', onSideNavState);
+            this.windowResize = _.debounce(function () { _this.setSideNaveState(); }, 10);
+            this.cleanupMainResized = this.$rootScope.$on('pipMainResized', function () {
+                _this.windowResize();
+            });
+            this.cleanupSideNavState = this.$rootScope.$on('pipSideNavState', function ($event, state) {
+                _this.onSideNavState($event, state);
+            });
         }
         else {
-            isResizing = false;
-            $scope.sidenavState = null;
-            $timeout(function () {
-                setState('toggle');
+            this._isResizing = false;
+            this.sidenavState = null;
+            this.$timeout(function () {
+                if (_this.pipSideNav.config.backdrop == false) {
+                    _this.$element.addClass('pip-sidenav-hide-backdrop');
+                }
+                else {
+                    _this.$element.removeClass('pip-sidenav-hide-backdrop');
+                }
+                _this.setState(SideNavState_1.SideNavStateNames.Toggle);
             }, 100);
         }
-        $rootScope.$on('pipNavIconClicked', onNavIconClick);
-        $rootScope.$on('pipSideNavChanged', onSideNavChanged);
-        return;
-        function checkSafari() {
-            if (!pipSystemInfo || pipSystemInfo.browserName != 'safari') {
-            }
-        }
-        function setBreakpoints() {
-            if (!pipMedia || !angular.isObject(pipMedia.breakpoints)) {
-                return { xs: 639, sm: 959, md: 1024, lg: 1919 };
-            }
-            else {
-                return pipMedia.breakpoints;
-            }
-        }
-        function onSideNavChanged(event, config) {
-            var config = config || {};
-            if (config.visible) {
-                $element.css('display', 'block');
-            }
-            else {
-                $element.css('display', 'none');
-            }
-        }
-        function onNavIconClick(event) {
-            pipSideNav.open();
-        }
-        function onSideNavState(event, state) {
-            if (angular.isString(state) && $scope.navState[state] !== undefined) {
-                setState(state);
-            }
-        }
-        function setSideNaveState() {
-            if (pipSideNav.config && pipSideNav.config.type == 'popup') {
-                return;
-            }
-            if (isResizing) {
-                $timeout(setSideNaveState, animationDuration);
-                return;
-            }
-            var mainWidth = $(mainContainer).innerWidth();
-            var sideNavWidth = $('.pip-sticky-sidenav').innerWidth();
-            var currentWidth = sideNavWidth ? sideNavWidth + 2 : 0;
-            if (mainWidth + currentWidth < mediaBreakpoints.sm) {
-                setState('toggle');
-                return;
-            }
-            if (mainWidth + currentWidth < mediaBreakpoints.md) {
-                setState('small');
-                return;
-            }
-            if (mainWidth + currentWidth < mediaBreakpoints.lg) {
-                setState('large');
-                return;
-            }
-            setState('xlarge');
-        }
-        function setState(state) {
-            if (isResizing)
-                return;
-            if ($scope.sidenavState && $scope.sidenavState.id == state)
-                return;
-            if (state != 'toggle') {
-                $element.removeClass('sidenav-mobile');
-            }
-            if (state != 'small') {
-                $element.removeClass('pip-sticky-nav-small');
-            }
-            if (state != 'xlarge') {
-                $element.removeClass('sidenav-desktop');
-            }
-            if (state != 'large') {
-                $element.removeClass('sidenav-smalldesktop');
-            }
-            isResizing = true;
-            if (state == 'toggle') {
-                pipSideNav.close();
-            }
-            $scope.sidenavState = $scope.navState[state];
-            $element.addClass($scope.sidenavState.addClass);
-            pipSideNav.state = $scope.sidenavState;
-            $timeout(function () {
-                setSideNaveState();
-            }, 15);
-            $timeout(function () {
-                isResizing = false;
-            }, animationDuration);
-        }
+        this.cleanupNavHeaderChanged = this.$rootScope.$on('pipNavIconClicked', function () {
+            _this.onNavIconClick();
+        });
+        this.cleanupSideNavChanged = this.$rootScope.$on('pipSideNavChanged', function ($event, config) {
+            _this.onSideNavChanged($event, config);
+        });
     }
-    function sideNavDirective() {
-        return {
-            restrict: 'E',
-            transclude: true,
-            scope: true,
-            templateUrl: 'sidenav/SideNav.html',
-            controller: SideNavDirectiveController
-        };
-    }
+    SideNavController.prototype.$onDestroy = function () {
+        if (angular.isFunction(this.cleanupNavHeaderChanged)) {
+            this.cleanupNavHeaderChanged();
+        }
+        if (angular.isFunction(this.cleanupSideNavChanged)) {
+            this.cleanupSideNavChanged();
+        }
+        if (angular.isFunction(this.cleanupMainResized)) {
+            this.cleanupMainResized();
+        }
+        if (angular.isFunction(this.cleanupSideNavState)) {
+            this.cleanupSideNavState();
+        }
+    };
+    SideNavController.prototype.setBreakpoints = function () {
+        if (!this._pipMedia || !angular.isObject(this._pipMedia.breakpoints)) {
+            return { xs: 639, sm: 959, md: 1024, lg: 1919 };
+        }
+        else {
+            return this._pipMedia.breakpoints;
+        }
+    };
+    SideNavController.prototype.onSideNavChanged = function ($event, config) {
+        if (config && config.visible) {
+            this.$element.css('display', 'block');
+        }
+        else {
+            this.$element.css('display', 'none');
+        }
+    };
+    SideNavController.prototype.onNavIconClick = function () {
+        this.pipSideNav.open();
+    };
+    SideNavController.prototype.onSideNavState = function ($event, stateName) {
+        if (angular.isString(stateName) && this._navState[stateName] !== undefined) {
+            this.setState(stateName);
+        }
+    };
+    SideNavController.prototype.setSideNaveState = function () {
+        var _this = this;
+        if (this.pipSideNav.config && this.pipSideNav.config.type == 'popup') {
+            return;
+        }
+        if (this._isResizing) {
+            this.$timeout(function () { _this.setSideNaveState(); }, this._animationDuration);
+            return;
+        }
+        var mainWidth = $(this._mainContainer).innerWidth();
+        var sideNavWidth = $('.pip-sticky-sidenav').innerWidth();
+        var currentWidth = sideNavWidth ? sideNavWidth + 2 : 0;
+        if (mainWidth + currentWidth < this._mediaBreakpoints.sm) {
+            this.setState(SideNavState_1.SideNavStateNames.Toggle);
+            return;
+        }
+        if (mainWidth + currentWidth < this._mediaBreakpoints.md) {
+            this.setState(SideNavState_1.SideNavStateNames.Small);
+            return;
+        }
+        if (mainWidth + currentWidth < this._mediaBreakpoints.lg) {
+            this.setState(SideNavState_1.SideNavStateNames.Large);
+            return;
+        }
+        this.setState(SideNavState_1.SideNavStateNames.XLarge);
+    };
+    SideNavController.prototype.setState = function (stateName) {
+        var _this = this;
+        if (this._isResizing)
+            return;
+        if (this.sidenavState && this.sidenavState.id == stateName)
+            return;
+        if (stateName != SideNavState_1.SideNavStateNames.Toggle) {
+            this.$element.removeClass('sidenav-mobile');
+        }
+        if (stateName != SideNavState_1.SideNavStateNames.Small) {
+            this.$element.removeClass('pip-sticky-nav-small');
+        }
+        if (stateName != SideNavState_1.SideNavStateNames.XLarge) {
+            this.$element.removeClass('sidenav-desktop');
+        }
+        if (stateName != SideNavState_1.SideNavStateNames.Large) {
+            this.$element.removeClass('sidenav-smalldesktop');
+        }
+        this._isResizing = true;
+        this.sidenavState = this._navState[String(stateName)];
+        this.$element.addClass(this.sidenavState.addClass);
+        this.pipSideNav.state = this.sidenavState;
+        this.$timeout(function () {
+            _this.setSideNaveState();
+        }, 15);
+        this.$timeout(function () {
+            _this._isResizing = false;
+        }, this._animationDuration);
+    };
+    return SideNavController;
+}());
+var SideNavBindings = {
+    sidenavState: '=?'
+};
+(function () {
+    var sideNav = {
+        transclude: true,
+        bindings: SideNavBindings,
+        templateUrl: 'sidenav/SideNav.html',
+        controller: SideNavController
+    };
     angular
         .module('pipSideNav')
-        .directive('pipSidenav', sideNavDirective);
+        .component('pipSidenav', sideNav);
 })();
-},{}],30:[function(require,module,exports){
-'use strict';
-(function () {
-    SideNavPartDirectiveController.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav'];
+},{"./SideNavState":40}],38:[function(require,module,exports){
+{
     sidenavPartDirective.$inject = ['ngIfDirective'];
-    function SideNavPartDirectiveController($scope, $element, $attrs, $rootScope, pipSideNav) {
-        "ngInject";
-        var partName = '' + $attrs.pipSidenavPart;
-        var partValue = null;
-        var pos = partName.indexOf(':');
-        if (pos > 0) {
-            partValue = partName.substr(pos + 1);
-            partName = partName.substr(0, pos);
+    var SideNavPartBindings_1 = {
+        visible: '=?'
+    };
+    var SideNavPartController_1 = (function () {
+        SideNavPartController_1.$inject = ['$scope', '$element', '$attrs', '$rootScope', 'pipSideNav'];
+        function SideNavPartController_1($scope, $element, $attrs, $rootScope, pipSideNav) {
+            var _this = this;
+            this.$scope = $scope;
+            this.partValue = null;
+            this.partName = '' + $attrs['pipSidenavPart'];
+            this.pos = this.partName.indexOf(':');
+            if (this.pos > 0) {
+                this.partValue = this.partName.substr(this.pos + 1);
+                this.partName = this.partName.substr(0, this.pos);
+            }
+            this.onSideNavChanged(null, pipSideNav.config);
+            $rootScope.$on('pipSideNavChanged', function (event, config) { _this.onSideNavChanged(event, config); });
         }
-        onSideNavChanged(null, pipSideNav.config);
-        $rootScope.$on('pipSideNavChanged', onSideNavChanged);
-        function onSideNavChanged(event, config) {
+        SideNavPartController_1.prototype.onSideNavChanged = function (event, config) {
             var parts = config.parts || {};
-            var currentPartValue = parts[partName];
-            var visible = !!(partValue ? currentPartValue == partValue : currentPartValue);
-            if (visible != $scope.visible)
-                $scope.visible = visible;
-        }
-    }
+            var currentPartValue = parts[this.partName];
+            var visible = !!(this.partValue ? currentPartValue == this.partValue : currentPartValue);
+            if (visible != this.$scope['visible'])
+                this.$scope['visible'] = visible;
+        };
+        return SideNavPartController_1;
+    }());
     function sidenavPartDirective(ngIfDirective) {
         "ngInject";
         var ngIf = ngIfDirective[0];
@@ -9655,36 +10582,31 @@ __export(require("./SearchService"));
             priority: ngIf.priority,
             terminal: ngIf.terminal,
             restrict: ngIf.restrict,
-            scope: true,
+            scope: SideNavPartBindings_1,
             link: function linkFunction($scope, $element, $attrs) {
-                $attrs.ngIf = function () { return $scope.visible; };
+                $attrs['ngIf'] = function () { return $scope['visible']; };
                 ngIf.link.apply(ngIf, arguments);
             },
-            controller: SideNavPartDirectiveController
+            controller: SideNavPartController_1
         };
     }
     angular
         .module('pipSideNav')
         .directive('pipSidenavPart', sidenavPartDirective);
-})();
-},{}],31:[function(require,module,exports){
-'use strict';
+}
+},{}],39:[function(require,module,exports){
+"use strict";
 hookSideNavEvents.$inject = ['$rootScope', 'pipSideNav'];
+var SideNavState_1 = require("./SideNavState");
 exports.SideNavChangedEvent = 'pipSideNavChanged';
 exports.SideNavStateChangedEvent = 'pipSideNavStateChanged';
 exports.OpenSideNavEvent = 'pipOpenSideNav';
 exports.CloseSideNavEvent = 'pipCloseSideNav';
-var SideNavConfig = (function () {
-    function SideNavConfig() {
-    }
-    return SideNavConfig;
-}());
-exports.SideNavConfig = SideNavConfig;
 var SideNavService = (function () {
     function SideNavService(config, $rootScope, $mdSidenav) {
+        this.$rootScope = $rootScope;
+        this.$mdSidenav = $mdSidenav;
         this._config = config;
-        this._rootScope = $rootScope;
-        this._sidenav = $mdSidenav;
     }
     Object.defineProperty(SideNavService.prototype, "config", {
         get: function () {
@@ -9717,19 +10639,39 @@ var SideNavService = (function () {
         },
         set: function (value) {
             this._state = value || {};
-            this._rootScope.$broadcast(exports.SideNavStateChangedEvent, value);
+            this.$rootScope.$broadcast(exports.SideNavStateChangedEvent, value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SideNavService.prototype, "type", {
+        get: function () {
+            return this._config.type;
+        },
+        set: function (value) {
+            this._config.type = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SideNavService.prototype, "backdrop", {
+        get: function () {
+            return this._config.backdrop;
+        },
+        set: function (value) {
+            this._config.backdrop = value;
         },
         enumerable: true,
         configurable: true
     });
     SideNavService.prototype.open = function () {
-        this._sidenav('pip-sticky-sidenav').open();
+        this.$mdSidenav('pip-sticky-sidenav').open();
     };
     SideNavService.prototype.close = function () {
-        this._sidenav('pip-sticky-sidenav').close();
+        this.$mdSidenav('pip-sticky-sidenav').close();
     };
     SideNavService.prototype.toggle = function () {
-        this._sidenav('pip-sticky-sidenav').toggle();
+        this.$mdSidenav('pip-sticky-sidenav').toggle();
     };
     SideNavService.prototype.show = function () {
         if (!this._config.visible) {
@@ -9770,7 +10712,7 @@ var SideNavService = (function () {
         this.sendConfigEvent();
     };
     SideNavService.prototype.sendConfigEvent = function () {
-        this._rootScope.$emit(exports.SideNavChangedEvent, this._config);
+        this.$rootScope.$emit(exports.SideNavChangedEvent, this._config);
     };
     return SideNavService;
 }());
@@ -9780,16 +10722,27 @@ var SideNavProvider = (function () {
             parts: {},
             classes: [],
             type: 'popup',
+            backdrop: true,
             state: null,
             visible: true
         };
     }
+    Object.defineProperty(SideNavProvider.prototype, "backdrop", {
+        get: function () {
+            return this._config.backdrop;
+        },
+        set: function (value) {
+            this._config.backdrop = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(SideNavProvider.prototype, "config", {
         get: function () {
             return this._config;
         },
         set: function (value) {
-            this._config = value || new SideNavConfig();
+            this._config = value || new SideNavState_1.SideNavConfig();
         },
         enumerable: true,
         configurable: true
@@ -9873,144 +10826,270 @@ angular
     .module('pipSideNav')
     .provider('pipSideNav', SideNavProvider)
     .run(hookSideNavEvents);
-},{}],32:[function(require,module,exports){
-'use strict';
+},{"./SideNavState":40}],40:[function(require,module,exports){
+"use strict";
+var SideNavStateNames = (function () {
+    function SideNavStateNames() {
+    }
+    return SideNavStateNames;
+}());
+SideNavStateNames.Toggle = 'toggle';
+SideNavStateNames.Small = 'small';
+SideNavStateNames.Large = 'large';
+SideNavStateNames.XLarge = 'xlarge';
+exports.SideNavStateNames = SideNavStateNames;
+var SideNavState = (function () {
+    function SideNavState() {
+    }
+    return SideNavState;
+}());
+exports.SideNavState = SideNavState;
+var SideNavStateConfig = (function () {
+    function SideNavStateConfig() {
+        this.toggle = {
+            id: SideNavStateNames.Toggle,
+            addClass: 'sidenav-mobile',
+            showHeader: true,
+            isLockedOpen: false,
+            expandedButton: false,
+            isExpanded: true,
+            expand: true,
+            showIconTooltype: false
+        };
+        this.small = {
+            id: SideNavStateNames.Small,
+            addClass: 'pip-sticky-nav-small sidenav-smalldesktop',
+            showHeader: false,
+            isLockedOpen: true,
+            expandedButton: false,
+            isExpanded: false,
+            expand: false,
+            showIconTooltype: true
+        };
+        this.large = {
+            id: SideNavStateNames.Large,
+            addClass: 'sidenav-smalldesktop',
+            showHeader: false,
+            isLockedOpen: true,
+            expandedButton: true,
+            isExpanded: true,
+            expand: true,
+            showIconTooltype: true
+        };
+        this.xlarge = {
+            id: SideNavStateNames.XLarge,
+            addClass: 'sidenav-desktop',
+            showHeader: false,
+            isLockedOpen: true,
+            expandedButton: false,
+            isExpanded: true,
+            expand: true,
+            showIconTooltype: false
+        };
+    }
+    return SideNavStateConfig;
+}());
+exports.SideNavStateConfig = SideNavStateConfig;
+var SideNavConfig = (function () {
+    function SideNavConfig() {
+        this.backdrop = true;
+    }
+    return SideNavConfig;
+}());
+exports.SideNavConfig = SideNavConfig;
+},{}],41:[function(require,module,exports){
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates']);
+require("./SideNavState");
 require("./SideNavService");
-require("./SideNavPartDirective");
-require("./SideNavDirective");
+require("./SideNavPart");
+require("./SideNav");
 __export(require("./SideNavService"));
-},{"./SideNavDirective":29,"./SideNavPartDirective":30,"./SideNavService":31}],33:[function(require,module,exports){
-'use strict';
-(function () {
-    TabsDirectiveController.$inject = ['$scope', '$element', '$attrs', '$mdMedia', '$injector', '$rootScope', '$parse', '$timeout'];
-    function TabsDirectiveController($scope, $element, $attrs, $mdMedia, $injector, $rootScope, $parse, $timeout) {
-        "ngInject";
-        var pipTheme = $injector.has('pipTheme') ? $injector.get('pipTheme') : null, pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null, pipTabIndex = $attrs.pipTabIndex ? parseInt($attrs.pipTabIndex) : 0, currentTheme = 'default';
-        $scope.selected = {};
-        if (pipTheme)
-            currentTheme = pipTheme.use();
-        else if ($rootScope.$theme)
-            currentTheme = $rootScope.$theme;
-        $scope.class = ($attrs.class || '') + ' md-' + currentTheme + '-theme';
-        if (pipTranslate) {
-            if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
-                pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
-            }
-            else {
-                pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+},{"./SideNav":37,"./SideNavPart":38,"./SideNavService":39,"./SideNavState":40}],42:[function(require,module,exports){
+"use strict";
+var PipTab = (function () {
+    function PipTab() {
+    }
+    return PipTab;
+}());
+exports.PipTab = PipTab;
+{
+    var TabsBindings = {
+        ngDisabled: '&?',
+        tabs: '<pipTabs',
+        showTabs: '&pipShowTabs',
+        showTabsShadow: '&pipTabsShadow',
+        activeIndex: '<?pipActiveIndex',
+        select: '=pipTabsSelect',
+        breakpoints: '<?pipBreakpoints',
+        themeClass: '<?themeClass',
+    };
+    var TabsChanges = (function () {
+        function TabsChanges() {
+        }
+        return TabsChanges;
+    }());
+    var TabsDirectiveController = (function () {
+        TabsDirectiveController.$inject = ['$element', '$injector', '$rootScope', '$timeout', 'navConstant', '$mdMedia'];
+        function TabsDirectiveController($element, $injector, $rootScope, $timeout, navConstant, $mdMedia) {
+            "ngInject";
+            this.$element = $element;
+            this.$injector = $injector;
+            this.$rootScope = $rootScope;
+            this.$timeout = $timeout;
+            this.navConstant = navConstant;
+            this.setTheme();
+            this.pipMedia = this.$injector.has('pipMedia') ? this.$injector.get('pipMedia') : $mdMedia;
+            if (!this.breakpoints) {
+                this.breakpoints = this.navConstant.TAB_BREAKPOINT;
             }
         }
-        if (pipTabIndex) {
-            $timeout(function () {
-                var a = $element.find('md-tabs-canvas');
-                if (a && a[0]) {
-                    angular.element(a[0]).attr('tabindex', pipTabIndex);
+        TabsDirectiveController.prototype.setTheme = function () {
+            this._pipTheme = this.$injector.has('pipTheme') ? this.$injector.get('pipTheme') : null;
+            if (this._pipTheme) {
+                this.currentTheme = this._pipTheme.theme;
+            }
+            else if (this.$rootScope['$theme']) {
+                this.currentTheme = this.$rootScope['$theme'];
+            }
+            this.themeClass = (this.themeClass || '') + ' md-' + this.currentTheme + '-theme';
+        };
+        TabsDirectiveController.prototype.setTranslate = function () {
+            this._pipTranslate = this.$injector.has('pipTranslate') ? this.$injector.get('pipTranslate') : null;
+            if (this._pipTranslate) {
+                if (this.tabs.length > 0 && this.tabs[0].title) {
+                    this._pipTranslate.translateObjects(this.tabs, 'title', 'nameLocal');
                 }
-                a.on('focusout', function () {
-                    angular.element(a[0]).attr('tabindex', pipTabIndex);
-                    $timeout(function () {
-                        angular.element(a[0]).attr('tabindex', pipTabIndex);
-                    }, 50);
-                });
-            }, 1000);
-        }
-        $scope.media = pipMedia !== undefined ? pipMedia : $mdMedia;
-        $scope.tabs = ($scope.tabs && _.isArray($scope.tabs)) ? $scope.tabs : [];
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate) {
-            if ($scope.tabs.length > 0 && $scope.tabs[0].title) {
-                pipTranslate.translateObjects($scope.tabs, 'title', 'nameLocal');
+                else {
+                    this._pipTranslate.translateObjects(this.tabs, 'name', 'nameLocal');
+                }
+            }
+        };
+        TabsDirectiveController.prototype.isDisabled = function () {
+            if (_.isFunction(this.ngDisabled)) {
+                return this.ngDisabled();
             }
             else {
-                pipTranslate.translateObjects($scope.tabs, 'name', 'nameLocal');
+                return this.toBoolean(this.ngDisabled);
             }
-        }
-        $scope.selected.activeIndex = $scope.activeIndex || 0;
-        $scope.selected.activeTab = $scope.selected.activeIndex;
-        $scope.disabled = disabled;
-        $scope.tabDisabled = tabDisabled;
-        $scope.onSelect = onSelect;
-        $scope.showShadow = showShadow;
-        $scope.show = show;
-        if (toBoolean($attrs.pipRebind)) {
-            $scope.$watch('activeIndex', function (newValue) {
-                $scope.selected.activeIndex = newValue || 0;
-                $scope.selected.activeTab = $scope.selected.activeIndex;
-            });
-        }
-        return;
-        function disabled() {
-            if ($scope.ngDisabled) {
-                return $scope.ngDisabled();
-            }
-        }
+        };
         ;
-        function tabDisabled(index) {
-            return ($scope.disabled() && $scope.selected.activeIndex != index);
-        }
+        TabsDirectiveController.prototype.tabDisabled = function (index) {
+            return (this.isDisabled() && this.activeIndex != index);
+        };
         ;
-        function onSelect(index) {
-            if ($scope.disabled())
+        TabsDirectiveController.prototype.onSelect = function (index) {
+            var _this = this;
+            if (this.isDisabled())
                 return;
-            $scope.activeIndex = index;
-            $scope.selected.activeIndex = index;
-            $scope.selected.activeTab = $scope.selected.activeIndex;
-            if ($scope.select) {
-                $scope.select($scope.tabs[$scope.selected.activeIndex], $scope.selected.activeIndex);
-            }
-        }
+            this.activeIndex = index;
+            this.selectedTabId = this.tabs.length >= this.activeIndex ? this.tabs[this.activeIndex].id : null;
+            this.$timeout(function () {
+                if (_this.select) {
+                    _this.select(_this.tabs[_this.activeIndex], _this.activeIndex);
+                }
+            }, 0);
+        };
         ;
-        function showShadow() {
-            if ($scope.showTabsShadow) {
-                return $scope.showTabsShadow();
+        TabsDirectiveController.prototype.showShadow = function () {
+            if (_.isFunction(this.showTabsShadow)) {
+                return this.showTabsShadow();
             }
             else {
-                return false;
+                return this.toBoolean(this.showTabsShadow);
             }
-        }
+        };
         ;
-        function show() {
-            if ($scope.showTabs) {
-                return $scope.showTabs();
-            }
-            else {
+        TabsDirectiveController.prototype.show = function () {
+            if (!this.showTabs)
                 return true;
+            if (_.isFunction(this.showTabs)) {
+                return this.showTabs();
             }
-        }
+            else {
+                return this.toBoolean(this.showTabs);
+            }
+        };
         ;
-        function toBoolean(value) {
+        TabsDirectiveController.prototype.toBoolean = function (value) {
             if (value == null)
                 return false;
             if (!value)
                 return false;
             value = value.toString().toLowerCase();
             return value == '1' || value == 'true';
-        }
-    }
-    function tabsDirective() {
-        return {
-            restrict: 'E',
-            scope: {
-                ngDisabled: '&',
-                tabs: '=pipTabs',
-                showTabs: '&pipShowTabs',
-                showTabsShadow: '&pipTabsShadow',
-                activeIndex: '=pipActiveIndex',
-                select: '=pipTabsSelect'
-            },
-            templateUrl: 'tabs/Tabs.html',
-            controller: TabsDirectiveController
         };
-    }
+        TabsDirectiveController.prototype.$onChanges = function (changes) {
+            var _this = this;
+            if (!changes.breakpoints) {
+                if (!this.breakpoints) {
+                    this.breakpoints = this.navConstant.TAB_BREAKPOINT;
+                }
+            }
+            else {
+                this.breakpoints = changes.breakpoints.currentValue ? changes.breakpoints.currentValue : this.navConstant.TAB_BREAKPOINT;
+            }
+            if (changes.activeIndex === undefined) {
+                if (!this.activeIndex) {
+                    this.activeIndex = 0;
+                }
+            }
+            else {
+                this.activeIndex = changes.activeIndex.currentValue || 0;
+                if (this.$timeout && this.activeIndex !== changes.activeIndex.previousValue) {
+                    this.$timeout(function () {
+                        var a = _this.$element.find('md-tabs-canvas');
+                        if (a && a[0]) {
+                            angular.element(a[0]).attr('activeIndex', _this.activeIndex);
+                        }
+                        a.on('focusout', function () {
+                            angular.element(a[0]).attr('activeIndex', _this.activeIndex);
+                            _this.$timeout(function () {
+                                angular.element(a[0]).attr('activeIndex', _this.activeIndex);
+                            }, 50);
+                        });
+                    }, 1000);
+                }
+            }
+            if (changes.tabs === undefined || !_.isArray(changes.tabs.currentValue)) {
+                if (!this.tabs) {
+                    this.tabs = [];
+                }
+            }
+            else {
+                this.tabs = changes.tabs.currentValue;
+                this.setTranslate();
+            }
+            if (!changes.activeIndex && changes.tabs && this.selectedTabId !== undefined) {
+                var index = _.indexOf(this.tabs, _.find(this.tabs, {
+                    id: this.selectedTabId
+                }));
+                if (index < 0) {
+                    this.selectedTabId = this.tabs.length >= this.activeIndex ? this.tabs[this.activeIndex].id : null;
+                }
+                else if (this.tabs.length > 0 && this.activeIndex) {
+                    this.onSelect(index);
+                }
+            }
+            else {
+                this.selectedTabId = this.tabs.length >= this.activeIndex ? this.tabs[this.activeIndex].id : null;
+            }
+        };
+        return TabsDirectiveController;
+    }());
+    var Tabs = {
+        bindings: TabsBindings,
+        templateUrl: 'tabs/Tabs.html',
+        controller: TabsDirectiveController
+    };
     angular
-        .module("pipTabs", ['pipNav.Templates'])
-        .directive('pipTabs', tabsDirective);
-})();
-},{}],34:[function(require,module,exports){
+        .module('pipTabs', ['pipNav.Templates'])
+        .component('pipTabs', Tabs);
+}
+},{}],43:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipNav.Templates');
@@ -10019,7 +11098,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('actions/PrimaryActions.html',
-    '<div pip-focused="" pip-focused-tabindex="2"><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in config.primaryLocalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="clickAction(action, $mdOpenMenu);" tabindex="-1" ng-hide="isHidden(action)" aria-label="{{action.title | translate}}"><div class="pip-primary-actions-badge" ng-show="action.count > 0">{{actionCount(action)}}</div><md-icon md-svg-icon="{{action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="clickAction(subAction)">{{::subAction.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in config.primaryGlobalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="clickAction(action, $mdOpenMenu);" ng-hide="isHidden(action)" tabindex="-1" aria-label="{{action.title | translate}}"><div class="pip-primary-actions-badge color-badge-bg" ng-show="action.count > 0">{{actionCount(action)}}</div><md-icon md-svg-icon="{{action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="clickAction(subAction)">{{subAction.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div>');
+    '<div pip-focused="" pip-focused-tabindex="2"><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in $ctrl.config.primaryLocalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="$ctrl.clickAction(action, $mdOpenMenu);" tabindex="-1" ng-hide="$ctrl.isHidden(action)" aria-label="{{ action.title | translate }}"><div class="pip-primary-actions-badge" ng-show="action.count > 0">{{ $ctrl.actionCount(action) }}</div><md-icon md-svg-icon="{{ action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="$ctrl.isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="$ctrl.clickAction(subAction)">{{ ::subAction.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in $ctrl.config.primaryGlobalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="$ctrl.clickAction(action, $mdOpenMenu);" ng-hide="$ctrl.isHidden(action)" tabindex="-1" aria-label="{{ action.title | translate }}"><div class="pip-primary-actions-badge color-badge-bg" ng-show="action.count > 0">{{ $ctrl.actionCount(action) }}</div><md-icon md-svg-icon="{{ action.icon }}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="$ctrl.isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="$ctrl.clickAction(subAction)">{{ subAction.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div>');
 }]);
 })();
 
@@ -10031,7 +11110,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('actions/SecondaryActions.html',
-    '<md-menu ng-if="secondaryActionsVisible()" md-position-mode="target-right target"><md-button class="md-icon-button" tabindex="3" ng-init="getMenu($mdOpenMenu)" ng-click="onSecondaryActionClick(); openMenu($mdOpenMenu, $event);" aria-label="open actions"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="action in config.secondaryLocalActions" ng-if="!action.divider" ng-hide="isHidden(action)"><md-button ng-hide="action.divider" ng-click="clickAction(action)">{{::action.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider><md-menu-divider ng-if="secondaryDividerVisible()"></md-menu-divider><md-menu-item ng-repeat-start="action in config.secondaryGlobalActions" ng-if="!action.divider" ng-hide="isHidden(action)"><md-button ng-hide="action.divider" ng-click="clickAction(action)">{{::action.title | translate}}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu>');
+    '<md-menu ng-if="$ctrl.secondaryActionsVisible()" md-position-mode="target-right target"><md-button class="md-icon-button" tabindex="3" ng-init="$ctrl.getMenu($mdOpenMenu)" ng-click="$ctrl.onSecondaryActionClick(); $ctrl.openMenu($mdOpenMenu, $event);" aria-label="open actions"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="action in $ctrl.config.secondaryLocalActions" ng-if="!action.divider" ng-hide="$ctrl.isHidden(action)"><md-button ng-hide="action.divider" ng-click="$ctrl.clickAction(action)">{{ ::action.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider><md-menu-divider ng-if="$ctrl.secondaryDividerVisible()"></md-menu-divider><md-menu-item ng-repeat-start="action in $ctrl.config.secondaryGlobalActions" ng-if="!action.divider" ng-hide="$ctrl.isHidden(action)"><md-button ng-hide="action.divider" ng-click="$ctrl.clickAction(action)">{{ ::action.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="action.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -10043,7 +11122,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('appbar/AppBar.html',
-    '<md-toolbar class="{{ config.classes.join(\' \') }}" ng-if="config.visible" ng-transclude=""></md-toolbar>');
+    '<md-toolbar class="{{ $ctrl.config.classes.join(\' \') }}" ng-if="$ctrl.config.visible" ng-transclude=""></md-toolbar>');
 }]);
 })();
 
@@ -10055,7 +11134,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!vm._media(\'xs\')"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span><span class="pip-breadcrumb-item {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-if="vm.config.items && vm.config.items.length > 0" ng-repeat-start="item in vm.config.items" ng-click="vm.onClick(item)" ng-init="stepWidth = 100/(vm.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !vm.actionsVisible(item)">{{item.title | translate}}</span><div ng-if="$last && vm.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{$last ? \'breadcrumb-accent\' : \'\'}}" ng-click="vm.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{item.title | translate}}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="vm.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{subItem.icon}}"></md-icon><span>{{subItem.title | translate}}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span></div><div style="position: relative;" ng-if="vm._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="vm.config.items && vm.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="vm.config.criteria" ng-click="vm.openSearch()">{{vm.config.criteria}} -</span> <span class="breadcrumb-accent" ng-if="vm.config.text">{{vm.config.text | translate}}</span> <span ng-if="vm.config.items && vm.config.items.length > 0" class="breadcrumb-accent {{(vm.config.items && vm.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{vm.config.items[vm.config.items.length - 1].title | translate}}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="vm.config.items && vm.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in vm.config.items" ng-if="vm.config.items && vm.config.items.length > 0"><md-button ng-click="vm.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{item.icon}}"></md-icon><span>{{item.title | translate}}</span></md-button></md-menu-item><md-menu-item ng-if="vm.config.text"><md-button tabindex="5"><span class="text-grey">{{vm.config.text | translate}}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!$ctrl._media(\'xs\')"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span><span class="pip-breadcrumb-item {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" ng-repeat-start="item in $ctrl.config.items" ng-click="$ctrl.onClick(item)" ng-init="stepWidth = 100/($ctrl.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !$ctrl.actionsVisible(item)">{{ item.title | translate }}</span><div ng-if="$last && $ctrl.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-click="$ctrl.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{ item.title | translate }}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="$ctrl.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{ subItem.icon }}"></md-icon><span>{{ subItem.title | translate }}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span></div><div style="position: relative;" ng-if="$ctrl._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="$ctrl.config.items && $ctrl.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span> <span class="breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span> <span ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" class="breadcrumb-accent {{ ($ctrl.config.items && $ctrl.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{ $ctrl.config.items[$ctrl.config.items.length - 1].title | translate }}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="$ctrl.config.items && $ctrl.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.config.items" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0"><md-button ng-click="$ctrl.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{ item.icon }}"></md-icon><span>{{ item.title | translate }}</span></md-button></md-menu-item><md-menu-item ng-if="$ctrl.config.text"><md-button tabindex="5"><span class="text-grey">{{ $ctrl.config.text | translate }}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
 }]);
 })();
 
@@ -10067,19 +11146,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dropdown/Dropdown.html',
-    '<md-toolbar class="md-subhead color-primary-bg {{class}}" ng-if="show()" ng-class="{\'md-whiteframe-3dp\': media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="selectedIndex" tabindex="15" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="onSelect(selectedIndex)"><md-option ng-repeat="action in actions" value="{{ ::$index }}" ng-selected="activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('header/NavHeader.html',
-    '<md-toolbar ng-show="showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="onUserClick()" tabindex="-1">{{ title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ subtitle | translate }}</div></div></md-toolbar>');
+    '<md-toolbar class="md-subhead color-primary-bg {{ $ctrl.themeClass}}" ng-if="$ctrl.show()" ng-class="{\'md-whiteframe-3dp\': $ctrl.media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="$ctrl.selectedIndex" tabindex="15" ng-disabled="$ctrl.disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.selectedIndex)"><md-option ng-repeat="action in $ctrl.actions" value="{{ ::$index }}" ng-selected="$ctrl.activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
 }]);
 })();
 
@@ -10091,7 +11158,19 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('icon/NavIcon.html',
-    '<md-button class="md-icon-button pip-nav-icon" ng-if="config.type != \'none\'" ng-class="config.class" ng-click="onNavIconClick()" tabindex="{{config.type==\'menu\' || config.type==\'back\' ? 4 : -1 }}" aria-label="menu"><md-icon ng-if="config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{config.imageUrl}}" ng-if="config.type==\'image\'" height="24" width="24"><md-icon ng-if="config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="config.type==\'icon\'" md-svg-icon="{{config.icon}}"></md-icon></md-button>');
+    '<md-button class="md-icon-button pip-nav-icon" ng-if="$ctrl.config.type != \'none\'" ng-class="$ctrl.config.class" ng-click="$ctrl.onNavIconClick()" tabindex="{{ $ctrl.config.type==\'menu\' || $ctrl.config.type==\'back\' ? 4 : -1 }}" aria-label="menu"><md-icon ng-if="$ctrl.config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{ $ctrl.config.imageUrl }}" ng-if="$ctrl.config.type==\'image\'" height="24" width="24"><md-icon ng-if="$ctrl.config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="$ctrl.config.type==\'icon\'" md-svg-icon="{{ $ctrl.config.icon }}"></md-icon></md-button>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('header/NavHeader.html',
+    '<md-toolbar ng-show="$ctrl.showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="$ctrl.onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="$ctrl.imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="$ctrl.onUserClick()" tabindex="-1">{{ $ctrl.title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ $ctrl.subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -10103,7 +11182,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('language/LanguagePicker.html',
-    '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{vm.language | translate}}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in vm.languages"><md-button ng-click="vm.onLanguageClick(lang)" tabindex="7">{{language | translate}}</md-button></md-menu-item></md-menu-content></md-menu>');
+    '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{ $ctrl.value | translate }}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in $ctrl.languages"><md-button ng-click="$ctrl.onLanguageClick(language)" tabindex="7">{{ language | translate }}</md-button></md-menu-item></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -10115,7 +11194,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('menu/NavMenu.html',
-    '<div ng-if="sections && sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="onExpand()" ng-disabled="!isCollapsed" tabindex="-1" ng-if="expandedButton"><md-icon md-svg-icon="icons:chevron-left" ng-if="expanded" class="pip-sticky-nav-menu-icon"></md-icon><md-icon md-svg-icon="icons:chevron-right" ng-if="!expanded" class="pip-sticky-nav-menu-icon"></md-icon></md-list-item><md-divider ng-show="expandedButton"></md-divider><div class="pip-section" ng-repeat="section in sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="expanded" class="pip-sticky-nav-menu-title section-title">{{::section.title | translate}}</span><md-icon md-svg-icon="{{section.icon}}" ng-if="!sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{section.icon}}" ng-if="sideNavState.showIconTooltype && !expanded && section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="!sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"></md-icon><md-icon md-svg-icon="{{defaultIcon}}" ng-if="sideNavState.showIconTooltype && !expanded && !section.icon" class="pip-sticky-nav-menu-icon section-icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{::section.tooltipText || section.title | translate}}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" ng-repeat="link in section.links" tabindex="-1" ng-class="{\'active\': isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-click="clickLink($event, link)"><md-tooltip md-visible="showTooltip" md-direction="right">{{::link.tooltipText | translate}}</md-tooltip><div class="pip-sticky-nav-menu-icon-block"><md-icon md-svg-icon="{{link.icon}}" ng-if="!(sideNavState.showIconTooltype && !link.tooltipText && !expanded)" ng-hide="!link.icon" class="pip-sticky-nav-menu-icon flex-fixed"></md-icon><md-icon md-svg-icon="{{link.icon}}" ng-hide="!link.icon" ng-if="sideNavState.showIconTooltype && !link.tooltipText && !expanded" class="pip-sticky-nav-menu-icon flex-fixed"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{::link.tooltipText || link.title | translate}}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{::link.title | translate}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{link.count}}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
+    '<div ng-if="$ctrl.sections && $ctrl.sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="$ctrl.onExpand()" ng-disabled="!$ctrl.isCollapsed" tabindex="-1" ng-if="$ctrl.expandedButton"><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-left" ng-if="$ctrl.expanded"></md-icon><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-right" ng-if="!$ctrl.expanded"></md-icon></md-list-item><md-divider ng-show="$ctrl.expandedButton"></md-divider><div class="pip-section" ng-repeat="section in $ctrl.sections" ng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !$ctrl.isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="$ctrl.expanded" class="pip-sticky-nav-menu-title section-title">{{ ::section.title | translate }}</span><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="!$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && section.icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ $ctrl.defaultIcon }}" ng-if="!$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && !section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ $ctrl.defaultIcon }}" ng-if="$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && !section.icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" tabindex="-1" ng-repeat="link in section.links" ng-class="{\'active\': $ctrl.isActive(link)}" ng-hide="link.access && !link.access(link)"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-click="$ctrl.clickLink($event, link)"><md-tooltip md-visible="showTooltip" md-direction="right">{{ ::link.tooltipText | translate }}</md-tooltip><div class="pip-sticky-nav-menu-icon-block"><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-if="!($ctrl.sideNavState.showIconTooltype && !link.tooltipText && !$ctrl.expanded)" ng-hide="!link.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-hide="!link.icon" ng-if="$ctrl.sideNavState.showIconTooltype && !link.tooltipText && !$ctrl.expanded"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::link.tooltipText || link.title | translate }}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{ ::link.title | translate }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{ link.count }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
 }]);
 })();
 
@@ -10127,19 +11206,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="vm.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="vm.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="vm.search.text" ng-keydown="vm.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="vm.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!vm.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="vm.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('sidenav/SideNav.html',
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
+    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -10151,13 +11218,25 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar class="pip-nav {{ class }}" ng-class="{\'pip-visible\': show(), \'pip-shadow\': showShadow()}"><md-tabs ng-if="media(\'gt-sm\')" md-selected="selected.activeTab" ng-class="{\'disabled\': disabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in tabs track by $index" ng-disabled="tabDisabled($index)" md-on-select="onSelect($index)"><md-tab-label>{{::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!media(\'gt-sm\')"><div class="pip-divider position-top m0"></div><md-select ng-model="selected.activeIndex" ng-disabled="disabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="onSelect(selected.activeIndex)"><md-option ng-repeat="tab in tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 0 && tab.newCounts <= 99">{{ tab.newCounts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.newCounts > 99">!</div></md-option></md-select></div></md-toolbar>');
+    '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('sidenav/SideNav.html',
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="$ctrl.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
 }]);
 })();
 
 
 
-},{}]},{},[34,21])(34)
+},{}]},{},[43,27])(43)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -11423,18 +12502,6 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipErrors.Templates');
-} catch (e) {
-  module = angular.module('pipErrors.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('missing_route/missing_route.html',
     '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
 }]);
@@ -11449,6 +12516,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('no_connection/no_connection.html',
     '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipErrors.Templates');
+} catch (e) {
+  module = angular.module('pipErrors.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('maintenance/maintenance.html',
+    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -11494,875 +12573,1004 @@ module.run(['$templateCache', function($templateCache) {
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipBarCharts', [])
-        .directive('pipBarChart', pipBarChart);
-    function pipBarChart() {
-        return {
-            restrict: 'E',
-            scope: {
-                series: '=pipSeries',
-                xTickFormat: '=pipXTickFormat',
-                yTickFormat: '=pipYTickFormat',
-                interactiveLegend: '=pipInterLegend'
-            },
-            bindToController: true,
-            controllerAs: 'barChart',
-            templateUrl: 'bar/bar_chart.html',
-            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
-                var vm = this;
-                var chart = null;
-                var chartElem = null;
-                var colors = _.map($mdColorPalette, function (palette, color) {
-                    return color;
-                });
-                colors = _.filter(colors, function (color) {
-                    return _.isObject($mdColorPalette[color]) && _.isObject($mdColorPalette[color][500] && _.isArray($mdColorPalette[color][500].value));
-                });
-                var height = 270;
-                vm.data = prepareData(vm.series) || [];
-                vm.legend = _.clone(vm.series);
-                if ((vm.series || []).length > colors.length) {
-                    vm.data = vm.series.slice(0, 9);
-                }
-                generateParameterColor();
-                d3.scale.paletteColors = function () {
-                    return d3.scale.ordinal().range(colors.map(materialColorToRgba));
-                };
-                $scope.$watch('barChart.series', function (updatedSeries) {
-                    vm.data = prepareData(updatedSeries);
-                    vm.legend = _.clone(vm.series);
-                    generateParameterColor();
-                    if (chart) {
-                        chartElem.datum(vm.data).call(chart);
-                        configBarWidthAndLabel();
-                        drawEmptyState();
-                    }
-                });
-                $scope.$watch('barChart.legend', function (updatedLegend) {
-                    vm.data = prepareData(updatedLegend);
-                    vm.legend = updatedLegend;
-                    if (chart) {
-                        chartElem.datum(vm.data).call(chart);
-                        configBarWidthAndLabel();
-                        drawEmptyState();
-                    }
-                }, true);
-                function prepareData(data) {
-                    var result = [];
-                    _.each(data, function (seria) {
-                        if (!seria.disabled && seria.values)
-                            result.push(seria);
-                    });
-                    return _.cloneDeep(result);
-                }
-                nv.addGraph(function () {
-                    chart = nv.models.discreteBarChart()
-                        .margin({ top: 10, right: 0, bottom: 10, left: 50 })
-                        .x(function (d) { return d.label || d.key || d.x; })
-                        .y(function (d) { return d.value; })
-                        .showValues(true)
-                        .staggerLabels(true)
-                        .showXAxis(true)
-                        .showYAxis(true)
-                        .valueFormat(d3.format('d'))
-                        .duration(0)
-                        .height(height)
-                        .color(function (d) {
-                        return vm.data[d.series].color || materialColorToRgba(colors[d.series]);
-                    });
-                    chart.tooltip.enabled(false);
-                    chart.noData('There is no data right now...');
-                    chart.yAxis
-                        .tickFormat(function (d) {
-                        return vm.yTickFormat ? vm.yTickFormat(d) : d;
-                    });
-                    chart.xAxis
-                        .tickFormat(function (d) {
-                        return vm.xTickFormat ? vm.xTickFormat(d) : d;
-                    });
-                    chartElem = d3.select($element.get(0))
-                        .select('.bar-chart svg')
-                        .datum(vm.data)
-                        .style('height', '285px')
-                        .call(chart);
-                    nv.utils.windowResize(function () {
-                        chart.update();
-                        configBarWidthAndLabel(0);
-                        drawEmptyState();
-                    });
-                    return chart;
-                }, function () {
-                    $timeout(configBarWidthAndLabel, 0);
-                    drawEmptyState();
-                });
-                function drawEmptyState() {
-                    if ($element.find('.nv-noData').length === 0) {
-                        d3.select($element.find('.empty-state')[0]).remove();
-                    }
-                    else {
-                        var g = chartElem.append('g').classed('empty-state', true), width = $element.find('.nvd3-svg').innerWidth(), margin = width * 0.1;
-                        g.append('g')
-                            .style('fill', 'rgba(0, 0, 0, 0.08)')
-                            .append('rect')
-                            .attr('height', height - 10)
-                            .attr('width', 38);
-                        g.append('g')
-                            .attr('transform', 'translate(42, 60)')
-                            .style('fill', 'rgba(0, 0, 0, 0.08)')
-                            .append('rect')
-                            .attr('height', 200)
-                            .attr('width', 38);
-                        g.append('g')
-                            .attr('transform', 'translate(84, 160)')
-                            .style('fill', 'rgba(0, 0, 0, 0.08)')
-                            .append('rect')
-                            .attr('height', 100)
-                            .attr('width', 38);
-                        g.attr('transform', 'translate(' + (50 + margin) + ', 0), ' + 'scale(' + ((width - 2 * margin) / 126) + ', 1)');
-                    }
-                }
-                function configBarWidthAndLabel(timeout) {
-                    if (timeout === void 0) { timeout = 1000; }
-                    var labels = $element.find('.nv-bar text'), chartBars = $element.find('.nv-bar'), parentHeight = $element.find('.nvd3-svg')[0].getBBox().height;
-                    d3.select($element.find('.bar-chart')[0]).classed('visible', true);
-                    chartBars.each(function (index, item) {
-                        var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')), element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
-                        element
-                            .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + (height - 20) + ')')
-                            .select('rect').attr('height', 0);
-                        element
-                            .transition()
-                            .duration(timeout)
-                            .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + y + ')')
-                            .select('rect').attr('height', barHeight);
-                        d3.select(labels[index])
-                            .attr('dy', barHeight / 2 + 10)
-                            .attr('x', barWidth / 2);
-                    });
-                }
-                function materialColorToRgba(color) {
-                    return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
-                        + $mdColorPalette[color][500].value[1] + ','
-                        + $mdColorPalette[color][500].value[2] + ','
-                        + ($mdColorPalette[color][500].value[3] || 1) + ')';
-                }
-                function getMaterialColor(index) {
-                    if (!colors || colors.length < 1)
-                        return null;
-                    if (index >= colors.length) {
-                        index = 0;
-                    }
-                    return materialColorToRgba(colors[index]);
-                }
-                function generateParameterColor() {
-                    if (!vm.data)
-                        return;
-                    vm.data.forEach(function (item, index) {
-                        if (item.values[0]) {
-                            item.values[0].color = item.values[0].color || getMaterialColor(index);
-                            item.color = item.values[0].color;
-                        }
-                    });
-                }
-            }]
+"use strict";
+{
+    var BarChartBindings = {
+        series: '<pipSeries',
+        xTickFormat: '<?pipXTickFormat',
+        yTickFormat: '<?pipYTickFormat',
+        interactiveLegend: '<?pipInterLegend'
+    };
+    var BarChartBindingsChanges = (function () {
+        function BarChartBindingsChanges() {
+        }
+        return BarChartBindingsChanges;
+    }());
+    var BarChartController = (function () {
+        BarChartController.$inject = ['$element', '$scope', '$timeout', 'pipChartColors'];
+        function BarChartController($element, $scope, $timeout, pipChartColors) {
+            "ngInject";
+            var _this = this;
+            this.$element = $element;
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this.pipChartColors = pipChartColors;
+            this.chart = null;
+            this.height = 270;
+            this.colors = this.pipChartColors.generateMaterialColors();
+            $scope.$watch('$ctrl.legend', function (updatedLegend) {
+                if (!updatedLegend)
+                    return;
+                _this.data = _this.prepareData(updatedLegend);
+                _this.legend = updatedLegend;
+                _this.updateChart();
+            }, true);
+        }
+        BarChartController.prototype.$onInit = function () {
+            var _this = this;
+            this.data = this.prepareData(this.series);
+            this.legend = _.clone(this.series);
+            this.generateParameterColor();
+            d3.scale.paletteColors = function () {
+                return d3.scale.ordinal().range(_this.colors.map(function (color) {
+                    return _this.pipChartColors.materialColorToRgba(color);
+                }));
+            };
+            this.instantiateChart();
         };
-    }
-})();
-},{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipCharts', [
-        'pipBarCharts',
-        'pipLineCharts',
-        'pipPieCharts',
-        'pipChartLegends',
-        'pipCharts.Templates'
-    ]);
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipChartLegends', [])
-        .directive('pipChartLegend', pipChartLegend);
-    function pipChartLegend() {
-        return {
-            restrict: 'E',
-            scope: {
-                series: '=pipSeries',
-                interactive: '=pipInteractive'
-            },
-            templateUrl: 'legend/interactive_legend.html',
-            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
-                var colors = _.map($mdColorPalette, function (palette) {
-                    return palette[500].hex;
+        BarChartController.prototype.$onChanges = function (changes) {
+            this.xTickFormat = changes.xTickFormat ? changes.xTickFormat.currentValue : null;
+            this.yTickFormat = changes.yTickFormat ? changes.yTickFormat.currentValue : null;
+            this.interactiveLegend = changes.interactiveLegend ? changes.interactiveLegend.currentValue : null;
+            if (changes.series && changes.series.currentValue !== changes.series.previousValue) {
+                this.series = changes.series.currentValue;
+                this.data = this.prepareData(this.series);
+                this.legend = _.clone(this.series);
+                this.generateParameterColor();
+                this.updateChart();
+            }
+        };
+        BarChartController.prototype.updateChart = function () {
+            if (this.chart) {
+                this.chartElem.datum(this.data).call(this.chart);
+                this.configBarWidthAndLabel();
+                this.drawEmptyState();
+            }
+        };
+        BarChartController.prototype.instantiateChart = function () {
+            var _this = this;
+            nv.addGraph(function () {
+                _this.chart = nv.models.discreteBarChart()
+                    .margin({
+                    top: 10,
+                    right: 0,
+                    bottom: 10,
+                    left: 50
+                })
+                    .x(function (d) {
+                    return d.label || d.key || d.x;
+                })
+                    .y(function (d) {
+                    return d.value;
+                })
+                    .showValues(true)
+                    .staggerLabels(true)
+                    .showXAxis(true)
+                    .showYAxis(true)
+                    .valueFormat(d3.format('d'))
+                    .duration(0)
+                    .height(_this.height)
+                    .color(function (d) {
+                    return _this.data[d.series].color || _this.pipChartColors.materialColorToRgba(_this.colors[d.series]);
                 });
-                colors = _.filter(colors, function (color) {
-                    return color !== undefined && color !== null;
+                _this.chart.tooltip.enabled(false);
+                _this.chart.noData('There is no data right now...');
+                _this.chart.yAxis
+                    .tickFormat(function (d) {
+                    return _this.yTickFormat ? _this.yTickFormat(d) : d;
                 });
-                function colorCheckboxes() {
-                    var checkboxContainers = $($element).find('md-checkbox .md-container');
-                    checkboxContainers.each(function (index, item) {
-                        if (index >= $scope.series.length) {
-                            return;
-                        }
-                        $(item)
-                            .css('color', $scope.series[index].color || colors[index])
-                            .find('.md-icon')
-                            .css('background-color', $scope.series[index].color || colors[index]);
-                    });
-                }
-                function animate() {
-                    var legendTitles = $($element).find('.chart-legend-item');
-                    legendTitles.each(function (index, item) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
-                    });
-                }
-                function prepareSeries() {
-                    if (!$scope.series)
-                        return;
-                    $scope.series.forEach(function (item, index) {
-                        item.color = item.color || (item.values && item.values[0] && item.values[0].color ? item.values[0].color : colors[index]);
-                        item.disabled = item.disabled || false;
-                    });
-                }
-                $scope.$watch('series', function () {
-                    $timeout(function () {
-                        animate();
-                        colorCheckboxes();
-                    }, 0);
-                    prepareSeries();
-                }, true);
-                $scope.$watch('interactive', function (newValue, oldValue) {
-                    if (newValue == true && newValue != oldValue) {
-                        $timeout(colorCheckboxes, 0);
-                    }
+                _this.chart.xAxis
+                    .tickFormat(function (d) {
+                    return _this.xTickFormat ? _this.xTickFormat(d) : d;
                 });
-                $timeout(function () {
-                    animate();
-                    colorCheckboxes();
+                _this.chartElem = d3.select(_this.$element.get(0))
+                    .select('.bar-chart svg')
+                    .datum(_this.data)
+                    .style('height', '285px')
+                    .call(_this.chart);
+                nv.utils.windowResize(function () {
+                    _this.chart.update();
+                    _this.configBarWidthAndLabel(0);
+                    _this.drawEmptyState();
+                });
+                return _this.chart;
+            }, function () {
+                _this.$timeout(function () {
+                    _this.configBarWidthAndLabel();
                 }, 0);
-                prepareSeries();
-            }]
+                _this.drawEmptyState();
+            });
         };
-    }
-})();
+        BarChartController.prototype.prepareData = function (data) {
+            var result = [];
+            _.each(data, function (seria) {
+                if (!seria.disabled && seria.values)
+                    result.push(seria);
+            });
+            return _.cloneDeep(result);
+        };
+        BarChartController.prototype.drawEmptyState = function () {
+            if (this.$element.find('.nv-noData').length === 0) {
+                d3.select(this.$element.find('.empty-state')[0]).remove();
+            }
+            else {
+                var g = this.chartElem.append('g').classed('empty-state', true), width = this.$element.find('.nvd3-svg').innerWidth(), margin = width * 0.1;
+                g.append('g')
+                    .style('fill', 'rgba(0, 0, 0, 0.08)')
+                    .append('rect')
+                    .attr('height', this.height - 10)
+                    .attr('width', 38);
+                g.append('g')
+                    .attr('transform', 'translate(42, 60)')
+                    .style('fill', 'rgba(0, 0, 0, 0.08)')
+                    .append('rect')
+                    .attr('height', 200)
+                    .attr('width', 38);
+                g.append('g')
+                    .attr('transform', 'translate(84, 160)')
+                    .style('fill', 'rgba(0, 0, 0, 0.08)')
+                    .append('rect')
+                    .attr('height', 100)
+                    .attr('width', 38);
+                g.attr('transform', 'translate(' + (50 + margin) + ', 0), ' + 'scale(' + ((width - 2 * margin) / 126) + ', 1)');
+            }
+        };
+        BarChartController.prototype.configBarWidthAndLabel = function (timeout) {
+            var _this = this;
+            if (timeout === void 0) { timeout = 1000; }
+            var labels = this.$element.find('.nv-bar text'), chartBars = this.$element.find('.nv-bar'), parentHeight = this.$element.find('.nvd3-svg')[0].getBBox().height;
+            d3.select(this.$element.find('.bar-chart')[0]).classed('visible', true);
+            _.each(chartBars, function (item, index) {
+                var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')), element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
+                element
+                    .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + (_this.height - 20) + ')')
+                    .select('rect').attr('height', 0);
+                element
+                    .transition()
+                    .duration(timeout)
+                    .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + y + ')')
+                    .select('rect').attr('height', barHeight);
+                d3.select(labels[index])
+                    .attr('dy', barHeight / 2 + 10)
+                    .attr('x', barWidth / 2);
+            });
+        };
+        BarChartController.prototype.generateParameterColor = function () {
+            var _this = this;
+            if (!this.data)
+                return;
+            _.each(this.data, function (item, index) {
+                if (item.values[0]) {
+                    item.values[0].color = item.values[0].color || _this.pipChartColors.getMaterialColor(index, _this.colors);
+                    item.color = item.values[0].color;
+                }
+            });
+        };
+        return BarChartController;
+    }());
+    var BarChart = {
+        bindings: BarChartBindings,
+        templateUrl: 'bar_chart/BarChart.html',
+        controller: BarChartController
+    };
+    angular
+        .module('pipBarCharts', [])
+        .component('pipBarChart', BarChart);
+}
+},{}],2:[function(require,module,exports){
+"use strict";
+{
+    var ChartColorsService = (function () {
+        ChartColorsService.$inject = ['$mdColorPalette'];
+        function ChartColorsService($mdColorPalette) {
+            "ngInject";
+            this.$mdColorPalette = $mdColorPalette;
+        }
+        ChartColorsService.prototype.getMaterialColor = function (index, colors) {
+            if (!colors || colors.length < 1)
+                return null;
+            if (index >= colors.length) {
+                index = 0;
+            }
+            return this.materialColorToRgba(colors[index]);
+        };
+        ChartColorsService.prototype.materialColorToRgba = function (color) {
+            return 'rgba(' + this.$mdColorPalette[color][500].value[0] + ',' +
+                this.$mdColorPalette[color][500].value[1] + ',' +
+                this.$mdColorPalette[color][500].value[2] + ',' +
+                (this.$mdColorPalette[color][500].value[3] || 1) + ')';
+        };
+        ChartColorsService.prototype.generateMaterialColors = function () {
+            var _this = this;
+            var colors = _.map(this.$mdColorPalette, function (palette, color) {
+                return color;
+            });
+            colors = _.filter(colors, function (color) {
+                return _.isObject(_this.$mdColorPalette[color]) && _.isObject(_this.$mdColorPalette[color][500]) && _.isArray(_this.$mdColorPalette[color][500].value);
+            });
+            return colors;
+        };
+        return ChartColorsService;
+    }());
+    angular
+        .module('pipChartColors', [])
+        .service('pipChartColors', ChartColorsService);
+}
+},{}],3:[function(require,module,exports){
+"use strict";
 },{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipLineCharts', [])
-        .directive('pipLineChart', pipLineChart);
-    function pipLineChart() {
-        return {
-            restrict: 'E',
-            scope: {
-                series: '=pipSeries',
-                showYAxis: '=pipYAxis',
-                showXAxis: '=pipXAxis',
-                xFormat: '=pipXFormat',
-                xTickFormat: '=pipXTickFormat',
-                yTickFormat: '=pipYTickFormat',
-                xTickValues: '=pipXTickValues',
-                dynamic: '=pipDynamic',
-                fixedHeight: '@pipDiagramHeight',
-                dynamicHeight: '@pipDynamicHeight',
-                minHeight: '@pipMinHeight',
-                maxHeight: '@pipMaxHeight',
-                interactiveLegend: '=pipInterLegend'
-            },
-            bindToController: true,
-            controllerAs: 'lineChart',
-            templateUrl: 'line/line_chart.html',
-            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
-                var vm = this;
-                var chart = null;
-                var chartElem = null;
-                var setZoom = null;
-                var updateZoomOptions = null;
-                var fixedHeight = vm.fixedHeight || 270;
-                var dynamicHeight = vm.dynamicHeight || false;
-                var minHeight = vm.minHeight || fixedHeight;
-                var maxHeight = vm.maxHeight || fixedHeight;
-                var filteredColor = _.filter($mdColorPalette, function (palette, color) {
-                    return _.isObject(color) && _.isObject(color[500] && _.isArray(color[500].value));
-                });
-                var colors = _.map(filteredColor, function (palette, color) {
-                    return color;
-                });
-                colors = _.filter(colors, function (color) {
-                    return _.isObject($mdColorPalette[color]) && _.isObject($mdColorPalette[color][500] && _.isArray($mdColorPalette[color][500].value));
-                });
-                vm.data = prepareData(vm.series) || [];
-                vm.legend = _.clone(vm.series);
-                vm.sourceEvents = [];
-                vm.isVisibleX = function () {
-                    return vm.showXAxis == undefined ? true : vm.showXAxis;
-                };
-                vm.isVisibleY = function () {
-                    return vm.showYAxis == undefined ? true : vm.showYAxis;
-                };
-                vm.zoomIn = function () {
-                    if (setZoom) {
-                        setZoom('in');
-                    }
-                };
-                vm.zoomOut = function () {
-                    if (setZoom) {
-                        setZoom('out');
-                    }
-                };
-                if (vm.series && vm.series.length > colors.length) {
-                    vm.data = vm.series.slice(0, 9);
-                }
-                generateParameterColor();
-                d3.scale.paletteColors = function () {
-                    return d3.scale.ordinal().range(colors.map(materialColorToRgba));
-                };
-                $scope.$watch('lineChart.series', function (updatedSeries) {
-                    vm.data = prepareData(updatedSeries);
-                    vm.legend = _.clone(vm.series);
-                    generateParameterColor();
-                    if (chart) {
-                        chart.xAxis
-                            .tickValues(vm.xTickValues && _.isArray(vm.xTickValues) && vm.xTickValues.length > 2 ?
-                            d3.range(vm.xTickValues[0], vm.xTickValues[1], vm.xTickValues[2]) : null);
-                        chartElem.datum(vm.data || []).call(chart);
-                        drawEmptyState();
-                        if (updateZoomOptions)
-                            updateZoomOptions(vm.data);
-                    }
-                }, true);
-                $scope.$watch('lineChart.legend', function (updatedLegend) {
-                    vm.data = prepareData(updatedLegend);
-                    vm.legend = updatedLegend;
-                    if (chart) {
-                        chartElem.datum(vm.data || []).call(chart);
-                        drawEmptyState();
-                        if (updateZoomOptions)
-                            updateZoomOptions(vm.data);
-                    }
-                }, true);
-                $scope.$on('$destroy', function () {
-                    setTimeout(function () { d3.selectAll('.nvtooltip').style('opacity', 0); }, 800);
-                });
-                function prepareData(data) {
-                    var result = [];
-                    _.each(data, function (seria) {
-                        if (!seria.disabled && seria.values)
-                            result.push(seria);
-                    });
-                    return _.cloneDeep(result);
-                }
-                var getHeight = function () {
-                    if (dynamicHeight) {
-                        var heigth = Math.min(Math.max(minHeight, $element.parent().innerHeight()), maxHeight);
-                        return heigth;
-                    }
-                    else {
-                        return fixedHeight;
-                    }
-                };
-                nv.addGraph(function () {
-                    chart = nv.models.lineChart()
-                        .margin({ top: 20, right: 20, bottom: 30, left: 30 })
-                        .x(function (d) {
-                        return (d !== undefined && d.x !== undefined) ? (vm.xFormat ? vm.xFormat(d.x) : d.x) : d;
-                    })
-                        .y(function (d) {
-                        return (d !== undefined && d.value !== undefined) ? d.value : d;
-                    })
-                        .height(getHeight() - 50)
-                        .useInteractiveGuideline(true)
-                        .showXAxis(true)
-                        .showYAxis(true)
-                        .showLegend(false)
-                        .color(function (d) {
-                        return d.color || d3.scale.paletteColors().range();
-                    });
-                    chart.tooltip.enabled(false);
-                    chart.noData('There is no data right now...');
-                    chart.yAxis
-                        .tickFormat(function (d) {
-                        return vm.yTickFormat ? vm.yTickFormat(d) : d;
-                    });
-                    chart.xAxis
-                        .tickFormat(function (d) {
-                        return vm.xTickFormat ? vm.xTickFormat(d) : d;
-                    })
-                        .tickValues(vm.xTickValues && _.isArray(vm.xTickValues) && vm.xTickValues.length > 2 ?
-                        d3.range(vm.xTickValues[0], vm.xTickValues[1], vm.xTickValues[2]) : null);
-                    chartElem = d3.select($element.get(0)).select('.line-chart svg');
-                    chartElem.datum(vm.data || []).style('height', (getHeight() - 50) + 'px').call(chart);
-                    $('.line-chart svg').on('touchstart touchmove', function (e) {
-                        setTimeout(function () {
-                            var tooltip = $('.nvtooltip'), tooltipW = tooltip.innerWidth(), bodyWidth = $('body').innerWidth(), x = e.originalEvent['touches'][0]['pageX'], y = e.originalEvent['touches'][0]['pageY'];
-                            tooltip.css('transform', 'translate('
-                                + (x + tooltipW >= bodyWidth ? (x - tooltipW) : x) + ','
-                                + y + ')');
-                            tooltip.css('left', 0);
-                            tooltip.css('top', 0);
-                        });
-                    });
-                    $('.line-chart svg').on('touchstart touchend', function (e) {
-                        var removeTooltip = function () {
-                            var tooltip = $('.nvtooltip');
-                            tooltip.css('opacity', 0);
-                        };
-                        removeTooltip();
-                        setTimeout(function () {
-                            removeTooltip();
-                        }, 500);
-                    });
-                    if (vm.dynamic) {
-                        addZoom(chart, chartElem);
-                    }
-                    nv.utils.windowResize(function () { onResize(); });
-                    $scope.$on('pipMainResized', function () { onResize(); });
-                    return chart;
-                }, function () {
-                    drawEmptyState();
-                });
-                function onResize() {
-                    chart.height(getHeight() - 50);
-                    chartElem.style('height', (getHeight() - 50) + 'px');
-                    chart.update();
-                    drawEmptyState();
-                }
-                function drawEmptyState() {
-                    if (!$element.find('text.nv-noData').get(0)) {
-                        d3.select($element.find('.empty-state')[0]).remove();
-                    }
-                    else {
-                        var containerWidth = $element.find('.line-chart').innerWidth(), containerHeight = $element.find('.line-chart').innerHeight();
-                        if ($element.find('.empty-state').get(0)) {
-                            chartElem
-                                .select('image')
-                                .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')');
-                        }
-                        else {
-                            chartElem
-                                .append("defs")
-                                .append("pattern")
-                                .attr("height", 1)
-                                .attr("width", 1)
-                                .attr("x", "0")
-                                .attr("y", "0")
-                                .attr("id", "bg")
-                                .append("image")
-                                .attr('x', 17)
-                                .attr('y', 0)
-                                .attr('height', "216px")
-                                .attr('width', "1151px")
-                                .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')')
-                                .attr("xlink:href", "images/line_chart_empty_state.svg");
-                            chartElem
-                                .append('rect')
-                                .classed('empty-state', true)
-                                .attr('height', "100%")
-                                .attr('width', "100%")
-                                .attr('fill', 'url(#bg)');
-                        }
-                    }
-                }
-                function updateScroll(domains, boundary) {
-                    var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = (domains[1] - domains[0]) / bDiff === 1;
-                    $($element[0]).find('.visual-scroll')
-                        .css('opacity', function () {
-                        return isEqual ? 0 : 1;
-                    });
-                    if (isEqual)
-                        return;
-                    $($element[0]).find('.scrolled-block')
-                        .css('left', function () {
-                        return domains[0] / bDiff * 100 + '%';
-                    })
-                        .css('width', function () {
-                        return domDiff / bDiff * 100 + '%';
-                    });
-                }
-                function addZoom(chart, svg) {
-                    var scaleExtent = 4;
-                    var yAxis = null;
-                    var xAxis = null;
-                    var xDomain = null;
-                    var yDomain = null;
-                    var redraw = null;
-                    var svg = svg;
-                    var xScale = null;
-                    var yScale = null;
-                    var x_boundary = null;
-                    var y_boundary = null;
-                    var d3zoom = d3.behavior.zoom();
-                    var prevXDomain = null;
-                    var prevScale = null;
-                    var prevTranslate = null;
-                    setData(chart);
-                    function setData(newChart) {
-                        yAxis = newChart.yAxis;
-                        xAxis = newChart.xAxis;
-                        xDomain = newChart.xDomain || xAxis.scale().domain;
-                        yDomain = newChart.yDomain || yAxis.scale().domain;
-                        redraw = newChart.update;
-                        xScale = xAxis.scale();
-                        yScale = yAxis.scale();
-                        x_boundary = xAxis.scale().domain().slice();
-                        y_boundary = yAxis.scale().domain().slice();
-                        prevXDomain = x_boundary;
-                        prevScale = d3zoom.scale();
-                        prevTranslate = d3zoom.translate();
-                        xScale.nice();
-                        yScale.nice();
-                    }
-                    function fixDomain(domain, boundary, scale, translate) {
-                        if (domain[0] < boundary[0]) {
-                            domain[0] = boundary[0];
-                            if (prevXDomain[0] !== boundary[0] || scale !== prevScale) {
-                                domain[1] += (boundary[0] - domain[0]);
-                            }
-                            else {
-                                domain[1] = prevXDomain[1];
-                                translate = _.clone(prevTranslate);
-                            }
-                        }
-                        if (domain[1] > boundary[1]) {
-                            domain[1] = boundary[1];
-                            if (prevXDomain[1] !== boundary[1] || scale !== prevScale) {
-                                domain[0] -= (domain[1] - boundary[1]);
-                            }
-                            else {
-                                domain[0] = prevXDomain[0];
-                                translate = _.clone(prevTranslate);
-                            }
-                        }
-                        d3zoom.translate(translate);
-                        prevXDomain = _.clone(domain);
-                        prevScale = _.clone(scale);
-                        prevTranslate = _.clone(translate);
-                        return domain;
-                    }
-                    function updateChart() {
-                        d3zoom.scale(1);
-                        d3zoom.translate([0, 0]);
-                        xScale.domain(x_boundary);
-                        d3zoom.x(xScale).y(yScale);
-                        svg.call(d3zoom);
-                    }
-                    function zoomed() {
-                        if (d3.event.scale === 1) {
-                            unzoomed();
-                            updateChart();
-                        }
-                        else {
-                            xDomain(fixDomain(xScale.domain(), x_boundary, d3.event.scale, d3.event.translate));
-                            redraw();
-                        }
-                        updateScroll(xScale.domain(), x_boundary);
-                    }
-                    setZoom = function (which) {
-                        var center0 = [svg[0][0].getBBox().width / 2, svg[0][0].getBBox().height / 2];
-                        var translate0 = d3zoom.translate(), coordinates0 = coordinates(center0);
-                        if (which === 'in') {
-                            if (prevScale < scaleExtent)
-                                d3zoom.scale(prevScale + 0.2);
-                        }
-                        else {
-                            if (prevScale > 1)
-                                d3zoom.scale(prevScale - 0.2);
-                        }
-                        var center1 = point(coordinates0);
-                        d3zoom.translate([translate0[0] + center0[0] - center1[0], translate0[1] + center0[1] - center1[1]]);
-                        d3zoom.event(svg);
-                    };
-                    function step(which) {
-                        var translate = d3zoom.translate();
-                        if (which === 'right') {
-                            translate[0] -= 20;
-                        }
-                        else {
-                            translate[0] += 20;
-                        }
-                        d3zoom.translate(translate);
-                        d3zoom.event(svg);
-                    }
-                    function coordinates(point) {
-                        var scale = d3zoom.scale(), translate = d3zoom.translate();
-                        return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
-                    }
-                    function point(coordinates) {
-                        var scale = d3zoom.scale(), translate = d3zoom.translate();
-                        return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
-                    }
-                    function keypress() {
-                        switch (d3.event.keyCode) {
-                            case 39:
-                                step('right');
-                                break;
-                            case 37:
-                                step('left');
-                                break;
-                            case 107:
-                                setZoom('in');
-                                break;
-                            case 109: setZoom('out');
-                        }
-                    }
-                    function unzoomed() {
-                        xDomain(x_boundary);
-                        redraw();
-                        d3zoom.scale(1);
-                        d3zoom.translate([0, 0]);
-                        prevScale = 1;
-                        prevTranslate = [0, 0];
-                    }
-                    d3zoom.x(xScale)
-                        .y(yScale)
-                        .scaleExtent([1, scaleExtent])
-                        .on('zoom', zoomed);
-                    svg.call(d3zoom).on('dblclick.zoom', unzoomed);
-                    $($element.get(0)).addClass('dynamic');
-                    svg
-                        .attr('focusable', false)
-                        .style('outline', 'none')
-                        .on('keydown', keypress)
-                        .on('focus', function () { });
-                    var getXMinMax = function (data) {
-                        var maxVal, minVal = null;
-                        for (var i = 0; i < data.length; i++) {
-                            if (!data[i].disabled) {
-                                var tempMinVal = d3.max(data[i].values, function (d) { return vm.xFormat ? vm.xFormat(d.x) : d.x; });
-                                var tempMaxVal = d3.min(data[i].values, function (d) { return vm.xFormat ? vm.xFormat(d.x) : d.x; });
-                                minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
-                                maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
-                            }
-                        }
-                        return [maxVal, minVal];
-                    };
-                    updateZoomOptions = function (data) {
-                        yAxis = chart.yAxis;
-                        xAxis = chart.xAxis;
-                        xScale = xAxis.scale();
-                        yScale = yAxis.scale();
-                        x_boundary = getXMinMax(data);
-                        if (d3zoom.scale() === 1) {
-                            d3zoom.x(xScale).y(yScale);
-                            svg.call(d3zoom);
-                            d3zoom.event(svg);
-                        }
-                        updateScroll(xScale.domain(), x_boundary);
-                    };
-                }
-                function materialColorToRgba(color) {
-                    return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
-                        + $mdColorPalette[color][500].value[1] + ','
-                        + $mdColorPalette[color][500].value[2] + ','
-                        + ($mdColorPalette[color][500].value[3] || 1) + ')';
-                }
-                function getMaterialColor(index) {
-                    if (!colors || colors.length < 1)
-                        return null;
-                    if (index >= colors.length) {
-                        index = 0;
-                    }
-                    return materialColorToRgba(colors[index]);
-                }
-                function generateParameterColor() {
-                    if (!vm.data)
-                        return;
-                    vm.data.forEach(function (item, index) {
-                        item.color = item.color || getMaterialColor(index);
-                    });
-                }
-            }]
+"use strict";
+{
+    var ChartLegendBindings = {
+        series: '<pipSeries',
+        interactive: '<pipInteractive'
+    };
+    var ChartLegendBindingsChanges = (function () {
+        function ChartLegendBindingsChanges() {
+        }
+        return ChartLegendBindingsChanges;
+    }());
+    var ChartLegendController = (function () {
+        ChartLegendController.$inject = ['$element', '$scope', '$timeout', 'pipChartColors'];
+        function ChartLegendController($element, $scope, $timeout, pipChartColors) {
+            "ngInject";
+            this.$element = $element;
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this.pipChartColors = pipChartColors;
+            this.colors = this.pipChartColors.generateMaterialColors();
+        }
+        ChartLegendController.prototype.$onInit = function () {
+            this.updateLegends();
         };
-    }
-})();
-},{}],5:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipPieCharts', [])
-        .directive('pipPieChart', pipPieChart);
-    function pipPieChart() {
-        return {
-            restrict: 'E',
-            scope: {
-                series: '=pipSeries',
-                donut: '=pipDonut',
-                legend: '=pipShowLegend',
-                total: '=pipShowTotal',
-                size: '=pipPieSize',
-                centered: '=pipCentered'
-            },
-            bindToController: true,
-            controllerAs: 'pieChart',
-            templateUrl: 'pie/pie_chart.html',
-            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
-                var vm = this;
-                var chart = null;
-                var titleElem = null;
-                var chartElem = null;
-                var colors = _.map($mdColorPalette, function (palette, color) {
-                    return color;
-                });
-                colors = _.filter(colors, function (color) {
-                    return _.isObject($mdColorPalette[color]) && _.isObject($mdColorPalette[color][500] && _.isArray($mdColorPalette[color][500].value));
-                });
-                var resizeTitleLabel = resizeTitleLabelUnwrap;
-                vm.data = vm.data || [];
-                vm.showLegend = function () {
-                    return vm.legend !== undefined ? vm.legend : true;
-                };
-                if (vm.series && vm.series.length > colors.length) {
-                    vm.data = vm.series.slice(0, 9);
-                }
-                $scope.$watch('pieChart.series', function (newVal) {
-                    vm.data = newVal;
-                    generateParameterColor();
-                    if (chart) {
-                        chartElem.datum(vm.data).call(chart);
-                        $timeout(resizeTitleLabel);
-                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
-                    }
-                }, true);
-                generateParameterColor();
-                d3.scale.paletteColors = function () {
-                    return d3.scale.ordinal().range(colors.map(materialColorToRgba));
-                };
-                nv.addGraph(function () {
-                    chart = nv.models.pieChart()
-                        .margin({ top: 0, right: 0, bottom: 0, left: 0 })
-                        .x(function (d) {
-                        return vm.donut ? d.value : null;
-                    })
-                        .y(function (d) {
-                        return d.value;
-                    })
-                        .height(vm.size || 250)
-                        .width(vm.size || 250)
-                        .showLabels(true)
-                        .labelThreshold(.001)
-                        .growOnHover(false)
-                        .donut(vm.donut)
-                        .donutRatio(0.5)
-                        .color(function (d) {
-                        return d.color || d3.scale.paletteColors().range();
-                    });
-                    chart.tooltip.enabled(false);
-                    chart.noData('There is no data right now...');
-                    chart.showLegend(false);
-                    chartElem = d3.select($element.get(0))
-                        .select('.pie-chart')
-                        .style('height', (vm.size || 250) + 'px')
-                        .style('width', vm.centered ? '100%' : (vm.size || 250) + 'px')
-                        .select('svg')
-                        .style('opacity', 0)
-                        .datum(vm.data || [])
-                        .call(chart);
-                    nv.utils.windowResize(function () {
-                        chart.update();
-                        $timeout(resizeTitleLabel);
-                        centerChart();
-                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
-                    });
-                    return chart;
-                }, function () {
-                    $timeout(function () {
-                        var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
-                        renderTotalLabel(svgElem);
-                        d3.select(svgElem)
-                            .transition()
-                            .duration(1000)
-                            .style('opacity', 1);
-                        $timeout(resizeTitleLabelUnwrap, 800);
-                        centerChart();
-                        drawEmptyState(svgElem);
-                    });
-                });
-                function drawEmptyState(svg) {
-                    if (!$element.find('text.nv-noData').get(0)) {
-                        d3.select($element.find('.empty-state')[0]).remove();
-                        $element.find('.pip-empty-pie-text').remove();
-                    }
-                    else {
-                        if ($element.find('.pip-empty-pie-text').length === 0) {
-                            $element.find('.pie-chart')
-                                .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
-                        }
-                        var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
-                        var arc = d3.svg.arc()
-                            .innerRadius(size / 2 - 20)
-                            .outerRadius(size / 2 - 57);
-                        svg = d3.select(svg)
-                            .append("g")
-                            .classed('empty-state', true)
-                            .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
-                        var path = svg.selectAll("path")
-                            .data(pie([1]))
-                            .enter().append("path")
-                            .attr("fill", "rgba(0, 0, 0, 0.08)")
-                            .attr("d", arc);
-                    }
-                }
-                function centerChart() {
-                    if (vm.centered) {
-                        var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0], leftMargin = $(svgElem).innerWidth() / 2 - (vm.size || 250) / 2;
-                        d3.select($element.find('.nv-pieChart')[0]).attr('transform', 'translate(' + leftMargin + ', 0)');
-                    }
-                }
-                function renderTotalLabel(svgElem) {
-                    if ((!vm.total && !vm.donut) || !vm.data)
-                        return;
-                    var totalVal = vm.data.reduce(function (sum, curr) {
-                        return sum + curr.value;
+        ChartLegendController.prototype.$onChanges = function (changes) {
+            var _this = this;
+            if (changes.series && changes.series.currentValue !== changes.series.previousValue) {
+                this.series = changes.series.currentValue;
+                this.updateLegends();
+            }
+            if (changes.interactive && changes.interactive.currentValue !== changes.interactive.previousValue) {
+                this.interactive = changes.interactive.currentValue;
+                if (this.interactive === true) {
+                    this.$timeout(function () {
+                        _this.colorCheckboxes();
                     }, 0);
-                    if (totalVal >= 10000)
-                        totalVal = (totalVal / 1000).toFixed(1) + 'k';
-                    d3.select(svgElem)
-                        .select('.nv-pie:not(.nvd3)')
-                        .append('text')
-                        .classed('label-total', true)
-                        .attr('text-anchor', 'middle')
-                        .style('dominant-baseline', 'central')
-                        .text(totalVal);
-                    titleElem = d3.select($element.find('text.label-total').get(0)).style('opacity', 0);
                 }
-                function resizeTitleLabelUnwrap() {
-                    if ((!vm.total && !vm.donut) || !vm.data)
-                        return;
-                    var boxSize = $element.find('.nvd3.nv-pieChart').get(0).getBBox();
-                    if (!boxSize.width || !boxSize.height) {
-                        return;
-                    }
-                    titleElem.style('font-size', ~~boxSize.width / 4.5).style('opacity', 1);
-                }
-                function materialColorToRgba(color) {
-                    return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
-                        + $mdColorPalette[color][500].value[1] + ','
-                        + $mdColorPalette[color][500].value[2] + ','
-                        + ($mdColorPalette[color][500].value[3] || 1) + ')';
-                }
-                function getMaterialColor(index) {
-                    if (!colors || colors.length < 1)
-                        return null;
-                    if (index >= colors.length) {
-                        index = 0;
-                    }
-                    return materialColorToRgba(colors[index]);
-                }
-                function generateParameterColor() {
-                    if (!vm.data)
-                        return;
-                    vm.data.forEach(function (item, index) {
-                        item.color = item.color || getMaterialColor(index);
-                    });
-                }
-            }]
+            }
         };
-    }
-})();
+        ChartLegendController.prototype.updateLegends = function () {
+            var _this = this;
+            this.$timeout(function () {
+                _this.animate();
+                _this.colorCheckboxes();
+            }, 0);
+            this.prepareSeries();
+        };
+        ChartLegendController.prototype.colorCheckboxes = function () {
+            var _this = this;
+            var checkboxContainers = this.$element.find('md-checkbox .md-container');
+            _.each(checkboxContainers, function (item, index) {
+                if (index >= _this.series.length) {
+                    return;
+                }
+                $(item)
+                    .css('color', _this.series[index].color || _this.colors[index])
+                    .find('.md-icon')
+                    .css('background-color', _this.series[index].color || _this.colors[index]);
+            });
+        };
+        ChartLegendController.prototype.animate = function () {
+            var _this = this;
+            var legendTitles = this.$element.find('.chart-legend-item');
+            _.each(legendTitles, function (item, index) {
+                _this.$timeout(function () {
+                    $(item).addClass('visible');
+                }, 200 * index);
+            });
+        };
+        ChartLegendController.prototype.prepareSeries = function () {
+            var _this = this;
+            if (!this.series)
+                return;
+            _.each(this.series, function (item, index) {
+                var materialColor = _this.pipChartColors.getMaterialColor(index, _this.colors);
+                item.color = item.color || (item.values && item.values[0] && item.values[0].color ? item.values[0].color : materialColor);
+                item.disabled = item.disabled || false;
+            });
+        };
+        return ChartLegendController;
+    }());
+    var ChartLegend = {
+        bindings: ChartLegendBindings,
+        templateUrl: 'chart_legend/ChartInteractiveLegend.html',
+        controller: ChartLegendController
+    };
+    angular
+        .module('pipChartLegends', [])
+        .component('pipChartLegend', ChartLegend);
+}
+},{}],5:[function(require,module,exports){
+angular.module('pipCharts', [
+    'pipBarCharts',
+    'pipLineCharts',
+    'pipPieCharts',
+    'pipChartLegends',
+    'pipChartColors',
+    'pipCharts.Templates'
+]);
 },{}],6:[function(require,module,exports){
+"use strict";
+{
+    var LineChartBindings = {
+        series: '<pipSeries',
+        showYAxis: '<?pipYAxis',
+        showXAxis: '<?pipXAxis',
+        xFormat: '<?pipXFormat',
+        xTickFormat: '<?pipXTickFormat',
+        yTickFormat: '<?pipYTickFormat',
+        xTickValues: '<?pipXTickValues',
+        dynamic: '<?pipDynamic',
+        fixedHeight: '<?pipDiagramHeight',
+        dynamicHeight: '<?pipDynamicHeight',
+        minHeight: '<?pipMinHeight',
+        maxHeight: '<?pipMaxHeight',
+        interactiveLegend: '<?pipInterLegend'
+    };
+    var LineChartBindingsChanges = (function () {
+        function LineChartBindingsChanges() {
+        }
+        return LineChartBindingsChanges;
+    }());
+    var LineChartController = (function () {
+        LineChartController.$inject = ['$element', '$scope', '$timeout', 'pipChartColors'];
+        function LineChartController($element, $scope, $timeout, pipChartColors) {
+            "ngInject";
+            var _this = this;
+            this.$element = $element;
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this.pipChartColors = pipChartColors;
+            this.HEIGHT = 270;
+            this.chart = null;
+            this.chartElem = null;
+            this.setZoom = null;
+            this.updateZoomOptions = null;
+            this.fixedHeight = this.HEIGHT;
+            this.dynamicHeight = false;
+            this.minHeight = this.HEIGHT;
+            this.maxHeight = this.HEIGHT;
+            this.showYAxis = true;
+            this.showXAxis = true;
+            this.dynamic = false;
+            this.interactiveLegend = false;
+            this.colors = this.pipChartColors.generateMaterialColors();
+            $scope.$watch('$ctrl.legend', function (updatedLegend) {
+                _this.data = _this.prepareData(updatedLegend);
+                _this.legend = updatedLegend;
+                _this.updateChart();
+            }, true);
+            $scope.$on('$destroy', function () {
+                $timeout(function () {
+                    d3.selectAll('.nvtooltip').style('opacity', 0);
+                }, 800);
+            });
+        }
+        LineChartController.prototype.$onInit = function () {
+            var _this = this;
+            this.data = this.prepareData(this.series) || [];
+            this.legend = _.clone(this.series);
+            this.sourceEvents = [];
+            this.generateParameterColor();
+            d3.scale.paletteColors = function () {
+                return d3.scale.ordinal().range(_this.colors.map(function (color) {
+                    return _this.pipChartColors.materialColorToRgba(color);
+                }));
+            };
+            this.instantiateChart();
+        };
+        LineChartController.prototype.$onChanges = function (changes) {
+            this.fixedHeight = changes.fixedHeight ? changes.fixedHeight.currentValue : this.HEIGHT;
+            this.minHeight = changes.minHeight ? changes.minHeight.currentValue : this.HEIGHT;
+            this.maxHeight = changes.maxHeight ? changes.maxHeight.currentValue : this.HEIGHT;
+            this.dynamicHeight = changes.dynamicHeight ? changes.dynamicHeight.currentValue : this.dynamicHeight;
+            this.showXAxis = changes.showXAxis ? changes.showXAxis.currentValue : this.showXAxis;
+            this.showYAxis = changes.showYAxis ? changes.showYAxis.currentValue : this.showYAxis;
+            this.dynamic = changes.dynamic ? changes.dynamic.currentValue : this.dynamic;
+            this.interactiveLegend = changes.interactiveLegend ? changes.interactiveLegend.currentValue : this.interactiveLegend;
+            this.xFormat = changes.xFormat ? changes.xFormat.currentValue : this.xFormat;
+            this.xTickFormat = changes.xTickFormat ? changes.xTickFormat.currentValue : this.xTickFormat;
+            this.yTickFormat = changes.yTickFormat ? changes.yTickFormat.currentValue : this.yTickFormat;
+            if (changes.xTickValues && changes.xTickValues.currentValue !== changes.xTickValues.previousValue) {
+                this.xTickValues = changes.xTickValues.currentValue;
+                this.updateXTickValues();
+                if (this.chartElem && this.chart)
+                    this.chartElem.datum(this.data || []).call(this.chart);
+            }
+            if (changes.series && changes.series.currentValue !== changes.series.previousValue) {
+                this.updateSeries();
+            }
+        };
+        LineChartController.prototype.prepareData = function (data) {
+            var result = [];
+            _.each(data, function (seria) {
+                if (!seria.disabled && seria.values)
+                    result.push(seria);
+            });
+            return _.cloneDeep(result);
+        };
+        LineChartController.prototype.getHeight = function () {
+            return this.dynamicHeight ? Math.min(Math.max(this.minHeight, this.$element.parent().innerHeight()), this.maxHeight) : this.fixedHeight;
+        };
+        ;
+        LineChartController.prototype.zoomIn = function () {
+            if (this.setZoom) {
+                this.setZoom('in');
+            }
+        };
+        ;
+        LineChartController.prototype.zoomOut = function () {
+            if (this.setZoom) {
+                this.setZoom('out');
+            }
+        };
+        ;
+        LineChartController.prototype.instantiateChart = function () {
+            var _this = this;
+            nv.addGraph(function () {
+                _this.chart = nv.models.lineChart()
+                    .margin({
+                    top: 20,
+                    right: 20,
+                    bottom: 30,
+                    left: 30
+                })
+                    .x(function (d) {
+                    return (d !== undefined && d.x !== undefined) ? (_this.xFormat ? _this.xFormat(d.x) : d.x) : d;
+                })
+                    .y(function (d) {
+                    return (d !== undefined && d.value !== undefined) ? d.value : d;
+                })
+                    .height(_this.getHeight() - 50)
+                    .useInteractiveGuideline(true)
+                    .showXAxis(true)
+                    .showYAxis(true)
+                    .showLegend(false)
+                    .color(function (d) {
+                    return d.color || d3.scale.paletteColors().range();
+                });
+                _this.chart.tooltip.enabled(false);
+                _this.chart.noData('There is no data right now...');
+                _this.chart.yAxis
+                    .tickFormat(function (d) {
+                    return _this.yTickFormat ? _this.yTickFormat(d) : d;
+                });
+                _this.chart.xAxis
+                    .tickFormat(function (d) {
+                    return _this.xTickFormat ? _this.xTickFormat(d) : d;
+                })
+                    .tickValues(_this.xTickValues && _.isArray(_this.xTickValues) && _this.xTickValues.length > 2 ?
+                    d3.range(_this.xTickValues[0], _this.xTickValues[1], _this.xTickValues[2]) : null);
+                _this.chartElem = d3.select(_this.$element.get(0)).select('.line-chart svg');
+                _this.chartElem.datum(_this.data || []).style('height', (_this.getHeight() - 50) + 'px').call(_this.chart);
+                $('.line-chart svg').on('touchstart touchmove', function (e) {
+                    _this.$timeout(function () {
+                        var tooltip = $('.nvtooltip'), tooltipW = tooltip.innerWidth(), bodyWidth = $('body').innerWidth(), x = e.originalEvent['touches'][0]['pageX'], y = e.originalEvent['touches'][0]['pageY'];
+                        tooltip.css('transform', 'translate(' +
+                            (x + tooltipW >= bodyWidth ? (x - tooltipW) : x) + ',' +
+                            y + ')');
+                        tooltip.css('left', 0);
+                        tooltip.css('top', 0);
+                    });
+                });
+                $('.line-chart svg').on('touchstart touchend', function (e) {
+                    var removeTooltip = function () {
+                        $('.nvtooltip').css('opacity', 0);
+                    };
+                    removeTooltip();
+                    _this.$timeout(function () {
+                        removeTooltip();
+                    }, 500);
+                });
+                if (_this.dynamic) {
+                    _this.addZoom(_this.chart, _this.chartElem);
+                }
+                nv.utils.windowResize(function () {
+                    _this.onResize();
+                });
+                _this.$scope.$on('pipMainResized', function () {
+                    _this.onResize();
+                });
+                return _this.chart;
+            }, function () {
+                _this.drawEmptyState();
+            });
+        };
+        LineChartController.prototype.updateXTickValues = function () {
+            if (!this.chart)
+                return;
+            this.chart.xAxis
+                .tickValues(this.xTickValues && _.isArray(this.xTickValues) && this.xTickValues.length > 2 ?
+                d3.range(this.xTickValues[0], this.xTickValues[1], this.xTickValues[2]) : null);
+        };
+        LineChartController.prototype.updateChart = function () {
+            if (this.chart) {
+                this.updateXTickValues();
+                this.chartElem.datum(this.data || []).call(this.chart);
+                this.drawEmptyState();
+                if (this.updateZoomOptions)
+                    this.updateZoomOptions(this.data);
+            }
+        };
+        LineChartController.prototype.updateSeries = function () {
+            this.data = this.prepareData(this.series);
+            this.legend = _.clone(this.series);
+            this.generateParameterColor();
+            this.updateChart();
+        };
+        LineChartController.prototype.onResize = function () {
+            this.chart.height(this.getHeight() - 50);
+            this.chartElem.style('height', (this.getHeight() - 50) + 'px');
+            this.chart.update();
+            this.drawEmptyState();
+        };
+        LineChartController.prototype.drawEmptyState = function () {
+            if (!this.$element.find('text.nv-noData').get(0)) {
+                d3.select(this.$element.find('.empty-state')[0]).remove();
+            }
+            else {
+                var containerWidth = this.$element.find('.line-chart').innerWidth(), containerHeight = this.$element.find('.line-chart').innerHeight();
+                if (this.$element.find('.empty-state').get(0)) {
+                    this.chartElem
+                        .select('image')
+                        .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')');
+                }
+                else {
+                    this.chartElem
+                        .append("defs")
+                        .append("pattern")
+                        .attr("height", 1)
+                        .attr("width", 1)
+                        .attr("x", "0")
+                        .attr("y", "0")
+                        .attr("id", "bg")
+                        .append("image")
+                        .attr('x', 17)
+                        .attr('y', 0)
+                        .attr('height', "216px")
+                        .attr('width', "1151px")
+                        .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')')
+                        .attr("xlink:href", "images/line_chart_empty_state.svg");
+                    this.chartElem
+                        .append('rect')
+                        .classed('empty-state', true)
+                        .attr('height', "100%")
+                        .attr('width', "100%")
+                        .attr('fill', 'url(#bg)');
+                }
+            }
+        };
+        LineChartController.prototype.updateScroll = function (domains, boundary) {
+            var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = domDiff / bDiff === 1;
+            $(this.$element[0]).find('.visual-scroll')
+                .css('opacity', function () {
+                return isEqual ? 0 : 1;
+            });
+            if (isEqual)
+                return;
+            $(this.$element[0]).find('.scrolled-block')
+                .css('left', function () {
+                return (domains[0] - boundary[0]) / bDiff * 100 + '%';
+            })
+                .css('width', function () {
+                return domDiff / bDiff * 100 + '%';
+            });
+        };
+        LineChartController.prototype.generateParameterColor = function () {
+            var _this = this;
+            if (!this.data)
+                return;
+            _.each(this.data, function (item, index) {
+                item.color = item.color || _this.pipChartColors.getMaterialColor(index, _this.colors);
+            });
+        };
+        LineChartController.prototype.addZoom = function (chart, svg) {
+            var _this = this;
+            var scaleExtent = 4;
+            var yAxis = null;
+            var xAxis = null;
+            var xDomain = null;
+            var yDomain = null;
+            var redraw = null;
+            var xScale = null;
+            var yScale = null;
+            var x_boundary = null;
+            var y_boundary = null;
+            var d3zoom = d3.behavior.zoom();
+            var prevXDomain = null;
+            var prevScale = null;
+            var prevTranslate = null;
+            var setData = function (newChart) {
+                yAxis = newChart.yAxis;
+                xAxis = newChart.xAxis;
+                xDomain = newChart.xDomain || xAxis.scale().domain;
+                yDomain = newChart.yDomain || yAxis.scale().domain;
+                redraw = newChart.update;
+                xScale = xAxis.scale();
+                yScale = yAxis.scale();
+                x_boundary = xAxis.scale().domain().slice();
+                y_boundary = yAxis.scale().domain().slice();
+                prevXDomain = x_boundary;
+                prevScale = d3zoom.scale();
+                prevTranslate = d3zoom.translate();
+                xScale.nice();
+                yScale.nice();
+            };
+            setData(chart);
+            var fixDomain = function (domain, boundary, scale, translate) {
+                if (domain[0] < boundary[0]) {
+                    domain[0] = boundary[0];
+                    if (prevXDomain[0] !== boundary[0] || scale !== prevScale) {
+                        domain[1] += (boundary[0] - domain[0]);
+                    }
+                    else {
+                        domain[1] = prevXDomain[1];
+                        translate = _.clone(prevTranslate);
+                    }
+                }
+                if (domain[1] > boundary[1]) {
+                    domain[1] = boundary[1];
+                    if (prevXDomain[1] !== boundary[1] || scale !== prevScale) {
+                        domain[0] -= (domain[1] - boundary[1]);
+                    }
+                    else {
+                        domain[0] = prevXDomain[0];
+                        translate = _.clone(prevTranslate);
+                    }
+                }
+                d3zoom.translate(translate);
+                prevXDomain = _.clone(domain);
+                prevScale = _.clone(scale);
+                prevTranslate = _.clone(translate);
+                return domain;
+            };
+            var updateChart = function () {
+                d3zoom.scale(1);
+                d3zoom.translate([0, 0]);
+                xScale.domain(x_boundary);
+                d3zoom.x(xScale).y(yScale);
+                svg.call(d3zoom);
+            };
+            var zoomed = function () {
+                if (d3.event.scale === 1) {
+                    unzoomed();
+                    updateChart();
+                }
+                else {
+                    xDomain(fixDomain(xScale.domain(), x_boundary, d3.event.scale, d3.event.translate));
+                    redraw();
+                }
+                _this.updateScroll(xScale.domain(), x_boundary);
+            };
+            this.setZoom = function (which) {
+                var center0 = [svg[0][0].getBBox().width / 2, svg[0][0].getBBox().height / 2];
+                var translate0 = d3zoom.translate(), coordinates0 = coordinates(center0);
+                if (which === 'in') {
+                    if (prevScale < scaleExtent)
+                        d3zoom.scale(prevScale + 0.2);
+                }
+                else {
+                    if (prevScale > 1)
+                        d3zoom.scale(prevScale - 0.2);
+                }
+                var center1 = point(coordinates0);
+                d3zoom.translate([translate0[0] + center0[0] - center1[0], translate0[1] + center0[1] - center1[1]]);
+                d3zoom.event(svg);
+            };
+            var step = function (which) {
+                var translate = d3zoom.translate();
+                if (which === 'right') {
+                    translate[0] -= 20;
+                }
+                else {
+                    translate[0] += 20;
+                }
+                d3zoom.translate(translate);
+                d3zoom.event(svg);
+            };
+            var coordinates = function (point) {
+                var scale = d3zoom.scale(), translate = d3zoom.translate();
+                return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
+            };
+            var point = function (coordinates) {
+                var scale = d3zoom.scale(), translate = d3zoom.translate();
+                return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
+            };
+            var keypress = function () {
+                switch (d3.event.keyCode) {
+                    case 39:
+                        step('right');
+                        break;
+                    case 37:
+                        step('left');
+                        break;
+                    case 107:
+                        _this.setZoom('in');
+                        break;
+                    case 109:
+                        _this.setZoom('out');
+                }
+            };
+            var unzoomed = function () {
+                xDomain(x_boundary);
+                redraw();
+                d3zoom.scale(1);
+                d3zoom.translate([0, 0]);
+                prevScale = 1;
+                prevTranslate = [0, 0];
+            };
+            d3zoom.x(xScale)
+                .y(yScale)
+                .scaleExtent([1, scaleExtent])
+                .on('zoom', zoomed);
+            svg.call(d3zoom).on('dblclick.zoom', unzoomed);
+            $(this.$element.get(0)).addClass('dynamic');
+            svg
+                .attr('focusable', false)
+                .style('outline', 'none')
+                .on('keydown', keypress)
+                .on('focus', function () { });
+            var getXMinMax = function (data) {
+                var maxVal, minVal = null;
+                for (var i = 0; i < data.length; i++) {
+                    if (!data[i].disabled) {
+                        var tempMinVal = d3.max(data[i].values, function (d) {
+                            return _this.xFormat ? _this.xFormat(d.x) : d.x;
+                        });
+                        var tempMaxVal = d3.min(data[i].values, function (d) {
+                            return _this.xFormat ? _this.xFormat(d.x) : d.x;
+                        });
+                        minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
+                        maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
+                    }
+                }
+                return [maxVal, minVal];
+            };
+            var updateZoomOptions = function (data) {
+                yAxis = chart.yAxis;
+                xAxis = chart.xAxis;
+                xScale = xAxis.scale();
+                yScale = yAxis.scale();
+                x_boundary = getXMinMax(data);
+                if (d3zoom.scale() === 1) {
+                    d3zoom.x(xScale).y(yScale);
+                    svg.call(d3zoom);
+                    d3zoom.event(svg);
+                }
+                _this.updateScroll(xScale.domain(), x_boundary);
+            };
+        };
+        return LineChartController;
+    }());
+    var LineChart = {
+        bindings: LineChartBindings,
+        templateUrl: 'line_chart/LineChart.html',
+        controller: LineChartController
+    };
+    angular
+        .module('pipLineCharts', [])
+        .component('pipLineChart', LineChart);
+}
+},{}],7:[function(require,module,exports){
+"use strict";
+{
+    var PieChartBindings = {
+        series: '<pipSeries',
+        donut: '<?pipDonut',
+        legend: '<?pipShowLegend',
+        total: '<?pipShowTotal',
+        size: '<?pipPieSize',
+        centered: '<?pipCentered'
+    };
+    var PieChartBindingsChanges = (function () {
+        function PieChartBindingsChanges() {
+        }
+        return PieChartBindingsChanges;
+    }());
+    var PieChartController = (function () {
+        PieChartController.$inject = ['$element', '$scope', '$timeout', 'pipChartColors'];
+        function PieChartController($element, $scope, $timeout, pipChartColors) {
+            "ngInject";
+            this.$element = $element;
+            this.$scope = $scope;
+            this.$timeout = $timeout;
+            this.pipChartColors = pipChartColors;
+            this.donut = false;
+            this.legend = true;
+            this.total = true;
+            this.size = 250;
+            this.centered = false;
+            this.chart = null;
+            this.colors = this.pipChartColors.generateMaterialColors();
+        }
+        PieChartController.prototype.$onInit = function () {
+            var _this = this;
+            this.data = this.series;
+            this.generateParameterColor();
+            d3.scale.paletteColors = function () {
+                return d3.scale.ordinal().range(_this.colors.map(function (color) {
+                    return _this.pipChartColors.materialColorToRgba(color);
+                }));
+            };
+            this.instantiateChart();
+        };
+        PieChartController.prototype.$onChanges = function (changes) {
+            var _this = this;
+            this.legend = changes.legend ? changes.legend.currentValue : this.legend;
+            this.centered = changes.centered ? changes.centered.currentValue : this.centered;
+            this.donut = changes.donut ? changes.donut.currentValue : this.donut;
+            this.size = changes.size ? changes.size.currentValue : this.size;
+            this.total = changes.total ? changes.total.currentValue : this.total;
+            if (changes.series && changes.series.currentValue !== changes.series.previousValue) {
+                this.data = changes.series.currentValue;
+                this.generateParameterColor();
+                if (this.chart) {
+                    this.chartElem.datum(this.data).call(this.chart);
+                    this.$timeout(function () {
+                        _this.resizeTitleLabelUnwrap();
+                    });
+                    this.drawEmptyState(d3.select(this.$element.get(0)).select('.pie-chart svg')[0][0]);
+                }
+            }
+        };
+        PieChartController.prototype.instantiateChart = function () {
+            var _this = this;
+            nv.addGraph(function () {
+                _this.chart = nv.models.pieChart()
+                    .margin({
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                })
+                    .x(function (d) {
+                    return _this.donut ? d.value : null;
+                })
+                    .y(function (d) {
+                    return d.value;
+                })
+                    .height(Number(_this.size))
+                    .width(Number(_this.size))
+                    .showLabels(true)
+                    .labelThreshold(.001)
+                    .growOnHover(false)
+                    .donut(_this.donut)
+                    .donutRatio(0.5)
+                    .color(function (d) {
+                    return d.color || d3.scale.paletteColors().range();
+                });
+                _this.chart.tooltip.enabled(false);
+                _this.chart.noData('There is no data right now...');
+                _this.chart.showLegend(false);
+                _this.chartElem = d3.select(_this.$element.get(0))
+                    .select('.pie-chart')
+                    .style('height', (_this.size) + 'px')
+                    .style('width', _this.centered ? '100%' : (_this.size) + 'px')
+                    .select('svg')
+                    .style('opacity', 0)
+                    .datum(_this.data || [])
+                    .call(_this.chart);
+                nv.utils.windowResize(function () {
+                    _this.chart.update();
+                    _this.$timeout(function () {
+                        _this.resizeTitleLabelUnwrap();
+                    });
+                    _this.centerChart();
+                    _this.drawEmptyState(d3.select(_this.$element.get(0)).select('.pie-chart svg')[0][0]);
+                });
+                return _this.chart;
+            }, function () {
+                _this.$timeout(function () {
+                    var svgElem = d3.select(_this.$element.get(0)).select('.pie-chart svg')[0][0];
+                    _this.renderTotalLabel(svgElem);
+                    d3.select(svgElem)
+                        .transition()
+                        .duration(1000)
+                        .style('opacity', 1);
+                    _this.$timeout(function () {
+                        _this.resizeTitleLabelUnwrap();
+                    }, 800);
+                    _this.centerChart();
+                    _this.drawEmptyState(svgElem);
+                });
+            });
+        };
+        PieChartController.prototype.drawEmptyState = function (svg) {
+            if (!this.$element.find('text.nv-noData').get(0)) {
+                d3.select(this.$element.find('.empty-state')[0]).remove();
+                this.$element.find('.pip-empty-pie-text').remove();
+            }
+            else {
+                if (this.$element.find('.pip-empty-pie-text').length === 0) {
+                    this.$element.find('.pie-chart')
+                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                }
+                var pie = d3.layout.pie().sort(null), size = Number(this.size);
+                var arc = d3.svg.arc()
+                    .innerRadius(size / 2 - 20)
+                    .outerRadius(size / 2 - 57);
+                svg = d3.select(svg)
+                    .append("g")
+                    .classed('empty-state', true)
+                    .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                var path = svg.selectAll("path")
+                    .data(pie([1]))
+                    .enter().append("path")
+                    .attr("fill", "rgba(0, 0, 0, 0.08)")
+                    .attr("d", arc);
+            }
+        };
+        PieChartController.prototype.centerChart = function () {
+            if (this.centered) {
+                var svgElem = d3.select(this.$element.get(0)).select('.pie-chart svg')[0][0], leftMargin = $(svgElem).innerWidth() / 2 - (Number(this.size) || 250) / 2;
+                d3.select(this.$element.find('.nv-pieChart')[0]).attr('transform', 'translate(' + leftMargin + ', 0)');
+            }
+        };
+        PieChartController.prototype.renderTotalLabel = function (svgElem) {
+            if ((!this.total && !this.donut) || !this.data)
+                return;
+            var totalVal = this.data.reduce(function (sum, curr) {
+                return sum + curr.value;
+            }, 0);
+            if (totalVal >= 10000)
+                totalVal = (totalVal / 1000).toFixed(1) + 'k';
+            d3.select(svgElem)
+                .select('.nv-pie:not(.nvd3)')
+                .append('text')
+                .classed('label-total', true)
+                .attr('text-anchor', 'middle')
+                .style('dominant-baseline', 'central')
+                .text(totalVal);
+            this.titleElem = d3.select(this.$element.find('text.label-total').get(0)).style('opacity', 0);
+        };
+        PieChartController.prototype.resizeTitleLabelUnwrap = function () {
+            if ((!this.total && !this.donut) || !this.data)
+                return;
+            var boxSize = this.$element.find('.nvd3.nv-pieChart').get(0).getBBox();
+            if (!boxSize.width || !boxSize.height) {
+                return;
+            }
+            this.titleElem.style('font-size', ~~boxSize.width / 4.5).style('opacity', 1);
+        };
+        PieChartController.prototype.generateParameterColor = function () {
+            var _this = this;
+            if (!this.data)
+                return;
+            _.each(this.data, function (item, index) {
+                item.color = item.color || _this.pipChartColors.getMaterialColor(index, _this.colors);
+            });
+        };
+        return PieChartController;
+    }());
+    var PieChart = {
+        bindings: PieChartBindings,
+        templateUrl: 'pie_chart/PieChart.html',
+        controller: PieChartController
+    };
+    angular
+        .module('pipPieCharts', [])
+        .component('pipPieChart', PieChart);
+}
+},{}],8:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -12370,8 +13578,12 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart"><svg></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="barChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('bar_chart/BarChart.html',
+    '<div class="bar-chart">\n' +
+    '    <svg ></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -12382,8 +13594,28 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('legend/interactive_legend.html',
-    '<div><div class="chart-legend-item" ng-repeat="item in series" ng-show="item.values || item.value"><md-checkbox ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
+  $templateCache.put('chart_legend/ChartInteractiveLegend.html',
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in $ctrl.series" ng-show="item.values || item.value">\n' +
+    '        <md-checkbox ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="$ctrl.interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '                ng-if="item.value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!$ctrl.interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -12394,8 +13626,25 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('line_chart/LineChart.html',
+    '<div class="line-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': $ctrl.showXAxis, \'visible-y-axis\': $ctrl.showYAxis}">\n' +
+    '    </svg>\n' +
+    '    <div class="scroll-container">\n' +
+    '        <div class="visual-scroll">\n' +
+    '            <div class="scrolled-block"></div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <md-button class="md-fab md-mini minus-button" ng-click="$ctrl.zoomOut()">\n' +
+    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '    <md-button class="md-fab md-mini plus-button" ng-click="$ctrl.zoomIn()">\n' +
+    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>\n' +
+    '');
 }]);
 })();
 
@@ -12406,107 +13655,140 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+  $templateCache.put('pie_chart/PieChart.html',
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
 }]);
 })();
 
 
 
-},{}]},{},[6,1,2,3,4,5])(6)
+},{}]},{},[8,1,2,3,4,5,6,7])(8)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).locations = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipLocations.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
+{
+    translateFilter.$inject = ['$injector'];
+    function translateFilter($injector) {
         var pipTranslate = $injector.has('pipTranslate')
             ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
-    }]);
-})();
+    }
+    angular
+        .module('pipLocations.Translate', [])
+        .filter('translate', translateFilter);
+}
 },{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipLocation", []);
-    thisModule.directive('pipLocation', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipLocationName: '&',
-                pipLocationPos: '&',
-                pipLocationResize: '&',
-                pipShowLocationIcon: '='
-            },
-            template: function ($element, $attrs) {
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
+angular.module('pipLocations', [
+    'pipLocation',
+    'pipLocationMap',
+    'pipLocationIp',
+    'pipLocationEditDialog',
+    'pipLocationEdit',
+    'pipLocations.Translate'
+]);
+},{}],3:[function(require,module,exports){
+{
+    var LocationBindings = {
+        pipLocationName: '<',
+        pipLocationPos: '<',
+        pipShowLocationIcon: '<',
+        pipCollapse: '<',
+        pipRebind: '<',
+        pipDisabled: '<',
+        pipLocationResize: '&'
+    };
+    var LocationBindingsChanges = (function () {
+        function LocationBindingsChanges() {
+        }
+        return LocationBindingsChanges;
+    }());
+    var LocationController = (function () {
+        LocationController.$inject = ['$element', '$timeout', '$scope'];
+        function LocationController($element, $timeout, $scope) {
+            "ngInject";
+            this.$element = $element;
+            this.$timeout = $timeout;
+            this.$scope = $scope;
+            this.showMap = true;
+            $element.addClass('pip-location');
+        }
+        LocationController.prototype.$postLink = function () {
+            var _this = this;
+            this.$timeout(function () {
+                _this.name = _this.$element.find('.pip-location-name');
+                _this.mapContainer = _this.$element.find('.pip-location-container');
+                if (_this.pipCollapse === true) {
+                    _this.mapContainer.hide();
+                    _this.showMap = false;
+                    _this.name.click(function (event) {
+                        event.stopPropagation();
+                        if (_this.pipDisabled)
+                            return;
+                        _this.showMap = !_this.showMap;
+                        _this.mapContainer[_this.showMap ? 'show' : 'hide']();
+                        if (_this.showMap)
+                            _this.generateMap();
+                        if (!_this.$scope.$$phase)
+                            _this.$scope.$apply();
+                    });
                 }
-                if (toBoolean($attrs.pipCollapse)) {
-                    return String()
-                        + '<div class="pip-location-name location-collapse" ng-click="pipLocationResize()" ng-hide="!pipLocationName()"'
-                        + 'ng-class="pipShowLocationIcon ? \'pip-location-icon-space\' : \'\'">'
-                        + '<md-icon md-svg-icon="icons:location" class="flex-fixed pip-icon" ng-if="pipShowLocationIcon"></md-icon>'
-                        + '<span class="pip-location-text">{{pipLocationName()}}</span> '
-                        + '</div>'
-                        + '<div class="pip-location-container" ng-hide="!pipLocationPos()"></div>';
-                }
-                else {
-                    return String()
-                        + '<md-button class="pip-location-name" ng-click="pipLocationResize()" '
-                        + 'ng-class="pipShowLocationIcon ? \'pip-location-icon-space\' : \'\'">'
-                        + '<div class="layout-align-start-center layout-row w-stretch">'
-                        + '<md-icon md-svg-icon="icons:location" class="flex-fixed pip-icon" ng-if="pipShowLocationIcon"></md-icon>'
-                        + '<span class="pip-location-text flex">{{pipLocationName()}}</span>'
-                        + '<md-icon md-svg-icon="icons:triangle-down" class="flex-fixed" ng-if="!showMap"></md-icon>'
-                        + '<md-icon md-svg-icon="icons:triangle-up" class="flex-fixed" ng-if="showMap"></md-icon>'
-                        + '</div></md-button>'
-                        + '<div class="pip-location-container"'
-                        + 'ng-class="pipShowLocationIcon ? \'pip-location-icon-space\' : \'\'"></div>';
-                }
-            },
-            controller: 'pipLocationController'
+                _this.redrawMap();
+            });
         };
-    });
-    thisModule.controller('pipLocationController', ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-        function toBoolean(value) {
-            if (value == null)
-                return false;
-            if (!value)
-                return false;
-            value = value.toString().toLowerCase();
-            return value == '1' || value == 'true';
-        }
-        var $name = $element.children('.pip-location-name'), $mapContainer = $element.children('.pip-location-container'), $mapControl = null, $up = $element.find('.icon-up'), $down = $element.find('.icon-down'), collapsable = toBoolean($attrs.pipCollapse);
-        function clearMap() {
-            if ($mapControl)
-                $mapControl.remove();
-            $mapControl = null;
-            $mapContainer.hide();
-        }
-        ;
-        function generateMap() {
-            var location = $scope.pipLocationPos();
-            if ($scope.showMap == false || location == null
+        LocationController.prototype.redrawMap = function () {
+            if (!this.mapContainer)
+                return;
+            if (this.pipLocationPos && this.showMap === true) {
+                this.generateMap();
+            }
+            else {
+                this.clearMap();
+            }
+        };
+        LocationController.prototype.$onChanges = function (changes) {
+            this.pipRebind = changes.pipRebind
+                ? changes.pipRebind.currentValue || false : false;
+            this.pipShowLocationIcon = changes.pipShowLocationIcon
+                ? changes.pipShowLocationIcon.currentValue || false : false;
+            this.pipCollapse = changes.pipCollapse
+                ? changes.pipCollapse.currentValue || false : false;
+            this.pipDisabled = changes.pipDisabled
+                ? changes.pipDisabled.currentValue || false : false;
+            if (this.pipRebind) {
+                this.pipLocationName = changes.pipLocationName
+                    ? changes.pipLocationName.currentValue : null;
+                this.pipLocationPos = changes.pipLocationPos
+                    ? changes.pipLocationPos.currentValue : null;
+                this.redrawMap();
+            }
+        };
+        LocationController.prototype.clearMap = function () {
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = null;
+            this.mapContainer.hide();
+        };
+        LocationController.prototype.generateMap = function () {
+            var location = this.pipLocationPos;
+            if (this.showMap === false
+                || location == null
                 || location.coordinates == null
                 || location.coordinates.length < 0) {
-                clearMap();
+                this.clearMap();
                 return;
             }
             var coordinates = new google.maps.LatLng(location.coordinates[0], location.coordinates[1]);
-            if ($mapControl)
-                $mapControl.remove();
-            $mapControl = $('<div></div>');
-            $mapContainer.show();
-            $mapControl.appendTo($mapContainer);
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = $('<div></div>');
+            this.mapContainer.show();
+            this.mapControl.appendTo(this.mapContainer);
             var mapOptions = {
                 center: coordinates,
                 zoom: 12,
@@ -12515,209 +13797,192 @@ module.run(['$templateCache', function($templateCache) {
                 disableDoubleClickZoom: true,
                 scrollwheel: false,
                 draggable: false
-            }, map = new google.maps.Map($mapControl[0], mapOptions);
+            }, map = new google.maps.Map(this.mapControl[0], mapOptions);
             new google.maps.Marker({
                 position: coordinates,
                 map: map
             });
-        }
+        };
         ;
-        if (!collapsable) {
-            $scope.showMap = false;
-            $up.hide();
-            $mapContainer.hide();
-            $name.click(function (event) {
-                event.stopPropagation();
-                if ($attrs.disabled)
-                    return;
-                $scope.showMap = !$scope.showMap;
-                $up[$scope.showMap ? 'show' : 'hide']();
-                $down[!$scope.showMap ? 'show' : 'hide']();
-                generateMap();
-            });
-        }
-        if (toBoolean($attrs.pipRebind)) {
-            $scope.$watch($scope.pipLocationPos, function (newValue) {
-                generateMap();
-            });
-        }
-        $element.addClass('pip-location');
-        if ($scope.pipLocationPos())
-            generateMap();
-        else
-            clearMap();
-    }]);
-})();
-},{}],3:[function(require,module,exports){
-var LocationDialogService = (function () {
-    LocationDialogService.$inject = ['$mdDialog'];
-    function LocationDialogService($mdDialog) {
-        this._$mdDialog = $mdDialog;
-    }
-    LocationDialogService.prototype.show = function (params, successCallback, cancelCallback) {
-        this._$mdDialog.show({
-            controller: 'pipLocationEditDialogController',
-            controllerAs: '$ctrl',
-            templateUrl: 'location_dialog/location_dialog.html',
-            locals: {
-                locationName: params.locationName,
-                locationPos: params.locationPos
-            },
-            clickOutsideToClose: true
-        })
-            .then(function (result) {
-            if (successCallback) {
-                successCallback(result);
-            }
-        }, function () {
-            if (cancelCallback) {
-                cancelCallback();
-            }
-        });
+        return LocationController;
+    }());
+    var LocationComponent = {
+        bindings: LocationBindings,
+        templateUrl: 'location/Location.html',
+        controller: LocationController
     };
-    return LocationDialogService;
-}());
-var LocationEditDialogController = (function () {
-    LocationEditDialogController.$inject = ['$scope', '$rootScope', '$timeout', '$mdDialog', 'locationPos', 'locationName'];
-    function LocationEditDialogController($scope, $rootScope, $timeout, $mdDialog, locationPos, locationName) {
-        var _this = this;
-        this._map = null;
-        this._marker = null;
-        this.onSetLocation = function () {
+    angular
+        .module("pipLocation", [])
+        .component('pipLocation', LocationComponent);
+}
+},{}],4:[function(require,module,exports){
+"use strict";
+},{}],5:[function(require,module,exports){
+"use strict";
+{
+    var LocationEditDialogController_1 = (function () {
+        function LocationEditDialogController_1($scope, $rootScope, $timeout, $mdDialog, locationPos, locationName) {
             var _this = this;
-            if (this._map == null)
-                return;
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var coordinates = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                _this._marker = _this.createMarker(coordinates);
-                _this._map.setCenter(coordinates);
-                _this._map.setZoom(12);
-                _this.changeLocation(coordinates, null);
-            }, function () {
-                _this.$scope.$apply();
-            }, {
-                maximumAge: 0,
-                enableHighAccuracy: true,
-                timeout: 5000
-            });
-        };
-        this._$mdDialog = $mdDialog;
-        this._$scope = $scope;
-        this.theme = $rootScope['$theme'];
-        this.locationPos = locationPos && locationPos.type == 'Point'
-            && locationPos.coordinates && locationPos.coordinates.length == 2
-            ? locationPos : null;
-        this.locationName = locationName;
-        this.supportSet = navigator.geolocation != null;
-        $timeout(function () {
-            var mapContainer = $('.pip-location-edit-dialog .pip-location-container');
-            var coordinates = _this.locationPos ?
-                new google.maps.LatLng(_this.locationPos.coordinates[0], _this.locationPos.coordinates[1]) : null;
-            var mapOptions = {
-                center: new google.maps.LatLng(0, 0),
-                zoom: 1,
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
-                disableDefaultUI: true
-            };
-            if (coordinates != null) {
-                mapOptions.center = coordinates;
-                mapOptions.zoom = 12;
-            }
-            _this._map = new google.maps.Map(mapContainer[0], mapOptions);
-            _this._marker = _this.createMarker(coordinates);
-            setTimeout(function () {
-                google.maps.event.trigger(_this._map, 'resize');
-            }, 1000);
-        }, 0);
-        $scope.$on('pipLayoutResized', function () {
-            if (_this._map == null)
-                return;
-            google.maps.event.trigger(_this._map, 'resize');
-        });
-    }
-    LocationEditDialogController.prototype.createMarker = function (coordinates) {
-        var _this = this;
-        if (this._marker)
-            this._marker.setMap(null);
-        if (coordinates) {
-            this._marker = new google.maps.Marker({
-                position: coordinates,
-                map: this._map,
-                draggable: true,
-                animation: google.maps.Animation.DROP
-            });
-            var thisMarker_1 = this._marker;
-            google.maps.event.addListener(thisMarker_1, 'dragend', function () {
-                var coordinates = thisMarker_1.getPosition();
-                _this.changeLocation(coordinates, null);
-            });
-        }
-        else {
+            this.$scope = $scope;
+            this.$mdDialog = $mdDialog;
+            this._map = null;
             this._marker = null;
+            this.onSetLocation = function () {
+                var _this = this;
+                if (this._map === null)
+                    return;
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var coordinates = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                    _this._marker = _this.createMarker(coordinates);
+                    _this._map.setCenter(coordinates);
+                    _this._map.setZoom(12);
+                    _this.changeLocation(coordinates, null);
+                }, function () {
+                    _this.$scope.$apply();
+                }, {
+                    maximumAge: 0,
+                    enableHighAccuracy: true,
+                    timeout: 5000
+                });
+            };
+            this.theme = $rootScope['$theme'];
+            this.locationPos = locationPos && locationPos.type == 'Point' &&
+                locationPos.coordinates && locationPos.coordinates.length == 2 ?
+                locationPos : null;
+            this.locationName = locationName;
+            this.supportSet = navigator.geolocation != null;
+            $timeout(function () {
+                var mapContainer = $('.pip-location-edit-dialog .pip-location-container');
+                var coordinates = _this.locationPos ?
+                    new google.maps.LatLng(_this.locationPos.coordinates[0], _this.locationPos.coordinates[1]) : null;
+                var mapOptions = {
+                    center: new google.maps.LatLng(0, 0),
+                    zoom: 1,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    disableDefaultUI: true
+                };
+                if (coordinates != null) {
+                    mapOptions.center = coordinates;
+                    mapOptions.zoom = 12;
+                }
+                _this._map = new google.maps.Map(mapContainer[0], mapOptions);
+                _this._marker = _this.createMarker(coordinates);
+                $timeout(function () {
+                    google.maps.event.trigger(_this._map, 'resize');
+                }, 1000);
+            }, 0);
+            $scope.$on('pipLayoutResized', function () {
+                if (_this._map == null)
+                    return;
+                google.maps.event.trigger(_this._map, 'resize');
+            });
         }
-        return this._marker;
-    };
-    LocationEditDialogController.prototype.changeLocation = function (coordinates, tid) {
-        var _this = this;
-        this.locationPos = {
-            type: 'Point',
-            coordinates: [coordinates.lat(), coordinates.lng()]
-        };
-        this.locationName = null;
-        if (tid == null) {
-            if (tid == null)
-                return;
-        }
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ location: coordinates }, function (results, status) {
-            if (status == google.maps.GeocoderStatus.OK && results && results.length > 0) {
-                _this.locationName = results[0].formatted_address;
+        LocationEditDialogController_1.prototype.createMarker = function (coordinates) {
+            var _this = this;
+            if (this._marker)
+                this._marker.setMap(null);
+            if (coordinates) {
+                this._marker = new google.maps.Marker({
+                    position: coordinates,
+                    map: this._map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
+                var thisMarker_1 = this._marker;
+                google.maps.event.addListener(thisMarker_1, 'dragend', function () {
+                    var coordinates = thisMarker_1.getPosition();
+                    _this.changeLocation(coordinates, null);
+                });
             }
-            _this._$scope.$apply();
-        });
-    };
-    LocationEditDialogController.prototype.onAddPin = function () {
-        if (this._map == null)
-            return;
-        var coordinates = this._map.getCenter();
-        this._marker = this.createMarker(coordinates);
-        this.changeLocation(coordinates, null);
-    };
-    LocationEditDialogController.prototype.onRemovePin = function () {
-        if (this._map == null)
-            return;
-        this._marker = this.createMarker(null);
-        this.locationPos = null;
-        this.locationName = null;
-    };
-    LocationEditDialogController.prototype.onZoomIn = function () {
-        if (this._map == null)
-            return;
-        var zoom = this._map.getZoom();
-        this._map.setZoom(zoom + 1);
-    };
-    LocationEditDialogController.prototype.onZoomOut = function () {
-        if (this._map == null)
-            return;
-        var zoom = this._map.getZoom();
-        this._map.setZoom(zoom > 1 ? zoom - 1 : zoom);
-    };
-    LocationEditDialogController.prototype.onCancel = function () {
-        this._$mdDialog.cancel();
-    };
-    LocationEditDialogController.prototype.onApply = function () {
-        this._$mdDialog.hide({
-            location: this.locationPos,
-            locationPos: this.locationPos,
-            locationName: this.locationName
-        });
-    };
-    return LocationEditDialogController;
-}());
-(function () {
-    'use strict';
-    LocationDialogRun.$inject = ['$injector'];
-    function LocationDialogRun($injector) {
+            else {
+                this._marker = null;
+            }
+            return this._marker;
+        };
+        LocationEditDialogController_1.prototype.changeLocation = function (coordinates, tid) {
+            var _this = this;
+            this.locationPos = {
+                type: 'Point',
+                coordinates: [coordinates.lat(), coordinates.lng()]
+            };
+            this.locationName = null;
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({
+                latLng: coordinates
+            }, function (results, status) {
+                if (results && results.length > 0) {
+                    _this.locationName = results[0].formatted_address;
+                }
+                _this.$scope.$apply();
+            });
+        };
+        LocationEditDialogController_1.prototype.onAddPin = function () {
+            if (this._map === null)
+                return;
+            var coordinates = this._map.getCenter();
+            this._marker = this.createMarker(coordinates);
+            this.changeLocation(coordinates, null);
+        };
+        LocationEditDialogController_1.prototype.onRemovePin = function () {
+            if (this._map === null)
+                return;
+            this._marker = this.createMarker(null);
+            this.locationPos = null;
+            this.locationName = null;
+        };
+        LocationEditDialogController_1.prototype.onZoomIn = function () {
+            if (this._map === null)
+                return;
+            var zoom = this._map.getZoom();
+            this._map.setZoom(zoom + 1);
+        };
+        LocationEditDialogController_1.prototype.onZoomOut = function () {
+            if (this._map === null)
+                return;
+            var zoom = this._map.getZoom();
+            this._map.setZoom(zoom > 1 ? zoom - 1 : zoom);
+        };
+        LocationEditDialogController_1.prototype.onCancel = function () {
+            this.$mdDialog.cancel();
+        };
+        LocationEditDialogController_1.prototype.onApply = function () {
+            this.$mdDialog.hide({
+                location: this.locationPos,
+                locationPos: this.locationPos,
+                locationName: this.locationName
+            });
+        };
+        return LocationEditDialogController_1;
+    }());
+    var LocationDialogService = (function () {
+        LocationDialogService.$inject = ['$mdDialog'];
+        function LocationDialogService($mdDialog) {
+            this.$mdDialog = $mdDialog;
+        }
+        LocationDialogService.prototype.show = function (params, successCallback, cancelCallback) {
+            this.$mdDialog.show({
+                controller: LocationEditDialogController_1,
+                controllerAs: '$ctrl',
+                templateUrl: 'location_dialog/LocationDialog.html',
+                locals: {
+                    locationName: params.locationName,
+                    locationPos: params.locationPos
+                },
+                clickOutsideToClose: true
+            })
+                .then(function (result) {
+                if (successCallback) {
+                    successCallback(result);
+                }
+            }, function () {
+                if (cancelCallback) {
+                    cancelCallback();
+                }
+            });
+        };
+        return LocationDialogService;
+    }());
+    var LocationDialogRun = function ($injector) {
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.setTranslations('en', {
@@ -12733,211 +13998,95 @@ var LocationEditDialogController = (function () {
                 'LOCATION_REMOVE_PIN': 'Убрать точку'
             });
         }
-    }
-    angular.module('pipLocationEditDialog', ['ngMaterial', 'pipLocations.Templates'])
+    };
+    LocationDialogRun.$inject = ['$injector'];
+    angular
+        .module('pipLocationEditDialog')
         .run(LocationDialogRun)
-        .service('pipLocationEditDialog', LocationDialogService)
-        .controller('pipLocationEditDialogController', LocationEditDialogController);
-})();
-},{}],4:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipLocationEdit", ['pipLocationEditDialog']);
-    thisModule.directive('pipLocationEdit', ['$parse', '$http', 'pipLocationEditDialog', function ($parse, $http, pipLocationEditDialog) {
-        return {
-            restrict: 'EAC',
-            scope: {
-                pipLocationName: '=',
-                pipLocationPos: '=',
-                pipLocationHolder: '=',
-                ngDisabled: '&',
-                pipChanged: '&'
-            },
-            template: String()
-                + '<md-input-container class="md-block">'
-                + '<label>{{ \'LOCATION\' | translate }}</label>'
-                + '<input ng-model="pipLocationName"'
-                + 'ng-disabled="ngDisabled()"/></md-input-container>'
-                + '<div class="pip-location-empty" layout="column" layout-align="center center">'
-                + '<md-button class="md-raised" ng-disabled="ngDisabled()" ng-click="onSetLocation()"'
-                + 'aria-label="LOCATION_ADD_LOCATION">'
-                + '<span class="icon-location"></span> {{::\'LOCATION_ADD_LOCATION\' | translate }}'
-                + '</md-button></div>'
-                + '<div class="pip-location-container" tabindex="{{ ngDisabled() ? -1 : 0 }}"'
-                + ' ng-click="onMapClick($event)" ng-keypress=""onMapKeyPress($event)"></div>',
-            controller: ['$scope', '$element', function ($scope, $element) {
-                $element.find('md-input-container').attr('md-no-float', !!$scope.pipLocationHolder);
-            }],
-            link: function ($scope, $element) {
-                var $empty = $element.children('.pip-location-empty'), $mapContainer = $element.children('.pip-location-container'), $mapControl = null;
-                function clearMap() {
-                    if ($mapControl)
-                        $mapControl.remove();
-                    $mapControl = null;
-                    $mapContainer.hide();
-                    $empty.show();
+        .service('pipLocationEditDialog', LocationDialogService);
+}
+},{}],6:[function(require,module,exports){
+"use strict";
+var LocationDialogParams = (function () {
+    function LocationDialogParams() {
+    }
+    return LocationDialogParams;
+}());
+exports.LocationDialogParams = LocationDialogParams;
+},{}],7:[function(require,module,exports){
+"use strict";
+angular.module('pipLocationEditDialog', ['ngMaterial', 'pipLocations.Templates']);
+require("./LocationDialog");
+},{"./LocationDialog":5}],8:[function(require,module,exports){
+"use strict";
+{
+    var LocationEditBindings = {
+        pipLocationName: '=',
+        pipLocationPos: '=',
+        pipLocationHolder: '=',
+        ngDisabled: '<',
+        pipChanged: '&'
+    };
+    var LocationEditBindingsChanges = (function () {
+        function LocationEditBindingsChanges() {
+        }
+        return LocationEditBindingsChanges;
+    }());
+    var LocationEditController = (function () {
+        function LocationEditController($element, $scope, pipLocationEditDialog) {
+            var _this = this;
+            this.$element = $element;
+            this.$scope = $scope;
+            this.pipLocationEditDialog = pipLocationEditDialog;
+            this.defineCoordinatesDebounced = _.debounce(function () {
+                _this.defineCoordinates;
+            }, 2000);
+        }
+        LocationEditController.prototype.$postLink = function () {
+            var _this = this;
+            this.$element.find('md-input-container').attr('md-no-float', (!!this.pipLocationHolder).toString());
+            this.empty = this.$element.children('.pip-location-empty');
+            this.mapContainer = this.$element.children('.pip-location-container');
+            this.mapControl = null;
+            this.$scope.$watch('$ctrl.pipLocationName', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    _this.defineCoordinatesDebounced();
                 }
-                ;
-                function generateMap() {
-                    var location = $scope.pipLocationPos;
-                    if (location == null || location.coordinates == null || location.coordinates.length < 0) {
-                        clearMap();
-                        return;
-                    }
-                    var coordinates = new google.maps.LatLng(location.coordinates[0], location.coordinates[1]);
-                    if ($mapControl)
-                        $mapControl.remove();
-                    $mapContainer.show();
-                    $empty.hide();
-                    $mapControl = $('<div></div>');
-                    $mapControl.appendTo($mapContainer);
-                    var mapOptions = {
-                        center: coordinates,
-                        zoom: 12,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP,
-                        disableDefaultUI: true,
-                        disableDoubleClickZoom: true,
-                        scrollwheel: false,
-                        draggable: false
-                    };
-                    var map = new google.maps.Map($mapControl[0], mapOptions);
-                    var marker = new google.maps.Marker({
-                        position: coordinates,
-                        map: map
-                    });
-                }
-                ;
-                function defineCoordinates() {
-                    var locationName = $scope.pipLocationName;
-                    if (locationName == '') {
-                        $scope.pipLocationPos = null;
-                        clearMap();
-                        $scope.$apply();
-                        return;
-                    }
-                    var geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ address: locationName }, function (results, status) {
-                        $scope.$apply(function () {
-                            if (status == google.maps.GeocoderStatus.OK) {
-                                if (results == null || results.length == 0) {
-                                    $scope.pipLocationPos = null;
-                                    clearMap();
-                                    return;
-                                }
-                                var geometry = results[0].geometry || {}, location = geometry.location || {};
-                                if (location.lat == null || location.lng == null) {
-                                    $scope.pipLocationPos = null;
-                                    clearMap();
-                                    return;
-                                }
-                                $scope.pipLocationPos = {
-                                    type: 'Point',
-                                    coordinates: [
-                                        location.lat(),
-                                        location.lng()
-                                    ]
-                                };
-                            }
-                            else {
-                                $scope.pipLocationPos = null;
-                            }
-                        });
-                    });
-                }
-                ;
-                var defineCoordinatesDebounced = _.debounce(defineCoordinates, 2000);
-                $scope.onSetLocation = function () {
-                    if ($scope.ngDisabled())
-                        return;
-                    pipLocationEditDialog.show({
-                        locationName: $scope.pipLocationName,
-                        locationPos: $scope.pipLocationPos
-                    }, function (result) {
-                        var location = result.location, locationName = result.locationName;
-                        if ($scope.pipLocationPos && $scope.pipLocationPos.type == 'Point'
-                            && $scope.pipLocationPos.coordinates.length == 2
-                            && location && location.coordinates.length == 2
-                            && ($scope.pipLocationPos.coordinates[0] - location.coordinates[0]) < 0.0001
-                            && ($scope.pipLocationPos.coordinates[1] - location.coordinates[1]) < 0.0001
-                            && (locationName == $scope.pipLocationName)) {
-                            return;
-                        }
-                        $scope.pipLocationPos = location;
-                        $scope.pipLocationName = locationName;
-                        if (locationName == null && location != null) {
-                            $scope.pipLocationName =
-                                '(' + result.location.coordinates[0]
-                                    + ',' + result.location.coordinates[1] + ')';
-                        }
-                        $scope.pipChanged();
-                        $mapContainer[0].focus();
-                    });
-                };
-                $scope.onMapClick = function ($event) {
-                    if ($scope.ngDisabled())
-                        return;
-                    $mapContainer[0].focus();
-                    $scope.onSetLocation();
-                };
-                $scope.onMapKeyPress = function ($event) {
-                    if ($scope.ngDisabled())
-                        return;
-                    if ($event.keyCode == 13 || $event.keyCode == 32) {
-                        $scope.onSetLocation();
-                    }
-                };
-                $scope.$watch(function () {
-                    return $scope.pipLocationName;
-                }, function (newValue, oldValue) {
-                    if (newValue != oldValue)
-                        defineCoordinatesDebounced();
-                });
-                $scope.$watch(function () {
-                    return $scope.pipLocationPos;
-                }, function () {
-                    generateMap();
-                });
-                $element.addClass('pip-location-edit');
-                if ($scope.pipLocationPos)
-                    generateMap();
-                else
-                    clearMap();
+            });
+            this.$scope.$watch('$ctrl.pipLocationPos', function () {
+                _this.generateMap();
+            });
+            this.$element.addClass('pip-location-edit');
+            if (this.pipLocationPos) {
+                this.generateMap();
+            }
+            else {
+                this.clearMap();
             }
         };
-    }]);
-})();
-},{}],5:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipLocationIp", []);
-    thisModule.directive('pipLocationIp', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipIpaddress: '&',
-                pipExtraInfo: '&'
-            },
-            template: '<div class="pip-location-container"></div>',
-            controller: 'pipLocationIpController'
+        LocationEditController.prototype.$onChanges = function (changes) {
+            this.ngDisabled = changes.ngDisabled ? changes.ngDisabled.currentValue : false;
         };
-    });
-    thisModule.controller('pipLocationIpController', ['$scope', '$element', '$attrs', '$http', function ($scope, $element, $attrs, $http) {
-        var $mapContainer = $element.children('.pip-location-container'), $mapControl = null;
-        function clearMap() {
-            if ($mapControl)
-                $mapControl.remove();
-            $mapControl = null;
-        }
-        function generateMap(latitude, longitude) {
-            if (latitude == null || longitude == null) {
-                clearMap();
+        LocationEditController.prototype.clearMap = function () {
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = null;
+            this.mapContainer.hide();
+            this.empty.show();
+        };
+        LocationEditController.prototype.generateMap = function () {
+            var location = this.pipLocationPos;
+            if (location == null || location.coordinates == null || location.coordinates.length < 0) {
+                this.clearMap();
                 return;
             }
-            var coordinates = new google.maps.LatLng(latitude, longitude);
-            if ($mapControl)
-                $mapControl.remove();
-            $mapControl = $('<div></div>');
-            $mapControl.appendTo($mapContainer);
+            var coordinates = new google.maps.LatLng(location.coordinates[0], location.coordinates[1]);
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapContainer.show();
+            this.empty.hide();
+            this.mapControl = $('<div></div>');
+            this.mapControl.appendTo(this.mapContainer);
             var mapOptions = {
                 center: coordinates,
                 zoom: 12,
@@ -12946,188 +14095,323 @@ var LocationEditDialogController = (function () {
                 disableDoubleClickZoom: true,
                 scrollwheel: false,
                 draggable: false
-            }, map = new google.maps.Map($mapControl[0], mapOptions);
+            }, map = new google.maps.Map(this.mapControl[0], mapOptions), marker = new google.maps.Marker({
+                position: coordinates,
+                map: map
+            });
+        };
+        LocationEditController.prototype.defineCoordinates = function () {
+            var locationName = this.pipLocationName;
+            if (locationName == '') {
+                this.pipLocationPos = null;
+                this.clearMap();
+                this.$scope.$apply();
+                return;
+            }
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({
+                address: locationName
+            }, function (results, status) {
+                this.$scope.$apply(function () {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results === null || results.length === 0) {
+                            this.pipLocationPos = null;
+                            this.clearMap();
+                            return;
+                        }
+                        var geometry = results[0].geometry || {}, location_1 = geometry.location || {};
+                        if (location_1.lat === null || location_1.lng === null) {
+                            this.pipLocationPos = null;
+                            this.clearMap();
+                            return;
+                        }
+                        this.pipLocationPos = {
+                            type: 'Point',
+                            coordinates: {
+                                latitude: location_1.lat(),
+                                longtitude: location_1.lng()
+                            }
+                        };
+                        this.generateMap();
+                    }
+                    else {
+                        this.pipLocationPos = null;
+                        this.clearMap();
+                    }
+                });
+            });
+        };
+        ;
+        LocationEditController.prototype.onSetLocation = function () {
+            var _this = this;
+            if (this.ngDisabled)
+                return;
+            this.pipLocationEditDialog.show({
+                locationName: this.pipLocationName,
+                locationPos: this.pipLocationPos
+            }, function (result) {
+                var location = result.location, locationName = result.locationName;
+                if (_this.pipLocationPos && _this.pipLocationPos.type == 'Point' &&
+                    _this.pipLocationPos.coordinates.length == 2 &&
+                    location && location.coordinates.length == 2 &&
+                    (_this.pipLocationPos.coordinates[0] - location.coordinates[0]) < 0.0001 &&
+                    (_this.pipLocationPos.coordinates[1] - location.coordinates[1]) < 0.0001 &&
+                    (locationName === _this.pipLocationName)) {
+                    return;
+                }
+                _this.pipLocationPos = location;
+                _this.pipLocationName = locationName;
+                if (locationName === null && location !== null) {
+                    _this.pipLocationName =
+                        '(' + result.location.coordinates[0] +
+                            ',' + result.location.coordinates[1] + ')';
+                }
+                _this.pipChanged();
+                _this.mapContainer[0].focus();
+            });
+        };
+        ;
+        LocationEditController.prototype.onMapClick = function ($event) {
+            if (this.ngDisabled)
+                return;
+            this.mapContainer[0].focus();
+            this.onSetLocation();
+        };
+        ;
+        LocationEditController.prototype.onMapKeyPress = function ($event) {
+            if (this.ngDisabled)
+                return;
+            if ($event.keyCode == 13 || $event.keyCode == 32) {
+                this.onSetLocation();
+            }
+        };
+        ;
+        return LocationEditController;
+    }());
+    var LocationEdit = {
+        bindings: LocationEditBindings,
+        templateUrl: 'location_edit/LocationEdit.html',
+        controller: LocationEditController
+    };
+    angular
+        .module("pipLocationEdit", ['pipLocationEditDialog'])
+        .component('pipLocationEdit', LocationEdit);
+}
+},{}],9:[function(require,module,exports){
+{
+    var LocationIpBindings = {
+        pipIpaddress: '<',
+        pipExtraInfo: '&',
+        pipRebind: '<'
+    };
+    var LocationIpBindingsChanges = (function () {
+        function LocationIpBindingsChanges() {
+        }
+        return LocationIpBindingsChanges;
+    }());
+    var LocationIpController = (function () {
+        function LocationIpController($element, $http) {
+            this.$http = $http;
+            this.mapContainer = $element.children('.pip-location-container');
+            $element.addClass('pip-location-ip');
+            this.defineCoordinates();
+        }
+        LocationIpController.prototype.$onChanges = function (changes) {
+            this.pipRebind = changes.pipRebind ? changes.pipRebind.currentValue || false : false;
+            if (this.pipRebind === true) {
+                this.pipIpaddress = changes.pipIpaddress ? changes.pipIpaddress.currentValue : this.pipIpaddress;
+                this.defineCoordinates();
+            }
+        };
+        LocationIpController.prototype.clearMap = function () {
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = null;
+        };
+        LocationIpController.prototype.generateMap = function (latitude, longitude) {
+            if (latitude == null || longitude == null) {
+                this.clearMap();
+                return;
+            }
+            var coordinates = new google.maps.LatLng(latitude, longitude);
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = $('<div></div>');
+            this.mapControl.appendTo(this.mapContainer);
+            var mapOptions = {
+                center: coordinates,
+                zoom: 12,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                disableDefaultUI: true,
+                disableDoubleClickZoom: true,
+                scrollwheel: false,
+                draggable: false
+            }, map = new google.maps.Map(this.mapControl[0], mapOptions);
             new google.maps.Marker({
                 position: coordinates,
                 map: map
             });
-        }
-        function toBoolean(value) {
-            if (value == null)
-                return false;
-            if (!value)
-                return false;
-            value = value.toString().toLowerCase();
-            return value == '1' || value == 'true';
-        }
-        function defineCoordinates() {
-            var ipAddress = $scope.pipIpaddress();
+        };
+        LocationIpController.prototype.defineCoordinates = function () {
+            var _this = this;
+            var ipAddress = this.pipIpaddress;
             if (ipAddress == '') {
-                clearMap();
+                this.clearMap();
                 return;
             }
-            $http.jsonp('https://www.geoplugin.net/json.gp?ip=' + ipAddress + '&jsoncallback=JSON_CALLBACK')
+            this.$http.get('https://freegeoip.net/json/' + ipAddress)
                 .success(function (response) {
-                if (response != null
-                    && response.geoplugin_latitude != null
-                    && response.geoplugin_longitude != null) {
-                    generateMap(response.geoplugin_latitude, response.geoplugin_longitude);
-                    if ($scope.pipExtraInfo) {
+                if (response != null &&
+                    response.latitude != null &&
+                    response.longitude != null) {
+                    _this.generateMap(response.latitude, response.longitude);
+                    if (_this.pipExtraInfo) {
                         var extraInfo = {
-                            city: response.geoplugin_city,
-                            regionCode: response.geoplugin_regionCode,
-                            region: response.geoplugin_regionName,
-                            areaCode: response.geoplugin_areaCode,
-                            countryCode: response.geoplugin_countryCode,
-                            country: response.geoplugin_countryName,
-                            continentCode: response.geoplugin_continentCode
+                            city: response.city,
+                            regionCode: response.regionCode,
+                            region: response.regionName,
+                            zipCode: response.zipCode,
+                            countryCode: response.countryCode,
+                            country: response.countryName
                         };
-                        $scope.pipExtraInfo({ extraInfo: extraInfo });
-                    }
-                }
-                else {
-                    clearMap();
-                }
-            })
-                .error(function (response) {
-                console.error(response);
-                clearMap();
-            });
-        }
-        if (toBoolean($attrs.pipRebind)) {
-            $scope.$watch(function () {
-                return $scope.pipIpaddress();
-            }, function (newValue) {
-                defineCoordinates();
-            });
-        }
-        $element.addClass('pip-location-ip');
-        defineCoordinates();
-    }]);
-})();
-},{}],6:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipLocationMap", []);
-    thisModule.directive('pipLocationMap', function () {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipLocationPos: '&',
-                pipLocationPositions: '&',
-                pipIconPath: '&',
-                pipDraggable: '&',
-                pipStretch: '&'
-            },
-            template: '<div class="pip-location-container"></div>',
-            controller: 'pipLocationMapController'
-        };
-    });
-    thisModule.controller('pipLocationMapController', ['$scope', '$element', '$attrs', '$parse', '$timeout', function ($scope, $element, $attrs, $parse, $timeout) {
-            var $mapContainer = $element.children('.pip-location-container'), $mapControl = null, stretchMap = $scope.pipStretch() || false, iconPath = $scope.pipIconPath();
-            function clearMap() {
-                if ($mapControl)
-                    $mapControl.remove();
-                $mapControl = null;
-            }
-            function checkLocation(loc) {
-                return !(loc == null
-                    || loc.coordinates == null
-                    || loc.coordinates.length < 0);
-            }
-            function determineCoordinates(loc) {
-                var point = new google.maps.LatLng(loc.coordinates[0], loc.coordinates[1]);
-                point.fill = loc.fill;
-                point.stroke = loc.stroke;
-                return point;
-            }
-            function toBoolean(value) {
-                if (value == null)
-                    return false;
-                if (!value)
-                    return false;
-                value = value.toString().toLowerCase();
-                return value == '1' || value == 'true';
-            }
-            function generateMap() {
-                var location = $scope.pipLocationPos(), locations = $scope.pipLocationPositions(), points = [], draggable = $scope.pipDraggable() || false;
-                if (checkLocation(location)) {
-                    points.push(determineCoordinates(location));
-                }
-                else {
-                    if (locations && locations.length && locations.length > 0) {
-                        locations.forEach(function (loc) {
-                            if (checkLocation(loc)) {
-                                points.push(determineCoordinates(loc));
-                            }
+                        _this.pipExtraInfo({
+                            extraInfo: extraInfo
                         });
                     }
                 }
-                if (points.length === 0) {
-                    clearMap();
-                    return;
+                else {
+                    _this.clearMap();
                 }
-                if ($mapControl)
-                    $mapControl.remove();
-                $mapControl = $('<div></div>');
-                $mapControl.appendTo($mapContainer);
-                var mapOptions = {
-                    center: points[0],
-                    zoom: 12,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP,
-                    disableDefaultUI: true,
-                    disableDoubleClickZoom: true,
-                    scrollwheel: draggable,
-                    draggable: draggable
-                }, map = new google.maps.Map($mapControl[0], mapOptions), bounds = new google.maps.LatLngBounds();
-                points.forEach(function (point) {
-                    var icon = {
-                        path: iconPath,
-                        fillColor: point.fill || '#EF5350',
-                        fillOpacity: 1,
-                        scale: 1,
-                        strokeColor: point.stroke || 'white',
-                        strokeWeight: 5
-                    };
-                    new google.maps.Marker({
-                        position: point,
-                        map: map,
-                        icon: iconPath ? icon : null
-                    });
-                    bounds.extend(point);
-                });
-                if (points.length > 1)
-                    map.fitBounds(bounds);
-            }
-            if (toBoolean($attrs.pipRebind)) {
-                $scope.$watch(function () {
-                    return $scope.pipLocationPos();
-                }, function () {
-                    generateMap();
-                });
-            }
+            })
+                .error(function (response) {
+                _this.clearMap();
+            });
+        };
+        return LocationIpController;
+    }());
+    var LocationIp = {
+        bindings: LocationIpBindings,
+        template: '<div class="pip-location-container"></div>',
+        controller: LocationIpController
+    };
+    angular
+        .module("pipLocationIp", [])
+        .component('pipLocationIp', LocationIp);
+}
+},{}],10:[function(require,module,exports){
+{
+    var LocationMapBindings = {
+        pipLocationPos: '<',
+        pipIconPath: '<',
+        pipInteractive: '<',
+        pipStretch: '<',
+        pipRebind: '<'
+    };
+    var LocationMapBindingsChanges = (function () {
+        function LocationMapBindingsChanges() {
+        }
+        return LocationMapBindingsChanges;
+    }());
+    var LocationMapController = (function () {
+        function LocationMapController($element) {
+            this.$element = $element;
+            this.mapControl = null;
+            this.mapContainer = $element.children('.pip-location-container');
             $element.addClass('pip-location-map');
-            if (stretchMap)
-                $mapContainer.addClass('stretch');
-            if ($scope.pipLocationPos() || $scope.pipLocationPositions())
-                $timeout(generateMap, 200);
-            else
-                clearMap();
-        }]);
-})();
-},{}],7:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipLocations', [
-        'pipLocation',
-        'pipLocationMap',
-        'pipLocationIp',
-        'pipLocationEditDialog',
-        'pipLocationEdit',
-        'pipLocations.Translate'
-    ]);
-})();
-},{}],8:[function(require,module,exports){
+        }
+        LocationMapController.prototype.$onChanges = function (changes) {
+            this.pipRebind = changes.pipRebind ? changes.pipRebind.currentValue || false : false;
+            this.pipInteractive = changes.pipInteractive ? changes.pipInteractive.currentValue || false : false;
+            this.pipStretch = changes.pipStretch ? changes.pipStretch.currentValue || false : false;
+            if (this.pipStretch === true) {
+                this.mapContainer.addClass('stretch');
+            }
+            else {
+                this.mapContainer.removeClass('stretch');
+            }
+            if (this.pipRebind === true) {
+                this.pipLocationPos = changes.pipLocationPos ? changes.pipLocationPos.currentValue : this.pipLocationPos;
+                this.pipIconPath = changes.pipIconPath ? changes.pipIconPath.currentValue : this.pipIconPath;
+                this.generateMap();
+            }
+        };
+        LocationMapController.prototype.clearMap = function () {
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = null;
+        };
+        LocationMapController.prototype.checkLocation = function (loc) {
+            return !(loc == null || loc.coordinates == null || loc.coordinates.length < 0);
+        };
+        LocationMapController.prototype.determineCoordinates = function (loc) {
+            var point = new google.maps.LatLng(loc.coordinates[0], loc.coordinates[1]);
+            point.fill = loc.fill;
+            point.stroke = loc.stroke;
+            return point;
+        };
+        LocationMapController.prototype.generateMap = function () {
+            var _this = this;
+            var locations = this.pipLocationPos, points = [], interactive = this.pipInteractive || false;
+            if (this.checkLocation(locations) && !_.isArray(locations)) {
+                points.push(this.determineCoordinates(locations));
+            }
+            else {
+                if (locations && _.isArray(locations) && locations.length > 0) {
+                    _.each(locations, function (loc) {
+                        if (_this.checkLocation(loc)) {
+                            points.push(_this.determineCoordinates(loc));
+                        }
+                    });
+                }
+            }
+            if (points.length === 0) {
+                this.clearMap();
+                return;
+            }
+            if (this.mapControl)
+                this.mapControl.remove();
+            this.mapControl = $('<div></div>');
+            this.mapControl.appendTo(this.mapContainer);
+            var mapOptions = {
+                center: points[0],
+                zoom: 12,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                disableDefaultUI: true,
+                disableDoubleClickZoom: true,
+                scrollwheel: interactive,
+                draggable: interactive
+            }, map = new google.maps.Map(this.mapControl[0], mapOptions), bounds = new google.maps.LatLngBounds();
+            _.each(points, function (point) {
+                var icon = {
+                    path: _this.pipIconPath,
+                    fillColor: point.fill || '#EF5350',
+                    fillOpacity: 1,
+                    scale: 1,
+                    strokeColor: point.stroke || 'white',
+                    strokeWeight: 5
+                };
+                new google.maps.Marker({
+                    position: point,
+                    map: map,
+                    icon: _this.pipIconPath ? icon : null
+                });
+                bounds.extend(point);
+            });
+            if (points.length > 1)
+                map.fitBounds(bounds);
+        };
+        return LocationMapController;
+    }());
+    var LocationMap = {
+        bindings: LocationMapBindings,
+        template: '<div class="pip-location-container"></div>',
+        controller: LocationMapController
+    };
+    angular
+        .module("pipLocationMap", [])
+        .component('pipLocationMap', LocationMap);
+}
+},{}],11:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipLocations.Templates');
@@ -13135,201 +14419,432 @@ try {
   module = angular.module('pipLocations.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('location_dialog/location_dialog.html',
-    '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{$ctrl.theme}}"><div class="pip-header layout-column layout-align-start-start"><md-progress-linear ng-show="$ctrl.transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><h3 class="flex">{{ \'LOCATION_SET_LOCATION\' | translate }}</h3></div><div class="pip-footer"><div class="layout-row layout-align-start-center"><md-button class="md-accent" ng-click="$ctrl.onAddPin()" ng-show="$ctrl.locationPos == null" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_ADD_PIN\' }}">{{ ::\'LOCATION_ADD_PIN\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onRemovePin()" ng-show="$ctrl.locationPos != null" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_REMOVE_PIN\' }}">{{ ::\'LOCATION_REMOVE_PIN\' | translate }}</md-button></div><div class="flex"></div><div class="layout-row layout-align-end-center"><md-button ng-click="$ctrl.onCancel()" aria-label="{{ ::\'CANCEL\' }}">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onApply()" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'APPLY\' }}">{{ ::\'APPLY\' | translate }}</md-button></div></div><div class="pip-body"><div class="pip-location-container"></div><md-button class="md-icon-button md-fab pip-zoom-in" ng-click="$ctrl.onZoomIn()" aria-label="{{ ::\'LOCATION_ZOOM_IN\' }}"><md-icon md-svg-icon="icons:plus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-zoom-out" ng-click="$ctrl.onZoomOut()" aria-label="{{ ::\'LOCATION_ZOOM_OUT\' }}"><md-icon md-svg-icon="icons:minus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-set-location" ng-click="$ctrl.onSetLocation()" aria-label="{{ ::\'LOCATION_SET_LOCATION\' }}" ng-show="supportSet" ng-disabled="transaction.busy()"><md-icon md-svg-icon="icons:target"></md-icon></md-button></div></md-dialog>');
+  $templateCache.put('location/Location.html',
+    '<div class="pip-location-name location-collapse" ng-click="$ctrl.pipLocationResize()" ng-if="!$ctrl.pipCollapse"\n' +
+    '    ng-class="$ctrl.pipShowLocationIcon ? \'pip-location-icon-space\' : \'\'">\n' +
+    '    <md-icon md-svg-icon="icons:location" class="flex-fixed pip-icon" ng-if="$ctrl.pipShowLocationIcon"></md-icon>\n' +
+    '    <span class="pip-location-text">{{$ctrl.pipLocationName}}</span>\n' +
+    '</div>\n' +
+    '\n' +
+    '<md-button class="pip-location-name" ng-click="$ctrl.pipLocationResize()" ng-if="$ctrl.pipCollapse"\n' +
+    '    ng-class="$ctrl.pipShowLocationIcon ? \'pip-location-icon-space\' : \'\'">\n' +
+    '    <div class="layout-align-start-center layout-row w-stretch">\n' +
+    '        <md-icon md-svg-icon="icons:location" class="flex-fixed pip-icon" ng-if="$ctrl.pipShowLocationIcon"></md-icon>\n' +
+    '        <span class="pip-location-text flex">{{$ctrl.pipLocationName}}</span>\n' +
+    '        <md-icon md-svg-icon="icons:triangle-down" class="flex-fixed" ng-show="!$ctrl.showMap"></md-icon>\n' +
+    '        <md-icon md-svg-icon="icons:triangle-up" class="flex-fixed" ng-show="$ctrl.showMap"></md-icon>\n' +
+    '    </div>\n' +
+    '</md-button>\n' +
+    '\n' +
+    '<div class="pip-location-container">\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipLocations.Templates');
+} catch (e) {
+  module = angular.module('pipLocations.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('location_dialog/LocationDialog.html',
+    '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{$ctrl.theme}}">\n' +
+    '\n' +
+    '    <div class="pip-header layout-column layout-align-start-start">\n' +
+    '        <md-progress-linear ng-show="$ctrl.transaction.busy()" md-mode="indeterminate" class="pip-progress-top">\n' +
+    '        </md-progress-linear>\n' +
+    '        <h3 class="flex">{{ \'LOCATION_SET_LOCATION\' | translate }}</h3>\n' +
+    '    </div>\n' +
+    '    <div class="pip-footer">\n' +
+    '        <div class="layout-row layout-align-start-center">\n' +
+    '            <md-button class="md-accent" ng-click="$ctrl.onAddPin()" ng-show="$ctrl.locationPos == null"\n' +
+    '                ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_ADD_PIN\'  }}">\n' +
+    '                {{ ::\'LOCATION_ADD_PIN\' | translate }}\n' +
+    '            </md-button>\n' +
+    '            <md-button class="md-accent" ng-click="$ctrl.onRemovePin()" ng-show="$ctrl.locationPos != null"\n' +
+    '                ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_REMOVE_PIN\'  }}">\n' +
+    '                {{ ::\'LOCATION_REMOVE_PIN\' | translate }}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '        <div class="flex"></div>\n' +
+    '        <div class="layout-row layout-align-end-center">\n' +
+    '            <md-button ng-click="$ctrl.onCancel()" aria-label="{{ ::\'CANCEL\'  }}">\n' +
+    '                {{ ::\'CANCEL\' | translate }}\n' +
+    '            </md-button>\n' +
+    '            <md-button class="md-accent" ng-click="$ctrl.onApply()" ng-disabled="$ctrl.transaction.busy()"\n' +
+    '                aria-label="{{ ::\'APPLY\'  }}">\n' +
+    '                {{ ::\'APPLY\' | translate }}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="pip-body">\n' +
+    '        <div class="pip-location-container"></div>\n' +
+    '        <md-button class="md-icon-button md-fab pip-zoom-in" ng-click="$ctrl.onZoomIn()"\n' +
+    '                   aria-label="{{ ::\'LOCATION_ZOOM_IN\'  }}">\n' +
+    '            <md-icon md-svg-icon="icons:plus"></md-icon>\n' +
+    '        </md-button>\n' +
+    '        <md-button class="md-icon-button md-fab pip-zoom-out" ng-click="$ctrl.onZoomOut()"\n' +
+    '                   aria-label="{{ ::\'LOCATION_ZOOM_OUT\'  }}">\n' +
+    '            <md-icon md-svg-icon="icons:minus"></md-icon>\n' +
+    '        </md-button>\n' +
+    '        <md-button class="md-icon-button md-fab pip-set-location" ng-click="$ctrl.onSetLocation()"\n' +
+    '                   aria-label="{{ ::\'LOCATION_SET_LOCATION\'  }}"\n' +
+    '                   ng-show="supportSet" ng-disabled="transaction.busy()">\n' +
+    '            <md-icon md-svg-icon="icons:target"></md-icon>\n' +
+    '        </md-button>\n' +
+    '    </div>\n' +
+    '</md-dialog>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipLocations.Templates');
+} catch (e) {
+  module = angular.module('pipLocations.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('location_edit/LocationEdit.html',
+    '<md-input-container class="md-block">\n' +
+    '    <label>{{ \'LOCATION\' | translate }}</label>\n' +
+    '    <input ng-model="$ctrl.pipLocationName" ng-disabled="$ctrl.ngDisabled"/>\n' +
+    '</md-input-container>\n' +
+    '<div class="pip-location-empty" layout="column" layout-align="center center">\n' +
+    '    <md-button class="md-raised" ng-disabled="$ctrl.ngDisabled" ng-click="$ctrl.onSetLocation()"\n' +
+    '            aria-label="LOCATION_ADD_LOCATION">\n' +
+    '            <span class="icon-location"></span> {{\'LOCATION_ADD_LOCATION\' | translate }}\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '<div class="pip-location-container" tabindex="{{ $ctrl.ngDisabled ? -1 : 0 }}" \n' +
+    '    ng-click="$ctrl.onMapClick($event)" ng-keypress="$ctrl.onMapKeyPress($event)">\n' +
+    '</div>');
 }]);
 })();
 
 
 
-},{}]},{},[8,1,3,4,5,6,2,7])(8)
+},{}]},{},[11,1,2,4,7,5,6,8,9,10,3])(11)
 });
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).files = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipFiles.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
+"use strict";
+var ButtonsUpload = (function () {
+    function ButtonsUpload() {
+    }
+    return ButtonsUpload;
+}());
+exports.ButtonsUpload = ButtonsUpload;
+},{}],2:[function(require,module,exports){
+{
+    translateFilter.$inject = ['$injector'];
+    function translateFilter($injector) {
         var pipTranslate = $injector.has('pipTranslate')
             ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
-    }]);
-})();
-},{}],2:[function(require,module,exports){
+    }
+    angular
+        .module('pipFiles.Translate', [])
+        .filter('translate', translateFilter);
+}
+},{}],3:[function(require,module,exports){
 "use strict";
-var FileSelectController_1 = require("./select/FileSelectController");
-var FileProgressController_1 = require("./progress/FileProgressController");
-var FileSelectService_1 = require("./service/FileSelectService");
-(function () {
+var FileFailBindings = {
+    buttons: '<?pipButtons',
+    name: '<pipName',
+    type: '<?pipType',
+    error: '<pipError'
+};
+var FileFailChanges = (function () {
+    function FileFailChanges() {
+    }
+    return FileFailChanges;
+}());
+var FileFailController = (function () {
+    FileFailController.$inject = ['$scope'];
+    function FileFailController($scope) {
+        "ngInject";
+        var _this = this;
+        $scope.$watch('error', function (error) {
+            _this.error = error;
+        });
+    }
+    return FileFailController;
+}());
+var fileFailComponent = {
+    controller: FileFailController,
+    bindings: FileFailBindings,
+    templateUrl: 'fail/FileFail.html'
+};
+angular
+    .module('pipFiles.FailUpload', [])
+    .component('pipFailUpload', fileFailComponent);
+},{}],4:[function(require,module,exports){
+"use strict";
+require("./service/FileUploadService");
+require("./model/FileModel");
+require("./success/FileSuccess");
+require("./upload/FileUpload");
+require("./start/FileStart");
+require("./fail/FileFail");
+require("./select/FileSelect");
+angular
+    .module('pipFiles', [
+    'pipFiles.Service',
+    'pipFiles.Model',
+    'pipFiles.SuccessUpload',
+    'pipFiles.FileUpload',
+    'pipFiles.StartUpload',
+    'pipFiles.FailUpload',
+    'pipFiles.Select'
+]);
+},{"./fail/FileFail":3,"./model/FileModel":5,"./select/FileSelect":6,"./service/FileUploadService":7,"./start/FileStart":10,"./success/FileSuccess":11,"./upload/FileUpload":12}],5:[function(require,module,exports){
+{
     fileModelDirective.$inject = ['$parse'];
+    function fileModelLink(scope, element, attrs, $parse) {
+        var model = $parse(attrs.fileModel);
+        var modelSetter = model.assign;
+        element.bind('change', function () {
+            scope.$apply(function () {
+                modelSetter(scope, element[0].files[0]);
+            });
+        });
+    }
     function fileModelDirective($parse) {
         "ngInject";
         return {
             restrict: 'A',
             link: function (scope, element, attrs) {
-                var model = $parse(attrs.fileModel);
-                var modelSetter = model.assign;
-                element.bind('change', function () {
-                    scope.$apply(function () {
-                        modelSetter(scope, element[0].files[0]);
-                    });
-                });
+                fileModelLink(scope, element, attrs, $parse);
             }
         };
     }
-    function fileSelectDirective() {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                localFile: '='
-            },
-            controller: FileSelectController_1.FileSelectController,
-            controllerAs: 'vm',
-            templateUrl: 'select/FileSelect.html'
-        };
-    }
-    function fileProgressDirective() {
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: FileProgressController_1.FileProgressController,
-            controllerAs: 'vm',
-            scope: {
-                cancel: '=pipCancel',
-                retry: '=pipRetry',
-                name: '=pipName',
-                type: '=?pipType'
-            },
-            templateUrl: 'progress/FileProgress.html'
-        };
-    }
     angular
-        .module('pipFiles', [])
-        .directive('fileModel', fileModelDirective)
-        .directive('pipFileSelect', fileSelectDirective)
-        .directive('pipFileProgress', fileProgressDirective)
-        .service('pipFileSelect', FileSelectService_1.FileSelectService);
-})();
-},{"./progress/FileProgressController":3,"./select/FileSelectController":4,"./service/FileSelectService":5}],3:[function(require,module,exports){
+        .module('pipFiles.Model', [])
+        .directive('fileModel', fileModelDirective);
+}
+},{}],6:[function(require,module,exports){
+{
+    var FileSelectBindings = {
+        localFile: '<pipLocalFile',
+        change: '<pipChange'
+    };
+    var FileSelectController = (function () {
+        FileSelectController.$inject = ['$scope'];
+        function FileSelectController($scope) {
+            "ngInject";
+            var _this = this;
+            $scope.$watch('$ctrl.localFile', function (item) {
+                if (_this.change) {
+                    _this.change(_this.localFile);
+                }
+            });
+        }
+        FileSelectController.prototype.onUploadButtonClick = function () {
+            $('#inp_file').click();
+        };
+        FileSelectController.prototype.onDeleteButtonClick = function () {
+            this.localFile = null;
+            var forml = document.getElementById('inp_form');
+            forml.reset();
+        };
+        return FileSelectController;
+    }());
+    var fileSelectDirective = {
+        restrict: 'E',
+        replace: true,
+        bindings: FileSelectBindings,
+        controller: FileSelectController,
+        templateUrl: 'select/FileSelect.html'
+    };
+    angular
+        .module('pipFiles.Select', [])
+        .component('pipFileSelect', fileSelectDirective);
+}
+},{}],7:[function(require,module,exports){
 "use strict";
-var FileProgressController = (function () {
-    FileProgressController.$inject = ['$scope', 'pipFileSelect'];
-    function FileProgressController($scope, pipFileSelect) {
+var FileUploadState_1 = require("./FileUploadState");
+var FileUploadService = (function () {
+    FileUploadService.$inject = ['$http'];
+    function FileUploadService($http) {
         "ngInject";
-        this.type = $scope['type'] || 'file';
-        this._cancel = $scope['cancel'];
-        this._retry = $scope['retry'];
-        this.name = $scope['name'];
-        this._service = pipFileSelect;
+        this.$http = $http;
     }
-    FileProgressController.prototype.globalProgress = function () {
-        return this._service.globalProgress;
-    };
-    FileProgressController.prototype.errorFail = function () {
-        return this._service.error;
-    };
-    FileProgressController.prototype.localProgress = function () {
-        return this._service.progress;
-    };
-    FileProgressController.prototype.onCancel = function () {
-        if (this._cancel)
-            this._cancel();
-    };
-    FileProgressController.prototype.onRetry = function () {
-        if (this._retry)
-            this._retry();
-    };
-    FileProgressController.prototype.abort = function () {
-        this._service.abort();
-        if (this._cancel)
-            this._cancel();
-    };
-    return FileProgressController;
-}());
-exports.FileProgressController = FileProgressController;
-},{}],4:[function(require,module,exports){
-"use strict";
-var FileSelectController = (function () {
-    FileSelectController.$inject = ['$scope'];
-    function FileSelectController($scope) {
-        "ngInject";
-        this.localFile = $scope['localFile'];
-        $scope.$watch('vm.localFile', function (item) {
-            $scope['localFile'] = item;
-        });
-    }
-    FileSelectController.prototype.onUploadButtonClick = function () {
-        $('#inp_file').click();
-    };
-    FileSelectController.prototype.onDeleteButtonClick = function () {
-        this.localFile = null;
-        var forml = document.getElementById('inp_form');
-        forml.reset();
-    };
-    return FileSelectController;
-}());
-exports.FileSelectController = FileSelectController;
-},{}],5:[function(require,module,exports){
-"use strict";
-var GlobalProgress = (function () {
-    function GlobalProgress() {
-    }
-    return GlobalProgress;
-}());
-GlobalProgress.All = ['start', 'upload', 'fail'];
-GlobalProgress.Start = 'start';
-GlobalProgress.Upload = 'upload';
-GlobalProgress.Fail = 'fail';
-exports.GlobalProgress = GlobalProgress;
-var FileSelectService = (function () {
-    FileSelectService.$inject = ['$http', 'pipTransaction'];
-    function FileSelectService($http, pipTransaction) {
-        "ngInject";
-        this.error = null;
-        this._http = $http;
-        this.transaction = pipTransaction.create('upload file');
-    }
-    FileSelectService.prototype.upload = function (url, file, callback) {
-        var _this = this;
+    FileUploadService.prototype.upload = function (file, url, resultCallback, progressCallback) {
         var fd = new FormData();
         fd.append('file', file);
-        this.progress = 0;
-        this.transaction.begin(GlobalProgress.Start);
-        this.globalProgress = GlobalProgress.Start;
-        this._http.post(url, fd, {
+        if (progressCallback)
+            progressCallback(FileUploadState_1.FileUploadState.Uploading, 0);
+        this.$http.post(url, fd, {
             uploadEventHandlers: {
                 progress: function (e) {
-                    if (e.lengthComputable) {
-                        _this.progress = (e.loaded / e.total) * 100;
+                    if (e.lengthComputable && progressCallback) {
+                        progressCallback(FileUploadState_1.FileUploadState.Uploading, (e.loaded / e.total) * 100);
                     }
                 }
             },
             headers: { 'Content-Type': undefined }
         })
             .success(function (response) {
-            _this.globalProgress = GlobalProgress.Upload;
-            _this.transaction.end(GlobalProgress.Upload);
-            if (callback)
-                callback(response, null);
+            if (progressCallback)
+                progressCallback(FileUploadState_1.FileUploadState.Completed, 100);
+            if (resultCallback)
+                resultCallback(response, null);
         })
             .error(function (response) {
-            _this.globalProgress = GlobalProgress.Fail;
-            _this.transaction.end(GlobalProgress.Fail);
-            _this.error = response.Error || response;
-            if (callback)
-                callback(null, response);
+            if (progressCallback)
+                progressCallback(FileUploadState_1.FileUploadState.Failed, 0);
+            if (resultCallback)
+                resultCallback(null, response.Error || response);
         });
     };
-    FileSelectService.prototype.abort = function () {
-        this.transaction.abort();
-    };
-    return FileSelectService;
+    return FileUploadService;
 }());
-exports.FileSelectService = FileSelectService;
-},{}],6:[function(require,module,exports){
+angular
+    .module('pipFiles.Service', [])
+    .service('pipFileUpload', FileUploadService);
+},{"./FileUploadState":8}],8:[function(require,module,exports){
+"use strict";
+var FileUploadState;
+(function (FileUploadState) {
+    FileUploadState[FileUploadState["Uploading"] = 0] = "Uploading";
+    FileUploadState[FileUploadState["Completed"] = 1] = "Completed";
+    FileUploadState[FileUploadState["Failed"] = 2] = "Failed";
+})(FileUploadState = exports.FileUploadState || (exports.FileUploadState = {}));
+},{}],9:[function(require,module,exports){
+"use strict";
+},{}],10:[function(require,module,exports){
+"use strict";
+var FileStartBindings = {
+    buttons: '<?pipButtons',
+    name: '<pipName',
+    type: '<?pipType',
+    progress: '<?pipProgress'
+};
+var FileStartChanges = (function () {
+    function FileStartChanges() {
+    }
+    return FileStartChanges;
+}());
+var FileStartController = (function () {
+    function FileStartController() {
+        this.progress = 0;
+    }
+    FileStartController.prototype.$onChanges = function (changes) {
+        if (changes.progress) {
+            this.progress = changes.progress.currentValue;
+        }
+    };
+    return FileStartController;
+}());
+var fileStartDirective = {
+    controller: FileStartController,
+    bindings: FileStartBindings,
+    templateUrl: 'start/FileStart.html'
+};
+angular
+    .module('pipFiles.StartUpload', [])
+    .component('pipStartUpload', fileStartDirective);
+},{}],11:[function(require,module,exports){
+"use strict";
+var FileSuccessBindings = {
+    buttons: '=?pipButtons',
+    name: '=pipName',
+    type: '=?pipType',
+};
+var FileSuccessController = (function () {
+    function FileSuccessController() {
+        this.type = 'file';
+    }
+    FileSuccessController.prototype.$onChanges = function (changes) { };
+    return FileSuccessController;
+}());
+var fileSuccessDirective = {
+    restrict: 'E',
+    replace: true,
+    controller: FileSuccessController,
+    controllerAs: 'vm',
+    bindings: FileSuccessBindings,
+    templateUrl: 'success/FileSuccess.html'
+};
+angular
+    .module('pipFiles.SuccessUpload', [])
+    .component('pipSuccesUpload', fileSuccessDirective);
+},{}],12:[function(require,module,exports){
+"use strict";
+var FileUploadButtons = (function () {
+    function FileUploadButtons() {
+    }
+    return FileUploadButtons;
+}());
+var FileUploadBindings = {
+    buttonFunction: '<?pipButtonFunctions',
+    buttons: '<?pipButtons',
+    error: '<?pipError',
+    name: '<pipName',
+    state: '<pipState',
+    type: '<?pipType',
+    progress: '<pipProgress'
+};
+var FileUploadChanges = (function () {
+    function FileUploadChanges() {
+    }
+    return FileUploadChanges;
+}());
+var FileUploadController = (function () {
+    function FileUploadController($scope) {
+        this.error = null;
+    }
+    FileUploadController.prototype.$onInit = function () {
+        var _this = this;
+        if (this.buttons) {
+            this.uploadButtons = [];
+            this.failButtons = [
+                { title: 'Cancel', click: function () { _this.onCancel(); } },
+                { title: 'Retry', click: function () { _this.onRetry(); } }
+            ];
+            this.startButtons = [
+                { title: 'Abort', click: function () { _this.onAbort(); } }
+            ];
+        }
+    };
+    FileUploadController.prototype.$onChanges = function (changes) {
+        if (changes.state) {
+            this.state = changes.state.currentValue;
+        }
+        if (changes.progress) {
+            this.progress = changes.progress.currentValue;
+        }
+        if (changes.error) {
+            this.error = changes.error.currentValue;
+        }
+    };
+    FileUploadController.prototype.onCancel = function () {
+        if (this.buttonFunction.cancel)
+            this.buttonFunction.cancel();
+    };
+    FileUploadController.prototype.onRetry = function () {
+        if (this.buttonFunction.retry)
+            this.buttonFunction.retry();
+    };
+    FileUploadController.prototype.onAbort = function () {
+        if (this.buttonFunction.abort)
+            this.buttonFunction.abort();
+    };
+    return FileUploadController;
+}());
+var fileUploadDirective = {
+    controller: FileUploadController,
+    bindings: FileUploadBindings,
+    templateUrl: 'upload/FileUpload.html'
+};
+angular
+    .module('pipFiles.FileUpload', [])
+    .component('pipFileUpload', fileUploadDirective);
+},{}],13:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipFiles.Templates');
@@ -13337,8 +14852,73 @@ try {
   module = angular.module('pipFiles.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/FileProgress.html',
-    '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon" ng-class="{\'color-badge-bg\': vm.globalProgress() == \'fail\', \'bb-orange\': vm.globalProgress() == \'start\', \'bb-green\': vm.globalProgress() == \'upload\' }"><md-icon md-svg-icon="icons:check" ng-if="vm.globalProgress() == \'upload\'"></md-icon><md-icon md-svg-icon="bootbarn-icons:play" ng-if="vm.globalProgress() == \'start\'"></md-icon><md-icon md-svg-icon="icons:cross" ng-if="vm.globalProgress() == \'fail\'"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title" ng-if="vm.globalProgress() == \'start\'">Uploading {{vm.type}}</h3><h3 class="pip-title" ng-if="vm.globalProgress() == \'upload\'">Uploaded {{vm.type}} successfully!</h3><h3 class="pip-title" ng-if="vm.globalProgress() == \'fail\'">Uploading {{vm.type}} failed with errors!</h3><div class="color-secondary-text pip-subtitle">{{vm.name}}</div><div class="color-error pip-error" ng-if="vm.globalProgress() == \'fail\'">{{vm.errorFail()}}</div><div ng-if="vm.globalProgress() == \'start\'"><md-progress-linear md-mode="determinate" class="md-accent" value="{{vm.localProgress()}}" ng-if="vm.localProgress() < 100"></md-progress-linear><md-progress-linear md-mode="indeterminate" class="md-accent" ng-if="vm.localProgress() == 100"></md-progress-linear></div></div></div></div><div class="pip-footer layout-row layout-align-end-center"><div><md-button class="md-accent" ng-click="vm.onCancel()" ng-show="!vm.globalProgress() || vm.globalProgress() == \'fail\'">Cancel</md-button><md-button class="md-accent" ng-click="vm.onRetry()" ng-show="vm.globalProgress() == \'fail\'">Retry</md-button><md-button class="md-accent" ng-click="vm.abort()" ng-show="vm.globalProgress() == \'start\'">Abort</md-button></div></div></div>');
+  $templateCache.put('fail/FileFail.html',
+    '<div class="pip-files pip-progress-files">\n' +
+    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
+    '    <div class="layout-row">\n' +
+    '        <div class="pip-progress-icon color-badge-bg">\n' +
+    '            <md-icon md-svg-icon="icons:cross"></md-icon>\n' +
+    '        </div>\n' +
+    '        <div class="pip-progress-content">\n' +
+    '                 <h3 class="pip-title">\n' +
+    '                Uploading {{$ctrl.type}} failed with errors!\n' +
+    '            </h3>\n' +
+    '            <div class="color-secondary-text pip-subtitle">\n' +
+    '                {{$ctrl.name}}\n' +
+    '            </div>\n' +
+    '            <div class="color-error pip-error">\n' +
+    '                 {{$ctrl.error}}\n' +
+    '            </div>\n' +
+    '\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="$ctrl.buttons && $ctrl.buttons.length > 0">\n' +
+    '        <div>\n' +
+    '           <md-button class="md-accent" \n' +
+    '                       ng-repeat="fail in $ctrl.buttons" ng-click="fail.click()">\n' +
+    '                {{::fail.title}}\n' +
+    '            </md-button> \n' +
+    '        </div>\n' +
+    '    </div>  \n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('success/FileSuccess.html',
+    '<div class="pip-files pip-progress-files">\n' +
+    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
+    '    <div class="layout-row">\n' +
+    '        <div class="pip-progress-icon bb-green">\n' +
+    '            <md-icon md-svg-icon="icons:check"></md-icon>\n' +
+    '        </div>\n' +
+    '        <div class="pip-progress-content">\n' +
+    '            <h3 class="pip-title">\n' +
+    '                Uploaded {{::vm.type}} successfully!\n' +
+    '            </h3>\n' +
+    '        \n' +
+    '            <div class="color-secondary-text pip-subtitle">\n' +
+    '                {{vm.name}}\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0">\n' +
+    '        <div>\n' +
+    '           <md-button class="md-accent" \n' +
+    '                       ng-repeat="start in vm.buttons" ng-click="start.click()">\n' +
+    '                {{start.title}}\n' +
+    '            </md-button> \n' +
+    '        </div>\n' +
+    '    </div>  \n' +
+    '</div>');
 }]);
 })();
 
@@ -13350,16 +14930,2539 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('select/FileSelect.html',
-    '<div class="pip-file-select"><form id="inp_form" class="pip-hidden-form"><input type="file" file-model="vm.localFile" id="inp_file" ng-model="vm.localFile"></form><md-button class="md-raised md-accent pip-button" ng-click="vm.onUploadButtonClick()" ng-if="!vm.localFile">Choose File</md-button><div ng-if="vm.localFile.name" class="pip-file layout-row layout-align-start-center"><md-icon md-svg-icon="icons:document" class="pip-icon"></md-icon><div class="flex"><div class="text-body2 text-overflow">{{vm.localFile.name}}</div><div ng-if="vm.localFile.size" class="color-secondary-text">{{vm.localFile.size}}</div></div><md-button ng-click="vm.onDeleteButtonClick()" class="md-icon-button"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div>');
+    '<div class="pip-file-select">\n' +
+    '      <form id="inp_form" class="pip-hidden-form">\n' +
+    '        <input type="file" file-model="$ctrl.localFile" id="inp_file" ng-model="$ctrl.localFile"></input>\n' +
+    '      </form>\n' +
+    '        <md-button class="md-raised md-accent pip-button"\n' +
+    '                   ng-click="$ctrl.onUploadButtonClick()" \n' +
+    '                   ng-if="!$ctrl.localFile">Choose File</md-button>\n' +
+    '        <div ng-if="$ctrl.localFile.name" class="pip-file layout-row layout-align-start-center">\n' +
+    '          <md-icon md-svg-icon="icons:document" class="pip-icon"></md-icon>\n' +
+    '            <div class="flex">\n' +
+    '                <div class="text-body2 text-overflow">\n' +
+    '                    {{$ctrl.localFile.name}}\n' +
+    '                </div>\n' +
+    '                <div ng-if="$ctrl.localFile.size" class="color-secondary-text">{{$ctrl.localFile.size}}</div>\n' +
+    '            </div>\n' +
+    '            <md-button ng-click="$ctrl.onDeleteButtonClick()" class="md-icon-button">\n' +
+    '              <md-icon md-svg-icon="icons:cross-circle"></md-icon>\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('start/FileStart.html',
+    '<div class="pip-files pip-progress-files">\n' +
+    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
+    '    <div class="layout-row">\n' +
+    '        <div class="pip-progress-icon bb-orange">\n' +
+    '            <md-icon md-svg-icon="icons:play"></md-icon>\n' +
+    '        </div>\n' +
+    '        <div class="pip-progress-content">\n' +
+    '            <h3 class="pip-title">\n' +
+    '                Uploading {{::$ctrl.type}}\n' +
+    '            </h3>\n' +
+    '            <div class="color-secondary-text pip-subtitle">\n' +
+    '                {{$ctrl.name}}\n' +
+    '            </div>\n' +
+    '            <div>\n' +
+    '                <md-progress-linear md-mode="determinate" \n' +
+    '                    class="md-accent" \n' +
+    '                    value="{{$ctrl.progress}}" \n' +
+    '                    ng-if="$ctrl.progress < 100">\n' +
+    '                </md-progress-linear>\n' +
+    '                <md-progress-linear md-mode="indeterminate" \n' +
+    '                    class="md-accent" \n' +
+    '                    ng-if="$ctrl.progress == 100">\n' +
+    '                </md-progress-linear>\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="$ctrl.buttons">\n' +
+    '        <div>\n' +
+    '            <md-button class="md-accent" \n' +
+    '                       ng-repeat="start in $ctrl.buttons" ng-click="start.click()">\n' +
+    '                {{start.title}}\n' +
+    '            </md-button>\n' +
+    '        </div>\n' +
+    '    </div>  \n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('upload/FileUpload.html',
+    '<div>\n' +
+    '    <pip-succes-upload \n' +
+    '            ng-if="$ctrl.state == 1 && (!$ctrl.buttons || $ctrl.uploadButtons)"\n' +
+    '            pip-name="$ctrl.name" \n' +
+    '            pip-type="$ctrl.type" \n' +
+    '            pip-buttons="$ctrl.buttons"></pip-succes-upload>\n' +
+    '    <pip-fail-upload \n' +
+    '            ng-if="$ctrl.state == 2"\n' +
+    '            pip-name="$ctrl.name" \n' +
+    '            pip-type="$ctrl.type" \n' +
+    '            pip-error="$ctrl.error"\n' +
+    '            pip-buttons="$ctrl.failButtons"></pip-fail-upload>\n' +
+    '\n' +
+    '    <pip-start-upload \n' +
+    '            ng-if="$ctrl.state == 0"\n' +
+    '            pip-name="$ctrl.name" \n' +
+    '            pip-type="$ctrl.type" \n' +
+    '            pip-progress="$ctrl.progress"\n' +
+    '            pip-buttons="$ctrl.startButtons"></pip-start-upload>\n' +
+    '</div>');
 }]);
 })();
 
 
 
-},{}]},{},[6,1,2,3,4,5])(6)
+},{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
 });
 
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dashboard = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+var AddTileDialog = (function () {
+    function AddTileDialog() {
+    }
+    return AddTileDialog;
+}());
+exports.AddTileDialog = AddTileDialog;
+var AddTileDialogController = (function () {
+    function AddTileDialogController(groups, activeGroupIndex, widgetList, $mdDialog) {
+        this.activeGroupIndex = activeGroupIndex;
+        this.$mdDialog = $mdDialog;
+        this.totalTiles = 0;
+        this.activeGroupIndex = _.isNumber(activeGroupIndex) ? activeGroupIndex : -1;
+        this.defaultTiles = _.cloneDeep(widgetList);
+        this.groups = _.map(groups, function (group) {
+            return group['title'];
+        });
+    }
+    AddTileDialogController.prototype.add = function () {
+        this.$mdDialog.hide({
+            groupIndex: this.activeGroupIndex,
+            widgets: this.defaultTiles
+        });
+    };
+    ;
+    AddTileDialogController.prototype.cancel = function () {
+        this.$mdDialog.cancel();
+    };
+    ;
+    AddTileDialogController.prototype.encrease = function (groupIndex, widgetIndex) {
+        var widget = this.defaultTiles[groupIndex][widgetIndex];
+        widget.amount++;
+        this.totalTiles++;
+    };
+    ;
+    AddTileDialogController.prototype.decrease = function (groupIndex, widgetIndex) {
+        var widget = this.defaultTiles[groupIndex][widgetIndex];
+        widget.amount = widget.amount ? widget.amount - 1 : 0;
+        this.totalTiles = this.totalTiles ? this.totalTiles - 1 : 0;
+    };
+    ;
+    return AddTileDialogController;
+}());
+exports.AddTileDialogController = AddTileDialogController;
+},{}],2:[function(require,module,exports){
+"use strict";
+var AddTileDialogController_1 = require("./AddTileDialogController");
+{
+    var setTranslations = function ($injector) {
+        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
+        if (pipTranslate) {
+            pipTranslate.setTranslations('en', {
+                DASHBOARD_ADD_TILE_DIALOG_TITLE: 'Add component',
+                DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS: 'Use "Enter" or "+" buttons on keyboard to encrease and "Delete" or "-" to decrease tiles amount',
+                DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP: 'Create new group'
+            });
+            pipTranslate.setTranslations('ru', {
+                DASHBOARD_ADD_TILE_DIALOG_TITLE: 'Добавить компонент',
+                DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS: 'Используйте "Enter" или "+" клавиши на клавиатуре чтобы увеличить и "Delete" or "-" чтобы уменшить количество тайлов',
+                DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP: 'Создать новую группу'
+            });
+        }
+    };
+    setTranslations.$inject = ['$injector'];
+    var AddTileDialogService_1 = (function () {
+        function AddTileDialogService_1(widgetList, $mdDialog) {
+            this.widgetList = widgetList;
+            this.$mdDialog = $mdDialog;
+        }
+        AddTileDialogService_1.prototype.show = function (groups, activeGroupIndex) {
+            var _this = this;
+            return this.$mdDialog
+                .show({
+                templateUrl: 'add_tile_dialog/AddTile.html',
+                bindToController: true,
+                controller: AddTileDialogController_1.AddTileDialogController,
+                controllerAs: 'dialogCtrl',
+                clickOutsideToClose: true,
+                resolve: {
+                    groups: function () {
+                        return groups;
+                    },
+                    activeGroupIndex: function () {
+                        return activeGroupIndex;
+                    },
+                    widgetList: function () {
+                        return _this.widgetList;
+                    }
+                }
+            });
+        };
+        ;
+        return AddTileDialogService_1;
+    }());
+    var AddTileDialogProvider = (function () {
+        function AddTileDialogProvider() {
+            this._widgetList = null;
+            this.configWidgetList = function (list) {
+                this._widgetList = list;
+            };
+        }
+        AddTileDialogProvider.prototype.$get = ['$mdDialog', function ($mdDialog) {
+            "ngInject";
+            if (this._service == null)
+                this._service = new AddTileDialogService_1(this._widgetList, $mdDialog);
+            return this._service;
+        }];
+        return AddTileDialogProvider;
+    }());
+    angular
+        .module('pipAddDashboardTileDialog')
+        .config(setTranslations)
+        .provider('pipAddTileDialog', AddTileDialogProvider);
+}
+},{"./AddTileDialogController":1}],3:[function(require,module,exports){
+"use strict";
+angular
+    .module('pipAddDashboardTileDialog', ['ngMaterial']);
+require("./AddTileDialogController");
+require("./AddTileProvider");
+},{"./AddTileDialogController":1,"./AddTileProvider":2}],4:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var MenuTileService_1 = require("../menu_tile/MenuTileService");
+{
+    var CalendarTileController = (function (_super) {
+        __extends(CalendarTileController, _super);
+        function CalendarTileController(pipTileConfigDialogService) {
+            var _this = _super.call(this) || this;
+            _this.pipTileConfigDialogService = pipTileConfigDialogService;
+            if (_this.options) {
+                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
+                _this.menu.push({
+                    title: 'Configurate',
+                    click: function () {
+                        _this.onConfigClick();
+                    }
+                });
+                _this.options.date = _this.options.date || new Date();
+                _this.color = _this.options.color || 'blue';
+            }
+            return _this;
+        }
+        CalendarTileController.prototype.onConfigClick = function () {
+            var _this = this;
+            this.pipTileConfigDialogService.show({
+                dialogClass: 'pip-calendar-config',
+                locals: {
+                    color: this.color,
+                    size: this.options.size,
+                    date: this.options.date,
+                },
+                extensionUrl: 'calendar_tile/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.changeSize(result.size);
+                _this.color = result.color;
+                _this.options.color = result.color;
+                _this.options.date = result.date;
+            });
+        };
+        return CalendarTileController;
+    }(MenuTileService_1.MenuTileService));
+    var CalendarTile = {
+        bindings: {
+            options: '=pipOptions',
+        },
+        controller: CalendarTileController,
+        templateUrl: 'calendar_tile/CalendarTile.html'
+    };
+    angular
+        .module('pipDashboard')
+        .component('pipCalendarTile', CalendarTile);
+}
+},{"../menu_tile/MenuTileService":17}],5:[function(require,module,exports){
+"use strict";
+var DashboardTile = (function () {
+    function DashboardTile() {
+    }
+    return DashboardTile;
+}());
+exports.DashboardTile = DashboardTile;
+},{}],6:[function(require,module,exports){
+"use strict";
+var TileColors = (function () {
+    function TileColors() {
+    }
+    return TileColors;
+}());
+TileColors.all = ['purple', 'green', 'gray', 'orange', 'blue'];
+var TileSizes = (function () {
+    function TileSizes() {
+    }
+    return TileSizes;
+}());
+TileSizes.all = [{
+        name: 'DASHBOARD_TILE_CONFIG_DIALOG_SIZE_SMALL',
+        id: '11'
+    },
+    {
+        name: 'DASHBOARD_TILE_CONFIG_DIALOG_SIZE_WIDE',
+        id: '21'
+    },
+    {
+        name: 'DASHBOARD_TILE_CONFIG_DIALOG_SIZE_LARGE',
+        id: '22'
+    }
+];
+var TileConfigDialogController = (function () {
+    TileConfigDialogController.$inject = ['params', 'extensionUrl', '$mdDialog'];
+    function TileConfigDialogController(params, extensionUrl, $mdDialog) {
+        "ngInject";
+        var _this = this;
+        this.params = params;
+        this.extensionUrl = extensionUrl;
+        this.$mdDialog = $mdDialog;
+        this.colors = TileColors.all;
+        this.sizes = TileSizes.all;
+        this.sizeId = TileSizes.all[0].id;
+        angular.extend(this, this.params);
+        this.sizeId = '' + this.params.size.colSpan + this.params.size.rowSpan;
+        this.onCancel = function () {
+            _this.$mdDialog.cancel();
+        };
+    }
+    TileConfigDialogController.prototype.onApply = function (updatedData) {
+        this['size'].sizeX = Number(this.sizeId.substr(0, 1));
+        this['size'].sizeY = Number(this.sizeId.substr(1, 1));
+        this.$mdDialog.hide(updatedData);
+    };
+    return TileConfigDialogController;
+}());
+exports.TileConfigDialogController = TileConfigDialogController;
+},{}],7:[function(require,module,exports){
+{
+    var TileConfigExtendComponentBindings = {
+        pipExtensionUrl: '<',
+        pipDialogScope: '<',
+        pipApply: '&'
+    };
+    var TileConfigExtendComponentChanges = (function () {
+        function TileConfigExtendComponentChanges() {
+        }
+        return TileConfigExtendComponentChanges;
+    }());
+    var TileConfigExtendComponentController = (function () {
+        function TileConfigExtendComponentController($templateRequest, $compile, $scope, $element, $attrs) {
+            this.$templateRequest = $templateRequest;
+            this.$compile = $compile;
+            this.$scope = $scope;
+            this.$element = $element;
+            this.$attrs = $attrs;
+        }
+        TileConfigExtendComponentController.prototype.$onChanges = function (changes) {
+            var _this = this;
+            if (changes.pipDialogScope) {
+                delete changes.pipDialogScope.currentValue['$scope'];
+                angular.extend(this, changes.pipDialogScope.currentValue);
+            }
+            if (changes.pipExtensionUrl && changes.pipExtensionUrl.currentValue) {
+                this.$templateRequest(changes.pipExtensionUrl.currentValue, false).then(function (html) {
+                    _this.$element.find('pip-extension-point').replaceWith(_this.$compile(html)(_this.$scope));
+                });
+            }
+        };
+        TileConfigExtendComponentController.prototype.onApply = function () {
+            this.pipApply({ updatedData: this });
+        };
+        return TileConfigExtendComponentController;
+    }());
+    var pipTileConfigComponent = {
+        templateUrl: 'config_tile_dialog/ConfigDialogExtendComponent.html',
+        controller: TileConfigExtendComponentController,
+        bindings: TileConfigExtendComponentBindings
+    };
+    angular
+        .module('pipConfigDashboardTileDialog')
+        .component('pipTileConfigExtendComponent', pipTileConfigComponent);
+}
+},{}],8:[function(require,module,exports){
+"use strict";
+var ConfigDialogController_1 = require("./ConfigDialogController");
+{
+    var setTranslations = function ($injector) {
+        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
+        if (pipTranslate) {
+            pipTranslate.setTranslations('en', {
+                DASHBOARD_TILE_CONFIG_DIALOG_TITLE: 'Edit tile',
+                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_SMALL: 'Small',
+                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_WIDE: 'Wide',
+                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_LARGE: 'Large'
+            });
+            pipTranslate.setTranslations('ru', {
+                DASHBOARD_TILE_CONFIG_DIALOG_TITLE: 'Изменить виджет',
+                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_SMALL: 'Мален.',
+                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_WIDE: 'Широкий',
+                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_LARGE: 'Большой'
+            });
+        }
+    };
+    setTranslations.$inject = ['$injector'];
+    var TileConfigDialogService = (function () {
+        TileConfigDialogService.$inject = ['$mdDialog'];
+        function TileConfigDialogService($mdDialog) {
+            this.$mdDialog = $mdDialog;
+        }
+        TileConfigDialogService.prototype.show = function (params, successCallback, cancelCallback) {
+            this.$mdDialog.show({
+                targetEvent: params.event,
+                templateUrl: params.templateUrl || 'dialogs/tile_config/ConfigDialog.html',
+                controller: ConfigDialogController_1.TileConfigDialogController,
+                bindToController: true,
+                controllerAs: 'vm',
+                locals: {
+                    extensionUrl: params.extensionUrl,
+                    params: params.locals
+                },
+                clickOutsideToClose: true
+            })
+                .then(function (key) {
+                if (successCallback) {
+                    successCallback(key);
+                }
+            }, function () {
+                if (cancelCallback) {
+                    cancelCallback();
+                }
+            });
+        };
+        return TileConfigDialogService;
+    }());
+    angular
+        .module('pipConfigDashboardTileDialog')
+        .config(setTranslations)
+        .service('pipTileConfigDialogService', TileConfigDialogService);
+}
+},{"./ConfigDialogController":6}],9:[function(require,module,exports){
+"use strict";
+angular
+    .module('pipConfigDashboardTileDialog', ['ngMaterial']);
+require("./ConfigDialogController");
+require("./ConfigDialogService");
+require("./ConfigDialogExtendComponent");
+},{"./ConfigDialogController":6,"./ConfigDialogExtendComponent":7,"./ConfigDialogService":8}],10:[function(require,module,exports){
+"use strict";
+{
+    var setTranslations = function ($injector) {
+        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
+        if (pipTranslate) {
+            pipTranslate.setTranslations('en', {
+                DROP_TO_CREATE_NEW_GROUP: 'Drop here to create new group',
+            });
+            pipTranslate.setTranslations('ru', {
+                DROP_TO_CREATE_NEW_GROUP: 'Перетащите сюда для создания новой группы'
+            });
+        }
+    };
+    setTranslations.$inject = ['$injector'];
+    var configureAvailableWidgets = function (pipAddTileDialogProvider) {
+        pipAddTileDialogProvider.configWidgetList([
+            [{
+                    title: 'Event',
+                    icon: 'document',
+                    name: 'event',
+                    amount: 0
+                },
+                {
+                    title: 'Position',
+                    icon: 'location',
+                    name: 'position',
+                    amount: 0
+                }
+            ],
+            [{
+                    title: 'Calendar',
+                    icon: 'date',
+                    name: 'calendar',
+                    amount: 0
+                },
+                {
+                    title: 'Sticky Notes',
+                    icon: 'note-take',
+                    name: 'notes',
+                    amount: 0
+                },
+                {
+                    title: 'Statistics',
+                    icon: 'tr-statistics',
+                    name: 'statistics',
+                    amount: 0
+                }
+            ]
+        ]);
+    };
+    configureAvailableWidgets.$inject = ['pipAddTileDialogProvider'];
+    var draggableOptions = (function () {
+        function draggableOptions() {
+        }
+        return draggableOptions;
+    }());
+    var DEFAULT_GRID_OPTIONS_1 = {
+        tileWidth: 150,
+        tileHeight: 150,
+        gutter: 10,
+        inline: false
+    };
+    var DashboardController = (function () {
+        function DashboardController($scope, $rootScope, $attrs, $element, $timeout, $interpolate, pipAddTileDialog, pipTileTemplate) {
+            var _this = this;
+            this.$rootScope = $rootScope;
+            this.$attrs = $attrs;
+            this.$element = $element;
+            this.$timeout = $timeout;
+            this.$interpolate = $interpolate;
+            this.pipAddTileDialog = pipAddTileDialog;
+            this.pipTileTemplate = pipTileTemplate;
+            this.defaultGroupMenuActions = [{
+                    title: 'Add Component',
+                    callback: function (groupIndex) {
+                        _this.addComponent(groupIndex);
+                    }
+                },
+                {
+                    title: 'Remove',
+                    callback: function (groupIndex) {
+                        _this.removeGroup(groupIndex);
+                    }
+                },
+                {
+                    title: 'Configurate',
+                    callback: function (groupIndex) {
+                        console.log('configurate group with index:', groupIndex);
+                    }
+                }
+            ];
+            this._includeTpl = '<pip-{{ type }}-tile group="groupIndex" index="index"' +
+                'pip-options="$parent.$ctrl.groupedWidgets[groupIndex][\'source\'][index].opts">' +
+                '</pip-{{ type }}-tile>';
+            this.groupMenuActions = this.defaultGroupMenuActions;
+            this.removeGroup = function (groupIndex) {
+                console.log('removeGroup', groupIndex);
+                _this.groupedWidgets.splice(groupIndex, 1);
+            };
+            $element.addClass('pip-scroll');
+            this.draggableGridOptions = this.gridOptions || DEFAULT_GRID_OPTIONS_1;
+            if (this.draggableGridOptions.inline === true) {
+                $element.addClass('inline-grid');
+            }
+            if (this.groupAdditionalActions)
+                angular.extend(this.groupMenuActions, this.groupAdditionalActions);
+            this.widgetsContext = $scope;
+            this.compileWidgets();
+            this.$timeout(function () {
+                _this.$element.addClass('visible');
+            }, 700);
+        }
+        DashboardController.prototype.compileWidgets = function () {
+            var _this = this;
+            _.each(this.groupedWidgets, function (group, groupIndex) {
+                group.removedWidgets = group.removedWidgets || [],
+                    group.source = group.source.map(function (widget, index) {
+                        widget.size = widget.size || {
+                            colSpan: 1,
+                            rowSpan: 1
+                        };
+                        widget.index = index;
+                        widget.groupIndex = groupIndex;
+                        widget.menu = widget.menu || {};
+                        angular.extend(widget.menu, [{
+                                title: 'Remove',
+                                click: function (item, params, object) {
+                                    _this.removeWidget(item, params, object);
+                                }
+                            }]);
+                        return {
+                            opts: widget,
+                            template: _this.pipTileTemplate.getTemplate(widget, _this._includeTpl)
+                        };
+                    });
+            });
+        };
+        DashboardController.prototype.addComponent = function (groupIndex) {
+            var _this = this;
+            this.pipAddTileDialog
+                .show(this.groupedWidgets, groupIndex)
+                .then(function (data) {
+                var activeGroup;
+                if (!data) {
+                    return;
+                }
+                if (data.groupIndex !== -1) {
+                    activeGroup = _this.groupedWidgets[data.groupIndex];
+                }
+                else {
+                    activeGroup = {
+                        title: 'New group',
+                        source: []
+                    };
+                }
+                _this.addWidgets(activeGroup.source, data.widgets);
+                if (data.groupIndex === -1) {
+                    _this.groupedWidgets.push(activeGroup);
+                }
+                _this.compileWidgets();
+            });
+        };
+        ;
+        DashboardController.prototype.addWidgets = function (group, widgets) {
+            widgets.forEach(function (widgetGroup) {
+                widgetGroup.forEach(function (widget) {
+                    if (widget.amount) {
+                        Array.apply(null, Array(widget.amount)).forEach(function () {
+                            group.push({
+                                type: widget.name
+                            });
+                        });
+                    }
+                });
+            });
+        };
+        DashboardController.prototype.removeWidget = function (item, params, object) {
+            var _this = this;
+            this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
+            this.groupedWidgets[params.options.groupIndex].removedWidgets.push(params.options.index);
+            this.groupedWidgets[params.options.groupIndex].source.splice(params.options.index, 1);
+            this.$timeout(function () {
+                _this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
+            });
+        };
+        return DashboardController;
+    }());
+    var Dashboard = {
+        bindings: {
+            gridOptions: '=pipGridOptions',
+            groupAdditionalActions: '=pipGroupActions',
+            groupedWidgets: '=pipGroups'
+        },
+        controller: DashboardController,
+        templateUrl: 'dashboard/Dashboard.html'
+    };
+    angular
+        .module('pipDashboard')
+        .config(configureAvailableWidgets)
+        .config(setTranslations)
+        .component('pipDashboard', Dashboard);
+}
+},{}],11:[function(require,module,exports){
+"use strict";
+var DraggableTileService_1 = require("./DraggableTileService");
+var TileGroupService_1 = require("../tile_group/TileGroupService");
+exports.DEFAULT_TILE_WIDTH = 150;
+exports.DEFAULT_TILE_HEIGHT = 150;
+exports.UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
+var SIMPLE_LAYOUT_COLUMNS_COUNT = 2;
+var DEFAULT_OPTIONS = {
+    tileWidth: exports.DEFAULT_TILE_WIDTH,
+    tileHeight: exports.DEFAULT_TILE_HEIGHT,
+    gutter: 20,
+    container: 'pip-draggable-grid:first-of-type',
+    activeDropzoneClass: 'dropzone-active',
+    groupContaninerSelector: '.pip-draggable-group:not(.fict-group)',
+};
+{
+    var DraggableController = (function () {
+        function DraggableController($scope, $rootScope, $compile, $timeout, $element, pipDragTile, pipTilesGrid, pipMedia) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$rootScope = $rootScope;
+            this.$compile = $compile;
+            this.$timeout = $timeout;
+            this.$element = $element;
+            this.sourceDropZoneElem = null;
+            this.isSameDropzone = true;
+            this.tileGroups = null;
+            this.opts = _.merge({
+                mobileBreakpoint: pipMedia.breakpoints.xs
+            }, DEFAULT_OPTIONS, this.options);
+            this.groups = this.tilesTemplates.map(function (group, groupIndex) {
+                return {
+                    title: group.title,
+                    editingName: false,
+                    index: groupIndex,
+                    source: group.source.map(function (tile) {
+                        var tileScope = _this.createTileScope(tile);
+                        return DraggableTileService_1.IDragTileConstructor(DraggableTileService_1.DragTileService, {
+                            tpl: $compile(tile.template)(tileScope),
+                            options: tile.opts,
+                            size: tile.opts.size
+                        });
+                    })
+                };
+            });
+            $scope.$watch('$ctrl.tilesTemplates', function (newVal) {
+                _this.watch(newVal);
+            }, true);
+            this.initialize();
+            $(window).on('resize', _.debounce(function () {
+                _this.availableWidth = _this.getContainerWidth();
+                _this.availableColumns = _this.getAvailableColumns(_this.availableWidth);
+                _this.tileGroups.forEach(function (group) {
+                    group
+                        .setAvailableColumns(_this.availableColumns)
+                        .generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth))
+                        .setTilesDimensions()
+                        .calcContainerHeight();
+                });
+            }, 50));
+        }
+        DraggableController.prototype.$postLink = function () {
+            this.$container = this.$element;
+        };
+        DraggableController.prototype.watch = function (newVal) {
+            var _this = this;
+            var prevVal = this.groups;
+            var changedGroupIndex = null;
+            if (newVal.length > prevVal.length) {
+                this.addGroup(newVal[newVal.length - 1]);
+                return;
+            }
+            if (newVal.length < prevVal.length) {
+                this.removeGroups(newVal);
+                return;
+            }
+            for (var i = 0; i < newVal.length; i++) {
+                var groupWidgetDiff = prevVal[i].source.length - newVal[i].source.length;
+                if (groupWidgetDiff || (newVal[i].removedWidgets && newVal[i].removedWidgets.length > 0)) {
+                    changedGroupIndex = i;
+                    if (groupWidgetDiff < 0) {
+                        var newTiles = newVal[changedGroupIndex].source.slice(groupWidgetDiff);
+                        _.each(newTiles, function (tile) {
+                            console.log('tile', tile);
+                        });
+                        this.addTilesIntoGroup(newTiles, this.tileGroups[changedGroupIndex], this.groupsContainers[changedGroupIndex]);
+                        this.$timeout(function () {
+                            _this.updateTilesGroups();
+                        });
+                    }
+                    else {
+                        this.removeTiles(this.tileGroups[changedGroupIndex], newVal[changedGroupIndex].removedWidgets, this.groupsContainers[changedGroupIndex]);
+                        this.updateTilesOptions(newVal);
+                        this.$timeout(function () {
+                            _this.updateTilesGroups();
+                        });
+                    }
+                    return;
+                }
+            }
+            if (newVal && this.tileGroups) {
+                this.updateTilesOptions(newVal);
+                this.$timeout(function () {
+                    _this.updateTilesGroups();
+                });
+            }
+        };
+        DraggableController.prototype.onTitleClick = function (group, event) {
+            if (!group.editingName) {
+                group.oldTitle = _.clone(group.title);
+                group.editingName = true;
+                this.$timeout(function () {
+                    $(event.currentTarget.children[0]).focus();
+                });
+            }
+        };
+        DraggableController.prototype.cancelEditing = function (group) {
+            group.title = group.oldTitle;
+        };
+        DraggableController.prototype.onBlurTitleInput = function (group) {
+            var _this = this;
+            this.$timeout(function () {
+                group.editingName = false;
+                _this.$rootScope.$broadcast(exports.UPDATE_GROUPS_EVENT, _this.groups);
+                _this.tilesTemplates[group.index].title = group.title;
+            }, 100);
+        };
+        DraggableController.prototype.onKyepressTitleInput = function (group, event) {
+            if (event.keyCode === 13) {
+                this.onBlurTitleInput(group);
+            }
+        };
+        DraggableController.prototype.updateTilesTemplates = function (updateType, source) {
+            switch (updateType) {
+                case 'addGroup':
+                    if (this.groups.length !== this.tilesTemplates.length) {
+                        this.tilesTemplates.push(source);
+                    }
+                    break;
+                case 'moveTile':
+                    var _a = {
+                        fromIndex: source.from.elem.attributes['data-group-id'].value,
+                        toIndex: source.to.elem.attributes['data-group-id'].value,
+                        tileOptions: source.tile.opts.options,
+                        fromTileIndex: source.tile.opts.options.index
+                    }, fromIndex = _a.fromIndex, toIndex = _a.toIndex, tileOptions = _a.tileOptions, fromTileIndex = _a.fromTileIndex;
+                    this.tilesTemplates[fromIndex].source.splice(fromTileIndex, 1);
+                    this.tilesTemplates[toIndex].source.push({
+                        opts: tileOptions
+                    });
+                    this.reIndexTiles(source.from.elem);
+                    this.reIndexTiles(source.to.elem);
+                    break;
+            }
+        };
+        DraggableController.prototype.createTileScope = function (tile) {
+            var tileScope = this.$rootScope.$new(false, this.tilesContext);
+            tileScope.index = tile.opts.index == undefined ? tile.opts.options.index : tile.opts.index;
+            tileScope.groupIndex = tile.opts.groupIndex == undefined ? tile.opts.options.groupIndex : tile.opts.groupIndex;
+            return tileScope;
+        };
+        DraggableController.prototype.removeTiles = function (group, indexes, container) {
+            var tiles = $(container).find('.pip-draggable-tile');
+            _.each(indexes, function (index) {
+                group.tiles.splice(index, 1);
+                tiles[index].remove();
+            });
+            this.reIndexTiles(container);
+        };
+        DraggableController.prototype.reIndexTiles = function (container, gIndex) {
+            var tiles = $(container).find('.pip-draggable-tile'), groupIndex = gIndex === undefined ? container.attributes['data-group-id'].value : gIndex;
+            _.each(tiles, function (tile, index) {
+                var child = $(tile).children()[0];
+                angular.element(child).scope()['index'] = index;
+                angular.element(child).scope()['groupIndex'] = groupIndex;
+            });
+        };
+        DraggableController.prototype.removeGroups = function (newGroups) {
+            var _this = this;
+            var removeIndexes = [], remain = [], containers = [];
+            _.each(this.groups, function (group, index) {
+                if (_.findIndex(newGroups, function (g) {
+                    return g['title'] === group.title;
+                }) < 0) {
+                    removeIndexes.push(index);
+                }
+                else {
+                    remain.push(index);
+                }
+            });
+            _.each(removeIndexes.reverse(), function (index) {
+                _this.groups.splice(index, 1);
+                _this.tileGroups.splice(index, 1);
+            });
+            _.each(remain, function (index) {
+                containers.push(_this.groupsContainers[index]);
+            });
+            this.groupsContainers = containers;
+            _.each(this.groupsContainers, function (container, index) {
+                _this.reIndexTiles(container, index);
+            });
+        };
+        DraggableController.prototype.addGroup = function (sourceGroup) {
+            var _this = this;
+            var group = {
+                title: sourceGroup.title,
+                source: sourceGroup.source.map(function (tile) {
+                    var tileScope = _this.createTileScope(tile);
+                    return DraggableTileService_1.IDragTileConstructor(DraggableTileService_1.DragTileService, {
+                        tpl: _this.$compile(tile.template)(tileScope),
+                        options: tile.opts,
+                        size: tile.opts.size
+                    });
+                })
+            };
+            this.groups.push(group);
+            if (!this.$scope.$$phase)
+                this.$scope.$apply();
+            this.$timeout(function () {
+                _this.groupsContainers = document.querySelectorAll(_this.opts.groupContaninerSelector);
+                _this.tileGroups.push(TileGroupService_1.ITilesGridConstructor(TileGroupService_1.TilesGridService, group.source, _this.opts, _this.availableColumns, _this.groupsContainers[_this.groupsContainers.length - 1])
+                    .generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth))
+                    .setTilesDimensions()
+                    .calcContainerHeight());
+            });
+            this.updateTilesTemplates('addGroup', sourceGroup);
+        };
+        DraggableController.prototype.addTilesIntoGroup = function (newTiles, group, groupContainer) {
+            var _this = this;
+            newTiles.forEach(function (tile) {
+                var tileScope = _this.createTileScope(tile);
+                var newTile = DraggableTileService_1.IDragTileConstructor(DraggableTileService_1.DragTileService, {
+                    tpl: _this.$compile(tile.template)(tileScope),
+                    options: tile.opts,
+                    size: tile.opts.size
+                });
+                group.addTile(newTile);
+                $('<div>')
+                    .addClass('pip-draggable-tile')
+                    .append(newTile.getCompiledTemplate())
+                    .appendTo(groupContainer);
+            });
+        };
+        DraggableController.prototype.updateTilesOptions = function (optionsGroup) {
+            var _this = this;
+            optionsGroup.forEach(function (optionGroup) {
+                optionGroup.source.forEach(function (tileOptions) {
+                    _this.tileGroups.forEach(function (group) {
+                        group.updateTileOptions(tileOptions.opts);
+                    });
+                });
+            });
+        };
+        DraggableController.prototype.initTilesGroups = function (tileGroups, opts, groupsContainers) {
+            var _this = this;
+            return tileGroups.map(function (group, index) {
+                return TileGroupService_1.ITilesGridConstructor(TileGroupService_1.TilesGridService, group.source, opts, _this.availableColumns, groupsContainers[index])
+                    .generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth))
+                    .setTilesDimensions()
+                    .calcContainerHeight();
+            });
+        };
+        DraggableController.prototype.updateTilesGroups = function (onlyPosition, draggedTile) {
+            var _this = this;
+            this.tileGroups.forEach(function (group) {
+                if (!onlyPosition) {
+                    group.generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth));
+                }
+                group
+                    .setTilesDimensions(onlyPosition, draggedTile)
+                    .calcContainerHeight();
+            });
+        };
+        DraggableController.prototype.getContainerWidth = function () {
+            var container = this.$container || $('body');
+            return container.width();
+        };
+        DraggableController.prototype.getAvailableColumns = function (availableWidth) {
+            return this.opts.mobileBreakpoint > availableWidth ? SIMPLE_LAYOUT_COLUMNS_COUNT :
+                Math.floor(availableWidth / (this.opts.tileWidth + this.opts.gutter));
+        };
+        DraggableController.prototype.getActiveGroupAndTile = function (elem) {
+            var active = {};
+            this.tileGroups.forEach(function (group) {
+                var foundTile = group.getTileByNode(elem);
+                if (foundTile) {
+                    active['group'] = group;
+                    active['tile'] = foundTile;
+                    return;
+                }
+            });
+            return active;
+        };
+        DraggableController.prototype.getSingleTileWidthForMobile = function (availableWidth) {
+            return this.opts.mobileBreakpoint > availableWidth ? availableWidth / 2 - this.opts.gutter : null;
+        };
+        DraggableController.prototype.onDragStartListener = function (event) {
+            var activeEntities = this.getActiveGroupAndTile(event.target);
+            this.container = $(event.target).parent('.pip-draggable-group').get(0);
+            this.draggedTile = activeEntities['tile'];
+            this.activeDraggedGroup = activeEntities['group'];
+            this.$element.addClass('drag-transfer');
+            this.draggedTile.startDrag();
+        };
+        DraggableController.prototype.onDragMoveListener = function (event) {
+            var _this = this;
+            var target = event.target;
+            var x = (parseFloat(target.style.left) || 0) + event.dx;
+            var y = (parseFloat(target.style.top) || 0) + event.dy;
+            this.containerOffset = this.getContainerOffset();
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            var belowElement = this.activeDraggedGroup.getTileByCoordinates({
+                left: event.pageX - this.containerOffset.left,
+                top: event.pageY - this.containerOffset.top
+            }, this.draggedTile);
+            if (belowElement) {
+                var draggedTileIndex = this.activeDraggedGroup.getTileIndex(this.draggedTile);
+                var belowElemIndex = this.activeDraggedGroup.getTileIndex(belowElement);
+                if ((draggedTileIndex + 1) === belowElemIndex) {
+                    return;
+                }
+                this.activeDraggedGroup
+                    .swapTiles(this.draggedTile, belowElement)
+                    .setTilesDimensions(true, this.draggedTile);
+                this.$timeout(function () {
+                    _this.setGroupContainersHeight();
+                }, 0);
+            }
+        };
+        DraggableController.prototype.onDragEndListener = function () {
+            this.draggedTile.stopDrag(this.isSameDropzone);
+            this.$element.removeClass('drag-transfer');
+            this.activeDraggedGroup = null;
+            this.draggedTile = null;
+        };
+        DraggableController.prototype.getContainerOffset = function () {
+            var containerRect = this.container.getBoundingClientRect();
+            return {
+                left: containerRect.left,
+                top: containerRect.top
+            };
+        };
+        DraggableController.prototype.setGroupContainersHeight = function () {
+            this.tileGroups.forEach(function (tileGroup) {
+                tileGroup.calcContainerHeight();
+            });
+        };
+        DraggableController.prototype.moveTile = function (from, to, tile) {
+            var elem;
+            var movedTile = from.removeTile(tile);
+            var tileScope = this.createTileScope(tile);
+            $(this.groupsContainers[_.findIndex(this.tileGroups, from)])
+                .find(movedTile.getElem())
+                .remove();
+            if (to !== null) {
+                to.addTile(movedTile);
+                elem = this.$compile(movedTile.getElem())(tileScope);
+                $(this.groupsContainers[_.findIndex(this.tileGroups, to)])
+                    .append(elem);
+                this.$timeout(to.setTilesDimensions.bind(to, true));
+            }
+            this.updateTilesTemplates('moveTile', {
+                from: from,
+                to: to,
+                tile: movedTile
+            });
+        };
+        DraggableController.prototype.onDropListener = function (event) {
+            var droppedGroupIndex = event.target.attributes['data-group-id'].value;
+            var droppedGroup = this.tileGroups[droppedGroupIndex];
+            if (this.activeDraggedGroup !== droppedGroup) {
+                this.moveTile(this.activeDraggedGroup, droppedGroup, this.draggedTile);
+            }
+            this.updateTilesGroups(true);
+            this.sourceDropZoneElem = null;
+        };
+        DraggableController.prototype.onDropToFictGroupListener = function (event) {
+            var _this = this;
+            var from = this.activeDraggedGroup;
+            var tile = this.draggedTile;
+            this.addGroup({
+                title: 'New group',
+                source: []
+            });
+            this.$timeout(function () {
+                _this.moveTile(from, _this.tileGroups[_this.tileGroups.length - 1], tile);
+                _this.updateTilesGroups(true);
+            });
+            this.sourceDropZoneElem = null;
+        };
+        DraggableController.prototype.onDropEnterListener = function (event) {
+            if (!this.sourceDropZoneElem) {
+                this.sourceDropZoneElem = event.dragEvent.dragEnter;
+            }
+            if (this.sourceDropZoneElem !== event.dragEvent.dragEnter) {
+                event.dragEvent.dragEnter.classList.add('dropzone-active');
+                $('body').css('cursor', 'copy');
+                this.isSameDropzone = false;
+            }
+            else {
+                $('body').css('cursor', '');
+                this.isSameDropzone = true;
+            }
+        };
+        DraggableController.prototype.onDropDeactivateListener = function (event) {
+            if (this.sourceDropZoneElem !== event.target) {
+                event.target.classList.remove(this.opts.activeDropzoneClass);
+                $('body').css('cursor', '');
+            }
+        };
+        DraggableController.prototype.onDropLeaveListener = function (event) {
+            event.target.classList.remove(this.opts.activeDropzoneClass);
+        };
+        DraggableController.prototype.initialize = function () {
+            var _this = this;
+            this.$timeout(function () {
+                _this.availableWidth = _this.getContainerWidth();
+                _this.availableColumns = _this.getAvailableColumns(_this.availableWidth);
+                _this.groupsContainers = document.querySelectorAll(_this.opts.groupContaninerSelector);
+                _this.tileGroups = _this.initTilesGroups(_this.groups, _this.opts, _this.groupsContainers);
+                interact('.pip-draggable-tile')
+                    .draggable({
+                    autoScroll: {
+                        enabled: true,
+                        container: $('#content').get(0),
+                        speed: 500
+                    },
+                    onstart: function (event) {
+                        _this.onDragStartListener(event);
+                    },
+                    onmove: function (event) {
+                        _this.onDragMoveListener(event);
+                    },
+                    onend: function (event) {
+                        _this.onDragEndListener();
+                    }
+                });
+                interact('.pip-draggable-group.fict-group')
+                    .dropzone({
+                    ondrop: function (event) {
+                        _this.onDropToFictGroupListener(event);
+                    },
+                    ondragenter: function (event) {
+                        _this.onDropEnterListener(event);
+                    },
+                    ondropdeactivate: function (event) {
+                        _this.onDropDeactivateListener(event);
+                    },
+                    ondragleave: function (event) {
+                        _this.onDropLeaveListener(event);
+                    }
+                });
+                interact('.pip-draggable-group')
+                    .dropzone({
+                    ondrop: function (event) {
+                        _this.onDropListener(event);
+                    },
+                    ondragenter: function (event) {
+                        _this.onDropEnterListener(event);
+                    },
+                    ondropdeactivate: function (event) {
+                        _this.onDropDeactivateListener(event);
+                    },
+                    ondragleave: function (event) {
+                        _this.onDropLeaveListener(event);
+                    }
+                });
+                _this.$container
+                    .on('mousedown touchstart', 'md-menu .md-icon-button', function () {
+                    interact('.pip-draggable-tile').draggable(false);
+                    $(_this).trigger('click');
+                })
+                    .on('mouseup touchend', function () {
+                    interact('.pip-draggable-tile').draggable(true);
+                });
+            }, 0);
+        };
+        return DraggableController;
+    }());
+    var DragComponent = {
+        bindings: {
+            tilesTemplates: '=pipTilesTemplates',
+            tilesContext: '=pipTilesContext',
+            options: '=pipDraggableGrid',
+            groupMenuActions: '=pipGroupMenuActions'
+        },
+        templateUrl: 'draggable/Draggable.html',
+        controller: DraggableController
+    };
+    angular.module('pipDraggableTiles')
+        .component('pipDraggableGrid', DragComponent);
+}
+},{"../tile_group/TileGroupService":24,"./DraggableTileService":12}],12:[function(require,module,exports){
+"use strict";
+function IDragTileConstructor(constructor, options) {
+    return new constructor(options);
+}
+exports.IDragTileConstructor = IDragTileConstructor;
+var DEFAULT_TILE_SIZE = {
+    colSpan: 1,
+    rowSpan: 1
+};
+var DragTileService = (function () {
+    function DragTileService(options) {
+        this.tpl = options.tpl.get(0);
+        this.opts = options;
+        this.size = _.merge({}, DEFAULT_TILE_SIZE, options.size);
+        this.elem = null;
+    }
+    DragTileService.prototype.getSize = function () {
+        return this.size;
+    };
+    DragTileService.prototype.setSize = function (width, height) {
+        this.size.width = width;
+        this.size.height = height;
+        if (this.elem) {
+            this.elem.css({
+                width: width,
+                height: height
+            });
+        }
+        return this;
+    };
+    DragTileService.prototype.setPosition = function (left, top) {
+        this.size.left = left;
+        this.size.top = top;
+        if (this.elem) {
+            this.elem.css({
+                left: left,
+                top: top
+            });
+        }
+        return this;
+    };
+    DragTileService.prototype.getCompiledTemplate = function () {
+        return this.tpl;
+    };
+    ;
+    DragTileService.prototype.updateElem = function (parent) {
+        this.elem = $(this.tpl).parent(parent);
+        return this;
+    };
+    ;
+    DragTileService.prototype.getElem = function () {
+        return this.elem.get(0);
+    };
+    ;
+    DragTileService.prototype.startDrag = function () {
+        this.preview = $('<div>')
+            .addClass('pip-dragged-preview')
+            .css({
+            position: 'absolute',
+            left: this.elem.css('left'),
+            top: this.elem.css('top'),
+            width: this.elem.css('width'),
+            height: this.elem.css('height')
+        });
+        this.elem
+            .addClass('no-animation')
+            .css({
+            zIndex: '9999'
+        })
+            .after(this.preview);
+        return this;
+    };
+    ;
+    DragTileService.prototype.stopDrag = function (isAnimate) {
+        var self = this;
+        if (isAnimate) {
+            this.elem
+                .removeClass('no-animation')
+                .css({
+                left: this.preview.css('left'),
+                top: this.preview.css('top')
+            })
+                .on('transitionend', onTransitionEnd);
+        }
+        else {
+            self.elem
+                .css({
+                left: self.preview.css('left'),
+                top: self.preview.css('top'),
+                zIndex: ''
+            })
+                .removeClass('no-animation');
+            self.preview.remove();
+            self.preview = null;
+        }
+        return this;
+        function onTransitionEnd() {
+            if (self.preview) {
+                self.preview.remove();
+                self.preview = null;
+            }
+            self.elem
+                .css('zIndex', '')
+                .off('transitionend', onTransitionEnd);
+        }
+    };
+    ;
+    DragTileService.prototype.setPreviewPosition = function (coords) {
+        this.preview.css(coords);
+    };
+    ;
+    DragTileService.prototype.getOptions = function () {
+        return this.opts.options;
+    };
+    ;
+    DragTileService.prototype.setOptions = function (options) {
+        _.merge(this.opts.options, options);
+        _.merge(this.size, options.size);
+        return this;
+    };
+    ;
+    return DragTileService;
+}());
+exports.DragTileService = DragTileService;
+angular
+    .module('pipDraggableTiles')
+    .service('pipDragTile', function () {
+    return function (options) {
+        var newTile = new DragTileService(options);
+        return newTile;
+    };
+});
+},{}],13:[function(require,module,exports){
+"use strict";
+angular.module('pipDraggableTiles', []);
+require("./DraggableTileService");
+require("./Draggable");
+},{"./Draggable":11,"./DraggableTileService":12}],14:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var MenuTileService_1 = require("../menu_tile/MenuTileService");
+{
+    var EventTileController = (function (_super) {
+        __extends(EventTileController, _super);
+        function EventTileController($scope, $element, $timeout, pipTileConfigDialogService) {
+            var _this = _super.call(this) || this;
+            _this.$element = $element;
+            _this.$timeout = $timeout;
+            _this.pipTileConfigDialogService = pipTileConfigDialogService;
+            _this.opacity = 0.57;
+            if (_this.options) {
+                if (_this.options.menu)
+                    _this.menu = _.union(_this.menu, _this.options.menu);
+            }
+            _this.menu.push({
+                title: 'Configurate',
+                click: function () {
+                    _this.onConfigClick();
+                }
+            });
+            _this.color = _this.options.color || 'gray';
+            _this.opacity = _this.options.opacity || _this.opacity;
+            _this.drawImage();
+            $scope.$watch(function () {
+                return $element.is(':visible');
+            }, function (newVal) {
+                _this.drawImage();
+            });
+            return _this;
+        }
+        EventTileController.prototype.drawImage = function () {
+            var _this = this;
+            if (this.options.image) {
+                this.$timeout(function () {
+                    _this.onImageLoad(_this.$element.find('img'));
+                }, 500);
+            }
+        };
+        EventTileController.prototype.onConfigClick = function () {
+            var _this = this;
+            this._oldOpacity = _.clone(this.opacity);
+            this.pipTileConfigDialogService.show({
+                dialogClass: 'pip-calendar-config',
+                locals: {
+                    color: this.color,
+                    size: this.options.size || {
+                        colSpan: 1,
+                        rowSpan: 1
+                    },
+                    date: this.options.date,
+                    title: this.options.title,
+                    text: this.options.text,
+                    opacity: this.opacity,
+                    onOpacitytest: function (opacity) {
+                        _this.opacity = opacity;
+                    }
+                },
+                extensionUrl: 'event_tile/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.changeSize(result.size);
+                _this.color = result.color;
+                _this.options.color = result.color;
+                _this.options.date = result.date;
+                _this.options.title = result.title;
+                _this.options.text = result.text;
+                _this.options.opacity = result.opacity;
+            }, function () {
+                _this.opacity = _this._oldOpacity;
+            });
+        };
+        EventTileController.prototype.onImageLoad = function (image) {
+            this.setImageMarginCSS(this.$element.parent(), image);
+        };
+        EventTileController.prototype.changeSize = function (params) {
+            var _this = this;
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            if (this.options.image) {
+                this.$timeout(function () {
+                    _this.setImageMarginCSS(_this.$element.parent(), _this.$element.find('img'));
+                }, 500);
+            }
+        };
+        EventTileController.prototype.setImageMarginCSS = function ($element, image) {
+            var containerWidth = $element.width ? $element.width() : $element.clientWidth, containerHeight = $element.height ? $element.height() : $element.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0, cssParams = {};
+            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
+                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
+                cssParams['margin-left'] = '' + margin + 'px';
+                cssParams['height'] = '' + containerHeight + 'px';
+                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
+                cssParams['margin-top'] = '';
+            }
+            else {
+                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
+                cssParams['margin-top'] = '' + margin + 'px';
+                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
+                cssParams['width'] = '' + containerWidth + 'px';
+                cssParams['margin-left'] = '';
+            }
+            image.css(cssParams);
+        };
+        return EventTileController;
+    }(MenuTileService_1.MenuTileService));
+    var EventTile = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: EventTileController,
+        templateUrl: 'event_tile/EventTile.html'
+    };
+    angular
+        .module('pipDashboard')
+        .component('pipEventTile', EventTile);
+}
+},{"../menu_tile/MenuTileService":17}],15:[function(require,module,exports){
+"use strict";
+require("./tile_group/index");
+require("./draggable");
+require("./menu_tile");
+require("./add_tile_dialog");
+require("./config_tile_dialog");
+angular.module('pipDashboard', [
+    'pipDraggableTiles',
+    'pipDraggableTilesGroup',
+    'pipMenuTile',
+    'pipConfigDashboardTileDialog',
+    'pipAddDashboardTileDialog',
+    'pipDashboard.Templates',
+    'pipLayout',
+    'pipLocations',
+    'pipDateTime',
+    'pipCharts',
+    'pipTranslate',
+    'pipControls',
+    'pipButtons'
+]);
+require("./utility/TileTemplateUtility");
+require("./common_tile/Tile");
+require("./calendar_tile/CalendarTile");
+require("./event_tile/EventTile");
+require("./note_tile/NoteTile");
+require("./picture_slider_tile/PictureSliderTile");
+require("./position_tile/PositionTile");
+require("./statistics_tile/StatisticsTile");
+require("./dashboard/Dashboard");
+},{"./add_tile_dialog":3,"./calendar_tile/CalendarTile":4,"./common_tile/Tile":5,"./config_tile_dialog":9,"./dashboard/Dashboard":10,"./draggable":13,"./event_tile/EventTile":14,"./menu_tile":18,"./note_tile/NoteTile":19,"./picture_slider_tile/PictureSliderTile":20,"./position_tile/PositionTile":21,"./statistics_tile/StatisticsTile":22,"./tile_group/index":25,"./utility/TileTemplateUtility":26}],16:[function(require,module,exports){
+{
+    var TileMenu = function () {
+        return {
+            restrict: 'EA',
+            templateUrl: 'menu_tile/MenuTile.html'
+        };
+    };
+    angular
+        .module('pipMenuTile')
+        .directive('pipTileMenu', TileMenu);
+}
+},{}],17:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Tile_1 = require("../common_tile/Tile");
+var MenuTileService = (function (_super) {
+    __extends(MenuTileService, _super);
+    function MenuTileService() {
+        "ngInject";
+        var _this = _super.call(this) || this;
+        _this.menu = [{
+                title: 'Change Size',
+                action: angular.noop,
+                submenu: [{
+                        title: '1 x 1',
+                        action: 'changeSize',
+                        params: {
+                            sizeX: 1,
+                            sizeY: 1
+                        }
+                    },
+                    {
+                        title: '2 x 1',
+                        action: 'changeSize',
+                        params: {
+                            sizeX: 2,
+                            sizeY: 1
+                        }
+                    },
+                    {
+                        title: '2 x 2',
+                        action: 'changeSize',
+                        params: {
+                            sizeX: 2,
+                            sizeY: 2
+                        }
+                    }
+                ]
+            }];
+        return _this;
+    }
+    MenuTileService.prototype.callAction = function (actionName, params, item) {
+        if (this[actionName]) {
+            this[actionName].call(this, params);
+        }
+        if (item['click']) {
+            item['click'].call(item, params, this);
+        }
+    };
+    ;
+    MenuTileService.prototype.changeSize = function (params) {
+        this.options.size.colSpan = params.sizeX;
+        this.options.size.rowSpan = params.sizeY;
+    };
+    ;
+    return MenuTileService;
+}(Tile_1.DashboardTile));
+exports.MenuTileService = MenuTileService;
+{
+    var MenuTileProvider = (function () {
+        function MenuTileProvider() {
+        }
+        MenuTileProvider.prototype.$get = function () {
+            "ngInject";
+            if (this._service == null)
+                this._service = new MenuTileService();
+            return this._service;
+        };
+        return MenuTileProvider;
+    }());
+    angular
+        .module('pipMenuTile')
+        .provider('pipMenuTile', MenuTileProvider);
+}
+},{"../common_tile/Tile":5}],18:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+angular
+    .module('pipMenuTile', []);
+require("./MenuTileDirective");
+require("./MenuTileService");
+__export(require("./MenuTileService"));
+},{"./MenuTileDirective":16,"./MenuTileService":17}],19:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var MenuTileService_1 = require("../menu_tile/MenuTileService");
+{
+    var NoteTileController = (function (_super) {
+        __extends(NoteTileController, _super);
+        function NoteTileController(pipTileConfigDialogService) {
+            var _this = _super.call(this) || this;
+            _this.pipTileConfigDialogService = pipTileConfigDialogService;
+            if (_this.options) {
+                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
+            }
+            _this.menu.push({
+                title: 'Configurate',
+                click: function () {
+                    _this.onConfigClick();
+                }
+            });
+            _this.color = _this.options.color || 'orange';
+            return _this;
+        }
+        NoteTileController.prototype.onConfigClick = function () {
+            var _this = this;
+            this.pipTileConfigDialogService.show({
+                locals: {
+                    color: this.color,
+                    size: this.options.size,
+                    title: this.options.title,
+                    text: this.options.text,
+                },
+                extensionUrl: 'note_tile/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.color = result.color;
+                _this.options.color = result.color;
+                _this.changeSize(result.size);
+                _this.options.text = result.text;
+                _this.options.title = result.title;
+            });
+        };
+        return NoteTileController;
+    }(MenuTileService_1.MenuTileService));
+    var NoteTile = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: NoteTileController,
+        templateUrl: 'note_tile/NoteTile.html'
+    };
+    angular
+        .module('pipDashboard')
+        .component('pipNoteTile', NoteTile);
+}
+},{"../menu_tile/MenuTileService":17}],20:[function(require,module,exports){
+'use strict';
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var MenuTileService_1 = require("../menu_tile/MenuTileService");
+{
+    var PictureSliderController = (function (_super) {
+        __extends(PictureSliderController, _super);
+        function PictureSliderController($scope, $element, $timeout, pipTileTemplate) {
+            var _this = _super.call(this) || this;
+            _this.$scope = $scope;
+            _this.$element = $element;
+            _this.$timeout = $timeout;
+            _this.pipTileTemplate = pipTileTemplate;
+            _this.animationType = 'fading';
+            _this.animationInterval = 5000;
+            if (_this.options) {
+                _this.animationType = _this.options.animationType || _this.animationType;
+                _this.animationInterval = _this.options.animationInterval || _this.animationInterval;
+            }
+            return _this;
+        }
+        PictureSliderController.prototype.onImageLoad = function ($event) {
+            var _this = this;
+            this.$timeout(function () {
+                _this.pipTileTemplate.setImageMarginCSS(_this.$element.parent(), $event.target);
+            });
+        };
+        PictureSliderController.prototype.changeSize = function (params) {
+            var _this = this;
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            this.$timeout(function () {
+                _.each(_this.$element.find('img'), function (image) {
+                    _this.pipTileTemplate.setImageMarginCSS(_this.$element.parent(), image);
+                });
+            }, 500);
+        };
+        return PictureSliderController;
+    }(MenuTileService_1.MenuTileService));
+    var PictureSliderTile = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: PictureSliderController,
+        templateUrl: 'picture_slider_tile/PictureSliderTile.html'
+    };
+    angular
+        .module('pipDashboard')
+        .component('pipPictureSliderTile', PictureSliderTile);
+}
+},{"../menu_tile/MenuTileService":17}],21:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var MenuTileService_1 = require("../menu_tile/MenuTileService");
+{
+    var PositionTileController = (function (_super) {
+        __extends(PositionTileController, _super);
+        function PositionTileController($scope, $timeout, $element, pipTileConfigDialogService, pipLocationEditDialog) {
+            var _this = _super.call(this) || this;
+            _this.$timeout = $timeout;
+            _this.$element = $element;
+            _this.pipTileConfigDialogService = pipTileConfigDialogService;
+            _this.pipLocationEditDialog = pipLocationEditDialog;
+            _this.showPosition = true;
+            if (_this.options) {
+                if (_this.options.menu)
+                    _this.menu = _.union(_this.menu, _this.options.menu);
+            }
+            _this.menu.push({
+                title: 'Configurate',
+                click: function () {
+                    _this.onConfigClick();
+                }
+            });
+            _this.menu.push({
+                title: 'Change location',
+                click: function () {
+                    _this.openLocationEditDialog();
+                }
+            });
+            _this.options.location = _this.options.location || _this.options.position;
+            $scope.$watch('$ctrl.options.location', function () {
+                _this.reDrawPosition();
+            });
+            $scope.$watch(function () {
+                return $element.is(':visible');
+            }, function (newVal) {
+                if (newVal == true)
+                    _this.reDrawPosition();
+            });
+            return _this;
+        }
+        PositionTileController.prototype.onConfigClick = function () {
+            var _this = this;
+            this.pipTileConfigDialogService.show({
+                dialogClass: 'pip-position-config',
+                locals: {
+                    size: this.options.size,
+                    locationName: this.options.locationName,
+                    hideColors: true,
+                },
+                extensionUrl: 'position_tile/ConfigDialogExtension.html'
+            }, function (result) {
+                _this.changeSize(result.size);
+                _this.options.locationName = result.locationName;
+            });
+        };
+        PositionTileController.prototype.changeSize = function (params) {
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            this.reDrawPosition();
+        };
+        PositionTileController.prototype.openLocationEditDialog = function () {
+            var _this = this;
+            this.pipLocationEditDialog.show({
+                locationName: this.options.locationName,
+                locationPos: this.options.location
+            }, function (newPosition) {
+                if (newPosition) {
+                    _this.options.location = newPosition.location;
+                    _this.options.locationName = newPosition.locatioName;
+                }
+            });
+        };
+        PositionTileController.prototype.reDrawPosition = function () {
+            var _this = this;
+            this.showPosition = false;
+            this.$timeout(function () {
+                _this.showPosition = true;
+            }, 50);
+        };
+        return PositionTileController;
+    }(MenuTileService_1.MenuTileService));
+    var PositionTile = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: PositionTileController,
+        templateUrl: 'position_tile/PositionTile.html'
+    };
+    angular
+        .module('pipDashboard')
+        .component('pipPositionTile', PositionTile);
+}
+},{"../menu_tile/MenuTileService":17}],22:[function(require,module,exports){
+"use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var MenuTileService_1 = require("../menu_tile/MenuTileService");
+{
+    var SMALL_CHART_1 = 70;
+    var BIG_CHART_1 = 250;
+    var StatisticsTileController = (function (_super) {
+        __extends(StatisticsTileController, _super);
+        function StatisticsTileController($scope, $timeout) {
+            var _this = _super.call(this) || this;
+            _this.reset = false;
+            _this.chartSize = SMALL_CHART_1;
+            _this._$scope = $scope;
+            _this._$timeout = $timeout;
+            if (_this.options) {
+                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
+            }
+            _this.setChartSize();
+            return _this;
+        }
+        StatisticsTileController.prototype.changeSize = function (params) {
+            var _this = this;
+            this.options.size.colSpan = params.sizeX;
+            this.options.size.rowSpan = params.sizeY;
+            this.reset = true;
+            this.setChartSize();
+            this._$timeout(function () {
+                _this.reset = false;
+            }, 500);
+        };
+        StatisticsTileController.prototype.setChartSize = function () {
+            this.chartSize = this.options.size.colSpan == 2 && this.options.size.rowSpan == 2 ? BIG_CHART_1 : SMALL_CHART_1;
+        };
+        return StatisticsTileController;
+    }(MenuTileService_1.MenuTileService));
+    var StatisticsTile = {
+        bindings: {
+            options: '=pipOptions'
+        },
+        controller: StatisticsTileController,
+        templateUrl: 'statistics_tile/StatisticsTile.html'
+    };
+    angular
+        .module('pipDashboard')
+        .component('pipStatisticsTile', StatisticsTile);
+}
+},{"../menu_tile/MenuTileService":17}],23:[function(require,module,exports){
+{
+    function DraggableTileLink($scope, $elem, $attr) {
+        var docFrag = document.createDocumentFragment(), group = $scope.$eval($attr.pipDraggableTiles);
+        group.forEach(function (tile) {
+            var tpl = wrapComponent(tile.getCompiledTemplate());
+            docFrag.appendChild(tpl);
+        });
+        $elem.append(docFrag);
+        function wrapComponent(elem) {
+            return $('<div>')
+                .addClass('pip-draggable-tile')
+                .append(elem)
+                .get(0);
+        }
+    }
+    function DraggableTiles() {
+        return {
+            restrict: 'A',
+            link: function ($scope, $elem, $attr) {
+                new DraggableTileLink($scope, $elem, $attr);
+            }
+        };
+    }
+    angular
+        .module('pipDraggableTilesGroup')
+        .directive('pipDraggableTiles', DraggableTiles);
+}
+},{}],24:[function(require,module,exports){
+"use strict";
+function ITilesGridConstructor(constructor, tiles, options, columns, elem) {
+    return new constructor(tiles, options, columns, elem);
+}
+exports.ITilesGridConstructor = ITilesGridConstructor;
+var MOBILE_LAYOUT_COLUMNS = 2;
+var TilesGridService = (function () {
+    function TilesGridService(tiles, options, columns, elem) {
+        this.gridCells = [];
+        this.inline = false;
+        this.tiles = tiles;
+        this.opts = options;
+        this.columns = columns || 0;
+        this.elem = elem;
+        this.gridCells = [];
+        this.inline = options.inline || false;
+        this.isMobileLayout = columns === MOBILE_LAYOUT_COLUMNS;
+    }
+    TilesGridService.prototype.addTile = function (tile) {
+        this.tiles.push(tile);
+        if (this.tiles.length === 1) {
+            this.generateGrid();
+        }
+        return this;
+    };
+    ;
+    TilesGridService.prototype.getCellByPosition = function (row, col) {
+        return this.gridCells[row][col];
+    };
+    ;
+    TilesGridService.prototype.getCells = function (prevCell, rowSpan, colSpan) {
+        if (this.isMobileLayout) {
+            return this.getAvailableCellsMobile(prevCell, rowSpan, colSpan);
+        }
+        else {
+            return this.getAvailableCellsDesktop(prevCell, rowSpan, colSpan);
+        }
+    };
+    ;
+    TilesGridService.prototype.getAvailableCellsDesktop = function (prevCell, rowSpan, colSpan) {
+        var leftCornerCell;
+        var rightCornerCell;
+        var basicCol = prevCell && prevCell.col || 0;
+        var basicRow = this.getBasicRow(prevCell);
+        if (colSpan === 1 && rowSpan === 1) {
+            var gridCopy = this.gridCells.slice();
+            if (!prevCell) {
+                leftCornerCell = gridCopy[0][0];
+            }
+            else {
+                leftCornerCell = this.getCell(gridCopy, basicRow, basicCol, this.columns);
+                if (!leftCornerCell) {
+                    var rowShift = this.isMobileLayout ? 1 : 2;
+                    leftCornerCell = this.getCell(gridCopy, basicRow + rowShift, 0, this.columns);
+                }
+            }
+        }
+        if (colSpan === 2 && rowSpan === 1) {
+            var prevTileSize = prevCell && prevCell.elem.size || null;
+            if (!prevTileSize) {
+                leftCornerCell = this.getCellByPosition(basicRow, basicCol);
+                rightCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
+            }
+            else if (prevTileSize.colSpan === 2 && prevTileSize.rowSpan === 2) {
+                if (this.columns - basicCol - 2 > 0) {
+                    leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
+                    rightCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
+                }
+                else {
+                    leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
+                    rightCornerCell = this.getCellByPosition(basicRow + 2, 1);
+                }
+            }
+            else if (prevTileSize.colSpan === 2 && prevTileSize.rowSpan === 1) {
+                if (prevCell.row % 2 === 0) {
+                    leftCornerCell = this.getCellByPosition(basicRow + 1, basicCol - 1);
+                    rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol);
+                }
+                else {
+                    if (this.columns - basicCol - 3 >= 0) {
+                        leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
+                        rightCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
+                    }
+                    else {
+                        leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
+                        rightCornerCell = this.getCellByPosition(basicRow + 2, 1);
+                    }
+                }
+            }
+            else if (prevTileSize.colSpan === 1 && prevTileSize.rowSpan === 1) {
+                if (this.columns - basicCol - 3 >= 0) {
+                    if (this.isCellFree(basicRow, basicCol + 1)) {
+                        leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
+                        rightCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
+                    }
+                    else {
+                        leftCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
+                        rightCornerCell = this.getCellByPosition(basicRow, basicCol + 3);
+                    }
+                }
+                else {
+                    leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
+                    rightCornerCell = this.getCellByPosition(basicRow + 2, 1);
+                }
+            }
+        }
+        if (!prevCell && rowSpan === 2 && colSpan === 2) {
+            leftCornerCell = this.getCellByPosition(basicRow, basicCol);
+            rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol + 1);
+        }
+        else if (rowSpan === 2 && colSpan === 2) {
+            if (this.columns - basicCol - 2 > 0) {
+                if (this.isCellFree(basicRow, basicCol + 1)) {
+                    leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
+                    rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol + 2);
+                }
+                else {
+                    leftCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
+                    rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol + 3);
+                }
+            }
+            else {
+                leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
+                rightCornerCell = this.getCellByPosition(basicRow + 3, 1);
+            }
+        }
+        return {
+            start: leftCornerCell,
+            end: rightCornerCell
+        };
+    };
+    ;
+    TilesGridService.prototype.getCell = function (src, basicRow, basicCol, columns) {
+        var cell, col, row;
+        if (this.isMobileLayout) {
+            for (col = basicCol; col < columns; col++) {
+                if (!src[basicRow][col].elem) {
+                    cell = src[basicRow][col];
+                    break;
+                }
+            }
+            return cell;
+        }
+        for (col = basicCol; col < columns; col++) {
+            for (row = 0; row < 2; row++) {
+                if (!src[row + basicRow][col].elem) {
+                    cell = src[row + basicRow][col];
+                    break;
+                }
+            }
+            if (cell) {
+                return cell;
+            }
+        }
+    };
+    ;
+    TilesGridService.prototype.getAvailableCellsMobile = function (prevCell, rowSpan, colSpan) {
+        var leftCornerCell;
+        var rightCornerCell;
+        var basicRow = this.getBasicRow(prevCell);
+        var basicCol = prevCell && prevCell.col || 0;
+        if (colSpan === 1 && rowSpan === 1) {
+            var gridCopy = this.gridCells.slice();
+            if (!prevCell) {
+                leftCornerCell = gridCopy[0][0];
+            }
+            else {
+                leftCornerCell = this.getCell(gridCopy, basicRow, basicCol, this.columns);
+                if (!leftCornerCell) {
+                    var rowShift = this.isMobileLayout ? 1 : 2;
+                    leftCornerCell = this.getCell(gridCopy, basicRow + rowShift, 0, this.columns);
+                }
+            }
+        }
+        if (!prevCell) {
+            leftCornerCell = this.getCellByPosition(basicRow, 0);
+            rightCornerCell = this.getCellByPosition(basicRow + rowSpan - 1, 1);
+        }
+        else if (colSpan === 2) {
+            leftCornerCell = this.getCellByPosition(basicRow + 1, 0);
+            rightCornerCell = this.getCellByPosition(basicRow + rowSpan, 1);
+        }
+        return {
+            start: leftCornerCell,
+            end: rightCornerCell
+        };
+    };
+    ;
+    TilesGridService.prototype.getBasicRow = function (prevCell) {
+        var basicRow;
+        if (this.isMobileLayout) {
+            if (prevCell) {
+                basicRow = prevCell && prevCell.row || 0;
+            }
+            else {
+                basicRow = 0;
+            }
+        }
+        else {
+            if (prevCell) {
+                basicRow = prevCell.row % 2 === 0 ? prevCell.row : prevCell.row - 1;
+            }
+            else {
+                basicRow = 0;
+            }
+        }
+        return basicRow;
+    };
+    ;
+    TilesGridService.prototype.isCellFree = function (row, col) {
+        return !this.gridCells[row][col].elem;
+    };
+    ;
+    TilesGridService.prototype.getCellIndex = function (srcCell) {
+        var self = this;
+        var index;
+        this.gridCells.forEach(function (row, rowIndex) {
+            index = _.findIndex(self.gridCells[rowIndex], function (cell) {
+                return cell === srcCell;
+            });
+            if (index !== -1) {
+                return;
+            }
+        });
+        return index !== -1 ? index : 0;
+    };
+    ;
+    TilesGridService.prototype.reserveCells = function (start, end, elem) {
+        this.gridCells.forEach(function (row) {
+            row.forEach(function (cell) {
+                if (cell.row >= start.row && cell.row <= end.row &&
+                    cell.col >= start.col && cell.col <= end.col) {
+                    cell.elem = elem;
+                }
+            });
+        });
+    };
+    ;
+    TilesGridService.prototype.clearElements = function () {
+        this.gridCells.forEach(function (row) {
+            row.forEach(function (tile) {
+                tile.elem = null;
+            });
+        });
+    };
+    ;
+    TilesGridService.prototype.setAvailableColumns = function (columns) {
+        this.isMobileLayout = columns === MOBILE_LAYOUT_COLUMNS;
+        this.columns = columns;
+        return this;
+    };
+    ;
+    TilesGridService.prototype.generateGrid = function (singleTileWidth) {
+        var self = this, tileWidth = singleTileWidth || this.opts.tileWidth, offset = document.querySelector('.pip-draggable-group-title').getBoundingClientRect();
+        var colsInRow = 0, rows = 0, gridInRow = [];
+        this.gridCells = [];
+        this.tiles.forEach(function (tile, index, srcTiles) {
+            var tileSize = tile.getSize();
+            generateCells(tileSize.colSpan);
+            if (srcTiles.length === index + 1) {
+                if (colsInRow < self.columns) {
+                    generateCells(self.columns - colsInRow);
+                }
+                if (self.tiles.length * 2 > self.gridCells.length) {
+                    Array.apply(null, Array(self.tiles.length * 2 - self.gridCells.length)).forEach(function () {
+                        generateCells(self.columns);
+                    });
+                }
+            }
+        });
+        function generateCells(newCellCount) {
+            Array.apply(null, Array(newCellCount)).forEach(function () {
+                if (self.columns < colsInRow + 1) {
+                    rows++;
+                    colsInRow = 0;
+                    self.gridCells.push(gridInRow);
+                    gridInRow = [];
+                }
+                var top = rows * self.opts.tileHeight + (rows ? rows * self.opts.gutter : 0) + offset.height;
+                var left = colsInRow * tileWidth + (colsInRow ? colsInRow * self.opts.gutter : 0);
+                gridInRow.push({
+                    top: top,
+                    left: left,
+                    bottom: top + self.opts.tileHeight,
+                    right: left + tileWidth,
+                    row: rows,
+                    col: colsInRow
+                });
+                colsInRow++;
+            });
+        }
+        return this;
+    };
+    ;
+    TilesGridService.prototype.setTilesDimensions = function (onlyPosition, draggedTile) {
+        var self = this;
+        var currIndex = 0;
+        var prevCell;
+        if (onlyPosition) {
+            self.clearElements();
+        }
+        this.tiles.forEach(function (tile) {
+            var tileSize = tile.getSize();
+            var startCell;
+            var width;
+            var height;
+            var cells;
+            tile.updateElem('.pip-draggable-tile');
+            if (tileSize.colSpan === 1) {
+                if (prevCell && prevCell.elem.size.colSpan === 2 && prevCell.elem.size.rowSpan === 1) {
+                    startCell = self.getCells(self.getCellByPosition(prevCell.row, prevCell.col - 1), 1, 1).start;
+                }
+                else {
+                    startCell = self.getCells(prevCell, 1, 1).start;
+                }
+                if (!onlyPosition) {
+                    width = startCell.right - startCell.left;
+                    height = startCell.bottom - startCell.top;
+                }
+                prevCell = startCell;
+                self.reserveCells(startCell, startCell, tile);
+                currIndex++;
+            }
+            else if (tileSize.colSpan === 2) {
+                cells = self.getCells(prevCell, tileSize.rowSpan, tileSize.colSpan);
+                startCell = cells.start;
+                if (!onlyPosition) {
+                    width = cells.end.right - cells.start.left;
+                    height = cells.end.bottom - cells.start.top;
+                }
+                prevCell = cells.end;
+                self.reserveCells(cells.start, cells.end, tile);
+                currIndex += 2;
+            }
+            if (draggedTile === tile) {
+                tile.setPreviewPosition({
+                    left: startCell.left,
+                    top: startCell.top
+                });
+                return;
+            }
+            if (!onlyPosition) {
+                tile.setSize(width, height);
+            }
+            tile.setPosition(startCell.left, startCell.top);
+        });
+        return this;
+    };
+    ;
+    TilesGridService.prototype.calcContainerHeight = function () {
+        var maxHeightSize, maxWidthSize;
+        if (!this.tiles.length) {
+            return this;
+        }
+        maxHeightSize = _.maxBy(this.tiles, function (tile) {
+            var tileSize = tile['getSize']();
+            return tileSize.top + tileSize.height;
+        })['getSize']();
+        this.elem.style.height = maxHeightSize.top + maxHeightSize.height + 'px';
+        if (this.inline) {
+            maxWidthSize = _.maxBy(this.tiles, function (tile) {
+                var tileSize = tile['getSize']();
+                return tileSize.left + tileSize.width;
+            })['getSize']();
+            this.elem.style.width = maxWidthSize.left + maxWidthSize.width + 'px';
+        }
+        return this;
+    };
+    ;
+    TilesGridService.prototype.getTileByNode = function (node) {
+        var foundTile = this.tiles.filter(function (tile) {
+            return node === tile.getElem();
+        });
+        return foundTile.length ? foundTile[0] : null;
+    };
+    ;
+    TilesGridService.prototype.getTileByCoordinates = function (coords, draggedTile) {
+        return this.tiles
+            .filter(function (tile) {
+            var tileSize = tile.getSize();
+            return tile !== draggedTile &&
+                tileSize.left <= coords.left && coords.left <= (tileSize.left + tileSize.width) &&
+                tileSize.top <= coords.top && coords.top <= (tileSize.top + tileSize.height);
+        })[0] || null;
+    };
+    ;
+    TilesGridService.prototype.getTileIndex = function (tile) {
+        return _.findIndex(this.tiles, tile);
+    };
+    ;
+    TilesGridService.prototype.swapTiles = function (movedTile, beforeTile) {
+        var movedTileIndex = _.findIndex(this.tiles, movedTile);
+        var beforeTileIndex = _.findIndex(this.tiles, beforeTile);
+        this.tiles.splice(movedTileIndex, 1);
+        this.tiles.splice(beforeTileIndex, 0, movedTile);
+        return this;
+    };
+    ;
+    TilesGridService.prototype.removeTile = function (removeTile) {
+        var droppedTile;
+        this.tiles.forEach(function (tile, index, tiles) {
+            if (tile === removeTile) {
+                droppedTile = tiles.splice(index, 1)[0];
+                return false;
+            }
+        });
+        return droppedTile;
+    };
+    ;
+    TilesGridService.prototype.updateTileOptions = function (opts) {
+        var index = _.findIndex(this.tiles, function (tile) {
+            return tile['getOptions']() === opts;
+        });
+        if (index !== -1) {
+            this.tiles[index].setOptions(opts);
+            return true;
+        }
+        return false;
+    };
+    ;
+    return TilesGridService;
+}());
+exports.TilesGridService = TilesGridService;
+angular
+    .module('pipDraggableTilesGroup')
+    .service('pipTilesGrid', function () {
+    return function (tiles, options, columns, elem) {
+        var newGrid = new TilesGridService(tiles, options, columns, elem);
+        return newGrid;
+    };
+});
+},{}],25:[function(require,module,exports){
+"use strict";
+angular
+    .module('pipDraggableTilesGroup', []);
+require("./TileGroupDirective");
+require("./TileGroupService");
+},{"./TileGroupDirective":23,"./TileGroupService":24}],26:[function(require,module,exports){
+"use strict";
+{
+    var tileTemplateService = (function () {
+        tileTemplateService.$inject = ['$interpolate', '$compile', '$templateRequest'];
+        function tileTemplateService($interpolate, $compile, $templateRequest) {
+            this._$interpolate = $interpolate;
+            this._$compile = $compile;
+            this._$templateRequest = $templateRequest;
+        }
+        tileTemplateService.prototype.getTemplate = function (source, tpl, tileScope, strictCompile) {
+            var _this = this;
+            var template = source.template, templateUrl = source.templateUrl, type = source.type;
+            var result;
+            if (type) {
+                var interpolated = tpl ? this._$interpolate(tpl)(source) : this._$interpolate(template)(source);
+                return strictCompile == true ?
+                    (tileScope ? this._$compile(interpolated)(tileScope) : this._$compile(interpolated)) :
+                    interpolated;
+            }
+            if (template) {
+                return tileScope ? this._$compile(template)(tileScope) : this._$compile(template);
+            }
+            if (templateUrl) {
+                this._$templateRequest(templateUrl, false).then(function (html) {
+                    result = tileScope ? _this._$compile(html)(tileScope) : _this._$compile(html);
+                });
+            }
+            return result;
+        };
+        tileTemplateService.prototype.setImageMarginCSS = function ($element, image) {
+            var containerWidth = $element.width ? $element.width() : $element.clientWidth, containerHeight = $element.height ? $element.height() : $element.clientHeight, imageWidth = (image[0] ? image[0].naturalWidth : image.naturalWidth) || image.width, imageHeight = (image[0] ? image[0].naturalHeight : image.naturalWidth) || image.height, margin = 0, cssParams = {};
+            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
+                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
+                cssParams['margin-left'] = '' + margin + 'px';
+                cssParams['height'] = '' + containerHeight + 'px';
+                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
+                cssParams['margin-top'] = '';
+            }
+            else {
+                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
+                cssParams['margin-top'] = '' + margin + 'px';
+                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
+                cssParams['width'] = '' + containerWidth + 'px';
+                cssParams['margin-left'] = '';
+            }
+            $(image).css(cssParams);
+        };
+        return tileTemplateService;
+    }());
+    var ImageLoad = function ImageLoad($parse) {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                var callback = $parse(attrs.pipImageLoad);
+                element.bind('load', function (event) {
+                    callback(scope, {
+                        $event: event
+                    });
+                });
+            }
+        };
+    };
+    ImageLoad.$inject = ['$parse'];
+    angular
+        .module('pipDashboard')
+        .service('pipTileTemplate', tileTemplateService)
+        .directive('pipImageLoad', ImageLoad);
+}
+},{}],27:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('calendar_tile/CalendarTile.html',
+    '<div class="widget-box pip-calendar-widget {{ $ctrl.color }} layout-column layout-fill tp0" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-end-center flex-none"><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="date lm24 rm12">{{ $ctrl.options.date.getDate() }}</span><div class="flex-auto layout-column"><span class="weekday md-headline">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div><div class="widget-content flex-auto layout-column layout-align-space-around-center" ng-hide="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="weekday md-headline" ng-hide="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="weekday" ng-show="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="date lm12 rm12">{{ $ctrl.options.date.getDate() }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div>');
+}]);
+})();
 
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('calendar_tile/ConfigDialogExtension.html',
+    '<div class="w-stretch bm16">Date:<md-datepicker ng-model="$ctrl.date" class="w-stretch"></md-datepicker></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('add_tile_dialog/AddTile.html',
+    '<md-dialog class="pip-dialog pip-add-component-dialog"><md-dialog-content class="layout-column"><div class="theme-divider p16 flex-auto"><h3 class="hide-xs m0 bm16 theme-text-primary" hide-xs="">{{ \'DASHBOARD_ADD_TILE_DIALOG_TITLE\' | translate }}<md-input-container class="layout-row flex-auto m0 tm16"><md-select class="flex-auto m0 theme-text-primary" ng-model="dialogCtrl.activeGroupIndex" placeholder="{{ \'DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP\' | translate }}" aria-label="Group"><md-option ng-value="$index" ng-repeat="group in dialogCtrl.groups">{{ group }}</md-option></md-select></md-input-container></h3></div><div class="pip-body pip-scroll p0 flex-auto"><p class="md-body-1 theme-text-secondary m0 lp16 rp16">{{ \'DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS\' | translate }}</p><md-list ng-init="groupIndex = $index" ng-repeat="group in dialogCtrl.defaultWidgets"><md-list-item class="layout-row pip-list-item lp16 rp16" ng-repeat="item in group"><div class="icon-holder flex-none"><md-icon md-svg-icon="icons:{{:: item.icon }}"></md-icon><div class="pip-badge theme-badge md-warn" ng-if="item.amount"><span>{{ item.amount }}</span></div></div><span class="flex-auto lm24 theme-text-primary">{{:: item.title }}</span><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.encrease(groupIndex, $index)" aria-label="Encrease"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.decrease(groupIndex, $index)" aria-label="Decrease"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button></md-list-item><md-divider class="lm72 tm8 bm8" ng-if="groupIndex !== (dialogCtrl.defaultWidgets.length - 1)"></md-divider></md-list></div></md-dialog-content><md-dialog-actions class="flex-none layout-align-end-center theme-divider divider-top theme-text-primary"><md-button ng-click="dialogCtrl.cancel()" aria-label="Cancel">{{ \'CANCEL\' | translate }}</md-button><md-button ng-click="dialogCtrl.add()" ng-disabled="dialogCtrl.totalWidgets === 0" arial-label="Add">{{ \'ADD\' | translate }}</md-button></md-dialog-actions></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('config_tile_dialog/ConfigDialog.html',
+    '<md-dialog class="pip-dialog pip-tile-config-dialog {{ vm.params.dialogClass }}" width="400" md-theme="{{vm.theme}}"><pip-tile-config-extend-component class="layout-column" pip-dialog-scope="vm" pip-extension-url="vm.extensionUrl" pip-apply="vm.onApply(updatedData)"></pip-tile-config-extend-component></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('config_tile_dialog/ConfigDialogExtendComponent.html',
+    '<h3 class="tm0 flex-none">{{ \'DASHBOARD_TILE_CONFIG_DIALOG_TITLE\' | translate }}</h3><div class="pip-body pip-scroll p16 bp0 flex-auto"><pip-extension-point></pip-extension-point><pip-toggle-buttons class="bm16" ng-if="!$ctrl.hideSizes" pip-buttons="$ctrl.sizes" ng-model="$ctrl.sizeId"></pip-toggle-buttons><pip-color-picker ng-if="!$ctrl.hideColors" pip-colors="$ctrl.colors" ng-model="$ctrl.color"></pip-color-picker></div><div class="pip-footer flex-none"><div><md-button class="md-accent" ng-click="$ctrl.onCancel()">{{ \'CANCEL\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onApply()">{{ \'APPLY\' | translate }}</md-button></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dashboard/Dashboard.html',
+    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="$ctrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="$ctrl.groupedWidgets" pip-tiles-context="$ctrl.widgetsContext" pip-draggable-grid="$ctrl.draggableGridOptions" pip-group-menu-actions="$ctrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('draggable/Draggable.html',
+    '<div class="pip-draggable-holder"><div class="pip-draggable-group" ng-repeat="group in $ctrl.groups" data-group-id="{{ $index }}" pip-draggable-tiles="group.source"><div class="pip-draggable-group-title layout-row layout-align-start-center"><div class="title-input-container" ng-click="$ctrl.onTitleClick(group, $event)"><input ng-if="group.editingName" ng-blur="$ctrl.onBlurTitleInput(group)" ng-keypress="$ctrl.onKyepressTitleInput(group, $event)" ng-model="group.title"><div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div></div><md-button class="md-icon-button flex-none layout-align-center-center" ng-show="group.editingName" ng-click="$ctrl.cancelEditing(group)" aria-label="Cancel"><md-icon md-svg-icon="icons:cross"></md-icon></md-button><md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName"><md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu"><md-icon md-svg-icon="icons:dots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="action in $ctrl.groupMenuActions"><md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button></md-menu-item></md-menu-content></md-menu></div></div><div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16"><div class="fict-group-text-container"><md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}</div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('event_tile/ConfigDialogExtension.html',
+    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container>Date:<md-datepicker ng-model="$ctrl.date" class="w-stretch bm8"></md-datepicker><md-input-container class="w-stretch"><label>Description:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
+    '    </textarea></md-input-container>Backdrop\'s opacity:<md-slider aria-label="opacity" type="number" min="0.1" max="0.9" step="0.01" ng-model="$ctrl.opacity" ng-change="$ctrl.onOpacitytest($ctrl.opacity)"></md-slider></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('event_tile/EventTile.html',
+    '<div class="widget-box pip-event-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><img ng-if="$ctrl.options.image" ng-src="{{$ctrl.options.image}}" alt="{{$ctrl.options.title || $ctrl.options.name}}"><div class="text-backdrop" style="background-color: rgba(0, 0, 0, {{ $ctrl.opacity }})"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="text-container flex-auto pip-scroll"><p class="date flex-none" ng-if="$ctrl.options.date">{{ $ctrl.options.date | formatShortDate }}</p><p class="text flex-auto">{{ $ctrl.options.text || $ctrl.options.description }}</p></div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('note_tile/ConfigDialogExtension.html',
+    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container><md-input-container class="w-stretch tm0"><label>Text:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
+    '    </textarea></md-input-container></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('note_tile/NoteTile.html',
+    '<div class="widget-box pip-notes-widget {{ $ctrl.color }} layout-column"><div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="$ctrl.options.title || $ctrl.options.name"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span></div><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu><div class="text-container flex-auto pip-scroll"><p>{{ $ctrl.options.text }}</p></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('menu_tile/MenuTile.html',
+    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('picture_slider_tile/PictureSliderTile.html',
+    '<div class="widget-box pip-picture-slider-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ $ctrl.options.title }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('position_tile/ConfigDialogExtension.html',
+    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Location name:</label> <input type="text" ng-model="$ctrl.locationName"></md-input-container></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('position_tile/PositionTile.html',
+    '<div class="pip-position-widget widget-box p0 layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="position-absolute-right-top" ng-if="!$ctrl.options.locationName"><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="$ctrl.options.locationName"><span class="flex text-overflow">{{ $ctrl.options.locationName }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><pip-location-map class="flex" ng-if="$ctrl.showPosition" pip-stretch="true" pip-rebind="true" pip-location-pos="$ctrl.options.location"></pip-location-map></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('statistics_tile/StatisticsTile.html',
+    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.series && !$ctrl.reset"><pip-pie-chart pip-series="$ctrl.options.series" ng-if="!$ctrl.options.chartType || $ctrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="$ctrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
+}]);
+})();
+
+
+
+},{}]},{},[15,27])(27)
+});
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
