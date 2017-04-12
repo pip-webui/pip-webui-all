@@ -311,10 +311,10 @@ declare module pip.behaviors {
 
 
 
+
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
-
 
 
 
@@ -401,6 +401,15 @@ declare module pip.controls {
 
 var marked: any;
 
+
+export interface IPopoverService {
+    show(p: Object): void;
+    hide(): void;
+    resize(): void;
+}
+
+
+
 export interface IImageSliderService {
     registerSlider(sliderId: string, sliderScope: any): void;
     removeSlider(sliderId: string): void;
@@ -413,15 +422,6 @@ export interface IImageSliderService {
 
 
 
-
-
-
-
-export interface IPopoverService {
-    show(p: Object): void;
-    hide(): void;
-    resize(): void;
-}
 
 
 
@@ -462,6 +462,8 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
+
 
 
 
@@ -536,8 +538,6 @@ export interface IDateFormatService {
 }
 export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
-
-
 
 
 
@@ -739,19 +739,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
 
 export class BreadcrumbItem {
     title: string;
@@ -779,6 +766,50 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
 
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+
+
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
 
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
@@ -816,38 +847,36 @@ export class NavHeaderConfig {
 
 export let NavHeaderChangedEvent: string;
 
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
+
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
     clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
 }
 
 
-
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
 }
 
-export const NavIconClickedEvent: string;
-export const NavIconChangedEvent: string;
-
-
-
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 export interface INavMenuService {
     sections: NavMenuSection[];
@@ -894,35 +923,6 @@ export class NavMenuConfig {
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
 
 
 export interface ISideNavService {
@@ -1073,7 +1073,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
 
 
 
-
 export interface IFormErrorsService {
     errorsWithHint(field: any): any;
     touchedErrorsWithHint(form: ng.IFormController, field: any): any;
@@ -1082,6 +1081,7 @@ export interface IFormErrorsService {
     setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
     goToUnhandledErrorPage(error: any): any;
 }
+
 
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
@@ -1118,6 +1118,7 @@ declare module pip.locations {
 
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1131,7 +1132,6 @@ export class LocationDialogParams {
 
 
 let google: any;
-
 
 }
 
@@ -1192,6 +1192,7 @@ export interface IAddTileDialogprovider {
 
 
 
+
 export interface IDashboardTile {
     options: any;
     color: string;
@@ -1224,6 +1225,16 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     dialogClass?: string;
     extensionUrl?: string;
     event?: any;
+}
+
+
+
+
+export class MenuTileService extends DashboardTile {
+    menu: any;
+    constructor();
+    callAction(actionName: any, params: any, item: any): void;
+    changeSize(params: any): void;
 }
 
 
@@ -1274,18 +1285,6 @@ export class DragTileService implements IDragTileService {
     setOptions(options: any): any;
 }
 
-
-
-
-
-
-
-export class MenuTileService extends DashboardTile {
-    menu: any;
-    constructor();
-    callAction(actionName: any, params: any, item: any): void;
-    changeSize(params: any): void;
-}
 
 
 
@@ -1356,6 +1355,7 @@ export class TilesGridService implements ITilesGridService {
     removeTile(removeTile: any): any;
     updateTileOptions(opts: any): any;
 }
+
 
 export interface ITileTemplateService {
     getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
