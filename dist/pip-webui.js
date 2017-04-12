@@ -1,8 +1,9 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).services = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./translate");
 require("./session");
 require("./transactions");
@@ -25,28 +26,32 @@ __export(require("./translate"));
 __export(require("./session"));
 __export(require("./transactions"));
 __export(require("./routing"));
-__export(require("./utilities"));
 },{"./routing":5,"./session":8,"./transactions":13,"./translate":18,"./utilities":26}],2:[function(require,module,exports){
-'use strict';
+"use strict";
 captureStateTranslations.$inject = ['$rootScope'];
-decorateBackStateService.$inject = ['$delegate', '$window'];
+decorateBackStateService.$inject = ['$delegate', '$window', '$rootScope'];
 addBackStateDecorator.$inject = ['$provide'];
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StateVar = "$state";
+exports.PrevStateVar = "$prevState";
 function captureStateTranslations($rootScope) {
     "ngInject";
     $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-        exports.CurrentState = {
+        var CurrentState = {
             name: toState.name,
             url: toState.url,
             params: toParams
         };
-        exports.PreviousState = {
+        var PreviousState = {
             name: fromState.name,
             url: fromState.url,
             params: fromParams
         };
+        $rootScope[exports.StateVar] = CurrentState;
+        $rootScope[exports.PrevStateVar] = PreviousState;
     });
 }
-function decorateBackStateService($delegate, $window) {
+function decorateBackStateService($delegate, $window, $rootScope) {
     "ngInject";
     $delegate.goBack = goBack;
     $delegate.goBackAndSelect = goBackAndSelect;
@@ -55,9 +60,8 @@ function decorateBackStateService($delegate, $window) {
         $window.history.back();
     }
     function goBackAndSelect(params) {
-        if (exports.PreviousState != null
-            && exports.PreviousState.name != null) {
-            var state = _.cloneDeep(exports.PreviousState);
+        if (!!$rootScope[exports.StateVar] && !!$rootScope[exports.PrevStateVar]) {
+            var state = _.cloneDeep($rootScope[exports.PrevStateVar]);
             state.params = _.extend(state.params, params);
             $delegate.go(state.name, state.params);
         }
@@ -74,7 +78,6 @@ angular
     .config(addBackStateDecorator)
     .run(captureStateTranslations);
 },{}],3:[function(require,module,exports){
-'use strict';
 decorateRedirectStateProvider.$inject = ['$delegate'];
 addRedirectStateProviderDecorator.$inject = ['$provide'];
 decorateRedirectStateService.$inject = ['$delegate', '$timeout'];
@@ -123,8 +126,9 @@ angular
     .config(addRedirectStateProviderDecorator)
     .config(addRedirectStateDecorator);
 },{}],4:[function(require,module,exports){
-'use strict';
+"use strict";
 hookRoutingEvents.$inject = ['$rootScope', '$log', '$state'];
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoutingVar = "$routing";
 function hookRoutingEvents($rootScope, $log, $state) {
     "ngInject";
@@ -139,26 +143,16 @@ function hookRoutingEvents($rootScope, $log, $state) {
         $log.error('Error while switching route to ' + toState.name);
         $log.error(error);
     });
-    $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
-        event.preventDefault();
-        $rootScope[exports.RoutingVar] = false;
-        $state.go('errors_missing_route', {
-            unfoundState: unfoundState,
-            fromState: {
-                to: fromState ? fromState.name : '',
-                fromParams: fromParams
-            }
-        });
-    });
 }
 angular
     .module('pipRouting')
     .run(hookRoutingEvents);
 },{}],5:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipRouting', ['ui.router']);
 require("./BackDecorator");
 require("./RedirectDecorator");
@@ -166,7 +160,8 @@ require("./RoutingEvents");
 __export(require("./BackDecorator"));
 __export(require("./RoutingEvents"));
 },{"./BackDecorator":2,"./RedirectDecorator":3,"./RoutingEvents":4}],6:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.IdentityRootVar = "$identity";
 exports.IdentityChangedEvent = "pipIdentityChanged";
 var IdentityService = (function () {
@@ -235,7 +230,8 @@ angular
     .module('pipSession')
     .provider('pipIdentity', IdentityProvider);
 },{}],7:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionRootVar = "$session";
 exports.SessionOpenedEvent = "pipSessionOpened";
 exports.SessionClosedEvent = "pipSessionClosed";
@@ -320,17 +316,19 @@ angular
     .module('pipSession')
     .provider('pipSession', SessionProvider);
 },{}],8:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSession', []);
 require("./IdentityService");
 require("./SessionService");
 __export(require("./IdentityService"));
 __export(require("./SessionService"));
 },{"./IdentityService":6,"./SessionService":7}],9:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionError_1 = require("./TransactionError");
 var Transaction = (function () {
     function Transaction(scope) {
@@ -421,7 +419,8 @@ var Transaction = (function () {
 }());
 exports.Transaction = Transaction;
 },{"./TransactionError":10}],10:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionError = (function () {
     function TransactionError(error) {
         if (error != null)
@@ -441,23 +440,26 @@ var TransactionError = (function () {
         this.reset();
         if (error == null)
             return;
-        if (error.message)
+        if (error.message) {
             this.message = error.message;
+        }
         if (error.data) {
             if (error.data.code) {
                 this.message = this.message || 'ERROR_' + error.data.code;
                 this.code = this.code || error.data.code;
             }
-            if (error.data.message)
+            if (error.data.message) {
                 this.message = this.message || error.data.message;
+            }
             this.message = this.message || error.data;
             this.details = this.details || error.data;
             this.cause = error.data.cause;
             this.stack_trace = error.data.stack_trace;
             this.details = error.data.details;
         }
-        if (error.statusText)
+        if (error.statusText) {
             this.message = this.message || error.statusText;
+        }
         if (error.status) {
             this.message = this.message || 'ERROR_' + error.status;
             this.code = this.code || error.status;
@@ -469,7 +471,8 @@ var TransactionError = (function () {
 }());
 exports.TransactionError = TransactionError;
 },{}],11:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Transaction_1 = require("./Transaction");
 var TransactionService = (function () {
     function TransactionService() {
@@ -496,11 +499,13 @@ angular
     .module('pipTransaction')
     .service('pipTransaction', TransactionService);
 },{"./Transaction":9}],12:[function(require,module,exports){
-'use strict';
+"use strict";
 configureTransactionStrings.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
 function configureTransactionStrings($injector) {
     "ngInject";
-    var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
+    var pipTranslate = $injector.has('pipTranslateProvider')
+        ? $injector.get('pipTranslateProvider') : null;
     if (pipTranslate) {
         pipTranslate.setTranslations('en', {
             'ENTERING': 'Entering...',
@@ -520,10 +525,11 @@ angular
     .module('pipTransaction')
     .config(configureTransactionStrings);
 },{}],13:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTransaction', []);
 require("./TransactionStrings");
 require("./TransactionError");
@@ -532,9 +538,10 @@ require("./TransactionService");
 __export(require("./TransactionError"));
 __export(require("./Transaction"));
 },{"./Transaction":9,"./TransactionError":10,"./TransactionService":11,"./TransactionStrings":12}],14:[function(require,module,exports){
-'use strict';
+"use strict";
 translateDirective.$inject = ['pipTranslate'];
 translateHtmlDirective.$inject = ['pipTranslate'];
+Object.defineProperty(exports, "__esModule", { value: true });
 function translateDirective(pipTranslate) {
     "ngInject";
     return {
@@ -570,9 +577,10 @@ angular
     .directive('pipTranslate', translateDirective)
     .directive('pipTranslateHtml', translateHtmlDirective);
 },{}],15:[function(require,module,exports){
-'use strict';
+"use strict";
 translateFilter.$inject = ['pipTranslate'];
 optionalTranslateFilter.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
 function translateFilter(pipTranslate) {
     "ngInject";
     return function (key) {
@@ -591,13 +599,19 @@ angular
     .module('pipTranslate')
     .filter('translate', translateFilter);
 },{}],16:[function(require,module,exports){
-'use strict';
+"use strict";
 initTranslate.$inject = ['pipTranslate'];
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var Translation_1 = require("./Translation");
 var PageResetService_1 = require("../utilities/PageResetService");
 exports.LanguageRootVar = "$language";
@@ -729,7 +743,8 @@ angular
     .provider('pipTranslate', TranslateProvider)
     .run(initTranslate);
 },{"../utilities/PageResetService":21,"./Translation":17}],17:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Translation = (function () {
     function Translation() {
         this._language = 'en';
@@ -863,10 +878,11 @@ var Translation = (function () {
 }());
 exports.Translation = Translation;
 },{}],18:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTranslate', []);
 require("./Translation");
 require("./TranslateService");
@@ -875,7 +891,8 @@ require("./TranslateDirective");
 __export(require("./Translation"));
 __export(require("./TranslateService"));
 },{"./TranslateDirective":14,"./TranslateFilter":15,"./TranslateService":16,"./Translation":17}],19:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Codes = (function () {
     function Codes() {
     }
@@ -896,22 +913,25 @@ angular
     .module('pipCodes', [])
     .service('pipCodes', Codes);
 },{}],20:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Format = (function () {
     function Format() {
         this.cache = {};
     }
     Format.prototype.sample = function (value, maxLength) {
-        if (!value || value == '')
+        if (!value || value == '') {
             return '';
+        }
         var length = value.indexOf('\n');
         length = length >= 0 ? length : value.length;
         length = length < maxLength ? value.length : maxLength;
         return value.substring(0, length);
     };
     Format.prototype.strRepeat = function (str, qty) {
-        if (qty < 1)
+        if (qty < 1) {
             return '';
+        }
         var result = '';
         while (qty > 0) {
             if (qty & 1)
@@ -1056,8 +1076,9 @@ angular
     .module('pipFormat', [])
     .service('pipFormat', Format);
 },{}],21:[function(require,module,exports){
-'use strict';
+"use strict";
 hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPageEvent = "pipResetPage";
 exports.ResetAreaEvent = "pipResetArea";
 exports.ResetRootVar = "$reset";
@@ -1098,7 +1119,8 @@ angular.module('pipPageReset', [])
     .service('pipPageReset', PageResetService)
     .run(hookResetEvents);
 },{}],22:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ScrollService = (function () {
     function ScrollService() {
     }
@@ -1126,7 +1148,8 @@ angular
     .module('pipScroll', [])
     .service('pipScroll', ScrollService);
 },{}],23:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SystemInfo = (function () {
     SystemInfo.$inject = ['$window'];
     function SystemInfo($window) {
@@ -1260,7 +1283,8 @@ angular
     .module('pipSystemInfo', [])
     .service('pipSystemInfo', SystemInfo);
 },{}],24:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Tags = (function () {
     function Tags() {
     }
@@ -1313,7 +1337,8 @@ angular
     .module('pipTags', [])
     .service('pipTags', Tags);
 },{}],25:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var TimerEvent = (function () {
     function TimerEvent(event, timeout) {
         this.event = event;
@@ -1402,10 +1427,8 @@ var TimerService = (function () {
 angular.module('pipTimer', [])
     .service('pipTimer', TimerService);
 },{}],26:[function(require,module,exports){
-'use strict';
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./Format");
 require("./TimerService");
 require("./ScrollService");
@@ -1413,9 +1436,10 @@ require("./Tags");
 require("./Codes");
 require("./SystemInfo");
 require("./PageResetService");
-__export(require("./PageResetService"));
 },{"./Codes":19,"./Format":20,"./PageResetService":21,"./ScrollService":22,"./SystemInfo":23,"./Tags":24,"./TimerService":25}]},{},[1])(1)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -1465,6 +1489,7 @@ __export(require("./PageResetService"));
 }
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./refresh_button/RefreshButton");
 require("./toggle_buttons/ToggleButtons");
 require("./fabs/FabTooltipVisibility");
@@ -1673,12 +1698,17 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[6,1,2,3,4,5])(6)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var MediaService_1 = require("../media/MediaService");
 {
     var AuxPanelDirectiveController = (function () {
+        AuxPanelDirectiveController.$inject = ['pipAuxPanel'];
         function AuxPanelDirectiveController(pipAuxPanel) {
+            "ngInject";
             this.pipAuxPanel = pipAuxPanel;
             this.normalSize = 320;
             this.largeSize = 480;
@@ -1752,6 +1782,7 @@ var MediaService_1 = require("../media/MediaService");
 },{}],3:[function(require,module,exports){
 "use strict";
 hookAuxPanelEvents.$inject = ['$rootScope', 'pipAuxPanel'];
+Object.defineProperty(exports, "__esModule", { value: true });
 var IAuxPanelService_1 = require("./IAuxPanelService");
 var IAuxPanelService_2 = require("./IAuxPanelService");
 var AuxPanelService = (function () {
@@ -1932,6 +1963,7 @@ var AuxPanelProvider = (function () {
     return AuxPanelProvider;
 }());
 function hookAuxPanelEvents($rootScope, pipAuxPanel) {
+    "ngInject";
     $rootScope.$on(IAuxPanelService_1.OpenAuxPanelEvent, function () { pipAuxPanel.open(); });
     $rootScope.$on(IAuxPanelService_1.CloseAuxPanelEvent, function () { pipAuxPanel.close(); });
 }
@@ -1941,6 +1973,7 @@ angular
     .run(hookAuxPanelEvents);
 },{"./IAuxPanelService":4}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuxPanelChangedEvent = 'pipAuxPanelChanged';
 exports.AuxPanelStateChangedEvent = 'pipAuxPanelStateChanged';
 exports.OpenAuxPanelEvent = 'pipOpenAuxPanel';
@@ -1956,6 +1989,7 @@ exports.AuxPanelConfig = AuxPanelConfig;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipAuxPanel', ['ngMaterial']);
 require("./AuxPanelService");
 require("./AuxPanelPart");
@@ -1966,6 +2000,7 @@ __export(require("./IAuxPanelService"));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLayout', ['wu.masonry', 'pipMedia', 'pipAuxPanel']);
 require("./media/index");
 require("./layouts/MainDirective");
@@ -1978,6 +2013,7 @@ require("./auxpanel/index");
 __export(require("./media/index"));
 },{"./auxpanel/index":5,"./layouts/CardDirective":7,"./layouts/DialogDirective":8,"./layouts/DocumentDirective":9,"./layouts/MainDirective":10,"./layouts/SimpleDirective":11,"./layouts/TilesDirective":12,"./media/index":16}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
 (function () {
@@ -2093,6 +2129,7 @@ var MediaService_1 = require("../media/MediaService");
 })();
 },{}],10:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
@@ -2100,6 +2137,7 @@ var MediaService_1 = require("../media/MediaService");
     var MainDirectiveController = (function () {
         MainDirectiveController.$inject = ['$scope', '$element', '$rootScope', '$timeout', '$attrs'];
         function MainDirectiveController($scope, $element, $rootScope, $timeout, $attrs) {
+            "ngInject";
             var _this = this;
             this.$scope = $scope;
             this.$element = $element;
@@ -2136,12 +2174,15 @@ var MediaService_1 = require("../media/MediaService");
         return MainDirectiveController;
     }());
     var MainBodyDirectiveLink = (function () {
+        MainBodyDirectiveLink.$inject = ['$scope', '$element'];
         function MainBodyDirectiveLink($scope, $element) {
+            "ngInject";
             $element.addClass('pip-main-body');
         }
         return MainBodyDirectiveLink;
     }());
     function mainDirective() {
+        "ngInject";
         return {
             restrict: 'EA',
             controller: MainDirectiveController,
@@ -2149,6 +2190,7 @@ var MediaService_1 = require("../media/MediaService");
         };
     }
     function mainBodyDirective() {
+        "ngInject";
         return {
             restrict: 'EA',
             link: MainBodyDirectiveLink
@@ -2162,6 +2204,7 @@ var MediaService_1 = require("../media/MediaService");
 },{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],11:[function(require,module,exports){
 (function () {
     function simpleDirective() {
+        "ngInject";
         return {
             restrict: 'EA',
             link: function ($scope, $element, $attrs) {
@@ -2176,6 +2219,7 @@ var MediaService_1 = require("../media/MediaService");
 },{}],12:[function(require,module,exports){
 "use strict";
 tilesDirective.$inject = ['$rootScope'];
+Object.defineProperty(exports, "__esModule", { value: true });
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
@@ -2185,15 +2229,17 @@ var TilesOptions = (function () {
     return TilesOptions;
 }());
 var TilesDirectiveLink = (function () {
+    TilesDirectiveLink.$inject = ['$scope', '$element', '$attrs', '$rootScope'];
     function TilesDirectiveLink($scope, $element, $attrs, $rootScope) {
+        "ngInject";
         var _this = this;
         this.$element = $element;
         this.$attrs = $attrs;
         this.$rootScope = $rootScope;
-        this._columnWidth = $attrs.columnWidth ? Math.floor(Number($attrs.columnWidth)) : 440,
-            this._container = $element.children('.pip-tiles-container'),
-            this._prevContainerWidth = null,
-            this._masonry = Masonry.data(this._container[0]);
+        this._columnWidth = $attrs.columnWidth ? Math.floor(Number($attrs.columnWidth)) : 440;
+        this._container = $element.children('.pip-tiles-container');
+        this._prevContainerWidth = null;
+        this._masonry = Masonry.data(this._container[0]);
         $element.addClass('pip-tiles');
         var listener = function () { _this.resize(false); };
         ResizeFunctions_1.addResizeListener($element[0], listener);
@@ -2289,6 +2335,7 @@ angular
     .directive('pipTiles', tilesDirective);
 },{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainResizedEvent = 'pipMainResized';
 exports.LayoutResizedEvent = 'pipLayoutResized';
 var MediaBreakpoints = (function () {
@@ -2323,6 +2370,7 @@ var MediaBreakpointStatuses = (function () {
 exports.MediaBreakpointStatuses = MediaBreakpointStatuses;
 },{}],14:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var IMediaService_1 = require("./IMediaService");
 exports.MainBreakpoints = new IMediaService_1.MediaBreakpoints(639, 716, 1024, 1439);
 exports.MainBreakpointStatuses = new IMediaService_1.MediaBreakpointStatuses();
@@ -2364,9 +2412,14 @@ angular
     .provider('pipMedia', MediaProvider);
 },{"./IMediaService":13}],15:[function(require,module,exports){
 "use strict";
+requestFrame.$inject = ['callback'];
+addResizeListener.$inject = ['element', 'listener'];
+removeResizeListener.$inject = ['element', 'listener'];
+Object.defineProperty(exports, "__esModule", { value: true });
 var attachEvent = document.attachEvent;
 var isIE = navigator.userAgent.match(/Trident/);
 function requestFrame(callback) {
+    "ngInject";
     var frame = window.requestAnimationFrame
         || window.mozRequestAnimationFrame
         || window.webkitRequestAnimationFrame
@@ -2376,6 +2429,7 @@ function requestFrame(callback) {
     return frame(callback);
 }
 function cancelFrame() {
+    "ngInject";
     var cancel = window.cancelAnimationFrame
         || window.mozCancelAnimationFrame
         || window.webkitCancelAnimationFrame
@@ -2402,6 +2456,7 @@ function loadListener(event) {
     }
 }
 function addResizeListener(element, listener) {
+    "ngInject";
     if (!element.__resizeListeners__) {
         element.__resizeListeners__ = [];
         if (attachEvent) {
@@ -2427,6 +2482,7 @@ function addResizeListener(element, listener) {
 }
 exports.addResizeListener = addResizeListener;
 function removeResizeListener(element, listener) {
+    "ngInject";
     if (listener)
         element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(listener), 1);
     if (!element.__resizeListeners__.length) {
@@ -2446,6 +2502,7 @@ exports.removeResizeListener = removeResizeListener;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipMedia', []);
 require("./MediaService");
 require("./ResizeFunctions");
@@ -2455,57 +2512,7 @@ __export(require("./ResizeFunctions"));
 },{"./IMediaService":13,"./MediaService":14,"./ResizeFunctions":15}]},{},[6])(6)
 });
 
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipSplit', []);
-    thisModule.run(['$rootScope', 'pipSplit', function ($rootScope, pipSplit) {
-        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-            var splitElements = $('.pip-split');
-            if (splitElements.length > 0) {
-                splitElements.removeClass('pip-transition-forward');
-                splitElements.removeClass('pip-transition-back');
-                if (toState.name != fromState.name) {
-                    if (pipSplit.forwardTransition(toState, fromState)) {
-                        splitElements.addClass('pip-transition-forward');
-                    }
-                    else {
-                        splitElements.addClass('pip-transition-back');
-                    }
-                }
-            }
-        });
-    }]);
-    thisModule.provider('pipSplit', function () {
-        var transitionSequences = [];
-        this.addTransitionSequence = addTransitionSequence;
-        this.$get = function () {
-            return {
-                forwardTransition: forwardTransition
-            };
-        };
-        return;
-        function addTransitionSequence(sequence) {
-            if (!_.isArray(sequence) || sequence.length == 0) {
-                throw new Error('Transition sequence must be an array of state names');
-            }
-            transitionSequences.push(sequence);
-        }
-        function forwardTransition(toState, fromState) {
-            var i, toIndex, fromIndex;
-            for (i = 0; i < transitionSequences.length; i++) {
-                toIndex = transitionSequences[i].indexOf(toState.name),
-                    fromIndex = transitionSequences[i].indexOf(fromState.name);
-                if (toIndex > -1) {
-                    return toIndex > fromIndex;
-                }
-            }
-            return false;
-        }
-    });
-})();
-},{}]},{},[1])(1)
-});
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -2529,6 +2536,7 @@ __export(require("./ResizeFunctions"));
 }
 },{}],2:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var DragLink_1 = (function () {
         function DragLink_1($rootScope, $parse, $document, $window, pipDraggable, $scope, $element, $attrs) {
@@ -2896,6 +2904,7 @@ __export(require("./ResizeFunctions"));
 }
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var DraggableService = (function () {
     function DraggableService() {
     }
@@ -2916,6 +2925,7 @@ angular
     .service('pipDraggable', DraggableService);
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var DropLink_1 = (function () {
         function DropLink_1($parse, $document, $timeout, pipDraggable, $scope, $element, $attrs) {
@@ -3108,6 +3118,7 @@ angular
 }
 },{}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module("pipDraggable", []);
 require("./DraggableService");
 require("./Drag");
@@ -3259,12 +3270,13 @@ require("./CancelDrag");
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require("./unsaved_changes/unsavedChanges");
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./unsaved_changes/UnsavedChanges");
 require("./shortcuts/index");
-require("./focused/focused");
+require("./focused/Focused");
 require("./draggable/index");
-require("./selected/selected");
-require("./infinite_scroll/infiniteScroll");
+require("./selected/Selected");
+require("./infinite_scroll/InfiniteScroll");
 angular.module('pipBehaviors', [
     'pipFocused',
     'pipSelected',
@@ -3274,7 +3286,7 @@ angular.module('pipBehaviors', [
     'pipShortcuts'
 ]);
 __export(require("./shortcuts/index"));
-},{"./draggable/index":6,"./focused/focused":7,"./infinite_scroll/infiniteScroll":9,"./selected/selected":10,"./shortcuts/index":16,"./unsaved_changes/unsavedChanges":17}],9:[function(require,module,exports){
+},{"./draggable/index":6,"./focused/Focused":7,"./infinite_scroll/InfiniteScroll":9,"./selected/Selected":10,"./shortcuts/index":16,"./unsaved_changes/UnsavedChanges":17}],9:[function(require,module,exports){
 {
     var InfiniteScrollLink_1 = (function () {
         function InfiniteScrollLink_1($rootScope, $window, $interval, $scope, $element, $attrs) {
@@ -3775,6 +3787,7 @@ __export(require("./shortcuts/index"));
 }
 },{}],11:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ShortcutItem = (function () {
     function ShortcutItem() {
     }
@@ -3792,6 +3805,7 @@ var ShortcutsConfig = (function () {
 exports.ShortcutsConfig = ShortcutsConfig;
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var KeyboardEvent = (function () {
     function KeyboardEvent() {
     }
@@ -3996,6 +4010,7 @@ var Shortcut = (function () {
 exports.Shortcut = Shortcut;
 },{}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Shortcut_1 = require("./Shortcut");
 {
     var ShortcutBindingService_1 = (function () {
@@ -4106,6 +4121,7 @@ var Shortcut_1 = require("./Shortcut");
 }
 },{"./Shortcut":12}],14:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ShortcutController = (function () {
     ShortcutController.$inject = ['$element', '$attrs', '$scope', '$log', '$parse', 'pipShortcutBinding'];
     function ShortcutController($element, $attrs, $scope, $log, $parse, pipShortcutBinding) {
@@ -4113,7 +4129,6 @@ var ShortcutController = (function () {
         var _this = this;
         if ($attrs.pipShortcutAction) {
             this.actionShortcuts = $parse($attrs.pipShortcutAction);
-            this.actionShortcuts($scope, { $event: {} });
         }
         else {
             $log.error('Shortcut action does not set.');
@@ -4151,6 +4166,7 @@ var ShortcutController = (function () {
 }
 },{}],15:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var IShortcutsService_1 = require("./IShortcutsService");
 exports.ShortcutsChangedEvent = 'pipShortcutsChanged';
 var ShortcutsService = (function () {
@@ -4218,7 +4234,9 @@ var ShortcutsService = (function () {
             var option = k.options ? k.options : generalOptions;
             var target;
             target = k.target ? k.target : k.targetId;
-            option.Target = target;
+            if (target) {
+                option.Target = target;
+            }
             _this.pipShortcutBinding.add(k.shortcut, function (e) {
                 _this.keypressShortcut(k, e);
             }, option);
@@ -4316,6 +4334,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipShortcuts', ['ngMaterial', 'ui.router']);
 require("./ShortcutBindingService");
 require("./ShortcutsService");
@@ -4368,6 +4387,8 @@ __export(require("./ShortcutsService"));
 }
 },{}]},{},[8])(8)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -4442,6 +4463,7 @@ __export(require("./ShortcutsService"));
 }
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var pipImageSliderController_1 = (function () {
         pipImageSliderController_1.$inject = ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', 'pipImageSlider'];
@@ -4542,6 +4564,7 @@ __export(require("./ShortcutsService"));
 }
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ImageSliderService = (function () {
         ImageSliderService.$inject = ['$timeout'];
@@ -4606,6 +4629,7 @@ __export(require("./ShortcutsService"));
 }
 },{}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var SliderButtonController_1 = (function () {
         SliderButtonController_1.$inject = ['$element', 'pipImageSlider'];
@@ -4637,6 +4661,7 @@ __export(require("./ShortcutsService"));
 }
 },{}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var SliderIndicatorController_1 = (function () {
         SliderIndicatorController_1.$inject = ['$element', 'pipImageSlider'];
@@ -4669,6 +4694,7 @@ __export(require("./ShortcutsService"));
 }
 },{}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service']);
 require("./ImageSlider");
@@ -4677,6 +4703,7 @@ require("./SliderButton");
 require("./SliderIndicator");
 },{"./ImageSlider":3,"./ImageSliderService":4,"./SliderButton":5,"./SliderIndicator":6}],8:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./color_picker/ColorPicker");
 require("./image_slider");
@@ -4917,6 +4944,7 @@ angular.module('pipControls', [
 }
 },{}],11:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var PopoverService = (function () {
         PopoverService.$inject = ['$compile', '$rootScope', '$timeout'];
@@ -4959,6 +4987,7 @@ angular.module('pipControls', [
 }
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipPopover', ['pipPopover.Service']);
 require("./Popover");
 require("./PopoverService");
@@ -4994,6 +5023,7 @@ require("./PopoverService");
 }
 },{}],14:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Toast = (function () {
     function Toast() {
     }
@@ -5002,6 +5032,7 @@ var Toast = (function () {
 exports.Toast = Toast;
 },{}],15:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ToastController_1 = (function () {
         function ToastController_1($mdToast, toast, $injector) {
@@ -5176,6 +5207,7 @@ exports.Toast = Toast;
 }
 },{}],16:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
 require("./ToastService");
 require("./Toast");
@@ -5233,61 +5265,70 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[17,8])(17)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipList.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
+{
+    translate.$inject = ['$injector'];
+    function translate($injector) {
         var pipTranslate = $injector.has('pipTranslate')
             ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
-    }]);
-})();
+    }
+    angular
+        .module('pipList.Translate', [])
+        .filter('translate', translate);
+}
 },{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipLists', [
-        'pipTagList'
-    ]);
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipTagList', ['pipList.Translate']);
-    thisModule.directive('pipTagList', ['$parse', function ($parse) {
-        return {
-            restrict: 'EA',
-            scope: {
-                pipTags: '=',
-                pipType: '=',
-                pipTypeLocal: '='
-            },
-            templateUrl: 'tag_list/tag_list.html',
-            controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-                var tagsGetter;
-                tagsGetter = $parse($attrs.pipTags);
-                $element.css('display', 'block');
-                $scope.tags = tagsGetter($scope);
-                function toBoolean(value) {
-                    if (value == null)
-                        return false;
-                    if (!value)
-                        return false;
-                    value = value.toString().toLowerCase();
-                    return value == '1' || value == 'true';
-                }
-                if (toBoolean($attrs.pipRebind)) {
-                    $scope.$watch(tagsGetter, function () {
-                        $scope.tags = tagsGetter($scope);
-                    });
-                }
-                $element.addClass('pip-tag-list');
-            }]
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+angular.module('pipLists', ['pipTagList']);
+require("./dependencies/TranslateFilter");
+require("./tag_list/TagList");
+},{"./dependencies/TranslateFilter":1,"./tag_list/TagList":3}],3:[function(require,module,exports){
+{
+    var TagListController = (function () {
+        function TagListController($scope, $element) {
+            $element.css('display', 'block');
+            $element.addClass('pip-tag-list');
+        }
+        TagListController.prototype.toBoolean = function (value) {
+            if (_.isNull(value) || _.isUndefined(value))
+                return false;
+            if (!value)
+                return false;
+            value = value.toString().toLowerCase();
+            return value == '1' || value == 'true';
         };
-    }]);
-})();
+        TagListController.prototype.$onChanges = function (changes) {
+            if (this.rebind && changes.tags) {
+                this.tags = changes.tags.currentValue;
+            }
+        };
+        return TagListController;
+    }());
+    var TagListBindings = {
+        tags: '<pipTags',
+        type: '<pipType',
+        typeLocal: '<pipTypeLocal',
+        rebuid: '<pipRebind'
+    };
+    var TagListChanges = (function () {
+        function TagListChanges() {
+        }
+        return TagListChanges;
+    }());
+    var TagList = {
+        bindings: TagListBindings,
+        templateUrl: 'tag_list/TagList.html',
+        controller: TagListController
+    };
+    angular
+        .module('pipTagList', ['pipList.Translate'])
+        .component('pipTagList', TagList);
+}
 },{}],4:[function(require,module,exports){
 (function(module) {
 try {
@@ -5296,8 +5337,20 @@ try {
   module = angular.module('pipLists.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tag_list/tag_list.html',
-    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}" ng-if="pipType && !pipTypeLocal"><span>{{pipType.toUpperCase() | translate | uppercase}}</span></div><div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + pipType + \'-chips\'}}" ng-if="pipType && pipTypeLocal"><span>{{pipTypeLocal.toUpperCase() | translate | uppercase}}</span></div><div class="pip-chip rm4" ng-repeat="tag in pipTags"><span>{{::tag}}</span></div>');
+  $templateCache.put('tag_list/TagList.html',
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + $ctrl.type + \'-chips\'}}"\n' +
+    '     ng-if="$ctrl.type && !$ctrl.typeLocal">\n' +
+    '\n' +
+    '    <span>{{$ctrl.type.toUpperCase() | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4 pip-type-chip pip-type-chip-left {{\'bg-\' + $ctrl.type + \'-chips\'}}"\n' +
+    '     ng-if="$ctrl.type && $ctrl.typeLocal">\n' +
+    '\n' +
+    '    <span>{{$ctrl.typeLocal.toUpperCase() | translate | uppercase}}</span>\n' +
+    '</div>\n' +
+    '<div class="pip-chip rm4" ng-repeat="tag in $ctrl.tags">\n' +
+    '    <span>{{::tag}}</span>\n' +
+    '</div>');
 }]);
 })();
 
@@ -5305,6 +5358,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[4,1,2,3])(4)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -5432,11 +5487,17 @@ module.run(['$templateCache', function($templateCache) {
 })();
 },{}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var IDateConvertService_1 = require("./IDateConvertService");
 (function () {
     var DateConvert = (function () {
@@ -5652,7 +5713,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
     var DateConvertProvider = (function (_super) {
         __extends(DateConvertProvider, _super);
         function DateConvertProvider() {
-            return _super.apply(this, arguments) || this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         DateConvertProvider.prototype.$get = function () {
             "ngInject";
@@ -5706,6 +5767,7 @@ formatTodayDateShortTimeShortFilter.$inject = ['pipDateFormat'];
 formatMillisecondsToSecondsFilter.$inject = ['pipDateFormat'];
 formatElapsedIntervalFilter.$inject = ['pipDateFormat'];
 getDateJSONFilter.$inject = ['pipDateConvert'];
+Object.defineProperty(exports, "__esModule", { value: true });
 function formatTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, format) {
@@ -5975,11 +6037,17 @@ angular
     .filter('formatElapsedInterval', formatElapsedIntervalFilter);
 },{}],4:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var IDateConvertService_1 = require("./IDateConvertService");
 (function () {
     var DateFormat = (function () {
@@ -6392,7 +6460,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
     var DateFormatProvider = (function (_super) {
         __extends(DateFormatProvider, _super);
         function DateFormatProvider() {
-            return _super.apply(this, arguments) || this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         DateFormatProvider.prototype.$get = function () {
             "ngInject";
@@ -6408,6 +6476,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
 })();
 },{"./IDateConvertService":5}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var DateRangeType = (function () {
     function DateRangeType() {
     }
@@ -6422,11 +6491,13 @@ DateRangeType.All = ['year', 'month', 'week', 'isoweek', 'day'];
 exports.DateRangeType = DateRangeType;
 },{}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],7:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipDate.Common', [
     'pipDate.Convert',
     'pipDate.Format',
@@ -6869,6 +6940,7 @@ angular.module('pipDates', [
 })();
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.IntervalTimeRange = 30;
 exports.MinutesInHour = 60;
 exports.HoursInDay = 24;
@@ -6951,14 +7023,15 @@ exports.MillisecondsInSecond = 1000;
             return end - start;
         };
         TimeRangeEditController.prototype.validateStartDate = function () {
-            var date, start, end, endTime, startTime;
-            if (!this.data.startDate) {
+            var date = new Date(), start = new Date(), end = new Date(), endTime, startTime;
+            if (!this.data.startDate || _.isNull(this.data.startDate) || !this.data) {
                 this.data.startTime = null;
+                this.data.startDate = null;
                 return;
             }
             if (_.isUndefined(this.data.startTime) || _.isNull(this.data.startTime)) {
-                if (!this.data.endTime) {
-                    start = new Date();
+                if (!this.data || !this.data.endTime) {
+                    date = new Date();
                     startTime = date.getTime() - this.pipDateConvert.toStartDay(date);
                     this.data.startTime = Math.floor(startTime / (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)) * exports.IntervalTimeRange;
                 }
@@ -6966,26 +7039,29 @@ exports.MillisecondsInSecond = 1000;
                     this.data.startTime = this.data.endTime === 0 ? 0 : this.data.endTime - exports.IntervalTimeRange;
                 }
             }
-            start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
-            if (this.data.duration) {
-                end = new Date(start.getTime() + this.data.duration);
-                this.data.endDate = this.pipDateConvert.toStartDay(end);
-                endTime = end.getTime() - this.data.endDate.getTime();
-                this.data.endTime = Math.floor(endTime / (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)) * exports.IntervalTimeRange;
-            }
-            else {
-                end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
-                if (start >= end) {
-                    this.data.endDate = this.pipDateConvert.toStartDay(new Date(start.getTime() + (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)));
-                    this.data.endTime = (this.data.startTime + exports.IntervalTimeRange) % (exports.HoursInDay * exports.MinutesInHour);
+            if (this.data && this.data.startDate) {
+                start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+                if (this.data.duration) {
+                    end = new Date(start.getTime() + this.data.duration);
+                    this.data.endDate = this.pipDateConvert.toStartDay(end);
+                    endTime = end.getTime() - this.data.endDate.getTime();
+                    this.data.endTime = Math.floor(endTime / (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)) * exports.IntervalTimeRange;
                 }
+                else {
+                    end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+                    if (start >= end) {
+                        this.data.endDate = this.pipDateConvert.toStartDay(new Date(start.getTime() + (exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond)));
+                        this.data.endTime = (this.data.startTime + exports.IntervalTimeRange) % (exports.HoursInDay * exports.MinutesInHour);
+                    }
+                }
+                this.data.startTime = Math.round(this.data.startTime / exports.IntervalTimeRange) * exports.IntervalTimeRange;
             }
-            this.data.startTime = Math.round(this.data.startTime / exports.IntervalTimeRange) * exports.IntervalTimeRange;
         };
         TimeRangeEditController.prototype.validateEndDate = function () {
-            var date, start, end;
+            var date = new Date(), start = new Date(), end = new Date();
             if (!this.data.endDate) {
                 this.data.endTime = null;
+                this.data.endDate = null;
                 return;
             }
             if (_.isUndefined(this.data.endTime) || _.isNull(this.data.endTime)) {
@@ -6998,8 +7074,12 @@ exports.MillisecondsInSecond = 1000;
                     this.data.endTime = this.data.startTime === (exports.HoursInDay * exports.MinutesInHour - exports.IntervalTimeRange) ? (exports.HoursInDay * exports.MinutesInHour - exports.IntervalTimeRange) : this.data.startTime + exports.IntervalTimeRange;
                 }
             }
-            start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
-            end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            if (this.data.startDate && this.data.startTime) {
+                start = new Date(this.data.startDate.getTime() + this.data.startTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            }
+            if (this.data.endDate && this.data.endTime) {
+                end = new Date(this.data.endDate.getTime() + this.data.endTime * exports.MinutesInHour * exports.MillisecondsInSecond);
+            }
             if (start >= end) {
                 this.data.startDate = this.pipDateConvert.toStartDay(new Date(end.getTime() - exports.IntervalTimeRange * exports.MinutesInHour * exports.MillisecondsInSecond));
                 this.data.startTime = this.data.endTime % (exports.HoursInDay * exports.MinutesInHour) === 0 ? (exports.HoursInDay * exports.MinutesInHour - exports.IntervalTimeRange) : this.data.endTime - exports.IntervalTimeRange;
@@ -7343,13 +7423,21 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[13,2,3,4,5,6,7,8,1,9,10,12,11])(13)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogParams_1 = require("./ConfirmationDialogParams");
 var ConfirmationDialogController = (function (_super) {
     __extends(ConfirmationDialogController, _super);
@@ -7360,7 +7448,7 @@ var ConfirmationDialogController = (function (_super) {
         _this._injector = $injector;
         _this.initTranslate();
         _this.$mdDialog = $mdDialog;
-        _this.theme = $rootScope['$theme'];
+        _this.theme = $rootScope[pip.themes.ThemeRootVar];
         return _this;
     }
     ConfirmationDialogController.prototype.initTranslate = function () {
@@ -7393,6 +7481,7 @@ angular
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
 },{"./ConfirmationDialogParams":2}],2:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogParams = (function () {
     function ConfirmationDialogParams() {
     }
@@ -7401,6 +7490,7 @@ var ConfirmationDialogParams = (function () {
 exports.ConfirmationDialogParams = ConfirmationDialogParams;
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogService = (function () {
     ConfirmationDialogService.$inject = ['$mdDialog'];
     function ConfirmationDialogService($mdDialog) {
@@ -7433,8 +7523,10 @@ angular
     .service('pipConfirmationDialog', ConfirmationDialogService);
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipConfirmationDialog', [
     'ngMaterial',
@@ -7461,11 +7553,17 @@ require("./ConfirmationDialogService");
 }
 },{}],7:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogParams_1 = require("./ErrorDetailsDialogParams");
 var ErrorDialogStrings = (function () {
     function ErrorDialogStrings() {
@@ -7487,7 +7585,7 @@ var ErrorDetailsDialogController = (function (_super) {
         _this.strings = new ErrorDialogStrings();
         _this._injector = $injector;
         _this.$mdDialog = $mdDialog;
-        _this.theme = $rootScope['$theme'];
+        _this.theme = $rootScope[pip.themes.ThemeRootVar];
         _this.initTranslate();
         if (!_this.error) {
             _this.error = '<none>';
@@ -7558,6 +7656,7 @@ angular
     .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
 },{"./ErrorDetailsDialogParams":8}],8:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogParams = (function () {
     function ErrorDetailsDialogParams() {
     }
@@ -7566,6 +7665,7 @@ var ErrorDetailsDialogParams = (function () {
 exports.ErrorDetailsDialogParams = ErrorDetailsDialogParams;
 },{}],9:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogService = (function () {
     ErrorDetailsDialogService.$inject = ['$mdDialog'];
     function ErrorDetailsDialogService($mdDialog) {
@@ -7601,6 +7701,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipErrorDetailsDialog', [
     'ngMaterial',
@@ -7616,6 +7717,7 @@ __export(require("./ErrorDetailsDialogParams"));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./error_details");
 require("./information");
@@ -7636,11 +7738,17 @@ __export(require("./options"));
 __export(require("./options_big"));
 },{"./confirmation":5,"./dependencies/TranslateFilter":6,"./error_details":10,"./information":15,"./options":21,"./options_big":27}],12:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogParams_1 = require("./InformationDialogParams");
 var InformationDialogController = (function (_super) {
     __extends(InformationDialogController, _super);
@@ -7651,7 +7759,7 @@ var InformationDialogController = (function (_super) {
         _this._injector = $injector;
         _this.initTranslate();
         _this.$mdDialog = $mdDialog;
-        _this.theme = $rootScope['$theme'];
+        _this.theme = $rootScope[pip.themes.ThemeRootVar];
         return _this;
     }
     InformationDialogController.prototype.initTranslate = function () {
@@ -7691,6 +7799,7 @@ angular
     .controller('pipInformationDialogController', InformationDialogController);
 },{"./InformationDialogParams":13}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogParams = (function () {
     function InformationDialogParams() {
     }
@@ -7699,6 +7808,7 @@ var InformationDialogParams = (function () {
 exports.InformationDialogParams = InformationDialogParams;
 },{}],14:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogService = (function () {
     InformationDialogService.$inject = ['$mdDialog'];
     function InformationDialogService($mdDialog) {
@@ -7730,6 +7840,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipInformationDialog', [
     'ngMaterial',
@@ -7742,11 +7853,17 @@ require("./InformationDialogService");
 __export(require("./InformationDialogParams"));
 },{"./InformationDialogController":12,"./InformationDialogParams":13,"./InformationDialogService":14}],16:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogParams_1 = require("./OptionsDialogParams");
 var OptionsDialogController = (function (_super) {
     __extends(OptionsDialogController, _super);
@@ -7756,7 +7873,7 @@ var OptionsDialogController = (function (_super) {
         var _this = _super.call(this) || this;
         _this.$mdDialog = $mdDialog;
         _this._injector = $injector;
-        _this.theme = $rootScope['$theme'];
+        _this.theme = $rootScope[pip.themes.ThemeRootVar];
         _this.options = _this.options || [];
         _this.initTranslate();
         _this.selectedOption = _.find(_this.options, { active: true }) || null;
@@ -7818,6 +7935,7 @@ angular
     .controller('pipOptionsDialogController', OptionsDialogController);
 },{"./OptionsDialogParams":18}],17:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogData = (function () {
     function OptionsDialogData() {
         this.icon = 'star';
@@ -7828,6 +7946,7 @@ var OptionsDialogData = (function () {
 exports.OptionsDialogData = OptionsDialogData;
 },{}],18:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogParams = (function () {
     function OptionsDialogParams() {
     }
@@ -7836,6 +7955,7 @@ var OptionsDialogParams = (function () {
 exports.OptionsDialogParams = OptionsDialogParams;
 },{}],19:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogResult = (function () {
     function OptionsDialogResult() {
     }
@@ -7844,6 +7964,7 @@ var OptionsDialogResult = (function () {
 exports.OptionsDialogResult = OptionsDialogResult;
 },{}],20:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogService = (function () {
     OptionsDialogService.$inject = ['$mdDialog'];
     function OptionsDialogService($mdDialog) {
@@ -7879,6 +8000,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipOptionsDialog', [
     'ngMaterial',
@@ -7895,11 +8017,17 @@ __export(require("./OptionsDialogParams"));
 __export(require("./OptionsDialogResult"));
 },{"./OptionsDialogController":16,"./OptionsDialogData":17,"./OptionsDialogParams":18,"./OptionsDialogResult":19,"./OptionsDialogService":20}],22:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogParams_1 = require("./OptionsBigDialogParams");
 var OptionsBigDialogData_1 = require("./OptionsBigDialogData");
 var OptionsBigDialogController = (function (_super) {
@@ -7915,7 +8043,7 @@ var OptionsBigDialogController = (function (_super) {
         };
         _this.$mdDialog = $mdDialog;
         _this._injector = $injector;
-        _this.theme = $rootScope['$theme'];
+        _this.theme = $rootScope[pip.themes.ThemeRootVar];
         _this.initTranslate();
         _this.selectedOption = _.find(_this.options, { active: true }) || null;
         var name = _this.selectedOption ? _this.selectedOption.name : _this.selectedOptionName;
@@ -7984,6 +8112,7 @@ angular
     .controller('pipOptionsBigDialogController', OptionsBigDialogController);
 },{"./OptionsBigDialogData":23,"./OptionsBigDialogParams":24}],23:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogData = (function () {
     function OptionsBigDialogData() {
     }
@@ -7992,6 +8121,7 @@ var OptionsBigDialogData = (function () {
 exports.OptionsBigDialogData = OptionsBigDialogData;
 },{}],24:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogParams = (function () {
     function OptionsBigDialogParams() {
     }
@@ -8000,6 +8130,7 @@ var OptionsBigDialogParams = (function () {
 exports.OptionsBigDialogParams = OptionsBigDialogParams;
 },{}],25:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogResult = (function () {
     function OptionsBigDialogResult() {
     }
@@ -8008,6 +8139,7 @@ var OptionsBigDialogResult = (function () {
 exports.OptionsBigDialogResult = OptionsBigDialogResult;
 },{}],26:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogService = (function () {
     OptionsBigDialogService.$inject = ['$mdDialog'];
     function OptionsBigDialogService($mdDialog) {
@@ -8043,6 +8175,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
@@ -8123,8 +8256,11 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[28,11])(28)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var IActionsService_1 = require("./IActionsService");
 var IActionsService_2 = require("./IActionsService");
 var IActionsService_3 = require("./IActionsService");
@@ -8291,11 +8427,17 @@ angular
     .provider('pipActions', ActionsProvider);
 },{"./IActionsService":2}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionsChangedEvent = 'pipActionsChanged';
 exports.SecondaryActionsOpenEvent = 'pipSecondaryActionsOpen';
 var SimpleActionItem = (function () {
@@ -8307,7 +8449,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        return _super.apply(this, arguments) || this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -8324,6 +8466,7 @@ var ActionsConfig = (function () {
 exports.ActionsConfig = ActionsConfig;
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var PrimaryActionsController = (function () {
     PrimaryActionsController.$inject = ['$element', '$injector', '$scope', '$rootScope', '$window', '$location', 'pipActions', '$log', '$attrs'];
     function PrimaryActionsController($element, $injector, $scope, $rootScope, $window, $location, pipActions, $log, $attrs) {
@@ -8436,6 +8579,7 @@ var PrimaryActionsChanges = (function () {
 })();
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SecondaryActionsController = (function () {
     SecondaryActionsController.$inject = ['$attrs', '$injector', '$log', '$rootScope', '$window', '$location', 'pipActions', '$element'];
     function SecondaryActionsController($attrs, $injector, $log, $rootScope, $window, $location, pipActions, $element) {
@@ -8568,6 +8712,7 @@ var SecondaryActionsChanges = (function () {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipActions', ['ngMaterial', 'pipNav.Templates', 'ui.router']);
 require("./ActionsService");
 require("./PrimaryActions");
@@ -8575,6 +8720,7 @@ require("./SecondaryActions");
 __export(require("./IActionsService"));
 },{"./ActionsService":1,"./IActionsService":2,"./PrimaryActions":3,"./SecondaryActions":4}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarController = (function () {
     AppBarController.$inject = ['$element', '$rootScope', 'pipAppBar'];
     function AppBarController($element, $rootScope, pipAppBar) {
@@ -8604,6 +8750,7 @@ var AppBarController = (function () {
 }
 },{}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarConfig = (function () {
     function AppBarConfig() {
     }
@@ -8612,6 +8759,7 @@ var AppBarConfig = (function () {
 exports.AppBarConfig = AppBarConfig;
 },{}],8:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarPartController = (function () {
     AppBarPartController.$inject = ['$scope', '$element', '$attrs', '$log', '$rootScope', 'pipAppBar'];
     function AppBarPartController($scope, $element, $attrs, $log, $rootScope, pipAppBar) {
@@ -8664,6 +8812,7 @@ var AppBarPartController = (function () {
 })();
 },{}],9:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarConfig_1 = require("./AppBarConfig");
 exports.AppBarChangedEvent = 'pipAppBarChanged';
 var AppBarService = (function () {
@@ -8844,6 +8993,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipAppBar', ['ngMaterial', 'pipNav.Templates']);
 require("./AppBarConfig");
@@ -8853,6 +9003,7 @@ require("./AppBarPart");
 __export(require("./AppBarService"));
 },{"./AppBar":6,"./AppBarConfig":7,"./AppBarPart":8,"./AppBarService":9}],11:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbService_1 = require("./BreadcrumbService");
 var BreadcrumbService_2 = require("./BreadcrumbService");
 var SearchService_1 = require("../search/SearchService");
@@ -8951,6 +9102,7 @@ angular
     .component('pipBreadcrumb', breadcrumb);
 },{"../search/SearchService":35,"./BreadcrumbService":13}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbItem = (function () {
     function BreadcrumbItem() {
         this.title = null;
@@ -8968,6 +9120,7 @@ var BreadcrumbConfig = (function () {
 exports.BreadcrumbConfig = BreadcrumbConfig;
 },{}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbConfig_1 = require("./BreadcrumbConfig");
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
 exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
@@ -9065,12 +9218,14 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate']);
 require("./Breadcrumb");
 require("./BreadcrumbService");
 __export(require("./BreadcrumbService"));
 },{"./Breadcrumb":11,"./BreadcrumbService":13}],15:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var NavService = (function () {
     NavService.$inject = ['$injector'];
     function NavService($injector) {
@@ -9200,6 +9355,7 @@ angular
 }
 },{}],18:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var NavHeaderController = (function () {
         NavHeaderController.$inject = ['$element', '$scope', '$log', '$rootScope', '$timeout', 'pipNavHeader', 'navConstant'];
@@ -9340,6 +9496,7 @@ angular
 }
 },{}],19:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var NavHeaderConfig = (function () {
     function NavHeaderConfig() {
     }
@@ -9349,6 +9506,7 @@ exports.NavHeaderConfig = NavHeaderConfig;
 ;
 },{}],20:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var NavHeaderConfig_1 = require("./NavHeaderConfig");
 exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
 var NavHeaderService = (function () {
@@ -9563,14 +9721,17 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
 require("./NavHeaderService");
 require("./NavHeader");
 __export(require("./NavHeaderService"));
 },{"./NavHeader":18,"./NavHeaderService":20}],22:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],23:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavService_1 = require("../sidenav/SideNavService");
 var NavIconService_1 = require("./NavIconService");
 var NavIconBindings = {
@@ -9644,6 +9805,7 @@ angular
     .component('pipNavIcon', NavIcon);
 },{"../sidenav/SideNavService":39,"./NavIconService":25}],24:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var NavIconConfig = (function () {
     function NavIconConfig() {
     }
@@ -9653,6 +9815,7 @@ exports.NavIconConfig = NavIconConfig;
 ;
 },{}],25:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var NavIconConfig_1 = require("./NavIconConfig");
 exports.NavIconClickedEvent = 'pipNavIconClicked';
 exports.NavIconChangedEvent = 'pipNavIconChanged';
@@ -9776,6 +9939,7 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavIconConfig");
 require("./INavIconService");
@@ -9788,6 +9952,7 @@ __export(require("./NavIconService"));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./language/LanguagePickerDirective");
 require("./dropdown/Dropdown");
@@ -9878,6 +10043,7 @@ __export(require("./header"));
 }
 },{}],29:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 (function () {
     var NavMenuController = (function () {
         NavMenuController.$inject = ['$scope', '$window', '$location', '$rootScope', '$timeout', 'pipSideNav', 'pipNavMenu', '$element', '$injector', 'navConstant'];
@@ -10053,6 +10219,7 @@ __export(require("./header"));
 })();
 },{}],30:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.NavMenuChangedEvent = 'pipNavMenuChanged';
 var NavMenuService = (function () {
     function NavMenuService(config, $rootScope) {
@@ -10156,13 +10323,16 @@ angular
     .provider('pipNavMenu', NavMenuProvider);
 },{}],31:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavMenuService");
 require("./NavMenu");
 },{"./NavMenu":29,"./NavMenuService":30}],32:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],33:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SearchService_1 = require("./SearchService");
 var SearchBarController = (function () {
     SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
@@ -10256,6 +10426,7 @@ angular
     .component('pipSearchBar', SearchBar);
 },{"./SearchService":35}],34:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SearchConfig = (function () {
     function SearchConfig() {
     }
@@ -10264,6 +10435,7 @@ var SearchConfig = (function () {
 exports.SearchConfig = SearchConfig;
 },{}],35:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SearchConfig_1 = require("./SearchConfig");
 exports.OpenSearchEvent = 'pipOpenSearch';
 exports.CloseSearchEvent = 'pipCloseSearch';
@@ -10375,6 +10547,7 @@ angular.module('pipSearchBar')
     .provider('pipSearch', SearchProvider);
 },{"./SearchConfig":34}],36:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./SearchConfig");
 require("./ISearchService");
@@ -10382,6 +10555,7 @@ require("./SearchService");
 require("./SearchBar");
 },{"./ISearchService":32,"./SearchBar":33,"./SearchConfig":34,"./SearchService":35}],37:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavState_1 = require("./SideNavState");
 var SideNavController = (function () {
     SideNavController.$inject = ['$element', '$attrs', '$injector', '$scope', '$rootScope', '$timeout', 'pipSideNav', 'navConstant'];
@@ -10597,6 +10771,7 @@ var SideNavBindings = {
 },{}],39:[function(require,module,exports){
 "use strict";
 hookSideNavEvents.$inject = ['$rootScope', 'pipSideNav'];
+Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavState_1 = require("./SideNavState");
 exports.SideNavChangedEvent = 'pipSideNavChanged';
 exports.SideNavStateChangedEvent = 'pipSideNavStateChanged';
@@ -10828,6 +11003,7 @@ angular
     .run(hookSideNavEvents);
 },{"./SideNavState":40}],40:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavStateNames = (function () {
     function SideNavStateNames() {
     }
@@ -10902,6 +11078,7 @@ exports.SideNavConfig = SideNavConfig;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates']);
 require("./SideNavState");
 require("./SideNavService");
@@ -10910,6 +11087,7 @@ require("./SideNav");
 __export(require("./SideNavService"));
 },{"./SideNav":37,"./SideNavPart":38,"./SideNavService":39,"./SideNavState":40}],42:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var PipTab = (function () {
     function PipTab() {
     }
@@ -11205,18 +11383,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/Tabs.html',
     '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
@@ -11234,140 +11400,159 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+}]);
+})();
+
 
 
 },{}]},{},[43,27])(43)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-configureBootBarnCoolTheme.$inject = ['$mdThemingProvider'];
-function configureBootBarnCoolTheme($mdThemingProvider) {
-    var coolBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(69, 90, 100, 1)'
-    });
-    $mdThemingProvider.definePalette('bootbarn-cool-background', coolBackgroundPalette);
-    var coolPrimaryPalette = $mdThemingProvider.extendPalette('grey', {
-        '300': 'rgba(69, 90, 100, .54)',
-        '500': 'rgba(69, 90, 100, 1)',
-        'contrastLightColors': ['500', '300']
-    });
-    $mdThemingProvider.definePalette('bootbarn-cool-primary', coolPrimaryPalette);
-    var coolAccentPalette = $mdThemingProvider.extendPalette('green', {
-        'A700': 'rgba(76, 175, 80, 1)',
-        'contrastLightColors': ['A700']
-    });
-    $mdThemingProvider.definePalette('bootbarn-cool-accent', coolAccentPalette);
-    $mdThemingProvider.theme('bootbarn-cool')
-        .primaryPalette('bootbarn-cool-primary', {
-        'default': '500',
-        'hue-1': '300'
-    })
-        .backgroundPalette('bootbarn-cool-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('bootbarn-cool-accent', {
-        'default': 'A700'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
+{
+    configureBootBarnCoolTheme.$inject = ['$mdThemingProvider'];
+    function configureBootBarnCoolTheme($mdThemingProvider) {
+        var coolBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(69, 90, 100, 1)'
+        });
+        $mdThemingProvider.definePalette('bootbarn-cool-background', coolBackgroundPalette);
+        var coolPrimaryPalette = $mdThemingProvider.extendPalette('grey', {
+            '300': 'rgba(69, 90, 100, .54)',
+            '500': 'rgba(69, 90, 100, 1)',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('bootbarn-cool-primary', coolPrimaryPalette);
+        var coolAccentPalette = $mdThemingProvider.extendPalette('green', {
+            'A700': 'rgba(76, 175, 80, 1)',
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('bootbarn-cool-accent', coolAccentPalette);
+        $mdThemingProvider.theme('bootbarn-cool')
+            .primaryPalette('bootbarn-cool-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('bootbarn-cool-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('bootbarn-cool-accent', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.BootBarn.Cool', ['ngMaterial'])
+        .config(configureBootBarnCoolTheme);
 }
-angular
-    .module('pipTheme.BootBarn.Cool', ['ngMaterial'])
-    .config(configureBootBarnCoolTheme);
 },{}],2:[function(require,module,exports){
-'use strict';
-configureBootBarnMonochromeTheme.$inject = ['$mdThemingProvider'];
-function configureBootBarnMonochromeTheme($mdThemingProvider) {
-    var monochromeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(38, 50, 56, 1)'
-    });
-    $mdThemingProvider.definePalette('bootbarn-monochrome-background', monochromeBackgroundPalette);
-    var monochromePrimaryPalette = $mdThemingProvider.extendPalette('grey', {
-        '300': 'rgba(38, 50, 56, .54)',
-        '500': 'rgba(38, 50, 56, 1)',
-        'contrastLightColors': ['500', '300']
-    });
-    $mdThemingProvider.definePalette('bootbarn-monochrome-primary', monochromePrimaryPalette);
-    var monochromeAccentPalette = $mdThemingProvider.extendPalette('green', {
-        'A700': 'rgba(76, 175, 80, 1)',
-        'contrastLightColors': ['A700']
-    });
-    $mdThemingProvider.definePalette('bootbarn-monochrome-accent', monochromeAccentPalette);
-    $mdThemingProvider.theme('bootbarn-monochrome')
-        .primaryPalette('bootbarn-monochrome-primary', {
-        'default': '500',
-        'hue-1': '300'
-    })
-        .backgroundPalette('bootbarn-monochrome-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('bootbarn-monochrome-accent', {
-        'default': 'A700'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
+{
+    configureBootBarnMonochromeTheme.$inject = ['$mdThemingProvider'];
+    function configureBootBarnMonochromeTheme($mdThemingProvider) {
+        var monochromeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(38, 50, 56, 1)'
+        });
+        $mdThemingProvider.definePalette('bootbarn-monochrome-background', monochromeBackgroundPalette);
+        var monochromePrimaryPalette = $mdThemingProvider.extendPalette('grey', {
+            '300': 'rgba(38, 50, 56, .54)',
+            '500': 'rgba(38, 50, 56, 1)',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('bootbarn-monochrome-primary', monochromePrimaryPalette);
+        var monochromeAccentPalette = $mdThemingProvider.extendPalette('green', {
+            'A700': 'rgba(76, 175, 80, 1)',
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('bootbarn-monochrome-accent', monochromeAccentPalette);
+        $mdThemingProvider.theme('bootbarn-monochrome')
+            .primaryPalette('bootbarn-monochrome-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('bootbarn-monochrome-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('bootbarn-monochrome-accent', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.BootBarn.Monochrome', ['ngMaterial'])
+        .config(configureBootBarnMonochromeTheme);
 }
-angular
-    .module('pipTheme.BootBarn.Monochrome', ['ngMaterial'])
-    .config(configureBootBarnMonochromeTheme);
 },{}],3:[function(require,module,exports){
-'use strict';
-configureBootBarnWarmTheme.$inject = ['$mdThemingProvider'];
-function configureBootBarnWarmTheme($mdThemingProvider) {
-    $mdThemingProvider.alwaysWatchTheme(true);
-    var warmBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(177, 55, 34, 1)'
-    });
-    $mdThemingProvider.definePalette('bootbarn-warm-background', warmBackgroundPalette);
-    var warmPrimaryPalette = $mdThemingProvider.extendPalette('brown', {
-        '300': 'rgba(177, 55, 34, .54)',
-        '500': 'rgba(177, 55, 34, 1)',
-        'contrastLightColors': ['500', '300']
-    });
-    $mdThemingProvider.definePalette('bootbarn-warm-primary', warmPrimaryPalette);
-    var warmAccentPalette = $mdThemingProvider.extendPalette('amber', {
-        'A700': 'rgba(127, 148, 92, 1)',
-        'contrastLightColors': ['A700']
-    });
-    $mdThemingProvider.definePalette('bootbarn-warm-accent', warmAccentPalette);
-    var warmErrorPalette = $mdThemingProvider.extendPalette('red', {
-        'A200': 'rgba(255, 82, 82, 1)',
-        'contrastLightColors': ['A200']
-    });
-    $mdThemingProvider.definePalette('bootbarn-warm-error', warmErrorPalette);
-    $mdThemingProvider.theme('bootbarn-warm')
-        .primaryPalette('bootbarn-warm-primary', {
-        'default': '500',
-        'hue-1': '300'
-    })
-        .backgroundPalette('bootbarn-warm-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('bootbarn-warm-error', {
-        'default': 'A200'
-    })
-        .accentPalette('bootbarn-warm-accent', {
-        'default': 'A700'
-    });
+{
+    configureBootBarnWarmTheme.$inject = ['$mdThemingProvider'];
+    function configureBootBarnWarmTheme($mdThemingProvider) {
+        $mdThemingProvider.alwaysWatchTheme(true);
+        var warmBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(177, 55, 34, 1)'
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-background', warmBackgroundPalette);
+        var warmPrimaryPalette = $mdThemingProvider.extendPalette('brown', {
+            '300': 'rgba(177, 55, 34, .54)',
+            '500': 'rgba(177, 55, 34, 1)',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-primary', warmPrimaryPalette);
+        var warmAccentPalette = $mdThemingProvider.extendPalette('amber', {
+            'A700': 'rgba(127, 148, 92, 1)',
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-accent', warmAccentPalette);
+        var warmErrorPalette = $mdThemingProvider.extendPalette('red', {
+            'A200': 'rgba(255, 82, 82, 1)',
+            'contrastLightColors': ['A200']
+        });
+        $mdThemingProvider.definePalette('bootbarn-warm-error', warmErrorPalette);
+        $mdThemingProvider.theme('bootbarn-warm')
+            .primaryPalette('bootbarn-warm-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('bootbarn-warm-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('bootbarn-warm-error', {
+            'default': 'A200'
+        })
+            .accentPalette('bootbarn-warm-accent', {
+            'default': 'A700'
+        });
+    }
+    angular
+        .module('pipTheme.BootBarn.Warm', ['ngMaterial'])
+        .config(configureBootBarnWarmTheme);
 }
-angular.module('pipTheme.BootBarn.Warm', ['ngMaterial'])
-    .config(configureBootBarnWarmTheme);
 },{}],4:[function(require,module,exports){
-'use strict';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./BootBarnCoolTheme");
 require("./BootBarnWarmTheme");
 require("./BootBarnMonochromeTheme");
@@ -11378,8 +11563,9 @@ angular.module('pipTheme.BootBarn', [
     'pipTheme.BootBarn.Monochrome',
 ]);
 },{"./BootBarnCoolTheme":1,"./BootBarnMonochromeTheme":2,"./BootBarnWarmTheme":3}],5:[function(require,module,exports){
-'use strict';
+"use strict";
 initTheme.$inject = ['pipTheme'];
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThemeRootVar = "$theme";
 exports.ThemeChangedEvent = "pipThemeChanged";
 exports.ThemeResetPage = "pipResetPage";
@@ -11389,18 +11575,17 @@ var ThemeConfig = (function () {
     return ThemeConfig;
 }());
 var ThemeService = (function () {
-    function ThemeService(config, setRootVar, persist, $rootScope, $log, $window, $mdTheming) {
+    function ThemeService($log, $rootScope, $window, $mdTheming, config, setRootVar, persist) {
+        this.$log = $log;
+        this.$rootScope = $rootScope;
+        this.$window = $window;
+        this.$mdTheming = $mdTheming;
         this._currentTheme = null;
         this._setRootVar = setRootVar;
         this._persist = persist;
         this._config = config;
-        this._rootScope = $rootScope;
-        this._log = $log;
-        this._window = $window;
-        this._theming = $mdTheming;
-        if (this._persist && this._window.localStorage && this._config.theme == "default")
-            this._config.theme = this._window.localStorage.getItem('theme') || this._config.theme;
-        this._log.debug("Set theme to " + this._config.theme);
+        this._config.theme = this.$window.localStorage.getItem('theme') || this._config.theme || 'default';
+        this.$log.debug("Set theme to " + this._config.theme);
         $('body').attr('md-theme', '{{' + exports.ThemeRootVar + '}}');
         this.save();
     }
@@ -11412,9 +11597,9 @@ var ThemeService = (function () {
             body.removeClass(this._currentTheme);
         this._currentTheme = newTheme;
         if (this._setRootVar)
-            this._rootScope[exports.ThemeRootVar] = this._config.theme;
-        if (this._persist && this._window.localStorage != null)
-            this._window.localStorage.setItem('theme', this._config.theme);
+            this.$rootScope[exports.ThemeRootVar] = this._config.theme;
+        if (this._persist && this.$window.localStorage != null)
+            this.$window.localStorage.setItem('theme', this._config.theme);
     };
     Object.defineProperty(ThemeService.prototype, "theme", {
         get: function () {
@@ -11422,22 +11607,24 @@ var ThemeService = (function () {
         },
         set: function (value) {
             if (value != this._config.theme) {
-                if (!(value in this._theming.THEMES))
+                if (!(value in this.$mdTheming.THEMES))
                     throw new Error('Theme ' + value + ' is not defined. Please, register it first with $mdThemingProvider');
                 this._config.theme = value;
-                this._log.debug("Changing theme to " + value);
+                this.$log.debug("Changing theme to " + value);
                 this.save();
-                this._rootScope.$emit(exports.ThemeChangedEvent, value);
-                this._rootScope.$emit(exports.ThemeResetPage);
+                this.$rootScope.$emit(exports.ThemeChangedEvent, value);
+                this.$rootScope.$emit(exports.ThemeResetPage);
             }
         },
         enumerable: true,
         configurable: true
     });
     ThemeService.prototype.use = function (theme) {
-        if (theme != null)
-            this.theme = theme;
-        return this.theme;
+        if (theme != null) {
+            this._config.theme = theme;
+            this.save();
+        }
+        return this._config.theme;
     };
     return ThemeService;
 }());
@@ -11479,14 +11666,18 @@ var ThemeProvider = (function () {
         configurable: true
     });
     ThemeProvider.prototype.use = function (theme) {
-        if (theme != null)
-            this.theme = theme;
-        return this.theme;
+        if (theme != null) {
+            this._config.theme = theme;
+            var body = $('body');
+            body.addClass(this._config.theme);
+        }
+        return this._config.theme;
     };
     ThemeProvider.prototype.$get = ['$rootScope', '$log', '$window', '$mdTheming', function ($rootScope, $log, $window, $mdTheming) {
         "ngInject";
-        if (this._service == null)
-            this._service = new ThemeService(this._config, this._setRootVar, this._persist, $rootScope, $log, $window, $mdTheming);
+        if (_.isUndefined(this._service) || _.isNull(this._service)) {
+            this._service = new ThemeService($log, $rootScope, $window, this._config, $mdTheming, this._setRootVar, this._persist);
+        }
         return this._service;
     }];
     return ThemeProvider;
@@ -11499,77 +11690,34 @@ angular
     .provider('pipTheme', ThemeProvider)
     .run(initTheme);
 },{}],6:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTheme', ['ngMaterial']);
 require("./ThemeService");
 __export(require("./ThemeService"));
 },{"./ThemeService":5}],7:[function(require,module,exports){
-'use strict';
-configureDefaultAmberTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultAmberTheme($mdThemingProvider) {
-    var orangeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(255, 152, 0, 1)'
-    });
-    $mdThemingProvider.definePalette('orange-background', orangeBackgroundPalette);
-    var orangePrimaryPalette = $mdThemingProvider.extendPalette('orange', {
-        '800': 'rgba(255, 152, 0, 1)',
-        '900': 'rgba(255, 152, 0, .54);'
-    });
-    $mdThemingProvider.definePalette('orange-primary', orangePrimaryPalette);
-    $mdThemingProvider.theme('amber')
-        .primaryPalette('orange-primary', {
-        'default': '800',
-        'hue-1': '900'
-    })
-        .backgroundPalette('orange-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('orange', {
-        'default': '900'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
-angular
-    .module('pipTheme.Amber', ['ngMaterial'])
-    .config(configureDefaultAmberTheme);
-},{}],8:[function(require,module,exports){
-'use strict';
-configureDefaultBlueTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultBlueTheme($mdThemingProvider) {
-    registerBlueTheme('default');
-    registerBlueTheme('blue');
-    $mdThemingProvider.setDefaultTheme('default');
-    $mdThemingProvider.alwaysWatchTheme(true);
-    function registerBlueTheme(themeName) {
-        var bluePrimaryPalette = $mdThemingProvider.extendPalette('blue', {
-            'contrastDefaultColor': 'light',
-            'contrastDarkColors': undefined
-        });
-        $mdThemingProvider.definePalette('blue-primary', bluePrimaryPalette);
-        var blueBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+{
+    configureDefaultAmberTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultAmberTheme($mdThemingProvider) {
+        var orangeBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
             'A100': 'rgba(250, 250, 250, 1)',
-            'A200': 'rgba(33, 150, 243, 1)'
+            'A200': 'rgba(255, 152, 0, 1)'
         });
-        $mdThemingProvider.definePalette('blue-background', blueBackgroundPalette);
-        var blueAccentPalette = $mdThemingProvider.extendPalette('green', {
-            '600': 'rgba(0, 200, 83, 1)'
+        $mdThemingProvider.definePalette('orange-background', orangeBackgroundPalette);
+        var orangePrimaryPalette = $mdThemingProvider.extendPalette('orange', {
+            '800': 'rgba(255, 152, 0, 1)',
+            '900': 'rgba(255, 152, 0, .54);'
         });
-        $mdThemingProvider.definePalette('blue-accent', blueAccentPalette);
-        $mdThemingProvider.theme(themeName)
-            .primaryPalette('blue-primary', {
-            'default': '500',
-            'hue-1': '300'
+        $mdThemingProvider.definePalette('orange-primary', orangePrimaryPalette);
+        $mdThemingProvider.theme('amber')
+            .primaryPalette('orange-primary', {
+            'default': '800',
+            'hue-1': '900'
         })
-            .backgroundPalette('blue-background', {
+            .backgroundPalette('orange-background', {
             'default': '50',
             'hue-1': 'A200',
             'hue-2': 'A700'
@@ -11577,203 +11725,255 @@ function configureDefaultBlueTheme($mdThemingProvider) {
             .warnPalette('red', {
             'default': 'A200'
         })
-            .accentPalette('blue-accent', {
+            .accentPalette('orange', {
+            'default': '900'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.Amber', ['ngMaterial'])
+        .config(configureDefaultAmberTheme);
+}
+},{}],8:[function(require,module,exports){
+{
+    configureDefaultBlueTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultBlueTheme($mdThemingProvider) {
+        registerBlueTheme('default');
+        registerBlueTheme('blue');
+        $mdThemingProvider.setDefaultTheme('default');
+        $mdThemingProvider.alwaysWatchTheme(true);
+        function registerBlueTheme(themeName) {
+            var bluePrimaryPalette = $mdThemingProvider.extendPalette('blue', {
+                'contrastDefaultColor': 'light',
+                'contrastDarkColors': undefined
+            });
+            $mdThemingProvider.definePalette('blue-primary', bluePrimaryPalette);
+            var blueBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+                'A100': 'rgba(250, 250, 250, 1)',
+                'A200': 'rgba(33, 150, 243, 1)'
+            });
+            $mdThemingProvider.definePalette('blue-background', blueBackgroundPalette);
+            var blueAccentPalette = $mdThemingProvider.extendPalette('green', {
+                '600': 'rgba(0, 200, 83, 1)'
+            });
+            $mdThemingProvider.definePalette('blue-accent', blueAccentPalette);
+            $mdThemingProvider.theme(themeName)
+                .primaryPalette('blue-primary', {
+                'default': '500',
+                'hue-1': '300'
+            })
+                .backgroundPalette('blue-background', {
+                'default': '50',
+                'hue-1': 'A200',
+                'hue-2': 'A700'
+            })
+                .warnPalette('red', {
+                'default': 'A200'
+            })
+                .accentPalette('blue-accent', {
+                'default': '600'
+            });
+        }
+    }
+    angular
+        .module('pipTheme.Blue', ['ngMaterial'])
+        .config(configureDefaultBlueTheme);
+}
+},{}],9:[function(require,module,exports){
+{
+    configureDefaultGreenTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultGreenTheme($mdThemingProvider) {
+        var greenBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(76, 175, 80, 1)'
+        });
+        $mdThemingProvider.definePalette('green-background', greenBackgroundPalette);
+        var greenPrimaryPalette = $mdThemingProvider.extendPalette('green', {
+            '300': '#9ed4a1',
+            'contrastLightColors': ['500', '300']
+        });
+        $mdThemingProvider.definePalette('green-primary', greenPrimaryPalette);
+        var greenAccentPalette = $mdThemingProvider.extendPalette('amber', {
+            'contrastLightColors': ['A700']
+        });
+        $mdThemingProvider.definePalette('green-accent', greenAccentPalette);
+        $mdThemingProvider.theme('green')
+            .primaryPalette('green-primary', {
+            'default': '500',
+            'hue-1': '300'
+        })
+            .backgroundPalette('green-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('green-accent', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.Green', ['ngMaterial'])
+        .config(configureDefaultGreenTheme);
+}
+},{}],10:[function(require,module,exports){
+{
+    configureDefaultGreyTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultGreyTheme($mdThemingProvider) {
+        var thirdPartyPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(255, 152, 0, 1)',
+            'A400': '#a9b9c0',
+            '500': '#607D8B',
+            'A700': '#90A4AE',
+            'contrastDefaultColor': 'dark',
+            'contrastLightColors': ['300', '400', '500', '600', '700', '800', '900', 'A700']
+        });
+        $mdThemingProvider.definePalette('third-party', thirdPartyPalette);
+        $mdThemingProvider.theme('grey')
+            .primaryPalette('third-party', {
+            'default': '500',
+            'hue-1': 'A400'
+        })
+            .backgroundPalette('third-party', {
+            'default': '50',
+            'hue-1': '500',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('third-party', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.Grey', ['ngMaterial'])
+        .config(configureDefaultGreyTheme);
+}
+},{}],11:[function(require,module,exports){
+{
+    configureDefaultNavyTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultNavyTheme($mdThemingProvider) {
+        var greyPalette = $mdThemingProvider.extendPalette('grey', {
+            '700': 'rgba(86, 97, 125, 1)',
+            '800': 'rgba(86, 97, 125, .54)',
+            'A100': 'rgba(250, 250, 250, 1)',
+        });
+        $mdThemingProvider.definePalette('grey', greyPalette);
+        var tealPalette = $mdThemingProvider.extendPalette('teal', {
+            'contrastLightColors': ['500', '600', '700', '800', '900', 'A700']
+        });
+        $mdThemingProvider.definePalette('teal', tealPalette);
+        $mdThemingProvider.theme('navy')
+            .primaryPalette('grey', {
+            'default': '700',
+            'hue-1': '800'
+        })
+            .backgroundPalette('grey', {
+            'default': '50',
+            'hue-1': '700',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('teal', {
+            'default': 'A700'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.Navy', ['ngMaterial'])
+        .config(configureDefaultNavyTheme);
+}
+},{}],12:[function(require,module,exports){
+{
+    configureDefaultOrangeTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultOrangeTheme($mdThemingProvider) {
+        var RedBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(255, 112, 67, 1)',
+            'contrastLightColors': ['600', '700', '800', '900', 'A200']
+        });
+        $mdThemingProvider.definePalette('red-background', RedBackgroundPalette);
+        var RedPrimaryPalette = $mdThemingProvider.extendPalette('orange', {
+            '800': 'rgba(255, 112, 67, 1)',
+            '900': 'rgba(255, 152, 67, .54)',
+            'A100': 'rgba(255, 171, 64, 1)',
+            'contrastLightColors': ['800', '900', 'A100']
+        });
+        $mdThemingProvider.definePalette('red-primary', RedPrimaryPalette);
+        $mdThemingProvider.theme('orange')
+            .primaryPalette('red-primary', {
+            'default': '800',
+            'hue-1': '900'
+        })
+            .backgroundPalette('red-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('red-primary', {
+            'default': 'A100'
+        });
+        $mdThemingProvider.alwaysWatchTheme(true);
+    }
+    angular
+        .module('pipTheme.Orange', ['ngMaterial'])
+        .config(configureDefaultOrangeTheme);
+}
+},{}],13:[function(require,module,exports){
+{
+    configureDefaultPinkTheme.$inject = ['$mdThemingProvider'];
+    function configureDefaultPinkTheme($mdThemingProvider) {
+        var PinkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
+            'A100': 'rgba(250, 250, 250, 1)',
+            'A200': 'rgba(188, 86, 121, 1)',
+            'contrastDefaultColor': 'dark',
+            'contrastLightColors': ['A200', 'A700']
+        });
+        $mdThemingProvider.definePalette('pink-background', PinkBackgroundPalette);
+        var PinkPrimaryPalette = $mdThemingProvider.extendPalette('pink', {
+            '600': 'rgba(255, 128, 171, 1)',
+            '700': 'rgba(188, 86, 121, .54)',
+            '900': 'rgba(188, 86, 121, 1)',
+            'contrastDefaultColor': 'light'
+        });
+        $mdThemingProvider.definePalette('pink-primary', PinkPrimaryPalette);
+        $mdThemingProvider.theme('pink')
+            .primaryPalette('pink-primary', {
+            'default': '900',
+            'hue-1': '700'
+        })
+            .backgroundPalette('pink-background', {
+            'default': '50',
+            'hue-1': 'A200',
+            'hue-2': 'A700'
+        })
+            .warnPalette('red', {
+            'default': 'A200'
+        })
+            .accentPalette('pink-primary', {
             'default': '600'
         });
+        $mdThemingProvider.alwaysWatchTheme(true);
     }
+    angular
+        .module('pipTheme.Pink', ['ngMaterial'])
+        .config(configureDefaultPinkTheme);
 }
-angular
-    .module('pipTheme.Blue', ['ngMaterial'])
-    .config(configureDefaultBlueTheme);
-},{}],9:[function(require,module,exports){
-'use strict';
-configureDefaultGreenTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultGreenTheme($mdThemingProvider) {
-    var greenBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(76, 175, 80, 1)'
-    });
-    $mdThemingProvider.definePalette('green-background', greenBackgroundPalette);
-    var greenPrimaryPalette = $mdThemingProvider.extendPalette('green', {
-        '300': '#9ed4a1',
-        'contrastLightColors': ['500', '300']
-    });
-    $mdThemingProvider.definePalette('green-primary', greenPrimaryPalette);
-    var greenAccentPalette = $mdThemingProvider.extendPalette('amber', {
-        'contrastLightColors': ['A700']
-    });
-    $mdThemingProvider.definePalette('green-accent', greenAccentPalette);
-    $mdThemingProvider.theme('green')
-        .primaryPalette('green-primary', {
-        'default': '500',
-        'hue-1': '300'
-    })
-        .backgroundPalette('green-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('green-accent', {
-        'default': 'A700'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
-angular
-    .module('pipTheme.Green', ['ngMaterial'])
-    .config(configureDefaultGreenTheme);
-},{}],10:[function(require,module,exports){
-'use strict';
-configureDefaultGreyTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultGreyTheme($mdThemingProvider) {
-    var thirdPartyPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(255, 152, 0, 1)',
-        'A400': '#a9b9c0',
-        '500': '#607D8B',
-        'A700': '#90A4AE',
-        'contrastDefaultColor': 'dark',
-        'contrastLightColors': ['300', '400', '500', '600', '700', '800', '900', 'A700']
-    });
-    $mdThemingProvider.definePalette('third-party', thirdPartyPalette);
-    $mdThemingProvider.theme('grey')
-        .primaryPalette('third-party', {
-        'default': '500',
-        'hue-1': 'A400'
-    })
-        .backgroundPalette('third-party', {
-        'default': '50',
-        'hue-1': '500',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('third-party', {
-        'default': 'A700'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
-angular
-    .module('pipTheme.Grey', ['ngMaterial'])
-    .config(configureDefaultGreyTheme);
-},{}],11:[function(require,module,exports){
-'use strict';
-configureDefaultNavyTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultNavyTheme($mdThemingProvider) {
-    var greyPalette = $mdThemingProvider.extendPalette('grey', {
-        '700': 'rgba(86, 97, 125, 1)',
-        '800': 'rgba(86, 97, 125, .54)',
-        'A100': 'rgba(250, 250, 250, 1)',
-    });
-    $mdThemingProvider.definePalette('grey', greyPalette);
-    var tealPalette = $mdThemingProvider.extendPalette('teal', {
-        'contrastLightColors': ['500', '600', '700', '800', '900', 'A700']
-    });
-    $mdThemingProvider.definePalette('teal', tealPalette);
-    $mdThemingProvider.theme('navy')
-        .primaryPalette('grey', {
-        'default': '700',
-        'hue-1': '800'
-    })
-        .backgroundPalette('grey', {
-        'default': '50',
-        'hue-1': '700',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('teal', {
-        'default': 'A700'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
-angular
-    .module('pipTheme.Navy', ['ngMaterial'])
-    .config(configureDefaultNavyTheme);
-},{}],12:[function(require,module,exports){
-'use strict';
-configureDefaultOrangeTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultOrangeTheme($mdThemingProvider) {
-    var RedBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(255, 112, 67, 1)',
-        'contrastLightColors': ['600', '700', '800', '900', 'A200']
-    });
-    $mdThemingProvider.definePalette('red-background', RedBackgroundPalette);
-    var RedPrimaryPalette = $mdThemingProvider.extendPalette('orange', {
-        '800': 'rgba(255, 112, 67, 1)',
-        '900': 'rgba(255, 152, 67, .54)',
-        'A100': 'rgba(255, 171, 64, 1)',
-        'contrastLightColors': ['800', '900', 'A100']
-    });
-    $mdThemingProvider.definePalette('red-primary', RedPrimaryPalette);
-    $mdThemingProvider.theme('orange')
-        .primaryPalette('red-primary', {
-        'default': '800',
-        'hue-1': '900'
-    })
-        .backgroundPalette('red-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('red-primary', {
-        'default': 'A100'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
-angular
-    .module('pipTheme.Orange', ['ngMaterial'])
-    .config(configureDefaultOrangeTheme);
-},{}],13:[function(require,module,exports){
-'use strict';
-configureDefaultPinkTheme.$inject = ['$mdThemingProvider'];
-function configureDefaultPinkTheme($mdThemingProvider) {
-    var PinkBackgroundPalette = $mdThemingProvider.extendPalette('grey', {
-        'A100': 'rgba(250, 250, 250, 1)',
-        'A200': 'rgba(188, 86, 121, 1)',
-        'contrastDefaultColor': 'dark',
-        'contrastLightColors': ['A200', 'A700']
-    });
-    $mdThemingProvider.definePalette('pink-background', PinkBackgroundPalette);
-    var PinkPrimaryPalette = $mdThemingProvider.extendPalette('pink', {
-        '600': 'rgba(255, 128, 171, 1)',
-        '700': 'rgba(188, 86, 121, .54)',
-        '900': 'rgba(188, 86, 121, 1)',
-        'contrastDefaultColor': 'light'
-    });
-    $mdThemingProvider.definePalette('pink-primary', PinkPrimaryPalette);
-    $mdThemingProvider.theme('pink')
-        .primaryPalette('pink-primary', {
-        'default': '900',
-        'hue-1': '700'
-    })
-        .backgroundPalette('pink-background', {
-        'default': '50',
-        'hue-1': 'A200',
-        'hue-2': 'A700'
-    })
-        .warnPalette('red', {
-        'default': 'A200'
-    })
-        .accentPalette('pink-primary', {
-        'default': '600'
-    });
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
-angular
-    .module('pipTheme.Pink', ['ngMaterial'])
-    .config(configureDefaultPinkTheme);
 },{}],14:[function(require,module,exports){
-'use strict';
+"use strict";
 configureDefaultTheme.$inject = ['$mdThemingProvider'];
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./DefaultBlueTheme");
 require("./DefaultPinkTheme");
 require("./DefaultAmberTheme");
@@ -11781,6 +11981,10 @@ require("./DefaultOrangeTheme");
 require("./DefaultGreenTheme");
 require("./DefaultNavyTheme");
 require("./DefaultGreyTheme");
+function configureDefaultTheme($mdThemingProvider) {
+    $mdThemingProvider.setDefaultTheme('default');
+    $mdThemingProvider.alwaysWatchTheme(true);
+}
 angular
     .module('pipTheme.Default', [
     'ngMaterial',
@@ -11793,15 +11997,12 @@ angular
     'pipTheme.Grey'
 ])
     .config(configureDefaultTheme);
-function configureDefaultTheme($mdThemingProvider) {
-    $mdThemingProvider.setDefaultTheme('default');
-    $mdThemingProvider.alwaysWatchTheme(true);
-}
 },{"./DefaultAmberTheme":7,"./DefaultBlueTheme":8,"./DefaultGreenTheme":9,"./DefaultGreyTheme":10,"./DefaultNavyTheme":11,"./DefaultOrangeTheme":12,"./DefaultPinkTheme":13}],15:[function(require,module,exports){
-'use strict';
+"use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./common");
 require("./default");
 require("./bootbarn");
@@ -11809,284 +12010,44 @@ __export(require("./common"));
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Strings', ['pipTranslate']);
-    thisModule.run(['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
-        if (pipTranslate == null)
-            return;
-        pipTranslate.translations('en', {
-            'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
-            'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
-            'ERROR_ROUTE_CONTINUE': 'Continue',
-            'ERROR_ROUTE_TRY_AGAIN': 'Try again',
-            'ERROR_ROUTE_GO_BACK': 'Go Back',
-            'ERROR_ROUTE_PAGE_TITLE': 'Wrong page',
-            'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
-            'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
-            'ERROR_UNKNOWN_CLOSE': 'Close',
-            'ERROR_UNKNOWN_DETAILS': 'Details',
-            'ERROR_AVAILABLE_TITLE': 'The server is on maintenance',
-            'ERROR_AVAILABLE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
-                'a short period. We\'ll be back soon. Thank for your patience.',
-            'ERROR_AVAILABLE_CLOSE': 'Close',
-            'ERROR_AVAILABLE_TRY_AGAIN': 'Try after',
-            'ERROR_RESPONDING_TITLE': 'No connection to the server',
-            'ERROR_RESPONDING_SUBTITLE': 'Unable to connect to the server. Check your Internet connection and try again.',
-            'ERROR_RESPONDING_RETRY': 'Retry',
-            'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
-            'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
-                'and easier to use. Unfortunately, your browser doesn\'t support those ' +
-                'technologies. Download on of these great browsers and you\'ll be on your way:',
-            'ERROR_UNSUPPORTED_O': 'Opera',
-            'ERROR_UNSUPPORTED_O_VER': 'Version 36+',
-            'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
-            'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
-            'ERROR_UNSUPPORTED_GC': 'Google Chrome',
-            'ERROR_UNSUPPORTED_GC_VER': 'Version 48+',
-            'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
-            'ERROR_UNSUPPORTED_FM_VER': 'Version 45+'
-        });
-        pipTranslate.translations('ru', {
-            'ERROR_ROUTE_TITLE': 'Sorry, the page isn\'t available',
-            'ERROR_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
-            'ERROR_ROUTE_CONTINUE': 'Continue',
-            'ERROR_ROUTE_TRY_AGAIN': 'Try again',
-            'ERROR_ROUTE_GO_BACK': 'Go Back',
-            'ERROR_ROUTE_PAGE_TITLE': 'Wrong page',
-            'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
-            'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
-            'ERROR_UNKNOWN_CLOSE': 'Close',
-            'ERROR_UNKNOWN_DETAILS': 'Details',
-            'ERROR_AVAILABLE_TITLE': 'The server is on maintenance',
-            'ERROR_AVAILABLE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
-                'a short period. We\'ll be back soon. Thank for your patience.',
-            'ERROR_AVAILABLE_CLOSE': 'Close',
-            'ERROR_AVAILABLE_TRY_AGAIN': 'Try after',
-            'ERROR_RESPONDING_TITLE': 'No connection to the server',
-            'ERROR_RESPONDING_SUBTITLE': 'Unable to connect to server. Check your Internet connection and try again.',
-            'ERROR_RESPONDING_RETRY': 'Retry',
-            'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
-            'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
-                'and easier to use. Unfortunately, your browser doesn\'t support those ' +
-                'technologies. Download on of these great browsers and you\'ll be on your way:',
-            'ERROR_UNSUPPORTED_O': 'Opera',
-            'ERROR_UNSUPPORTED_O_VER': 'Version 35+',
-            'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
-            'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
-            'ERROR_UNSUPPORTED_GC': 'Google Chrome',
-            'ERROR_UNSUPPORTED_GC_VER': 'Version 47+',
-            'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
-            'ERROR_UNSUPPORTED_FM_VER': 'Version 43+'
-        });
-    }]);
-})();
-},{}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
-        var pipTranslate = $injector.has('pipTranslate')
-            ? $injector.get('pipTranslate') : null;
-        return function (key) {
-            return pipTranslate ? pipTranslate.translate(key) || key : key;
-        };
-    }]);
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipErrors', [
-        'pipErrors.Pages',
-        'pipErrorsService',
-        'pipNoConnectionPanel',
-        'pipClearErrors',
-        'pipFormErrors'
-    ]);
-})();
-},{}],4:[function(require,module,exports){
-'use strict';
-angular.module('pipErrorsService', []);
-require("./errors_service");
-},{"./errors_service":6}],5:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Pages', [
-        'ngMaterial',
-        'pipErrors.Strings', 'pipErrors.NoConnection', 'pipErrors.MissingRoute', 'pipErrors.Unsupported',
-        'pipErrors.Unknown', 'pipErrors.Maintenance', 'pipErrors.Translate', 'pipErrors.Templates'
-    ]);
-    thisModule.config(['$stateProvider', '$httpProvider', function ($stateProvider, $httpProvider) {
-        $httpProvider.interceptors.push('pipAuthHttpResponseInterceptor');
-        $stateProvider
-            .state('errors_no_connection', {
-            url: '/errors/no_connection',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorNoConnectionController',
-            templateUrl: 'no_connection/no_connection.html'
-        })
-            .state('errors_maintenance', {
-            url: '/errors/maintenance',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorMaintenanceController',
-            templateUrl: 'maintenance/maintenance.html'
-        })
-            .state('errors_missing_route', {
-            url: '/errors/missing_route',
-            params: {
-                unfoundState: null,
-                fromState: null
-            },
-            controller: 'pipErrorMissingRouteController',
-            templateUrl: 'missing_route/missing_route.html'
-        })
-            .state('errors_unsupported', {
-            url: '/errors/unsupported',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorUnsupportedController',
-            templateUrl: 'unsupported/unsupported.html'
-        })
-            .state('errors_unknown', {
-            url: '/errors/unknown',
-            params: {
-                error: null
-            },
-            controller: 'pipErrorUnknownController',
-            templateUrl: 'unknown/unknown.html'
-        });
-    }]);
-    thisModule.run(['$rootScope', '$state', '$injector', 'pipErrorsService', function ($rootScope, $state, $injector, pipErrorsService) {
-        var errorConfig = pipErrorsService.config;
-        if (errorConfig.Unsupported.Active) {
-            checkSupported();
-        }
-        if (errorConfig.MissingRoute.Active) {
-            $rootScope.$on('$stateNotFound', function (event, unfoundState, fromState, fromParams) {
-                event.preventDefault();
-                $state.go('errors_missing_route', {
-                    unfoundState: unfoundState,
-                    fromState: {
-                        to: fromState ? fromState.name : '',
-                        fromParams: fromParams
-                    }
-                });
-                $rootScope.$routing = false;
-            });
-        }
-        if (errorConfig.NoConnection.Active) {
-            $rootScope.$on('pipNoConnectionError', noConnectionError);
-        }
-        if (errorConfig.Unknown.Active) {
-            $rootScope.$on('pipUnknownError', unknownError);
-        }
-        if (errorConfig.Maintenance.Active) {
-            $rootScope.$on('pipMaintenanceError', maintenanceError);
-        }
-        function goToErrors(toState, params) {
-            if (toState == null)
-                throw new Error('Error state was not defined');
-            $state.go(toState, params);
-        }
-        ;
-        function maintenanceError(event, params) {
-            goToErrors('errors_maintenance', params);
-        }
-        function noConnectionError(event, params) {
-            goToErrors('errors_no_connection', params);
-        }
-        function unknownError(event, params) {
-            goToErrors('errors_unknown', params);
-        }
-        function checkSupported(supported) {
-            var pipSystemInfo = $injector.has('pipSystemInfo') ? $injector.get('pipSystemInfo') : null;
-            if (!pipSystemInfo) {
-                return;
-            }
-            if (!supported) {
-                supported = {
-                    edge: 11,
-                    ie: 11,
-                    firefox: 43,
-                    opera: 35,
-                    chrome: 47
-                };
-            }
-            var browser = pipSystemInfo.browserName;
-            var version = pipSystemInfo.browserVersion;
-            version = version.split(".")[0];
-            if (browser && supported[browser] && version >= supported[browser]) {
-                return;
-            }
-            $state.go('errors_unsupported');
-        }
-    }]);
-    thisModule.factory('pipAuthHttpResponseInterceptor', ['$q', '$location', '$rootScope', function ($q, $location, $rootScope) {
-        return {
-            responseError: function (rejection) {
-                var toState = $rootScope.$state && $rootScope.$state.name ? $rootScope.$state.name : null, toParams = $rootScope.$state && $rootScope.$state.params ? $rootScope.$state.params : null;
-                switch (rejection.status) {
-                    case 503:
-                        $rootScope.$emit('pipMaintenanceError', {
-                            error: rejection
-                        });
-                        break;
-                    case -1:
-                        $rootScope.$emit('pipNoConnectionError', {
-                            error: rejection
-                        });
-                        break;
-                    default:
-                        console.error("errors_unknown", rejection);
-                        break;
-                }
-                return $q.reject(rejection);
-            }
-        };
-    }]);
-})();
-},{}],6:[function(require,module,exports){
-'use strict';
-var ErrorStateItem = (function () {
-    function ErrorStateItem() {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ErrorPageConfig = (function () {
+    function ErrorPageConfig() {
     }
-    return ErrorStateItem;
+    return ErrorPageConfig;
 }());
-exports.ErrorStateItem = ErrorStateItem;
-var pipErrorsConfig = (function () {
-    function pipErrorsConfig() {
+exports.ErrorPageConfig = ErrorPageConfig;
+var ErrorPageConfigs = (function () {
+    function ErrorPageConfigs() {
         this.Maintenance = {
             Active: true,
             Name: 'errors_maintenance',
             Event: 'pipMaintenanceError',
-            Title: 'ERROR_AVAILABLE_TITLE',
-            SubTitle: 'ERROR_AVAILABLE_SUBTITLE',
-            Breadcrumb: 'ERROR_AVAILABLE_TITLE',
+            Title: 'ERROR_MAINTENANCE_TITLE',
+            SubTitle: 'ERROR_MAINTENANCE_SUBTITLE',
+            Breadcrumb: 'ERROR_MAINTENANCE_TITLE',
             Image: 'images/maintenance.svg'
         };
         this.MissingRoute = {
             Active: true,
             Name: 'errors_missing_route',
             Event: '$stateNotFound',
-            Title: 'ERROR_ROUTE_TITLE',
-            SubTitle: 'ERROR_ROUTE_SUBTITLE',
-            Breadcrumb: 'ERROR_ROUTE_PAGE_TITLE',
+            Title: 'ERROR_MISSING_ROUTE_TITLE',
+            SubTitle: 'ERROR_MISSING_ROUTE_SUBTITLE',
+            Breadcrumb: 'ERROR_MISSING_ROUTE_PAGE_TITLE',
             Image: 'images/invalid_route.svg'
         };
         this.NoConnection = {
             Active: true,
             Name: 'errors_no_connection',
             Event: 'pipNoConnectionError',
-            Title: 'ERROR_RESPONDING_TITLE',
-            SubTitle: 'ERROR_RESPONDING_SUBTITLE',
-            Breadcrumb: 'ERROR_RESPONDING_TITLE',
+            Title: 'ERROR_NO_CONNECTION_TITLE',
+            SubTitle: 'ERROR_NO_CONNECTION_SUBTITLE',
+            Breadcrumb: 'ERROR_NO_CONNECTION_TITLE',
             Image: 'images/no_response.svg'
         };
         this.Unknown = {
@@ -12106,395 +12067,770 @@ var pipErrorsConfig = (function () {
             SubTitle: 'ERROR_UNSUPPORTED_SUBTITLE',
             Breadcrumb: 'ERROR_UNSUPPORTED_TITLE',
             Image: '',
-            Params: {
-                supported: {
-                    edge: 11,
-                    ie: 11,
-                    firefox: 43,
-                    opera: 35,
-                    chrome: 47
-                }
-            }
+            Params: {}
         };
     }
-    return pipErrorsConfig;
+    return ErrorPageConfigs;
 }());
-exports.pipErrorsConfig = pipErrorsConfig;
-var pipErrorsService = (function () {
-    pipErrorsService.$inject = ['config'];
-    function pipErrorsService(config) {
-        "ngInject";
-        this._config = config || new pipErrorsConfig();
+exports.ErrorPageConfigs = ErrorPageConfigs;
+var SupportedBrowsers = (function () {
+    function SupportedBrowsers() {
+        this.edge = 11;
+        this.ie = 11;
+        this.firefox = 43;
+        this.opera = 35;
+        this.chrome = 47;
     }
-    Object.defineProperty(pipErrorsService.prototype, "config", {
+    return SupportedBrowsers;
+}());
+exports.SupportedBrowsers = SupportedBrowsers;
+},{}],2:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ErrorPageConfig_1 = require("./ErrorPageConfig");
+var ErrorPageConfigService = (function () {
+    ErrorPageConfigService.$inject = ['config'];
+    function ErrorPageConfigService(config) {
+        "ngInject";
+        this._config = config || new ErrorPageConfig_1.ErrorPageConfigs();
+    }
+    Object.defineProperty(ErrorPageConfigService.prototype, "configs", {
         get: function () {
             return this._config;
         },
         enumerable: true,
         configurable: true
     });
-    pipErrorsService.prototype.getErrorItemByKey = function (errorName) {
-        if (!errorName || !this._config[errorName]) {
+    ErrorPageConfigService.prototype.getErrorPageConfig = function (pageName) {
+        console.log(pageName, this._config);
+        if (!pageName || !this._config[pageName]) {
             return null;
         }
-        return this._config[errorName];
+        return this._config[pageName];
     };
-    return pipErrorsService;
+    return ErrorPageConfigService;
 }());
-var pipErrorsProvider = (function () {
-    function pipErrorsProvider() {
-        this._config = new pipErrorsConfig();
+var ErrorPageConfigProvider = (function () {
+    function ErrorPageConfigProvider() {
+        this.configs = new ErrorPageConfig_1.ErrorPageConfigs();
+        this.configs.Unsupported.Params.supported = new ErrorPageConfig_1.SupportedBrowsers();
     }
-    pipErrorsProvider.prototype.configureErrorByKey = function (errorName, errorParams) {
-        if (!errorName || !errorParams)
+    ErrorPageConfigProvider.prototype.setErrorPageConfig = function (pageName, config) {
+        if (!pageName || !config)
             return;
-        if (!this._config[errorName])
+        if (!this.configs[pageName])
             return;
-        this._config[errorName] = _.defaultsDeep(errorParams, this._config[errorName]);
+        this.configs[pageName] = _.defaultsDeep(config, this.configs[pageName]);
     };
-    pipErrorsProvider.prototype.configureErrors = function (value) {
-        if (!value)
+    ErrorPageConfigProvider.prototype.setAllErrorPageConfigs = function (configs) {
+        if (!configs)
             return;
-        this._config = _.defaultsDeep(value, this._config);
+        this.configs = _.defaultsDeep(configs, this.configs);
     };
-    pipErrorsProvider.prototype.$get = function () {
+    ErrorPageConfigProvider.prototype.setSupportedBrowsers = function (browsers) {
+        this.configs.Unsupported.Params.supported = browsers;
+    };
+    ErrorPageConfigProvider.prototype.$get = function () {
         "ngInject";
-        if (this._service == null)
-            this._service = new pipErrorsService(this._config);
+        if (this._service == null) {
+            this._service = new ErrorPageConfigService(this.configs);
+        }
         return this._service;
     };
-    return pipErrorsProvider;
+    return ErrorPageConfigProvider;
 }());
-angular
-    .module('pipErrorsService')
-    .provider('pipErrorsService', pipErrorsProvider);
-},{}],7:[function(require,module,exports){
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipClearErrors', []);
-    thisModule.directive('pipClearErrors', function () {
+    angular
+        .module('pipErrorPageConfigService', [])
+        .provider('pipErrorPageConfigService', ErrorPageConfigProvider);
+})();
+},{"./ErrorPageConfig":1}],3:[function(require,module,exports){
+(function () {
+    var ClearErrorsLink = (function () {
+        function ClearErrorsLink($scope, $element, $attrs, $ctrls) {
+            var _this = this;
+            this._fieldController = $ctrls[0];
+            this._formController = $ctrls[1];
+            $scope.$watch($attrs['ngModel'], function (newValue) {
+                _this.clearFieldErrors();
+                _this.clearFormErrors();
+            });
+        }
+        ClearErrorsLink.prototype.clearFieldErrors = function () {
+            var errors = this._fieldController.$error;
+            for (var prop in errors) {
+                if (errors.hasOwnProperty(prop) && prop.substring(0, 6) == 'ERROR_') {
+                    this._fieldController.$setValidity(prop, true);
+                }
+            }
+        };
+        ClearErrorsLink.prototype.clearFormErrors = function () {
+            this._formController.$serverError = {};
+        };
+        return ClearErrorsLink;
+    }());
+    function clearErrorsDirective() {
         return {
             restrict: 'A',
             require: ['ngModel', '^?form'],
-            link: function ($scope, $element, $attrs, $ctrls) {
-                var fieldController = $ctrls[0], formController = $ctrls[1];
-                $scope.$watch($attrs.ngModel, function (newValue) {
-                    clearFieldErrors();
-                    clearFormErrors();
-                });
-                function clearFieldErrors() {
-                    var errors = fieldController.$error;
-                    for (var prop in errors) {
-                        if (errors.hasOwnProperty(prop) && prop.substring(0, 6) == 'ERROR_') {
-                            fieldController.$setValidity(prop, true);
-                        }
-                    }
-                    ;
-                }
-                function clearFormErrors() {
-                    formController.$serverError = {};
-                }
-                ;
-            }
+            link: ClearErrorsLink
         };
+    }
+    angular
+        .module('pipClearErrors', [])
+        .directive('pipClearErrors', clearErrorsDirective);
+})();
+},{}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var FormErrorsService = (function () {
+    FormErrorsService.$inject = ['$rootScope'];
+    function FormErrorsService($rootScope) {
+        this.$rootScope = $rootScope;
+    }
+    FormErrorsService.prototype.errorsWithHint = function (field) {
+        if (field == null)
+            return;
+        return _.isEmpty(field.$error) ? { hint: true } : field.$error;
+    };
+    ;
+    FormErrorsService.prototype.touchedErrorsWithHint = function (form, field) {
+        if (form == null)
+            return;
+        if (field == null)
+            return;
+        if (form.$submitted && (field.$touched || form.$dirty) || !form.$submitted && (field.$touched || field.$dirty)) {
+            var result = _.isEmpty(field.$error) ? { hint: true } : field.$error;
+            return result;
+        }
+        return { hint: true };
+    };
+    FormErrorsService.prototype.resetFormErrors = function (form, errors) {
+        form.$setPristine();
+        form.$setUntouched();
+        if (errors) {
+            form.$setDirty();
+            form.$setSubmitted();
+        }
+        form['$serverError'] = {};
+    };
+    FormErrorsService.prototype.resetFieldsErrors = function (form, field) {
+        if (!form)
+            return;
+        if (field && form[field] && form[field].$error) {
+            form[field].$error = {};
+        }
+        else {
+            for (var prop in form) {
+                if (form[prop] && form[prop].$error) {
+                    form[prop].$error = {};
+                }
+            }
+            if (form && form.$error) {
+                form.$error = {};
+            }
+        }
+    };
+    FormErrorsService.prototype.setFormError = function (form, error, errorFieldMap) {
+        if (error == null)
+            return;
+        form['$serverError'] = form['$serverError'] || {};
+        var code = error.code || (error.data || {}).code || null;
+        if (!code && error.status)
+            code = error.status;
+        if (code) {
+            var errorName = 'ERROR_' + code, field = errorFieldMap ? errorFieldMap[code] : null;
+            if (field && form[field] && form[field].$setValidity) {
+                form[field].$setValidity(errorName, false);
+                return;
+            }
+            if (field == 'form') {
+                form['$serverError'][errorName] = true;
+                return;
+            }
+        }
+        if (error.data && error.data.message) {
+            form['$serverError']['ERROR_UNKNOWN'] = error.data.message;
+            this.goToUnhandledErrorPage(error);
+            return;
+        }
+        if (error.message) {
+            form['$serverError']['ERROR_UNKNOWN'] = error.message;
+            this.goToUnhandledErrorPage(error);
+            return;
+        }
+        if (error.name) {
+            form['$serverError']['ERROR_UNKNOWN'] = error.name;
+            this.goToUnhandledErrorPage(error);
+            return;
+        }
+        form['$serverError']['ERROR_UNKNOWN'] = error;
+        this.goToUnhandledErrorPage(error);
+    };
+    FormErrorsService.prototype.goToUnhandledErrorPage = function (error) {
+        this.$rootScope.$emit('pipUnhandledInternalError', {
+            error: error
+        });
+    };
+    return FormErrorsService;
+}());
+(function () {
+    angular
+        .module('pipFormErrors', [])
+        .service('pipFormErrors', FormErrorsService);
+})();
+},{}],5:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+angular
+    .module('pipErrors.Pages', [
+    'ngMaterial'
+]);
+require("./maintenance/MaintenanceErrorPage");
+require("./missing_route/MissingRouteErrorPage");
+require("./no_connection/NoConnectionErrorPage");
+require("./unknown/UnknownErrorPage");
+require("./unsupported/UnsupportedErrorPage");
+require("./error_pages/ErrorPageConfigService");
+require("./no_connection_panel/NoConnectionPanel");
+require("./form_errors/ClearErrorsDirective");
+require("./form_errors/FormErrorsService");
+angular
+    .module('pipErrors', [
+    'pipErrors.Templates',
+    'pipErrors.Pages',
+    'pipErrorPageConfigService',
+    'pipNoConnectionPanel',
+    'pipClearErrors',
+    'pipFormErrors'
+]);
+__export(require("./error_pages/ErrorPageConfig"));
+},{"./error_pages/ErrorPageConfig":1,"./error_pages/ErrorPageConfigService":2,"./form_errors/ClearErrorsDirective":3,"./form_errors/FormErrorsService":4,"./maintenance/MaintenanceErrorPage":6,"./missing_route/MissingRouteErrorPage":7,"./no_connection/NoConnectionErrorPage":8,"./no_connection_panel/NoConnectionPanel":9,"./unknown/UnknownErrorPage":10,"./unsupported/UnsupportedErrorPage":11}],6:[function(require,module,exports){
+"use strict";
+configureMaintenanceErrorPageRoute.$inject = ['$stateProvider'];
+initMaintenanceErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
+setMaintenanceErrorPageResources.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorsMaintenanceState = 'errors_maintenance';
+exports.MaintenanceErrorEvent = 'pipMaintenanceError';
+var MaintenanceError = (function () {
+    function MaintenanceError() {
+    }
+    return MaintenanceError;
+}());
+var MaintenanceErrorConfig = (function () {
+    function MaintenanceErrorConfig() {
+    }
+    return MaintenanceErrorConfig;
+}());
+var MaintenanceErrorParams = (function () {
+    function MaintenanceErrorParams() {
+        this.interval = 0;
+    }
+    return MaintenanceErrorParams;
+}());
+var MaintenanceErrorPageController = (function () {
+    MaintenanceErrorPageController.$inject = ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorPageConfigService'];
+    function MaintenanceErrorPageController($scope, $state, $rootScope, $mdMedia, $injector, pipErrorPageConfigService) {
+        "ngInject";
+        this._pageName = 'Maintenance';
+        this.isCordova = false;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        this.config = pipErrorPageConfigService.getErrorPageConfig(this._pageName);
+        this.pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        this.media = pipMedia ? pipMedia : $mdMedia;
+        $rootScope[pip.services.RoutingVar] = false;
+        this.appHeader();
+        this.error = $state && $state.params && $state.params['error'] ? $state.params['error'] : {};
+        this.timeoutInterval = this.error && this.error.config &&
+            this.error.config.params && this.error.config.params.interval ? this.error.config.params.interval : 0;
+    }
+    MaintenanceErrorPageController.prototype.appHeader = function () {
+        if (!this.pipNavService)
+            return;
+        this.pipNavService.appbar.addShadow();
+        this.pipNavService.icon.showMenu();
+        this.pipNavService.breadcrumb.text = this.config.Breadcrumb;
+        this.pipNavService.actions.hide();
+    };
+    return MaintenanceErrorPageController;
+}());
+function configureMaintenanceErrorPageRoute($stateProvider) {
+    "ngInject";
+    $stateProvider
+        .state(exports.ErrorsMaintenanceState, {
+        url: '/errors/maintenance',
+        params: {
+            error: null
+        },
+        controller: MaintenanceErrorPageController,
+        controllerAs: '$ctrl',
+        templateUrl: 'maintenance/MaintenanceErrorPage.html'
     });
+}
+function initMaintenanceErrorPage($rootScope, $state, pipErrorPageConfigService) {
+    "ngInject";
+    var _this = this;
+    var config = pipErrorPageConfigService.configs;
+    if (!config.Maintenance.Active)
+        return;
+    $rootScope.$on(exports.MaintenanceErrorEvent, function (event, params) {
+        _this.$state.go(exports.ErrorsMaintenanceState, params);
+    });
+}
+function setMaintenanceErrorPageResources($injector) {
+    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+    if (pipTranslate == null)
+        return;
+    pipTranslate.translations('en', {
+        'ERROR_MAINTENANCE_TITLE': 'The server is on maintenance',
+        'ERROR_MAINTENANCE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
+            'a short period. We\'ll be back soon. Thank for your patience.',
+        'ERROR_MAINTENANCE_CLOSE': 'Close',
+        'ERROR_MAINTENANCE_TRY_AGAIN': 'Try after'
+    });
+    pipTranslate.translations('ru', {
+        'ERROR_MAINTENANCE_TITLE': 'The server is on maintenance',
+        'ERROR_MAINTENANCE_SUBTITLE': 'Sorry for the inconvenience. This application is undergoing maintenance for ' +
+            'a short period. We\'ll be back soon. Thank for your patience.',
+        'ERROR_MAINTENANCE_CLOSE': 'Close',
+        'ERROR_MAINTENANCE_TRY_AGAIN': 'Try after'
+    });
+}
+(function () {
+    angular
+        .module('pipErrors.Pages')
+        .config(configureMaintenanceErrorPageRoute)
+        .run(initMaintenanceErrorPage)
+        .run(setMaintenanceErrorPageResources);
+})();
+},{}],7:[function(require,module,exports){
+"use strict";
+configureMissingRouteErrorPageRoute.$inject = ['$stateProvider'];
+initMissingRouteErrorPage.$inject = ['$rootScope', '$state', '$injector', 'pipErrorPageConfigService'];
+setMissingRouteErrorPageResources.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorsMissingRouteState = 'errors_missing_route';
+exports.StateNotFoundEvent = '$stateNotFound';
+var MissingRouteErrorState = (function () {
+    function MissingRouteErrorState() {
+    }
+    return MissingRouteErrorState;
+}());
+var MissingRouteErrorPageController = (function () {
+    MissingRouteErrorPageController.$inject = ['$scope', '$location', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorPageConfigService'];
+    function MissingRouteErrorPageController($scope, $location, $state, $rootScope, $mdMedia, $injector, pipErrorPageConfigService) {
+        "ngInject";
+        this.$location = $location;
+        this._pageName = 'MissingRoute';
+        this.isCordova = false;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        this.config = pipErrorPageConfigService.getErrorPageConfig(this._pageName);
+        this.pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        this.media = pipMedia ? pipMedia : $mdMedia;
+        $rootScope[pip.services.RoutingVar] = false;
+        this.appHeader();
+        this.fromState = $state && $state.params && $state.params['fromState'] ? $state.params['fromState'] : {};
+        this.unfoundState = $state && $state.params ? $state.params['unfoundState'] : {};
+        this.url = this.unfoundState && this.unfoundState.to ? $state.href(this.unfoundState.to, this.unfoundState.toParams, { absolute: true }) : '';
+        this.urlBack = this.fromState && this.fromState.to ? $state.href(this.fromState.to, this.fromState.fromParams, { absolute: true }) : '';
+    }
+    MissingRouteErrorPageController.prototype.appHeader = function () {
+        if (!this.pipNavService)
+            return;
+        this.pipNavService.appbar.addShadow();
+        this.pipNavService.icon.showMenu();
+        this.pipNavService.breadcrumb.text = this.config.Breadcrumb;
+        this.pipNavService.actions.hide();
+    };
+    MissingRouteErrorPageController.prototype.onContinue = function () {
+        this.$location.url('/');
+    };
+    return MissingRouteErrorPageController;
+}());
+function configureMissingRouteErrorPageRoute($stateProvider) {
+    "ngInject";
+    $stateProvider
+        .state(exports.ErrorsMissingRouteState, {
+        url: '/errors/missing_route',
+        params: {
+            unfoundState: null,
+            fromState: null
+        },
+        controller: MissingRouteErrorPageController,
+        controllerAs: '$ctrl',
+        templateUrl: 'missing_route/MissingRouteErrorPage.html'
+    });
+}
+function initMissingRouteErrorPage($rootScope, $state, $injector, pipErrorPageConfigService) {
+    "ngInject";
+    var config = pipErrorPageConfigService.configs;
+    if (!config.MissingRoute.Active)
+        return;
+    $rootScope.$on(exports.StateNotFoundEvent, function (event, unfoundState, fromState, fromParams) {
+        event.preventDefault();
+        $state.go(exports.ErrorsMissingRouteState, {
+            unfoundState: unfoundState,
+            fromState: {
+                to: fromState ? fromState.name : '',
+                fromParams: fromParams
+            }
+        });
+        $rootScope[pip.services.RoutingVar] = false;
+    });
+}
+function setMissingRouteErrorPageResources($injector) {
+    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+    if (pipTranslate == null)
+        return;
+    pipTranslate.translations('en', {
+        'ERROR_MISSING_ROUTE_TITLE': 'Sorry, the page isn\'t available',
+        'ERROR_MISSING_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
+        'ERROR_MISSING_ROUTE_CONTINUE': 'Continue',
+        'ERROR_MISSING_ROUTE_TRY_AGAIN': 'Try again',
+        'ERROR_MISSING_ROUTE_GO_BACK': 'Go Back',
+        'ERROR_MISSING_ROUTE_PAGE_TITLE': 'Wrong page'
+    });
+    pipTranslate.translations('ru', {
+        'ERROR_MISSING_ROUTE_TITLE': 'Sorry, the page isn\'t available',
+        'ERROR_MISSING_ROUTE_SUBTITLE': 'The link you followed may be broken, or the page may have been removed.',
+        'ERROR_MISSING_ROUTE_CONTINUE': 'Continue',
+        'ERROR_MISSING_ROUTE_TRY_AGAIN': 'Try again',
+        'ERROR_MISSING_ROUTE_GO_BACK': 'Go Back',
+        'ERROR_MISSING_ROUTE_PAGE_TITLE': 'Wrong page'
+    });
+}
+(function () {
+    angular
+        .module('pipErrors.Pages')
+        .config(configureMissingRouteErrorPageRoute)
+        .run(initMissingRouteErrorPage)
+        .run(setMissingRouteErrorPageResources);
 })();
 },{}],8:[function(require,module,exports){
+"use strict";
+configureNoConnectionErrorPageRoute.$inject = ['$injector', '$stateProvider'];
+initNoConnectionErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
+setNoConnectionErrorPageResources.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorsConnectionState = 'errors_no_connection';
+exports.ErrorsConnectionEvent = 'pipNoConnectionError';
+var NoConnectionError = (function () {
+    function NoConnectionError() {
+    }
+    return NoConnectionError;
+}());
+var NoConnectionErrorPageController = (function () {
+    NoConnectionErrorPageController.$inject = ['$window', '$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorPageConfigService'];
+    function NoConnectionErrorPageController($window, $scope, $state, $rootScope, $mdMedia, $injector, pipErrorPageConfigService) {
+        "ngInject";
+        this.$window = $window;
+        this._pageName = 'NoConnection';
+        this.isCordova = false;
+        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
+        this.errorConfig = pipErrorPageConfigService.getErrorPageConfig(this._pageName);
+        this.pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        this.media = pipMedia ? pipMedia : $mdMedia;
+        $rootScope[pip.services.RoutingVar] = false;
+        this.appHeader();
+        this.error = $state && $state.params && $state.params['error'] ? $state.params['error'] : {};
+    }
+    NoConnectionErrorPageController.prototype.appHeader = function () {
+        if (!this.pipNavService)
+            return;
+        this.pipNavService.appbar.addShadow();
+        this.pipNavService.icon.showMenu();
+        this.pipNavService.breadcrumb.text = this.errorConfig.Breadcrumb;
+        this.pipNavService.actions.hide();
+    };
+    NoConnectionErrorPageController.prototype.onRetry = function () {
+        this.$window.history.back();
+    };
+    return NoConnectionErrorPageController;
+}());
+function configureNoConnectionErrorPageRoute($injector, $stateProvider) {
+    "ngInject";
+    $stateProvider
+        .state(exports.ErrorsConnectionState, {
+        url: '/errors/no_connection',
+        params: {
+            error: null
+        },
+        controller: NoConnectionErrorPageController,
+        controllerAs: '$ctrl',
+        templateUrl: 'no_connection/NoConnectionErrorPage.html'
+    });
+}
+function initNoConnectionErrorPage($rootScope, $state, pipErrorPageConfigService) {
+    "ngInject";
+    var _this = this;
+    var config = pipErrorPageConfigService.configs;
+    if (!config.NoConnection.Active)
+        return;
+    $rootScope.$on(exports.ErrorsConnectionEvent, function (event, params) {
+        _this.$state.go(exports.ErrorsConnectionState, params);
+    });
+}
+function setNoConnectionErrorPageResources($injector) {
+    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+    if (pipTranslate == null)
+        return;
+    pipTranslate.translations('en', {
+        'ERROR_NO_CONNECTION_TITLE': 'No connection to the server',
+        'ERROR_NO_CONNECTION_SUBTITLE': 'Unable to connect to the server. Check your Internet connection and try again.',
+        'ERROR_NO_CONNECTION_RETRY': 'Retry',
+    });
+    pipTranslate.translations('ru', {
+        'ERROR_NO_CONNECTION_TITLE': 'No connection to the server',
+        'ERROR_NO_CONNECTION_SUBTITLE': 'Unable to connect to server. Check your Internet connection and try again.',
+        'ERROR_NO_CONNECTION_RETRY': 'Retry',
+    });
+}
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipFormErrors', []);
-    thisModule.factory('pipFormErrors', ['$rootScope', function ($rootScope) {
-        return {
-            errorsWithHint: errorsWithHint,
-            touchedErrorsWithHint: touchedErrorsWithHint,
-            resetFormErrors: resetFormErrors,
-            setFormError: setFormError,
-            resetFieldsErrors: resetFieldsErrors
-        };
-        function errorsWithHint(field) {
-            if (field == null)
-                return;
-            return _.isEmpty(field.$error) ? { hint: true } : field.$error;
-        }
-        ;
-        function touchedErrorsWithHint(form, field) {
-            if (form == null)
-                return;
-            if (field == null)
-                return;
-            if (form.$submitted && (field.$touched || form.$dirty) || !form.$submitted && (field.$touched || field.$dirty)) {
-                var result = _.isEmpty(field.$error) ? { hint: true } : field.$error;
-                return result;
-            }
-            return { hint: true };
-        }
-        ;
-        function resetFormErrors(form, errors) {
-            form.$setPristine();
-            form.$setUntouched();
-            if (errors) {
-                form.$setDirty();
-                form.$setSubmitted();
-            }
-            form.$serverError = {};
-        }
-        ;
-        function resetFieldsErrors(form, field) {
-            if (!form)
-                return;
-            if (field && form[field] && form[field].$error) {
-                form[field].$error = {};
-            }
-            else {
-                for (var prop in form) {
-                    if (form[prop] && form[prop].$error) {
-                        form[prop].$error = {};
-                    }
-                    ;
-                }
-                if (form && form.$error)
-                    form.$error = {};
-            }
-        }
-        ;
-        function setFormError(form, error, errorFieldMap) {
-            if (error == null)
-                return;
-            form.$serverError = form.$serverError || {};
-            var code = error.code || (error.data || {}).code || null;
-            if (!code && error.status)
-                code = error.status;
-            if (code) {
-                var errorName = 'ERROR_' + code, field = errorFieldMap ? errorFieldMap[code] : null;
-                if (field && form[field] && form[field].$setValidity) {
-                    form[field].$setValidity(errorName, false);
-                    return;
-                }
-                if (field == 'form') {
-                    form.$serverError[errorName] = true;
-                    return;
-                }
-            }
-            if (error.data && error.data.message) {
-                form.$serverError['ERROR_UNKNOWN'] = error.data.message;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-            if (error.message) {
-                form.$serverError['ERROR_UNKNOWN'] = error.message;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-            if (error.name) {
-                form.$serverError['ERROR_UNKNOWN'] = error.name;
-                goToUnhandledErrorPage(error);
-                return;
-            }
-            form.$serverError['ERROR_UNKNOWN'] = error;
-            goToUnhandledErrorPage(error);
-        }
-        ;
-        function goToUnhandledErrorPage(error) {
-            $rootScope.$emit('pipUnhandledInternalError', {
-                error: error
-            });
-        }
-        ;
-    }]);
+    angular
+        .module('pipErrors.Pages')
+        .config(configureNoConnectionErrorPageRoute)
+        .run(initNoConnectionErrorPage)
+        .run(setNoConnectionErrorPageResources);
 })();
 },{}],9:[function(require,module,exports){
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Maintenance', []);
-    thisModule.controller('pipErrorMaintenanceController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $mdMedia, $injector, pipErrorsService) {
-        var errorKey = 'Maintenance';
-        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
-        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
-        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        $scope.media = pipMedia ? pipMedia : $mdMedia;
-        $rootScope.$routing = false;
-        $scope.isCordova = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.timeoutInterval = $scope.error && $scope.error.config &&
-            $scope.error.config.params && $scope.error.config.params.interval ? $scope.error.config.params.interval : 0;
-        $scope.onClose = onClose;
-        return;
-        function appHeader() {
-            if (!pipNavService)
-                return;
-            pipNavService.appbar.addShadow();
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
-            pipNavService.actions.hide();
+    var NoConnectionPanelController = (function () {
+        NoConnectionPanelController.$inject = ['$scope'];
+        function NoConnectionPanelController($scope) {
+            this._retry = $scope['retry'];
+            this.error = $scope['error'];
         }
-        ;
-        function onClose() {
-        }
-        ;
-    }]);
-})();
-},{}],10:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.MissingRoute', []);
-    thisModule.controller('pipErrorMissingRouteController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $mdMedia, $injector, pipErrorsService) {
-        var errorKey = 'MissingRoute';
-        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
-        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
-        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        $scope.media = pipMedia ? pipMedia : $mdMedia;
-        appHeader();
-        $rootScope.$routing = false;
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.fromState : {};
-        $scope.unfoundState = $state && $state.params ? $state.params.unfoundState : {};
-        $scope.url = $scope.unfoundState && $scope.unfoundState.to ? $state.href($scope.unfoundState.to, $scope.unfoundState.toParams, { absolute: true }) : '';
-        $scope.urlBack = $scope.fromState && $scope.fromState.to ? $state.href($scope.fromState.to, $scope.fromState.fromParams, { absolute: true }) : '';
-        $scope.onContinue = onContinue;
-        return;
-        function appHeader() {
-            if (!pipNavService)
-                return;
-            pipNavService.appbar.addShadow();
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
-            pipNavService.actions.hide();
-        }
-        ;
-        function onContinue() {
-        }
-        ;
-    }]);
-})();
-},{}],11:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.NoConnection', []);
-    thisModule.controller('pipErrorNoConnectionController', ['$scope', '$state', '$rootScope', '$window', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $window, $mdMedia, $injector, pipErrorsService) {
-        var errorKey = 'NoConnection';
-        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
-        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
-        var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        $scope.media = pipMedia ? pipMedia : $mdMedia;
-        $rootScope.$routing = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.onRetry = onRetry;
-        return;
-        function onRetry() {
-            $window.history.back();
-        }
-        ;
-        function appHeader() {
-            if (!pipNavService)
-                return;
-            pipNavService.appbar.addShadow();
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
-            pipNavService.actions.hide();
-        }
-        ;
-    }]);
-})();
-},{}],12:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module("pipNoConnectionPanel", ['pipErrors.Translate']);
-    thisModule.directive('pipNoConnectionPanel', function () {
+        NoConnectionPanelController.prototype.onRetry = function () {
+            if (this._retry && angular.isFunction(this._retry))
+                this._retry();
+        };
+        return NoConnectionPanelController;
+    }());
+    angular
+        .module("pipNoConnectionPanel", [])
+        .directive('pipNoConnectionPanel', function () {
         return {
             restrict: 'E',
             scope: {
                 error: '=pipError',
                 retry: '=pipRetry'
             },
-            templateUrl: 'no_connection_panel/no_connection_panel.html',
-            controller: 'pipNoConnectionPanelController'
+            templateUrl: 'no_connection_panel/NoConnectionPanel.html',
+            controller: NoConnectionPanelController,
+            controllerAs: '$ctrl'
         };
     });
-    thisModule.controller('pipNoConnectionPanelController', ['$scope', '$element', '$attrs', 'pipTranslate', function ($scope, $element, $attrs, pipTranslate) {
-        $scope.onRetry = onRetry;
-        return;
-        function onRetry() {
-            if ($scope.retry && angular.isFunction($scope.retry))
-                $scope.retry();
-        }
-        ;
-    }]);
 })();
-},{}],13:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Unknown', []);
-    thisModule.controller('pipErrorUnknownController', ['$scope', '$state', '$rootScope', '$injector', '$mdMedia', 'pipErrorsService', function ($scope, $state, $rootScope, $injector, $mdMedia, pipErrorsService) {
-        var errorKey = 'Unknown';
-        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
-        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+},{}],10:[function(require,module,exports){
+"use strict";
+configureUnknownErrorPageRoute.$inject = ['$injector', '$stateProvider'];
+initUnknownErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
+setUnknownErrorPageResources.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ErrorsUnknownState = 'errors_unknown';
+exports.ErrorsUnknownEvent = 'pipUnknownError';
+var UnknownErrorDetails = (function () {
+    function UnknownErrorDetails() {
+    }
+    return UnknownErrorDetails;
+}());
+var UnknownErrorPageController = (function () {
+    UnknownErrorPageController.$inject = ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorPageConfigService'];
+    function UnknownErrorPageController($scope, $state, $rootScope, $mdMedia, $injector, pipErrorPageConfigService) {
+        "ngInject";
+        this._pageName = 'Unknown';
+        this.isCordova = false;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        $scope.media = pipMedia ? pipMedia : $mdMedia;
-        $rootScope.$routing = false;
-        $scope.isCordova = false;
-        appHeader();
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
-        $scope.error_details = null;
-        $scope.onDetails = onDetails;
-        $scope.onClose = onClose;
-        parseError();
+        this.config = pipErrorPageConfigService.getErrorPageConfig(this._pageName);
+        this.pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        this.media = pipMedia ? pipMedia : $mdMedia;
+        $rootScope[pip.services.RoutingVar] = false;
+        this.showError = $scope['showError'];
+        this.appHeader();
+        this.error = $state && $state.params && $state.params['error'] ? $state.params['error'] : {};
+        this.parseError();
+    }
+    UnknownErrorPageController.prototype.appHeader = function () {
+        if (!this.pipNavService)
+            return;
+        this.pipNavService.appbar.addShadow();
+        this.pipNavService.icon.showMenu();
+        this.pipNavService.breadcrumb.text = this.config.Breadcrumb;
+        this.pipNavService.actions.hide();
+    };
+    UnknownErrorPageController.prototype.parseError = function () {
+        this.error_details = new UnknownErrorDetails();
+        this.error_details.code = this.error.code;
+        this.error_details.message = this.error.message;
+        this.error_details.status = this.error.status;
+        this.error_details.server_stacktrace = function () { };
+        this.error_details.client_stacktrace = function () { };
+    };
+    UnknownErrorPageController.prototype.onDetails = function () {
+        this.showError = true;
+    };
+    return UnknownErrorPageController;
+}());
+function configureUnknownErrorPageRoute($injector, $stateProvider) {
+    "ngInject";
+    $stateProvider
+        .state(exports.ErrorsUnknownState, {
+        url: '/errors/unknown',
+        params: {
+            error: null
+        },
+        controllerAs: '$ctrl',
+        controller: UnknownErrorPageController,
+        templateUrl: 'unknown/UnknownErrorPage.html'
+    });
+}
+function initUnknownErrorPage($rootScope, $state, pipErrorPageConfigService) {
+    "ngInject";
+    var _this = this;
+    var config = pipErrorPageConfigService.configs;
+    if (!config.Unknown.Active)
         return;
-        function appHeader() {
-            if (!pipNavService)
-                return;
-            pipNavService.appbar.addShadow();
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
-            pipNavService.actions.hide();
-        }
-        ;
-        function parseError() {
-            $scope.error_details = {};
-            $scope.error_details.code = $scope.error.code;
-            $scope.error_details.message = $scope.error.message;
-            $scope.error_details.status = $scope.error.status;
-            $scope.error_details.server_stacktrace = function () {
-            };
-            $scope.error_details.client_stacktrace = function () {
-            };
-        }
-        ;
-        function onDetails() {
-            $scope.showError = true;
-        }
-        ;
-        function onClose() {
-        }
-        ;
-    }]);
-})();
-},{}],14:[function(require,module,exports){
+    $rootScope.$on(exports.ErrorsUnknownEvent, function (event, params) {
+        _this.$state.go(exports.ErrorsUnknownState, params);
+    });
+}
+function setUnknownErrorPageResources($injector) {
+    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+    if (pipTranslate == null)
+        return;
+    pipTranslate.translations('en', {
+        'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
+        'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
+        'ERROR_UNKNOWN_CLOSE': 'Close',
+        'ERROR_UNKNOWN_DETAILS': 'Details',
+    });
+    pipTranslate.translations('ru', {
+        'ERROR_UNKNOWN_TITLE': 'Oops. Something went wrong',
+        'ERROR_UNKNOWN_SUBTITLE': 'Unknown error occurred, but don\'t worry we already have been notified.',
+        'ERROR_UNKNOWN_CLOSE': 'Close',
+        'ERROR_UNKNOWN_DETAILS': 'Details',
+    });
+}
 (function () {
-    'use strict';
-    var thisModule = angular.module('pipErrors.Unsupported', []);
-    thisModule.controller('pipErrorUnsupportedController', ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorsService', function ($scope, $state, $rootScope, $mdMedia, $injector, pipErrorsService) {
-        var errorKey = 'Unsupported';
-        $scope.errorConfig = pipErrorsService.getErrorItemByKey(errorKey);
-        var pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+    angular
+        .module('pipErrors.Pages')
+        .config(configureUnknownErrorPageRoute)
+        .run(initUnknownErrorPage)
+        .run(setUnknownErrorPageResources);
+})();
+},{}],11:[function(require,module,exports){
+"use strict";
+configureUnsupportedErrorPageRoute.$inject = ['$stateProvider'];
+initUnsupportedErrorPage.$inject = ['$rootScope', '$state', '$injector', 'pipErrorPageConfigService'];
+setUnsupportedErrorPageResources.$inject = ['$injector'];
+Object.defineProperty(exports, "__esModule", { value: true });
+var UnsupportedError = (function () {
+    function UnsupportedError() {
+    }
+    return UnsupportedError;
+}());
+var UnsupportedErrorPageController = (function () {
+    UnsupportedErrorPageController.$inject = ['$scope', '$state', '$rootScope', '$mdMedia', '$injector', 'pipErrorPageConfigService'];
+    function UnsupportedErrorPageController($scope, $state, $rootScope, $mdMedia, $injector, pipErrorPageConfigService) {
+        "ngInject";
+        this._pageName = 'Unsupported';
+        this.isCordova = false;
         var pipMedia = $injector.has('pipMedia') ? $injector.get('pipMedia') : null;
-        $scope.media = pipMedia ? pipMedia : $mdMedia;
-        $rootScope.$routing = false;
-        if (pipNavService) {
-            appHeader();
-        }
-        $scope.error = $state && $state.params && $state.params.error ? $state.params.error : {};
+        this.errorConfig = pipErrorPageConfigService.getErrorPageConfig(this._pageName);
+        this.pipNavService = $injector.has('pipNavService') ? $injector.get('pipNavService') : null;
+        this.media = pipMedia ? pipMedia : $mdMedia;
+        $rootScope[pip.services.RoutingVar] = false;
+        this.appHeader();
+        this.error = $state && $state.params && $state.params['error'] ? $state.params['error'] : {};
+    }
+    UnsupportedErrorPageController.prototype.appHeader = function () {
+        if (!this.pipNavService)
+            return;
+        this.pipNavService.appbar.addShadow();
+        this.pipNavService.icon.showMenu();
+        this.pipNavService.breadcrumb.text = this.errorConfig.Breadcrumb;
+        this.pipNavService.actions.hide();
+    };
+    return UnsupportedErrorPageController;
+}());
+function configureUnsupportedErrorPageRoute($stateProvider) {
+    "ngInject";
+    $stateProvider
+        .state('errors_unsupported', {
+        url: '/errors/unsupported',
+        params: {
+            error: null
+        },
+        controllerAs: '$ctrl',
+        controller: UnsupportedErrorPageController,
+        templateUrl: 'unsupported/UnsupportedErrorPage.html'
+    });
+}
+function initUnsupportedErrorPage($rootScope, $state, $injector, pipErrorPageConfigService) {
+    "ngInject";
+    var config = pipErrorPageConfigService.configs;
+    if (!config.Unsupported.Active)
         return;
-        function appHeader() {
-            pipNavService.appbar.addShadow();
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = $scope.errorConfig.Breadcrumb;
-            pipNavService.actions.hide();
-        }
-        ;
-    }]);
+    var pipSystemInfo = $injector.has('pipSystemInfo') ? $injector.get('pipSystemInfo') : null;
+    if (!pipSystemInfo) {
+        return;
+    }
+    var supportedVersions = config.Unsupported.Params.supported;
+    var browser = pipSystemInfo.browserName;
+    var version = pipSystemInfo.browserVersion;
+    version = version.split(".")[0];
+    if (browser
+        && supportedVersions[browser]
+        && version >= supportedVersions[browser]) {
+        return;
+    }
+    this.$state.go('errors_unsupported');
+}
+function setUnsupportedErrorPageResources($injector) {
+    var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
+    if (pipTranslate == null)
+        return;
+    pipTranslate.translations('en', {
+        'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
+        'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
+            'and easier to use. Unfortunately, your browser doesn\'t support those ' +
+            'technologies. Download one of these great browsers and you\'ll be on your way:',
+        'ERROR_UNSUPPORTED_O': 'Opera',
+        'ERROR_UNSUPPORTED_O_VER': 'Version 36+',
+        'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
+        'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
+        'ERROR_UNSUPPORTED_GC': 'Google Chrome',
+        'ERROR_UNSUPPORTED_GC_VER': 'Version 48+',
+        'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
+        'ERROR_UNSUPPORTED_FM_VER': 'Version 45+'
+    });
+    pipTranslate.translations('ru', {
+        'ERROR_UNSUPPORTED_TITLE': 'This browser is not supported',
+        'ERROR_UNSUPPORTED_SUBTITLE': 'Our application using the latest technology. This makes the application faster ' +
+            'and easier to use. Unfortunately, your browser doesn\'t support those ' +
+            'technologies. Download one of these great browsers and you\'ll be on your way:',
+        'ERROR_UNSUPPORTED_O': 'Opera',
+        'ERROR_UNSUPPORTED_O_VER': 'Version 35+',
+        'ERROR_UNSUPPORTED_IE': 'Internet Explorer',
+        'ERROR_UNSUPPORTED_IE_VER': 'Version 11+',
+        'ERROR_UNSUPPORTED_GC': 'Google Chrome',
+        'ERROR_UNSUPPORTED_GC_VER': 'Version 47+',
+        'ERROR_UNSUPPORTED_FM': 'Mozilla Firefox',
+        'ERROR_UNSUPPORTED_FM_VER': 'Version 43+'
+    });
+}
+(function () {
+    angular
+        .module('pipErrors.Pages')
+        .config(configureUnsupportedErrorPageRoute)
+        .run(initUnsupportedErrorPage)
+        .run(setUnsupportedErrorPageResources);
 })();
-},{}],15:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipErrors.Templates');
@@ -12502,8 +12838,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/missing_route.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="onContinue($event)">{{::\'ERROR_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{url}}">{{::\'ERROR_ROUTE_TRY_AGAIN\' | translate }}: {{url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{urlBack}}">{{::\'ERROR_ROUTE_GO_BACK\' | translate }}: {{urlBack}}</a></div></div>');
+  $templateCache.put('maintenance/MaintenanceErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_MAINTENANCE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_MAINTENANCE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="$ctrl.timeoutInterval">{{::\'ERROR_MAINTENANCE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="$ctrl.isCordova"><md-button class="md-accent" ng-click="$ctrl.onClose($event)" aria-label="CLOSE">{{::\'ERROR_MAINTENANCE_CLOSE\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -12514,8 +12850,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection/no_connection.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('missing_route/MissingRouteErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.config.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.config.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="$ctrl.onContinue($event)">{{::\'ERROR_MISSING_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{$ctrl.url}}">{{::\'ERROR_MISSING_ROUTE_TRY_AGAIN\' | translate }}: {{$ctrl.url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{$ctrl.urlBack}}">{{::\'ERROR_MISSING_ROUTE_GO_BACK\' | translate }}: {{$ctrl.urlBack}}</a></div></div></div>');
 }]);
 })();
 
@@ -12526,8 +12862,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/maintenance.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_AVAILABLE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_AVAILABLE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="timeoutInterval">{{::\'ERROR_AVAILABLE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="isCordova"><md-button class="md-accent" ng-click="onClose($event)" aria-label="CLOSE">{{::\'ERROR_AVAILABLE_CLOSE\' | translate}}</md-button></div></div>');
+  $templateCache.put('no_connection/NoConnectionErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="$ctrl.onRetry($event)">{{::\'ERROR_NO_CONNECTION_RETRY\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -12538,8 +12874,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/no_connection_panel.html',
-    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="onRetry($event)">{{::\'ERROR_RESPONDING_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('unsupported/UnsupportedErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$ctrl.media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$ctrl.media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div></div>');
 }]);
 })();
 
@@ -12550,8 +12886,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unknown/unknown.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{errorConfig.Image}}" class="pip-pic block"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="showError && error_details && error_details.message"><div ng-if="error_details.code">Code: {{error_details.code}}</div><div ng-if="error_details.message">Description: {{error_details.message}}</div><div ng-if="error_details.status">HTTP status: {{error_details.status}}</div><div ng-if="error_details.server_stacktrace">Server stacktrace: {{error_details.server_stacktrace}}</div><div ng-if="error_details.client_stacktrace">Client stacktrace stacktrace: {{error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48" ng-if="error_details && error_details.status"><md-button aria-label="DETAILS" class="md-accent" ng-click="onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div>');
+  $templateCache.put('no_connection_panel/NoConnectionPanel.html',
+    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{$ctrl.error.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.error.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.error.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="$ctrl.onRetry($event)">{{::\'ERROR_NO_CONNECTION_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -12562,18 +12898,21 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unsupported/unsupported.html',
-    '<div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div>');
+  $templateCache.put('unknown/UnknownErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.config.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.config.SubTitle | translate}}</div><div class="pip-error-subtext" ng-if="$ctrl.showError && $ctrl.error_details && $ctrl.error_details.message"><div ng-if="$ctrl.error_details.code">Code: {{$ctrl.error_details.code}}</div><div ng-if="$ctrl.error_details.message">Description: {{$ctrl.error_details.message}}</div><div ng-if="$ctrl.error_details.status">HTTP status: {{$ctrl.error_details.status}}</div><div ng-if="$ctrl.error_details.server_stacktrace">Server stacktrace: {{$ctrl.error_details.server_stacktrace}}</div><div ng-if="$ctrl.error_details.client_stacktrace">Client stacktrace stacktrace: {{$ctrl.error_details.client_stacktrace}}</div></div><div class="pip-error-actions layout-column layout-align-center-center"><div class="h48" ng-if="$ctrl.isCordova"><md-button aria-label="CLOSE" class="md-accent" ng-click="$ctrl.onClose($event)">{{::\'ERROR_UNKNOWN_CLOSE\' | translate}}</md-button></div><div class="h48" ng-if="$ctrl.error_details && $ctrl.error_details.status"><md-button aria-label="DETAILS" class="md-accent" ng-click="$ctrl.onDetails($event)">{{::\'ERROR_UNKNOWN_DETAILS\' | translate}}</md-button></div></div></div></div>');
 }]);
 })();
 
 
 
-},{}]},{},[15,1,2,4,5,6,3,7,8,9,10,12,11,13,14])(15)
+},{}]},{},[12,5])(12)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var BarChartBindings = {
         series: '<pipSeries',
@@ -12769,6 +13108,7 @@ module.run(['$templateCache', function($templateCache) {
 }
 },{}],2:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ChartColorsService = (function () {
         ChartColorsService.$inject = ['$mdColorPalette'];
@@ -12808,8 +13148,10 @@ module.run(['$templateCache', function($templateCache) {
 }
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ChartLegendBindings = {
         series: '<pipSeries',
@@ -12910,6 +13252,7 @@ angular.module('pipCharts', [
 ]);
 },{}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LineChartBindings = {
         series: '<pipSeries',
@@ -13372,6 +13715,7 @@ angular.module('pipCharts', [
 }
 },{}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var PieChartBindings = {
         series: '<pipSeries',
@@ -13578,22 +13922,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar_chart/BarChart.html',
-    '<div class="bar-chart">\n' +
-    '    <svg ></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('chart_legend/ChartInteractiveLegend.html',
     '<div >\n' +
     '    <div class="chart-legend-item" ng-repeat="item in $ctrl.series" ng-show="item.values || item.value">\n' +
@@ -13616,6 +13944,22 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('bar_chart/BarChart.html',
+    '<div class="bar-chart">\n' +
+    '    <svg ></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -13668,6 +14012,8 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[8,1,2,3,4,5,6,7])(8)
 });
+
+
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).locations = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -13817,8 +14163,10 @@ angular.module('pipLocations', [
 }
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LocationEditDialogController_1 = (function () {
         function LocationEditDialogController_1($scope, $rootScope, $timeout, $mdDialog, locationPos, locationName) {
@@ -14007,6 +14355,7 @@ angular.module('pipLocations', [
 }
 },{}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var LocationDialogParams = (function () {
     function LocationDialogParams() {
     }
@@ -14015,10 +14364,12 @@ var LocationDialogParams = (function () {
 exports.LocationDialogParams = LocationDialogParams;
 },{}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLocationEditDialog', ['ngMaterial', 'pipLocations.Templates']);
 require("./LocationDialog");
 },{"./LocationDialog":5}],8:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LocationEditBindings = {
         pipLocationName: '=',
@@ -14528,8 +14879,11 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[11,1,2,4,7,5,6,8,9,10,3])(11)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).files = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ButtonsUpload = (function () {
     function ButtonsUpload() {
     }
@@ -14552,6 +14906,7 @@ exports.ButtonsUpload = ButtonsUpload;
 }
 },{}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileFailBindings = {
     buttons: '<?pipButtons',
     name: '<pipName',
@@ -14584,6 +14939,7 @@ angular
     .component('pipFailUpload', fileFailComponent);
 },{}],4:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./service/FileUploadService");
 require("./model/FileModel");
 require("./success/FileSuccess");
@@ -14666,6 +15022,7 @@ angular
 }
 },{}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState_1 = require("./FileUploadState");
 var FileUploadService = (function () {
     FileUploadService.$inject = ['$http'];
@@ -14708,6 +15065,7 @@ angular
     .service('pipFileUpload', FileUploadService);
 },{"./FileUploadState":8}],8:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState;
 (function (FileUploadState) {
     FileUploadState[FileUploadState["Uploading"] = 0] = "Uploading";
@@ -14716,8 +15074,10 @@ var FileUploadState;
 })(FileUploadState = exports.FileUploadState || (exports.FileUploadState = {}));
 },{}],9:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 },{}],10:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileStartBindings = {
     buttons: '<?pipButtons',
     name: '<pipName',
@@ -14750,6 +15110,7 @@ angular
     .component('pipStartUpload', fileStartDirective);
 },{}],11:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileSuccessBindings = {
     buttons: '=?pipButtons',
     name: '=pipName',
@@ -14775,6 +15136,7 @@ angular
     .component('pipSuccesUpload', fileSuccessDirective);
 },{}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadButtons = (function () {
     function FileUploadButtons() {
     }
@@ -14892,43 +15254,6 @@ try {
   module = angular.module('pipFiles.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('success/FileSuccess.html',
-    '<div class="pip-files pip-progress-files">\n' +
-    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
-    '    <div class="layout-row">\n' +
-    '        <div class="pip-progress-icon bb-green">\n' +
-    '            <md-icon md-svg-icon="icons:check"></md-icon>\n' +
-    '        </div>\n' +
-    '        <div class="pip-progress-content">\n' +
-    '            <h3 class="pip-title">\n' +
-    '                Uploaded {{::vm.type}} successfully!\n' +
-    '            </h3>\n' +
-    '        \n' +
-    '            <div class="color-secondary-text pip-subtitle">\n' +
-    '                {{vm.name}}\n' +
-    '            </div>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '  </div>\n' +
-    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0">\n' +
-    '        <div>\n' +
-    '           <md-button class="md-accent" \n' +
-    '                       ng-repeat="start in vm.buttons" ng-click="start.click()">\n' +
-    '                {{start.title}}\n' +
-    '            </md-button> \n' +
-    '        </div>\n' +
-    '    </div>  \n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipFiles.Templates');
-} catch (e) {
-  module = angular.module('pipFiles.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('select/FileSelect.html',
     '<div class="pip-file-select">\n' +
     '      <form id="inp_form" class="pip-hidden-form">\n' +
@@ -15007,6 +15332,43 @@ try {
   module = angular.module('pipFiles.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('success/FileSuccess.html',
+    '<div class="pip-files pip-progress-files">\n' +
+    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
+    '    <div class="layout-row">\n' +
+    '        <div class="pip-progress-icon bb-green">\n' +
+    '            <md-icon md-svg-icon="icons:check"></md-icon>\n' +
+    '        </div>\n' +
+    '        <div class="pip-progress-content">\n' +
+    '            <h3 class="pip-title">\n' +
+    '                Uploaded {{::vm.type}} successfully!\n' +
+    '            </h3>\n' +
+    '        \n' +
+    '            <div class="color-secondary-text pip-subtitle">\n' +
+    '                {{vm.name}}\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0">\n' +
+    '        <div>\n' +
+    '           <md-button class="md-accent" \n' +
+    '                       ng-repeat="start in vm.buttons" ng-click="start.click()">\n' +
+    '                {{start.title}}\n' +
+    '            </md-button> \n' +
+    '        </div>\n' +
+    '    </div>  \n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('upload/FileUpload.html',
     '<div>\n' +
     '    <pip-succes-upload \n' +
@@ -15036,8 +15398,11 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dashboard = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var AddTileDialog = (function () {
     function AddTileDialog() {
     }
@@ -15083,6 +15448,7 @@ var AddTileDialogController = (function () {
 exports.AddTileDialogController = AddTileDialogController;
 },{}],2:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var AddTileDialogController_1 = require("./AddTileDialogController");
 {
     var setTranslations = function ($injector) {
@@ -15153,17 +15519,24 @@ var AddTileDialogController_1 = require("./AddTileDialogController");
 }
 },{"./AddTileDialogController":1}],3:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipAddDashboardTileDialog', ['ngMaterial']);
 require("./AddTileDialogController");
 require("./AddTileProvider");
 },{"./AddTileDialogController":1,"./AddTileProvider":2}],4:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var CalendarTileController = (function (_super) {
@@ -15216,6 +15589,7 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
 }
 },{"../menu_tile/MenuTileService":17}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var DashboardTile = (function () {
     function DashboardTile() {
     }
@@ -15224,6 +15598,7 @@ var DashboardTile = (function () {
 exports.DashboardTile = DashboardTile;
 },{}],6:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var TileColors = (function () {
     function TileColors() {
     }
@@ -15321,6 +15696,7 @@ exports.TileConfigDialogController = TileConfigDialogController;
 }
 },{}],8:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ConfigDialogController_1 = require("./ConfigDialogController");
 {
     var setTranslations = function ($injector) {
@@ -15378,6 +15754,7 @@ var ConfigDialogController_1 = require("./ConfigDialogController");
 }
 },{"./ConfigDialogController":6}],9:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipConfigDashboardTileDialog', ['ngMaterial']);
 require("./ConfigDialogController");
@@ -15385,6 +15762,7 @@ require("./ConfigDialogService");
 require("./ConfigDialogExtendComponent");
 },{"./ConfigDialogController":6,"./ConfigDialogExtendComponent":7,"./ConfigDialogService":8}],10:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var setTranslations = function ($injector) {
         var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
@@ -15588,6 +15966,7 @@ require("./ConfigDialogExtendComponent");
 }
 },{}],11:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var DraggableTileService_1 = require("./DraggableTileService");
 var TileGroupService_1 = require("../tile_group/TileGroupService");
 exports.DEFAULT_TILE_WIDTH = 150;
@@ -16082,6 +16461,7 @@ var DEFAULT_OPTIONS = {
 }
 },{"../tile_group/TileGroupService":24,"./DraggableTileService":12}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function IDragTileConstructor(constructor, options) {
     return new constructor(options);
 }
@@ -16215,16 +16595,23 @@ angular
 });
 },{}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipDraggableTiles', []);
 require("./DraggableTileService");
 require("./Draggable");
 },{"./Draggable":11,"./DraggableTileService":12}],14:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var EventTileController = (function (_super) {
@@ -16341,6 +16728,7 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
 }
 },{"../menu_tile/MenuTileService":17}],15:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("./tile_group/index");
 require("./draggable");
 require("./menu_tile");
@@ -16384,11 +16772,17 @@ require("./dashboard/Dashboard");
 }
 },{}],17:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var Tile_1 = require("../common_tile/Tile");
 var MenuTileService = (function (_super) {
     __extends(MenuTileService, _super);
@@ -16464,6 +16858,7 @@ exports.MenuTileService = MenuTileService;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipMenuTile', []);
 require("./MenuTileDirective");
@@ -16471,11 +16866,17 @@ require("./MenuTileService");
 __export(require("./MenuTileService"));
 },{"./MenuTileDirective":16,"./MenuTileService":17}],19:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var NoteTileController = (function (_super) {
@@ -16528,11 +16929,17 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
 }
 },{"../menu_tile/MenuTileService":17}],20:[function(require,module,exports){
 'use strict';
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var PictureSliderController = (function (_super) {
@@ -16582,11 +16989,17 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
 }
 },{"../menu_tile/MenuTileService":17}],21:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var PositionTileController = (function (_super) {
@@ -16680,11 +17093,17 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
 }
 },{"../menu_tile/MenuTileService":17}],22:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var SMALL_CHART_1 = 70;
@@ -16759,6 +17178,7 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
 }
 },{}],24:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function ITilesGridConstructor(constructor, tiles, options, columns, elem) {
     return new constructor(tiles, options, columns, elem);
 }
@@ -17191,12 +17611,14 @@ angular
 });
 },{}],25:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipDraggableTilesGroup', []);
 require("./TileGroupDirective");
 require("./TileGroupService");
 },{"./TileGroupDirective":23,"./TileGroupService":24}],26:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 {
     var tileTemplateService = (function () {
         tileTemplateService.$inject = ['$interpolate', '$compile', '$templateRequest'];
@@ -17272,6 +17694,18 @@ try {
   module = angular.module('pipDashboard.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('add_tile_dialog/AddTile.html',
+    '<md-dialog class="pip-dialog pip-add-component-dialog"><md-dialog-content class="layout-column"><div class="theme-divider p16 flex-auto"><h3 class="hide-xs m0 bm16 theme-text-primary" hide-xs="">{{ \'DASHBOARD_ADD_TILE_DIALOG_TITLE\' | translate }}<md-input-container class="layout-row flex-auto m0 tm16"><md-select class="flex-auto m0 theme-text-primary" ng-model="dialogCtrl.activeGroupIndex" placeholder="{{ \'DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP\' | translate }}" aria-label="Group"><md-option ng-value="$index" ng-repeat="group in dialogCtrl.groups">{{ group }}</md-option></md-select></md-input-container></h3></div><div class="pip-body pip-scroll p0 flex-auto"><p class="md-body-1 theme-text-secondary m0 lp16 rp16">{{ \'DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS\' | translate }}</p><md-list ng-init="groupIndex = $index" ng-repeat="group in dialogCtrl.defaultWidgets"><md-list-item class="layout-row pip-list-item lp16 rp16" ng-repeat="item in group"><div class="icon-holder flex-none"><md-icon md-svg-icon="icons:{{:: item.icon }}"></md-icon><div class="pip-badge theme-badge md-warn" ng-if="item.amount"><span>{{ item.amount }}</span></div></div><span class="flex-auto lm24 theme-text-primary">{{:: item.title }}</span><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.encrease(groupIndex, $index)" aria-label="Encrease"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.decrease(groupIndex, $index)" aria-label="Decrease"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button></md-list-item><md-divider class="lm72 tm8 bm8" ng-if="groupIndex !== (dialogCtrl.defaultWidgets.length - 1)"></md-divider></md-list></div></md-dialog-content><md-dialog-actions class="flex-none layout-align-end-center theme-divider divider-top theme-text-primary"><md-button ng-click="dialogCtrl.cancel()" aria-label="Cancel">{{ \'CANCEL\' | translate }}</md-button><md-button ng-click="dialogCtrl.add()" ng-disabled="dialogCtrl.totalWidgets === 0" arial-label="Add">{{ \'ADD\' | translate }}</md-button></md-dialog-actions></md-dialog>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('calendar_tile/CalendarTile.html',
     '<div class="widget-box pip-calendar-widget {{ $ctrl.color }} layout-column layout-fill tp0" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-end-center flex-none"><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="date lm24 rm12">{{ $ctrl.options.date.getDate() }}</span><div class="flex-auto layout-column"><span class="weekday md-headline">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div><div class="widget-content flex-auto layout-column layout-align-space-around-center" ng-hide="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="weekday md-headline" ng-hide="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="weekday" ng-show="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="date lm12 rm12">{{ $ctrl.options.date.getDate() }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div>');
 }]);
@@ -17286,18 +17720,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('calendar_tile/ConfigDialogExtension.html',
     '<div class="w-stretch bm16">Date:<md-datepicker ng-model="$ctrl.date" class="w-stretch"></md-datepicker></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('add_tile_dialog/AddTile.html',
-    '<md-dialog class="pip-dialog pip-add-component-dialog"><md-dialog-content class="layout-column"><div class="theme-divider p16 flex-auto"><h3 class="hide-xs m0 bm16 theme-text-primary" hide-xs="">{{ \'DASHBOARD_ADD_TILE_DIALOG_TITLE\' | translate }}<md-input-container class="layout-row flex-auto m0 tm16"><md-select class="flex-auto m0 theme-text-primary" ng-model="dialogCtrl.activeGroupIndex" placeholder="{{ \'DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP\' | translate }}" aria-label="Group"><md-option ng-value="$index" ng-repeat="group in dialogCtrl.groups">{{ group }}</md-option></md-select></md-input-container></h3></div><div class="pip-body pip-scroll p0 flex-auto"><p class="md-body-1 theme-text-secondary m0 lp16 rp16">{{ \'DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS\' | translate }}</p><md-list ng-init="groupIndex = $index" ng-repeat="group in dialogCtrl.defaultWidgets"><md-list-item class="layout-row pip-list-item lp16 rp16" ng-repeat="item in group"><div class="icon-holder flex-none"><md-icon md-svg-icon="icons:{{:: item.icon }}"></md-icon><div class="pip-badge theme-badge md-warn" ng-if="item.amount"><span>{{ item.amount }}</span></div></div><span class="flex-auto lm24 theme-text-primary">{{:: item.title }}</span><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.encrease(groupIndex, $index)" aria-label="Encrease"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.decrease(groupIndex, $index)" aria-label="Decrease"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button></md-list-item><md-divider class="lm72 tm8 bm8" ng-if="groupIndex !== (dialogCtrl.defaultWidgets.length - 1)"></md-divider></md-list></div></md-dialog-content><md-dialog-actions class="flex-none layout-align-end-center theme-divider divider-top theme-text-primary"><md-button ng-click="dialogCtrl.cancel()" aria-label="Cancel">{{ \'CANCEL\' | translate }}</md-button><md-button ng-click="dialogCtrl.add()" ng-disabled="dialogCtrl.totalWidgets === 0" arial-label="Add">{{ \'ADD\' | translate }}</md-button></md-dialog-actions></md-dialog>');
 }]);
 })();
 
@@ -17381,6 +17803,18 @@ try {
   module = angular.module('pipDashboard.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('menu_tile/MenuTile.html',
+    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('note_tile/ConfigDialogExtension.html',
     '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container><md-input-container class="w-stretch tm0"><label>Text:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
     '    </textarea></md-input-container></div>');
@@ -17396,18 +17830,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('note_tile/NoteTile.html',
     '<div class="widget-box pip-notes-widget {{ $ctrl.color }} layout-column"><div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="$ctrl.options.title || $ctrl.options.name"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span></div><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu><div class="text-container flex-auto pip-scroll"><p>{{ $ctrl.options.text }}</p></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('menu_tile/MenuTile.html',
-    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -17464,97 +17886,99 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[15,27])(27)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-require("./settings_service/index");
-require("./settings_page/index");
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./service");
+require("./page");
 angular.module('pipSettings', [
     'pipSettings.Service',
     'pipSettings.Page'
 ]);
-},{"./settings_page/index":5,"./settings_service/index":8}],2:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipSettings', [
-        'pipSettings.Service',
-        'pipSettings.Page'
-    ]);
-})();
-},{}],3:[function(require,module,exports){
-(function () {
-    var SettingsPageController = (function () {
-        SettingsPageController.$inject = ['$log', '$q', '$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
-        function SettingsPageController($log, $q, $state, pipNavService, pipSettings, $rootScope, $timeout) {
-            var _this = this;
-            this._log = $log;
-            this._q = $q;
-            this._state = $state;
-            this.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-                if (tab.visible === true && (tab.access ? tab.access($rootScope.$user, tab) : true)) {
-                    return tab;
+__export(require("./service"));
+},{"./page":4,"./service":11}],2:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsPageSelectedTab_1 = require("../service/SettingsPageSelectedTab");
+var SettingsPageController = (function () {
+    SettingsPageController.$inject = ['$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
+    function SettingsPageController($state, pipNavService, pipSettings, $rootScope, $timeout) {
+        var _this = this;
+        this.$state = $state;
+        this.tabs = _.filter(pipSettings.getTabs(), function (tab) {
+            if (tab.visible === true && (tab.access ? tab.access($rootScope['$user'], tab) : true)) {
+                return tab;
+            }
+        });
+        this.tabs = _.sortBy(this.tabs, 'index');
+        this.selected = new SettingsPageSelectedTab_1.SettingsPageSelectedTab();
+        if (this.$state.current.name !== 'settings') {
+            this.initSelect(this.$state.current.name);
+        }
+        else if (this.$state.current.name === 'settings' && pipSettings.getDefaultTab()) {
+            this.initSelect(pipSettings.getDefaultTab().state);
+        }
+        else {
+            $timeout(function () {
+                if (pipSettings.getDefaultTab()) {
+                    _this.initSelect(pipSettings.getDefaultTab().state);
+                }
+                if (!pipSettings.getDefaultTab() && _this.tabs.length > 0) {
+                    _this.initSelect(_this.tabs[0].state);
                 }
             });
-            this.tabs = _.sortBy(this.tabs, 'index');
-            this.selected = {};
-            if (this._state.current.name !== 'settings') {
-                this.initSelect(this._state.current.name);
-            }
-            else if (this._state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-                this.initSelect(pipSettings.getDefaultTab().state);
-            }
-            else {
-                $timeout(function () {
-                    if (pipSettings.getDefaultTab()) {
-                        this.initSelect(pipSettings.getDefaultTab().state);
-                    }
-                    if (!pipSettings.getDefaultTab() && this.tabs.length > 0) {
-                        this.initSelect(this.tabs[0].state);
-                    }
-                });
-            }
-            pipNavService.icon.showMenu();
-            pipNavService.breadcrumb.text = "Settings";
-            pipNavService.actions.hide();
-            pipNavService.appbar.removeShadow();
-            this.onDropdownSelect = function (state) {
-                _this.onNavigationSelect(state.state);
-            };
         }
-        SettingsPageController.prototype.initSelect = function (state) {
-            this.selected.tab = _.find(this.tabs, function (tab) {
-                return tab.state === state;
-            });
-            this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
-            this.selected.tabId = state;
+        pipNavService.icon.showMenu();
+        pipNavService.breadcrumb.text = "Settings";
+        pipNavService.actions.hide();
+        pipNavService.appbar.removeShadow();
+        this.onDropdownSelect = function (state) {
+            _this.onNavigationSelect(state.state);
         };
-        SettingsPageController.prototype.onNavigationSelect = function (state) {
-            this.initSelect(state);
-            if (this.selected.tab) {
-                this._state.go(state);
-            }
-        };
-        return SettingsPageController;
-    }());
+    }
+    SettingsPageController.prototype.initSelect = function (state) {
+        this.selected.tab = _.find(this.tabs, function (tab) {
+            return tab.state === state;
+        });
+        this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
+        this.selected.tabId = state;
+        this.$state.go(this.selected.tabId);
+    };
+    SettingsPageController.prototype.onNavigationSelect = function (state) {
+        this.initSelect(state);
+        if (this.selected.tab) {
+            this.$state.go(state);
+        }
+    };
+    return SettingsPageController;
+}());
+angular
+    .module('pipSettings.Page')
+    .controller('pipSettingsPageController', SettingsPageController);
+},{"../service/SettingsPageSelectedTab":7}],3:[function(require,module,exports){
+{
+    configureSettingsPageRoutes.$inject = ['$stateProvider'];
+    function configureSettingsPageRoutes($stateProvider) {
+        $stateProvider
+            .state('settings', {
+            url: '/settings?party_id',
+            auth: true,
+            controllerAs: 'vm',
+            controller: 'pipSettingsPageController',
+            templateUrl: 'page/SettingsPage.html'
+        });
+    }
     angular.module('pipSettings.Page')
-        .controller('pipSettingsPageController', SettingsPageController);
-})();
-},{}],4:[function(require,module,exports){
-'use strict';
-configureSettingsPageRoutes.$inject = ['$stateProvider'];
-function configureSettingsPageRoutes($stateProvider) {
-    $stateProvider
-        .state('settings', {
-        url: '/settings?party_id',
-        auth: true,
-        controllerAs: 'vm',
-        controller: 'pipSettingsPageController',
-        templateUrl: 'settings_page/SettingsPage.html'
-    });
+        .config(configureSettingsPageRoutes);
 }
-angular.module('pipSettings.Page')
-    .config(configureSettingsPageRoutes);
-},{}],5:[function(require,module,exports){
-'use strict';
+},{}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSettings.Page', [
     'ui.router',
     'pipSettings.Service',
@@ -17563,18 +17987,14 @@ angular.module('pipSettings.Page', [
     'pipTranslate',
     'pipSettings.Templates'
 ]);
-require("./SettingsPageController");
+require("./SettingsPage");
 require("./SettingsPageRoutes");
-},{"./SettingsPageController":3,"./SettingsPageRoutes":4}],6:[function(require,module,exports){
-
-},{}],7:[function(require,module,exports){
-'use strict';
-var SettingsTab = (function () {
-    function SettingsTab() {
-    }
-    return SettingsTab;
-}());
-exports.SettingsTab = SettingsTab;
+},{"./SettingsPage":2,"./SettingsPageRoutes":3}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+},{}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsConfig = (function () {
     function SettingsConfig() {
         this.tabs = [];
@@ -17585,11 +18005,24 @@ var SettingsConfig = (function () {
     return SettingsConfig;
 }());
 exports.SettingsConfig = SettingsConfig;
+},{}],7:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsPageSelectedTab = (function () {
+    function SettingsPageSelectedTab() {
+        this.tabIndex = 0;
+    }
+    return SettingsPageSelectedTab;
+}());
+exports.SettingsPageSelectedTab = SettingsPageSelectedTab;
+},{}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsConfig_1 = require("./SettingsConfig");
 var SettingsService = (function () {
-    SettingsService.$inject = ['$rootScope', 'config'];
-    function SettingsService($rootScope, config) {
+    SettingsService.$inject = ['config'];
+    function SettingsService(config) {
         "ngInject";
-        this._rootScope = $rootScope;
         this._config = config;
     }
     SettingsService.prototype.getFullStateName = function (state) {
@@ -17604,9 +18037,10 @@ var SettingsService = (function () {
         this._config.defaultTab = this.getFullStateName(name);
     };
     SettingsService.prototype.getDefaultTab = function () {
+        var _this = this;
         var defaultTab;
-        defaultTab = _.find(this._config.tabs, function (p) {
-            return p.state === defaultTab;
+        defaultTab = _.find(this._config.tabs, function (tab) {
+            return tab.state === _this._config.defaultTab;
         });
         return _.cloneDeep(defaultTab);
     };
@@ -17638,24 +18072,24 @@ var SettingsService = (function () {
 var SettingsProvider = (function () {
     SettingsProvider.$inject = ['$stateProvider'];
     function SettingsProvider($stateProvider) {
-        this._config = new SettingsConfig();
-        this._stateProvider = $stateProvider;
+        this.$stateProvider = $stateProvider;
+        this._config = new SettingsConfig_1.SettingsConfig();
     }
     SettingsProvider.prototype.getFullStateName = function (state) {
         return 'settings.' + state;
     };
     SettingsProvider.prototype.getDefaultTab = function () {
         var defaultTab;
-        defaultTab = _.find(this._config.tabs, function (p) {
-            return p.state === defaultTab;
+        defaultTab = _.find(this._config.tabs, function (tab) {
+            return tab.state === defaultTab.state;
         });
         return _.cloneDeep(defaultTab);
     };
     SettingsProvider.prototype.addTab = function (tabObj) {
         var existingTab;
         this.validateTab(tabObj);
-        existingTab = _.find(this._config.tabs, function (p) {
-            return p.state === 'settings.' + tabObj.state;
+        existingTab = _.find(this._config.tabs, function (tab) {
+            return tab.state === 'settings.' + tabObj.state;
         });
         if (existingTab) {
             throw new Error('Tab with state name "' + tabObj.state + '" is already registered');
@@ -17668,7 +18102,7 @@ var SettingsProvider = (function () {
             visible: tabObj.visible !== false,
             stateConfig: _.cloneDeep(tabObj.stateConfig)
         });
-        this._stateProvider.state(this.getFullStateName(tabObj.state), tabObj.stateConfig);
+        this.$stateProvider.state(this.getFullStateName(tabObj.state), tabObj.stateConfig);
         if (typeof this._config.defaultTab === 'undefined' && this._config.tabs.length === 1) {
             this.setDefaultTab(tabObj.state);
         }
@@ -17715,486 +18149,54 @@ var SettingsProvider = (function () {
         }
         return this._config.isNavIcon;
     };
-    SettingsProvider.prototype.$get = ['$rootScope', '$state', function ($rootScope, $state) {
+    SettingsProvider.prototype.$get = function () {
         "ngInject";
-        if (this._service == null)
-            this._service = new SettingsService($rootScope, this._config);
+        if (_.isNull(this._service) || _.isUndefined(this._service)) {
+            this._service = new SettingsService(this._config);
+        }
         return this._service;
-    }];
+    };
     return SettingsProvider;
 }());
 angular
     .module('pipSettings.Service')
     .provider('pipSettings', SettingsProvider);
-},{}],8:[function(require,module,exports){
-'use strict';
-angular.module('pipSettings.Service', []);
-require("./SettingsService");
-},{"./SettingsService":7}],9:[function(require,module,exports){
-(function () {
-    'use strict';
-    angular.module('pipUserSettings', [
-        'ngMaterial', 'pipData',
-        'pipSettings.Service',
-        'pipSettings.Page',
-        'pipUserSettings.Strings',
-        'pipUserSettings.Sessions',
-        'pipUserSettings.BasicInfo',
-        'pipSettings.Templates'
-    ]);
-})();
+},{"./SettingsConfig":6}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsStateConfig = (function () {
+    function SettingsStateConfig() {
+        this.auth = false;
+    }
+    return SettingsStateConfig;
+}());
+exports.SettingsStateConfig = SettingsStateConfig;
 },{}],10:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.BasicInfo', ['pipUserSettings.ChangePassword', 'pipUserSettings.VerifyEmail',
-        'pipSettings.Service', 'pipSettings.Page',]);
-    thisModule.config(['pipSettingsProvider', function (pipSettingsProvider) {
-        pipSettingsProvider.addTab({
-            state: 'basic_info',
-            index: 1,
-            title: 'SETTINGS_BASIC_INFO_TITLE',
-            stateConfig: {
-                url: '/basic_info',
-                controller: 'pipUserSettingsBasicInfoController',
-                templateUrl: 'user_settings/user_settings_basic_info.html',
-                auth: true
-            }
-        });
-        pipSettingsProvider.setDefaultTab('basic_info');
-    }]);
-    thisModule.controller('pipUserSettingsBasicInfoController', ['$scope', '$rootScope', '$mdDialog', '$state', '$window', '$timeout', '$mdTheming', 'pipTranslate', 'pipTransaction', 'pipTheme', 'pipToasts', 'pipDataUser', 'pipDataParty', 'pipFormErrors', function ($scope, $rootScope, $mdDialog, $state, $window, $timeout, $mdTheming, pipTranslate, pipTransaction, pipTheme, pipToasts, pipDataUser, pipDataParty, pipFormErrors) {
-        try {
-            $scope.originalParty = angular.toJson($rootScope.$party);
-        }
-        catch (err) {
-            throw err;
-        }
-        $scope.nameCopy = $rootScope.$party.name;
-        $timeout(function () {
-            $scope.loc_pos = $rootScope.$party.loc_pos;
-        });
-        $scope.genders = pipTranslate.translateSet(['male', 'female', 'n/s']);
-        $scope.languages = pipTranslate.translateSet(['ru', 'en']);
-        $scope.transaction = pipTransaction('settings.basic_info', $scope);
-        $scope.themes = _.keys(_.omit($mdTheming.THEMES, 'default'));
-        $state.get('settings.basic_info').onExit = saveChanges;
-        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
-        $scope.onChangePassword = onChangePassword;
-        $scope.onVerifyEmail = onVerifyEmail;
-        $scope.onPictureCreated = onPictureCreated;
-        $scope.onPictureChanged = onPictureChanged;
-        $scope.onChangeUser = _.debounce(updateUser, 2000);
-        $scope.onChangeBasicInfo = _.debounce(saveChanges, 2000);
-        function onPictureChanged() {
-            $scope.picture.save(function () {
-                $rootScope.$broadcast('pipPartyAvatarUpdated');
-            }, function (error) {
-                return new Error(error);
-            });
-        }
-        function onPictureCreated($event) {
-            $scope.picture = $event.sender;
-            $scope.picture.save(function () {
-                $rootScope.$broadcast('pipPartyAvatarUpdated');
-            }, function (error) {
-                return new Error(error);
-            });
-        }
-        function saveChanges() {
-            if ($scope.form) {
-                $scope.form.$setSubmitted();
-            }
-            if ($rootScope.$party) {
-                if ($rootScope.$party.type === 'person' && $scope.form.$invalid) {
-                    return;
-                }
-                $rootScope.$party.loc_pos = $scope.loc_pos;
-                try {
-                    var party = angular.toJson($rootScope.$party);
-                }
-                catch (err) {
-                    throw err;
-                }
-                if (party !== $scope.originalParty) {
-                    var tid = $scope.transaction.begin('UPDATING');
-                    pipDataParty.updateParty($rootScope.$party, function (data) {
-                        if ($scope.transaction.aborted(tid)) {
-                            return;
-                        }
-                        $scope.transaction.end();
-                        $scope.originalParty = party;
-                        $scope.nameCopy = data.name;
-                    }, function (error) {
-                        $scope.transaction.end(error);
-                        $scope.message = String() + 'ERROR_' + error.status || error.data.status_code;
-                        $rootScope.$party = angular.fromJson($scope.originalParty);
-                    });
-                }
-            }
-        }
-        function updateUser() {
-            var tid = $scope.transaction.begin('RequestEmailVerification');
-            if ($rootScope.$user.id === $rootScope.$party.id) {
-                pipDataUser.updateUser({
-                    item: $rootScope.$user
-                }, function (data) {
-                    if ($scope.transaction.aborted(tid)) {
-                        return;
-                    }
-                    $scope.transaction.end();
-                    pipTranslate.use(data.language);
-                    $rootScope.$user.language = data.language;
-                    $rootScope.$user.theme = data.theme;
-                    if ($rootScope.$user.theme) {
-                        pipTheme.setCurrentTheme($rootScope.$user.theme, true);
-                    }
-                }, function (error) {
-                    var message;
-                    $scope.transaction.end(error);
-                    message = String() + 'ERROR_' + error.status || error.data.status_code;
-                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
-                });
-            }
-        }
-        function onChangePassword(event) {
-            var message;
-            $mdDialog.show({
-                templateUrl: 'user_settings/user_settings_change_password.html',
-                controller: 'pipUserSettingsChangePasswordController',
-                targetEvent: event,
-                locals: { email: $rootScope.$party.email }
-            }).then(function (answer) {
-                if (answer) {
-                    message = String() + 'RESET_PWD_SUCCESS_TEXT';
-                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
-                }
-            });
-        }
-        function onVerifyEmail(event) {
-            var message;
-            $mdDialog.show({
-                templateUrl: 'user_settings/user_settings_verify_email.html',
-                controller: 'pipUserSettingsVerifyEmailController',
-                targetEvent: event,
-                locals: { email: $rootScope.$party.email }
-            }).then(function (answer) {
-                $scope.user.email_ver = answer;
-                if (answer) {
-                    message = String() + 'VERIFY_EMAIL_SUCCESS_TEXT';
-                    pipToasts.showNotification(pipTranslate.translate(message), null, null, null);
-                }
-            });
-        }
-    }]);
-})();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var SettingsTab = (function () {
+    function SettingsTab() {
+    }
+    return SettingsTab;
+}());
+exports.SettingsTab = SettingsTab;
 },{}],11:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.ChangePassword', []);
-    thisModule.controller('pipUserSettingsChangePasswordController', ['$scope', '$rootScope', '$mdDialog', 'email', 'pipDataUser', 'pipTransaction', 'pipFormErrors', function ($scope, $rootScope, $mdDialog, email, pipDataUser, pipTransaction, pipFormErrors) {
-        $scope.transaction = pipTransaction('settings.change_password', $scope);
-        $scope.errorsRepeatWithHint = function (form, formPart) {
-            if ($scope.showRepeatHint) {
-                return pipFormErrors.errorsWithHint(form, formPart);
-            }
-            return {};
-        };
-        $scope.showRepeatHint = true;
-        $scope.changePasData = {};
-        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
-        $scope.onCancel = onCancel;
-        $scope.onCheckRepeatPassword = onCheckRepeatPassword;
-        $scope.onApply = onApply;
-        function onCancel() {
-            $mdDialog.cancel();
-        }
-        function onCheckRepeatPassword() {
-            if ($scope.changePasData) {
-                if ($scope.repeat === $scope.changePasData.new_password || $scope.repeat === '' || !$scope.repeat) {
-                    $scope.form.repeat.$setValidity('repeat', true);
-                    if ($scope.repeat === $scope.changePasData.new_password) {
-                        $scope.showRepeatHint = false;
-                    }
-                    else {
-                        $scope.showRepeatHint = true;
-                    }
-                }
-                else {
-                    $scope.showRepeatHint = true;
-                    $scope.form.repeat.$setValidity('repeat', false);
-                }
-            }
-        }
-        function onApply() {
-            $scope.onCheckRepeatPassword();
-            if ($scope.form.$invalid) {
-                return;
-            }
-            if (!$scope.transaction.begin('CHANGE_PASSWORD')) {
-                return;
-            }
-            $scope.changePasData.email = email;
-            pipDataUser.changePassword($scope.changePasData, function () {
-                $scope.transaction.end();
-                $mdDialog.hide(true);
-            }, function (error) {
-                $scope.transaction.end(error);
-                pipFormErrors.setFormError($scope.form, error, {
-                    1107: 'oldPassword',
-                    1105: 'newPassword'
-                });
-            });
-        }
-    }]);
-})();
-},{}],12:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.Sessions', [
-        'pipSettings.Service', 'pipSettings.Page',
-    ]);
-    thisModule.config(['pipSettingsProvider', 'pipDataSessionProvider', function (pipSettingsProvider, pipDataSessionProvider) {
-        pipSettingsProvider.addTab({
-            state: 'sessions',
-            index: 3,
-            title: 'SETTINGS_ACTIVE_SESSIONS_TITLE',
-            stateConfig: {
-                url: '/sessions',
-                controller: 'pipUserSettingsSessionsController',
-                templateUrl: 'user_settings/user_settings_sessions.html',
-                auth: true,
-                resolve: {
-                    sessions: pipDataSessionProvider.readSessionsResolver,
-                    sessionId: pipDataSessionProvider.readSessionIdResolver
-                }
-            }
-        });
-    }]);
-    thisModule.controller('pipUserSettingsSessionsController', ['$scope', 'pipTransaction', 'pipDataSession', 'sessions', 'sessionId', function ($scope, pipTransaction, pipDataSession, sessions, sessionId) {
-        $scope.sessionId = sessionId;
-        $scope.transaction = pipTransaction('settings.sessions', $scope);
-        $scope.sessions = sessions;
-        $scope.onRemoveAll = onRemoveAll;
-        $scope.onRemove = onRemove;
-        function onRemoveAll() {
-            var tid = $scope.transaction.begin('REMOVING');
-            async.eachSeries($scope.sessions, function (session, callback) {
-                if (session.id == $scope.sessionId) {
-                    callback();
-                }
-                else {
-                    pipDataSession.removeSession({
-                        session: session
-                    }, function () {
-                        $scope.sessions = _.without($scope.sessions, session);
-                        callback();
-                    }, function (error) {
-                        callback;
-                    });
-                }
-            }, function (err) {
-                if (err) {
-                    $scope.transaction.end(err);
-                }
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-            });
-        }
-        function onRemove(session, callback) {
-            if (session.id === $scope.sessionId) {
-                return;
-            }
-            var tid = $scope.transaction.begin('REMOVING');
-            pipDataSession.removeSession({
-                session: session
-            }, function () {
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-                $scope.sessions = _.without($scope.sessions, session);
-                if (callback) {
-                    callback();
-                }
-            }, function (error) {
-                $scope.transaction.end(error);
-                $scope.message = 'ERROR_' + error.status || error.data.status_code;
-            });
-        }
-    }]);
-})();
-},{}],13:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.Strings', ['pipTranslate']);
-    thisModule.config(['pipTranslateProvider', function (pipTranslateProvider) {
-        pipTranslateProvider.translations('en', {
-            'SETTINGS_TITLE': 'Settings',
-            'SETTINGS_BASIC_INFO_TITLE': 'Basic info',
-            'SETTINGS_ACTIVE_SESSIONS_TITLE': 'Active sessions',
-            'SETTINGS_BASIC_INFO_FULL_NAME': 'Full name',
-            'SETTINGS_BASIC_INFO_VERIFY_HINT': 'Please, verify your email address.',
-            'SETTINGS_BASIC_INFO_VERIFY_CODE': 'Verify email address',
-            'SETTINGS_BASIC_INFO_DATE_CHANGE_PASSWORD': 'Your password was changed on ',
-            'SETTINGS_BASIC_INFO_CHANGE_PASSWORD': 'Change your password',
-            'SETTINGS_BASIC_INFO_NAME_HINT': 'Please, use your real name to let other people know who you are.',
-            'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME': 'Few words about yourself',
-            'SETTINGS_BASIC_INFO_GENDER': 'Gender',
-            'SETTINGS_BASIC_INFO_BIRTHDAY': 'Birthday',
-            'SETTINGS_BASIC_INFO_LOCATION': 'Current location',
-            'SETTINGS_BASIC_INFO_PRIMARY_EMAIL': 'Primary email',
-            'SETTINGS_BASIC_INFO_FROM': 'User since ',
-            'SETTINGS_BASIC_INFO_USER_ID': 'User ID',
-            'SETTINGS_CHANGE_PASSWORD_TITLE': 'Change password',
-            'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD': 'New password',
-            'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD': 'Repeat password',
-            'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD': 'Current password',
-            'SETTINGS_ACTIVE_SESSIONS_SUBTITLE': ' If you notice any unfamiliar devices or locations, click' +
-                '"Close Session" to end the session.',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION': 'Close session',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS': 'Close active sessions',
-            'SETTINGS_ACTIVE_SESSION_OS': 'OS: ',
-            'SETTINGS_ACTIVE_SESSION_IP': 'IP: ',
-            'SETTINGS_ACTIVE_SESSION_ACTIVE': 'active',
-            'SETTINGS_BLACKLIST_TITLE': 'Blacklist',
-            'SETTINGS_BLACKLIST_SUBTITLE': 'Parties from blacklist will not be able to send you invitations and ' +
-                'private messages.',
-            'SETTINGS_BLACKLIST_UNBLOCK': 'Unblock',
-            'SETTINGS_BLACKLIST_EMPTY': 'You have no blocked parties',
-            'SETTINGS_CONTACT_INFO_TITLE': 'Contact info',
-            'SETTINGS_CONTACT_INFO_EMAIL': 'Email',
-            'SETTINGS_CONTACT_INFO_ADD_EMAIL': 'Add email',
-            'SETTINGS_CONTACT_INFO_ADD_PHONE': 'Add phone',
-            'SETTINGS_CONTACT_INFO_ADD_ADDRESS': 'Add address',
-            'SETTINGS_CONTACT_INFO_ADD_ACCOUNT': 'Add account',
-            'SETTINGS_CONTACT_INFO_ADD_URL': 'Add URL',
-            'SETTINGS_CONTACT_INFO_ADDRESS': 'Address',
-            'SETTINGS_CONTACT_INFO_PHONE': 'Phone',
-            'SETTINGS_CONTACT_INFO_ACCOUNT_NAME': 'Account name',
-            'SETTINGS_CONTACT_INFO_URL': 'URL',
-            'THEME': 'Theme',
-            'HINT_PASSWORD': 'Minimum 6 characters',
-            'HINT_REPEAT_PASSWORD': 'Repeat password',
-            'ERROR_WRONG_PASSWORD': 'Wrong password',
-            'ERROR_IDENTICAL_PASSWORDS': 'Old and new passwords are identical',
-            'REPEAT_PASSWORD_INVALID': 'Password does not match',
-            'ERROR_EMAIL_INVALID': 'Please, enter a valid email'
-        });
-        pipTranslateProvider.translations('ru', {
-            'SETTINGS_TITLE': 'Настройки',
-            'SETTINGS_BASIC_INFO_TITLE': 'Основные данные',
-            'SETTINGS_ACTIVE_SESSIONS_TITLE': 'Активные сессии',
-            'SETTINGS_BASIC_INFO_FULL_NAME': 'Полное имя',
-            'SETTINGS_BASIC_INFO_NAME_HINT': 'Пожалуйста, используйте реальное имя, чтоб люди могли вас узнать',
-            'SETTINGS_BASIC_INFO_VERIFY_HINT': 'Пожалуйста, подтвердите адрес своей электронной почты',
-            'SETTINGS_BASIC_INFO_VERIFY_CODE': 'Подтвердите адрес эл.почты',
-            'SETTINGS_BASIC_INFO_DATE_CHANGE_PASSWORD': 'Ваш пароль был изменен ',
-            'SETTINGS_BASIC_INFO_CHANGE_PASSWORD': 'Поменять пароль',
-            'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME': 'Несколько слов о себе',
-            'SETTINGS_BASIC_INFO_GENDER': 'Пол',
-            'SETTINGS_BASIC_INFO_BIRTHDAY': 'Дата рождения',
-            'SETTINGS_BASIC_INFO_LOCATION': 'Текущее местонахождение',
-            'SETTINGS_BASIC_INFO_PRIMARY_EMAIL': 'Основной адрес эл. почты',
-            'SETTINGS_BASIC_INFO_FROM': 'Начиная с',
-            'SETTINGS_BASIC_INFO_USER_ID': 'Личный код',
-            'SETTINGS_CHANGE_PASSWORD_TITLE': 'Изменить пароль',
-            'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD': 'Новый пароль',
-            'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD': 'Повтор',
-            'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD': 'Текущий пароль',
-            'SETTINGS_ACTIVE_SESSIONS_SUBTITLE': 'Если вы заметили какие-либо незнакомые устройства или ' +
-                'месторасположение, нажмите кнопку "Закончить сеанс", чтобы завершить сеанс.',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION': 'Закрыть сессию',
-            'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS': 'Закрыть активные сессии',
-            'SETTINGS_ACTIVE_SESSION_OS': 'ОС: ',
-            'SETTINGS_ACTIVE_SESSION_IP': 'IP: ',
-            'SETTINGS_ACTIVE_SESSION_ACTIVE': 'Активно',
-            'SETTINGS_BLACKLIST_TITLE': 'Блокировки',
-            'SETTINGS_BLACKLIST_SUBTITLE': 'Участники из черного списка не смогут' +
-                ' посылать вам приглашения и личные сообщения.',
-            'SETTINGS_BLACKLIST_UNBLOCK': 'Разблокировать',
-            'SETTINGS_BLACKLIST_EMPTY': 'У вас нет заблокированных участников',
-            'SETTINGS_CONTACT_INFO_TITLE': 'Контакты',
-            'SETTINGS_CONTACT_INFO_EMAIL': 'Адрес электронной почты',
-            'SETTINGS_CONTACT_INFO_ADD_EMAIL': 'Добавить адрес эл. почты',
-            'SETTINGS_CONTACT_INFO_ADD_PHONE': 'Добавить телефон',
-            'SETTINGS_CONTACT_INFO_ADD_ADDRESS': 'Добавить адрес',
-            'SETTINGS_CONTACT_INFO_ADD_ACCOUNT': 'Добавить аккаунт',
-            'SETTINGS_CONTACT_INFO_ADD_URL': 'Добавить веб-сайт',
-            'SETTINGS_CONTACT_INFO_ADDRESS': 'Адрес',
-            'SETTINGS_CONTACT_INFO_PHONE': 'Телефон',
-            'SETTINGS_CONTACT_INFO_ACCOUNT_NAME': 'Учетка в мессенджере',
-            'SETTINGS_CONTACT_INFO_URL': 'Веб сайт',
-            'THEME': 'Тема',
-            'HINT_PASSWORD': 'Минимум 6 знаков',
-            'HINT_REPEAT_PASSWORD': 'Повторите пароль',
-            'ERROR_WRONG_PASSWORD': 'Неправильный пароль',
-            'ERROR_IDENTICAL_PASSWORDS': 'Старый и новый пароли идентичны',
-            'REPEAT_PASSWORD_INVALID': 'Пароль не совпадает',
-            'ERROR_EMAIL_INVALID': 'Пожалуйста, введите правильный почт.адрес'
-        });
-    }]);
-})();
-},{}],14:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipUserSettings.VerifyEmail', []);
-    thisModule.controller('pipUserSettingsVerifyEmailController', ['$scope', '$rootScope', '$mdDialog', 'pipTransaction', 'pipFormErrors', 'pipDataUser', 'email', function ($scope, $rootScope, $mdDialog, pipTransaction, pipFormErrors, pipDataUser, email) {
-        $scope.emailVerified = false;
-        $scope.data = {
-            email: email,
-            code: ''
-        };
-        $scope.transaction = pipTransaction('settings.verify_email', $scope);
-        $scope.onAbort = onAbort;
-        $scope.onRequestVerificationClick = onRequestVerificationClick;
-        $scope.errorsWithHint = pipFormErrors.errorsWithHint;
-        $scope.onVerify = onVerify;
-        $scope.onCancel = onCancel;
-        function onAbort() {
-            $scope.transaction.abort();
-        }
-        function onCancel() {
-            $mdDialog.cancel();
-        }
-        function onRequestVerificationClick() {
-            var tid = $scope.transaction.begin('RequestEmailVerification');
-            pipDataUser.requestEmailVerification({}, function (result) {
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-            }, function (error) {
-                $scope.transaction.end(error);
-            });
-        }
-        function onVerify() {
-            $scope.form.$setSubmitted();
-            if ($scope.form.$invalid) {
-                return;
-            }
-            var tid = $scope.transaction.begin('Verifying');
-            pipDataUser.verifyEmail({
-                email: $scope.data.email,
-                code: $scope.data.code
-            }, function (verifyData) {
-                if ($scope.transaction.aborted(tid)) {
-                    return;
-                }
-                $scope.transaction.end();
-                $mdDialog.hide(true);
-            }, function (error) {
-                $scope.transaction.end(error);
-                pipFormErrors.setFormError($scope.form, error, {
-                    1106: 'email',
-                    1103: 'code'
-                });
-            });
-        }
-    }]);
-})();
-},{}],15:[function(require,module,exports){
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+angular.module('pipSettings.Service', []);
+require("./SettingsConfig");
+require("./SettingsPageSelectedTab");
+require("./SettingsStateConfig");
+require("./SettingsTab");
+require("./SettingsService");
+__export(require("./SettingsConfig"));
+__export(require("./SettingsPageSelectedTab"));
+__export(require("./SettingsStateConfig"));
+__export(require("./SettingsTab"));
+},{"./SettingsConfig":6,"./SettingsPageSelectedTab":7,"./SettingsService":8,"./SettingsStateConfig":9,"./SettingsTab":10}],12:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipSettings.Templates');
@@ -18202,103 +18204,106 @@ try {
   module = angular.module('pipSettings.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('settings_page/SettingsPage.html',
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-settings"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" ng-if="vm.$party.id == vm.$user.id || tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\' || tab.state ==\'settings.blacklist\'" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body tp24-flex layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipSettings.Templates');
-} catch (e) {
-  module = angular.module('pipSettings.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('user_settings/user_settings_basic_info.html',
-    '<form name="form" class="w-stretch" novalidate=""><md-progress-linear class="pip-progress-top" ng-show="transaction.busy()" md-mode="indeterminate"></md-progress-linear><div class="layout-row bm12"><div class="md-tile-left"><pip-avatar-edit pip-party-id="$party.id" pip-created="onPictureCreated($event)" pip-changed="onPictureChanged($control, $event)"></pip-avatar-edit></div><div class="md-tile-content tp0 layout-align-center"><h3 class="tm16 bm8 text-one-line">{{ nameCopy }}</h3><p class="text-primary text-overflow m0">{{::\'SETTINGS_BASIC_INFO_FROM\' | translate}} {{$user.signup | formatLongDate }}</p></div></div><md-input-container class="md-block"><label>{{::\'SETTINGS_BASIC_INFO_FULL_NAME\' | translate}}</label> <input name="fullName" step="any" type="text" tabindex="0" required="" ng-model="$party.name" ng-disabled="transaction.busy()" ng-change="onChangeBasicInfo()"><div class="hint" ng-if="errorsWithHint(form, form.fullName).hint">{{::\'ERROR_FULLNAME_INVALID\' | translate}}</div></md-input-container><md-input-container class="md-block bm0"><label>{{::\'SETTINGS_BASIC_INFO_PRIMARY_EMAIL\' | translate}}</label> <input name="email" type="email" required="" ng-model="$party.email" ng-change="onChangeBasicInfo()" pip-email-unique="{{$party.email}}"><div class="hint" ng-if="errorsWithHint(form, form.email).hint && !$user.email_ver">{{::\'SETTINGS_BASIC_INFO_VERIFY_HINT\' | translate}}</div><div ng-messages="errorsWithHint(form.email)" ng-hide="$party.type ==\'team\'"><div ng-message="email">{{::\'ERROR_EMAIL_INVALID\' | translate}}</div><div ng-message="emailUnique">{{::\'ERROR_EMAIL_INVALID\' | translate}}</div></div></md-input-container><md-button class="md-raised bm16 tm8 rm8" ng-click="onVerifyEmail($event)" ng-hide="$user.email_ver || $party.type ==\'team\'">{{::\'SETTINGS_BASIC_INFO_VERIFY_CODE\' | translate}}</md-button><md-button ng-click="onChangePassword($event)" class="md-raised bm16 tm8" ng-hide="$party.type ==\'team\'">{{::\'SETTINGS_BASIC_INFO_CHANGE_PASSWORD\' | translate}}</md-button><md-input-container class="md-block flex"><label>{{::\'SETTINGS_BASIC_INFO_WORDS_ABOUT_ME\' | translate }}</label> <textarea ng-model="$party.about" columns="1" ng-change="onChangeBasicInfo()"></textarea></md-input-container><md-input-container class="md-block" ng-hide="$party.type ==\'team\'"><label>{{::\'GENDER\' | translate}}</label><md-select ng-model="$party.gender" ng-change="onChangeBasicInfo()" placeholder="{{\'GENDER\' | translate}}"><md-option ng-value="gender.id" ng-repeat="gender in genders">{{gender.name}}</md-option></md-select></md-input-container><div ng-hide="$party.type ==\'team\'"><p class="text-caption text-grey tm0 bm0">{{::\'SETTINGS_BASIC_INFO_BIRTHDAY\' | translate}}</p><pip-date ng-model="$party.birthday" ng-change="onChangeBasicInfo()" pip-time-mode="past time-mode=" past"=""></pip-date></div><md-input-container class="md-block" ng-hide="$party.type ==\'team\'"><label>{{::\'LANGUAGE\' | translate}}</label><md-select placeholder="{{\'LANGUAGE\' | translate}}" ng-model="$user.language" ng-change="onChangeUser()"><md-option ng-value="language.id" ng-repeat="language in languages">{{language.name}}</md-option></md-select></md-input-container><md-input-container class="md-block" ng-if="$party.type !=\'team\'"><label>{{::\'THEME\' | translate}}</label><md-select class="w-stretch theme-text-primary" ng-model="$user.theme" ng-change="onChangeUser()" ng-disabled="transaction.busy()"><md-option ng-value="theme" ng-repeat="theme in themes" ng-selected="$theme == theme ? true : false">{{ theme | translate }}</md-option></md-select></md-input-container><pip-location-edit class="map-edit bm24-flex" ng-hide="$party.type ==\'team\'" pip-changed="onChangeBasicInfo()" pip-location-name="$party.loc_name" pip-location-pos="loc_pos"></pip-location-edit></form>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipSettings.Templates');
-} catch (e) {
-  module = angular.module('pipSettings.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('user_settings/user_settings_change_password.html',
-    '<md-dialog class="pip-dialog layout-column" width="440"><form name="form" ng-submit="onApply()"><div class="pip-header"><h3 class="m0">{{::\'SETTINGS_CHANGE_PASSWORD_TITLE\' | translate : module}}</h3></div><div class="pip-body"><div class="pip-content"><div class="text-error bm8" ng-messages="form.$serverError"><div ng-message="ERROR_UNKNOWN">{{ form.$serverError.ERROR_UNKNOWN | translate }}</div></div><md-input-container class="md-block"><label>{{::\'SETTINGS_CHANGE_PASSWORD_CURRENT_PASSWORD\' | translate }}</label> <input name="oldPassword" type="password" ng-model="changePasData.old_password" ng-required="change_password.$submitted" pip-clear-errors=""><div ng-messages="errorsWithHint(form, form.oldPassword)"><div ng-message="required">{{::\'ERROR_REQUIRED\' | translate }}</div><div ng-message="ERROR_1107">{{::\'ERROR_WRONG_PASSWORD\' | translate }}</div></div></md-input-container><md-input-container class="md-block"><label>{{\'SETTINGS_CHANGE_PASSWORD_NEW_PASSWORD\' | translate }}</label> <input name="newPassword" type="password" ng-model="changePasData.new_password" ng-change="onCheckRepeatPassword()" ng-required="change_password.$submitted" ng-minlength="6" pip-clear-errors=""><div class="hint" ng-if="errorsWithHint(form, form.newPassword).hint">{{ \'HINT_PASSWORD\' | translate }}</div><div ng-messages="errorsWithHint(form, form.newPassword)"><div ng-message="required">{{::\'ERROR_REQUIRED\' | translate}}</div><div ng-message="minlength">{{::\'HINT_PASSWORD\' | translate }}</div><div ng-message="ERROR_1105">{{::\'ERROR_IDENTICAL_PASSWORDS\' | translate }}</div></div></md-input-container><md-input-container class="md-block"><label>{{ \'SETTINGS_CHANGE_PASSWORD_REPEAT_RASSWORD\' | translate }}</label> <input name="repeat" type="password" ng-model="repeat" ng-change="onCheckRepeatPassword()" ng-required="change_password.$submitted" ng-minlength="6"><div class="hint" ng-if="errorsRepeatWithHint(form.repeat).hint">{{::\'HINT_REPEAT_PASSWORD\' | translate }}</div><div ng-messages="errorsRepeatWithHint(form.repeat)"><div ng-message="required">{{::\'ERROR_REQUIRED\' | translate }}</div><div ng-message="minlength">{{::\'HINT_PASSWORD\' | translate }}</div><div ng-message="repeat">{{::\'REPEAT_PASSWORD_INVALID\' | translate }}</div></div></md-input-container></div></div><div class="pip-footer"><div><md-button aria-label="xxx" ng-click="onCancel()">{{::\'CANCEL\' | translate }}</md-button><md-button type="submit" class="md-accent" aria-label="xxx">{{::\'APPLY\' | translate : module}}</md-button></div></div></form></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipSettings.Templates');
-} catch (e) {
-  module = angular.module('pipSettings.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('user_settings/user_settings_sessions.html',
-    '<md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><div class="pip-details-title pip-sessions"><p class="pip-title bm16">{{::\'SETTINGS_ACTIVE_SESSIONS_TITLE\' | translate}}</p><p class="pip-subtitle">{{::\'SETTINGS_ACTIVE_SESSIONS_SUBTITLE\' | translate}}</p></div><md-list class="w-stretch"><div ng-repeat="session in sessions"><div class="layout-row" ng-init="showBlock = session.id != sessionId" ng-click="showBlock = !showBlock"><p class="m0 text-subhead2 text-overflow max-w50-stretch">{{::session.client}}</p><p class="m0 lp4 text-body1 color-secondary-text flex">{{::\'SETTINGS_ACTIVE_SESSION_ACTIVE\' | translate}}</p><p class="m0 text-body1 color-secondary-text">{{::country}}<md-icon ng-if="showBlock" md-svg-icon="icons:triangle-up"></md-icon><md-icon ng-if="!showBlock" md-svg-icon="icons:triangle-down"></md-icon></p></div><div class="layout-row bm8 bp8" ng-class="{\'divider-bottom\':!$last}"><div class="flex-50"><p class="m0 bm4 text-body1 text-overflow color-secondary-text">{{session.last_req | date : \'medium\'}}</p><p class="m0 bm4 text-body1 text-overflow color-secondary-text" ng-show="showBlock">{{::\'SETTINGS_ACTIVE_SESSION_OS\' | translate}}{{::session.platform}}</p><p class="m0 bm4 text-body1 text-overflow color-secondary-text" ng-show="showBlock">{{::\'SETTINGS_ACTIVE_SESSION_IP\' | translate}}{{::session.address}}</p><md-button class="md-raised" ng-show="showBlock && session.id != sessionId" ng-click="onRemove(session)">{{::\'SETTINGS_ACTIVE_SESSIONS_CLOSE_SESSION\' | translate}}</md-button></div><pip-location-ip class="map-edit flex-50" ng-if="showBlock" pip-ipaddress="session.address" pip-extra-info="country = extraInfo.country"></pip-location-ip></div></div></md-list><div class="layout-row layout-align-end-center"><md-button class="md-raised" ng-show="sessions.length > 1" ng-click="onRemoveAll()">{{::\'SETTINGS_ACTIVE_SESSIONS_CLOSE_ACTIVE_SESSIONS\' | translate}}</md-button></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipSettings.Templates');
-} catch (e) {
-  module = angular.module('pipSettings.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('user_settings/user_settings_verify_email.html',
-    '<md-dialog class="pip-dialog layout-column" width="440"><div class="pip-body"><div class="pip-content"><md-progress-linear ng-show="transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><h2>{{::\'VERIFY_EMAIL_TITLE\' | translate}}</h2><p class="title-padding">{{::\'VERIFY_EMAIL_TEXT_1\' | translate}}</p><form name="form" novalidate=""><div ng-messages="form.$serverError" class="text-error bm8"><div ng-message="ERROR_UNKNOWN">{{ form.$serverError.ERROR_UNKNOWN | translate }}</div></div><md-input-container class="display bp4 md-block"><label>{{::\'EMAIL\' | translate}}</label> <input name="email" type="email" ng-model="data.email" required="" step="any" pip-clear-errors="" tabindex="1" ng-disabled="transaction.busy()" pip-test="input-email"><div class="hint" ng-if="errorsWithHint(form, form.email).hint">{{::\'HINT_EMAIL\' | translate}}</div><div ng-messages="errorsWithHint(form, form.email)" xng-if="!form.email.$pristine"><div ng-message="required">{{::\'ERROR_EMAIL_INVALID\' | translate }}</div><div ng-message="ERROR_1106">{{::\'ERROR_USER_NOT_FOUND\' | translate}}</div></div></md-input-container><md-input-container class="md-block"><label>{{::\'ENTRY_VERIFICATION_CODE\' | translate}}</label> <input name="code" ng-disabled="transaction.busy()" tabindex="0" ng-model="data.code" required="" pip-clear-errors=""><div ng-messages="errorsWithHint(form, form.code)"><div ng-message="required">{{::\'ERROR_CODE_INVALID\' | translate }}</div><div ng-message="ERROR_1103">{{::\'ERROR_CODE_WRONG\' | translate }}</div></div></md-input-container><p>{{::\'VERIFY_EMAIL_TEXT_21\' | translate}} <a ng-click="onRequestVerificationClick()" class="pointer" tabindex="0">{{::\'VERIFY_EMAIL_RESEND\' | translate}}</a> {{::\'VERIFY_EMAIL_TEXT_22\' | translate}}</p></form></div></div><div class="pip-footer"><md-button ng-click="onCancel()" ng-hide="transaction.busy()" aria-label="xxx">{{::\'CANCEL\' | translate}}</md-button><md-button class="md-accent" ng-click="onVerify()" ng-hide="transaction.busy()" tabindex="0" aria-label="xxx" ng-disabled="data.code.length == 0 || data.email.length == 0 || (!data.email && form.$pristine) || (!data.code)">{{::\'VERIFY\' | translate}}</md-button><md-button class="md-warn" ng-show="transaction.busy()" ng-click="transaction.abort()" tabindex="0" aria-label="xxx">{{::\'CANCEL\' | translate}}</md-button></div></md-dialog>');
+  $templateCache.put('page/SettingsPage.html',
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar>\n' +
+    '<pip-document width="800" min-height="400"\n' +
+    '              class="pip-settings">\n' +
+    '\n' +
+    '    <div class="pip-menu-container"\n' +
+    '         ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1">\n' +
+    '        <md-list class="pip-menu pip-simple-list"\n' +
+    '                 pip-selected="vm.selected.tabIndex"\n' +
+    '                 pip-selected-watch="vm.selected.navId"\n' +
+    '                 pip-select="vm.onNavigationSelect($event.id)">\n' +
+    '            <md-list-item class="pip-simple-list-item pip-selectable flex"\n' +
+    '                          ng-repeat="tab in vm.tabs track by tab.state" ng-if="vm.$party.id == vm.$user.id ||\n' +
+    '                          tab.state == \'settings.basic_info\'|| tab.state ==\'settings.contact_info\'\n' +
+    '                          || tab.state ==\'settings.blacklist\'"\n' +
+    '                          md-ink-ripple\n' +
+    '                          pip-id="{{:: tab.state }}">\n' +
+    '                <p>{{::tab.title | translate}}</p>\n' +
+    '            </md-list-item>\n' +
+    '        </md-list>\n' +
+    '\n' +
+    '        <div class="pip-content-container">\n' +
+    '            <pip-dropdown pip-actions="vm.tabs"\n' +
+    '                          pip-dropdown-select="vm.onDropdownSelect"\n' +
+    '                          pip-active-index="vm.selected.tabIndex"></pip-dropdown>\n' +
+    '\n' +
+    '            <div class="pip-body tp24-flex layout-column" ui-view></div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="layout-column layout-align-center-center flex"\n' +
+    '         ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">\n' +
+    '        {{::\'ERROR_400\' | translate}}\n' +
+    '    </div>\n' +
+    '</pip-document>');
 }]);
 })();
 
 
 
-},{}]},{},[15,5,6,3,4,8,7,2,1,10,11,12,13,14,9])(15)
+},{}]},{},[12,1,4,2,3,11,5,6,7,8,9,10])(12)
 });
 
+
+
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function () {
-    'use strict';
-    var thisModule = angular.module('pipHelp.Translate', []);
-    thisModule.filter('translate', ['$injector', function ($injector) {
+{
+    filter.$inject = ['$injector'];
+    function filter($injector) {
         var pipTranslate = $injector.has('pipTranslate')
             ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate.translate(key) || key : key;
         };
-    }]);
-})();
+    }
+    angular.module('pipHelp.Translate', [])
+        .filter('translate', filter);
+}
 },{}],2:[function(require,module,exports){
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./service");
+require("./page");
+angular.module('pipHelp', [
+    'pipHelp.Service',
+    'pipHelp.Page'
+]);
+__export(require("./service"));
+},{"./page":5,"./service":12}],3:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var HelpPageSelectedTab_1 = require("../service/HelpPageSelectedTab");
 var HelpPageController = (function () {
-    HelpPageController.$inject = ['$log', '$q', '$state', 'pipNavService', 'pipHelp', '$rootScope', '$timeout'];
-    function HelpPageController($log, $q, $state, pipNavService, pipHelp, $rootScope, $timeout) {
+    HelpPageController.$inject = ['$log', '$state', '$rootScope', '$timeout', 'pipNavService', 'pipHelp'];
+    function HelpPageController($log, $state, $rootScope, $timeout, pipNavService, pipHelp) {
         var _this = this;
-        this._log = $log;
-        this._q = $q;
-        this._state = $state;
+        this.$log = $log;
+        this.$state = $state;
         this.tabs = _.filter(pipHelp.getTabs(), function (tab) {
-            return tab;
+            if (tab.visible === true) {
+                return tab;
+            }
         });
         this.tabs = _.sortBy(this.tabs, 'index');
-        this.selected = {};
-        if (this._state.current.name !== 'help') {
-            this.initSelect(this._state.current.name);
+        this.selected = new HelpPageSelectedTab_1.HelpPageSelectedTab();
+        if (this.$state.current.name !== 'help') {
+            this.initSelect(this.$state.current.name);
         }
-        else if (this._state.current.name === 'help' && pipHelp.getDefaultTab()) {
+        else if (this.$state.current.name === 'help' && pipHelp.getDefaultTab()) {
             this.initSelect(pipHelp.getDefaultTab().state);
         }
         else {
             $timeout(function () {
                 if (pipHelp.getDefaultTab()) {
-                    this.initSelect(pipHelp.getDefaultTab().state);
+                    _this.initSelect(pipHelp.getDefaultTab().state);
                 }
-                if (!pipHelp.getDefaultTab() && this.tabs && this.tabs.length > 0) {
-                    this.initSelect(this.tabs[0].state);
+                if (!pipHelp.getDefaultTab() && _this.tabs && _this.tabs.length > 0) {
+                    _this.initSelect(_this.tabs[0].state);
                 }
             });
         }
@@ -18316,50 +18321,51 @@ var HelpPageController = (function () {
         });
         this.selected.tabIndex = _.indexOf(this.tabs, this.selected.tab);
         this.selected.tabId = state;
+        this.$state.go(this.selected.tabId);
     };
     HelpPageController.prototype.onNavigationSelect = function (state) {
         this.initSelect(state);
         if (this.selected.tab) {
-            this._state.go(state);
+            this.$state.go(state);
         }
     };
     return HelpPageController;
 }());
-(function () {
-    angular.module('pipHelp.Page', [
-        'ui.router',
-        'pipHelp.Service',
-        'pipNav',
-        'pipSelected',
-        'pipTranslate',
-        'pipHelp.Templates'
-    ])
-        .controller('pipHelpPageController', HelpPageController);
-})();
-require("./HelpPageRoutes");
-},{"./HelpPageRoutes":3}],3:[function(require,module,exports){
-'use strict';
-configureHelpPageRoutes.$inject = ['$stateProvider'];
-function configureHelpPageRoutes($stateProvider) {
-    $stateProvider
-        .state('help', {
-        url: '/help?party_id',
-        auth: true,
-        controllerAs: 'vm',
-        controller: 'pipHelpPageController',
-        templateUrl: 'help_page/HelpPage.html'
-    });
-}
-angular.module('pipHelp.Page')
-    .config(configureHelpPageRoutes);
-},{}],4:[function(require,module,exports){
-'use strict';
-var HelpTab = (function () {
-    function HelpTab() {
+angular
+    .module('pipHelp.Page')
+    .controller('pipHelpPageController', HelpPageController);
+},{"../service/HelpPageSelectedTab":7}],4:[function(require,module,exports){
+{
+    configureHelpPageRoutes.$inject = ['$stateProvider'];
+    function configureHelpPageRoutes($stateProvider) {
+        $stateProvider
+            .state('help', {
+            url: '/help?party_id',
+            auth: true,
+            controllerAs: '$ctrl',
+            controller: 'pipHelpPageController',
+            templateUrl: 'page/HelpPage.html'
+        });
     }
-    return HelpTab;
-}());
-exports.HelpTab = HelpTab;
+    angular.module('pipHelp.Page')
+        .config(configureHelpPageRoutes);
+}
+},{}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+angular.module('pipHelp.Page', [
+    'ui.router',
+    'pipHelp.Service',
+    'pipNav',
+    'pipSelected',
+    'pipTranslate',
+    'pipHelp.Templates'
+]);
+require("./HelpPage");
+require("./HelpPageRoutes");
+},{"./HelpPage":3,"./HelpPageRoutes":4}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var HelpConfig = (function () {
     function HelpConfig() {
         this.tabs = [];
@@ -18370,12 +18376,24 @@ var HelpConfig = (function () {
     return HelpConfig;
 }());
 exports.HelpConfig = HelpConfig;
+},{}],7:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var HelpPageSelectedTab = (function () {
+    function HelpPageSelectedTab() {
+    }
+    return HelpPageSelectedTab;
+}());
+exports.HelpPageSelectedTab = HelpPageSelectedTab;
+},{}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var HelpConfig_1 = require("./HelpConfig");
 var HelpService = (function () {
-    HelpService.$inject = ['$rootScope', 'config'];
-    function HelpService($rootScope, config) {
+    HelpService.$inject = ['_config'];
+    function HelpService(_config) {
         "ngInject";
-        this._rootScope = $rootScope;
-        this._config = config;
+        this._config = _config;
     }
     HelpService.prototype.getFullStateName = function (state) {
         return 'help.' + state;
@@ -18389,9 +18407,10 @@ var HelpService = (function () {
         this._config.defaultTab = this.getFullStateName(name);
     };
     HelpService.prototype.getDefaultTab = function () {
+        var _this = this;
         var defaultTab;
         defaultTab = _.find(this._config.tabs, function (p) {
-            return p.state === defaultTab;
+            return p.state === _this._config.defaultTab;
         });
         return _.cloneDeep(defaultTab);
     };
@@ -18423,16 +18442,17 @@ var HelpService = (function () {
 var HelpProvider = (function () {
     HelpProvider.$inject = ['$stateProvider'];
     function HelpProvider($stateProvider) {
-        this._config = new HelpConfig();
-        this._stateProvider = $stateProvider;
+        this.$stateProvider = $stateProvider;
+        this._config = new HelpConfig_1.HelpConfig();
     }
     HelpProvider.prototype.getFullStateName = function (state) {
         return 'help.' + state;
     };
     HelpProvider.prototype.getDefaultTab = function () {
+        var _this = this;
         var defaultTab;
         defaultTab = _.find(this._config.tabs, function (p) {
-            return p.state === defaultTab;
+            return p.state === _this._config.defaultTab;
         });
         return _.cloneDeep(defaultTab);
     };
@@ -18453,8 +18473,8 @@ var HelpProvider = (function () {
             visible: tabObj.visible !== false,
             stateConfig: _.cloneDeep(tabObj.stateConfig)
         });
-        this._stateProvider.state(this.getFullStateName(tabObj.state), tabObj.stateConfig);
-        if (typeof this._config.defaultTab === 'undefined' && this._config.tabs.length === 1) {
+        this.$stateProvider.state(this.getFullStateName(tabObj.state), tabObj.stateConfig);
+        if (typeof _.isUndefined(this._config.defaultTab) && this._config.tabs.length === 1) {
             this.setDefaultTab(tabObj.state);
         }
     };
@@ -18495,35 +18515,63 @@ var HelpProvider = (function () {
         return this._config.titleLogo;
     };
     HelpProvider.prototype.showNavIcon = function (value) {
-        if (value !== null && value !== undefined) {
+        if (!_.isNull(value) && !_.isUndefined(value)) {
             this._config.isNavIcon = !!value;
         }
         return this._config.isNavIcon;
     };
-    HelpProvider.prototype.$get = ['$rootScope', '$state', function ($rootScope, $state) {
+    HelpProvider.prototype.$get = function () {
         "ngInject";
-        if (this._service == null)
-            this._service = new HelpService($rootScope, this._config);
+        if (_.isNull(this._service) || _.isUndefined(this._service)) {
+            this._service = new HelpService(this._config);
+        }
         return this._service;
-    }];
+    };
     return HelpProvider;
 }());
 angular
-    .module('pipHelp.Service', [])
+    .module('pipHelp.Service')
     .provider('pipHelp', HelpProvider);
-},{}],5:[function(require,module,exports){
+},{"./HelpConfig":6}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var HelpStateConfig = (function () {
+    function HelpStateConfig() {
+        this.auth = false;
+    }
+    return HelpStateConfig;
+}());
+exports.HelpStateConfig = HelpStateConfig;
+},{}],10:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var HelpTab = (function () {
+    function HelpTab() {
+    }
+    return HelpTab;
+}());
+exports.HelpTab = HelpTab;
+},{}],11:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+},{}],12:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-require("./help_service/HelpService");
-require("./help_page/HelpPageController");
-angular.module('pipHelp', [
-    'pipHelp.Service',
-    'pipHelp.Page'
-]);
-__export(require("./help_service/HelpService"));
-},{"./help_page/HelpPageController":2,"./help_service/HelpService":4}],6:[function(require,module,exports){
+Object.defineProperty(exports, "__esModule", { value: true });
+angular
+    .module('pipHelp.Service', []);
+require("./HelpConfig");
+require("./HelpPageSelectedTab");
+require("./HelpTab");
+require("./HelpStateConfig");
+require("./HelpService");
+__export(require("./HelpConfig"));
+__export(require("./HelpPageSelectedTab"));
+__export(require("./HelpTab"));
+__export(require("./HelpStateConfig"));
+},{"./HelpConfig":6,"./HelpPageSelectedTab":7,"./HelpService":8,"./HelpStateConfig":9,"./HelpTab":10}],13:[function(require,module,exports){
 (function(module) {
 try {
   module = angular.module('pipHelp.Templates');
@@ -18531,14 +18579,46 @@ try {
   module = angular.module('pipHelp.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('help_page/HelpPage.html',
-    '<md-toolbar class="pip-appbar-ext"></md-toolbar><pip-document width="800" min-height="400" class="pip-help"><div class="pip-menu-container" ng-hide="vm.manager === false || !vm.tabs || vm.tabs.length < 1"><md-list class="pip-menu pip-simple-list" pip-selected="vm.selected.tabIndex" pip-selected-watch="vm.selected.navId" pip-select="vm.onNavigationSelect($event.id)"><md-list-item class="pip-simple-list-item pip-selectable flex" ng-repeat="tab in vm.tabs track by tab.state" md-ink-ripple="" pip-id="{{:: tab.state }}"><p>{{::tab.title | translate}}</p></md-list-item></md-list><div class="pip-content-container"><pip-dropdown pip-actions="vm.tabs" pip-dropdown-select="vm.onDropdownSelect" pip-active-index="vm.selected.tabIndex"></pip-dropdown><div class="pip-body p0 layout-column" ui-view=""></div></div></div><div class="layout-column layout-align-center-center flex" ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">{{::\'ERROR_400\' | translate}}</div></pip-document>');
+  $templateCache.put('page/HelpPage.html',
+    '<md-toolbar class="pip-appbar-ext"></md-toolbar>\n' +
+    '<pip-document width="800" min-height="400"\n' +
+    '              class="pip-help">\n' +
+    '\n' +
+    '    <div class="pip-menu-container"\n' +
+    '         ng-hide="$ctrl.manager === false || !$ctrl.tabs || $ctrl.tabs.length < 1">\n' +
+    '        <md-list class="pip-menu pip-simple-list"\n' +
+    '                 pip-selected="$ctrl.selected.tabIndex"\n' +
+    '                 pip-selected-watch="$ctrl.selected.navId"\n' +
+    '                 pip-select="$ctrl.onNavigationSelect($event.id)">\n' +
+    '            <md-list-item class="pip-simple-list-item pip-selectable flex"\n' +
+    '                          ng-repeat="tab in $ctrl.tabs track by tab.state" \n' +
+    '                          md-ink-ripple\n' +
+    '                          pip-id="{{:: tab.state }}">\n' +
+    '                <p>{{::tab.title | translate}}</p>\n' +
+    '            </md-list-item>\n' +
+    '        </md-list>\n' +
+    '\n' +
+    '        <div class="pip-content-container">\n' +
+    '            <pip-dropdown pip-actions="$ctrl.tabs"\n' +
+    '                          pip-dropdown-select="$ctrl.onDropdownSelect"\n' +
+    '                          pip-active-index="$ctrl.selected.tabIndex"></pip-dropdown>\n' +
+    '\n' +
+    '            <div class="pip-body p0 layout-column" ui-view></div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '    <div class="layout-column layout-align-center-center flex"\n' +
+    '         ng-show="$ctrl.manager === false || !$ctrl.tabs || $ctrl.tabs.length < 1">\n' +
+    '        {{::\'ERROR_400\' | translate}}\n' +
+    '    </div>\n' +
+    '</pip-document>');
 }]);
 })();
 
 
 
-},{}]},{},[6,1,2,3,4,5])(6)
+},{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
 });
+
+
 
 //# sourceMappingURL=pip-webui.js.map

@@ -1,7 +1,7 @@
 declare module pip.services {
 
-export let CurrentState: any;
-export let PreviousState: any;
+export let StateVar: string;
+export let PrevStateVar: string;
 
 
 let RedirectedStates: any;
@@ -14,6 +14,7 @@ export let RoutingVar: string;
 
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
+
 export interface IIdentity {
     id: string;
     full_name: string;
@@ -22,6 +23,7 @@ export interface IIdentity {
     photo_url: string;
     groups: string[];
 }
+
 export interface IIdentityService {
     identity: any;
 }
@@ -31,9 +33,6 @@ export interface IIdentityProvider extends ng.IServiceProvider {
 }
 
 
-export const SessionRootVar = "$session";
-export const SessionOpenedEvent = "pipSessionOpened";
-export const SessionClosedEvent = "pipSessionClosed";
 export interface ISessionService {
     session: any;
     isOpened(): boolean;
@@ -45,107 +44,11 @@ export interface ISessionProvider extends ng.IServiceProvider {
     session: any;
 }
 
-
-function translateDirective(pipTranslate: any): ng.IDirective;
-function translateHtmlDirective(pipTranslate: any): ng.IDirective;
-
-function translateFilter(pipTranslate: any): (key: any) => any;
-function optionalTranslateFilter($injector: any): (key: any) => any;
-
-export let LanguageRootVar: string;
-export let LanguageChangedEvent: string;
-export interface ITranslateService {
-    language: string;
-    use(language: string): string;
-    setTranslations(language: string, translations: any): void;
-    translations(language: string, translations: any): void;
-    translate(key: string): string;
-    translateArray(keys: string[]): string[];
-    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
-    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
-    translateWithPrefix(prefix: string, key: string): any;
-    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
-    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
-}
-export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
-}
-
-export class Translation {
-    protected _language: string;
-    protected _translations: {
-        en: {
-            'en': string;
-            'ru': string;
-            'es': string;
-            'pt': string;
-            'de': string;
-            'fr': string;
-        };
-        ru: {
-            'en': string;
-            'ru': string;
-            'es': string;
-            'pt': string;
-            'de': string;
-            'fr': string;
-        };
-    };
-    constructor();
-    language: string;
-    use(language: string): string;
-    setTranslations(language: string, translations: any): void;
-    translations(language: string, translations: any): void;
-    translate(key: string): string;
-    translateArray(keys: string[]): string[];
-    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
-    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
-    translateWithPrefix(prefix: string, key: string): any;
-    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
-    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
-}
+export const SessionRootVar = "$session";
+export const SessionOpenedEvent = "pipSessionOpened";
+export const SessionClosedEvent = "pipSessionClosed";
 
 
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-function configureTransactionStrings($injector: any): void;
 
 export interface ICodes {
     hash(value: string): number;
@@ -158,10 +61,6 @@ export interface IFormat {
 }
 
 
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
 export interface IPageResetService {
     reset(): void;
     resetArea(area: string): void;
@@ -199,6 +98,116 @@ export interface ITimerService {
     start(): void;
     stop(): void;
 }
+
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+
+
+
+
+
+
+export interface ITranslateService {
+    language: string;
+    use(language: string): string;
+    setTranslations(language: string, translations: any): void;
+    translations(language: string, translations: any): void;
+    translate(key: string): string;
+    translateArray(keys: string[]): string[];
+    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
+    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
+    translateWithPrefix(prefix: string, key: string): any;
+    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
+    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
+}
+export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
+
+
+
+export let LanguageRootVar: string;
+export let LanguageChangedEvent: string;
+
+export class Translation {
+    protected _language: string;
+    protected _translations: {
+        en: {
+            'en': string;
+            'ru': string;
+            'es': string;
+            'pt': string;
+            'de': string;
+            'fr': string;
+        };
+        ru: {
+            'en': string;
+            'ru': string;
+            'es': string;
+            'pt': string;
+            'de': string;
+            'fr': string;
+        };
+    };
+    constructor();
+    language: string;
+    use(language: string): string;
+    setTranslations(language: string, translations: any): void;
+    translations(language: string, translations: any): void;
+    translate(key: string): string;
+    translateArray(keys: string[]): string[];
+    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
+    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
+    translateWithPrefix(prefix: string, key: string): any;
+    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+}
+
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+
 
 }
 
@@ -291,14 +300,10 @@ export interface IMediaProvider extends ng.IServiceProvider {
 
 
 export let MainBreakpoints: MediaBreakpoints;
-export let MainBreakpointStatuses: MediaBreakpointStatuses;
+export const MainBreakpointStatuses: MediaBreakpointStatuses;
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-}
-
-declare module pip.split {
 
 }
 
@@ -306,10 +311,10 @@ declare module pip.behaviors {
 
 
 
-
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
+
 
 
 
@@ -461,6 +466,8 @@ declare module pip.dates {
 
 
 
+
+
 export class DateRangeType {
     static Year: string;
     static Month: string;
@@ -530,8 +537,6 @@ export interface IDateFormatService {
 }
 export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
-
-
 
 
 
@@ -889,36 +894,6 @@ export class NavMenuConfig {
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
-
 export class PipTab {
     id: string;
     name?: string;
@@ -993,21 +968,41 @@ export class SideNavConfig {
     visible: boolean;
 }
 
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
+
 }
 
 declare module pip.themes {
 
-function configureBootBarnCoolTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureBootBarnMonochromeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
-
-function configureBootBarnWarmTheme($mdThemingProvider: any): void;
-
-
-
-export let ThemeRootVar: string;
-export let ThemeChangedEvent: string;
-export let ThemeResetPage: string;
 export interface IThemeService {
     theme: string;
     use(language: string): string;
@@ -1017,21 +1012,21 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
     persist: boolean;
 }
 
-function configureDefaultAmberTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+export let ThemeRootVar: string;
+export let ThemeChangedEvent: string;
+export let ThemeResetPage: string;
 
-function configureDefaultBlackTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureDefaultBlueTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureDefaultGreenTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureDefaultGreyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureDefaultNavyTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureDefaultOrangeTheme($mdThemingProvider: ng.material.IThemingProvider): void;
 
-function configureDefaultPinkTheme($mdThemingProvider: ng.material.IThemingProvider): void;
+
+
+
+
+
 
 
 }
@@ -1040,9 +1035,7 @@ declare module pip.errors {
 
 
 
-
-
-export class ErrorStateItem {
+export class ErrorPageConfig {
     Active: boolean;
     Name: string;
     Event: string;
@@ -1052,29 +1045,57 @@ export class ErrorStateItem {
     Image: string;
     Params?: any;
 }
-export class pipErrorsConfig {
-    Maintenance: ErrorStateItem;
-    MissingRoute: ErrorStateItem;
-    NoConnection: ErrorStateItem;
-    Unknown: ErrorStateItem;
-    Unsupported: ErrorStateItem;
+export class ErrorPageConfigs {
+    Maintenance: ErrorPageConfig;
+    MissingRoute: ErrorPageConfig;
+    NoConnection: ErrorPageConfig;
+    Unknown: ErrorPageConfig;
+    Unsupported: ErrorPageConfig;
 }
-export interface IpipErrorsService {
-    getErrorItemByKey(errorName: string): ErrorStateItem;
-    config: pipErrorsConfig;
+export class SupportedBrowsers {
+    edge: number;
+    ie: number;
+    firefox: number;
+    opera: number;
+    chrome: number;
 }
-export interface IpipErrorsProvider extends ng.IServiceProvider {
-    configureErrorByKey(errorName: string, errorParams: ErrorStateItem): void;
-    configureErrors(value: pipErrorsConfig): void;
+
+
+export interface IErrorPageConfigService {
+    getErrorPageConfig(pageName: string): ErrorPageConfig;
+    configs: ErrorPageConfigs;
+}
+export interface IErrorPageConfigProvider extends ng.IServiceProvider {
+    setErrorPageConfig(pageName: string, config: ErrorPageConfig): void;
+    setAllErrorPageConfigs(configs: ErrorPageConfigs): void;
+    setSupportedBrowsers(browsers: SupportedBrowsers): void;
+    configs: ErrorPageConfigs;
 }
 
 
 
+export interface IFormErrorsService {
+    errorsWithHint(field: any): any;
+    touchedErrorsWithHint(form: ng.IFormController, field: any): any;
+    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
+    resetFieldsErrors(form: ng.IFormController, field: any): void;
+    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
+    goToUnhandledErrorPage(error: any): any;
+}
+
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
+
+export let ErrorsMissingRouteState: string;
+export let StateNotFoundEvent: string;
+
+export let ErrorsConnectionState: string;
+export let ErrorsConnectionEvent: string;
 
 
 
-
-
+export let ErrorsUnknownState: string;
+export let ErrorsUnknownEvent: string;
 
 }
 
@@ -1125,6 +1146,9 @@ export class ButtonsUpload {
 
 
 
+
+
+
 export enum FileUploadState {
     Uploading = 0,
     Completed = 1,
@@ -1136,25 +1160,9 @@ export interface IFileUploadService {
 }
 
 
-
-
-
 }
 
 declare module pip.dashboard {
-
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-}
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
-}
-
 
 export class AddTileDialog {
     title: string;
@@ -1182,6 +1190,19 @@ export interface IAddTileDialogprovider {
     configWidgetList(list: [AddTileDialog[]]): void;
 }
 
+
+
+export interface IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+}
+export class DashboardTile implements IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+    constructor();
+}
 
 export class TileConfigDialogController {
     params: any;
@@ -1257,13 +1278,13 @@ export class DragTileService implements IDragTileService {
 
 
 
-
 export class MenuTileService extends DashboardTile {
     menu: any;
     constructor();
     callAction(actionName: any, params: any, item: any): void;
     changeSize(params: any): void;
 }
+
 
 
 
@@ -1346,34 +1367,21 @@ export interface ITileTemplateService {
 declare module pip.settings {
 
 
-
-
-function configureSettingsPageRoutes($stateProvider: any): void;
-
-
-
-export class SettingsTab {
-    state: string;
-    title: string;
-    index: string;
-    access: boolean;
-    visible: boolean;
-    stateConfig: any;
-}
 export interface ISettingsService {
-    getDefaultTab(): any;
-    showTitleText(newTitleText: any): any;
+    getDefaultTab(): SettingsTab;
+    showTitleText(newTitleText: string): void;
     showTitleLogo(newTitleLogo: any): any;
-    setDefaultTab(name: string): any;
-    showNavIcon(value: any): any;
-    getTabs(): any;
+    setDefaultTab(name: string): void;
+    showNavIcon(value: boolean): boolean;
+    getTabs(): SettingsTab[];
 }
 export interface ISettingsProvider extends ng.IServiceProvider {
     getDefaultTab(): SettingsTab;
-    addTab(tabObj: any): any;
+    addTab(tabObj: SettingsTab): void;
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
+
 export class SettingsConfig {
     defaultTab: string;
     tabs: SettingsTab[];
@@ -1382,8 +1390,28 @@ export class SettingsConfig {
     isNavIcon: boolean;
 }
 
+export class SettingsPageSelectedTab {
+    tab: SettingsTab;
+    tabIndex: number;
+    tabId: string;
+}
 
 
+export class SettingsStateConfig {
+    url: string;
+    auth: boolean;
+    templateUrl?: string;
+    template?: string;
+}
+
+export class SettingsTab {
+    state: string;
+    title: string;
+    index: number;
+    access: Function;
+    visible: boolean;
+    stateConfig: SettingsStateConfig;
+}
 
 
 
@@ -1393,38 +1421,55 @@ export class SettingsConfig {
 declare module pip.help {
 
 
-export class HelpTab {
-    state: string;
-    title: string;
-    index: string;
-    access: boolean;
-    visible: boolean;
-    stateConfig: any;
-}
-export interface IHelpService {
-    getDefaultTab(): any;
-    showTitleText(newTitleText: any): any;
-    showTitleLogo(newTitleLogo: any): any;
-    setDefaultTab(name: string): any;
-    showNavIcon(value: any): any;
-    getTabs(): any;
-}
-export interface IHelpProvider extends ng.IServiceProvider {
-    getDefaultTab(): HelpTab;
-    addTab(tabObj: any): any;
-    setDefaultTab(name: string): void;
-    getFullStateName(state: string): string;
-}
 export class HelpConfig {
     defaultTab: string;
     tabs: HelpTab[];
     titleText: string;
-    titleLogo: boolean;
+    titleLogo: string;
     isNavIcon: boolean;
 }
 
+export class HelpPageSelectedTab {
+    tab: HelpTab;
+    tabIndex: number;
+    tabId: string;
+}
 
-function configureHelpPageRoutes($stateProvider: any): void;
+
+export class HelpStateConfig {
+    url: string;
+    auth: boolean;
+    templateUrl?: string;
+    template?: string;
+}
+
+export class HelpTab {
+    state: string;
+    title: string;
+    index: number;
+    access: Function;
+    visible: boolean;
+    stateConfig: HelpStateConfig;
+}
+
+export interface IHelpService {
+    getDefaultTab(): HelpTab;
+    showTitleText(newTitleText: string): string;
+    showTitleLogo(newTitleLogo: string): any;
+    setDefaultTab(name: string): void;
+    showNavIcon(value: boolean): boolean;
+    getTabs(): HelpTab[];
+}
+export interface IHelpProvider extends ng.IServiceProvider {
+    getDefaultTab(): HelpTab;
+    addTab(tabObj: HelpTab): void;
+    setDefaultTab(name: string): void;
+    getFullStateName(state: string): string;
+}
+
+
+
+
 
 }
 
