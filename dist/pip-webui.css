@@ -5865,9 +5865,24 @@ md-select md-select-value .md-text .pip-tabs-badge {
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   z-index: 0; }
 
+pip-appbar-shadow {
+  height: 48px;
+  width: 100%;
+  margin-top: -48px;
+  display: block;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26); }
+
 @media (max-width: 704px) {
   .pip-appbar .pip-appbar-hide-sm {
-    display: none; } }
+    display: none; }
+  pip-appbar-shadow {
+    height: 56px;
+    margin-top: -56px; } }
+
+@media (min-width: 1440px) {
+  pip-appbar-shadow {
+    height: 64px;
+    margin-top: -64px; } }
 
 @media (min-width: 704px) {
   .pip-appbar .pip-appbar-show-sm {
