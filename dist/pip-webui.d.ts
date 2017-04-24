@@ -36,7 +36,13 @@ export interface IIdentityProvider extends ng.IServiceProvider {
 export interface ISessionService {
     session: any;
     isOpened(): boolean;
-    open(session: any): void;
+    addOpenListener(listener: any): void;
+    addCloseListener(listener: any): void;
+    removeOpenListener(listener: any): void;
+    removeCloseListener(listener: any): void;
+    clearOpenListeners(): void;
+    clearCloseListeners(): void;
+    open(session: any, decorator?: (callback: () => void) => void): void;
     close(): void;
 }
 export interface ISessionProvider extends ng.IServiceProvider {
@@ -261,6 +267,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export const MainResizedEvent = "pipMainResized";
 export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
@@ -298,12 +310,6 @@ export const MainBreakpointStatuses: MediaBreakpointStatuses;
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -466,6 +472,7 @@ declare module pip.dates {
 
 
 
+
 export class DateRangeType {
     static Year: string;
     static Month: string;
@@ -540,7 +547,6 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
@@ -594,36 +600,6 @@ export class InformationDialogParams {
 
 
 
-export interface IOptionsBigDialogService {
-    show(params: OptionsBigDialogParams, successCallback?: (result: OptionsBigDialogResult) => void, cancelCallback?: () => void): any;
-}
-
-
-export class OptionsBigDialogData {
-    name: string;
-    title: string;
-    subtitle: string;
-}
-
-export class OptionsBigDialogParams {
-    event?: MouseEvent;
-    title?: string;
-    ok?: string;
-    options?: OptionsBigDialogData[];
-    selectedOption?: OptionsBigDialogData;
-    selectedOptionName?: string;
-    hint?: string;
-    noTitle: any;
-    noActions: any;
-}
-
-export class OptionsBigDialogResult {
-    option: OptionsBigDialogData;
-    isCheckboxOption: boolean;
-}
-
-
-
 export interface IOptionsDialogService {
     show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
 }
@@ -653,9 +629,71 @@ export class OptionsDialogResult {
 }
 
 
+
+export interface IOptionsBigDialogService {
+    show(params: OptionsBigDialogParams, successCallback?: (result: OptionsBigDialogResult) => void, cancelCallback?: () => void): any;
+}
+
+
+export class OptionsBigDialogData {
+    name: string;
+    title: string;
+    subtitle: string;
+}
+
+export class OptionsBigDialogParams {
+    event?: MouseEvent;
+    title?: string;
+    ok?: string;
+    options?: OptionsBigDialogData[];
+    selectedOption?: OptionsBigDialogData;
+    selectedOptionName?: string;
+    hint?: string;
+    noTitle: any;
+    noActions: any;
+}
+
+export class OptionsBigDialogResult {
+    option: OptionsBigDialogData;
+    isCheckboxOption: boolean;
+}
+
+
 }
 
 declare module pip.nav {
+
+
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
+}
+
+
+export const AppBarChangedEvent: string;
+
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
+    hide(): void;
+    addShadow(...breakpoints: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
 
 
 export const ActionsChangedEvent: string;
@@ -707,35 +745,16 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-
-export class AppBarConfig {
-    visible: boolean;
-    parts: any;
-    classes: string[];
-}
-
-
-export const AppBarChangedEvent: string;
-
-export interface IAppBarService {
-    readonly config: AppBarConfig;
-    readonly classes: string[];
-    parts: any;
-    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
-    hide(): void;
-    addShadow(...breakpoints: string[]): void;
-    removeShadow(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAppBarProvider extends ng.IServiceProvider {
-    config: AppBarConfig;
-    parts: any;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
 }
 
 
@@ -765,21 +784,6 @@ export interface IBreadcrumbService {
 export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
 }
-
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
 
 
 export interface INavHeaderService {
@@ -817,6 +821,8 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
+
+
 
 export interface INavIconService {
     readonly config: NavIconConfig;
@@ -1003,6 +1009,10 @@ export class PipTab {
 declare module pip.themes {
 
 
+
+
+
+
 export interface IThemeService {
     theme: string;
     use(language: string): string;
@@ -1025,25 +1035,10 @@ export let ThemeResetPage: string;
 
 
 
-
-
-
-
 }
 
 declare module pip.errors {
 
-
-
-
-export interface IFormErrorsService {
-    errorsWithHint(field: any): any;
-    touchedErrorsWithHint(form: ng.IFormController, field: any): any;
-    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
-    resetFieldsErrors(form: ng.IFormController, field: any): void;
-    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
-    goToUnhandledErrorPage(error: any): any;
-}
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1082,9 +1077,20 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
-
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
+
+
+
+
+export interface IFormErrorsService {
+    errorsWithHint(field: any): any;
+    touchedErrorsWithHint(form: ng.IFormController, field: any): any;
+    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
+    resetFieldsErrors(form: ng.IFormController, field: any): void;
+    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
+    goToUnhandledErrorPage(error: any): any;
+}
 
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
@@ -1096,10 +1102,13 @@ export let ErrorsConnectionEvent: string;
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
 
+export let ErrorsUnsupportedState: string;
+export let ErrorsUnsupportedEvent: string;
 
 }
 
 declare module pip.charts {
+
 
 
 export interface IChartColorsService {
@@ -1111,10 +1120,13 @@ export interface IChartColorsService {
 
 
 
-
 }
 
 declare module pip.locations {
+
+
+
+let google: any;
 
 
 
@@ -1128,10 +1140,6 @@ export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
-
-
-let google: any;
-
 
 }
 

@@ -7701,6 +7701,30 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
     .pip-error-page .pip-actions .md-button {
       width: calc(100% - $pip-error-page-padding) !important; } }
 
+.hint {
+  /* Position the hint */
+  position: absolute;
+  left: 2px;
+  right: auto;
+  bottom: 7px;
+  /* Copy styles from ng-messages */
+  font-size: 12px;
+  line-height: 14px;
+  transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+  /* Set our own color */
+  color: grey; }
+
+.hint.ng-hide,
+.hint.ng-enter,
+.hint.ng-leave.ng-leave-active {
+  bottom: 26px;
+  opacity: 0; }
+
+.hint.ng-leave,
+.hint.ng-enter.ng-enter-active {
+  bottom: 7px;
+  opacity: 1; }
+
 .pip-page-errors, .pip-form-errors {
   background-color: rgba(0, 0, 0, 0.08);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
@@ -7748,6 +7772,16 @@ input:focus, p:focus, div:focus, li:focus, md-list-item:focus, md-list:focus, a:
       height: 20px;
       width: 20px;
       margin-right: 8px !important; }
+  .pip-page-errors md-input-container [ng-messages] ::after, .pip-form-errors md-input-container [ng-messages] ::after {
+    opacity: 1; }
+  .pip-page-errors md-input-container .md-input-message-animation, .pip-page-errors md-input-container .md-char-counter, .pip-form-errors md-input-container .md-input-message-animation, .pip-form-errors md-input-container .md-char-counter {
+    font-size: normal 400 12px Roboto, "Helvetica Neue", sans-serif;
+    line-height: 14px;
+    overflow: hidden;
+    -webkit-transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+    transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+    opacity: 1;
+    margin-top: 0; }
 
 @media (max-width: 768px) {
   .pip-page-errors, .pip-form-errors {
