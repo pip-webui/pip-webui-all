@@ -40,8 +40,6 @@ export interface ISessionService {
     addCloseListener(listener: any): void;
     removeOpenListener(listener: any): void;
     removeCloseListener(listener: any): void;
-    clearOpenListeners(): void;
-    clearCloseListeners(): void;
     open(session: any, decorator?: (callback: () => void) => void): void;
     close(): void;
 }
@@ -317,12 +315,13 @@ declare module pip.behaviors {
 
 
 
+
+
+
+
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
-
-
-
 
 
 
@@ -398,7 +397,6 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
-
 }
 
 declare module pip.controls {
@@ -431,7 +429,6 @@ export interface IPopoverService {
 
 
 
-
 export interface IToastService {
     showNextToast(): void;
     showToast(toast: Toast): void;
@@ -459,6 +456,7 @@ export class Toast {
 }
 
 
+
 }
 
 declare module pip.lists {
@@ -468,6 +466,7 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
 
 
 
@@ -546,7 +545,6 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
@@ -571,19 +569,6 @@ export interface IConfirmationDialogService {
 
 
 
-
-export class ErrorDetailsDialogParams {
-    event?: MouseEvent;
-    dismissButton?: string;
-    error: any;
-}
-
-
-export interface IErrorDetailsDialogService {
-    show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
 export interface IInformationDialogService {
     show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
@@ -596,6 +581,19 @@ export class InformationDialogParams {
     title?: string;
     message: string;
     item?: any;
+}
+
+
+
+export class ErrorDetailsDialogParams {
+    event?: MouseEvent;
+    dismissButton?: string;
+    error: any;
+}
+
+
+export interface IErrorDetailsDialogService {
+    show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
@@ -664,38 +662,6 @@ export class OptionsBigDialogResult {
 declare module pip.nav {
 
 
-export class AppBarConfig {
-    visible: boolean;
-    parts: any;
-    classes: string[];
-}
-
-
-export const AppBarChangedEvent: string;
-
-export interface IAppBarService {
-    readonly config: AppBarConfig;
-    readonly classes: string[];
-    parts: any;
-    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
-    hide(): void;
-    addShadow(...breakpoints: string[]): void;
-    removeShadow(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAppBarProvider extends ng.IServiceProvider {
-    config: AppBarConfig;
-    parts: any;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
-
-
 export const ActionsChangedEvent: string;
 export const SecondaryActionsOpenEvent: string;
 export class SimpleActionItem {
@@ -745,6 +711,38 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
+}
+
+
+export const AppBarChangedEvent: string;
+
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
+    hide(): void;
+    addShadow(...breakpoints: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -786,6 +784,8 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+
+
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
     imageUrl: string;
@@ -821,8 +821,6 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
-
-
 
 export interface INavIconService {
     readonly config: NavIconConfig;
@@ -930,6 +928,13 @@ export const CloseSearchEvent = "pipCloseSearch";
 export const SearchChangedEvent = "pipSearchChanged";
 export const SearchActivatedEvent = "pipSearchActivated";
 
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
+}
+
 
 export interface ISideNavService {
     readonly config: SideNavConfig;
@@ -997,20 +1002,9 @@ export class SideNavConfig {
     visible: boolean;
 }
 
-export class PipTab {
-    id: string;
-    name?: string;
-    count: number;
-    title: string;
-}
-
 }
 
 declare module pip.themes {
-
-
-
-
 
 
 export interface IThemeService {
@@ -1025,6 +1019,10 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
 export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
 export let ThemeResetPage: string;
+
+
+
+
 
 
 
@@ -1077,10 +1075,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
-export let ErrorsMaintenanceState: string;
-export let MaintenanceErrorEvent: string;
-
-
 
 
 export interface IFormErrorsService {
@@ -1091,6 +1085,10 @@ export interface IFormErrorsService {
     setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
     goToUnhandledErrorPage(error: any): any;
 }
+
+
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
 
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
@@ -1126,9 +1124,6 @@ declare module pip.locations {
 
 
 
-let google: any;
-
-
 
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
@@ -1140,6 +1135,9 @@ export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
+
+let google: any;
+
 
 }
 
@@ -1155,6 +1153,8 @@ export class ButtonsUpload {
 
 
 
+
+
 export enum FileUploadState {
     Uploading = 0,
     Completed = 1,
@@ -1164,8 +1164,6 @@ export enum FileUploadState {
 export interface IFileUploadService {
     upload(file: any, url: string, resultCallback?: (data: any, err: any) => void, progressCallback?: (state: FileUploadState, progress: number) => void): any;
 }
-
-
 
 
 }
@@ -1200,18 +1198,6 @@ export interface IAddTileDialogprovider {
 
 
 
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-}
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
-}
-
 export class TileConfigDialogController {
     params: any;
     extensionUrl: any;
@@ -1234,6 +1220,18 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     event?: any;
 }
 
+
+export interface IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+}
+export class DashboardTile implements IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+    constructor();
+}
 
 
 export const DEFAULT_TILE_WIDTH: number;
@@ -1292,8 +1290,6 @@ export class MenuTileService extends DashboardTile {
     callAction(actionName: any, params: any, item: any): void;
     changeSize(params: any): void;
 }
-
-
 
 
 
@@ -1365,10 +1361,12 @@ export class TilesGridService implements ITilesGridService {
     updateTileOptions(opts: any): any;
 }
 
+
 export interface ITileTemplateService {
     getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
     setImageMarginCSS($element: any, image: any): void;
 }
+
 
 }
 
