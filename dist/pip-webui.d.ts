@@ -96,64 +96,6 @@ export class TransactionError {
 
 
 
-export interface ITranslateService {
-    language: string;
-    use(language: string): string;
-    setTranslations(language: string, translations: any): void;
-    translations(language: string, translations: any): void;
-    translate(key: string): string;
-    translateArray(keys: string[]): string[];
-    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
-    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
-    translateWithPrefix(prefix: string, key: string): any;
-    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
-    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
-}
-export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
-    setRootVar: boolean;
-    persist: boolean;
-}
-
-
-
-export let LanguageRootVar: string;
-export let LanguageChangedEvent: string;
-
-export class Translation {
-    protected _language: string;
-    protected _translations: {
-        en: {
-            'en': string;
-            'ru': string;
-            'es': string;
-            'pt': string;
-            'de': string;
-            'fr': string;
-        };
-        ru: {
-            'en': string;
-            'ru': string;
-            'es': string;
-            'pt': string;
-            'de': string;
-            'fr': string;
-        };
-    };
-    constructor();
-    language: string;
-    use(language: string): string;
-    setTranslations(language: string, translations: any): void;
-    translations(language: string, translations: any): void;
-    translate(key: string): string;
-    translateArray(keys: string[]): string[];
-    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
-    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
-    translateWithPrefix(prefix: string, key: string): any;
-    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
-    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
-}
-
-
 
 export interface ICodes {
     hash(value: string): number;
@@ -216,6 +158,64 @@ export let ResetAreaRootVar: string;
 
 
 
+
+export interface ITranslateService {
+    language: string;
+    use(language: string): string;
+    setTranslations(language: string, translations: any): void;
+    translations(language: string, translations: any): void;
+    translate(key: string): string;
+    translateArray(keys: string[]): string[];
+    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
+    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
+    translateWithPrefix(prefix: string, key: string): any;
+    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
+    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any;
+}
+export interface ITranslateProvider extends ITranslateService, ng.IServiceProvider {
+    setRootVar: boolean;
+    persist: boolean;
+}
+
+
+
+export let LanguageRootVar: string;
+export let LanguageChangedEvent: string;
+
+export class Translation {
+    protected _language: string;
+    protected _translations: {
+        en: {
+            'en': string;
+            'ru': string;
+            'es': string;
+            'pt': string;
+            'de': string;
+            'fr': string;
+        };
+        ru: {
+            'en': string;
+            'ru': string;
+            'es': string;
+            'pt': string;
+            'de': string;
+            'fr': string;
+        };
+    };
+    constructor();
+    language: string;
+    use(language: string): string;
+    setTranslations(language: string, translations: any): void;
+    translations(language: string, translations: any): void;
+    translate(key: string): string;
+    translateArray(keys: string[]): string[];
+    translateSet(keys: string[], keyProp: string, valueProp: string): any[];
+    translateObjects(items: any[], keyProp: string, valueProp: string): any[];
+    translateWithPrefix(prefix: string, key: string): any;
+    translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+    translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
+}
+
 }
 
 declare module pip.buttons {
@@ -268,12 +268,6 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
-
-
-
-
-
-
 export const MainResizedEvent = "pipMainResized";
 export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
@@ -312,18 +306,25 @@ export const MainBreakpointStatuses: MediaBreakpointStatuses;
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
+
+
+
+
+
+
+}
+
+declare module pip.split {
+
 }
 
 declare module pip.behaviors {
 
 
 
-
-
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
-
 
 
 
@@ -400,13 +401,14 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
+
+
+
 }
 
 declare module pip.controls {
 
 
-
-var marked: any;
 
 export interface IImageSliderService {
     registerSlider(sliderId: string, sliderScope: any): void;
@@ -418,6 +420,18 @@ export interface IImageSliderService {
 }
 
 
+
+
+
+
+var marked: any;
+
+
+export interface IPopoverService {
+    show(p: Object): void;
+    hide(): void;
+    resize(): void;
+}
 
 
 
@@ -450,16 +464,6 @@ export class Toast {
 }
 
 
-
-export interface IPopoverService {
-    show(p: Object): void;
-    hide(): void;
-    resize(): void;
-}
-
-
-
-
 }
 
 declare module pip.lists {
@@ -469,7 +473,6 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
-
 
 
 
@@ -543,6 +546,7 @@ export interface IDateFormatService {
 }
 export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
+
 
 
 
@@ -665,6 +669,66 @@ export class OptionsDialogResult {
 declare module pip.nav {
 
 
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
+}
+
+
+export const AppBarChangedEvent: string;
+
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
+    hide(): void;
+    addShadow(...breakpoints: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
+
+
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 export const ActionsChangedEvent: string;
 export const SecondaryActionsOpenEvent: string;
 export class SimpleActionItem {
@@ -714,39 +778,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-
-export class AppBarConfig {
-    visible: boolean;
-    parts: any;
-    classes: string[];
-}
-
-
-export const AppBarChangedEvent: string;
-
-export interface IAppBarService {
-    readonly config: AppBarConfig;
-    readonly classes: string[];
-    parts: any;
-    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
-    hide(): void;
-    addShadow(...breakpoints: string[]): void;
-    removeShadow(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAppBarProvider extends ng.IServiceProvider {
-    config: AppBarConfig;
-    parts: any;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
-
-
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -761,64 +792,6 @@ export interface INavService {
 
 
 
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-
-export const BreadcrumbChangedEvent: string;
-export const BreadcrumbBackEvent: string;
-
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
-
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
-
-
-
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-
-export const NavIconClickedEvent: string;
-export const NavIconChangedEvent: string;
 
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
@@ -856,12 +829,36 @@ export class NavHeaderConfig {
 
 export let NavHeaderChangedEvent: string;
 
-export class PipTab {
-    id: string;
-    name?: string;
-    count: number;
-    title: string;
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
 }
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
+
 
 export interface INavMenuService {
     sections: NavMenuSection[];
@@ -907,6 +904,36 @@ export class NavMenuConfig {
 }
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
+
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 
 export interface ISideNavService {
@@ -975,39 +1002,20 @@ export class SideNavConfig {
     visible: boolean;
 }
 
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
 }
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
 
 }
 
 declare module pip.themes {
+
+
+
+
 
 
 export interface IThemeService {
@@ -1032,26 +1040,10 @@ export let ThemeResetPage: string;
 
 
 
-
-
-
-
 }
 
 declare module pip.errors {
 
-
-
-
-
-export interface IFormErrorsService {
-    errorsWithHint(field: any): any;
-    touchedErrorsWithHint(form: ng.IFormController, field: any): any;
-    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
-    resetFieldsErrors(form: ng.IFormController, field: any): void;
-    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
-    goToUnhandledErrorPage(error: any): any;
-}
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1090,6 +1082,18 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
+
+
+
+export interface IFormErrorsService {
+    errorsWithHint(field: any): any;
+    touchedErrorsWithHint(form: ng.IFormController, field: any): any;
+    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
+    resetFieldsErrors(form: ng.IFormController, field: any): void;
+    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
+    goToUnhandledErrorPage(error: any): any;
+}
+
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
 
@@ -1111,12 +1115,12 @@ export let ErrorsUnsupportedEvent: string;
 declare module pip.charts {
 
 
+
 export interface IChartColorsService {
     getMaterialColor(index: number, colors: string[]): string;
     materialColorToRgba(color: string): string;
     generateMaterialColors(): string[];
 }
-
 
 
 
@@ -1127,8 +1131,8 @@ declare module pip.locations {
 
 
 
-
 let google: any;
+
 
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
@@ -1167,208 +1171,6 @@ export interface IFileUploadService {
 }
 
 
-
-
-}
-
-declare module pip.dashboard {
-
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-}
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
-}
-
-
-export class AddTileDialog {
-    title: string;
-    icon: string;
-    name: string;
-    amount: number;
-}
-export class AddTileDialogController implements ng.IController {
-    activeGroupIndex: number;
-    $mdDialog: angular.material.IDialogService;
-    defaultTiles: [AddTileDialog[]];
-    groups: any;
-    totalTiles: number;
-    constructor(groups: any, activeGroupIndex: number, widgetList: [AddTileDialog[]], $mdDialog: angular.material.IDialogService);
-    add(): void;
-    cancel(): void;
-    encrease(groupIndex: number, widgetIndex: number): void;
-    decrease(groupIndex: number, widgetIndex: number): void;
-}
-
-export interface IAddTileDialogService {
-    show(groups: any, activeGroupIndex: any): angular.IPromise<any>;
-}
-export interface IAddTileDialogprovider {
-    configWidgetList(list: [AddTileDialog[]]): void;
-}
-
-
-
-export class TileConfigDialogController {
-    params: any;
-    extensionUrl: any;
-    $mdDialog: angular.material.IDialogService;
-    colors: string[];
-    sizes: any;
-    sizeId: string;
-    onCancel: Function;
-    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
-    onApply(updatedData: any): void;
-}
-
-
-export interface ITileConfigService {
-    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
-}
-export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
-    dialogClass?: string;
-    extensionUrl?: string;
-    event?: any;
-}
-
-
-export const DEFAULT_TILE_WIDTH: number;
-export const DEFAULT_TILE_HEIGHT: number;
-export const UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
-
-export interface DragTileConstructor {
-    new (options: any): any;
-}
-export function IDragTileConstructor(constructor: DragTileConstructor, options: any): IDragTileService;
-export interface IDragTileService {
-    tpl: any;
-    opts: any;
-    size: any;
-    elem: any;
-    preview: any;
-    getSize(): any;
-    setSize(width: any, height: any): any;
-    setPosition(left: any, top: any): any;
-    getCompiledTemplate(): any;
-    updateElem(parent: any): any;
-    getElem(): any;
-    startDrag(): any;
-    stopDrag(isAnimate: any): any;
-    setPreviewPosition(coords: any): void;
-    getOptions(): any;
-    setOptions(options: any): any;
-}
-export class DragTileService implements IDragTileService {
-    tpl: any;
-    opts: any;
-    size: any;
-    elem: any;
-    preview: any;
-    constructor(options: any);
-    getSize(): any;
-    setSize(width: any, height: any): any;
-    setPosition(left: any, top: any): any;
-    getCompiledTemplate(): any;
-    updateElem(parent: any): any;
-    getElem(): any;
-    startDrag(): any;
-    stopDrag(isAnimate: any): any;
-    setPreviewPosition(coords: any): void;
-    getOptions(): any;
-    setOptions(options: any): any;
-}
-
-
-
-
-
-
-export class MenuTileService extends DashboardTile {
-    menu: any;
-    constructor();
-    callAction(actionName: any, params: any, item: any): void;
-    changeSize(params: any): void;
-}
-
-
-
-
-export interface TilesGridConstructor {
-    new (tiles: any, options: any, columns: any, elem: any): any;
-}
-export function ITilesGridConstructor(constructor: TilesGridConstructor, tiles: any, options: any, columns: any, elem: any): ITilesGridService;
-export interface ITilesGridService {
-    tiles: any;
-    opts: any;
-    columns: any;
-    elem: any;
-    gridCells: any;
-    inline: boolean;
-    isMobileLayout: boolean;
-    addTile(tile: any): any;
-    getCellByPosition(row: any, col: any): any;
-    getCells(prevCell: any, rowSpan: any, colSpan: any): any;
-    getAvailableCellsDesktop(prevCell: any, rowSpan: any, colSpan: any): any;
-    getCell(src: any, basicRow: any, basicCol: any, columns: any): any;
-    getAvailableCellsMobile(prevCell: any, rowSpan: any, colSpan: any): any;
-    getBasicRow(prevCell: any): any;
-    isCellFree(row: any, col: any): any;
-    getCellIndex(srcCell: any): any;
-    reserveCells(start: any, end: any, elem: any): void;
-    clearElements(): void;
-    setAvailableColumns(columns: any): any;
-    generateGrid(singleTileWidth?: any): any;
-    setTilesDimensions(onlyPosition: any, draggedTile: any): any;
-    calcContainerHeight(): any;
-    getTileByNode(node: any): any;
-    getTileByCoordinates(coords: any, draggedTile: any): any;
-    getTileIndex(tile: any): any;
-    swapTiles(movedTile: any, beforeTile: any): any;
-    removeTile(removeTile: any): any;
-    updateTileOptions(opts: any): any;
-}
-export class TilesGridService implements ITilesGridService {
-    tiles: any;
-    opts: any;
-    columns: any;
-    elem: any;
-    gridCells: any;
-    inline: boolean;
-    isMobileLayout: boolean;
-    constructor(tiles: any, options: any, columns: any, elem: any);
-    addTile(tile: any): any;
-    getCellByPosition(row: any, col: any): any;
-    getCells(prevCell: any, rowSpan: any, colSpan: any): any;
-    getAvailableCellsDesktop(prevCell: any, rowSpan: any, colSpan: any): any;
-    getCell(src: any, basicRow: any, basicCol: any, columns: any): any;
-    getAvailableCellsMobile(prevCell: any, rowSpan: any, colSpan: any): any;
-    getBasicRow(prevCell: any): any;
-    isCellFree(row: any, col: any): any;
-    getCellIndex(srcCell: any): any;
-    reserveCells(start: any, end: any, elem: any): void;
-    clearElements(): void;
-    setAvailableColumns(columns: any): any;
-    generateGrid(singleTileWidth?: any): any;
-    setTilesDimensions(onlyPosition: any, draggedTile: any): any;
-    calcContainerHeight(): any;
-    getTileByNode(node: any): any;
-    getTileByCoordinates(coords: any, draggedTile: any): any;
-    getTileIndex(tile: any): any;
-    swapTiles(movedTile: any, beforeTile: any): any;
-    removeTile(removeTile: any): any;
-    updateTileOptions(opts: any): any;
-}
-
-
-export interface ITileTemplateService {
-    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
-    setImageMarginCSS($element: any, image: any): void;
-}
 
 
 }
@@ -1430,9 +1232,6 @@ export class SettingsTab {
 declare module pip.help {
 
 
-
-
-
 export class HelpConfig {
     defaultTab: string;
     tabs: HelpTab[];
@@ -1478,6 +1277,9 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
+
+
+
 
 
 }

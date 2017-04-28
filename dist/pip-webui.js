@@ -92,142 +92,12 @@ var initialParams = function (fn) {
     });
 };
 
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return value != null && (type == 'object' || type == 'function');
-}
-
-/**
- * Take a sync function and make it async, passing its return value to a
- * callback. This is useful for plugging sync functions into a waterfall,
- * series, or other async functions. Any arguments passed to the generated
- * function will be passed to the wrapped function (except for the final
- * callback argument). Errors thrown will be passed to the callback.
- *
- * If the function passed to `asyncify` returns a Promise, that promises's
- * resolved/rejected state will be used to call the callback, rather than simply
- * the synchronous return value.
- *
- * This also means you can asyncify ES2017 `async` functions.
- *
- * @name asyncify
- * @static
- * @memberOf module:Utils
- * @method
- * @alias wrapSync
- * @category Util
- * @param {Function} func - The synchronous funuction, or Promise-returning
- * function to convert to an {@link AsyncFunction}.
- * @returns {AsyncFunction} An asynchronous wrapper of the `func`. To be
- * invoked with `(args..., callback)`.
- * @example
- *
- * // passing a regular synchronous function
- * async.waterfall([
- *     async.apply(fs.readFile, filename, "utf8"),
- *     async.asyncify(JSON.parse),
- *     function (data, next) {
- *         // data is the result of parsing the text.
- *         // If there was a parsing error, it would have been caught.
- *     }
- * ], callback);
- *
- * // passing a function returning a promise
- * async.waterfall([
- *     async.apply(fs.readFile, filename, "utf8"),
- *     async.asyncify(function (contents) {
- *         return db.model.create(contents);
- *     }),
- *     function (model, next) {
- *         // `model` is the instantiated model object.
- *         // If there was an error, this function would be skipped.
- *     }
- * ], callback);
- *
- * // es2017 example, though `asyncify` is not needed if your JS environment
- * // supports async functions out of the box
- * var q = async.queue(async.asyncify(async function(file) {
- *     var intermediateStep = await processFile(file);
- *     return await somePromise(intermediateStep)
- * }));
- *
- * q.push(files);
- */
-function asyncify(func) {
-    return initialParams(function (args, callback) {
-        var result;
-        try {
-            result = func.apply(this, args);
-        } catch (e) {
-            return callback(e);
-        }
-        // if result is Promise object
-        if (isObject(result) && typeof result.then === 'function') {
-            result.then(function (value) {
-                callback(null, value);
-            }, function (err) {
-                callback(err.message ? err : new Error(err));
-            });
-        } else {
-            callback(null, result);
-        }
-    });
-}
-
-var supportsSymbol = typeof Symbol === 'function';
-
-function supportsAsync() {
-    var supported;
-    try {
-        /* eslint no-eval: 0 */
-        supported = isAsync(eval('(async function () {})'));
-    } catch (e) {
-        supported = false;
-    }
-    return supported;
-}
-
-function isAsync(fn) {
-    return supportsSymbol && fn[Symbol.toStringTag] === 'AsyncFunction';
-}
-
-function wrapAsync(asyncFn) {
-    return isAsync(asyncFn) ? asyncify(asyncFn) : asyncFn;
-}
-
-var wrapAsync$1 = supportsAsync() ? wrapAsync : identity;
-
 function applyEach$1(eachfn) {
     return rest(function (fns, args) {
         var go = initialParams(function (args, callback) {
             var that = this;
             return eachfn(fns, function (fn, cb) {
-                wrapAsync$1(fn).apply(that, args.concat(cb));
+                fn.apply(that, args.concat([cb]));
             }, callback);
         });
         if (args.length) {
@@ -338,6 +208,36 @@ function baseGetTag(value) {
     : objectToString(value);
 }
 
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return value != null && (type == 'object' || type == 'function');
+}
+
 /** `Object#toString` result references. */
 var asyncTag = '[object AsyncFunction]';
 var funcTag = '[object Function]';
@@ -433,10 +333,6 @@ function isLength(value) {
 function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
-
-// A temporary value used to identify if the loop should be broken.
-// See #1064, #1293
-var breakLoop = {};
 
 /**
  * This method returns `undefined`.
@@ -947,6 +843,10 @@ function onlyOnce(fn) {
     };
 }
 
+// A temporary value used to identify if the loop should be broken.
+// See #1064, #1293
+var breakLoop = {};
+
 function _eachOfLimit(limit) {
     return function (obj, iteratee, callback) {
         callback = once(callback || noop);
@@ -1002,15 +902,17 @@ function _eachOfLimit(limit) {
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async function to apply to each
+ * @param {Function} iteratee - A function to apply to each
  * item in `coll`. The `key` is the item's key, or index in the case of an
- * array.
- * Invoked with (item, key, callback).
+ * array. The iteratee is passed a `callback(err)` which must be called once it
+ * has completed. If no error has occurred, the callback should be run without
+ * arguments or with an explicit `null` argument. Invoked with
+ * (item, key, callback).
  * @param {Function} [callback] - A callback which is called when all
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  */
 function eachOfLimit(coll, limit, iteratee, callback) {
-  _eachOfLimit(limit)(coll, wrapAsync$1(iteratee), callback);
+  _eachOfLimit(limit)(coll, iteratee, callback);
 }
 
 function doLimit(fn, limit) {
@@ -1029,10 +931,10 @@ function eachOfArrayLike(coll, iteratee, callback) {
         callback(null);
     }
 
-    function iteratorCallback(err, value) {
+    function iteratorCallback(err) {
         if (err) {
             callback(err);
-        } else if (++completed === length || value === breakLoop) {
+        } else if (++completed === length) {
             callback(null);
         }
     }
@@ -1057,10 +959,12 @@ var eachOfGeneric = doLimit(eachOfLimit, Infinity);
  * @category Collection
  * @see [async.each]{@link module:Collections.each}
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A function to apply to each
- * item in `coll`.
- * The `key` is the item's key, or index in the case of an array.
- * Invoked with (item, key, callback).
+ * @param {Function} iteratee - A function to apply to each
+ * item in `coll`. The `key` is the item's key, or index in the case of an
+ * array. The iteratee is passed a `callback(err)` which must be called once it
+ * has completed. If no error has occurred, the callback should be run without
+ * arguments or with an explicit `null` argument. Invoked with
+ * (item, key, callback).
  * @param {Function} [callback] - A callback which is called when all
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  * @example
@@ -1086,12 +990,12 @@ var eachOfGeneric = doLimit(eachOfLimit, Infinity);
  */
 var eachOf = function (coll, iteratee, callback) {
     var eachOfImplementation = isArrayLike(coll) ? eachOfArrayLike : eachOfGeneric;
-    eachOfImplementation(coll, wrapAsync$1(iteratee), callback);
+    eachOfImplementation(coll, iteratee, callback);
 };
 
 function doParallel(fn) {
     return function (obj, iteratee, callback) {
-        return fn(eachOf, obj, wrapAsync$1(iteratee), callback);
+        return fn(eachOf, obj, iteratee, callback);
     };
 }
 
@@ -1100,11 +1004,10 @@ function _asyncMap(eachfn, arr, iteratee, callback) {
     arr = arr || [];
     var results = [];
     var counter = 0;
-    var _iteratee = wrapAsync$1(iteratee);
 
     eachfn(arr, function (value, _, callback) {
         var index = counter++;
-        _iteratee(value, function (err, v) {
+        iteratee(value, function (err, v) {
             results[index] = v;
             callback(err);
         });
@@ -1128,7 +1031,7 @@ function _asyncMap(eachfn, arr, iteratee, callback) {
  *
  * If `map` is passed an Object, the results will be an Array.  The results
  * will roughly be in the order of the original Objects' keys (but this can
- * vary across JavaScript engines).
+ * vary across JavaScript engines)
  *
  * @name map
  * @static
@@ -1136,10 +1039,10 @@ function _asyncMap(eachfn, arr, iteratee, callback) {
  * @method
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with the transformed item.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, transformed)` which must be called
+ * once it has completed with an error (which can be `null`) and a
+ * transformed item. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. Results is an Array of the
  * transformed items from the `coll`. Invoked with (err, results).
@@ -1163,7 +1066,7 @@ var map = doParallel(_asyncMap);
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {Array|Iterable|Object} fns - A collection of {@link AsyncFunction}s
+ * @param {Array|Iterable|Object} fns - A collection of asynchronous functions
  * to all call with the same arguments
  * @param {...*} [args] - any number of separate arguments to pass to the
  * function.
@@ -1188,7 +1091,7 @@ var applyEach = applyEach$1(map);
 
 function doParallelLimit(fn) {
     return function (obj, limit, iteratee, callback) {
-        return fn(_eachOfLimit(limit), obj, wrapAsync$1(iteratee), callback);
+        return fn(_eachOfLimit(limit), obj, iteratee, callback);
     };
 }
 
@@ -1203,10 +1106,10 @@ function doParallelLimit(fn) {
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with the transformed item.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, transformed)` which must be called
+ * once it has completed with an error (which can be `null`) and a transformed
+ * item. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. Results is an array of the
  * transformed items from the `coll`. Invoked with (err, results).
@@ -1223,10 +1126,10 @@ var mapLimit = doParallelLimit(_asyncMap);
  * @see [async.map]{@link module:Collections.map}
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with the transformed item.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, transformed)` which must be called
+ * once it has completed with an error (which can be `null`) and a
+ * transformed item. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. Results is an array of the
  * transformed items from the `coll`. Invoked with (err, results).
@@ -1242,7 +1145,7 @@ var mapSeries = doLimit(mapLimit, 1);
  * @method
  * @see [async.applyEach]{@link module:ControlFlow.applyEach}
  * @category Control Flow
- * @param {Array|Iterable|Object} fns - A collection of {@link AsyncFunction}s to all
+ * @param {Array|Iterable|Object} fns - A collection of asynchronous functions to all
  * call with the same arguments
  * @param {...*} [args] - any number of separate arguments to pass to the
  * function.
@@ -1303,6 +1206,82 @@ var apply$2 = rest(function (fn, args) {
         return fn.apply(null, args.concat(callArgs));
     });
 });
+
+/**
+ * Take a sync function and make it async, passing its return value to a
+ * callback. This is useful for plugging sync functions into a waterfall,
+ * series, or other async functions. Any arguments passed to the generated
+ * function will be passed to the wrapped function (except for the final
+ * callback argument). Errors thrown will be passed to the callback.
+ *
+ * If the function passed to `asyncify` returns a Promise, that promises's
+ * resolved/rejected state will be used to call the callback, rather than simply
+ * the synchronous return value.
+ *
+ * This also means you can asyncify ES2016 `async` functions.
+ *
+ * @name asyncify
+ * @static
+ * @memberOf module:Utils
+ * @method
+ * @alias wrapSync
+ * @category Util
+ * @param {Function} func - The synchronous function to convert to an
+ * asynchronous function.
+ * @returns {Function} An asynchronous wrapper of the `func`. To be invoked with
+ * (callback).
+ * @example
+ *
+ * // passing a regular synchronous function
+ * async.waterfall([
+ *     async.apply(fs.readFile, filename, "utf8"),
+ *     async.asyncify(JSON.parse),
+ *     function (data, next) {
+ *         // data is the result of parsing the text.
+ *         // If there was a parsing error, it would have been caught.
+ *     }
+ * ], callback);
+ *
+ * // passing a function returning a promise
+ * async.waterfall([
+ *     async.apply(fs.readFile, filename, "utf8"),
+ *     async.asyncify(function (contents) {
+ *         return db.model.create(contents);
+ *     }),
+ *     function (model, next) {
+ *         // `model` is the instantiated model object.
+ *         // If there was an error, this function would be skipped.
+ *     }
+ * ], callback);
+ *
+ * // es6 example
+ * var q = async.queue(async.asyncify(async function(file) {
+ *     var intermediateStep = await processFile(file);
+ *     return await somePromise(intermediateStep)
+ * }));
+ *
+ * q.push(files);
+ */
+function asyncify(func) {
+    return initialParams(function (args, callback) {
+        var result;
+        try {
+            result = func.apply(this, args);
+        } catch (e) {
+            return callback(e);
+        }
+        // if result is Promise object
+        if (isObject(result) && typeof result.then === 'function') {
+            result.then(function (value) {
+                callback(null, value);
+            }, function (err) {
+                callback(err.message ? err : new Error(err));
+            });
+        } else {
+            callback(null, result);
+        }
+    });
+}
 
 /**
  * A specialized version of `_.forEach` for arrays without support for
@@ -1446,17 +1425,17 @@ function baseIndexOf(array, value, fromIndex) {
 }
 
 /**
- * Determines the best order for running the {@link AsyncFunction}s in `tasks`, based on
+ * Determines the best order for running the functions in `tasks`, based on
  * their requirements. Each function can optionally depend on other functions
  * being completed first, and each function is run as soon as its requirements
  * are satisfied.
  *
- * If any of the {@link AsyncFunction}s pass an error to their callback, the `auto` sequence
+ * If any of the functions pass an error to their callback, the `auto` sequence
  * will stop. Further tasks will not execute (so any other functions depending
  * on it will not run), and the main `callback` is immediately called with the
  * error.
  *
- * {@link AsyncFunction}s also receive an object containing the results of functions which
+ * Functions also receive an object containing the results of functions which
  * have completed so far as the first argument, if they have dependencies. If a
  * task function has no dependencies, it will only be passed a callback.
  *
@@ -1466,7 +1445,7 @@ function baseIndexOf(array, value, fromIndex) {
  * @method
  * @category Control Flow
  * @param {Object} tasks - An object. Each of its properties is either a
- * function or an array of requirements, with the {@link AsyncFunction} itself the last item
+ * function or an array of requirements, with the function itself the last item
  * in the array. The object's key of a property serves as the name of the task
  * defined by that property, i.e. can be used when specifying requirements for
  * other tasks. The function receives one or two arguments:
@@ -1544,7 +1523,7 @@ var auto = function (tasks, concurrency, callback) {
     var runningTasks = 0;
     var hasError = false;
 
-    var listeners = Object.create(null);
+    var listeners = {};
 
     var readyTasks = [];
 
@@ -1572,7 +1551,7 @@ var auto = function (tasks, concurrency, callback) {
 
         arrayEach(dependencies, function (dependencyName) {
             if (!tasks[dependencyName]) {
-                throw new Error('async.auto task `' + key + '` has a non-existent dependency `' + dependencyName + '` in ' + dependencies.join(', '));
+                throw new Error('async.auto task `' + key + '` has a non-existent dependency in ' + dependencies.join(', '));
             }
             addListener(dependencyName, function () {
                 remainingDependencies--;
@@ -1634,7 +1613,7 @@ var auto = function (tasks, concurrency, callback) {
                 });
                 safeResults[key] = args;
                 hasError = true;
-                listeners = Object.create(null);
+                listeners = [];
 
                 callback(err, safeResults);
             } else {
@@ -1644,7 +1623,7 @@ var auto = function (tasks, concurrency, callback) {
         }));
 
         runningTasks++;
-        var taskFn = wrapAsync$1(task[task.length - 1]);
+        var taskFn = task[task.length - 1];
         if (task.length > 1) {
             taskFn(results, taskCallback);
         } else {
@@ -1988,7 +1967,7 @@ function trim(string, chars, guard) {
   return castSlice(strSymbols, start, end).join('');
 }
 
-var FN_ARGS = /^(?:async\s+)?(function)?\s*[^\(]*\(\s*([^\)]*)\)/m;
+var FN_ARGS = /^(function)?\s*[^\(]*\(\s*([^\)]*)\)/m;
 var FN_ARG_SPLIT = /,/;
 var FN_ARG = /(=.+)?(\s*)$/;
 var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
@@ -2022,7 +2001,7 @@ function parseParams(func) {
  * @method
  * @see [async.auto]{@link module:ControlFlow.auto}
  * @category Control Flow
- * @param {Object} tasks - An object, each of whose properties is an {@link AsyncFunction} of
+ * @param {Object} tasks - An object, each of whose properties is a function of
  * the form 'func([dependencies...], callback). The object's key of a property
  * serves as the name of the task defined by that property, i.e. can be used
  * when specifying requirements for other tasks.
@@ -2090,25 +2069,22 @@ function autoInject(tasks, callback) {
 
     baseForOwn(tasks, function (taskFn, key) {
         var params;
-        var fnIsAsync = isAsync(taskFn);
-        var hasNoDeps = !fnIsAsync && taskFn.length === 1 || fnIsAsync && taskFn.length === 0;
 
         if (isArray(taskFn)) {
             params = taskFn.slice(0, -1);
             taskFn = taskFn[taskFn.length - 1];
 
             newTasks[key] = params.concat(params.length > 0 ? newTask : taskFn);
-        } else if (hasNoDeps) {
+        } else if (taskFn.length === 1) {
             // no dependencies, use the function as-is
             newTasks[key] = taskFn;
         } else {
             params = parseParams(taskFn);
-            if (taskFn.length === 0 && !fnIsAsync && params.length === 0) {
+            if (taskFn.length === 0 && params.length === 0) {
                 throw new Error("autoInject task functions require explicit parameters.");
             }
 
-            // remove callback param
-            if (!fnIsAsync) params.pop();
+            params.pop();
 
             newTasks[key] = params.concat(newTask);
         }
@@ -2118,7 +2094,7 @@ function autoInject(tasks, callback) {
                 return results[name];
             });
             newArgs.push(taskCb);
-            wrapAsync$1(taskFn).apply(null, newArgs);
+            taskFn.apply(null, newArgs);
         }
     });
 
@@ -2216,10 +2192,6 @@ function queue(worker, concurrency, payload) {
         throw new Error('Concurrency must not be zero');
     }
 
-    var _worker = wrapAsync$1(worker);
-    var numRunning = 0;
-    var workersList = [];
-
     function _insert(data, insertAtFront, callback) {
         if (callback != null && typeof callback !== 'function') {
             throw new Error('task callback must be a function');
@@ -2252,7 +2224,7 @@ function queue(worker, concurrency, payload) {
 
     function _next(tasks) {
         return rest(function (args) {
-            numRunning -= 1;
+            workers -= 1;
 
             for (var i = 0, l = tasks.length; i < l; i++) {
                 var task = tasks[i];
@@ -2268,7 +2240,7 @@ function queue(worker, concurrency, payload) {
                 }
             }
 
-            if (numRunning <= q.concurrency - q.buffer) {
+            if (workers <= q.concurrency - q.buffer) {
                 q.unsaturated();
             }
 
@@ -2279,7 +2251,8 @@ function queue(worker, concurrency, payload) {
         });
     }
 
-    var isProcessing = false;
+    var workers = 0;
+    var workersList = [];
     var q = {
         _tasks: new DLL(),
         concurrency: concurrency,
@@ -2303,13 +2276,7 @@ function queue(worker, concurrency, payload) {
             _insert(data, true, callback);
         },
         process: function () {
-            // Avoid trying to start too many processing operations. This can occur
-            // when callbacks resolve synchronously (#1267).
-            if (isProcessing) {
-                return;
-            }
-            isProcessing = true;
-            while (!q.paused && numRunning < q.concurrency && q._tasks.length) {
+            while (!q.paused && workers < q.concurrency && q._tasks.length) {
                 var tasks = [],
                     data = [];
                 var l = q._tasks.length;
@@ -2323,29 +2290,28 @@ function queue(worker, concurrency, payload) {
                 if (q._tasks.length === 0) {
                     q.empty();
                 }
-                numRunning += 1;
+                workers += 1;
                 workersList.push(tasks[0]);
 
-                if (numRunning === q.concurrency) {
+                if (workers === q.concurrency) {
                     q.saturated();
                 }
 
                 var cb = onlyOnce(_next(tasks));
-                _worker(data, cb);
+                worker(data, cb);
             }
-            isProcessing = false;
         },
         length: function () {
             return q._tasks.length;
         },
         running: function () {
-            return numRunning;
+            return workers;
         },
         workersList: function () {
             return workersList;
         },
         idle: function () {
-            return q._tasks.length + numRunning === 0;
+            return q._tasks.length + workers === 0;
         },
         pause: function () {
             q.paused = true;
@@ -2355,7 +2321,12 @@ function queue(worker, concurrency, payload) {
                 return;
             }
             q.paused = false;
-            setImmediate$1(q.process);
+            var resumeCount = Math.min(q.concurrency, q._tasks.length);
+            // Need to call q.process once per concurrent
+            // worker to preserve full concurrency after pause
+            for (var w = 1; w <= resumeCount; w++) {
+                setImmediate$1(q.process);
+            }
         }
     };
     return q;
@@ -2409,8 +2380,9 @@ function queue(worker, concurrency, payload) {
  * @method
  * @see [async.queue]{@link module:ControlFlow.queue}
  * @category Control Flow
- * @param {AsyncFunction} worker - An asynchronous function for processing an array
- * of queued tasks. Invoked with `(tasks, callback)`.
+ * @param {Function} worker - An asynchronous function for processing an array
+ * of queued tasks, which must call its `callback(err)` argument when finished,
+ * with an optional `err` argument. Invoked with `(tasks, callback)`.
  * @param {number} [payload=Infinity] - An optional `integer` for determining
  * how many tasks should be processed per round; if omitted, the default is
  * unlimited.
@@ -2453,9 +2425,11 @@ function cargo(worker, payload) {
  * @alias forEachOfSeries
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * Invoked with (item, key, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`. The
+ * `key` is the item's key, or index in the case of an array. The iteratee is
+ * passed a `callback(err)` which must be called once it has completed. If no
+ * error has occurred, the callback should be run without arguments or with an
+ * explicit `null` argument. Invoked with (item, key, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. Invoked with (err).
  */
@@ -2481,12 +2455,12 @@ var eachOfSeries = doLimit(eachOfLimit, 1);
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {*} memo - The initial state of the reduction.
- * @param {AsyncFunction} iteratee - A function applied to each item in the
- * array to produce the next step in the reduction.
- * The `iteratee` should complete with the next state of the reduction.
- * If the iteratee complete with an error, the reduction is stopped and the
- * main `callback` is immediately called with the error.
- * Invoked with (memo, item, callback).
+ * @param {Function} iteratee - A function applied to each item in the
+ * array to produce the next step in the reduction. The `iteratee` is passed a
+ * `callback(err, reduction)` which accepts an optional error as its first
+ * argument, and the state of the reduction as the second. If an error is
+ * passed to the callback, the reduction is stopped and the main `callback` is
+ * immediately called with the error. Invoked with (memo, item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Result is the reduced value. Invoked with
  * (err, result).
@@ -2503,9 +2477,8 @@ var eachOfSeries = doLimit(eachOfLimit, 1);
  */
 function reduce(coll, memo, iteratee, callback) {
     callback = once(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
     eachOfSeries(coll, function (x, i, callback) {
-        _iteratee(memo, x, function (err, v) {
+        iteratee(memo, x, function (err, v) {
             memo = v;
             callback(err);
         });
@@ -2527,7 +2500,7 @@ function reduce(coll, memo, iteratee, callback) {
  * @method
  * @see [async.compose]{@link module:ControlFlow.compose}
  * @category Control Flow
- * @param {...AsyncFunction} functions - the asynchronous functions to compose
+ * @param {...Function} functions - the asynchronous functions to compose
  * @returns {Function} a function that composes the `functions` in order
  * @example
  *
@@ -2553,7 +2526,6 @@ function reduce(coll, memo, iteratee, callback) {
  * });
  */
 var seq$1 = rest(function seq(functions) {
-    var _functions = arrayMap(functions, wrapAsync$1);
     return rest(function (args) {
         var that = this;
 
@@ -2564,10 +2536,10 @@ var seq$1 = rest(function seq(functions) {
             cb = noop;
         }
 
-        reduce(_functions, args, function (newargs, fn, cb) {
-            fn.apply(that, newargs.concat(rest(function (err, nextargs) {
+        reduce(functions, args, function (newargs, fn, cb) {
+            fn.apply(that, newargs.concat([rest(function (err, nextargs) {
                 cb(err, nextargs);
-            })));
+            })]));
         }, function (err, results) {
             cb.apply(that, [err].concat(results));
         });
@@ -2587,7 +2559,7 @@ var seq$1 = rest(function seq(functions) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {...AsyncFunction} functions - the asynchronous functions to compose
+ * @param {...Function} functions - the asynchronous functions to compose
  * @returns {Function} an asynchronous function that is the composed
  * asynchronous `functions`
  * @example
@@ -2638,8 +2610,10 @@ function concat$1(eachfn, arr, fn, callback) {
  * @method
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A function to apply to each item in `coll`,
- * which should use an array as its result. Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, results)` which must be called once
+ * it has completed with an error (which can be `null`) and an array of results.
+ * Invoked with (item, callback).
  * @param {Function} [callback(err)] - A callback which is called after all the
  * `iteratee` functions have finished, or an error occurs. Results is an array
  * containing the concatenated results of the `iteratee` function. Invoked with
@@ -2654,7 +2628,7 @@ var concat = doParallel(concat$1);
 
 function doSeries(fn) {
     return function (obj, iteratee, callback) {
-        return fn(eachOfSeries, obj, wrapAsync$1(iteratee), callback);
+        return fn(eachOfSeries, obj, iteratee, callback);
     };
 }
 
@@ -2668,8 +2642,9 @@ function doSeries(fn) {
  * @see [async.concat]{@link module:Collections.concat}
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A function to apply to each item in `coll`.
- * The iteratee should complete with an array an array of results.
+ * @param {Function} iteratee - A function to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, results)` which must be called once
+ * it has completed with an error (which can be `null`) and an array of results.
  * Invoked with (item, callback).
  * @param {Function} [callback(err)] - A callback which is called after all the
  * `iteratee` functions have finished, or an error occurs. Results is an array
@@ -2690,7 +2665,7 @@ var concatSeries = doSeries(concat$1);
  * @category Util
  * @param {...*} arguments... - Any number of arguments to automatically invoke
  * callback with.
- * @returns {AsyncFunction} Returns a function that when invoked, automatically
+ * @returns {Function} Returns a function that when invoked, automatically
  * invokes the callback with the previous given arguments.
  * @example
  *
@@ -2727,30 +2702,36 @@ var constant = rest(function (values) {
     });
 });
 
-function _createTester(check, getResult) {
-    return function (eachfn, arr, iteratee, cb) {
-        cb = cb || noop;
-        var testPassed = false;
-        var testResult;
-        eachfn(arr, function (value, _, callback) {
-            iteratee(value, function (err, result) {
-                if (err) {
-                    callback(err);
-                } else if (check(result) && !testResult) {
-                    testPassed = true;
-                    testResult = getResult(true, value);
-                    callback(null, breakLoop);
+function _createTester(eachfn, check, getResult) {
+    return function (arr, limit, iteratee, cb) {
+        function done() {
+            if (cb) {
+                cb(null, getResult(false));
+            }
+        }
+        function wrappedIteratee(x, _, callback) {
+            if (!cb) return callback();
+            iteratee(x, function (err, v) {
+                // Check cb as another iteratee may have resolved with a
+                // value or error since we started this iteratee
+                if (cb && (err || check(v))) {
+                    if (err) cb(err);else cb(err, getResult(true, x));
+                    cb = iteratee = false;
+                    callback(err, breakLoop);
                 } else {
                     callback();
                 }
             });
-        }, function (err) {
-            if (err) {
-                cb(err);
-            } else {
-                cb(null, testPassed ? testResult : getResult(false));
-            }
-        });
+        }
+        if (arguments.length > 3) {
+            cb = cb || noop;
+            eachfn(arr, limit, wrappedIteratee, done);
+        } else {
+            cb = iteratee;
+            cb = cb || noop;
+            iteratee = limit;
+            eachfn(arr, wrappedIteratee, done);
+        }
     };
 }
 
@@ -2775,9 +2756,9 @@ function _findGetResult(v, x) {
  * @alias find
  * @category Collections
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A truth test to apply to each item in `coll`.
- * The iteratee must complete with a boolean value as its result.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, truthValue)` which must be called
+ * with a boolean argument once it has completed. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called as soon as any
  * iteratee returns `true`, or after all the `iteratee` functions have finished.
  * Result will be the first item in the array that passes the truth test
@@ -2793,7 +2774,7 @@ function _findGetResult(v, x) {
  *     // result now equals the first file in the list that exists
  * });
  */
-var detect = doParallel(_createTester(identity, _findGetResult));
+var detect = _createTester(eachOf, identity, _findGetResult);
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs a maximum of `limit` async operations at a
@@ -2808,16 +2789,16 @@ var detect = doParallel(_createTester(identity, _findGetResult));
  * @category Collections
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - A truth test to apply to each item in `coll`.
- * The iteratee must complete with a boolean value as its result.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, truthValue)` which must be called
+ * with a boolean argument once it has completed. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called as soon as any
  * iteratee returns `true`, or after all the `iteratee` functions have finished.
  * Result will be the first item in the array that passes the truth test
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
+var detectLimit = _createTester(eachOfLimit, identity, _findGetResult);
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs only a single async operation at a time.
@@ -2830,20 +2811,20 @@ var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
  * @alias findSeries
  * @category Collections
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A truth test to apply to each item in `coll`.
- * The iteratee must complete with a boolean value as its result.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, truthValue)` which must be called
+ * with a boolean argument once it has completed. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called as soon as any
  * iteratee returns `true`, or after all the `iteratee` functions have finished.
  * Result will be the first item in the array that passes the truth test
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectSeries = doLimit(detectLimit, 1);
+var detectSeries = _createTester(eachOfSeries, identity, _findGetResult);
 
 function consoleFunc(name) {
     return rest(function (fn, args) {
-        wrapAsync$1(fn).apply(null, args.concat(rest(function (err, args) {
+        fn.apply(null, args.concat([rest(function (err, args) {
             if (typeof console === 'object') {
                 if (err) {
                     if (console.error) {
@@ -2855,16 +2836,15 @@ function consoleFunc(name) {
                     });
                 }
             }
-        })));
+        })]));
     });
 }
 
 /**
- * Logs the result of an [`async` function]{@link AsyncFunction} to the
- * `console` using `console.dir` to display the properties of the resulting object.
- * Only works in Node.js or in browsers that support `console.dir` and
- * `console.error` (such as FF and Chrome).
- * If multiple arguments are returned from the async function,
+ * Logs the result of an `async` function to the `console` using `console.dir`
+ * to display the properties of the resulting object. Only works in Node.js or
+ * in browsers that support `console.dir` and `console.error` (such as FF and
+ * Chrome). If multiple arguments are returned from the async function,
  * `console.dir` is called on each argument in order.
  *
  * @name dir
@@ -2872,8 +2852,8 @@ function consoleFunc(name) {
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {AsyncFunction} function - The function you want to eventually apply
- * all arguments to.
+ * @param {Function} function - The function you want to eventually apply all
+ * arguments to.
  * @param {...*} arguments... - Any number of arguments to apply to the function.
  * @example
  *
@@ -2901,30 +2881,29 @@ var dir = consoleFunc('dir');
  * @method
  * @see [async.during]{@link module:ControlFlow.during}
  * @category Control Flow
- * @param {AsyncFunction} fn - An async function which is called each time
- * `test` passes. Invoked with (callback).
- * @param {AsyncFunction} test - asynchronous truth test to perform before each
+ * @param {Function} fn - A function which is called each time `test` passes.
+ * The function is passed a `callback(err)`, which must be called once it has
+ * completed with an optional `err` argument. Invoked with (callback).
+ * @param {Function} test - asynchronous truth test to perform before each
  * execution of `fn`. Invoked with (...args, callback), where `...args` are the
  * non-error args from the previous callback of `fn`.
  * @param {Function} [callback] - A callback which is called after the test
  * function has failed and repeated execution of `fn` has stopped. `callback`
- * will be passed an error if one occurred, otherwise `null`.
+ * will be passed an error if one occured, otherwise `null`.
  */
 function doDuring(fn, test, callback) {
     callback = onlyOnce(callback || noop);
-    var _fn = wrapAsync$1(fn);
-    var _test = wrapAsync$1(test);
 
     var next = rest(function (err, args) {
         if (err) return callback(err);
         args.push(check);
-        _test.apply(this, args);
+        test.apply(this, args);
     });
 
     function check(err, truth) {
         if (err) return callback(err);
         if (!truth) return callback(null);
-        _fn(next);
+        fn(next);
     }
 
     check(null, true);
@@ -2942,10 +2921,11 @@ function doDuring(fn, test, callback) {
  * @method
  * @see [async.whilst]{@link module:ControlFlow.whilst}
  * @category Control Flow
- * @param {AsyncFunction} iteratee - A function which is called each time `test`
- * passes. Invoked with (callback).
+ * @param {Function} iteratee - A function which is called each time `test`
+ * passes. The function is passed a `callback(err)`, which must be called once
+ * it has completed with an optional `err` argument. Invoked with (callback).
  * @param {Function} test - synchronous truth test to perform after each
- * execution of `iteratee`. Invoked with any non-error callback results of
+ * execution of `iteratee`. Invoked with the non-error callback results of 
  * `iteratee`.
  * @param {Function} [callback] - A callback which is called after the test
  * function has failed and repeated execution of `iteratee` has stopped.
@@ -2954,13 +2934,12 @@ function doDuring(fn, test, callback) {
  */
 function doWhilst(iteratee, test, callback) {
     callback = onlyOnce(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
     var next = rest(function (err, args) {
         if (err) return callback(err);
-        if (test.apply(this, args)) return _iteratee(next);
+        if (test.apply(this, args)) return iteratee(next);
         callback.apply(null, [null].concat(args));
     });
-    _iteratee(next);
+    iteratee(next);
 }
 
 /**
@@ -2973,18 +2952,18 @@ function doWhilst(iteratee, test, callback) {
  * @method
  * @see [async.doWhilst]{@link module:ControlFlow.doWhilst}
  * @category Control Flow
- * @param {AsyncFunction} iteratee - An async function which is called each time
- * `test` fails. Invoked with (callback).
+ * @param {Function} fn - A function which is called each time `test` fails.
+ * The function is passed a `callback(err)`, which must be called once it has
+ * completed with an optional `err` argument. Invoked with (callback).
  * @param {Function} test - synchronous truth test to perform after each
- * execution of `iteratee`. Invoked with any non-error callback results of
- * `iteratee`.
+ * execution of `fn`. Invoked with the non-error callback results of `fn`.
  * @param {Function} [callback] - A callback which is called after the test
- * function has passed and repeated execution of `iteratee` has stopped. `callback`
- * will be passed an error and any arguments passed to the final `iteratee`'s
+ * function has passed and repeated execution of `fn` has stopped. `callback`
+ * will be passed an error and any arguments passed to the final `fn`'s
  * callback. Invoked with (err, [results]);
  */
-function doUntil(iteratee, test, callback) {
-    doWhilst(iteratee, function () {
+function doUntil(fn, test, callback) {
+    doWhilst(fn, function () {
         return !test.apply(this, arguments);
     }, callback);
 }
@@ -3001,13 +2980,14 @@ function doUntil(iteratee, test, callback) {
  * @method
  * @see [async.whilst]{@link module:ControlFlow.whilst}
  * @category Control Flow
- * @param {AsyncFunction} test - asynchronous truth test to perform before each
+ * @param {Function} test - asynchronous truth test to perform before each
  * execution of `fn`. Invoked with (callback).
- * @param {AsyncFunction} fn - An async function which is called each time
- * `test` passes. Invoked with (callback).
+ * @param {Function} fn - A function which is called each time `test` passes.
+ * The function is passed a `callback(err)`, which must be called once it has
+ * completed with an optional `err` argument. Invoked with (callback).
  * @param {Function} [callback] - A callback which is called after the test
  * function has failed and repeated execution of `fn` has stopped. `callback`
- * will be passed an error, if one occurred, otherwise `null`.
+ * will be passed an error, if one occured, otherwise `null`.
  * @example
  *
  * var count = 0;
@@ -3027,21 +3007,19 @@ function doUntil(iteratee, test, callback) {
  */
 function during(test, fn, callback) {
     callback = onlyOnce(callback || noop);
-    var _fn = wrapAsync$1(fn);
-    var _test = wrapAsync$1(test);
 
     function next(err) {
         if (err) return callback(err);
-        _test(check);
+        test(check);
     }
 
     function check(err, truth) {
         if (err) return callback(err);
         if (!truth) return callback(null);
-        _fn(next);
+        fn(next);
     }
 
-    _test(check);
+    test(check);
 }
 
 function _withoutIndex(iteratee) {
@@ -3067,10 +3045,12 @@ function _withoutIndex(iteratee) {
  * @alias forEach
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to
- * each item in `coll`. Invoked with (item, callback).
- * The array index is not passed to the iteratee.
- * If you need the index, use `eachOf`.
+ * @param {Function} iteratee - A function to apply to each item
+ * in `coll`. The iteratee is passed a `callback(err)` which must be called once
+ * it has completed. If no error has occurred, the `callback` should be run
+ * without arguments or with an explicit `null` argument. The array index is not
+ * passed to the iteratee. Invoked with (item, callback). If you need the index,
+ * use `eachOf`.
  * @param {Function} [callback] - A callback which is called when all
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  * @example
@@ -3108,7 +3088,7 @@ function _withoutIndex(iteratee) {
  * });
  */
 function eachLimit(coll, iteratee, callback) {
-  eachOf(coll, _withoutIndex(wrapAsync$1(iteratee)), callback);
+  eachOf(coll, _withoutIndex(iteratee), callback);
 }
 
 /**
@@ -3123,16 +3103,17 @@ function eachLimit(coll, iteratee, callback) {
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The array index is not passed to the iteratee.
- * If you need the index, use `eachOfLimit`.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`. The
+ * iteratee is passed a `callback(err)` which must be called once it has
+ * completed. If no error has occurred, the `callback` should be run without
+ * arguments or with an explicit `null` argument. The array index is not passed
+ * to the iteratee. Invoked with (item, callback). If you need the index, use
+ * `eachOfLimit`.
  * @param {Function} [callback] - A callback which is called when all
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  */
 function eachLimit$1(coll, limit, iteratee, callback) {
-  _eachOfLimit(limit)(coll, _withoutIndex(wrapAsync$1(iteratee)), callback);
+  _eachOfLimit(limit)(coll, _withoutIndex(iteratee), callback);
 }
 
 /**
@@ -3146,11 +3127,12 @@ function eachLimit$1(coll, limit, iteratee, callback) {
  * @alias forEachSeries
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to each
- * item in `coll`.
- * The array index is not passed to the iteratee.
- * If you need the index, use `eachOfSeries`.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each
+ * item in `coll`. The iteratee is passed a `callback(err)` which must be called
+ * once it has completed. If no error has occurred, the `callback` should be run
+ * without arguments or with an explicit `null` argument. The array index is
+ * not passed to the iteratee. Invoked with (item, callback). If you need the
+ * index, use `eachOfSeries`.
  * @param {Function} [callback] - A callback which is called when all
  * `iteratee` functions have finished, or an error occurs. Invoked with (err).
  */
@@ -3162,17 +3144,16 @@ var eachSeries = doLimit(eachLimit$1, 1);
  * no extra deferral is added. This is useful for preventing stack overflows
  * (`RangeError: Maximum call stack size exceeded`) and generally keeping
  * [Zalgo](http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony)
- * contained. ES2017 `async` functions are returned as-is -- they are immune
- * to Zalgo's corrupting influences, as they always resolve on a later tick.
+ * contained.
  *
  * @name ensureAsync
  * @static
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {AsyncFunction} fn - an async function, one that expects a node-style
+ * @param {Function} fn - an async function, one that expects a node-style
  * callback as its last argument.
- * @returns {AsyncFunction} Returns a wrapped function with the exact same call
+ * @returns {Function} Returns a wrapped function with the exact same call
  * signature as the function passed in.
  * @example
  *
@@ -3192,7 +3173,6 @@ var eachSeries = doLimit(eachLimit$1, 1);
  * async.mapSeries(args, async.ensureAsync(sometimesAsync), done);
  */
 function ensureAsync(fn) {
-    if (isAsync(fn)) return fn;
     return initialParams(function (args, callback) {
         var sync = true;
         args.push(function () {
@@ -3225,10 +3205,10 @@ function notId(v) {
  * @alias all
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async truth test to apply to each item
- * in the collection in parallel.
- * The iteratee must complete with a boolean result value.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in the
+ * collection in parallel. The iteratee is passed a `callback(err, truthValue)`
+ * which must be called with a  boolean argument once it has completed. Invoked
+ * with (item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Result will be either `true` or `false`
  * depending on the values of the async tests. Invoked with (err, result).
@@ -3242,7 +3222,7 @@ function notId(v) {
  *     // if result is true then every file exists
  * });
  */
-var every = doParallel(_createTester(notId, notId));
+var every = _createTester(eachOf, notId, notId);
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs a maximum of `limit` async operations at a time.
@@ -3256,15 +3236,15 @@ var every = doParallel(_createTester(notId, notId));
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async truth test to apply to each item
- * in the collection in parallel.
- * The iteratee must complete with a boolean result value.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in the
+ * collection in parallel. The iteratee is passed a `callback(err, truthValue)`
+ * which must be called with a  boolean argument once it has completed. Invoked
+ * with (item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Result will be either `true` or `false`
  * depending on the values of the async tests. Invoked with (err, result).
  */
-var everyLimit = doParallelLimit(_createTester(notId, notId));
+var everyLimit = _createTester(eachOfLimit, notId, notId);
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs only a single async operation at a time.
@@ -3277,10 +3257,10 @@ var everyLimit = doParallelLimit(_createTester(notId, notId));
  * @alias allSeries
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async truth test to apply to each item
- * in the collection in series.
- * The iteratee must complete with a boolean result value.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in the
+ * collection in parallel. The iteratee is passed a `callback(err, truthValue)`
+ * which must be called with a  boolean argument once it has completed. Invoked
+ * with (item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Result will be either `true` or `false`
  * depending on the values of the async tests. Invoked with (err, result).
@@ -3343,7 +3323,7 @@ function filterGeneric(eachfn, coll, iteratee, callback) {
 
 function _filter(eachfn, coll, iteratee, callback) {
     var filter = isArrayLike(coll) ? filterArray : filterGeneric;
-    filter(eachfn, coll, wrapAsync$1(iteratee), callback || noop);
+    filter(eachfn, coll, iteratee, callback || noop);
 }
 
 /**
@@ -3419,16 +3399,16 @@ var filterSeries = doLimit(filterLimit, 1);
  * Calls the asynchronous function `fn` with a callback parameter that allows it
  * to call itself again, in series, indefinitely.
 
- * If an error is passed to the callback then `errback` is called with the
- * error, and execution stops, otherwise it will never be called.
+ * If an error is passed to the
+ * callback then `errback` is called with the error, and execution stops,
+ * otherwise it will never be called.
  *
  * @name forever
  * @static
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {AsyncFunction} fn - an async function to call repeatedly.
- * Invoked with (next).
+ * @param {Function} fn - a function to call repeatedly. Invoked with (next).
  * @param {Function} [errback] - when `fn` passes an error to it's callback,
  * this function will be called, and execution stops. Invoked with (err).
  * @example
@@ -3446,7 +3426,7 @@ var filterSeries = doLimit(filterLimit, 1);
  */
 function forever(fn, errback) {
     var done = onlyOnce(errback || noop);
-    var task = wrapAsync$1(ensureAsync(fn));
+    var task = ensureAsync(fn);
 
     function next(err) {
         if (err) return done(err);
@@ -3454,114 +3434,6 @@ function forever(fn, errback) {
     }
     next();
 }
-
-/**
- * The same as [`groupBy`]{@link module:Collections.groupBy} but runs a maximum of `limit` async operations at a time.
- *
- * @name groupByLimit
- * @static
- * @memberOf module:Collections
- * @method
- * @see [async.groupBy]{@link module:Collections.groupBy}
- * @category Collection
- * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with a `key` to group the value under.
- * Invoked with (value, callback).
- * @param {Function} [callback] - A callback which is called when all `iteratee`
- * functions have finished, or an error occurs. Result is an `Object` whoses
- * properties are arrays of values which returned the corresponding key.
- */
-var groupByLimit = function (coll, limit, iteratee, callback) {
-    callback = callback || noop;
-    var _iteratee = wrapAsync$1(iteratee);
-    mapLimit(coll, limit, function (val, callback) {
-        _iteratee(val, function (err, key) {
-            if (err) return callback(err);
-            return callback(null, { key: key, val: val });
-        });
-    }, function (err, mapResults) {
-        var result = {};
-        // from MDN, handle object having an `hasOwnProperty` prop
-        var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-        for (var i = 0; i < mapResults.length; i++) {
-            if (mapResults[i]) {
-                var key = mapResults[i].key;
-                var val = mapResults[i].val;
-
-                if (hasOwnProperty.call(result, key)) {
-                    result[key].push(val);
-                } else {
-                    result[key] = [val];
-                }
-            }
-        }
-
-        return callback(err, result);
-    });
-};
-
-/**
- * Returns a new object, where each value corresponds to an array of items, from
- * `coll`, that returned the corresponding key. That is, the keys of the object
- * correspond to the values passed to the `iteratee` callback.
- *
- * Note: Since this function applies the `iteratee` to each item in parallel,
- * there is no guarantee that the `iteratee` functions will complete in order.
- * However, the values for each key in the `result` will be in the same order as
- * the original `coll`. For Objects, the values will roughly be in the order of
- * the original Objects' keys (but this can vary across JavaScript engines).
- *
- * @name groupBy
- * @static
- * @memberOf module:Collections
- * @method
- * @category Collection
- * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with a `key` to group the value under.
- * Invoked with (value, callback).
- * @param {Function} [callback] - A callback which is called when all `iteratee`
- * functions have finished, or an error occurs. Result is an `Object` whoses
- * properties are arrays of values which returned the corresponding key.
- * @example
- *
- * async.groupBy(['userId1', 'userId2', 'userId3'], function(userId, callback) {
- *     db.findById(userId, function(err, user) {
- *         if (err) return callback(err);
- *         return callback(null, user.age);
- *     });
- * }, function(err, result) {
- *     // result is object containing the userIds grouped by age
- *     // e.g. { 30: ['userId1', 'userId3'], 42: ['userId2']};
- * });
- */
-var groupBy = doLimit(groupByLimit, Infinity);
-
-/**
- * The same as [`groupBy`]{@link module:Collections.groupBy} but runs only a single async operation at a time.
- *
- * @name groupBySeries
- * @static
- * @memberOf module:Collections
- * @method
- * @see [async.groupBy]{@link module:Collections.groupBy}
- * @category Collection
- * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with a `key` to group the value under.
- * Invoked with (value, callback).
- * @param {Function} [callback] - A callback which is called when all `iteratee`
- * functions have finished, or an error occurs. Result is an `Object` whoses
- * properties are arrays of values which returned the corresponding key.
- */
-var groupBySeries = doLimit(groupByLimit, 1);
 
 /**
  * Logs the result of an `async` function to the `console`. Only works in
@@ -3574,8 +3446,8 @@ var groupBySeries = doLimit(groupByLimit, 1);
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {AsyncFunction} function - The function you want to eventually apply
- * all arguments to.
+ * @param {Function} function - The function you want to eventually apply all
+ * arguments to.
  * @param {...*} arguments... - Any number of arguments to apply to the function.
  * @example
  *
@@ -3604,10 +3476,10 @@ var log = consoleFunc('log');
  * @category Collection
  * @param {Object} obj - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - A function to apply to each value and key
- * in `coll`.
- * The iteratee should complete with the transformed value as its result.
- * Invoked with (value, key, callback).
+ * @param {Function} iteratee - A function to apply to each value in `obj`.
+ * The iteratee is passed a `callback(err, transformed)` which must be called
+ * once it has completed with an error (which can be `null`) and a
+ * transformed value. Invoked with (value, key, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. `result` is a new object consisting
  * of each key from `obj`, with each transformed value on the right-hand side.
@@ -3616,9 +3488,8 @@ var log = consoleFunc('log');
 function mapValuesLimit(obj, limit, iteratee, callback) {
     callback = once(callback || noop);
     var newObj = {};
-    var _iteratee = wrapAsync$1(iteratee);
     eachOfLimit(obj, limit, function (val, key, next) {
-        _iteratee(val, key, function (err, result) {
+        iteratee(val, key, function (err, result) {
             if (err) return next(err);
             newObj[key] = result;
             next();
@@ -3647,10 +3518,10 @@ function mapValuesLimit(obj, limit, iteratee, callback) {
  * @method
  * @category Collection
  * @param {Object} obj - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A function to apply to each value and key
- * in `coll`.
- * The iteratee should complete with the transformed value as its result.
- * Invoked with (value, key, callback).
+ * @param {Function} iteratee - A function to apply to each value and key in
+ * `coll`. The iteratee is passed a `callback(err, transformed)` which must be
+ * called once it has completed with an error (which can be `null`) and a
+ * transformed value. Invoked with (value, key, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. `result` is a new object consisting
  * of each key from `obj`, with each transformed value on the right-hand side.
@@ -3685,10 +3556,10 @@ var mapValues = doLimit(mapValuesLimit, Infinity);
  * @see [async.mapValues]{@link module:Collections.mapValues}
  * @category Collection
  * @param {Object} obj - A collection to iterate over.
- * @param {AsyncFunction} iteratee - A function to apply to each value and key
- * in `coll`.
- * The iteratee should complete with the transformed value as its result.
- * Invoked with (value, key, callback).
+ * @param {Function} iteratee - A function to apply to each value in `obj`.
+ * The iteratee is passed a `callback(err, transformed)` which must be called
+ * once it has completed with an error (which can be `null`) and a
+ * transformed value. Invoked with (value, key, callback).
  * @param {Function} [callback] - A callback which is called when all `iteratee`
  * functions have finished, or an error occurs. `result` is a new object consisting
  * of each key from `obj`, with each transformed value on the right-hand side.
@@ -3701,7 +3572,7 @@ function has(obj, key) {
 }
 
 /**
- * Caches the results of an async function. When creating a hash to store
+ * Caches the results of an `async` function. When creating a hash to store
  * function results against, the callback is omitted from the hash and an
  * optional hash function can be used.
  *
@@ -3719,11 +3590,11 @@ function has(obj, key) {
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {AsyncFunction} fn - The async function to proxy and cache results from.
+ * @param {Function} fn - The function to proxy and cache results from.
  * @param {Function} hasher - An optional function for generating a custom hash
  * for storing results. It has all the arguments applied to it apart from the
  * callback, and must be synchronous.
- * @returns {AsyncFunction} a memoized version of `fn`
+ * @returns {Function} a memoized version of `fn`
  * @example
  *
  * var slow_fn = function(name, callback) {
@@ -3741,7 +3612,6 @@ function memoize(fn, hasher) {
     var memo = Object.create(null);
     var queues = Object.create(null);
     hasher = hasher || identity;
-    var _fn = wrapAsync$1(fn);
     var memoized = initialParams(function memoized(args, callback) {
         var key = hasher.apply(null, args);
         if (has(memo, key)) {
@@ -3752,14 +3622,14 @@ function memoize(fn, hasher) {
             queues[key].push(callback);
         } else {
             queues[key] = [callback];
-            _fn.apply(null, args.concat(rest(function (args) {
+            fn.apply(null, args.concat([rest(function (args) {
                 memo[key] = args;
                 var q = queues[key];
                 delete queues[key];
                 for (var i = 0, l = q.length; i < l; i++) {
                     q[i].apply(null, args);
                 }
-            })));
+            })]));
         }
     });
     memoized.memo = memo;
@@ -3815,7 +3685,7 @@ function _parallel(eachfn, tasks, callback) {
     var results = isArrayLike(tasks) ? [] : {};
 
     eachfn(tasks, function (task, key, callback) {
-        wrapAsync$1(task)(rest(function (err, args) {
+        task(rest(function (err, args) {
             if (args.length <= 1) {
                 args = args[0];
             }
@@ -3840,9 +3710,6 @@ function _parallel(eachfn, tasks, callback) {
  * sections for each task will happen one after the other.  JavaScript remains
  * single-threaded.
  *
- * **Hint:** Use [`reflect`]{@link module:Utils.reflect} to continue the
- * execution of other tasks when a task fails.
- *
  * It is also possible to use an object instead of an array. Each property will
  * be run as a function and the results will be passed to the final `callback`
  * as an object instead of an array. This can be a more readable way of handling
@@ -3853,14 +3720,14 @@ function _parallel(eachfn, tasks, callback) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {Array|Iterable|Object} tasks - A collection of
- * [async functions]{@link AsyncFunction} to run.
- * Each async function can complete with any number of optional `result` values.
+ * @param {Array|Iterable|Object} tasks - A collection containing functions to run.
+ * Each function is passed a `callback(err, result)` which it must call on
+ * completion with an error `err` (which can be `null`) and an optional `result`
+ * value.
  * @param {Function} [callback] - An optional callback to run once all the
  * functions have completed successfully. This function gets a results array
  * (or object) containing all the result arguments passed to the task callbacks.
  * Invoked with (err, results).
- *
  * @example
  * async.parallel([
  *     function(callback) {
@@ -3910,9 +3777,10 @@ function parallelLimit(tasks, callback) {
  * @method
  * @see [async.parallel]{@link module:ControlFlow.parallel}
  * @category Control Flow
- * @param {Array|Iterable|Object} tasks - A collection of
- * [async functions]{@link AsyncFunction} to run.
- * Each async function can complete with any number of optional `result` values.
+ * @param {Array|Collection} tasks - A collection containing functions to run.
+ * Each function is passed a `callback(err, result)` which it must call on
+ * completion with an error `err` (which can be `null`) and an optional `result`
+ * value.
  * @param {number} limit - The maximum number of async operations at a time.
  * @param {Function} [callback] - An optional callback to run once all the
  * functions have completed successfully. This function gets a results array
@@ -3981,9 +3849,11 @@ function parallelLimit$1(tasks, limit, callback) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {AsyncFunction} worker - An async function for processing a queued task.
- * If you want to handle errors from an individual task, pass a callback to
- * `q.push()`. Invoked with (task, callback).
+ * @param {Function} worker - An asynchronous function for processing a queued
+ * task, which must call its `callback(err)` argument when finished, with an
+ * optional `error` as an argument.  If you want to handle errors from an
+ * individual task, pass a callback to `q.push()`. Invoked with
+ * (task, callback).
  * @param {number} [concurrency=1] - An `integer` for determining how many
  * `worker` functions should be run in parallel.  If omitted, the concurrency
  * defaults to `1`.  If the concurrency is `0`, an error is thrown.
@@ -4022,9 +3892,8 @@ function parallelLimit$1(tasks, limit, callback) {
  * });
  */
 var queue$1 = function (worker, concurrency) {
-  var _worker = wrapAsync$1(worker);
   return queue(function (items, cb) {
-    _worker(items[0], cb);
+    worker(items[0], cb);
   }, concurrency, 1);
 };
 
@@ -4038,10 +3907,11 @@ var queue$1 = function (worker, concurrency) {
  * @method
  * @see [async.queue]{@link module:ControlFlow.queue}
  * @category Control Flow
- * @param {AsyncFunction} worker - An async function for processing a queued task.
- * If you want to handle errors from an individual task, pass a callback to
- * `q.push()`.
- * Invoked with (task, callback).
+ * @param {Function} worker - An asynchronous function for processing a queued
+ * task, which must call its `callback(err)` argument when finished, with an
+ * optional `error` as an argument.  If you want to handle errors from an
+ * individual task, pass a callback to `q.push()`. Invoked with
+ * (task, callback).
  * @param {number} concurrency - An `integer` for determining how many `worker`
  * functions should be run in parallel.  If omitted, the concurrency defaults to
  * `1`.  If the concurrency is `0`, an error is thrown.
@@ -4111,8 +3981,9 @@ var priorityQueue = function (worker, concurrency) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {Array} tasks - An array containing [async functions]{@link AsyncFunction}
- * to run. Each function can complete with an optional `result` value.
+ * @param {Array} tasks - An array containing functions to run. Each function
+ * is passed a `callback(err, result)` which it must call on completion with an
+ * error `err` (which can be `null`) and an optional `result` value.
  * @param {Function} callback - A callback to run once any of the functions have
  * completed. This function gets an error or result from the first function that
  * completed. Invoked with (err, result).
@@ -4141,7 +4012,7 @@ function race(tasks, callback) {
     if (!isArray(tasks)) return callback(new TypeError('First argument to race must be an array of functions'));
     if (!tasks.length) return callback();
     for (var i = 0, l = tasks.length; i < l; i++) {
-        wrapAsync$1(tasks[i])(callback);
+        tasks[i](callback);
     }
 }
 
@@ -4159,12 +4030,12 @@ var slice = Array.prototype.slice;
  * @category Collection
  * @param {Array} array - A collection to iterate over.
  * @param {*} memo - The initial state of the reduction.
- * @param {AsyncFunction} iteratee - A function applied to each item in the
- * array to produce the next step in the reduction.
- * The `iteratee` should complete with the next state of the reduction.
- * If the iteratee complete with an error, the reduction is stopped and the
- * main `callback` is immediately called with the error.
- * Invoked with (memo, item, callback).
+ * @param {Function} iteratee - A function applied to each item in the
+ * array to produce the next step in the reduction. The `iteratee` is passed a
+ * `callback(err, reduction)` which accepts an optional error as its first
+ * argument, and the state of the reduction as the second. If an error is
+ * passed to the callback, the reduction is stopped and the main `callback` is
+ * immediately called with the error. Invoked with (memo, item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Result is the reduced value. Invoked with
  * (err, result).
@@ -4175,17 +4046,17 @@ function reduceRight(array, memo, iteratee, callback) {
 }
 
 /**
- * Wraps the async function in another function that always completes with a
- * result object, even when it errors.
+ * Wraps the function in another function that always returns data even when it
+ * errors.
  *
- * The result object has either the property `error` or `value`.
+ * The object returned has either the property `error` or `value`.
  *
  * @name reflect
  * @static
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {AsyncFunction} fn - The async function you want to wrap
+ * @param {Function} fn - The function you want to wrap
  * @returns {Function} - A function that always passes null to it's callback as
  * the error. The second argument to the callback will be an `object` with
  * either an `error` or a `value` property.
@@ -4214,7 +4085,6 @@ function reduceRight(array, memo, iteratee, callback) {
  * });
  */
 function reflect(fn) {
-    var _fn = wrapAsync$1(fn);
     return initialParams(function reflectOn(args, reflectCallback) {
         args.push(rest(function callback(err, cbArgs) {
             if (err) {
@@ -4234,7 +4104,7 @@ function reflect(fn) {
             }
         }));
 
-        return _fn.apply(this, args);
+        return fn.apply(this, args);
     });
 }
 
@@ -4256,10 +4126,9 @@ function reject$1(eachfn, arr, iteratee, callback) {
  * @see [async.filter]{@link module:Collections.filter}
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {Function} iteratee - An async truth test to apply to each item in
- * `coll`.
- * The should complete with a boolean value as its `result`.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in `coll`.
+ * The `iteratee` is passed a `callback(err, truthValue)`, which must be called
+ * with a boolean argument once it has completed. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Invoked with (err, results).
  * @example
@@ -4276,7 +4145,7 @@ function reject$1(eachfn, arr, iteratee, callback) {
 var reject = doParallel(reject$1);
 
 /**
- * A helper function that wraps an array or an object of functions with `reflect`.
+ * A helper function that wraps an array or an object of functions with reflect.
  *
  * @name reflectAll
  * @static
@@ -4284,9 +4153,8 @@ var reject = doParallel(reject$1);
  * @method
  * @see [async.reflect]{@link module:Utils.reflect}
  * @category Util
- * @param {Array|Object|Iterable} tasks - The collection of
- * [async functions]{@link AsyncFunction} to wrap in `async.reflect`.
- * @returns {Array} Returns an array of async functions, each wrapped in
+ * @param {Array} tasks - The array of functions to wrap in `async.reflect`.
+ * @returns {Array} Returns an array of functions, each function wrapped in
  * `async.reflect`
  * @example
  *
@@ -4367,10 +4235,9 @@ function reflectAll(tasks) {
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {Function} iteratee - An async truth test to apply to each item in
- * `coll`.
- * The should complete with a boolean value as its `result`.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in `coll`.
+ * The `iteratee` is passed a `callback(err, truthValue)`, which must be called
+ * with a boolean argument once it has completed. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Invoked with (err, results).
  */
@@ -4386,10 +4253,9 @@ var rejectLimit = doParallelLimit(reject$1);
  * @see [async.reject]{@link module:Collections.reject}
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {Function} iteratee - An async truth test to apply to each item in
- * `coll`.
- * The should complete with a boolean value as its `result`.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in `coll`.
+ * The `iteratee` is passed a `callback(err, truthValue)`, which must be called
+ * with a boolean argument once it has completed. Invoked with (item, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Invoked with (err, results).
  */
@@ -4431,7 +4297,6 @@ function constant$1(value) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @see [async.retryable]{@link module:ControlFlow.retryable}
  * @param {Object|number} [opts = {times: 5, interval: 0}| 5] - Can be either an
  * object with `times` and `interval` or a number.
  * * `times` - The number of attempts to make before giving up.  The default
@@ -4446,13 +4311,16 @@ function constant$1(value) {
  *   Invoked with (err).
  * * If `opts` is a number, the number specifies the number of times to retry,
  *   with the default interval of `0`.
- * @param {AsyncFunction} task - An async function to retry.
- * Invoked with (callback).
+ * @param {Function} task - A function which receives two arguments: (1) a
+ * `callback(err, result)` which must be called when finished, passing `err`
+ * (which can be `null`) and the `result` of the function's execution, and (2)
+ * a `results` object, containing the results of the previously executed
+ * functions (if nested inside another control flow). Invoked with
+ * (callback, results).
  * @param {Function} [callback] - An optional callback which is called when the
  * task has succeeded, or after the final failed attempt. It receives the `err`
  * and `result` arguments of the last attempt at completing the `task`. Invoked
  * with (err, results).
- *
  * @example
  *
  * // The `retry` function can be used as a stand-alone control flow by passing
@@ -4498,7 +4366,7 @@ function constant$1(value) {
  * // individual methods that are not as reliable, like this:
  * async.auto({
  *     users: api.getUsers.bind(api),
- *     payments: async.retryable(3, api.getPayments.bind(api))
+ *     payments: async.retry(3, api.getPayments.bind(api))
  * }, function(err, results) {
  *     // do something with the results
  * });
@@ -4539,11 +4407,9 @@ function retry(opts, task, callback) {
         throw new Error("Invalid arguments for async.retry");
     }
 
-    var _task = wrapAsync$1(task);
-
     var attempt = 1;
     function retryAttempt() {
-        _task(function (err) {
+        task(function (err) {
             if (err && attempt++ < options.times && (typeof options.errorFilter != 'function' || options.errorFilter(err))) {
                 setTimeout(retryAttempt, options.intervalFunc(attempt));
             } else {
@@ -4556,9 +4422,8 @@ function retry(opts, task, callback) {
 }
 
 /**
- * A close relative of [`retry`]{@link module:ControlFlow.retry}.  This method
- * wraps a task and makes it retryable, rather than immediately calling it
- * with retries.
+ * A close relative of [`retry`]{@link module:ControlFlow.retry}.  This method wraps a task and makes it
+ * retryable, rather than immediately calling it with retries.
  *
  * @name retryable
  * @static
@@ -4568,12 +4433,9 @@ function retry(opts, task, callback) {
  * @category Control Flow
  * @param {Object|number} [opts = {times: 5, interval: 0}| 5] - optional
  * options, exactly the same as from `retry`
- * @param {AsyncFunction} task - the asynchronous function to wrap.
- * This function will be passed any arguments passed to the returned wrapper.
- * Invoked with (...args, callback).
- * @returns {AsyncFunction} The wrapped function, which when invoked, will
- * retry on an error, based on the parameters specified in `opts`.
- * This function will accept the same parameters as `task`.
+ * @param {Function} task - the asynchronous function to wrap
+ * @returns {Functions} The wrapped function, which when invoked, will retry on
+ * an error, based on the parameters specified in `opts`.
  * @example
  *
  * async.auto({
@@ -4588,10 +4450,9 @@ var retryable = function (opts, task) {
         task = opts;
         opts = null;
     }
-    var _task = wrapAsync$1(task);
     return initialParams(function (args, callback) {
         function taskFn(cb) {
-            _task.apply(null, args.concat(cb));
+            task.apply(null, args.concat([cb]));
         }
 
         if (opts) retry(opts, taskFn, callback);else retry(taskFn, callback);
@@ -4624,9 +4485,9 @@ var retryable = function (opts, task) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {Array|Iterable|Object} tasks - A collection containing
- * [async functions]{@link AsyncFunction} to run in series.
- * Each function can complete with any number of optional `result` values.
+ * @param {Array|Iterable|Object} tasks - A collection containing functions to run, each
+ * function is passed a `callback(err, result)` it must call on completion with
+ * an error `err` (which can be `null`) and an optional `result` value.
  * @param {Function} [callback] - An optional callback to run once all the
  * functions have completed. This function gets a results array (or object)
  * containing all the result arguments passed to the `task` callbacks. Invoked
@@ -4678,10 +4539,10 @@ function series(tasks, callback) {
  * @alias any
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async truth test to apply to each item
- * in the collections in parallel.
- * The iteratee should complete with a boolean `result` value.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in the array
+ * in parallel. The iteratee is passed a `callback(err, truthValue)` which must
+ * be called with a boolean argument once it has completed. Invoked with
+ * (item, callback).
  * @param {Function} [callback] - A callback which is called as soon as any
  * iteratee returns `true`, or after all the iteratee functions have finished.
  * Result will be either `true` or `false` depending on the values of the async
@@ -4696,7 +4557,7 @@ function series(tasks, callback) {
  *     // if result is true then at least one of the files exists
  * });
  */
-var some = doParallel(_createTester(Boolean, identity));
+var some = _createTester(eachOf, Boolean, identity);
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs a maximum of `limit` async operations at a time.
@@ -4710,16 +4571,16 @@ var some = doParallel(_createTester(Boolean, identity));
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - An async truth test to apply to each item
- * in the collections in parallel.
- * The iteratee should complete with a boolean `result` value.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in the array
+ * in parallel. The iteratee is passed a `callback(err, truthValue)` which must
+ * be called with a boolean argument once it has completed. Invoked with
+ * (item, callback).
  * @param {Function} [callback] - A callback which is called as soon as any
  * iteratee returns `true`, or after all the iteratee functions have finished.
  * Result will be either `true` or `false` depending on the values of the async
  * tests. Invoked with (err, result).
  */
-var someLimit = doParallelLimit(_createTester(Boolean, identity));
+var someLimit = _createTester(eachOfLimit, Boolean, identity);
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs only a single async operation at a time.
@@ -4732,10 +4593,10 @@ var someLimit = doParallelLimit(_createTester(Boolean, identity));
  * @alias anySeries
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async truth test to apply to each item
- * in the collections in series.
- * The iteratee should complete with a boolean `result` value.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A truth test to apply to each item in the array
+ * in parallel. The iteratee is passed a `callback(err, truthValue)` which must
+ * be called with a boolean argument once it has completed. Invoked with
+ * (item, callback).
  * @param {Function} [callback] - A callback which is called as soon as any
  * iteratee returns `true`, or after all the iteratee functions have finished.
  * Result will be either `true` or `false` depending on the values of the async
@@ -4753,11 +4614,10 @@ var someSeries = doLimit(someLimit, 1);
  * @method
  * @category Collection
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
- * @param {AsyncFunction} iteratee - An async function to apply to each item in
- * `coll`.
- * The iteratee should complete with a value to use as the sort criteria as
- * its `result`.
- * Invoked with (item, callback).
+ * @param {Function} iteratee - A function to apply to each item in `coll`.
+ * The iteratee is passed a `callback(err, sortValue)` which must be called once
+ * it has completed with an error (which can be `null`) and a value to use as
+ * the sort criteria. Invoked with (item, callback).
  * @param {Function} callback - A callback which is called after all the
  * `iteratee` functions have finished, or an error occurs. Results is the items
  * from the original `coll` sorted by the values returned by the `iteratee`
@@ -4791,9 +4651,8 @@ var someSeries = doLimit(someLimit, 1);
  * });
  */
 function sortBy(coll, iteratee, callback) {
-    var _iteratee = wrapAsync$1(iteratee);
     map(coll, function (x, callback) {
-        _iteratee(x, function (err, criteria) {
+        iteratee(x, function (err, criteria) {
             if (err) return callback(err);
             callback(null, { value: x, criteria: criteria });
         });
@@ -4819,13 +4678,14 @@ function sortBy(coll, iteratee, callback) {
  * @memberOf module:Utils
  * @method
  * @category Util
- * @param {AsyncFunction} asyncFn - The async function to limit in time.
+ * @param {Function} asyncFn - The asynchronous function you want to set the
+ * time limit.
  * @param {number} milliseconds - The specified time limit.
  * @param {*} [info] - Any variable you want attached (`string`, `object`, etc)
  * to timeout Error for more information..
- * @returns {AsyncFunction} Returns a wrapped function that can be used with any
- * of the control flow functions.
- * Invoke this function with the same parameters as you would `asyncFunc`.
+ * @returns {Function} Returns a wrapped function that can be used with any of
+ * the control flow functions. Invoke this function with the same
+ * parameters as you would `asyncFunc`.
  * @example
  *
  * function myFunction(foo, callback) {
@@ -4872,13 +4732,11 @@ function timeout(asyncFn, milliseconds, info) {
         originalCallback(error);
     }
 
-    var fn = wrapAsync$1(asyncFn);
-
     return initialParams(function (args, origCallback) {
         originalCallback = origCallback;
         // setup timer and call original function
         timer = setTimeout(timeoutCallback, milliseconds);
-        fn.apply(null, args.concat(injectedCallback));
+        asyncFn.apply(null, args.concat(injectedCallback));
     });
 }
 
@@ -4921,13 +4779,12 @@ function baseRange(start, end, step, fromRight) {
  * @category Control Flow
  * @param {number} count - The number of times to run the function.
  * @param {number} limit - The maximum number of async operations at a time.
- * @param {AsyncFunction} iteratee - The async function to call `n` times.
- * Invoked with the iteration index and a callback: (n, next).
+ * @param {Function} iteratee - The function to call `n` times. Invoked with the
+ * iteration index and a callback (n, next).
  * @param {Function} callback - see [async.map]{@link module:Collections.map}.
  */
 function timeLimit(count, limit, iteratee, callback) {
-  var _iteratee = wrapAsync$1(iteratee);
-  mapLimit(baseRange(0, count, 1), limit, _iteratee, callback);
+  mapLimit(baseRange(0, count, 1), limit, iteratee, callback);
 }
 
 /**
@@ -4941,8 +4798,8 @@ function timeLimit(count, limit, iteratee, callback) {
  * @see [async.map]{@link module:Collections.map}
  * @category Control Flow
  * @param {number} n - The number of times to run the function.
- * @param {AsyncFunction} iteratee - The async function to call `n` times.
- * Invoked with the iteration index and a callback: (n, next).
+ * @param {Function} iteratee - The function to call `n` times. Invoked with the
+ * iteration index and a callback (n, next).
  * @param {Function} callback - see {@link module:Collections.map}.
  * @example
  *
@@ -4974,8 +4831,8 @@ var times = doLimit(timeLimit, Infinity);
  * @see [async.times]{@link module:ControlFlow.times}
  * @category Control Flow
  * @param {number} n - The number of times to run the function.
- * @param {AsyncFunction} iteratee - The async function to call `n` times.
- * Invoked with the iteration index and a callback: (n, next).
+ * @param {Function} iteratee - The function to call `n` times. Invoked with the
+ * iteration index and a callback (n, next).
  * @param {Function} callback - see {@link module:Collections.map}.
  */
 var timesSeries = doLimit(timeLimit, 1);
@@ -4993,8 +4850,11 @@ var timesSeries = doLimit(timeLimit, 1);
  * @param {Array|Iterable|Object} coll - A collection to iterate over.
  * @param {*} [accumulator] - The initial state of the transform.  If omitted,
  * it will default to an empty Object or Array, depending on the type of `coll`
- * @param {AsyncFunction} iteratee - A function applied to each item in the
- * collection that potentially modifies the accumulator.
+ * @param {Function} iteratee - A function applied to each item in the
+ * collection that potentially modifies the accumulator. The `iteratee` is
+ * passed a `callback(err)` which accepts an optional error as its first
+ * argument. If an error is passed to the callback, the transform is stopped
+ * and the main `callback` is immediately called with the error.
  * Invoked with (accumulator, item, key, callback).
  * @param {Function} [callback] - A callback which is called after all the
  * `iteratee` functions have finished. Result is the transformed accumulator.
@@ -5023,16 +4883,15 @@ var timesSeries = doLimit(timeLimit, 1);
  * })
  */
 function transform(coll, accumulator, iteratee, callback) {
-    if (arguments.length <= 3) {
+    if (arguments.length === 3) {
         callback = iteratee;
         iteratee = accumulator;
         accumulator = isArray(coll) ? [] : {};
     }
     callback = once(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
 
     eachOf(coll, function (v, k, cb) {
-        _iteratee(accumulator, v, k, cb);
+        iteratee(accumulator, v, k, cb);
     }, function (err) {
         callback(err, accumulator);
     });
@@ -5048,8 +4907,8 @@ function transform(coll, accumulator, iteratee, callback) {
  * @method
  * @see [async.memoize]{@link module:Utils.memoize}
  * @category Util
- * @param {AsyncFunction} fn - the memoized function
- * @returns {AsyncFunction} a function that calls the original unmemoized function
+ * @param {Function} fn - the memoized function
+ * @returns {Function} a function that calls the original unmemoized function
  */
 function unmemoize(fn) {
     return function () {
@@ -5068,8 +4927,9 @@ function unmemoize(fn) {
  * @category Control Flow
  * @param {Function} test - synchronous truth test to perform before each
  * execution of `iteratee`. Invoked with ().
- * @param {AsyncFunction} iteratee - An async function which is called each time
- * `test` passes. Invoked with (callback).
+ * @param {Function} iteratee - A function which is called each time `test` passes.
+ * The function is passed a `callback(err)`, which must be called once it has
+ * completed with an optional `err` argument. Invoked with (callback).
  * @param {Function} [callback] - A callback which is called after the test
  * function has failed and repeated execution of `iteratee` has stopped. `callback`
  * will be passed an error and any arguments passed to the final `iteratee`'s
@@ -5093,20 +4953,19 @@ function unmemoize(fn) {
  */
 function whilst(test, iteratee, callback) {
     callback = onlyOnce(callback || noop);
-    var _iteratee = wrapAsync$1(iteratee);
     if (!test()) return callback(null);
     var next = rest(function (err, args) {
         if (err) return callback(err);
-        if (test()) return _iteratee(next);
+        if (test()) return iteratee(next);
         callback.apply(null, [null].concat(args));
     });
-    _iteratee(next);
+    iteratee(next);
 }
 
 /**
- * Repeatedly call `iteratee` until `test` returns `true`. Calls `callback` when
+ * Repeatedly call `fn` until `test` returns `true`. Calls `callback` when
  * stopped, or an error occurs. `callback` will be passed an error and any
- * arguments passed to the final `iteratee`'s callback.
+ * arguments passed to the final `fn`'s callback.
  *
  * The inverse of [whilst]{@link module:ControlFlow.whilst}.
  *
@@ -5117,18 +4976,19 @@ function whilst(test, iteratee, callback) {
  * @see [async.whilst]{@link module:ControlFlow.whilst}
  * @category Control Flow
  * @param {Function} test - synchronous truth test to perform before each
- * execution of `iteratee`. Invoked with ().
- * @param {AsyncFunction} iteratee - An async function which is called each time
- * `test` fails. Invoked with (callback).
+ * execution of `fn`. Invoked with ().
+ * @param {Function} fn - A function which is called each time `test` fails.
+ * The function is passed a `callback(err)`, which must be called once it has
+ * completed with an optional `err` argument. Invoked with (callback).
  * @param {Function} [callback] - A callback which is called after the test
- * function has passed and repeated execution of `iteratee` has stopped. `callback`
- * will be passed an error and any arguments passed to the final `iteratee`'s
+ * function has passed and repeated execution of `fn` has stopped. `callback`
+ * will be passed an error and any arguments passed to the final `fn`'s
  * callback. Invoked with (err, [results]);
  */
-function until(test, iteratee, callback) {
+function until(test, fn, callback) {
     whilst(function () {
         return !test.apply(this, arguments);
-    }, iteratee, callback);
+    }, fn, callback);
 }
 
 /**
@@ -5142,10 +5002,10 @@ function until(test, iteratee, callback) {
  * @memberOf module:ControlFlow
  * @method
  * @category Control Flow
- * @param {Array} tasks - An array of [async functions]{@link AsyncFunction}
- * to run.
- * Each function should complete with any number of `result` values.
- * The `result` values will be passed as arguments, in order, to the next task.
+ * @param {Array} tasks - An array of functions to run, each function is passed
+ * a `callback(err, result1, result2, ...)` it must call on completion. The
+ * first argument is an error (which can be `null`) and any further arguments
+ * will be passed as arguments in order to the next task.
  * @param {Function} [callback] - An optional callback to run once all the
  * functions have completed. This will be passed the results of the last task's
  * callback. Invoked with (err, [results]).
@@ -5208,7 +5068,7 @@ var waterfall = function (tasks, callback) {
 
         args.push(taskCallback);
 
-        var task = wrapAsync$1(tasks[taskIndex++]);
+        var task = tasks[taskIndex++];
         task.apply(null, args);
     }
 
@@ -5216,51 +5076,11 @@ var waterfall = function (tasks, callback) {
 };
 
 /**
- * An "async function" in the context of Async is an asynchronous function with
- * a variable number of parameters, with the final parameter being a callback.
- * (`function (arg1, arg2, ..., callback) {}`)
- * The final callback is of the form `callback(err, results...)`, which must be
- * called once the function is completed.  The callback should be called with a
- * Error as its first argument to signal that an error occurred.
- * Otherwise, if no error occurred, it should be called with `null` as the first
- * argument, and any additional `result` arguments that may apply, to signal
- * successful completion.
- * The callback must be called exactly once, ideally on a later tick of the
- * JavaScript event loop.
- *
- * This type of function is also referred to as a "Node-style async function",
- * or a "continuation passing-style function" (CPS). Most of the methods of this
- * library are themselves CPS/Node-style async functions, or functions that
- * return CPS/Node-style async functions.
- *
- * Wherever we accept a Node-style async function, we also directly accept an
- * [ES2017 `async` function]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function}.
- * In this case, the `async` function will not be passed a final callback
- * argument, and any thrown error will be used as the `err` argument of the
- * implicit callback, and the return value will be used as the `result` value.
- * (i.e. a `rejected` of the returned Promise becomes the `err` callback
- * argument, and a `resolved` value becomes the `result`.)
- *
- * Note, due to JavaScript limitations, we can only detect native `async`
- * functions and not transpilied implementations.
- * Your environment must have `async`/`await` support for this to work.
- * (e.g. Node > v7.6, or a recent version of a modern browser).
- * If you are using `async` functions through a transpiler (e.g. Babel), you
- * must still wrap the function with [asyncify]{@link module:Utils.asyncify},
- * because the `async function` will be compiled to an ordinary function that
- * returns a promise.
- *
- * @typedef {Function} AsyncFunction
- * @static
- */
-
-/**
  * Async is a utility module which provides straight-forward, powerful functions
  * for working with asynchronous JavaScript. Although originally designed for
  * use with [Node.js](http://nodejs.org) and installable via
  * `npm install --save async`, it can also be used directly in the browser.
  * @module async
- * @see AsyncFunction
  */
 
 /**
@@ -5278,7 +5098,6 @@ var waterfall = function (tasks, callback) {
  * A collection of `async` utility functions.
  * @module Utils
  */
-
 var index = {
   applyEach: applyEach,
   applyEachSeries: applyEachSeries,
@@ -5313,9 +5132,6 @@ var index = {
   filterLimit: filterLimit,
   filterSeries: filterSeries,
   forever: forever,
-  groupBy: groupBy,
-  groupByLimit: groupByLimit,
-  groupBySeries: groupBySeries,
   log: log,
   map: map,
   mapLimit: mapLimit,
@@ -5408,9 +5224,6 @@ exports.filter = filter;
 exports.filterLimit = filterLimit;
 exports.filterSeries = filterSeries;
 exports.forever = forever;
-exports.groupBy = groupBy;
-exports.groupByLimit = groupByLimit;
-exports.groupBySeries = groupBySeries;
 exports.log = log;
 exports.map = map;
 exports.mapLimit = mapLimit;
@@ -5666,7 +5479,6 @@ process.umask = function() { return 0; };
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./translate");
 require("./session");
 require("./transactions");
@@ -5694,7 +5506,6 @@ __export(require("./routing"));
 captureStateTranslations.$inject = ['$rootScope'];
 decorateBackStateService.$inject = ['$delegate', '$window', '$rootScope'];
 addBackStateDecorator.$inject = ['$provide'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.StateVar = "$state";
 exports.PrevStateVar = "$prevState";
 function captureStateTranslations($rootScope) {
@@ -5743,7 +5554,6 @@ angular
 },{}],5:[function(require,module,exports){
 "use strict";
 hookRoutingEvents.$inject = ['$rootScope', '$log', '$state'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoutingVar = "$routing";
 function hookRoutingEvents($rootScope, $log, $state) {
     "ngInject";
@@ -5767,7 +5577,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipRouting', ['ui.router']);
 require("./BackDecorator");
 require("./RoutingEvents");
@@ -5775,7 +5584,6 @@ __export(require("./BackDecorator"));
 __export(require("./RoutingEvents"));
 },{"./BackDecorator":4,"./RoutingEvents":5}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.IdentityRootVar = "$identity";
 exports.IdentityChangedEvent = "pipIdentityChanged";
 var IdentityService = (function () {
@@ -5845,7 +5653,6 @@ angular
     .provider('pipIdentity', IdentityProvider);
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionRootVar = "$session";
 exports.SessionOpenedEvent = "pipSessionOpened";
 exports.SessionClosedEvent = "pipSessionClosed";
@@ -6014,7 +5821,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSession', []);
 require("./IdentityService");
 require("./SessionService");
@@ -6022,7 +5828,6 @@ __export(require("./IdentityService"));
 __export(require("./SessionService"));
 },{"./IdentityService":7,"./SessionService":8}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionError_1 = require("./TransactionError");
 var Transaction = (function () {
     function Transaction(scope) {
@@ -6114,7 +5919,6 @@ var Transaction = (function () {
 exports.Transaction = Transaction;
 },{"./TransactionError":11}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionError = (function () {
     function TransactionError(error) {
         if (error != null)
@@ -6166,7 +5970,6 @@ var TransactionError = (function () {
 exports.TransactionError = TransactionError;
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Transaction_1 = require("./Transaction");
 var TransactionService = (function () {
     function TransactionService() {
@@ -6195,7 +5998,6 @@ angular
 },{"./Transaction":10}],13:[function(require,module,exports){
 "use strict";
 configureTransactionStrings.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function configureTransactionStrings($injector) {
     "ngInject";
     var pipTranslate = $injector.has('pipTranslateProvider')
@@ -6223,7 +6025,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTransaction', []);
 require("./TransactionStrings");
 require("./TransactionError");
@@ -6235,7 +6036,6 @@ __export(require("./Transaction"));
 "use strict";
 translateDirective.$inject = ['pipTranslate'];
 translateHtmlDirective.$inject = ['pipTranslate'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function translateDirective(pipTranslate) {
     "ngInject";
     return {
@@ -6274,7 +6074,6 @@ angular
 "use strict";
 translateFilter.$inject = ['pipTranslate'];
 optionalTranslateFilter.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function translateFilter(pipTranslate) {
     "ngInject";
     return function (key) {
@@ -6295,17 +6094,11 @@ angular
 },{}],17:[function(require,module,exports){
 "use strict";
 initTranslate.$inject = ['pipTranslate'];
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Translation_1 = require("./Translation");
 var PageResetService_1 = require("../utilities/PageResetService");
 exports.LanguageRootVar = "$language";
@@ -6438,7 +6231,6 @@ angular
     .run(initTranslate);
 },{"../utilities/PageResetService":22,"./Translation":18}],18:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Translation = (function () {
     function Translation() {
         this._language = 'en';
@@ -6576,7 +6368,6 @@ exports.Translation = Translation;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTranslate', []);
 require("./Translation");
 require("./TranslateService");
@@ -6586,7 +6377,6 @@ __export(require("./Translation"));
 __export(require("./TranslateService"));
 },{"./TranslateDirective":15,"./TranslateFilter":16,"./TranslateService":17,"./Translation":18}],20:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Codes = (function () {
     function Codes() {
     }
@@ -6608,7 +6398,6 @@ angular
     .service('pipCodes', Codes);
 },{}],21:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Format = (function () {
     function Format() {
         this.cache = {};
@@ -6807,7 +6596,6 @@ angular
 },{}],22:[function(require,module,exports){
 "use strict";
 hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPageEvent = "pipResetPage";
 exports.ResetAreaEvent = "pipResetArea";
 exports.ResetRootVar = "$reset";
@@ -6849,7 +6637,6 @@ angular.module('pipPageReset', [])
     .run(hookResetEvents);
 },{}],23:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ScrollService = (function () {
     function ScrollService() {
     }
@@ -6878,7 +6665,6 @@ angular
     .service('pipScroll', ScrollService);
 },{}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SystemInfo = (function () {
     SystemInfo.$inject = ['$window'];
     function SystemInfo($window) {
@@ -7013,7 +6799,6 @@ angular
     .service('pipSystemInfo', SystemInfo);
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Tags = (function () {
     function Tags() {
     }
@@ -7067,7 +6852,6 @@ angular
     .service('pipTags', Tags);
 },{}],26:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TimerEvent = (function () {
     function TimerEvent(event, timeout) {
         this.event = event;
@@ -7157,7 +6941,6 @@ angular.module('pipTimer', [])
     .service('pipTimer', TimerService);
 },{}],27:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./Format");
 require("./TimerService");
 require("./ScrollService");
@@ -7167,8 +6950,6 @@ require("./SystemInfo");
 require("./PageResetService");
 },{"./Codes":20,"./Format":21,"./PageResetService":22,"./ScrollService":23,"./SystemInfo":24,"./Tags":25,"./TimerService":26}]},{},[3])(3)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -7218,7 +6999,6 @@ require("./PageResetService");
 }
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./refresh_button/RefreshButton");
 require("./toggle_buttons/ToggleButtons");
 require("./fabs/FabTooltipVisibility");
@@ -7427,11 +7207,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[6,1,2,3,4,5])(6)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var MediaService_1 = require("../media/MediaService");
 {
     var AuxPanelDirectiveController = (function () {
@@ -7511,7 +7288,6 @@ var MediaService_1 = require("../media/MediaService");
 },{}],3:[function(require,module,exports){
 "use strict";
 hookAuxPanelEvents.$inject = ['$rootScope', 'pipAuxPanel'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var IAuxPanelService_1 = require("./IAuxPanelService");
 var IAuxPanelService_2 = require("./IAuxPanelService");
 var AuxPanelService = (function () {
@@ -7702,7 +7478,6 @@ angular
     .run(hookAuxPanelEvents);
 },{"./IAuxPanelService":4}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuxPanelChangedEvent = 'pipAuxPanelChanged';
 exports.AuxPanelStateChangedEvent = 'pipAuxPanelStateChanged';
 exports.OpenAuxPanelEvent = 'pipOpenAuxPanel';
@@ -7718,7 +7493,6 @@ exports.AuxPanelConfig = AuxPanelConfig;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipAuxPanel', ['ngMaterial']);
 require("./AuxPanelService");
 require("./AuxPanelPart");
@@ -7729,7 +7503,6 @@ __export(require("./IAuxPanelService"));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLayout', ['wu.masonry', 'pipMedia', 'pipAuxPanel']);
 require("./media/index");
 require("./layouts/MainDirective");
@@ -7742,7 +7515,6 @@ require("./auxpanel/index");
 __export(require("./media/index"));
 },{"./auxpanel/index":5,"./layouts/CardDirective":7,"./layouts/DialogDirective":8,"./layouts/DocumentDirective":9,"./layouts/MainDirective":10,"./layouts/SimpleDirective":11,"./layouts/TilesDirective":12,"./media/index":16}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
 (function () {
@@ -7858,7 +7630,6 @@ var MediaService_1 = require("../media/MediaService");
 })();
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
@@ -7948,7 +7719,6 @@ var MediaService_1 = require("../media/MediaService");
 },{}],12:[function(require,module,exports){
 "use strict";
 tilesDirective.$inject = ['$rootScope'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
@@ -8064,7 +7834,6 @@ angular
     .directive('pipTiles', tilesDirective);
 },{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainResizedEvent = 'pipMainResized';
 exports.LayoutResizedEvent = 'pipLayoutResized';
 var MediaBreakpoints = (function () {
@@ -8099,7 +7868,6 @@ var MediaBreakpointStatuses = (function () {
 exports.MediaBreakpointStatuses = MediaBreakpointStatuses;
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IMediaService_1 = require("./IMediaService");
 exports.MainBreakpoints = new IMediaService_1.MediaBreakpoints(639, 716, 1024, 1439);
 exports.MainBreakpointStatuses = new IMediaService_1.MediaBreakpointStatuses();
@@ -8144,7 +7912,6 @@ angular
 requestFrame.$inject = ['callback'];
 addResizeListener.$inject = ['element', 'listener'];
 removeResizeListener.$inject = ['element', 'listener'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var attachEvent = document.attachEvent;
 var isIE = navigator.userAgent.match(/Trident/);
 function requestFrame(callback) {
@@ -8231,7 +7998,6 @@ exports.removeResizeListener = removeResizeListener;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipMedia', []);
 require("./MediaService");
 require("./ResizeFunctions");
@@ -8241,7 +8007,57 @@ __export(require("./ResizeFunctions"));
 },{"./IMediaService":13,"./MediaService":14,"./ResizeFunctions":15}]},{},[6])(6)
 });
 
-
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSplit', []);
+    thisModule.run(['$rootScope', 'pipSplit', function ($rootScope, pipSplit) {
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+            var splitElements = $('.pip-split');
+            if (splitElements.length > 0) {
+                splitElements.removeClass('pip-transition-forward');
+                splitElements.removeClass('pip-transition-back');
+                if (toState.name != fromState.name) {
+                    if (pipSplit.forwardTransition(toState, fromState)) {
+                        splitElements.addClass('pip-transition-forward');
+                    }
+                    else {
+                        splitElements.addClass('pip-transition-back');
+                    }
+                }
+            }
+        });
+    }]);
+    thisModule.provider('pipSplit', function () {
+        var transitionSequences = [];
+        this.addTransitionSequence = addTransitionSequence;
+        this.$get = function () {
+            return {
+                forwardTransition: forwardTransition
+            };
+        };
+        return;
+        function addTransitionSequence(sequence) {
+            if (!_.isArray(sequence) || sequence.length == 0) {
+                throw new Error('Transition sequence must be an array of state names');
+            }
+            transitionSequences.push(sequence);
+        }
+        function forwardTransition(toState, fromState) {
+            var i, toIndex, fromIndex;
+            for (i = 0; i < transitionSequences.length; i++) {
+                toIndex = transitionSequences[i].indexOf(toState.name),
+                    fromIndex = transitionSequences[i].indexOf(fromState.name);
+                if (toIndex > -1) {
+                    return toIndex > fromIndex;
+                }
+            }
+            return false;
+        }
+    });
+})();
+},{}]},{},[1])(1)
+});
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -8265,7 +8081,6 @@ __export(require("./ResizeFunctions"));
 }
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var DragLink_1 = (function () {
         function DragLink_1($rootScope, $parse, $document, $window, pipDraggable, $scope, $element, $attrs) {
@@ -8294,6 +8109,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             $scope.value = $attrs.ngDrag;
             this._myid = $scope.$id;
             this.onDragStartCallback = $parse($attrs.pipDragStart) || null;
+            this.onDragMoveCallbak = $parse($attrs.pipDragMove) || null;
             this.onDragStopCallback = $parse($attrs.pipDragStop) || null;
             this.onDragSuccessCallback = $parse($attrs.pipDragSuccess) || null;
             this.allowTransform = angular.isDefined($attrs.allowTransform) ? $scope.$eval($attrs.allowTransform) : false;
@@ -8400,7 +8216,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
         };
         DragLink_1.prototype.saveElementStyles = function () {
-            this._elementStyle.left = this.$element.css('css') || 0;
+            this._elementStyle.left = this.$element.css('left') || 0;
             this._elementStyle.top = this.$element.css('top') || 0;
             this._elementStyle.position = this.$element.css('position');
             this._elementStyle.width = this.$element.css('width');
@@ -8504,6 +8320,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 uid: this._myid,
                 dragOffset: this._dragOffset
             });
+            if (this.onDragMoveCallbak) {
+                this.$scope.$apply(function () {
+                    _this.onDragMoveCallbak(_this.$scope, {
+                        $data: _this._data,
+                        $event: angular.extend(evt),
+                    });
+                });
+            }
         };
         DragLink_1.prototype.onrelease = function (evt) {
             var _this = this;
@@ -8633,7 +8457,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var DraggableService = (function () {
     function DraggableService() {
     }
@@ -8654,7 +8477,6 @@ angular
     .service('pipDraggable', DraggableService);
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var DropLink_1 = (function () {
         function DropLink_1($parse, $document, $timeout, pipDraggable, $scope, $element, $attrs) {
@@ -8672,6 +8494,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
             this.onDragStartCallback = $parse($attrs.pipDragStart);
             this.onDragStopCallback = $parse($attrs.pipDragStop);
             this.onDragMoveCallback = $parse($attrs.pipDragMove);
+            this.onEnterCallback = $parse($attrs.pipEnter);
+            this.onLeaveCallback = $parse($attrs.pipLeave);
+            this.onDiactiveCallback = $parse($attrs.pipDiactive);
             this.initialize();
         }
         DropLink_1.prototype.initialize = function () {
@@ -8707,7 +8532,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             var _this = this;
             if (!this._dropEnabled)
                 return;
-            this.isTouching(obj.x, obj.y, obj.element);
+            this.isTouching(obj.x, obj.y, obj.element, evt, obj);
             if (this.$attrs.pipDragStart) {
                 this.$timeout(function () {
                     _this.onDragStartCallback(_this.$scope, {
@@ -8721,7 +8546,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
             var _this = this;
             if (!this._dropEnabled)
                 return;
-            this.isTouching(obj.x, obj.y, obj.element);
+            this.isTouching(obj.x, obj.y, obj.element, evt, obj);
             if (this.$attrs.pipDragMove) {
                 this.$timeout(function () {
                     _this.onDragMoveCallback(_this.$scope, {
@@ -8733,17 +8558,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
         };
         DropLink_1.prototype.onDragEnd = function (evt, obj) {
             var _this = this;
-            if (!this._dropEnabled || this._myid === obj.uid) {
+            if (!this._dropEnabled) {
                 this.updateDragStyles(false, obj.element);
                 return;
             }
-            if (this.isTouching(obj.x, obj.y, obj.element)) {
+            if (this.isTouching(obj.x, obj.y, obj.element, evt, obj)) {
                 if (obj.callback) {
                     obj.callback(obj);
                 }
                 if (this.$attrs.pipDropSuccess) {
                     this.$timeout(function () {
                         _this.onDropCallback(_this.$scope, {
+                            $data: obj.data,
+                            $event: obj,
+                            $target: _this.$scope.$eval(_this.$scope.value)
+                        });
+                    });
+                }
+                if (this.$attrs.pipDiactive) {
+                    this.$timeout(function () {
+                        _this.onDiactiveCallback(_this.$scope, {
                             $data: obj.data,
                             $event: obj,
                             $target: _this.$scope.$eval(_this.$scope.value)
@@ -8761,8 +8595,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }
             this.updateDragStyles(false, obj.element);
         };
-        DropLink_1.prototype.isTouching = function (mouseX, mouseY, dragElement) {
+        DropLink_1.prototype.isTouching = function (mouseX, mouseY, dragElement, evt, obj) {
             var touching = this.hitTest(mouseX, mouseY);
+            if (touching !== this.$scope.isTouching) {
+                if (touching) {
+                    this.onEnterCallback(this.$scope, {
+                        $data: obj.data,
+                        $event: obj,
+                        $target: this.$scope.$eval(this.$scope.value)
+                    });
+                }
+                else {
+                    this.onLeaveCallback(this.$scope, {
+                        $data: obj.data,
+                        $event: obj,
+                        $target: this.$scope.$eval(this.$scope.value)
+                    });
+                }
+            }
             this.$scope.isTouching = touching;
             if (touching) {
                 this._lastDropTouch = this.$element;
@@ -8847,7 +8697,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module("pipDraggable", []);
 require("./DraggableService");
 require("./Drag");
@@ -8999,7 +8848,6 @@ require("./CancelDrag");
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./unsaved_changes/UnsavedChanges");
 require("./shortcuts/index");
 require("./focused/Focused");
@@ -9516,7 +9364,6 @@ __export(require("./shortcuts/index"));
 }
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ShortcutItem = (function () {
     function ShortcutItem() {
     }
@@ -9534,7 +9381,6 @@ var ShortcutsConfig = (function () {
 exports.ShortcutsConfig = ShortcutsConfig;
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var KeyboardEvent = (function () {
     function KeyboardEvent() {
     }
@@ -9739,7 +9585,6 @@ var Shortcut = (function () {
 exports.Shortcut = Shortcut;
 },{}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Shortcut_1 = require("./Shortcut");
 {
     var ShortcutBindingService_1 = (function () {
@@ -9850,7 +9695,6 @@ var Shortcut_1 = require("./Shortcut");
 }
 },{"./Shortcut":12}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ShortcutController = (function () {
     ShortcutController.$inject = ['$element', '$attrs', '$scope', '$log', '$parse', 'pipShortcutBinding'];
     function ShortcutController($element, $attrs, $scope, $log, $parse, pipShortcutBinding) {
@@ -9895,7 +9739,6 @@ var ShortcutController = (function () {
 }
 },{}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IShortcutsService_1 = require("./IShortcutsService");
 exports.ShortcutsChangedEvent = 'pipShortcutsChanged';
 var ShortcutsService = (function () {
@@ -10063,7 +9906,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipShortcuts', ['ngMaterial', 'ui.router']);
 require("./ShortcutBindingService");
 require("./ShortcutsService");
@@ -10116,8 +9958,6 @@ __export(require("./ShortcutsService"));
 }
 },{}]},{},[8])(8)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -10192,7 +10032,6 @@ __export(require("./ShortcutsService"));
 }
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var pipImageSliderController_1 = (function () {
         pipImageSliderController_1.$inject = ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', 'pipImageSlider'];
@@ -10293,7 +10132,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ImageSliderService = (function () {
         ImageSliderService.$inject = ['$timeout'];
@@ -10358,7 +10196,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var SliderButtonController_1 = (function () {
         SliderButtonController_1.$inject = ['$element', 'pipImageSlider'];
@@ -10390,7 +10227,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var SliderIndicatorController_1 = (function () {
         SliderIndicatorController_1.$inject = ['$element', 'pipImageSlider'];
@@ -10423,7 +10259,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service']);
 require("./ImageSlider");
@@ -10432,7 +10267,6 @@ require("./SliderButton");
 require("./SliderIndicator");
 },{"./ImageSlider":3,"./ImageSliderService":4,"./SliderButton":5,"./SliderIndicator":6}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./color_picker/ColorPicker");
 require("./image_slider");
@@ -10673,7 +10507,6 @@ angular.module('pipControls', [
 }
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var PopoverService = (function () {
         PopoverService.$inject = ['$compile', '$rootScope', '$timeout'];
@@ -10716,7 +10549,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipPopover', ['pipPopover.Service']);
 require("./Popover");
 require("./PopoverService");
@@ -10752,7 +10584,6 @@ require("./PopoverService");
 }
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Toast = (function () {
     function Toast() {
     }
@@ -10761,7 +10592,6 @@ var Toast = (function () {
 exports.Toast = Toast;
 },{}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ToastController_1 = (function () {
         function ToastController_1($mdToast, toast, $injector) {
@@ -10936,7 +10766,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],16:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
 require("./ToastService");
 require("./Toast");
@@ -10950,18 +10779,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('color_picker/ColorPicker.html',
     '<ul class="pip-color-picker {{$ctrl.class}}" pip-selected="$ctrl.currentColorIndex" pip-enter-space-press="$ctrl.enterSpacePress($event)"><li tabindex="-1" ng-repeat="color in $ctrl.colors track by color"><md-button tabindex="-1" class="md-icon-button pip-selectable" ng-click="$ctrl.selectColor($index)" aria-label="color" ng-disabled="$ctrl.ngDisabled"><md-icon ng-style="{\'color\': color}" md-svg-icon="icons:{{ color == $ctrl.currentColor ? \'circle\' : \'radio-off\' }}"></md-icon></md-button></li></ul>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipControls.Templates');
-} catch (e) {
-  module = angular.module('pipControls.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('toast/Toast.html',
-    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': vm.toast.type==\'error\', \'pip-column-toast\': vm.toast.actions.length > 1 || vm.actionLenght > 4, \'pip-no-action-toast\': vm.actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="vm.message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="vm.actions.length > 0 || (vm.toast.type==\'error\' && vm.toast.error)"><div class="flex" ng-if="vm.toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="vm.toast.type==\'error\' && vm.toast.error && vm.showDetails" ng-click="vm.onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="vm.onAction(action)" ng-repeat="action in vm.actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
 }]);
 })();
 
@@ -10989,12 +10806,22 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+(function(module) {
+try {
+  module = angular.module('pipControls.Templates');
+} catch (e) {
+  module = angular.module('pipControls.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('toast/Toast.html',
+    '<md-toast class="md-action pip-toast" ng-class="{\'pip-error\': vm.toast.type==\'error\', \'pip-column-toast\': vm.toast.actions.length > 1 || vm.actionLenght > 4, \'pip-no-action-toast\': vm.actionLenght == 0}" style="height:initial; max-height: initial;"><span class="flex-var pip-text" ng-bind-html="vm.message"></span><div class="layout-row layout-align-end-start pip-actions" ng-if="vm.actions.length > 0 || (vm.toast.type==\'error\' && vm.toast.error)"><div class="flex" ng-if="vm.toast.actions.length > 1"></div><md-button class="flex-fixed pip-toast-button" ng-if="vm.toast.type==\'error\' && vm.toast.error && vm.showDetails" ng-click="vm.onDetails()">Details</md-button><md-button class="flex-fixed pip-toast-button" ng-click="vm.onAction(action)" ng-repeat="action in vm.actions" aria-label="{{::action| translate}}">{{::action| translate}}</md-button></div></md-toast>');
+}]);
+})();
+
 
 
 },{}]},{},[17,8])(17)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -11012,7 +10839,6 @@ module.run(['$templateCache', function($templateCache) {
 }
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLists', ['pipTagList']);
 require("./dependencies/TranslateFilter");
 require("./tag_list/TagList");
@@ -11087,8 +10913,6 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[4,1,2,3])(4)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -11216,17 +11040,11 @@ module.run(['$templateCache', function($templateCache) {
 })();
 },{}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var IDateConvertService_1 = require("./IDateConvertService");
 (function () {
     var DateConvert = (function () {
@@ -11442,7 +11260,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
     var DateConvertProvider = (function (_super) {
         __extends(DateConvertProvider, _super);
         function DateConvertProvider() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            return _super.apply(this, arguments) || this;
         }
         DateConvertProvider.prototype.$get = function () {
             "ngInject";
@@ -11496,7 +11314,6 @@ formatTodayDateShortTimeShortFilter.$inject = ['pipDateFormat'];
 formatMillisecondsToSecondsFilter.$inject = ['pipDateFormat'];
 formatElapsedIntervalFilter.$inject = ['pipDateFormat'];
 getDateJSONFilter.$inject = ['pipDateConvert'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function formatTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, format) {
@@ -11766,17 +11583,11 @@ angular
     .filter('formatElapsedInterval', formatElapsedIntervalFilter);
 },{}],4:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var IDateConvertService_1 = require("./IDateConvertService");
 (function () {
     var DateFormat = (function () {
@@ -12189,7 +12000,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
     var DateFormatProvider = (function (_super) {
         __extends(DateFormatProvider, _super);
         function DateFormatProvider() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            return _super.apply(this, arguments) || this;
         }
         DateFormatProvider.prototype.$get = function () {
             "ngInject";
@@ -12205,7 +12016,6 @@ var IDateConvertService_1 = require("./IDateConvertService");
 })();
 },{"./IDateConvertService":5}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var DateRangeType = (function () {
     function DateRangeType() {
     }
@@ -12220,13 +12030,11 @@ DateRangeType.All = ['year', 'month', 'week', 'isoweek', 'day'];
 exports.DateRangeType = DateRangeType;
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],7:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipDate.Common', [
     'pipDate.Convert',
     'pipDate.Format',
@@ -12669,7 +12477,6 @@ angular.module('pipDates', [
 })();
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.IntervalTimeRange = 30;
 exports.MinutesInHour = 60;
 exports.HoursInDay = 24;
@@ -13152,21 +12959,13 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[13,2,3,4,5,6,7,8,1,9,10,12,11])(13)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var ConfirmationDialogParams_1 = require("./ConfirmationDialogParams");
 var ConfirmationDialogController = (function (_super) {
     __extends(ConfirmationDialogController, _super);
@@ -13210,7 +13009,6 @@ angular
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
 },{"./ConfirmationDialogParams":2}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogParams = (function () {
     function ConfirmationDialogParams() {
     }
@@ -13219,7 +13017,6 @@ var ConfirmationDialogParams = (function () {
 exports.ConfirmationDialogParams = ConfirmationDialogParams;
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogService = (function () {
     ConfirmationDialogService.$inject = ['$mdDialog'];
     function ConfirmationDialogService($mdDialog) {
@@ -13252,10 +13049,8 @@ angular
     .service('pipConfirmationDialog', ConfirmationDialogService);
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipConfirmationDialog', [
     'ngMaterial',
@@ -13282,17 +13077,11 @@ require("./ConfirmationDialogService");
 }
 },{}],7:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var ErrorDetailsDialogParams_1 = require("./ErrorDetailsDialogParams");
 var ErrorDialogStrings = (function () {
     function ErrorDialogStrings() {
@@ -13314,7 +13103,7 @@ var ErrorDetailsDialogController = (function (_super) {
         _this.strings = new ErrorDialogStrings();
         _this._injector = $injector;
         _this.$mdDialog = $mdDialog;
-        _this.theme = $rootScope[pip.themes.ThemeRootVar];
+        _this.theme = $rootScope['$theme'];
         _this.initTranslate();
         if (!_this.error) {
             _this.error = '<none>';
@@ -13385,7 +13174,6 @@ angular
     .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
 },{"./ErrorDetailsDialogParams":8}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogParams = (function () {
     function ErrorDetailsDialogParams() {
     }
@@ -13394,7 +13182,6 @@ var ErrorDetailsDialogParams = (function () {
 exports.ErrorDetailsDialogParams = ErrorDetailsDialogParams;
 },{}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogService = (function () {
     ErrorDetailsDialogService.$inject = ['$mdDialog'];
     function ErrorDetailsDialogService($mdDialog) {
@@ -13430,7 +13217,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipErrorDetailsDialog', [
     'ngMaterial',
@@ -13446,7 +13232,6 @@ __export(require("./ErrorDetailsDialogParams"));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./error_details");
 require("./information");
@@ -13467,17 +13252,11 @@ __export(require("./options"));
 __export(require("./options_big"));
 },{"./confirmation":5,"./dependencies/TranslateFilter":6,"./error_details":10,"./information":15,"./options":21,"./options_big":27}],12:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var InformationDialogParams_1 = require("./InformationDialogParams");
 var InformationDialogController = (function (_super) {
     __extends(InformationDialogController, _super);
@@ -13528,7 +13307,6 @@ angular
     .controller('pipInformationDialogController', InformationDialogController);
 },{"./InformationDialogParams":13}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogParams = (function () {
     function InformationDialogParams() {
     }
@@ -13537,7 +13315,6 @@ var InformationDialogParams = (function () {
 exports.InformationDialogParams = InformationDialogParams;
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogService = (function () {
     InformationDialogService.$inject = ['$mdDialog'];
     function InformationDialogService($mdDialog) {
@@ -13569,7 +13346,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipInformationDialog', [
     'ngMaterial',
@@ -13582,17 +13358,11 @@ require("./InformationDialogService");
 __export(require("./InformationDialogParams"));
 },{"./InformationDialogController":12,"./InformationDialogParams":13,"./InformationDialogService":14}],16:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var OptionsDialogParams_1 = require("./OptionsDialogParams");
 var OptionsDialogController = (function (_super) {
     __extends(OptionsDialogController, _super);
@@ -13664,7 +13434,6 @@ angular
     .controller('pipOptionsDialogController', OptionsDialogController);
 },{"./OptionsDialogParams":18}],17:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogData = (function () {
     function OptionsDialogData() {
         this.icon = 'star';
@@ -13675,7 +13444,6 @@ var OptionsDialogData = (function () {
 exports.OptionsDialogData = OptionsDialogData;
 },{}],18:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogParams = (function () {
     function OptionsDialogParams() {
     }
@@ -13684,7 +13452,6 @@ var OptionsDialogParams = (function () {
 exports.OptionsDialogParams = OptionsDialogParams;
 },{}],19:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogResult = (function () {
     function OptionsDialogResult() {
     }
@@ -13693,7 +13460,6 @@ var OptionsDialogResult = (function () {
 exports.OptionsDialogResult = OptionsDialogResult;
 },{}],20:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogService = (function () {
     OptionsDialogService.$inject = ['$mdDialog'];
     function OptionsDialogService($mdDialog) {
@@ -13729,7 +13495,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipOptionsDialog', [
     'ngMaterial',
@@ -13746,17 +13511,11 @@ __export(require("./OptionsDialogParams"));
 __export(require("./OptionsDialogResult"));
 },{"./OptionsDialogController":16,"./OptionsDialogData":17,"./OptionsDialogParams":18,"./OptionsDialogResult":19,"./OptionsDialogService":20}],22:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var OptionsBigDialogParams_1 = require("./OptionsBigDialogParams");
 var OptionsBigDialogData_1 = require("./OptionsBigDialogData");
 var OptionsBigDialogController = (function (_super) {
@@ -13841,7 +13600,6 @@ angular
     .controller('pipOptionsBigDialogController', OptionsBigDialogController);
 },{"./OptionsBigDialogData":23,"./OptionsBigDialogParams":24}],23:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogData = (function () {
     function OptionsBigDialogData() {
     }
@@ -13850,7 +13608,6 @@ var OptionsBigDialogData = (function () {
 exports.OptionsBigDialogData = OptionsBigDialogData;
 },{}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogParams = (function () {
     function OptionsBigDialogParams() {
     }
@@ -13859,7 +13616,6 @@ var OptionsBigDialogParams = (function () {
 exports.OptionsBigDialogParams = OptionsBigDialogParams;
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogResult = (function () {
     function OptionsBigDialogResult() {
     }
@@ -13868,7 +13624,6 @@ var OptionsBigDialogResult = (function () {
 exports.OptionsBigDialogResult = OptionsBigDialogResult;
 },{}],26:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogService = (function () {
     OptionsBigDialogService.$inject = ['$mdDialog'];
     function OptionsBigDialogService($mdDialog) {
@@ -13904,7 +13659,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
@@ -13985,11 +13739,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[28,11])(28)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IActionsService_1 = require("./IActionsService");
 var IActionsService_2 = require("./IActionsService");
 var IActionsService_3 = require("./IActionsService");
@@ -14156,17 +13907,11 @@ angular
     .provider('pipActions', ActionsProvider);
 },{"./IActionsService":2}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 exports.ActionsChangedEvent = 'pipActionsChanged';
 exports.SecondaryActionsOpenEvent = 'pipSecondaryActionsOpen';
 var SimpleActionItem = (function () {
@@ -14178,7 +13923,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        return _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -14195,7 +13940,6 @@ var ActionsConfig = (function () {
 exports.ActionsConfig = ActionsConfig;
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var PrimaryActionsController = (function () {
     PrimaryActionsController.$inject = ['$element', '$injector', '$scope', '$rootScope', '$window', '$location', 'pipActions', '$log', '$attrs'];
     function PrimaryActionsController($element, $injector, $scope, $rootScope, $window, $location, pipActions, $log, $attrs) {
@@ -14308,7 +14052,6 @@ var PrimaryActionsChanges = (function () {
 })();
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SecondaryActionsController = (function () {
     SecondaryActionsController.$inject = ['$attrs', '$injector', '$log', '$rootScope', '$window', '$location', 'pipActions', '$element'];
     function SecondaryActionsController($attrs, $injector, $log, $rootScope, $window, $location, pipActions, $element) {
@@ -14441,7 +14184,6 @@ var SecondaryActionsChanges = (function () {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipActions', ['ngMaterial', 'pipNav.Templates', 'ui.router']);
 require("./ActionsService");
 require("./PrimaryActions");
@@ -14449,7 +14191,6 @@ require("./SecondaryActions");
 __export(require("./IActionsService"));
 },{"./ActionsService":1,"./IActionsService":2,"./PrimaryActions":3,"./SecondaryActions":4}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarController = (function () {
     AppBarController.$inject = ['$element', '$rootScope', 'pipAppBar'];
     function AppBarController($element, $rootScope, pipAppBar) {
@@ -14479,7 +14220,6 @@ var AppBarController = (function () {
 }
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarConfig = (function () {
     function AppBarConfig() {
     }
@@ -14488,7 +14228,6 @@ var AppBarConfig = (function () {
 exports.AppBarConfig = AppBarConfig;
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarPartController = (function () {
     AppBarPartController.$inject = ['$scope', '$element', '$attrs', '$log', '$rootScope', 'pipAppBar'];
     function AppBarPartController($scope, $element, $attrs, $log, $rootScope, pipAppBar) {
@@ -14541,7 +14280,6 @@ var AppBarPartController = (function () {
 })();
 },{}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarConfig_1 = require("./AppBarConfig");
 exports.AppBarChangedEvent = 'pipAppBarChanged';
 var AppBarService = (function () {
@@ -14722,7 +14460,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipAppBar', ['ngMaterial', 'pipNav.Templates']);
 require("./AppBarConfig");
@@ -14732,7 +14469,6 @@ require("./AppBarPart");
 __export(require("./AppBarService"));
 },{"./AppBar":6,"./AppBarConfig":7,"./AppBarPart":8,"./AppBarService":9}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbService_1 = require("./BreadcrumbService");
 var BreadcrumbService_2 = require("./BreadcrumbService");
 var SearchService_1 = require("../search/SearchService");
@@ -14831,7 +14567,6 @@ angular
     .component('pipBreadcrumb', breadcrumb);
 },{"../search/SearchService":35,"./BreadcrumbService":13}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbItem = (function () {
     function BreadcrumbItem() {
         this.title = null;
@@ -14849,7 +14584,6 @@ var BreadcrumbConfig = (function () {
 exports.BreadcrumbConfig = BreadcrumbConfig;
 },{}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbConfig_1 = require("./BreadcrumbConfig");
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
 exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
@@ -14947,14 +14681,12 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate']);
 require("./Breadcrumb");
 require("./BreadcrumbService");
 __export(require("./BreadcrumbService"));
 },{"./Breadcrumb":11,"./BreadcrumbService":13}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavService = (function () {
     NavService.$inject = ['$injector'];
     function NavService($injector) {
@@ -15084,7 +14816,6 @@ angular
 }
 },{}],18:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var NavHeaderController = (function () {
         NavHeaderController.$inject = ['$element', '$scope', '$log', '$rootScope', '$timeout', 'pipNavHeader', 'navConstant'];
@@ -15225,7 +14956,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],19:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavHeaderConfig = (function () {
     function NavHeaderConfig() {
     }
@@ -15235,7 +14965,6 @@ exports.NavHeaderConfig = NavHeaderConfig;
 ;
 },{}],20:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavHeaderConfig_1 = require("./NavHeaderConfig");
 exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
 var NavHeaderService = (function () {
@@ -15450,17 +15179,14 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
 require("./NavHeaderService");
 require("./NavHeader");
 __export(require("./NavHeaderService"));
 },{"./NavHeader":18,"./NavHeaderService":20}],22:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],23:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavService_1 = require("../sidenav/SideNavService");
 var NavIconService_1 = require("./NavIconService");
 var NavIconBindings = {
@@ -15534,7 +15260,6 @@ angular
     .component('pipNavIcon', NavIcon);
 },{"../sidenav/SideNavService":39,"./NavIconService":25}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavIconConfig = (function () {
     function NavIconConfig() {
     }
@@ -15544,7 +15269,6 @@ exports.NavIconConfig = NavIconConfig;
 ;
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavIconConfig_1 = require("./NavIconConfig");
 exports.NavIconClickedEvent = 'pipNavIconClicked';
 exports.NavIconChangedEvent = 'pipNavIconChanged';
@@ -15668,7 +15392,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavIconConfig");
 require("./INavIconService");
@@ -15681,7 +15404,6 @@ __export(require("./NavIconService"));
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./language/LanguagePickerDirective");
 require("./dropdown/Dropdown");
@@ -15772,7 +15494,6 @@ __export(require("./header"));
 }
 },{}],29:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 (function () {
     var NavMenuController = (function () {
         NavMenuController.$inject = ['$scope', '$window', '$location', '$rootScope', '$timeout', 'pipSideNav', 'pipNavMenu', '$element', '$injector', 'navConstant'];
@@ -15948,7 +15669,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 })();
 },{}],30:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.NavMenuChangedEvent = 'pipNavMenuChanged';
 var NavMenuService = (function () {
     function NavMenuService(config, $rootScope) {
@@ -16052,16 +15772,13 @@ angular
     .provider('pipNavMenu', NavMenuProvider);
 },{}],31:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavMenuService");
 require("./NavMenu");
 },{"./NavMenu":29,"./NavMenuService":30}],32:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],33:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SearchService_1 = require("./SearchService");
 var SearchBarController = (function () {
     SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
@@ -16155,7 +15872,6 @@ angular
     .component('pipSearchBar', SearchBar);
 },{"./SearchService":35}],34:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SearchConfig = (function () {
     function SearchConfig() {
     }
@@ -16164,7 +15880,6 @@ var SearchConfig = (function () {
 exports.SearchConfig = SearchConfig;
 },{}],35:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SearchConfig_1 = require("./SearchConfig");
 exports.OpenSearchEvent = 'pipOpenSearch';
 exports.CloseSearchEvent = 'pipCloseSearch';
@@ -16276,7 +15991,6 @@ angular.module('pipSearchBar')
     .provider('pipSearch', SearchProvider);
 },{"./SearchConfig":34}],36:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./SearchConfig");
 require("./ISearchService");
@@ -16284,7 +15998,6 @@ require("./SearchService");
 require("./SearchBar");
 },{"./ISearchService":32,"./SearchBar":33,"./SearchConfig":34,"./SearchService":35}],37:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavService_1 = require("../sidenav/SideNavService");
 var SideNavState_1 = require("./SideNavState");
 var SideNavController = (function () {
@@ -16501,7 +16214,6 @@ var SideNavBindings = {
 },{}],39:[function(require,module,exports){
 "use strict";
 hookSideNavEvents.$inject = ['$rootScope', 'pipSideNav'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavState_1 = require("./SideNavState");
 exports.SideNavChangedEvent = 'pipSideNavChanged';
 exports.SideNavStateChangedEvent = 'pipSideNavStateChanged';
@@ -16733,7 +16445,6 @@ angular
     .run(hookSideNavEvents);
 },{"./SideNavState":40}],40:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavStateNames = (function () {
     function SideNavStateNames() {
     }
@@ -16808,7 +16519,6 @@ exports.SideNavConfig = SideNavConfig;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates']);
 require("./SideNavState");
 require("./SideNavService");
@@ -16817,7 +16527,6 @@ require("./SideNav");
 __export(require("./SideNavService"));
 },{"./SideNav":37,"./SideNavPart":38,"./SideNavService":39,"./SideNavState":40}],42:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var PipTab = (function () {
     function PipTab() {
     }
@@ -17005,6 +16714,30 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('appbar/AppBar.html',
+    '<md-toolbar class="{{ $ctrl.config.classes.join(\' \') }}" ng-if="$ctrl.config.visible" ng-transclude=""></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('breadcrumb/Breadcrumb.html',
+    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!$ctrl._media(\'xs\')"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span><span class="pip-breadcrumb-item {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" ng-repeat-start="item in $ctrl.config.items" ng-click="$ctrl.onClick(item)" ng-init="stepWidth = 100/($ctrl.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !$ctrl.actionsVisible(item)">{{ item.title | translate }}</span><div ng-if="$last && $ctrl.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-click="$ctrl.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{ item.title | translate }}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="$ctrl.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{ subItem.icon }}"></md-icon><span>{{ subItem.title | translate }}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span></div><div style="position: relative;" ng-if="$ctrl._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="$ctrl.config.items && $ctrl.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span> <span class="breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span> <span ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" class="breadcrumb-accent {{ ($ctrl.config.items && $ctrl.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{ $ctrl.config.items[$ctrl.config.items.length - 1].title | translate }}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="$ctrl.config.items && $ctrl.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.config.items" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0"><md-button ng-click="$ctrl.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{ item.icon }}"></md-icon><span>{{ item.title | translate }}</span></md-button></md-menu-item><md-menu-item ng-if="$ctrl.config.text"><md-button tabindex="5"><span class="text-grey">{{ $ctrl.config.text | translate }}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('actions/PrimaryActions.html',
     '<div pip-focused="" pip-focused-tabindex="2"><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in $ctrl.config.primaryLocalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="$ctrl.clickAction(action, $mdOpenMenu);" tabindex="-1" ng-hide="$ctrl.isHidden(action)" aria-label="{{ action.title | translate }}"><div class="pip-primary-actions-badge" ng-show="action.count > 0">{{ $ctrl.actionCount(action) }}</div><md-icon md-svg-icon="{{ action.icon}}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="$ctrl.isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="$ctrl.clickAction(subAction)">{{ ::subAction.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu><md-menu md-position-mode="target-right target" class="pip-primary-actions" ng-repeat="action in $ctrl.config.primaryGlobalActions"><md-button class="pip-primary-actions-action md-icon-button pip-focusable" ng-click="$ctrl.clickAction(action, $mdOpenMenu);" ng-hide="$ctrl.isHidden(action)" tabindex="-1" aria-label="{{ action.title | translate }}"><div class="pip-primary-actions-badge color-badge-bg" ng-show="action.count > 0">{{ $ctrl.actionCount(action) }}</div><md-icon md-svg-icon="{{ action.icon }}"></md-icon></md-button><md-menu-content width="3"><md-menu-item ng-repeat-start="subAction in action.subActions" ng-if="!subAction.divider" ng-hide="$ctrl.isHidden(subAction)"><md-button class="pip-focusable" ng-hide="subAction.divider" tabindex="-1" ng-click="$ctrl.clickAction(subAction)">{{ subAction.title | translate }}</md-button></md-menu-item><md-menu-divider ng-if="subAction.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div>');
 }]);
@@ -17029,56 +16762,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('appbar/AppBar.html',
-    '<md-toolbar class="{{ $ctrl.config.classes.join(\' \') }}" ng-if="$ctrl.config.visible" ng-transclude=""></md-toolbar>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('dropdown/Dropdown.html',
     '<md-toolbar class="md-subhead color-primary-bg {{ $ctrl.themeClass}}" ng-if="$ctrl.show()" ng-class="{\'md-whiteframe-3dp\': $ctrl.media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="$ctrl.selectedIndex" tabindex="15" ng-disabled="$ctrl.disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.selectedIndex)"><md-option ng-repeat="action in $ctrl.actions" value="{{ ::$index }}" ng-selected="$ctrl.activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!$ctrl._media(\'xs\')"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span><span class="pip-breadcrumb-item {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" ng-repeat-start="item in $ctrl.config.items" ng-click="$ctrl.onClick(item)" ng-init="stepWidth = 100/($ctrl.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !$ctrl.actionsVisible(item)">{{ item.title | translate }}</span><div ng-if="$last && $ctrl.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-click="$ctrl.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{ item.title | translate }}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="$ctrl.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{ subItem.icon }}"></md-icon><span>{{ subItem.title | translate }}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span></div><div style="position: relative;" ng-if="$ctrl._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="$ctrl.config.items && $ctrl.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span> <span class="breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span> <span ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" class="breadcrumb-accent {{ ($ctrl.config.items && $ctrl.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{ $ctrl.config.items[$ctrl.config.items.length - 1].title | translate }}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="$ctrl.config.items && $ctrl.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.config.items" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0"><md-button ng-click="$ctrl.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{ item.icon }}"></md-icon><span>{{ item.title | translate }}</span></md-button></md-menu-item><md-menu-item ng-if="$ctrl.config.text"><md-button tabindex="5"><span class="text-grey">{{ $ctrl.config.text | translate }}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('language/LanguagePicker.html',
-    '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{ $ctrl.value | translate }}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in $ctrl.languages"><md-button ng-click="$ctrl.onLanguageClick(language)" tabindex="7">{{ language | translate }}</md-button></md-menu-item></md-menu-content></md-menu>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('icon/NavIcon.html',
-    '<md-button class="md-icon-button pip-nav-icon" ng-if="$ctrl.config.type != \'none\'" ng-class="$ctrl.config.class" ng-click="$ctrl.onNavIconClick()" tabindex="{{ $ctrl.config.type==\'menu\' || $ctrl.config.type==\'back\' ? 4 : -1 }}" aria-label="menu"><md-icon ng-if="$ctrl.config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{ $ctrl.config.imageUrl }}" ng-if="$ctrl.config.type==\'image\'" height="24" width="24"><md-icon ng-if="$ctrl.config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="$ctrl.config.type==\'icon\'" md-svg-icon="{{ $ctrl.config.icon }}"></md-icon></md-button>');
 }]);
 })();
 
@@ -17101,8 +16786,20 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
+  $templateCache.put('icon/NavIcon.html',
+    '<md-button class="md-icon-button pip-nav-icon" ng-if="$ctrl.config.type != \'none\'" ng-class="$ctrl.config.class" ng-click="$ctrl.onNavIconClick()" tabindex="{{ $ctrl.config.type==\'menu\' || $ctrl.config.type==\'back\' ? 4 : -1 }}" aria-label="menu"><md-icon ng-if="$ctrl.config.type==\'menu\'" md-svg-icon="icons:menu"></md-icon><img ng-src="{{ $ctrl.config.imageUrl }}" ng-if="$ctrl.config.type==\'image\'" height="24" width="24"><md-icon ng-if="$ctrl.config.type==\'back\'" md-svg-icon="icons:arrow-left"></md-icon><md-icon ng-if="$ctrl.config.type==\'icon\'" md-svg-icon="{{ $ctrl.config.icon }}"></md-icon></md-button>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('language/LanguagePicker.html',
+    '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{ $ctrl.value | translate }}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in $ctrl.languages"><md-button ng-click="$ctrl.onLanguageClick(language)" tabindex="7">{{ language | translate }}</md-button></md-menu-item></md-menu-content></md-menu>');
 }]);
 })();
 
@@ -17125,6 +16822,18 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('sidenav/SideNav.html',
     '<md-sidenav class="md-sidenav-left" md-is-locked-open="$ctrl.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
 }]);
@@ -17137,8 +16846,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+  $templateCache.put('tabs/Tabs.html',
+    '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
 })();
 
@@ -17146,8 +16855,6 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[43,27])(43)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -17282,7 +16989,6 @@ module.run(['$templateCache', function($templateCache) {
 }
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./BootBarnCoolTheme");
 require("./BootBarnWarmTheme");
 require("./BootBarnMonochromeTheme");
@@ -17295,7 +17001,6 @@ angular.module('pipTheme.BootBarn', [
 },{"./BootBarnCoolTheme":1,"./BootBarnMonochromeTheme":2,"./BootBarnWarmTheme":3}],5:[function(require,module,exports){
 "use strict";
 initTheme.$inject = ['pipTheme'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThemeRootVar = "$theme";
 exports.ThemeChangedEvent = "pipThemeChanged";
 exports.ThemeResetPage = "pipResetPage";
@@ -17424,7 +17129,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTheme', ['ngMaterial']);
 require("./ThemeService");
 __export(require("./ThemeService"));
@@ -17703,7 +17407,6 @@ __export(require("./ThemeService"));
 },{}],14:[function(require,module,exports){
 "use strict";
 configureDefaultTheme.$inject = ['$mdThemingProvider'];
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./DefaultBlueTheme");
 require("./DefaultPinkTheme");
 require("./DefaultAmberTheme");
@@ -17732,7 +17435,6 @@ angular
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./common");
 require("./default");
 require("./bootbarn");
@@ -17740,11 +17442,8 @@ __export(require("./common"));
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorPageConfig = (function () {
     function ErrorPageConfig() {
     }
@@ -17816,7 +17515,6 @@ var SupportedBrowsers = (function () {
 exports.SupportedBrowsers = SupportedBrowsers;
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorPageConfig_1 = require("./ErrorPageConfig");
 var ErrorPageConfigService = (function () {
     ErrorPageConfigService.$inject = ['config'];
@@ -17916,7 +17614,6 @@ var ErrorPageConfigProvider = (function () {
 })();
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FormErrorsService = (function () {
     FormErrorsService.$inject = ['$rootScope'];
     function FormErrorsService($rootScope) {
@@ -18018,7 +17715,6 @@ var FormErrorsService = (function () {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipErrors.Pages', [
     'ngMaterial'
@@ -18047,7 +17743,6 @@ __export(require("./error_pages/ErrorPageConfig"));
 configureMaintenanceErrorPageRoute.$inject = ['$stateProvider'];
 initMaintenanceErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
 setMaintenanceErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsMaintenanceState = 'errors_maintenance';
 exports.MaintenanceErrorEvent = 'pipMaintenanceError';
 var MaintenanceError = (function () {
@@ -18146,7 +17841,6 @@ function setMaintenanceErrorPageResources($injector) {
 configureMissingRouteErrorPageRoute.$inject = ['$stateProvider'];
 initMissingRouteErrorPage.$inject = ['$rootScope', '$state', '$injector', 'pipErrorPageConfigService'];
 setMissingRouteErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsMissingRouteState = 'errors_missing_route';
 exports.StateNotFoundEvent = '$stateNotFound';
 var MissingRouteErrorState = (function () {
@@ -18249,7 +17943,6 @@ function setMissingRouteErrorPageResources($injector) {
 configureNoConnectionErrorPageRoute.$inject = ['$injector', '$stateProvider'];
 initNoConnectionErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
 setNoConnectionErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsConnectionState = 'errors_no_connection';
 exports.ErrorsConnectionEvent = 'pipNoConnectionError';
 var NoConnectionError = (function () {
@@ -18364,7 +18057,6 @@ function setNoConnectionErrorPageResources($injector) {
 configureUnknownErrorPageRoute.$inject = ['$injector', '$stateProvider'];
 initUnknownErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
 setUnknownErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsUnknownState = 'errors_unknown';
 exports.ErrorsUnknownEvent = 'pipUnknownError';
 var UnknownErrorDetails = (function () {
@@ -18461,7 +18153,6 @@ function setUnknownErrorPageResources($injector) {
 configureUnsupportedErrorPageRoute.$inject = ['$stateProvider'];
 initUnsupportedErrorPage.$inject = ['$rootScope', '$state', '$injector', 'pipErrorPageConfigService'];
 setUnsupportedErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsUnsupportedState = 'errors_unsupported';
 exports.ErrorsUnsupportedEvent = 'pipUnsupportedError';
 var UnsupportedError = (function () {
@@ -18644,11 +18335,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[12,5])(12)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var BarChartBindings = {
         series: '<pipSeries',
@@ -18844,7 +18532,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ChartColorsService = (function () {
         ChartColorsService.$inject = ['$mdColorPalette'];
@@ -18884,10 +18571,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ChartLegendBindings = {
         series: '<pipSeries',
@@ -18988,7 +18673,6 @@ angular.module('pipCharts', [
 ]);
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LineChartBindings = {
         series: '<pipSeries',
@@ -19451,7 +19135,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var PieChartBindings = {
         series: '<pipSeries',
@@ -19706,22 +19389,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie_chart/PieChart.html',
-    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line_chart/LineChart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': $ctrl.showXAxis, \'visible-y-axis\': $ctrl.showYAxis}">\n' +
@@ -19744,12 +19411,26 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie_chart/PieChart.html',
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
+}]);
+})();
+
 
 
 },{}]},{},[8,1,2,3,4,5,6,7])(8)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).locations = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -19899,10 +19580,8 @@ angular.module('pipLocations', [
 }
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LocationEditDialogController_1 = (function () {
         function LocationEditDialogController_1($scope, $rootScope, $timeout, $mdDialog, locationPos, locationName) {
@@ -20091,7 +19770,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 }
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var LocationDialogParams = (function () {
     function LocationDialogParams() {
     }
@@ -20100,12 +19778,10 @@ var LocationDialogParams = (function () {
 exports.LocationDialogParams = LocationDialogParams;
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLocationEditDialog', ['ngMaterial', 'pipLocations.Templates']);
 require("./LocationDialog");
 },{"./LocationDialog":5}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LocationEditBindings = {
         pipLocationName: '=',
@@ -20615,11 +20291,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[11,1,2,4,7,5,6,8,9,10,3])(11)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).files = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ButtonsUpload = (function () {
     function ButtonsUpload() {
     }
@@ -20642,7 +20315,6 @@ exports.ButtonsUpload = ButtonsUpload;
 }
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileFailBindings = {
     buttons: '<?pipButtons',
     name: '<pipName',
@@ -20675,7 +20347,6 @@ angular
     .component('pipFailUpload', fileFailComponent);
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./service/FileUploadService");
 require("./model/FileModel");
 require("./success/FileSuccess");
@@ -20758,7 +20429,6 @@ angular
 }
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState_1 = require("./FileUploadState");
 var FileUploadService = (function () {
     FileUploadService.$inject = ['$http'];
@@ -20801,7 +20471,6 @@ angular
     .service('pipFileUpload', FileUploadService);
 },{"./FileUploadState":8}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState;
 (function (FileUploadState) {
     FileUploadState[FileUploadState["Uploading"] = 0] = "Uploading";
@@ -20810,10 +20479,8 @@ var FileUploadState;
 })(FileUploadState = exports.FileUploadState || (exports.FileUploadState = {}));
 },{}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileStartBindings = {
     buttons: '<?pipButtons',
     name: '<pipName',
@@ -20846,7 +20513,6 @@ angular
     .component('pipStartUpload', fileStartDirective);
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileSuccessBindings = {
     buttons: '=?pipButtons',
     name: '=pipName',
@@ -20872,7 +20538,6 @@ angular
     .component('pipSuccesUpload', fileSuccessDirective);
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadButtons = (function () {
     function FileUploadButtons() {
     }
@@ -21134,2502 +20799,11 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
 });
 
-
-
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dashboard = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var AddTileDialog = (function () {
-    function AddTileDialog() {
-    }
-    return AddTileDialog;
-}());
-exports.AddTileDialog = AddTileDialog;
-var AddTileDialogController = (function () {
-    function AddTileDialogController(groups, activeGroupIndex, widgetList, $mdDialog) {
-        this.activeGroupIndex = activeGroupIndex;
-        this.$mdDialog = $mdDialog;
-        this.totalTiles = 0;
-        this.activeGroupIndex = _.isNumber(activeGroupIndex) ? activeGroupIndex : -1;
-        this.defaultTiles = _.cloneDeep(widgetList);
-        this.groups = _.map(groups, function (group) {
-            return group['title'];
-        });
-    }
-    AddTileDialogController.prototype.add = function () {
-        this.$mdDialog.hide({
-            groupIndex: this.activeGroupIndex,
-            widgets: this.defaultTiles
-        });
-    };
-    ;
-    AddTileDialogController.prototype.cancel = function () {
-        this.$mdDialog.cancel();
-    };
-    ;
-    AddTileDialogController.prototype.encrease = function (groupIndex, widgetIndex) {
-        var widget = this.defaultTiles[groupIndex][widgetIndex];
-        widget.amount++;
-        this.totalTiles++;
-    };
-    ;
-    AddTileDialogController.prototype.decrease = function (groupIndex, widgetIndex) {
-        var widget = this.defaultTiles[groupIndex][widgetIndex];
-        widget.amount = widget.amount ? widget.amount - 1 : 0;
-        this.totalTiles = this.totalTiles ? this.totalTiles - 1 : 0;
-    };
-    ;
-    return AddTileDialogController;
-}());
-exports.AddTileDialogController = AddTileDialogController;
-},{}],2:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var AddTileDialogController_1 = require("./AddTileDialogController");
-{
-    var setTranslations = function ($injector) {
-        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
-        if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                DASHBOARD_ADD_TILE_DIALOG_TITLE: 'Add component',
-                DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS: 'Use "Enter" or "+" buttons on keyboard to encrease and "Delete" or "-" to decrease tiles amount',
-                DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP: 'Create new group'
-            });
-            pipTranslate.setTranslations('ru', {
-                DASHBOARD_ADD_TILE_DIALOG_TITLE: 'Добавить компонент',
-                DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS: 'Используйте "Enter" или "+" клавиши на клавиатуре чтобы увеличить и "Delete" or "-" чтобы уменшить количество тайлов',
-                DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP: 'Создать новую группу'
-            });
-        }
-    };
-    setTranslations.$inject = ['$injector'];
-    var AddTileDialogService_1 = (function () {
-        function AddTileDialogService_1(widgetList, $mdDialog) {
-            this.widgetList = widgetList;
-            this.$mdDialog = $mdDialog;
-        }
-        AddTileDialogService_1.prototype.show = function (groups, activeGroupIndex) {
-            var _this = this;
-            return this.$mdDialog
-                .show({
-                templateUrl: 'add_tile_dialog/AddTile.html',
-                bindToController: true,
-                controller: AddTileDialogController_1.AddTileDialogController,
-                controllerAs: 'dialogCtrl',
-                clickOutsideToClose: true,
-                resolve: {
-                    groups: function () {
-                        return groups;
-                    },
-                    activeGroupIndex: function () {
-                        return activeGroupIndex;
-                    },
-                    widgetList: function () {
-                        return _this.widgetList;
-                    }
-                }
-            });
-        };
-        ;
-        return AddTileDialogService_1;
-    }());
-    var AddTileDialogProvider = (function () {
-        function AddTileDialogProvider() {
-            this._widgetList = null;
-            this.configWidgetList = function (list) {
-                this._widgetList = list;
-            };
-        }
-        AddTileDialogProvider.prototype.$get = ['$mdDialog', function ($mdDialog) {
-            "ngInject";
-            if (this._service == null)
-                this._service = new AddTileDialogService_1(this._widgetList, $mdDialog);
-            return this._service;
-        }];
-        return AddTileDialogProvider;
-    }());
-    angular
-        .module('pipAddDashboardTileDialog')
-        .config(setTranslations)
-        .provider('pipAddTileDialog', AddTileDialogProvider);
-}
-},{"./AddTileDialogController":1}],3:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-angular
-    .module('pipAddDashboardTileDialog', ['ngMaterial']);
-require("./AddTileDialogController");
-require("./AddTileProvider");
-},{"./AddTileDialogController":1,"./AddTileProvider":2}],4:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MenuTileService_1 = require("../menu_tile/MenuTileService");
-{
-    var CalendarTileController = (function (_super) {
-        __extends(CalendarTileController, _super);
-        function CalendarTileController(pipTileConfigDialogService) {
-            var _this = _super.call(this) || this;
-            _this.pipTileConfigDialogService = pipTileConfigDialogService;
-            if (_this.options) {
-                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
-                _this.menu.push({
-                    title: 'Configurate',
-                    click: function () {
-                        _this.onConfigClick();
-                    }
-                });
-                _this.options.date = _this.options.date || new Date();
-                _this.color = _this.options.color || 'blue';
-            }
-            return _this;
-        }
-        CalendarTileController.prototype.onConfigClick = function () {
-            var _this = this;
-            this.pipTileConfigDialogService.show({
-                dialogClass: 'pip-calendar-config',
-                locals: {
-                    color: this.color,
-                    size: this.options.size,
-                    date: this.options.date,
-                },
-                extensionUrl: 'calendar_tile/ConfigDialogExtension.html'
-            }, function (result) {
-                _this.changeSize(result.size);
-                _this.color = result.color;
-                _this.options.color = result.color;
-                _this.options.date = result.date;
-            });
-        };
-        return CalendarTileController;
-    }(MenuTileService_1.MenuTileService));
-    var CalendarTile = {
-        bindings: {
-            options: '=pipOptions',
-        },
-        controller: CalendarTileController,
-        templateUrl: 'calendar_tile/CalendarTile.html'
-    };
-    angular
-        .module('pipDashboard')
-        .component('pipCalendarTile', CalendarTile);
-}
-},{"../menu_tile/MenuTileService":17}],5:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var DashboardTile = (function () {
-    function DashboardTile() {
-    }
-    return DashboardTile;
-}());
-exports.DashboardTile = DashboardTile;
-},{}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var TileColors = (function () {
-    function TileColors() {
-    }
-    return TileColors;
-}());
-TileColors.all = ['purple', 'green', 'gray', 'orange', 'blue'];
-var TileSizes = (function () {
-    function TileSizes() {
-    }
-    return TileSizes;
-}());
-TileSizes.all = [{
-        name: 'DASHBOARD_TILE_CONFIG_DIALOG_SIZE_SMALL',
-        id: '11'
-    },
-    {
-        name: 'DASHBOARD_TILE_CONFIG_DIALOG_SIZE_WIDE',
-        id: '21'
-    },
-    {
-        name: 'DASHBOARD_TILE_CONFIG_DIALOG_SIZE_LARGE',
-        id: '22'
-    }
-];
-var TileConfigDialogController = (function () {
-    TileConfigDialogController.$inject = ['params', 'extensionUrl', '$mdDialog'];
-    function TileConfigDialogController(params, extensionUrl, $mdDialog) {
-        "ngInject";
-        var _this = this;
-        this.params = params;
-        this.extensionUrl = extensionUrl;
-        this.$mdDialog = $mdDialog;
-        this.colors = TileColors.all;
-        this.sizes = TileSizes.all;
-        this.sizeId = TileSizes.all[0].id;
-        angular.extend(this, this.params);
-        this.sizeId = '' + this.params.size.colSpan + this.params.size.rowSpan;
-        this.onCancel = function () {
-            _this.$mdDialog.cancel();
-        };
-    }
-    TileConfigDialogController.prototype.onApply = function (updatedData) {
-        this['size'].sizeX = Number(this.sizeId.substr(0, 1));
-        this['size'].sizeY = Number(this.sizeId.substr(1, 1));
-        this.$mdDialog.hide(updatedData);
-    };
-    return TileConfigDialogController;
-}());
-exports.TileConfigDialogController = TileConfigDialogController;
-},{}],7:[function(require,module,exports){
-{
-    var TileConfigExtendComponentBindings = {
-        pipExtensionUrl: '<',
-        pipDialogScope: '<',
-        pipApply: '&'
-    };
-    var TileConfigExtendComponentChanges = (function () {
-        function TileConfigExtendComponentChanges() {
-        }
-        return TileConfigExtendComponentChanges;
-    }());
-    var TileConfigExtendComponentController = (function () {
-        function TileConfigExtendComponentController($templateRequest, $compile, $scope, $element, $attrs) {
-            this.$templateRequest = $templateRequest;
-            this.$compile = $compile;
-            this.$scope = $scope;
-            this.$element = $element;
-            this.$attrs = $attrs;
-        }
-        TileConfigExtendComponentController.prototype.$onChanges = function (changes) {
-            var _this = this;
-            if (changes.pipDialogScope) {
-                delete changes.pipDialogScope.currentValue['$scope'];
-                angular.extend(this, changes.pipDialogScope.currentValue);
-            }
-            if (changes.pipExtensionUrl && changes.pipExtensionUrl.currentValue) {
-                this.$templateRequest(changes.pipExtensionUrl.currentValue, false).then(function (html) {
-                    _this.$element.find('pip-extension-point').replaceWith(_this.$compile(html)(_this.$scope));
-                });
-            }
-        };
-        TileConfigExtendComponentController.prototype.onApply = function () {
-            this.pipApply({ updatedData: this });
-        };
-        return TileConfigExtendComponentController;
-    }());
-    var pipTileConfigComponent = {
-        templateUrl: 'config_tile_dialog/ConfigDialogExtendComponent.html',
-        controller: TileConfigExtendComponentController,
-        bindings: TileConfigExtendComponentBindings
-    };
-    angular
-        .module('pipConfigDashboardTileDialog')
-        .component('pipTileConfigExtendComponent', pipTileConfigComponent);
-}
-},{}],8:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var ConfigDialogController_1 = require("./ConfigDialogController");
-{
-    var setTranslations = function ($injector) {
-        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
-        if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                DASHBOARD_TILE_CONFIG_DIALOG_TITLE: 'Edit tile',
-                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_SMALL: 'Small',
-                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_WIDE: 'Wide',
-                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_LARGE: 'Large'
-            });
-            pipTranslate.setTranslations('ru', {
-                DASHBOARD_TILE_CONFIG_DIALOG_TITLE: 'Изменить виджет',
-                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_SMALL: 'Мален.',
-                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_WIDE: 'Широкий',
-                DASHBOARD_TILE_CONFIG_DIALOG_SIZE_LARGE: 'Большой'
-            });
-        }
-    };
-    setTranslations.$inject = ['$injector'];
-    var TileConfigDialogService = (function () {
-        TileConfigDialogService.$inject = ['$mdDialog'];
-        function TileConfigDialogService($mdDialog) {
-            this.$mdDialog = $mdDialog;
-        }
-        TileConfigDialogService.prototype.show = function (params, successCallback, cancelCallback) {
-            this.$mdDialog.show({
-                targetEvent: params.event,
-                templateUrl: params.templateUrl || 'dialogs/tile_config/ConfigDialog.html',
-                controller: ConfigDialogController_1.TileConfigDialogController,
-                bindToController: true,
-                controllerAs: 'vm',
-                locals: {
-                    extensionUrl: params.extensionUrl,
-                    params: params.locals
-                },
-                clickOutsideToClose: true
-            })
-                .then(function (key) {
-                if (successCallback) {
-                    successCallback(key);
-                }
-            }, function () {
-                if (cancelCallback) {
-                    cancelCallback();
-                }
-            });
-        };
-        return TileConfigDialogService;
-    }());
-    angular
-        .module('pipConfigDashboardTileDialog')
-        .config(setTranslations)
-        .service('pipTileConfigDialogService', TileConfigDialogService);
-}
-},{"./ConfigDialogController":6}],9:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-angular
-    .module('pipConfigDashboardTileDialog', ['ngMaterial']);
-require("./ConfigDialogController");
-require("./ConfigDialogService");
-require("./ConfigDialogExtendComponent");
-},{"./ConfigDialogController":6,"./ConfigDialogExtendComponent":7,"./ConfigDialogService":8}],10:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-{
-    var setTranslations = function ($injector) {
-        var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
-        if (pipTranslate) {
-            pipTranslate.setTranslations('en', {
-                DROP_TO_CREATE_NEW_GROUP: 'Drop here to create new group',
-            });
-            pipTranslate.setTranslations('ru', {
-                DROP_TO_CREATE_NEW_GROUP: 'Перетащите сюда для создания новой группы'
-            });
-        }
-    };
-    setTranslations.$inject = ['$injector'];
-    var configureAvailableWidgets = function (pipAddTileDialogProvider) {
-        pipAddTileDialogProvider.configWidgetList([
-            [{
-                    title: 'Event',
-                    icon: 'document',
-                    name: 'event',
-                    amount: 0
-                },
-                {
-                    title: 'Position',
-                    icon: 'location',
-                    name: 'position',
-                    amount: 0
-                }
-            ],
-            [{
-                    title: 'Calendar',
-                    icon: 'date',
-                    name: 'calendar',
-                    amount: 0
-                },
-                {
-                    title: 'Sticky Notes',
-                    icon: 'note-take',
-                    name: 'notes',
-                    amount: 0
-                },
-                {
-                    title: 'Statistics',
-                    icon: 'tr-statistics',
-                    name: 'statistics',
-                    amount: 0
-                }
-            ]
-        ]);
-    };
-    configureAvailableWidgets.$inject = ['pipAddTileDialogProvider'];
-    var draggableOptions = (function () {
-        function draggableOptions() {
-        }
-        return draggableOptions;
-    }());
-    var DEFAULT_GRID_OPTIONS_1 = {
-        tileWidth: 150,
-        tileHeight: 150,
-        gutter: 10,
-        inline: false
-    };
-    var DashboardController = (function () {
-        function DashboardController($scope, $rootScope, $attrs, $element, $timeout, $interpolate, pipAddTileDialog, pipTileTemplate) {
-            var _this = this;
-            this.$rootScope = $rootScope;
-            this.$attrs = $attrs;
-            this.$element = $element;
-            this.$timeout = $timeout;
-            this.$interpolate = $interpolate;
-            this.pipAddTileDialog = pipAddTileDialog;
-            this.pipTileTemplate = pipTileTemplate;
-            this.defaultGroupMenuActions = [{
-                    title: 'Add Component',
-                    callback: function (groupIndex) {
-                        _this.addComponent(groupIndex);
-                    }
-                },
-                {
-                    title: 'Remove',
-                    callback: function (groupIndex) {
-                        _this.removeGroup(groupIndex);
-                    }
-                },
-                {
-                    title: 'Configurate',
-                    callback: function (groupIndex) {
-                        console.log('configurate group with index:', groupIndex);
-                    }
-                }
-            ];
-            this._includeTpl = '<pip-{{ type }}-tile group="groupIndex" index="index"' +
-                'pip-options="$parent.$ctrl.groupedWidgets[groupIndex][\'source\'][index].opts">' +
-                '</pip-{{ type }}-tile>';
-            this.groupMenuActions = this.defaultGroupMenuActions;
-            this.removeGroup = function (groupIndex) {
-                console.log('removeGroup', groupIndex);
-                _this.groupedWidgets.splice(groupIndex, 1);
-            };
-            $element.addClass('pip-scroll');
-            this.draggableGridOptions = this.gridOptions || DEFAULT_GRID_OPTIONS_1;
-            if (this.draggableGridOptions.inline === true) {
-                $element.addClass('inline-grid');
-            }
-            if (this.groupAdditionalActions)
-                angular.extend(this.groupMenuActions, this.groupAdditionalActions);
-            this.widgetsContext = $scope;
-            this.compileWidgets();
-            this.$timeout(function () {
-                _this.$element.addClass('visible');
-            }, 700);
-        }
-        DashboardController.prototype.compileWidgets = function () {
-            var _this = this;
-            _.each(this.groupedWidgets, function (group, groupIndex) {
-                group.removedWidgets = group.removedWidgets || [],
-                    group.source = group.source.map(function (widget, index) {
-                        widget.size = widget.size || {
-                            colSpan: 1,
-                            rowSpan: 1
-                        };
-                        widget.index = index;
-                        widget.groupIndex = groupIndex;
-                        widget.menu = widget.menu || {};
-                        angular.extend(widget.menu, [{
-                                title: 'Remove',
-                                click: function (item, params, object) {
-                                    _this.removeWidget(item, params, object);
-                                }
-                            }]);
-                        return {
-                            opts: widget,
-                            template: _this.pipTileTemplate.getTemplate(widget, _this._includeTpl)
-                        };
-                    });
-            });
-        };
-        DashboardController.prototype.addComponent = function (groupIndex) {
-            var _this = this;
-            this.pipAddTileDialog
-                .show(this.groupedWidgets, groupIndex)
-                .then(function (data) {
-                var activeGroup;
-                if (!data) {
-                    return;
-                }
-                if (data.groupIndex !== -1) {
-                    activeGroup = _this.groupedWidgets[data.groupIndex];
-                }
-                else {
-                    activeGroup = {
-                        title: 'New group',
-                        source: []
-                    };
-                }
-                _this.addWidgets(activeGroup.source, data.widgets);
-                if (data.groupIndex === -1) {
-                    _this.groupedWidgets.push(activeGroup);
-                }
-                _this.compileWidgets();
-            });
-        };
-        ;
-        DashboardController.prototype.addWidgets = function (group, widgets) {
-            widgets.forEach(function (widgetGroup) {
-                widgetGroup.forEach(function (widget) {
-                    if (widget.amount) {
-                        Array.apply(null, Array(widget.amount)).forEach(function () {
-                            group.push({
-                                type: widget.name
-                            });
-                        });
-                    }
-                });
-            });
-        };
-        DashboardController.prototype.removeWidget = function (item, params, object) {
-            var _this = this;
-            this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
-            this.groupedWidgets[params.options.groupIndex].removedWidgets.push(params.options.index);
-            this.groupedWidgets[params.options.groupIndex].source.splice(params.options.index, 1);
-            this.$timeout(function () {
-                _this.groupedWidgets[params.options.groupIndex].removedWidgets = [];
-            });
-        };
-        return DashboardController;
-    }());
-    var Dashboard = {
-        bindings: {
-            gridOptions: '=pipGridOptions',
-            groupAdditionalActions: '=pipGroupActions',
-            groupedWidgets: '=pipGroups'
-        },
-        controller: DashboardController,
-        templateUrl: 'dashboard/Dashboard.html'
-    };
-    angular
-        .module('pipDashboard')
-        .config(configureAvailableWidgets)
-        .config(setTranslations)
-        .component('pipDashboard', Dashboard);
-}
-},{}],11:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var DraggableTileService_1 = require("./DraggableTileService");
-var TileGroupService_1 = require("../tile_group/TileGroupService");
-exports.DEFAULT_TILE_WIDTH = 150;
-exports.DEFAULT_TILE_HEIGHT = 150;
-exports.UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
-var SIMPLE_LAYOUT_COLUMNS_COUNT = 2;
-var DEFAULT_OPTIONS = {
-    tileWidth: exports.DEFAULT_TILE_WIDTH,
-    tileHeight: exports.DEFAULT_TILE_HEIGHT,
-    gutter: 20,
-    container: 'pip-draggable-grid:first-of-type',
-    activeDropzoneClass: 'dropzone-active',
-    groupContaninerSelector: '.pip-draggable-group:not(.fict-group)',
-};
-{
-    var DraggableController = (function () {
-        function DraggableController($scope, $rootScope, $compile, $timeout, $element, pipDragTile, pipTilesGrid, pipMedia) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$rootScope = $rootScope;
-            this.$compile = $compile;
-            this.$timeout = $timeout;
-            this.$element = $element;
-            this.sourceDropZoneElem = null;
-            this.isSameDropzone = true;
-            this.tileGroups = null;
-            this.opts = _.merge({
-                mobileBreakpoint: pipMedia.breakpoints.xs
-            }, DEFAULT_OPTIONS, this.options);
-            this.groups = this.tilesTemplates.map(function (group, groupIndex) {
-                return {
-                    title: group.title,
-                    editingName: false,
-                    index: groupIndex,
-                    source: group.source.map(function (tile) {
-                        var tileScope = _this.createTileScope(tile);
-                        return DraggableTileService_1.IDragTileConstructor(DraggableTileService_1.DragTileService, {
-                            tpl: $compile(tile.template)(tileScope),
-                            options: tile.opts,
-                            size: tile.opts.size
-                        });
-                    })
-                };
-            });
-            $scope.$watch('$ctrl.tilesTemplates', function (newVal) {
-                _this.watch(newVal);
-            }, true);
-            this.initialize();
-            $(window).on('resize', _.debounce(function () {
-                _this.availableWidth = _this.getContainerWidth();
-                _this.availableColumns = _this.getAvailableColumns(_this.availableWidth);
-                _this.tileGroups.forEach(function (group) {
-                    group
-                        .setAvailableColumns(_this.availableColumns)
-                        .generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth))
-                        .setTilesDimensions()
-                        .calcContainerHeight();
-                });
-            }, 50));
-        }
-        DraggableController.prototype.$postLink = function () {
-            this.$container = this.$element;
-        };
-        DraggableController.prototype.watch = function (newVal) {
-            var _this = this;
-            var prevVal = this.groups;
-            var changedGroupIndex = null;
-            if (newVal.length > prevVal.length) {
-                this.addGroup(newVal[newVal.length - 1]);
-                return;
-            }
-            if (newVal.length < prevVal.length) {
-                this.removeGroups(newVal);
-                return;
-            }
-            for (var i = 0; i < newVal.length; i++) {
-                var groupWidgetDiff = prevVal[i].source.length - newVal[i].source.length;
-                if (groupWidgetDiff || (newVal[i].removedWidgets && newVal[i].removedWidgets.length > 0)) {
-                    changedGroupIndex = i;
-                    if (groupWidgetDiff < 0) {
-                        var newTiles = newVal[changedGroupIndex].source.slice(groupWidgetDiff);
-                        _.each(newTiles, function (tile) {
-                            console.log('tile', tile);
-                        });
-                        this.addTilesIntoGroup(newTiles, this.tileGroups[changedGroupIndex], this.groupsContainers[changedGroupIndex]);
-                        this.$timeout(function () {
-                            _this.updateTilesGroups();
-                        });
-                    }
-                    else {
-                        this.removeTiles(this.tileGroups[changedGroupIndex], newVal[changedGroupIndex].removedWidgets, this.groupsContainers[changedGroupIndex]);
-                        this.updateTilesOptions(newVal);
-                        this.$timeout(function () {
-                            _this.updateTilesGroups();
-                        });
-                    }
-                    return;
-                }
-            }
-            if (newVal && this.tileGroups) {
-                this.updateTilesOptions(newVal);
-                this.$timeout(function () {
-                    _this.updateTilesGroups();
-                });
-            }
-        };
-        DraggableController.prototype.onTitleClick = function (group, event) {
-            if (!group.editingName) {
-                group.oldTitle = _.clone(group.title);
-                group.editingName = true;
-                this.$timeout(function () {
-                    $(event.currentTarget.children[0]).focus();
-                });
-            }
-        };
-        DraggableController.prototype.cancelEditing = function (group) {
-            group.title = group.oldTitle;
-        };
-        DraggableController.prototype.onBlurTitleInput = function (group) {
-            var _this = this;
-            this.$timeout(function () {
-                group.editingName = false;
-                _this.$rootScope.$broadcast(exports.UPDATE_GROUPS_EVENT, _this.groups);
-                _this.tilesTemplates[group.index].title = group.title;
-            }, 100);
-        };
-        DraggableController.prototype.onKyepressTitleInput = function (group, event) {
-            if (event.keyCode === 13) {
-                this.onBlurTitleInput(group);
-            }
-        };
-        DraggableController.prototype.updateTilesTemplates = function (updateType, source) {
-            switch (updateType) {
-                case 'addGroup':
-                    if (this.groups.length !== this.tilesTemplates.length) {
-                        this.tilesTemplates.push(source);
-                    }
-                    break;
-                case 'moveTile':
-                    var _a = {
-                        fromIndex: source.from.elem.attributes['data-group-id'].value,
-                        toIndex: source.to.elem.attributes['data-group-id'].value,
-                        tileOptions: source.tile.opts.options,
-                        fromTileIndex: source.tile.opts.options.index
-                    }, fromIndex = _a.fromIndex, toIndex = _a.toIndex, tileOptions = _a.tileOptions, fromTileIndex = _a.fromTileIndex;
-                    this.tilesTemplates[fromIndex].source.splice(fromTileIndex, 1);
-                    this.tilesTemplates[toIndex].source.push({
-                        opts: tileOptions
-                    });
-                    this.reIndexTiles(source.from.elem);
-                    this.reIndexTiles(source.to.elem);
-                    break;
-            }
-        };
-        DraggableController.prototype.createTileScope = function (tile) {
-            var tileScope = this.$rootScope.$new(false, this.tilesContext);
-            tileScope.index = tile.opts.index == undefined ? tile.opts.options.index : tile.opts.index;
-            tileScope.groupIndex = tile.opts.groupIndex == undefined ? tile.opts.options.groupIndex : tile.opts.groupIndex;
-            return tileScope;
-        };
-        DraggableController.prototype.removeTiles = function (group, indexes, container) {
-            var tiles = $(container).find('.pip-draggable-tile');
-            _.each(indexes, function (index) {
-                group.tiles.splice(index, 1);
-                tiles[index].remove();
-            });
-            this.reIndexTiles(container);
-        };
-        DraggableController.prototype.reIndexTiles = function (container, gIndex) {
-            var tiles = $(container).find('.pip-draggable-tile'), groupIndex = gIndex === undefined ? container.attributes['data-group-id'].value : gIndex;
-            _.each(tiles, function (tile, index) {
-                var child = $(tile).children()[0];
-                angular.element(child).scope()['index'] = index;
-                angular.element(child).scope()['groupIndex'] = groupIndex;
-            });
-        };
-        DraggableController.prototype.removeGroups = function (newGroups) {
-            var _this = this;
-            var removeIndexes = [], remain = [], containers = [];
-            _.each(this.groups, function (group, index) {
-                if (_.findIndex(newGroups, function (g) {
-                    return g['title'] === group.title;
-                }) < 0) {
-                    removeIndexes.push(index);
-                }
-                else {
-                    remain.push(index);
-                }
-            });
-            _.each(removeIndexes.reverse(), function (index) {
-                _this.groups.splice(index, 1);
-                _this.tileGroups.splice(index, 1);
-            });
-            _.each(remain, function (index) {
-                containers.push(_this.groupsContainers[index]);
-            });
-            this.groupsContainers = containers;
-            _.each(this.groupsContainers, function (container, index) {
-                _this.reIndexTiles(container, index);
-            });
-        };
-        DraggableController.prototype.addGroup = function (sourceGroup) {
-            var _this = this;
-            var group = {
-                title: sourceGroup.title,
-                source: sourceGroup.source.map(function (tile) {
-                    var tileScope = _this.createTileScope(tile);
-                    return DraggableTileService_1.IDragTileConstructor(DraggableTileService_1.DragTileService, {
-                        tpl: _this.$compile(tile.template)(tileScope),
-                        options: tile.opts,
-                        size: tile.opts.size
-                    });
-                })
-            };
-            this.groups.push(group);
-            if (!this.$scope.$$phase)
-                this.$scope.$apply();
-            this.$timeout(function () {
-                _this.groupsContainers = document.querySelectorAll(_this.opts.groupContaninerSelector);
-                _this.tileGroups.push(TileGroupService_1.ITilesGridConstructor(TileGroupService_1.TilesGridService, group.source, _this.opts, _this.availableColumns, _this.groupsContainers[_this.groupsContainers.length - 1])
-                    .generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth))
-                    .setTilesDimensions()
-                    .calcContainerHeight());
-            });
-            this.updateTilesTemplates('addGroup', sourceGroup);
-        };
-        DraggableController.prototype.addTilesIntoGroup = function (newTiles, group, groupContainer) {
-            var _this = this;
-            newTiles.forEach(function (tile) {
-                var tileScope = _this.createTileScope(tile);
-                var newTile = DraggableTileService_1.IDragTileConstructor(DraggableTileService_1.DragTileService, {
-                    tpl: _this.$compile(tile.template)(tileScope),
-                    options: tile.opts,
-                    size: tile.opts.size
-                });
-                group.addTile(newTile);
-                $('<div>')
-                    .addClass('pip-draggable-tile')
-                    .append(newTile.getCompiledTemplate())
-                    .appendTo(groupContainer);
-            });
-        };
-        DraggableController.prototype.updateTilesOptions = function (optionsGroup) {
-            var _this = this;
-            optionsGroup.forEach(function (optionGroup) {
-                optionGroup.source.forEach(function (tileOptions) {
-                    _this.tileGroups.forEach(function (group) {
-                        group.updateTileOptions(tileOptions.opts);
-                    });
-                });
-            });
-        };
-        DraggableController.prototype.initTilesGroups = function (tileGroups, opts, groupsContainers) {
-            var _this = this;
-            return tileGroups.map(function (group, index) {
-                return TileGroupService_1.ITilesGridConstructor(TileGroupService_1.TilesGridService, group.source, opts, _this.availableColumns, groupsContainers[index])
-                    .generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth))
-                    .setTilesDimensions()
-                    .calcContainerHeight();
-            });
-        };
-        DraggableController.prototype.updateTilesGroups = function (onlyPosition, draggedTile) {
-            var _this = this;
-            this.tileGroups.forEach(function (group) {
-                if (!onlyPosition) {
-                    group.generateGrid(_this.getSingleTileWidthForMobile(_this.availableWidth));
-                }
-                group
-                    .setTilesDimensions(onlyPosition, draggedTile)
-                    .calcContainerHeight();
-            });
-        };
-        DraggableController.prototype.getContainerWidth = function () {
-            var container = this.$container || $('body');
-            return container.width();
-        };
-        DraggableController.prototype.getAvailableColumns = function (availableWidth) {
-            return this.opts.mobileBreakpoint > availableWidth ? SIMPLE_LAYOUT_COLUMNS_COUNT :
-                Math.floor(availableWidth / (this.opts.tileWidth + this.opts.gutter));
-        };
-        DraggableController.prototype.getActiveGroupAndTile = function (elem) {
-            var active = {};
-            this.tileGroups.forEach(function (group) {
-                var foundTile = group.getTileByNode(elem);
-                if (foundTile) {
-                    active['group'] = group;
-                    active['tile'] = foundTile;
-                    return;
-                }
-            });
-            return active;
-        };
-        DraggableController.prototype.getSingleTileWidthForMobile = function (availableWidth) {
-            return this.opts.mobileBreakpoint > availableWidth ? availableWidth / 2 - this.opts.gutter : null;
-        };
-        DraggableController.prototype.onDragStartListener = function (event) {
-            var activeEntities = this.getActiveGroupAndTile(event.target);
-            this.container = $(event.target).parent('.pip-draggable-group').get(0);
-            this.draggedTile = activeEntities['tile'];
-            this.activeDraggedGroup = activeEntities['group'];
-            this.$element.addClass('drag-transfer');
-            this.draggedTile.startDrag();
-        };
-        DraggableController.prototype.onDragMoveListener = function (event) {
-            var _this = this;
-            var target = event.target;
-            var x = (parseFloat(target.style.left) || 0) + event.dx;
-            var y = (parseFloat(target.style.top) || 0) + event.dy;
-            this.containerOffset = this.getContainerOffset();
-            target.style.left = x + 'px';
-            target.style.top = y + 'px';
-            var belowElement = this.activeDraggedGroup.getTileByCoordinates({
-                left: event.pageX - this.containerOffset.left,
-                top: event.pageY - this.containerOffset.top
-            }, this.draggedTile);
-            if (belowElement) {
-                var draggedTileIndex = this.activeDraggedGroup.getTileIndex(this.draggedTile);
-                var belowElemIndex = this.activeDraggedGroup.getTileIndex(belowElement);
-                if ((draggedTileIndex + 1) === belowElemIndex) {
-                    return;
-                }
-                this.activeDraggedGroup
-                    .swapTiles(this.draggedTile, belowElement)
-                    .setTilesDimensions(true, this.draggedTile);
-                this.$timeout(function () {
-                    _this.setGroupContainersHeight();
-                }, 0);
-            }
-        };
-        DraggableController.prototype.onDragEndListener = function () {
-            this.draggedTile.stopDrag(this.isSameDropzone);
-            this.$element.removeClass('drag-transfer');
-            this.activeDraggedGroup = null;
-            this.draggedTile = null;
-        };
-        DraggableController.prototype.getContainerOffset = function () {
-            var containerRect = this.container.getBoundingClientRect();
-            return {
-                left: containerRect.left,
-                top: containerRect.top
-            };
-        };
-        DraggableController.prototype.setGroupContainersHeight = function () {
-            this.tileGroups.forEach(function (tileGroup) {
-                tileGroup.calcContainerHeight();
-            });
-        };
-        DraggableController.prototype.moveTile = function (from, to, tile) {
-            var elem;
-            var movedTile = from.removeTile(tile);
-            var tileScope = this.createTileScope(tile);
-            $(this.groupsContainers[_.findIndex(this.tileGroups, from)])
-                .find(movedTile.getElem())
-                .remove();
-            if (to !== null) {
-                to.addTile(movedTile);
-                elem = this.$compile(movedTile.getElem())(tileScope);
-                $(this.groupsContainers[_.findIndex(this.tileGroups, to)])
-                    .append(elem);
-                this.$timeout(to.setTilesDimensions.bind(to, true));
-            }
-            this.updateTilesTemplates('moveTile', {
-                from: from,
-                to: to,
-                tile: movedTile
-            });
-        };
-        DraggableController.prototype.onDropListener = function (event) {
-            var droppedGroupIndex = event.target.attributes['data-group-id'].value;
-            var droppedGroup = this.tileGroups[droppedGroupIndex];
-            if (this.activeDraggedGroup !== droppedGroup) {
-                this.moveTile(this.activeDraggedGroup, droppedGroup, this.draggedTile);
-            }
-            this.updateTilesGroups(true);
-            this.sourceDropZoneElem = null;
-        };
-        DraggableController.prototype.onDropToFictGroupListener = function (event) {
-            var _this = this;
-            var from = this.activeDraggedGroup;
-            var tile = this.draggedTile;
-            this.addGroup({
-                title: 'New group',
-                source: []
-            });
-            this.$timeout(function () {
-                _this.moveTile(from, _this.tileGroups[_this.tileGroups.length - 1], tile);
-                _this.updateTilesGroups(true);
-            });
-            this.sourceDropZoneElem = null;
-        };
-        DraggableController.prototype.onDropEnterListener = function (event) {
-            if (!this.sourceDropZoneElem) {
-                this.sourceDropZoneElem = event.dragEvent.dragEnter;
-            }
-            if (this.sourceDropZoneElem !== event.dragEvent.dragEnter) {
-                event.dragEvent.dragEnter.classList.add('dropzone-active');
-                $('body').css('cursor', 'copy');
-                this.isSameDropzone = false;
-            }
-            else {
-                $('body').css('cursor', '');
-                this.isSameDropzone = true;
-            }
-        };
-        DraggableController.prototype.onDropDeactivateListener = function (event) {
-            if (this.sourceDropZoneElem !== event.target) {
-                event.target.classList.remove(this.opts.activeDropzoneClass);
-                $('body').css('cursor', '');
-            }
-        };
-        DraggableController.prototype.onDropLeaveListener = function (event) {
-            event.target.classList.remove(this.opts.activeDropzoneClass);
-        };
-        DraggableController.prototype.initialize = function () {
-            var _this = this;
-            this.$timeout(function () {
-                _this.availableWidth = _this.getContainerWidth();
-                _this.availableColumns = _this.getAvailableColumns(_this.availableWidth);
-                _this.groupsContainers = document.querySelectorAll(_this.opts.groupContaninerSelector);
-                _this.tileGroups = _this.initTilesGroups(_this.groups, _this.opts, _this.groupsContainers);
-                interact('.pip-draggable-tile')
-                    .draggable({
-                    autoScroll: {
-                        enabled: true,
-                        container: $('#content').get(0),
-                        speed: 500
-                    },
-                    onstart: function (event) {
-                        _this.onDragStartListener(event);
-                    },
-                    onmove: function (event) {
-                        _this.onDragMoveListener(event);
-                    },
-                    onend: function (event) {
-                        _this.onDragEndListener();
-                    }
-                });
-                interact('.pip-draggable-group.fict-group')
-                    .dropzone({
-                    ondrop: function (event) {
-                        _this.onDropToFictGroupListener(event);
-                    },
-                    ondragenter: function (event) {
-                        _this.onDropEnterListener(event);
-                    },
-                    ondropdeactivate: function (event) {
-                        _this.onDropDeactivateListener(event);
-                    },
-                    ondragleave: function (event) {
-                        _this.onDropLeaveListener(event);
-                    }
-                });
-                interact('.pip-draggable-group')
-                    .dropzone({
-                    ondrop: function (event) {
-                        _this.onDropListener(event);
-                    },
-                    ondragenter: function (event) {
-                        _this.onDropEnterListener(event);
-                    },
-                    ondropdeactivate: function (event) {
-                        _this.onDropDeactivateListener(event);
-                    },
-                    ondragleave: function (event) {
-                        _this.onDropLeaveListener(event);
-                    }
-                });
-                _this.$container
-                    .on('mousedown touchstart', 'md-menu .md-icon-button', function () {
-                    interact('.pip-draggable-tile').draggable(false);
-                    $(_this).trigger('click');
-                })
-                    .on('mouseup touchend', function () {
-                    interact('.pip-draggable-tile').draggable(true);
-                });
-            }, 0);
-        };
-        return DraggableController;
-    }());
-    var DragComponent = {
-        bindings: {
-            tilesTemplates: '=pipTilesTemplates',
-            tilesContext: '=pipTilesContext',
-            options: '=pipDraggableGrid',
-            groupMenuActions: '=pipGroupMenuActions'
-        },
-        templateUrl: 'draggable/Draggable.html',
-        controller: DraggableController
-    };
-    angular.module('pipDraggableTiles')
-        .component('pipDraggableGrid', DragComponent);
-}
-},{"../tile_group/TileGroupService":24,"./DraggableTileService":12}],12:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-function IDragTileConstructor(constructor, options) {
-    return new constructor(options);
-}
-exports.IDragTileConstructor = IDragTileConstructor;
-var DEFAULT_TILE_SIZE = {
-    colSpan: 1,
-    rowSpan: 1
-};
-var DragTileService = (function () {
-    function DragTileService(options) {
-        this.tpl = options.tpl.get(0);
-        this.opts = options;
-        this.size = _.merge({}, DEFAULT_TILE_SIZE, options.size);
-        this.elem = null;
-    }
-    DragTileService.prototype.getSize = function () {
-        return this.size;
-    };
-    DragTileService.prototype.setSize = function (width, height) {
-        this.size.width = width;
-        this.size.height = height;
-        if (this.elem) {
-            this.elem.css({
-                width: width,
-                height: height
-            });
-        }
-        return this;
-    };
-    DragTileService.prototype.setPosition = function (left, top) {
-        this.size.left = left;
-        this.size.top = top;
-        if (this.elem) {
-            this.elem.css({
-                left: left,
-                top: top
-            });
-        }
-        return this;
-    };
-    DragTileService.prototype.getCompiledTemplate = function () {
-        return this.tpl;
-    };
-    ;
-    DragTileService.prototype.updateElem = function (parent) {
-        this.elem = $(this.tpl).parent(parent);
-        return this;
-    };
-    ;
-    DragTileService.prototype.getElem = function () {
-        return this.elem.get(0);
-    };
-    ;
-    DragTileService.prototype.startDrag = function () {
-        this.preview = $('<div>')
-            .addClass('pip-dragged-preview')
-            .css({
-            position: 'absolute',
-            left: this.elem.css('left'),
-            top: this.elem.css('top'),
-            width: this.elem.css('width'),
-            height: this.elem.css('height')
-        });
-        this.elem
-            .addClass('no-animation')
-            .css({
-            zIndex: '9999'
-        })
-            .after(this.preview);
-        return this;
-    };
-    ;
-    DragTileService.prototype.stopDrag = function (isAnimate) {
-        var self = this;
-        if (isAnimate) {
-            this.elem
-                .removeClass('no-animation')
-                .css({
-                left: this.preview.css('left'),
-                top: this.preview.css('top')
-            })
-                .on('transitionend', onTransitionEnd);
-        }
-        else {
-            self.elem
-                .css({
-                left: self.preview.css('left'),
-                top: self.preview.css('top'),
-                zIndex: ''
-            })
-                .removeClass('no-animation');
-            self.preview.remove();
-            self.preview = null;
-        }
-        return this;
-        function onTransitionEnd() {
-            if (self.preview) {
-                self.preview.remove();
-                self.preview = null;
-            }
-            self.elem
-                .css('zIndex', '')
-                .off('transitionend', onTransitionEnd);
-        }
-    };
-    ;
-    DragTileService.prototype.setPreviewPosition = function (coords) {
-        this.preview.css(coords);
-    };
-    ;
-    DragTileService.prototype.getOptions = function () {
-        return this.opts.options;
-    };
-    ;
-    DragTileService.prototype.setOptions = function (options) {
-        _.merge(this.opts.options, options);
-        _.merge(this.size, options.size);
-        return this;
-    };
-    ;
-    return DragTileService;
-}());
-exports.DragTileService = DragTileService;
-angular
-    .module('pipDraggableTiles')
-    .service('pipDragTile', function () {
-    return function (options) {
-        var newTile = new DragTileService(options);
-        return newTile;
-    };
-});
-},{}],13:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-angular.module('pipDraggableTiles', []);
-require("./DraggableTileService");
-require("./Draggable");
-},{"./Draggable":11,"./DraggableTileService":12}],14:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MenuTileService_1 = require("../menu_tile/MenuTileService");
-{
-    var EventTileController = (function (_super) {
-        __extends(EventTileController, _super);
-        function EventTileController($scope, $element, $timeout, pipTileConfigDialogService) {
-            var _this = _super.call(this) || this;
-            _this.$element = $element;
-            _this.$timeout = $timeout;
-            _this.pipTileConfigDialogService = pipTileConfigDialogService;
-            _this.opacity = 0.57;
-            if (_this.options) {
-                if (_this.options.menu)
-                    _this.menu = _.union(_this.menu, _this.options.menu);
-            }
-            _this.menu.push({
-                title: 'Configurate',
-                click: function () {
-                    _this.onConfigClick();
-                }
-            });
-            _this.color = _this.options.color || 'gray';
-            _this.opacity = _this.options.opacity || _this.opacity;
-            _this.drawImage();
-            $scope.$watch(function () {
-                return $element.is(':visible');
-            }, function (newVal) {
-                _this.drawImage();
-            });
-            return _this;
-        }
-        EventTileController.prototype.drawImage = function () {
-            var _this = this;
-            if (this.options.image) {
-                this.$timeout(function () {
-                    _this.onImageLoad(_this.$element.find('img'));
-                }, 500);
-            }
-        };
-        EventTileController.prototype.onConfigClick = function () {
-            var _this = this;
-            this._oldOpacity = _.clone(this.opacity);
-            this.pipTileConfigDialogService.show({
-                dialogClass: 'pip-calendar-config',
-                locals: {
-                    color: this.color,
-                    size: this.options.size || {
-                        colSpan: 1,
-                        rowSpan: 1
-                    },
-                    date: this.options.date,
-                    title: this.options.title,
-                    text: this.options.text,
-                    opacity: this.opacity,
-                    onOpacitytest: function (opacity) {
-                        _this.opacity = opacity;
-                    }
-                },
-                extensionUrl: 'event_tile/ConfigDialogExtension.html'
-            }, function (result) {
-                _this.changeSize(result.size);
-                _this.color = result.color;
-                _this.options.color = result.color;
-                _this.options.date = result.date;
-                _this.options.title = result.title;
-                _this.options.text = result.text;
-                _this.options.opacity = result.opacity;
-            }, function () {
-                _this.opacity = _this._oldOpacity;
-            });
-        };
-        EventTileController.prototype.onImageLoad = function (image) {
-            this.setImageMarginCSS(this.$element.parent(), image);
-        };
-        EventTileController.prototype.changeSize = function (params) {
-            var _this = this;
-            this.options.size.colSpan = params.sizeX;
-            this.options.size.rowSpan = params.sizeY;
-            if (this.options.image) {
-                this.$timeout(function () {
-                    _this.setImageMarginCSS(_this.$element.parent(), _this.$element.find('img'));
-                }, 500);
-            }
-        };
-        EventTileController.prototype.setImageMarginCSS = function ($element, image) {
-            var containerWidth = $element.width ? $element.width() : $element.clientWidth, containerHeight = $element.height ? $element.height() : $element.clientHeight, imageWidth = image[0].naturalWidth || image.width, imageHeight = image[0].naturalHeight || image.height, margin = 0, cssParams = {};
-            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
-                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
-                cssParams['margin-left'] = '' + margin + 'px';
-                cssParams['height'] = '' + containerHeight + 'px';
-                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
-                cssParams['margin-top'] = '';
-            }
-            else {
-                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
-                cssParams['margin-top'] = '' + margin + 'px';
-                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
-                cssParams['width'] = '' + containerWidth + 'px';
-                cssParams['margin-left'] = '';
-            }
-            image.css(cssParams);
-        };
-        return EventTileController;
-    }(MenuTileService_1.MenuTileService));
-    var EventTile = {
-        bindings: {
-            options: '=pipOptions'
-        },
-        controller: EventTileController,
-        templateUrl: 'event_tile/EventTile.html'
-    };
-    angular
-        .module('pipDashboard')
-        .component('pipEventTile', EventTile);
-}
-},{"../menu_tile/MenuTileService":17}],15:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-require("./tile_group/index");
-require("./draggable");
-require("./menu_tile");
-require("./add_tile_dialog");
-require("./config_tile_dialog");
-angular.module('pipDashboard', [
-    'pipDraggableTiles',
-    'pipDraggableTilesGroup',
-    'pipMenuTile',
-    'pipConfigDashboardTileDialog',
-    'pipAddDashboardTileDialog',
-    'pipDashboard.Templates',
-    'pipLayout',
-    'pipLocations',
-    'pipDateTime',
-    'pipCharts',
-    'pipTranslate',
-    'pipControls',
-    'pipButtons'
-]);
-require("./utility/TileTemplateUtility");
-require("./common_tile/Tile");
-require("./calendar_tile/CalendarTile");
-require("./event_tile/EventTile");
-require("./note_tile/NoteTile");
-require("./picture_slider_tile/PictureSliderTile");
-require("./position_tile/PositionTile");
-require("./statistics_tile/StatisticsTile");
-require("./dashboard/Dashboard");
-},{"./add_tile_dialog":3,"./calendar_tile/CalendarTile":4,"./common_tile/Tile":5,"./config_tile_dialog":9,"./dashboard/Dashboard":10,"./draggable":13,"./event_tile/EventTile":14,"./menu_tile":18,"./note_tile/NoteTile":19,"./picture_slider_tile/PictureSliderTile":20,"./position_tile/PositionTile":21,"./statistics_tile/StatisticsTile":22,"./tile_group/index":25,"./utility/TileTemplateUtility":26}],16:[function(require,module,exports){
-{
-    var TileMenu = function () {
-        return {
-            restrict: 'EA',
-            templateUrl: 'menu_tile/MenuTile.html'
-        };
-    };
-    angular
-        .module('pipMenuTile')
-        .directive('pipTileMenu', TileMenu);
-}
-},{}],17:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var Tile_1 = require("../common_tile/Tile");
-var MenuTileService = (function (_super) {
-    __extends(MenuTileService, _super);
-    function MenuTileService() {
-        "ngInject";
-        var _this = _super.call(this) || this;
-        _this.menu = [{
-                title: 'Change Size',
-                action: angular.noop,
-                submenu: [{
-                        title: '1 x 1',
-                        action: 'changeSize',
-                        params: {
-                            sizeX: 1,
-                            sizeY: 1
-                        }
-                    },
-                    {
-                        title: '2 x 1',
-                        action: 'changeSize',
-                        params: {
-                            sizeX: 2,
-                            sizeY: 1
-                        }
-                    },
-                    {
-                        title: '2 x 2',
-                        action: 'changeSize',
-                        params: {
-                            sizeX: 2,
-                            sizeY: 2
-                        }
-                    }
-                ]
-            }];
-        return _this;
-    }
-    MenuTileService.prototype.callAction = function (actionName, params, item) {
-        if (this[actionName]) {
-            this[actionName].call(this, params);
-        }
-        if (item['click']) {
-            item['click'].call(item, params, this);
-        }
-    };
-    ;
-    MenuTileService.prototype.changeSize = function (params) {
-        this.options.size.colSpan = params.sizeX;
-        this.options.size.rowSpan = params.sizeY;
-    };
-    ;
-    return MenuTileService;
-}(Tile_1.DashboardTile));
-exports.MenuTileService = MenuTileService;
-{
-    var MenuTileProvider = (function () {
-        function MenuTileProvider() {
-        }
-        MenuTileProvider.prototype.$get = function () {
-            "ngInject";
-            if (this._service == null)
-                this._service = new MenuTileService();
-            return this._service;
-        };
-        return MenuTileProvider;
-    }());
-    angular
-        .module('pipMenuTile')
-        .provider('pipMenuTile', MenuTileProvider);
-}
-},{"../common_tile/Tile":5}],18:[function(require,module,exports){
-"use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-angular
-    .module('pipMenuTile', []);
-require("./MenuTileDirective");
-require("./MenuTileService");
-__export(require("./MenuTileService"));
-},{"./MenuTileDirective":16,"./MenuTileService":17}],19:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MenuTileService_1 = require("../menu_tile/MenuTileService");
-{
-    var NoteTileController = (function (_super) {
-        __extends(NoteTileController, _super);
-        function NoteTileController(pipTileConfigDialogService) {
-            var _this = _super.call(this) || this;
-            _this.pipTileConfigDialogService = pipTileConfigDialogService;
-            if (_this.options) {
-                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
-            }
-            _this.menu.push({
-                title: 'Configurate',
-                click: function () {
-                    _this.onConfigClick();
-                }
-            });
-            _this.color = _this.options.color || 'orange';
-            return _this;
-        }
-        NoteTileController.prototype.onConfigClick = function () {
-            var _this = this;
-            this.pipTileConfigDialogService.show({
-                locals: {
-                    color: this.color,
-                    size: this.options.size,
-                    title: this.options.title,
-                    text: this.options.text,
-                },
-                extensionUrl: 'note_tile/ConfigDialogExtension.html'
-            }, function (result) {
-                _this.color = result.color;
-                _this.options.color = result.color;
-                _this.changeSize(result.size);
-                _this.options.text = result.text;
-                _this.options.title = result.title;
-            });
-        };
-        return NoteTileController;
-    }(MenuTileService_1.MenuTileService));
-    var NoteTile = {
-        bindings: {
-            options: '=pipOptions'
-        },
-        controller: NoteTileController,
-        templateUrl: 'note_tile/NoteTile.html'
-    };
-    angular
-        .module('pipDashboard')
-        .component('pipNoteTile', NoteTile);
-}
-},{"../menu_tile/MenuTileService":17}],20:[function(require,module,exports){
-'use strict';
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MenuTileService_1 = require("../menu_tile/MenuTileService");
-{
-    var PictureSliderController = (function (_super) {
-        __extends(PictureSliderController, _super);
-        function PictureSliderController($scope, $element, $timeout, pipTileTemplate) {
-            var _this = _super.call(this) || this;
-            _this.$scope = $scope;
-            _this.$element = $element;
-            _this.$timeout = $timeout;
-            _this.pipTileTemplate = pipTileTemplate;
-            _this.animationType = 'fading';
-            _this.animationInterval = 5000;
-            if (_this.options) {
-                _this.animationType = _this.options.animationType || _this.animationType;
-                _this.animationInterval = _this.options.animationInterval || _this.animationInterval;
-            }
-            return _this;
-        }
-        PictureSliderController.prototype.onImageLoad = function ($event) {
-            var _this = this;
-            this.$timeout(function () {
-                _this.pipTileTemplate.setImageMarginCSS(_this.$element.parent(), $event.target);
-            });
-        };
-        PictureSliderController.prototype.changeSize = function (params) {
-            var _this = this;
-            this.options.size.colSpan = params.sizeX;
-            this.options.size.rowSpan = params.sizeY;
-            this.$timeout(function () {
-                _.each(_this.$element.find('img'), function (image) {
-                    _this.pipTileTemplate.setImageMarginCSS(_this.$element.parent(), image);
-                });
-            }, 500);
-        };
-        return PictureSliderController;
-    }(MenuTileService_1.MenuTileService));
-    var PictureSliderTile = {
-        bindings: {
-            options: '=pipOptions'
-        },
-        controller: PictureSliderController,
-        templateUrl: 'picture_slider_tile/PictureSliderTile.html'
-    };
-    angular
-        .module('pipDashboard')
-        .component('pipPictureSliderTile', PictureSliderTile);
-}
-},{"../menu_tile/MenuTileService":17}],21:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MenuTileService_1 = require("../menu_tile/MenuTileService");
-{
-    var PositionTileController = (function (_super) {
-        __extends(PositionTileController, _super);
-        function PositionTileController($scope, $timeout, $element, pipTileConfigDialogService, pipLocationEditDialog) {
-            var _this = _super.call(this) || this;
-            _this.$timeout = $timeout;
-            _this.$element = $element;
-            _this.pipTileConfigDialogService = pipTileConfigDialogService;
-            _this.pipLocationEditDialog = pipLocationEditDialog;
-            _this.showPosition = true;
-            if (_this.options) {
-                if (_this.options.menu)
-                    _this.menu = _.union(_this.menu, _this.options.menu);
-            }
-            _this.menu.push({
-                title: 'Configurate',
-                click: function () {
-                    _this.onConfigClick();
-                }
-            });
-            _this.menu.push({
-                title: 'Change location',
-                click: function () {
-                    _this.openLocationEditDialog();
-                }
-            });
-            _this.options.location = _this.options.location || _this.options.position;
-            $scope.$watch('$ctrl.options.location', function () {
-                _this.reDrawPosition();
-            });
-            $scope.$watch(function () {
-                return $element.is(':visible');
-            }, function (newVal) {
-                if (newVal == true)
-                    _this.reDrawPosition();
-            });
-            return _this;
-        }
-        PositionTileController.prototype.onConfigClick = function () {
-            var _this = this;
-            this.pipTileConfigDialogService.show({
-                dialogClass: 'pip-position-config',
-                locals: {
-                    size: this.options.size,
-                    locationName: this.options.locationName,
-                    hideColors: true,
-                },
-                extensionUrl: 'position_tile/ConfigDialogExtension.html'
-            }, function (result) {
-                _this.changeSize(result.size);
-                _this.options.locationName = result.locationName;
-            });
-        };
-        PositionTileController.prototype.changeSize = function (params) {
-            this.options.size.colSpan = params.sizeX;
-            this.options.size.rowSpan = params.sizeY;
-            this.reDrawPosition();
-        };
-        PositionTileController.prototype.openLocationEditDialog = function () {
-            var _this = this;
-            this.pipLocationEditDialog.show({
-                locationName: this.options.locationName,
-                locationPos: this.options.location
-            }, function (newPosition) {
-                if (newPosition) {
-                    _this.options.location = newPosition.location;
-                    _this.options.locationName = newPosition.locatioName;
-                }
-            });
-        };
-        PositionTileController.prototype.reDrawPosition = function () {
-            var _this = this;
-            this.showPosition = false;
-            this.$timeout(function () {
-                _this.showPosition = true;
-            }, 50);
-        };
-        return PositionTileController;
-    }(MenuTileService_1.MenuTileService));
-    var PositionTile = {
-        bindings: {
-            options: '=pipOptions'
-        },
-        controller: PositionTileController,
-        templateUrl: 'position_tile/PositionTile.html'
-    };
-    angular
-        .module('pipDashboard')
-        .component('pipPositionTile', PositionTile);
-}
-},{"../menu_tile/MenuTileService":17}],22:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MenuTileService_1 = require("../menu_tile/MenuTileService");
-{
-    var SMALL_CHART_1 = 70;
-    var BIG_CHART_1 = 250;
-    var StatisticsTileController = (function (_super) {
-        __extends(StatisticsTileController, _super);
-        function StatisticsTileController($scope, $timeout) {
-            var _this = _super.call(this) || this;
-            _this.reset = false;
-            _this.chartSize = SMALL_CHART_1;
-            _this._$scope = $scope;
-            _this._$timeout = $timeout;
-            if (_this.options) {
-                _this.menu = _this.options.menu ? _.union(_this.menu, _this.options.menu) : _this.menu;
-            }
-            _this.setChartSize();
-            return _this;
-        }
-        StatisticsTileController.prototype.changeSize = function (params) {
-            var _this = this;
-            this.options.size.colSpan = params.sizeX;
-            this.options.size.rowSpan = params.sizeY;
-            this.reset = true;
-            this.setChartSize();
-            this._$timeout(function () {
-                _this.reset = false;
-            }, 500);
-        };
-        StatisticsTileController.prototype.setChartSize = function () {
-            this.chartSize = this.options.size.colSpan == 2 && this.options.size.rowSpan == 2 ? BIG_CHART_1 : SMALL_CHART_1;
-        };
-        return StatisticsTileController;
-    }(MenuTileService_1.MenuTileService));
-    var StatisticsTile = {
-        bindings: {
-            options: '=pipOptions'
-        },
-        controller: StatisticsTileController,
-        templateUrl: 'statistics_tile/StatisticsTile.html'
-    };
-    angular
-        .module('pipDashboard')
-        .component('pipStatisticsTile', StatisticsTile);
-}
-},{"../menu_tile/MenuTileService":17}],23:[function(require,module,exports){
-{
-    function DraggableTileLink($scope, $elem, $attr) {
-        var docFrag = document.createDocumentFragment(), group = $scope.$eval($attr.pipDraggableTiles);
-        group.forEach(function (tile) {
-            var tpl = wrapComponent(tile.getCompiledTemplate());
-            docFrag.appendChild(tpl);
-        });
-        $elem.append(docFrag);
-        function wrapComponent(elem) {
-            return $('<div>')
-                .addClass('pip-draggable-tile')
-                .append(elem)
-                .get(0);
-        }
-    }
-    function DraggableTiles() {
-        return {
-            restrict: 'A',
-            link: function ($scope, $elem, $attr) {
-                new DraggableTileLink($scope, $elem, $attr);
-            }
-        };
-    }
-    angular
-        .module('pipDraggableTilesGroup')
-        .directive('pipDraggableTiles', DraggableTiles);
-}
-},{}],24:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-function ITilesGridConstructor(constructor, tiles, options, columns, elem) {
-    return new constructor(tiles, options, columns, elem);
-}
-exports.ITilesGridConstructor = ITilesGridConstructor;
-var MOBILE_LAYOUT_COLUMNS = 2;
-var TilesGridService = (function () {
-    function TilesGridService(tiles, options, columns, elem) {
-        this.gridCells = [];
-        this.inline = false;
-        this.tiles = tiles;
-        this.opts = options;
-        this.columns = columns || 0;
-        this.elem = elem;
-        this.gridCells = [];
-        this.inline = options.inline || false;
-        this.isMobileLayout = columns === MOBILE_LAYOUT_COLUMNS;
-    }
-    TilesGridService.prototype.addTile = function (tile) {
-        this.tiles.push(tile);
-        if (this.tiles.length === 1) {
-            this.generateGrid();
-        }
-        return this;
-    };
-    ;
-    TilesGridService.prototype.getCellByPosition = function (row, col) {
-        return this.gridCells[row][col];
-    };
-    ;
-    TilesGridService.prototype.getCells = function (prevCell, rowSpan, colSpan) {
-        if (this.isMobileLayout) {
-            return this.getAvailableCellsMobile(prevCell, rowSpan, colSpan);
-        }
-        else {
-            return this.getAvailableCellsDesktop(prevCell, rowSpan, colSpan);
-        }
-    };
-    ;
-    TilesGridService.prototype.getAvailableCellsDesktop = function (prevCell, rowSpan, colSpan) {
-        var leftCornerCell;
-        var rightCornerCell;
-        var basicCol = prevCell && prevCell.col || 0;
-        var basicRow = this.getBasicRow(prevCell);
-        if (colSpan === 1 && rowSpan === 1) {
-            var gridCopy = this.gridCells.slice();
-            if (!prevCell) {
-                leftCornerCell = gridCopy[0][0];
-            }
-            else {
-                leftCornerCell = this.getCell(gridCopy, basicRow, basicCol, this.columns);
-                if (!leftCornerCell) {
-                    var rowShift = this.isMobileLayout ? 1 : 2;
-                    leftCornerCell = this.getCell(gridCopy, basicRow + rowShift, 0, this.columns);
-                }
-            }
-        }
-        if (colSpan === 2 && rowSpan === 1) {
-            var prevTileSize = prevCell && prevCell.elem.size || null;
-            if (!prevTileSize) {
-                leftCornerCell = this.getCellByPosition(basicRow, basicCol);
-                rightCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
-            }
-            else if (prevTileSize.colSpan === 2 && prevTileSize.rowSpan === 2) {
-                if (this.columns - basicCol - 2 > 0) {
-                    leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
-                    rightCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
-                }
-                else {
-                    leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
-                    rightCornerCell = this.getCellByPosition(basicRow + 2, 1);
-                }
-            }
-            else if (prevTileSize.colSpan === 2 && prevTileSize.rowSpan === 1) {
-                if (prevCell.row % 2 === 0) {
-                    leftCornerCell = this.getCellByPosition(basicRow + 1, basicCol - 1);
-                    rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol);
-                }
-                else {
-                    if (this.columns - basicCol - 3 >= 0) {
-                        leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
-                        rightCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
-                    }
-                    else {
-                        leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
-                        rightCornerCell = this.getCellByPosition(basicRow + 2, 1);
-                    }
-                }
-            }
-            else if (prevTileSize.colSpan === 1 && prevTileSize.rowSpan === 1) {
-                if (this.columns - basicCol - 3 >= 0) {
-                    if (this.isCellFree(basicRow, basicCol + 1)) {
-                        leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
-                        rightCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
-                    }
-                    else {
-                        leftCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
-                        rightCornerCell = this.getCellByPosition(basicRow, basicCol + 3);
-                    }
-                }
-                else {
-                    leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
-                    rightCornerCell = this.getCellByPosition(basicRow + 2, 1);
-                }
-            }
-        }
-        if (!prevCell && rowSpan === 2 && colSpan === 2) {
-            leftCornerCell = this.getCellByPosition(basicRow, basicCol);
-            rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol + 1);
-        }
-        else if (rowSpan === 2 && colSpan === 2) {
-            if (this.columns - basicCol - 2 > 0) {
-                if (this.isCellFree(basicRow, basicCol + 1)) {
-                    leftCornerCell = this.getCellByPosition(basicRow, basicCol + 1);
-                    rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol + 2);
-                }
-                else {
-                    leftCornerCell = this.getCellByPosition(basicRow, basicCol + 2);
-                    rightCornerCell = this.getCellByPosition(basicRow + 1, basicCol + 3);
-                }
-            }
-            else {
-                leftCornerCell = this.getCellByPosition(basicRow + 2, 0);
-                rightCornerCell = this.getCellByPosition(basicRow + 3, 1);
-            }
-        }
-        return {
-            start: leftCornerCell,
-            end: rightCornerCell
-        };
-    };
-    ;
-    TilesGridService.prototype.getCell = function (src, basicRow, basicCol, columns) {
-        var cell, col, row;
-        if (this.isMobileLayout) {
-            for (col = basicCol; col < columns; col++) {
-                if (!src[basicRow][col].elem) {
-                    cell = src[basicRow][col];
-                    break;
-                }
-            }
-            return cell;
-        }
-        for (col = basicCol; col < columns; col++) {
-            for (row = 0; row < 2; row++) {
-                if (!src[row + basicRow][col].elem) {
-                    cell = src[row + basicRow][col];
-                    break;
-                }
-            }
-            if (cell) {
-                return cell;
-            }
-        }
-    };
-    ;
-    TilesGridService.prototype.getAvailableCellsMobile = function (prevCell, rowSpan, colSpan) {
-        var leftCornerCell;
-        var rightCornerCell;
-        var basicRow = this.getBasicRow(prevCell);
-        var basicCol = prevCell && prevCell.col || 0;
-        if (colSpan === 1 && rowSpan === 1) {
-            var gridCopy = this.gridCells.slice();
-            if (!prevCell) {
-                leftCornerCell = gridCopy[0][0];
-            }
-            else {
-                leftCornerCell = this.getCell(gridCopy, basicRow, basicCol, this.columns);
-                if (!leftCornerCell) {
-                    var rowShift = this.isMobileLayout ? 1 : 2;
-                    leftCornerCell = this.getCell(gridCopy, basicRow + rowShift, 0, this.columns);
-                }
-            }
-        }
-        if (!prevCell) {
-            leftCornerCell = this.getCellByPosition(basicRow, 0);
-            rightCornerCell = this.getCellByPosition(basicRow + rowSpan - 1, 1);
-        }
-        else if (colSpan === 2) {
-            leftCornerCell = this.getCellByPosition(basicRow + 1, 0);
-            rightCornerCell = this.getCellByPosition(basicRow + rowSpan, 1);
-        }
-        return {
-            start: leftCornerCell,
-            end: rightCornerCell
-        };
-    };
-    ;
-    TilesGridService.prototype.getBasicRow = function (prevCell) {
-        var basicRow;
-        if (this.isMobileLayout) {
-            if (prevCell) {
-                basicRow = prevCell && prevCell.row || 0;
-            }
-            else {
-                basicRow = 0;
-            }
-        }
-        else {
-            if (prevCell) {
-                basicRow = prevCell.row % 2 === 0 ? prevCell.row : prevCell.row - 1;
-            }
-            else {
-                basicRow = 0;
-            }
-        }
-        return basicRow;
-    };
-    ;
-    TilesGridService.prototype.isCellFree = function (row, col) {
-        return !this.gridCells[row][col].elem;
-    };
-    ;
-    TilesGridService.prototype.getCellIndex = function (srcCell) {
-        var self = this;
-        var index;
-        this.gridCells.forEach(function (row, rowIndex) {
-            index = _.findIndex(self.gridCells[rowIndex], function (cell) {
-                return cell === srcCell;
-            });
-            if (index !== -1) {
-                return;
-            }
-        });
-        return index !== -1 ? index : 0;
-    };
-    ;
-    TilesGridService.prototype.reserveCells = function (start, end, elem) {
-        this.gridCells.forEach(function (row) {
-            row.forEach(function (cell) {
-                if (cell.row >= start.row && cell.row <= end.row &&
-                    cell.col >= start.col && cell.col <= end.col) {
-                    cell.elem = elem;
-                }
-            });
-        });
-    };
-    ;
-    TilesGridService.prototype.clearElements = function () {
-        this.gridCells.forEach(function (row) {
-            row.forEach(function (tile) {
-                tile.elem = null;
-            });
-        });
-    };
-    ;
-    TilesGridService.prototype.setAvailableColumns = function (columns) {
-        this.isMobileLayout = columns === MOBILE_LAYOUT_COLUMNS;
-        this.columns = columns;
-        return this;
-    };
-    ;
-    TilesGridService.prototype.generateGrid = function (singleTileWidth) {
-        var self = this, tileWidth = singleTileWidth || this.opts.tileWidth, offset = document.querySelector('.pip-draggable-group-title').getBoundingClientRect();
-        var colsInRow = 0, rows = 0, gridInRow = [];
-        this.gridCells = [];
-        this.tiles.forEach(function (tile, index, srcTiles) {
-            var tileSize = tile.getSize();
-            generateCells(tileSize.colSpan);
-            if (srcTiles.length === index + 1) {
-                if (colsInRow < self.columns) {
-                    generateCells(self.columns - colsInRow);
-                }
-                if (self.tiles.length * 2 > self.gridCells.length) {
-                    Array.apply(null, Array(self.tiles.length * 2 - self.gridCells.length)).forEach(function () {
-                        generateCells(self.columns);
-                    });
-                }
-            }
-        });
-        function generateCells(newCellCount) {
-            Array.apply(null, Array(newCellCount)).forEach(function () {
-                if (self.columns < colsInRow + 1) {
-                    rows++;
-                    colsInRow = 0;
-                    self.gridCells.push(gridInRow);
-                    gridInRow = [];
-                }
-                var top = rows * self.opts.tileHeight + (rows ? rows * self.opts.gutter : 0) + offset.height;
-                var left = colsInRow * tileWidth + (colsInRow ? colsInRow * self.opts.gutter : 0);
-                gridInRow.push({
-                    top: top,
-                    left: left,
-                    bottom: top + self.opts.tileHeight,
-                    right: left + tileWidth,
-                    row: rows,
-                    col: colsInRow
-                });
-                colsInRow++;
-            });
-        }
-        return this;
-    };
-    ;
-    TilesGridService.prototype.setTilesDimensions = function (onlyPosition, draggedTile) {
-        var self = this;
-        var currIndex = 0;
-        var prevCell;
-        if (onlyPosition) {
-            self.clearElements();
-        }
-        this.tiles.forEach(function (tile) {
-            var tileSize = tile.getSize();
-            var startCell;
-            var width;
-            var height;
-            var cells;
-            tile.updateElem('.pip-draggable-tile');
-            if (tileSize.colSpan === 1) {
-                if (prevCell && prevCell.elem.size.colSpan === 2 && prevCell.elem.size.rowSpan === 1) {
-                    startCell = self.getCells(self.getCellByPosition(prevCell.row, prevCell.col - 1), 1, 1).start;
-                }
-                else {
-                    startCell = self.getCells(prevCell, 1, 1).start;
-                }
-                if (!onlyPosition) {
-                    width = startCell.right - startCell.left;
-                    height = startCell.bottom - startCell.top;
-                }
-                prevCell = startCell;
-                self.reserveCells(startCell, startCell, tile);
-                currIndex++;
-            }
-            else if (tileSize.colSpan === 2) {
-                cells = self.getCells(prevCell, tileSize.rowSpan, tileSize.colSpan);
-                startCell = cells.start;
-                if (!onlyPosition) {
-                    width = cells.end.right - cells.start.left;
-                    height = cells.end.bottom - cells.start.top;
-                }
-                prevCell = cells.end;
-                self.reserveCells(cells.start, cells.end, tile);
-                currIndex += 2;
-            }
-            if (draggedTile === tile) {
-                tile.setPreviewPosition({
-                    left: startCell.left,
-                    top: startCell.top
-                });
-                return;
-            }
-            if (!onlyPosition) {
-                tile.setSize(width, height);
-            }
-            tile.setPosition(startCell.left, startCell.top);
-        });
-        return this;
-    };
-    ;
-    TilesGridService.prototype.calcContainerHeight = function () {
-        var maxHeightSize, maxWidthSize;
-        if (!this.tiles.length) {
-            return this;
-        }
-        maxHeightSize = _.maxBy(this.tiles, function (tile) {
-            var tileSize = tile['getSize']();
-            return tileSize.top + tileSize.height;
-        })['getSize']();
-        this.elem.style.height = maxHeightSize.top + maxHeightSize.height + 'px';
-        if (this.inline) {
-            maxWidthSize = _.maxBy(this.tiles, function (tile) {
-                var tileSize = tile['getSize']();
-                return tileSize.left + tileSize.width;
-            })['getSize']();
-            this.elem.style.width = maxWidthSize.left + maxWidthSize.width + 'px';
-        }
-        return this;
-    };
-    ;
-    TilesGridService.prototype.getTileByNode = function (node) {
-        var foundTile = this.tiles.filter(function (tile) {
-            return node === tile.getElem();
-        });
-        return foundTile.length ? foundTile[0] : null;
-    };
-    ;
-    TilesGridService.prototype.getTileByCoordinates = function (coords, draggedTile) {
-        return this.tiles
-            .filter(function (tile) {
-            var tileSize = tile.getSize();
-            return tile !== draggedTile &&
-                tileSize.left <= coords.left && coords.left <= (tileSize.left + tileSize.width) &&
-                tileSize.top <= coords.top && coords.top <= (tileSize.top + tileSize.height);
-        })[0] || null;
-    };
-    ;
-    TilesGridService.prototype.getTileIndex = function (tile) {
-        return _.findIndex(this.tiles, tile);
-    };
-    ;
-    TilesGridService.prototype.swapTiles = function (movedTile, beforeTile) {
-        var movedTileIndex = _.findIndex(this.tiles, movedTile);
-        var beforeTileIndex = _.findIndex(this.tiles, beforeTile);
-        this.tiles.splice(movedTileIndex, 1);
-        this.tiles.splice(beforeTileIndex, 0, movedTile);
-        return this;
-    };
-    ;
-    TilesGridService.prototype.removeTile = function (removeTile) {
-        var droppedTile;
-        this.tiles.forEach(function (tile, index, tiles) {
-            if (tile === removeTile) {
-                droppedTile = tiles.splice(index, 1)[0];
-                return false;
-            }
-        });
-        return droppedTile;
-    };
-    ;
-    TilesGridService.prototype.updateTileOptions = function (opts) {
-        var index = _.findIndex(this.tiles, function (tile) {
-            return tile['getOptions']() === opts;
-        });
-        if (index !== -1) {
-            this.tiles[index].setOptions(opts);
-            return true;
-        }
-        return false;
-    };
-    ;
-    return TilesGridService;
-}());
-exports.TilesGridService = TilesGridService;
-angular
-    .module('pipDraggableTilesGroup')
-    .service('pipTilesGrid', function () {
-    return function (tiles, options, columns, elem) {
-        var newGrid = new TilesGridService(tiles, options, columns, elem);
-        return newGrid;
-    };
-});
-},{}],25:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-angular
-    .module('pipDraggableTilesGroup', []);
-require("./TileGroupDirective");
-require("./TileGroupService");
-},{"./TileGroupDirective":23,"./TileGroupService":24}],26:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-{
-    var tileTemplateService = (function () {
-        tileTemplateService.$inject = ['$interpolate', '$compile', '$templateRequest'];
-        function tileTemplateService($interpolate, $compile, $templateRequest) {
-            this._$interpolate = $interpolate;
-            this._$compile = $compile;
-            this._$templateRequest = $templateRequest;
-        }
-        tileTemplateService.prototype.getTemplate = function (source, tpl, tileScope, strictCompile) {
-            var _this = this;
-            var template = source.template, templateUrl = source.templateUrl, type = source.type;
-            var result;
-            if (type) {
-                var interpolated = tpl ? this._$interpolate(tpl)(source) : this._$interpolate(template)(source);
-                return strictCompile == true ?
-                    (tileScope ? this._$compile(interpolated)(tileScope) : this._$compile(interpolated)) :
-                    interpolated;
-            }
-            if (template) {
-                return tileScope ? this._$compile(template)(tileScope) : this._$compile(template);
-            }
-            if (templateUrl) {
-                this._$templateRequest(templateUrl, false).then(function (html) {
-                    result = tileScope ? _this._$compile(html)(tileScope) : _this._$compile(html);
-                });
-            }
-            return result;
-        };
-        tileTemplateService.prototype.setImageMarginCSS = function ($element, image) {
-            var containerWidth = $element.width ? $element.width() : $element.clientWidth, containerHeight = $element.height ? $element.height() : $element.clientHeight, imageWidth = (image[0] ? image[0].naturalWidth : image.naturalWidth) || image.width, imageHeight = (image[0] ? image[0].naturalHeight : image.naturalWidth) || image.height, margin = 0, cssParams = {};
-            if ((imageWidth / containerWidth) > (imageHeight / containerHeight)) {
-                margin = -((imageWidth / imageHeight * containerHeight - containerWidth) / 2);
-                cssParams['margin-left'] = '' + margin + 'px';
-                cssParams['height'] = '' + containerHeight + 'px';
-                cssParams['width'] = '' + imageWidth * containerHeight / imageHeight + 'px';
-                cssParams['margin-top'] = '';
-            }
-            else {
-                margin = -((imageHeight / imageWidth * containerWidth - containerHeight) / 2);
-                cssParams['margin-top'] = '' + margin + 'px';
-                cssParams['height'] = '' + imageHeight * containerWidth / imageWidth + 'px';
-                cssParams['width'] = '' + containerWidth + 'px';
-                cssParams['margin-left'] = '';
-            }
-            $(image).css(cssParams);
-        };
-        return tileTemplateService;
-    }());
-    var ImageLoad = function ImageLoad($parse) {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                var callback = $parse(attrs.pipImageLoad);
-                element.bind('load', function (event) {
-                    callback(scope, {
-                        $event: event
-                    });
-                });
-            }
-        };
-    };
-    ImageLoad.$inject = ['$parse'];
-    angular
-        .module('pipDashboard')
-        .service('pipTileTemplate', tileTemplateService)
-        .directive('pipImageLoad', ImageLoad);
-}
-},{}],27:[function(require,module,exports){
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('calendar_tile/CalendarTile.html',
-    '<div class="widget-box pip-calendar-widget {{ $ctrl.color }} layout-column layout-fill tp0" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-end-center flex-none"><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="date lm24 rm12">{{ $ctrl.options.date.getDate() }}</span><div class="flex-auto layout-column"><span class="weekday md-headline">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div><div class="widget-content flex-auto layout-column layout-align-space-around-center" ng-hide="$ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1"><span class="weekday md-headline" ng-hide="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="weekday" ng-show="$ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1">{{ $ctrl.options.date | formatLongDayOfWeek }}</span> <span class="date lm12 rm12">{{ $ctrl.options.date.getDate() }}</span> <span class="month-year md-headline">{{ $ctrl.options.date | formatLongMonth }} {{ $ctrl.options.date | formatYear }}</span></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('calendar_tile/ConfigDialogExtension.html',
-    '<div class="w-stretch bm16">Date:<md-datepicker ng-model="$ctrl.date" class="w-stretch"></md-datepicker></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('add_tile_dialog/AddTile.html',
-    '<md-dialog class="pip-dialog pip-add-component-dialog"><md-dialog-content class="layout-column"><div class="theme-divider p16 flex-auto"><h3 class="hide-xs m0 bm16 theme-text-primary" hide-xs="">{{ \'DASHBOARD_ADD_TILE_DIALOG_TITLE\' | translate }}<md-input-container class="layout-row flex-auto m0 tm16"><md-select class="flex-auto m0 theme-text-primary" ng-model="dialogCtrl.activeGroupIndex" placeholder="{{ \'DASHBOARD_ADD_TILE_DIALOG_CREATE_NEW_GROUP\' | translate }}" aria-label="Group"><md-option ng-value="$index" ng-repeat="group in dialogCtrl.groups">{{ group }}</md-option></md-select></md-input-container></h3></div><div class="pip-body pip-scroll p0 flex-auto"><p class="md-body-1 theme-text-secondary m0 lp16 rp16">{{ \'DASHBOARD_ADD_TILE_DIALOG_USE_HOT_KEYS\' | translate }}</p><md-list ng-init="groupIndex = $index" ng-repeat="group in dialogCtrl.defaultWidgets"><md-list-item class="layout-row pip-list-item lp16 rp16" ng-repeat="item in group"><div class="icon-holder flex-none"><md-icon md-svg-icon="icons:{{:: item.icon }}"></md-icon><div class="pip-badge theme-badge md-warn" ng-if="item.amount"><span>{{ item.amount }}</span></div></div><span class="flex-auto lm24 theme-text-primary">{{:: item.title }}</span><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.encrease(groupIndex, $index)" aria-label="Encrease"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button><md-button class="md-icon-button flex-none" ng-click="dialogCtrl.decrease(groupIndex, $index)" aria-label="Decrease"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button></md-list-item><md-divider class="lm72 tm8 bm8" ng-if="groupIndex !== (dialogCtrl.defaultWidgets.length - 1)"></md-divider></md-list></div></md-dialog-content><md-dialog-actions class="flex-none layout-align-end-center theme-divider divider-top theme-text-primary"><md-button ng-click="dialogCtrl.cancel()" aria-label="Cancel">{{ \'CANCEL\' | translate }}</md-button><md-button ng-click="dialogCtrl.add()" ng-disabled="dialogCtrl.totalWidgets === 0" arial-label="Add">{{ \'ADD\' | translate }}</md-button></md-dialog-actions></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dashboard/Dashboard.html',
-    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="$ctrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="$ctrl.groupedWidgets" pip-tiles-context="$ctrl.widgetsContext" pip-draggable-grid="$ctrl.draggableGridOptions" pip-group-menu-actions="$ctrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('config_tile_dialog/ConfigDialog.html',
-    '<md-dialog class="pip-dialog pip-tile-config-dialog {{ vm.params.dialogClass }}" width="400" md-theme="{{vm.theme}}"><pip-tile-config-extend-component class="layout-column" pip-dialog-scope="vm" pip-extension-url="vm.extensionUrl" pip-apply="vm.onApply(updatedData)"></pip-tile-config-extend-component></md-dialog>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('config_tile_dialog/ConfigDialogExtendComponent.html',
-    '<h3 class="tm0 flex-none">{{ \'DASHBOARD_TILE_CONFIG_DIALOG_TITLE\' | translate }}</h3><div class="pip-body pip-scroll p16 bp0 flex-auto"><pip-extension-point></pip-extension-point><pip-toggle-buttons class="bm16" ng-if="!$ctrl.hideSizes" pip-buttons="$ctrl.sizes" ng-model="$ctrl.sizeId"></pip-toggle-buttons><pip-color-picker ng-if="!$ctrl.hideColors" pip-colors="$ctrl.colors" ng-model="$ctrl.color"></pip-color-picker></div><div class="pip-footer flex-none"><div><md-button class="md-accent" ng-click="$ctrl.onCancel()">{{ \'CANCEL\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onApply()">{{ \'APPLY\' | translate }}</md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('draggable/Draggable.html',
-    '<div class="pip-draggable-holder"><div class="pip-draggable-group" ng-repeat="group in $ctrl.groups" data-group-id="{{ $index }}" pip-draggable-tiles="group.source"><div class="pip-draggable-group-title layout-row layout-align-start-center"><div class="title-input-container" ng-click="$ctrl.onTitleClick(group, $event)"><input ng-if="group.editingName" ng-blur="$ctrl.onBlurTitleInput(group)" ng-keypress="$ctrl.onKyepressTitleInput(group, $event)" ng-model="group.title"><div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div></div><md-button class="md-icon-button flex-none layout-align-center-center" ng-show="group.editingName" ng-click="$ctrl.cancelEditing(group)" aria-label="Cancel"><md-icon md-svg-icon="icons:cross"></md-icon></md-button><md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName"><md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu"><md-icon md-svg-icon="icons:dots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="action in $ctrl.groupMenuActions"><md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button></md-menu-item></md-menu-content></md-menu></div></div><div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16"><div class="fict-group-text-container"><md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}</div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('event_tile/ConfigDialogExtension.html',
-    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container>Date:<md-datepicker ng-model="$ctrl.date" class="w-stretch bm8"></md-datepicker><md-input-container class="w-stretch"><label>Description:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
-    '    </textarea></md-input-container>Backdrop\'s opacity:<md-slider aria-label="opacity" type="number" min="0.1" max="0.9" step="0.01" ng-model="$ctrl.opacity" ng-change="$ctrl.onOpacitytest($ctrl.opacity)"></md-slider></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('event_tile/EventTile.html',
-    '<div class="widget-box pip-event-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><img ng-if="$ctrl.options.image" ng-src="{{$ctrl.options.image}}" alt="{{$ctrl.options.title || $ctrl.options.name}}"><div class="text-backdrop" style="background-color: rgba(0, 0, 0, {{ $ctrl.opacity }})"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="text-container flex-auto pip-scroll"><p class="date flex-none" ng-if="$ctrl.options.date">{{ $ctrl.options.date | formatShortDate }}</p><p class="text flex-auto">{{ $ctrl.options.text || $ctrl.options.description }}</p></div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('note_tile/ConfigDialogExtension.html',
-    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container><md-input-container class="w-stretch tm0"><label>Text:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
-    '    </textarea></md-input-container></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('note_tile/NoteTile.html',
-    '<div class="widget-box pip-notes-widget {{ $ctrl.color }} layout-column"><div class="widget-heading layout-row layout-align-start-center flex-none" ng-if="$ctrl.options.title || $ctrl.options.name"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span></div><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu><div class="text-container flex-auto pip-scroll"><p>{{ $ctrl.options.text }}</p></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('menu_tile/MenuTile.html',
-    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('picture_slider_tile/PictureSliderTile.html',
-    '<div class="widget-box pip-picture-slider-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ $ctrl.options.title }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('position_tile/ConfigDialogExtension.html',
-    '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Location name:</label> <input type="text" ng-model="$ctrl.locationName"></md-input-container></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('position_tile/PositionTile.html',
-    '<div class="pip-position-widget widget-box p0 layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="position-absolute-right-top" ng-if="!$ctrl.options.locationName"><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="$ctrl.options.locationName"><span class="flex text-overflow">{{ $ctrl.options.locationName }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><pip-location-map class="flex" ng-if="$ctrl.showPosition" pip-stretch="true" pip-rebind="true" pip-location-pos="$ctrl.options.location"></pip-location-map></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('statistics_tile/StatisticsTile.html',
-    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.series && !$ctrl.reset"><pip-pie-chart pip-series="$ctrl.options.series" ng-if="!$ctrl.options.chartType || $ctrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="$ctrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
-}]);
-})();
-
-
-
-},{}]},{},[15,27])(27)
-});
-
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./service");
 require("./page");
 angular.module('pipSettings', [
@@ -23639,7 +20813,6 @@ angular.module('pipSettings', [
 __export(require("./service"));
 },{"./page":4,"./service":11}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsPageSelectedTab_1 = require("../service/SettingsPageSelectedTab");
 var SettingsPageController = (function () {
     SettingsPageController.$inject = ['$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
@@ -23714,7 +20887,6 @@ angular
 }
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSettings.Page', [
     'ui.router',
     'pipSettings.Service',
@@ -23727,10 +20899,8 @@ require("./SettingsPage");
 require("./SettingsPageRoutes");
 },{"./SettingsPage":2,"./SettingsPageRoutes":3}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsConfig = (function () {
     function SettingsConfig() {
         this.tabs = [];
@@ -23743,7 +20913,6 @@ var SettingsConfig = (function () {
 exports.SettingsConfig = SettingsConfig;
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsPageSelectedTab = (function () {
     function SettingsPageSelectedTab() {
         this.tabIndex = 0;
@@ -23753,7 +20922,6 @@ var SettingsPageSelectedTab = (function () {
 exports.SettingsPageSelectedTab = SettingsPageSelectedTab;
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsConfig_1 = require("./SettingsConfig");
 var SettingsService = (function () {
     SettingsService.$inject = ['config'];
@@ -23899,7 +21067,6 @@ angular
     .provider('pipSettings', SettingsProvider);
 },{"./SettingsConfig":6}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsStateConfig = (function () {
     function SettingsStateConfig() {
         this.auth = false;
@@ -23909,7 +21076,6 @@ var SettingsStateConfig = (function () {
 exports.SettingsStateConfig = SettingsStateConfig;
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsTab = (function () {
     function SettingsTab() {
     }
@@ -23921,7 +21087,6 @@ exports.SettingsTab = SettingsTab;
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSettings.Service', []);
 require("./SettingsConfig");
 require("./SettingsPageSelectedTab");
@@ -23982,8 +21147,6 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[12,1,4,2,3,11,5,6,7,8,9,10])(12)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
     filter.$inject = ['$injector'];
@@ -24002,7 +21165,6 @@ module.run(['$templateCache', function($templateCache) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./service");
 require("./page");
 angular.module('pipHelp', [
@@ -24012,7 +21174,6 @@ angular.module('pipHelp', [
 __export(require("./service"));
 },{"./page":5,"./service":12}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpPageSelectedTab_1 = require("../service/HelpPageSelectedTab");
 var HelpPageController = (function () {
     HelpPageController.$inject = ['$log', '$state', '$rootScope', '$timeout', 'pipNavService', 'pipHelp'];
@@ -24088,7 +21249,6 @@ angular
 }
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipHelp.Page', [
     'ui.router',
     'pipHelp.Service',
@@ -24101,7 +21261,6 @@ require("./HelpPage");
 require("./HelpPageRoutes");
 },{"./HelpPage":3,"./HelpPageRoutes":4}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpConfig = (function () {
     function HelpConfig() {
         this.tabs = [];
@@ -24114,7 +21273,6 @@ var HelpConfig = (function () {
 exports.HelpConfig = HelpConfig;
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpPageSelectedTab = (function () {
     function HelpPageSelectedTab() {
     }
@@ -24123,7 +21281,6 @@ var HelpPageSelectedTab = (function () {
 exports.HelpPageSelectedTab = HelpPageSelectedTab;
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpConfig_1 = require("./HelpConfig");
 var HelpService = (function () {
     HelpService.$inject = ['_config'];
@@ -24270,7 +21427,6 @@ angular
     .provider('pipHelp', HelpProvider);
 },{"./HelpConfig":6}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpStateConfig = (function () {
     function HelpStateConfig() {
         this.auth = false;
@@ -24280,7 +21436,6 @@ var HelpStateConfig = (function () {
 exports.HelpStateConfig = HelpStateConfig;
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpTab = (function () {
     function HelpTab() {
     }
@@ -24289,13 +21444,11 @@ var HelpTab = (function () {
 exports.HelpTab = HelpTab;
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 },{}],12:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipHelp.Service', []);
 require("./HelpConfig");
@@ -24354,7 +21507,5 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
 });
-
-
 
 //# sourceMappingURL=pip-webui.js.map
