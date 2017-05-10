@@ -97,7 +97,7 @@ function applyEach$1(eachfn) {
         var go = initialParams(function (args, callback) {
             var that = this;
             return eachfn(fns, function (fn, cb) {
-                fn.apply(that, args.concat(cb));
+                fn.apply(that, args.concat([cb]));
             }, callback);
         });
         if (args.length) {
@@ -202,7 +202,8 @@ function baseGetTag(value) {
   if (value == null) {
     return value === undefined ? undefinedTag : nullTag;
   }
-  return (symToStringTag && symToStringTag in Object(value))
+  value = Object(value);
+  return (symToStringTag && symToStringTag in value)
     ? getRawTag(value)
     : objectToString(value);
 }
@@ -332,10 +333,6 @@ function isLength(value) {
 function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
-
-// A temporary value used to identify if the loop should be broken.
-// See #1064, #1293
-var breakLoop = {};
 
 /**
  * This method returns `undefined`.
@@ -641,7 +638,7 @@ var freeProcess = moduleExports$1 && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
-    return freeProcess && freeProcess.binding && freeProcess.binding('util');
+    return freeProcess && freeProcess.binding('util');
   } catch (e) {}
 }());
 
@@ -846,6 +843,10 @@ function onlyOnce(fn) {
     };
 }
 
+// A temporary value used to identify if the loop should be broken.
+// See #1064, #1293
+var breakLoop = {};
+
 function _eachOfLimit(limit) {
     return function (obj, iteratee, callback) {
         callback = once(callback || noop);
@@ -930,10 +931,10 @@ function eachOfArrayLike(coll, iteratee, callback) {
         callback(null);
     }
 
-    function iteratorCallback(err, value) {
+    function iteratorCallback(err) {
         if (err) {
             callback(err);
-        } else if (++completed === length || value === breakLoop) {
+        } else if (++completed === length) {
             callback(null);
         }
     }
@@ -1522,7 +1523,7 @@ var auto = function (tasks, concurrency, callback) {
     var runningTasks = 0;
     var hasError = false;
 
-    var listeners = Object.create(null);
+    var listeners = {};
 
     var readyTasks = [];
 
@@ -1550,7 +1551,7 @@ var auto = function (tasks, concurrency, callback) {
 
         arrayEach(dependencies, function (dependencyName) {
             if (!tasks[dependencyName]) {
-                throw new Error('async.auto task `' + key + '` has a non-existent dependency `' + dependencyName + '` in ' + dependencies.join(', '));
+                throw new Error('async.auto task `' + key + '` has a non-existent dependency in ' + dependencies.join(', '));
             }
             addListener(dependencyName, function () {
                 remainingDependencies--;
@@ -1612,7 +1613,7 @@ var auto = function (tasks, concurrency, callback) {
                 });
                 safeResults[key] = args;
                 hasError = true;
-                listeners = Object.create(null);
+                listeners = [];
 
                 callback(err, safeResults);
             } else {
@@ -1829,17 +1830,15 @@ function asciiToArray(string) {
 
 /** Used to compose unicode character classes. */
 var rsAstralRange = '\\ud800-\\udfff';
-var rsComboMarksRange = '\\u0300-\\u036f';
-var reComboHalfMarksRange = '\\ufe20-\\ufe2f';
-var rsComboSymbolsRange = '\\u20d0-\\u20ff';
-var rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;
+var rsComboMarksRange = '\\u0300-\\u036f\\ufe20-\\ufe23';
+var rsComboSymbolsRange = '\\u20d0-\\u20f0';
 var rsVarRange = '\\ufe0e\\ufe0f';
 
 /** Used to compose unicode capture groups. */
 var rsZWJ = '\\u200d';
 
 /** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
-var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboMarksRange + rsComboSymbolsRange + rsVarRange + ']');
 
 /**
  * Checks if `string` contains Unicode symbols.
@@ -1854,15 +1853,13 @@ function hasUnicode(string) {
 
 /** Used to compose unicode character classes. */
 var rsAstralRange$1 = '\\ud800-\\udfff';
-var rsComboMarksRange$1 = '\\u0300-\\u036f';
-var reComboHalfMarksRange$1 = '\\ufe20-\\ufe2f';
-var rsComboSymbolsRange$1 = '\\u20d0-\\u20ff';
-var rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1;
+var rsComboMarksRange$1 = '\\u0300-\\u036f\\ufe20-\\ufe23';
+var rsComboSymbolsRange$1 = '\\u20d0-\\u20f0';
 var rsVarRange$1 = '\\ufe0e\\ufe0f';
 
 /** Used to compose unicode capture groups. */
 var rsAstral = '[' + rsAstralRange$1 + ']';
-var rsCombo = '[' + rsComboRange$1 + ']';
+var rsCombo = '[' + rsComboMarksRange$1 + rsComboSymbolsRange$1 + ']';
 var rsFitz = '\\ud83c[\\udffb-\\udfff]';
 var rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')';
 var rsNonAstral = '[^' + rsAstralRange$1 + ']';
@@ -2256,7 +2253,6 @@ function queue(worker, concurrency, payload) {
 
     var workers = 0;
     var workersList = [];
-    var isProcessing = false;
     var q = {
         _tasks: new DLL(),
         concurrency: concurrency,
@@ -2280,12 +2276,6 @@ function queue(worker, concurrency, payload) {
             _insert(data, true, callback);
         },
         process: function () {
-            // Avoid trying to start too many processing operations. This can occur
-            // when callbacks resolve synchronously (#1267).
-            if (isProcessing) {
-                return;
-            }
-            isProcessing = true;
             while (!q.paused && workers < q.concurrency && q._tasks.length) {
                 var tasks = [],
                     data = [];
@@ -2310,7 +2300,6 @@ function queue(worker, concurrency, payload) {
                 var cb = onlyOnce(_next(tasks));
                 worker(data, cb);
             }
-            isProcessing = false;
         },
         length: function () {
             return q._tasks.length;
@@ -2332,7 +2321,12 @@ function queue(worker, concurrency, payload) {
                 return;
             }
             q.paused = false;
-            setImmediate$1(q.process);
+            var resumeCount = Math.min(q.concurrency, q._tasks.length);
+            // Need to call q.process once per concurrent
+            // worker to preserve full concurrency after pause
+            for (var w = 1; w <= resumeCount; w++) {
+                setImmediate$1(q.process);
+            }
         }
     };
     return q;
@@ -2543,9 +2537,9 @@ var seq$1 = rest(function seq(functions) {
         }
 
         reduce(functions, args, function (newargs, fn, cb) {
-            fn.apply(that, newargs.concat(rest(function (err, nextargs) {
+            fn.apply(that, newargs.concat([rest(function (err, nextargs) {
                 cb(err, nextargs);
-            })));
+            })]));
         }, function (err, results) {
             cb.apply(that, [err].concat(results));
         });
@@ -2708,30 +2702,36 @@ var constant = rest(function (values) {
     });
 });
 
-function _createTester(check, getResult) {
-    return function (eachfn, arr, iteratee, cb) {
-        cb = cb || noop;
-        var testPassed = false;
-        var testResult;
-        eachfn(arr, function (value, _, callback) {
-            iteratee(value, function (err, result) {
-                if (err) {
-                    callback(err);
-                } else if (check(result) && !testResult) {
-                    testPassed = true;
-                    testResult = getResult(true, value);
-                    callback(null, breakLoop);
+function _createTester(eachfn, check, getResult) {
+    return function (arr, limit, iteratee, cb) {
+        function done() {
+            if (cb) {
+                cb(null, getResult(false));
+            }
+        }
+        function wrappedIteratee(x, _, callback) {
+            if (!cb) return callback();
+            iteratee(x, function (err, v) {
+                // Check cb as another iteratee may have resolved with a
+                // value or error since we started this iteratee
+                if (cb && (err || check(v))) {
+                    if (err) cb(err);else cb(err, getResult(true, x));
+                    cb = iteratee = false;
+                    callback(err, breakLoop);
                 } else {
                     callback();
                 }
             });
-        }, function (err) {
-            if (err) {
-                cb(err);
-            } else {
-                cb(null, testPassed ? testResult : getResult(false));
-            }
-        });
+        }
+        if (arguments.length > 3) {
+            cb = cb || noop;
+            eachfn(arr, limit, wrappedIteratee, done);
+        } else {
+            cb = iteratee;
+            cb = cb || noop;
+            iteratee = limit;
+            eachfn(arr, wrappedIteratee, done);
+        }
     };
 }
 
@@ -2774,7 +2774,7 @@ function _findGetResult(v, x) {
  *     // result now equals the first file in the list that exists
  * });
  */
-var detect = doParallel(_createTester(identity, _findGetResult));
+var detect = _createTester(eachOf, identity, _findGetResult);
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs a maximum of `limit` async operations at a
@@ -2798,7 +2798,7 @@ var detect = doParallel(_createTester(identity, _findGetResult));
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
+var detectLimit = _createTester(eachOfLimit, identity, _findGetResult);
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs only a single async operation at a time.
@@ -2820,11 +2820,11 @@ var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectSeries = doLimit(detectLimit, 1);
+var detectSeries = _createTester(eachOfSeries, identity, _findGetResult);
 
 function consoleFunc(name) {
     return rest(function (fn, args) {
-        fn.apply(null, args.concat(rest(function (err, args) {
+        fn.apply(null, args.concat([rest(function (err, args) {
             if (typeof console === 'object') {
                 if (err) {
                     if (console.error) {
@@ -2836,7 +2836,7 @@ function consoleFunc(name) {
                     });
                 }
             }
-        })));
+        })]));
     });
 }
 
@@ -3222,7 +3222,7 @@ function notId(v) {
  *     // if result is true then every file exists
  * });
  */
-var every = doParallel(_createTester(notId, notId));
+var every = _createTester(eachOf, notId, notId);
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs a maximum of `limit` async operations at a time.
@@ -3244,7 +3244,7 @@ var every = doParallel(_createTester(notId, notId));
  * `iteratee` functions have finished. Result will be either `true` or `false`
  * depending on the values of the async tests. Invoked with (err, result).
  */
-var everyLimit = doParallelLimit(_createTester(notId, notId));
+var everyLimit = _createTester(eachOfLimit, notId, notId);
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs only a single async operation at a time.
@@ -3622,14 +3622,14 @@ function memoize(fn, hasher) {
             queues[key].push(callback);
         } else {
             queues[key] = [callback];
-            fn.apply(null, args.concat(rest(function (args) {
+            fn.apply(null, args.concat([rest(function (args) {
                 memo[key] = args;
                 var q = queues[key];
                 delete queues[key];
                 for (var i = 0, l = q.length; i < l; i++) {
                     q[i].apply(null, args);
                 }
-            })));
+            })]));
         }
     });
     memoized.memo = memo;
@@ -4452,7 +4452,7 @@ var retryable = function (opts, task) {
     }
     return initialParams(function (args, callback) {
         function taskFn(cb) {
-            task.apply(null, args.concat(cb));
+            task.apply(null, args.concat([cb]));
         }
 
         if (opts) retry(opts, taskFn, callback);else retry(taskFn, callback);
@@ -4557,7 +4557,7 @@ function series(tasks, callback) {
  *     // if result is true then at least one of the files exists
  * });
  */
-var some = doParallel(_createTester(Boolean, identity));
+var some = _createTester(eachOf, Boolean, identity);
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs a maximum of `limit` async operations at a time.
@@ -4580,7 +4580,7 @@ var some = doParallel(_createTester(Boolean, identity));
  * Result will be either `true` or `false` depending on the values of the async
  * tests. Invoked with (err, result).
  */
-var someLimit = doParallelLimit(_createTester(Boolean, identity));
+var someLimit = _createTester(eachOfLimit, Boolean, identity);
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs only a single async operation at a time.
@@ -5479,7 +5479,6 @@ process.umask = function() { return 0; };
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./translate");
 require("./session");
 require("./transactions");
@@ -5502,13 +5501,11 @@ __export(require("./translate"));
 __export(require("./session"));
 __export(require("./transactions"));
 __export(require("./routing"));
-
 },{"./routing":6,"./session":9,"./transactions":14,"./translate":19,"./utilities":27}],4:[function(require,module,exports){
 "use strict";
 captureStateTranslations.$inject = ['$rootScope'];
 decorateBackStateService.$inject = ['$delegate', '$window', '$rootScope'];
 addBackStateDecorator.$inject = ['$provide'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.StateVar = "$state";
 exports.PrevStateVar = "$prevState";
 function captureStateTranslations($rootScope) {
@@ -5554,11 +5551,9 @@ angular
     .module('pipRouting')
     .config(addBackStateDecorator)
     .run(captureStateTranslations);
-
 },{}],5:[function(require,module,exports){
 "use strict";
 hookRoutingEvents.$inject = ['$rootScope', '$log', '$state'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoutingVar = "$routing";
 function hookRoutingEvents($rootScope, $log, $state) {
     "ngInject";
@@ -5577,22 +5572,18 @@ function hookRoutingEvents($rootScope, $log, $state) {
 angular
     .module('pipRouting')
     .run(hookRoutingEvents);
-
 },{}],6:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipRouting', ['ui.router']);
 require("./BackDecorator");
 require("./RoutingEvents");
 __export(require("./BackDecorator"));
 __export(require("./RoutingEvents"));
-
 },{"./BackDecorator":4,"./RoutingEvents":5}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.IdentityRootVar = "$identity";
 exports.IdentityChangedEvent = "pipIdentityChanged";
 var IdentityService = (function () {
@@ -5660,10 +5651,8 @@ var IdentityProvider = (function () {
 angular
     .module('pipSession')
     .provider('pipIdentity', IdentityProvider);
-
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.SessionRootVar = "$session";
 exports.SessionOpenedEvent = "pipSessionOpened";
 exports.SessionClosedEvent = "pipSessionClosed";
@@ -5827,22 +5816,18 @@ var SessionProvider = (function () {
 angular
     .module('pipSession')
     .provider('pipSession', SessionProvider);
-
 },{"async":1}],9:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSession', []);
 require("./IdentityService");
 require("./SessionService");
 __export(require("./IdentityService"));
 __export(require("./SessionService"));
-
 },{"./IdentityService":7,"./SessionService":8}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionError_1 = require("./TransactionError");
 var Transaction = (function () {
     function Transaction(scope) {
@@ -5932,10 +5917,8 @@ var Transaction = (function () {
     return Transaction;
 }());
 exports.Transaction = Transaction;
-
 },{"./TransactionError":11}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TransactionError = (function () {
     function TransactionError(error) {
         if (error != null)
@@ -5985,10 +5968,8 @@ var TransactionError = (function () {
     return TransactionError;
 }());
 exports.TransactionError = TransactionError;
-
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Transaction_1 = require("./Transaction");
 var TransactionService = (function () {
     function TransactionService() {
@@ -6014,11 +5995,9 @@ var TransactionService = (function () {
 angular
     .module('pipTransaction')
     .service('pipTransaction', TransactionService);
-
 },{"./Transaction":10}],13:[function(require,module,exports){
 "use strict";
 configureTransactionStrings.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function configureTransactionStrings($injector) {
     "ngInject";
     var pipTranslate = $injector.has('pipTranslateProvider')
@@ -6041,13 +6020,11 @@ function configureTransactionStrings($injector) {
 angular
     .module('pipTransaction')
     .config(configureTransactionStrings);
-
 },{}],14:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTransaction', []);
 require("./TransactionStrings");
 require("./TransactionError");
@@ -6055,12 +6032,10 @@ require("./Transaction");
 require("./TransactionService");
 __export(require("./TransactionError"));
 __export(require("./Transaction"));
-
 },{"./Transaction":10,"./TransactionError":11,"./TransactionService":12,"./TransactionStrings":13}],15:[function(require,module,exports){
 "use strict";
 translateDirective.$inject = ['pipTranslate'];
 translateHtmlDirective.$inject = ['pipTranslate'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function translateDirective(pipTranslate) {
     "ngInject";
     return {
@@ -6095,12 +6070,10 @@ angular
     .module('pipTranslate')
     .directive('pipTranslate', translateDirective)
     .directive('pipTranslateHtml', translateHtmlDirective);
-
 },{}],16:[function(require,module,exports){
 "use strict";
 translateFilter.$inject = ['pipTranslate'];
 optionalTranslateFilter.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function translateFilter(pipTranslate) {
     "ngInject";
     return function (key) {
@@ -6118,21 +6091,14 @@ function optionalTranslateFilter($injector) {
 angular
     .module('pipTranslate')
     .filter('translate', translateFilter);
-
 },{}],17:[function(require,module,exports){
 "use strict";
 initTranslate.$inject = ['pipTranslate'];
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Translation_1 = require("./Translation");
 var PageResetService_1 = require("../utilities/PageResetService");
 exports.LanguageRootVar = "$language";
@@ -6263,10 +6229,8 @@ angular
     .module('pipTranslate')
     .provider('pipTranslate', TranslateProvider)
     .run(initTranslate);
-
 },{"../utilities/PageResetService":22,"./Translation":18}],18:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Translation = (function () {
     function Translation() {
         this._language = 'en';
@@ -6399,13 +6363,11 @@ var Translation = (function () {
     return Translation;
 }());
 exports.Translation = Translation;
-
 },{}],19:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTranslate', []);
 require("./Translation");
 require("./TranslateService");
@@ -6413,10 +6375,8 @@ require("./TranslateFilter");
 require("./TranslateDirective");
 __export(require("./Translation"));
 __export(require("./TranslateService"));
-
 },{"./TranslateDirective":15,"./TranslateFilter":16,"./TranslateService":17,"./Translation":18}],20:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Codes = (function () {
     function Codes() {
     }
@@ -6436,10 +6396,8 @@ var Codes = (function () {
 angular
     .module('pipCodes', [])
     .service('pipCodes', Codes);
-
 },{}],21:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Format = (function () {
     function Format() {
         this.cache = {};
@@ -6635,11 +6593,9 @@ var Format = (function () {
 angular
     .module('pipFormat', [])
     .service('pipFormat', Format);
-
 },{}],22:[function(require,module,exports){
 "use strict";
 hookResetEvents.$inject = ['$rootScope', 'pipPageReset'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPageEvent = "pipResetPage";
 exports.ResetAreaEvent = "pipResetArea";
 exports.ResetRootVar = "$reset";
@@ -6679,10 +6635,8 @@ function hookResetEvents($rootScope, pipPageReset) {
 angular.module('pipPageReset', [])
     .service('pipPageReset', PageResetService)
     .run(hookResetEvents);
-
 },{}],23:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ScrollService = (function () {
     function ScrollService() {
     }
@@ -6709,10 +6663,8 @@ var ScrollService = (function () {
 angular
     .module('pipScroll', [])
     .service('pipScroll', ScrollService);
-
 },{}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SystemInfo = (function () {
     SystemInfo.$inject = ['$window'];
     function SystemInfo($window) {
@@ -6845,10 +6797,8 @@ var SystemInfo = (function () {
 angular
     .module('pipSystemInfo', [])
     .service('pipSystemInfo', SystemInfo);
-
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Tags = (function () {
     function Tags() {
     }
@@ -6900,10 +6850,8 @@ var Tags = (function () {
 angular
     .module('pipTags', [])
     .service('pipTags', Tags);
-
 },{}],26:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TimerEvent = (function () {
     function TimerEvent(event, timeout) {
         this.event = event;
@@ -6991,10 +6939,8 @@ var TimerService = (function () {
 }());
 angular.module('pipTimer', [])
     .service('pipTimer', TimerService);
-
 },{}],27:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./Format");
 require("./TimerService");
 require("./ScrollService");
@@ -7002,11 +6948,8 @@ require("./Tags");
 require("./Codes");
 require("./SystemInfo");
 require("./PageResetService");
-
 },{"./Codes":20,"./Format":21,"./PageResetService":22,"./ScrollService":23,"./SystemInfo":24,"./Tags":25,"./TimerService":26}]},{},[3])(3)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).buttons = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -7020,7 +6963,6 @@ require("./PageResetService");
     angular.module('pipButtons.Translate', [])
         .filter('translate', translate);
 }
-
 },{}],2:[function(require,module,exports){
 {
     pipFabTooltipVisibility.$inject = ['$parse', '$timeout'];
@@ -7055,10 +6997,8 @@ require("./PageResetService");
         .module('pipFabTooltipVisibility', [])
         .directive('pipFabTooltipVisibility', pipFabTooltipVisibility);
 }
-
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./refresh_button/RefreshButton");
 require("./toggle_buttons/ToggleButtons");
 require("./fabs/FabTooltipVisibility");
@@ -7067,7 +7007,6 @@ angular.module('pipButtons', [
     'pipRefreshButton',
     'pipFabTooltipVisibility'
 ]);
-
 },{"./fabs/FabTooltipVisibility":2,"./refresh_button/RefreshButton":4,"./toggle_buttons/ToggleButtons":5}],4:[function(require,module,exports){
 {
     var RefreshButtonBindings = {
@@ -7133,7 +7072,6 @@ angular.module('pipButtons', [
         .module('pipRefreshButton', ['ngMaterial'])
         .component('pipRefreshButton', RefreshButtonComponent);
 }
-
 },{}],5:[function(require,module,exports){
 {
     var ToggleButton = (function () {
@@ -7228,7 +7166,6 @@ angular.module('pipButtons', [
         .module('pipToggleButtons', ['pipButtons.Templates'])
         .component('pipToggleButtons', ToggleButtons);
 }
-
 },{}],6:[function(require,module,exports){
 (function(module) {
 try {
@@ -7270,11 +7207,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[6,1,2,3,4,5])(6)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).layouts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var MediaService_1 = require("../media/MediaService");
 {
     var AuxPanelDirectiveController = (function () {
@@ -7304,7 +7238,6 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipAuxPanel')
         .component('pipAuxPanel', AuxPanel);
 }
-
 },{"../media/MediaService":14}],2:[function(require,module,exports){
 {
     AuxPanelPartDirective.$inject = ['ngIfDirective'];
@@ -7352,11 +7285,9 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipAuxPanel')
         .directive('pipAuxPanelPart', AuxPanelPartDirective);
 }
-
 },{}],3:[function(require,module,exports){
 "use strict";
 hookAuxPanelEvents.$inject = ['$rootScope', 'pipAuxPanel'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var IAuxPanelService_1 = require("./IAuxPanelService");
 var IAuxPanelService_2 = require("./IAuxPanelService");
 var AuxPanelService = (function () {
@@ -7545,10 +7476,8 @@ angular
     .module('pipAuxPanel')
     .provider('pipAuxPanel', AuxPanelProvider)
     .run(hookAuxPanelEvents);
-
 },{"./IAuxPanelService":4}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuxPanelChangedEvent = 'pipAuxPanelChanged';
 exports.AuxPanelStateChangedEvent = 'pipAuxPanelStateChanged';
 exports.OpenAuxPanelEvent = 'pipOpenAuxPanel';
@@ -7559,25 +7488,21 @@ var AuxPanelConfig = (function () {
     return AuxPanelConfig;
 }());
 exports.AuxPanelConfig = AuxPanelConfig;
-
 },{}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipAuxPanel', ['ngMaterial']);
 require("./AuxPanelService");
 require("./AuxPanelPart");
 require("./AuxPanel");
 __export(require("./IAuxPanelService"));
-
 },{"./AuxPanel":1,"./AuxPanelPart":2,"./AuxPanelService":3,"./IAuxPanelService":4}],6:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLayout', ['wu.masonry', 'pipMedia', 'pipAuxPanel']);
 require("./media/index");
 require("./layouts/MainDirective");
@@ -7588,10 +7513,8 @@ require("./layouts/SimpleDirective");
 require("./layouts/TilesDirective");
 require("./auxpanel/index");
 __export(require("./media/index"));
-
 },{"./auxpanel/index":5,"./layouts/CardDirective":7,"./layouts/DialogDirective":8,"./layouts/DocumentDirective":9,"./layouts/MainDirective":10,"./layouts/SimpleDirective":11,"./layouts/TilesDirective":12,"./media/index":16}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
 (function () {
@@ -7677,7 +7600,6 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipCard', cardDirective);
 })();
-
 },{"../media/IMediaService":13,"../media/MediaService":14}],8:[function(require,module,exports){
 (function () {
     function dialogDirective() {
@@ -7692,7 +7614,6 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipDialog', dialogDirective);
 })();
-
 },{}],9:[function(require,module,exports){
 (function () {
     function documentDirective() {
@@ -7707,10 +7628,8 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipDocument', documentDirective);
 })();
-
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
@@ -7782,7 +7701,6 @@ var MediaService_1 = require("../media/MediaService");
         .directive('pipMain', mainDirective)
         .directive('pipMainBody', mainBodyDirective);
 })();
-
 },{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],11:[function(require,module,exports){
 (function () {
     function simpleDirective() {
@@ -7798,11 +7716,9 @@ var MediaService_1 = require("../media/MediaService");
         .module('pipLayout')
         .directive('pipSimple', simpleDirective);
 })();
-
 },{}],12:[function(require,module,exports){
 "use strict";
 tilesDirective.$inject = ['$rootScope'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var ResizeFunctions_1 = require("../media/ResizeFunctions");
 var IMediaService_1 = require("../media/IMediaService");
 var MediaService_1 = require("../media/MediaService");
@@ -7916,10 +7832,8 @@ function tilesDirective($rootScope) {
 angular
     .module('pipLayout')
     .directive('pipTiles', tilesDirective);
-
 },{"../media/IMediaService":13,"../media/MediaService":14,"../media/ResizeFunctions":15}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.MainResizedEvent = 'pipMainResized';
 exports.LayoutResizedEvent = 'pipLayoutResized';
 var MediaBreakpoints = (function () {
@@ -7952,10 +7866,8 @@ var MediaBreakpointStatuses = (function () {
     return MediaBreakpointStatuses;
 }());
 exports.MediaBreakpointStatuses = MediaBreakpointStatuses;
-
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IMediaService_1 = require("./IMediaService");
 exports.MainBreakpoints = new IMediaService_1.MediaBreakpoints(639, 716, 1024, 1439);
 exports.MainBreakpointStatuses = new IMediaService_1.MediaBreakpointStatuses();
@@ -7995,13 +7907,11 @@ var MediaProvider = (function () {
 angular
     .module('pipMedia')
     .provider('pipMedia', MediaProvider);
-
 },{"./IMediaService":13}],15:[function(require,module,exports){
 "use strict";
 requestFrame.$inject = ['callback'];
 addResizeListener.$inject = ['element', 'listener'];
 removeResizeListener.$inject = ['element', 'listener'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var attachEvent = document.attachEvent;
 var isIE = navigator.userAgent.match(/Trident/);
 function requestFrame(callback) {
@@ -8083,24 +7993,71 @@ function removeResizeListener(element, listener) {
     }
 }
 exports.removeResizeListener = removeResizeListener;
-
 },{}],16:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipMedia', []);
 require("./MediaService");
 require("./ResizeFunctions");
 __export(require("./IMediaService"));
 __export(require("./MediaService"));
 __export(require("./ResizeFunctions"));
-
 },{"./IMediaService":13,"./MediaService":14,"./ResizeFunctions":15}]},{},[6])(6)
 });
 
-
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).split = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function () {
+    'use strict';
+    var thisModule = angular.module('pipSplit', []);
+    thisModule.run(['$rootScope', 'pipSplit', function ($rootScope, pipSplit) {
+        $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+            var splitElements = $('.pip-split');
+            if (splitElements.length > 0) {
+                splitElements.removeClass('pip-transition-forward');
+                splitElements.removeClass('pip-transition-back');
+                if (toState.name != fromState.name) {
+                    if (pipSplit.forwardTransition(toState, fromState)) {
+                        splitElements.addClass('pip-transition-forward');
+                    }
+                    else {
+                        splitElements.addClass('pip-transition-back');
+                    }
+                }
+            }
+        });
+    }]);
+    thisModule.provider('pipSplit', function () {
+        var transitionSequences = [];
+        this.addTransitionSequence = addTransitionSequence;
+        this.$get = function () {
+            return {
+                forwardTransition: forwardTransition
+            };
+        };
+        return;
+        function addTransitionSequence(sequence) {
+            if (!_.isArray(sequence) || sequence.length == 0) {
+                throw new Error('Transition sequence must be an array of state names');
+            }
+            transitionSequences.push(sequence);
+        }
+        function forwardTransition(toState, fromState) {
+            var i, toIndex, fromIndex;
+            for (i = 0; i < transitionSequences.length; i++) {
+                toIndex = transitionSequences[i].indexOf(toState.name),
+                    fromIndex = transitionSequences[i].indexOf(fromState.name);
+                if (toIndex > -1) {
+                    return toIndex > fromIndex;
+                }
+            }
+            return false;
+        }
+    });
+})();
+},{}]},{},[1])(1)
+});
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).behaviors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -8122,10 +8079,8 @@ __export(require("./ResizeFunctions"));
         .module("pipDraggable")
         .directive('pipCancelDrag', CancelDrag);
 }
-
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var DragLink_1 = (function () {
         function DragLink_1($rootScope, $parse, $document, $window, pipDraggable, $scope, $element, $attrs) {
@@ -8500,10 +8455,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module("pipDraggable")
         .directive('pipDrag', Drag);
 }
-
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var DraggableService = (function () {
     function DraggableService() {
     }
@@ -8522,10 +8475,8 @@ var DraggableService = (function () {
 angular
     .module("pipDraggable")
     .service('pipDraggable', DraggableService);
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var DropLink_1 = (function () {
         function DropLink_1($parse, $document, $timeout, pipDraggable, $scope, $element, $attrs) {
@@ -8705,7 +8656,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module("pipDraggable")
         .directive('pipDrop', Drop);
 }
-
 },{}],5:[function(require,module,exports){
 {
     var PreventDragLink_1 = (function () {
@@ -8745,17 +8695,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module("pipDraggable")
         .directive('pipPreventDrag', PreventDrag);
 }
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module("pipDraggable", []);
 require("./DraggableService");
 require("./Drag");
 require("./Drop");
 require("./PreventDrag");
 require("./CancelDrag");
-
 },{"./CancelDrag":1,"./Drag":2,"./DraggableService":3,"./Drop":4,"./PreventDrag":5}],7:[function(require,module,exports){
 {
     var FocusedLink_1 = (function () {
@@ -8896,13 +8843,11 @@ require("./CancelDrag");
         .module("pipFocused", [])
         .directive('pipFocused', Focused);
 }
-
 },{}],8:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./unsaved_changes/UnsavedChanges");
 require("./shortcuts/index");
 require("./focused/Focused");
@@ -8918,7 +8863,6 @@ angular.module('pipBehaviors', [
     'pipShortcuts'
 ]);
 __export(require("./shortcuts/index"));
-
 },{"./draggable/index":6,"./focused/Focused":7,"./infinite_scroll/InfiniteScroll":9,"./selected/Selected":10,"./shortcuts/index":16,"./unsaved_changes/UnsavedChanges":17}],9:[function(require,module,exports){
 {
     var InfiniteScrollLink_1 = (function () {
@@ -9118,7 +9062,6 @@ __export(require("./shortcuts/index"));
         .module("pipInfiniteScroll", [])
         .directive('pipInfiniteScroll', InfiniteScroll);
 }
-
 },{}],10:[function(require,module,exports){
 {
     var SelectedLink_1 = (function () {
@@ -9419,10 +9362,8 @@ __export(require("./shortcuts/index"));
         .module("pipSelected", [])
         .directive('pipSelected', Selected);
 }
-
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ShortcutItem = (function () {
     function ShortcutItem() {
     }
@@ -9438,10 +9379,8 @@ var ShortcutsConfig = (function () {
     return ShortcutsConfig;
 }());
 exports.ShortcutsConfig = ShortcutsConfig;
-
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var KeyboardEvent = (function () {
     function KeyboardEvent() {
     }
@@ -9644,10 +9583,8 @@ var Shortcut = (function () {
     return Shortcut;
 }());
 exports.Shortcut = Shortcut;
-
 },{}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Shortcut_1 = require("./Shortcut");
 {
     var ShortcutBindingService_1 = (function () {
@@ -9756,10 +9693,8 @@ var Shortcut_1 = require("./Shortcut");
         .module('pipShortcuts')
         .provider('pipShortcutBinding', ShortcutBindingProvider);
 }
-
 },{"./Shortcut":12}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ShortcutController = (function () {
     ShortcutController.$inject = ['$element', '$attrs', '$scope', '$log', '$parse', 'pipShortcutBinding'];
     function ShortcutController($element, $attrs, $scope, $log, $parse, pipShortcutBinding) {
@@ -9802,10 +9737,8 @@ var ShortcutController = (function () {
         .module('pipShortcuts')
         .directive('pipShortcut', shortcutsDirective);
 }
-
 },{}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IShortcutsService_1 = require("./IShortcutsService");
 exports.ShortcutsChangedEvent = 'pipShortcutsChanged';
 var ShortcutsService = (function () {
@@ -9968,20 +9901,17 @@ var ShortcutsProvider = (function () {
 angular
     .module('pipShortcuts')
     .provider('pipShortcuts', ShortcutsProvider);
-
 },{"./IShortcutsService":11}],16:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipShortcuts', ['ngMaterial', 'ui.router']);
 require("./ShortcutBindingService");
 require("./ShortcutsService");
 require("./ShortcutDirective");
 __export(require("./IShortcutsService"));
 __export(require("./ShortcutsService"));
-
 },{"./IShortcutsService":11,"./ShortcutBindingService":13,"./ShortcutDirective":14,"./ShortcutsService":15}],17:[function(require,module,exports){
 {
     var UnsavedChangesLink_1 = (function () {
@@ -10026,11 +9956,8 @@ __export(require("./ShortcutsService"));
         .module("pipUnsavedChanges", [])
         .directive("pipUnsavedChanges", UnsavedChanges);
 }
-
 },{}]},{},[8])(8)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).controls = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -10090,7 +10017,6 @@ __export(require("./ShortcutsService"));
         .module('pipColorPicker', ['pipControls.Templates'])
         .component('pipColorPicker', pipColorPicker);
 }
-
 },{}],2:[function(require,module,exports){
 {
     translateFilter.$inject = ['$injector'];
@@ -10104,10 +10030,8 @@ __export(require("./ShortcutsService"));
         .module('pipControls.Translate', [])
         .filter('translate', translateFilter);
 }
-
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var pipImageSliderController_1 = (function () {
         pipImageSliderController_1.$inject = ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', 'pipImageSlider'];
@@ -10206,10 +10130,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
     angular.module('pipImageSlider')
         .directive('pipImageSlider', ImageSlider);
 }
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ImageSliderService = (function () {
         ImageSliderService.$inject = ['$timeout'];
@@ -10272,10 +10194,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipImageSlider.Service', [])
         .service('pipImageSlider', ImageSliderService);
 }
-
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var SliderButtonController_1 = (function () {
         SliderButtonController_1.$inject = ['$element', 'pipImageSlider'];
@@ -10305,10 +10225,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipSliderButton', [])
         .directive('pipSliderButton', SliderButton);
 }
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var SliderIndicatorController_1 = (function () {
         SliderIndicatorController_1.$inject = ['$element', 'pipImageSlider'];
@@ -10339,20 +10257,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipSliderIndicator', [])
         .directive('pipSliderIndicator', SliderIndicator);
 }
-
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipImageSlider', ['pipSliderButton', 'pipSliderIndicator', 'pipImageSlider.Service']);
 require("./ImageSlider");
 require("./ImageSliderService");
 require("./SliderButton");
 require("./SliderIndicator");
-
 },{"./ImageSlider":3,"./ImageSliderService":4,"./SliderButton":5,"./SliderIndicator":6}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./color_picker/ColorPicker");
 require("./image_slider");
@@ -10369,7 +10283,6 @@ angular.module('pipControls', [
     'pipToasts',
     'pipControls.Translate'
 ]);
-
 },{"./color_picker/ColorPicker":1,"./dependencies/TranslateFilter":2,"./image_slider":7,"./markdown/Markdown":9,"./popover":12,"./progress/RoutingProgress":13,"./toast":16}],9:[function(require,module,exports){
 {
     var ConfigTranslations = function ($injector) {
@@ -10489,7 +10402,6 @@ angular.module('pipControls', [
         .run(ConfigTranslations)
         .component('pipMarkdown', MarkdownComponent);
 }
-
 },{}],10:[function(require,module,exports){
 {
     var PopoverBindings = {
@@ -10593,10 +10505,8 @@ angular.module('pipControls', [
         .module('pipPopover')
         .component('pipPopover', Popover);
 }
-
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var PopoverService = (function () {
         PopoverService.$inject = ['$compile', '$rootScope', '$timeout'];
@@ -10637,14 +10547,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipPopover.Service', [])
         .service('pipPopoverService', PopoverService);
 }
-
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipPopover', ['pipPopover.Service']);
 require("./Popover");
 require("./PopoverService");
-
 },{"./Popover":10,"./PopoverService":11}],13:[function(require,module,exports){
 {
     var RoutingBindings = {
@@ -10675,20 +10582,16 @@ require("./PopoverService");
         .module('pipRoutingProgress', ['ngMaterial'])
         .component('pipRoutingProgress', RoutingProgress);
 }
-
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var Toast = (function () {
     function Toast() {
     }
     return Toast;
 }());
 exports.Toast = Toast;
-
 },{}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ToastController_1 = (function () {
         function ToastController_1($mdToast, toast, $injector) {
@@ -10861,14 +10764,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipToasts')
         .service('pipToasts', ToastService);
 }
-
 },{}],16:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipToasts', ['ngMaterial', 'pipControls.Translate']);
 require("./ToastService");
 require("./Toast");
-
 },{"./Toast":14,"./ToastService":15}],17:[function(require,module,exports){
 (function(module) {
 try {
@@ -10923,8 +10823,6 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[17,8])(17)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).lists = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
     translate.$inject = ['$injector'];
@@ -10939,14 +10837,11 @@ module.run(['$templateCache', function($templateCache) {
         .module('pipList.Translate', [])
         .filter('translate', translate);
 }
-
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLists', ['pipTagList']);
 require("./dependencies/TranslateFilter");
 require("./tag_list/TagList");
-
 },{"./dependencies/TranslateFilter":1,"./tag_list/TagList":3}],3:[function(require,module,exports){
 {
     var TagListController = (function () {
@@ -10989,7 +10884,6 @@ require("./tag_list/TagList");
         .module('pipTagList', ['pipList.Translate'])
         .component('pipTagList', TagList);
 }
-
 },{}],4:[function(require,module,exports){
 (function(module) {
 try {
@@ -11019,8 +10913,6 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[4,1,2,3])(4)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dates = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
@@ -11146,20 +11038,13 @@ module.run(['$templateCache', function($templateCache) {
         .module('pipDate', ['pipDates.Templates'])
         .component('pipDate', DateComponent);
 })();
-
 },{}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var IDateConvertService_1 = require("./IDateConvertService");
 (function () {
     var DateConvert = (function () {
@@ -11375,7 +11260,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
     var DateConvertProvider = (function (_super) {
         __extends(DateConvertProvider, _super);
         function DateConvertProvider() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            return _super.apply(this, arguments) || this;
         }
         DateConvertProvider.prototype.$get = function () {
             "ngInject";
@@ -11389,7 +11274,6 @@ var IDateConvertService_1 = require("./IDateConvertService");
         .module('pipDate.Convert', [])
         .provider('pipDateConvert', DateConvertProvider);
 })();
-
 },{"./IDateConvertService":5}],3:[function(require,module,exports){
 "use strict";
 formatTimeFilter.$inject = ['pipDateFormat'];
@@ -11430,7 +11314,6 @@ formatTodayDateShortTimeShortFilter.$inject = ['pipDateFormat'];
 formatMillisecondsToSecondsFilter.$inject = ['pipDateFormat'];
 formatElapsedIntervalFilter.$inject = ['pipDateFormat'];
 getDateJSONFilter.$inject = ['pipDateConvert'];
-Object.defineProperty(exports, "__esModule", { value: true });
 function formatTimeFilter(pipDateFormat) {
     "ngInject";
     return function (value, format) {
@@ -11698,20 +11581,13 @@ angular
     .filter('formatTodayDateShortTimeShort', formatTodayDateShortTimeShortFilter)
     .filter('formatMillisecondsToSeconds', formatMillisecondsToSecondsFilter)
     .filter('formatElapsedInterval', formatElapsedIntervalFilter);
-
 },{}],4:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var IDateConvertService_1 = require("./IDateConvertService");
 (function () {
     var DateFormat = (function () {
@@ -12124,7 +12000,7 @@ var IDateConvertService_1 = require("./IDateConvertService");
     var DateFormatProvider = (function (_super) {
         __extends(DateFormatProvider, _super);
         function DateFormatProvider() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            return _super.apply(this, arguments) || this;
         }
         DateFormatProvider.prototype.$get = function () {
             "ngInject";
@@ -12138,10 +12014,8 @@ var IDateConvertService_1 = require("./IDateConvertService");
         .module('pipDate.Format', [])
         .provider('pipDateFormat', DateFormatProvider);
 })();
-
 },{"./IDateConvertService":5}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var DateRangeType = (function () {
     function DateRangeType() {
     }
@@ -12154,17 +12028,13 @@ DateRangeType.WeekFromSunday = 'isoweek';
 DateRangeType.Day = 'day';
 DateRangeType.All = ['year', 'month', 'week', 'isoweek', 'day'];
 exports.DateRangeType = DateRangeType;
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],7:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipDate.Common', [
     'pipDate.Convert',
     'pipDate.Format',
@@ -12176,7 +12046,6 @@ require("./DateFormatService");
 require("./IDateConvertService");
 require("./IDateFormatService");
 __export(require("./IDateConvertService"));
-
 },{"./DateConvertService":2,"./DateFormatFilter":3,"./DateFormatService":4,"./IDateConvertService":5,"./IDateFormatService":6}],8:[function(require,module,exports){
 (function () {
     var DateRangeBindings = {
@@ -12517,7 +12386,6 @@ __export(require("./IDateConvertService"));
         .module('pipDateRange', ['pipDates.Templates'])
         .component('pipDateRange', daterange);
 })();
-
 },{}],9:[function(require,module,exports){
 {
     translateFilter.$inject = ['$injector'];
@@ -12532,7 +12400,6 @@ __export(require("./IDateConvertService"));
         .module('pipDates.Translate', [])
         .filter('translate', translateFilter);
 }
-
 },{}],10:[function(require,module,exports){
 angular.module('pipDates', [
     'pipDate',
@@ -12542,7 +12409,6 @@ angular.module('pipDates', [
     'pipDateRange',
     'pipDates.Translate'
 ]);
-
 },{}],11:[function(require,module,exports){
 (function () {
     var TimeRangeData = (function () {
@@ -12609,10 +12475,8 @@ angular.module('pipDates', [
     angular.module('pipTimeRange', [])
         .component('pipTimeRange', TimeRangeComponent);
 })();
-
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.IntervalTimeRange = 30;
 exports.MinutesInHour = 60;
 exports.HoursInDay = 24;
@@ -12878,7 +12742,6 @@ exports.MillisecondsInSecond = 1000;
     angular.module('pipTimeRangeEdit', [])
         .component('pipTimeRangeEdit', TimeRangeEditComponent);
 }
-
 },{}],13:[function(require,module,exports){
 (function(module) {
 try {
@@ -13096,21 +12959,13 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[13,2,3,4,5,6,7,8,1,9,10,12,11])(13)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dialogs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var ConfirmationDialogParams_1 = require("./ConfirmationDialogParams");
 var ConfirmationDialogController = (function (_super) {
     __extends(ConfirmationDialogController, _super);
@@ -13152,20 +13007,16 @@ var ConfirmationDialogController = (function (_super) {
 angular
     .module('pipConfirmationDialog')
     .controller('pipConfirmationDialogController', ConfirmationDialogController);
-
 },{"./ConfirmationDialogParams":2}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogParams = (function () {
     function ConfirmationDialogParams() {
     }
     return ConfirmationDialogParams;
 }());
 exports.ConfirmationDialogParams = ConfirmationDialogParams;
-
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ConfirmationDialogService = (function () {
     ConfirmationDialogService.$inject = ['$mdDialog'];
     function ConfirmationDialogService($mdDialog) {
@@ -13196,14 +13047,10 @@ var ConfirmationDialogService = (function () {
 angular
     .module('pipConfirmationDialog')
     .service('pipConfirmationDialog', ConfirmationDialogService);
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipConfirmationDialog', [
     'ngMaterial',
@@ -13214,7 +13061,6 @@ require("./ConfirmationDialogParams");
 require("./ConfirmationDialogController");
 require("./IConfirmationDialogService");
 require("./ConfirmationDialogService");
-
 },{"./ConfirmationDialogController":1,"./ConfirmationDialogParams":2,"./ConfirmationDialogService":3,"./IConfirmationDialogService":4}],6:[function(require,module,exports){
 {
     translate.$inject = ['$injector'];
@@ -13229,20 +13075,13 @@ require("./ConfirmationDialogService");
         .module('pipDialogs.Translate', [])
         .filter('translate', translate);
 }
-
 },{}],7:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var ErrorDetailsDialogParams_1 = require("./ErrorDetailsDialogParams");
 var ErrorDialogStrings = (function () {
     function ErrorDialogStrings() {
@@ -13333,20 +13172,16 @@ var ErrorDetailsDialogController = (function (_super) {
 angular
     .module('pipErrorDetailsDialog')
     .controller('pipErrorDetailsDialogController', ErrorDetailsDialogController);
-
 },{"./ErrorDetailsDialogParams":8}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogParams = (function () {
     function ErrorDetailsDialogParams() {
     }
     return ErrorDetailsDialogParams;
 }());
 exports.ErrorDetailsDialogParams = ErrorDetailsDialogParams;
-
 },{}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorDetailsDialogService = (function () {
     ErrorDetailsDialogService.$inject = ['$mdDialog'];
     function ErrorDetailsDialogService($mdDialog) {
@@ -13377,13 +13212,11 @@ var ErrorDetailsDialogService = (function () {
 angular
     .module('pipErrorDetailsDialog')
     .service('pipErrorDetailsDialog', ErrorDetailsDialogService);
-
 },{}],10:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipErrorDetailsDialog', [
     'ngMaterial',
@@ -13394,13 +13227,11 @@ require("./ErrorDetailsDialogParams");
 require("./ErrorDetailsDialogService");
 require("./ErrorDetailsDialogController");
 __export(require("./ErrorDetailsDialogParams"));
-
 },{"./ErrorDetailsDialogController":7,"./ErrorDetailsDialogParams":8,"./ErrorDetailsDialogService":9}],11:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./error_details");
 require("./information");
@@ -13419,20 +13250,13 @@ __export(require("./error_details"));
 __export(require("./information"));
 __export(require("./options"));
 __export(require("./options_big"));
-
 },{"./confirmation":5,"./dependencies/TranslateFilter":6,"./error_details":10,"./information":15,"./options":21,"./options_big":27}],12:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var InformationDialogParams_1 = require("./InformationDialogParams");
 var InformationDialogController = (function (_super) {
     __extends(InformationDialogController, _super);
@@ -13481,20 +13305,16 @@ var InformationDialogController = (function (_super) {
 angular
     .module('pipInformationDialog')
     .controller('pipInformationDialogController', InformationDialogController);
-
 },{"./InformationDialogParams":13}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogParams = (function () {
     function InformationDialogParams() {
     }
     return InformationDialogParams;
 }());
 exports.InformationDialogParams = InformationDialogParams;
-
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var InformationDialogService = (function () {
     InformationDialogService.$inject = ['$mdDialog'];
     function InformationDialogService($mdDialog) {
@@ -13521,13 +13341,11 @@ var InformationDialogService = (function () {
 angular
     .module('pipInformationDialog')
     .service('pipInformationDialog', InformationDialogService);
-
 },{}],15:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipInformationDialog', [
     'ngMaterial',
@@ -13538,20 +13356,13 @@ require("./InformationDialogParams");
 require("./InformationDialogController");
 require("./InformationDialogService");
 __export(require("./InformationDialogParams"));
-
 },{"./InformationDialogController":12,"./InformationDialogParams":13,"./InformationDialogService":14}],16:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var OptionsDialogParams_1 = require("./OptionsDialogParams");
 var OptionsDialogController = (function (_super) {
     __extends(OptionsDialogController, _super);
@@ -13621,10 +13432,8 @@ var OptionsDialogController = (function (_super) {
 angular
     .module('pipOptionsDialog')
     .controller('pipOptionsDialogController', OptionsDialogController);
-
 },{"./OptionsDialogParams":18}],17:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogData = (function () {
     function OptionsDialogData() {
         this.icon = 'star';
@@ -13633,30 +13442,24 @@ var OptionsDialogData = (function () {
     return OptionsDialogData;
 }());
 exports.OptionsDialogData = OptionsDialogData;
-
 },{}],18:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogParams = (function () {
     function OptionsDialogParams() {
     }
     return OptionsDialogParams;
 }());
 exports.OptionsDialogParams = OptionsDialogParams;
-
 },{}],19:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogResult = (function () {
     function OptionsDialogResult() {
     }
     return OptionsDialogResult;
 }());
 exports.OptionsDialogResult = OptionsDialogResult;
-
 },{}],20:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsDialogService = (function () {
     OptionsDialogService.$inject = ['$mdDialog'];
     function OptionsDialogService($mdDialog) {
@@ -13687,13 +13490,11 @@ var OptionsDialogService = (function () {
 angular
     .module('pipOptionsDialog')
     .service('pipOptionsDialog', OptionsDialogService);
-
 },{}],21:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipOptionsDialog', [
     'ngMaterial',
@@ -13708,20 +13509,13 @@ require("./OptionsDialogService");
 __export(require("./OptionsDialogData"));
 __export(require("./OptionsDialogParams"));
 __export(require("./OptionsDialogResult"));
-
 },{"./OptionsDialogController":16,"./OptionsDialogData":17,"./OptionsDialogParams":18,"./OptionsDialogResult":19,"./OptionsDialogService":20}],22:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var OptionsBigDialogParams_1 = require("./OptionsBigDialogParams");
 var OptionsBigDialogData_1 = require("./OptionsBigDialogData");
 var OptionsBigDialogController = (function (_super) {
@@ -13804,40 +13598,32 @@ var OptionsBigDialogController = (function (_super) {
 angular
     .module('pipOptionsBigDialog')
     .controller('pipOptionsBigDialogController', OptionsBigDialogController);
-
 },{"./OptionsBigDialogData":23,"./OptionsBigDialogParams":24}],23:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogData = (function () {
     function OptionsBigDialogData() {
     }
     return OptionsBigDialogData;
 }());
 exports.OptionsBigDialogData = OptionsBigDialogData;
-
 },{}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogParams = (function () {
     function OptionsBigDialogParams() {
     }
     return OptionsBigDialogParams;
 }());
 exports.OptionsBigDialogParams = OptionsBigDialogParams;
-
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogResult = (function () {
     function OptionsBigDialogResult() {
     }
     return OptionsBigDialogResult;
 }());
 exports.OptionsBigDialogResult = OptionsBigDialogResult;
-
 },{}],26:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var OptionsBigDialogService = (function () {
     OptionsBigDialogService.$inject = ['$mdDialog'];
     function OptionsBigDialogService($mdDialog) {
@@ -13868,13 +13654,11 @@ var OptionsBigDialogService = (function () {
 angular
     .module('pipOptionsBigDialog')
     .service('pipOptionsBigDialog', OptionsBigDialogService);
-
 },{}],27:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipOptionsBigDialog', [
     'ngMaterial',
@@ -13889,7 +13673,6 @@ require("./OptionsBigDialogService");
 __export(require("./OptionsBigDialogParams"));
 __export(require("./OptionsBigDialogData"));
 __export(require("./OptionsBigDialogResult"));
-
 },{"./OptionsBigDialogController":22,"./OptionsBigDialogData":23,"./OptionsBigDialogParams":24,"./OptionsBigDialogResult":25,"./OptionsBigDialogService":26}],28:[function(require,module,exports){
 (function(module) {
 try {
@@ -13956,11 +13739,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[28,11])(28)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).nav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var IActionsService_1 = require("./IActionsService");
 var IActionsService_2 = require("./IActionsService");
 var IActionsService_3 = require("./IActionsService");
@@ -14125,20 +13905,13 @@ var ActionsProvider = (function () {
 angular
     .module('pipActions')
     .provider('pipActions', ActionsProvider);
-
 },{"./IActionsService":2}],2:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 exports.ActionsChangedEvent = 'pipActionsChanged';
 exports.SecondaryActionsOpenEvent = 'pipSecondaryActionsOpen';
 var SimpleActionItem = (function () {
@@ -14150,7 +13923,7 @@ exports.SimpleActionItem = SimpleActionItem;
 var ActionItem = (function (_super) {
     __extends(ActionItem, _super);
     function ActionItem() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        return _super.apply(this, arguments) || this;
     }
     return ActionItem;
 }(SimpleActionItem));
@@ -14165,10 +13938,8 @@ var ActionsConfig = (function () {
     return ActionsConfig;
 }());
 exports.ActionsConfig = ActionsConfig;
-
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var PrimaryActionsController = (function () {
     PrimaryActionsController.$inject = ['$element', '$injector', '$scope', '$rootScope', '$window', '$location', 'pipActions', '$log', '$attrs'];
     function PrimaryActionsController($element, $injector, $scope, $rootScope, $window, $location, pipActions, $log, $attrs) {
@@ -14279,10 +14050,8 @@ var PrimaryActionsChanges = (function () {
         .module('pipActions')
         .component('pipPrimaryActions', primaryActions);
 })();
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SecondaryActionsController = (function () {
     SecondaryActionsController.$inject = ['$attrs', '$injector', '$log', '$rootScope', '$window', '$location', 'pipActions', '$element'];
     function SecondaryActionsController($attrs, $injector, $log, $rootScope, $window, $location, pipActions, $element) {
@@ -14410,22 +14179,18 @@ var SecondaryActionsChanges = (function () {
         .module('pipActions')
         .component('pipSecondaryActions', secondaryActions);
 })();
-
 },{}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipActions', ['ngMaterial', 'pipNav.Templates', 'ui.router']);
 require("./ActionsService");
 require("./PrimaryActions");
 require("./SecondaryActions");
 __export(require("./IActionsService"));
-
 },{"./ActionsService":1,"./IActionsService":2,"./PrimaryActions":3,"./SecondaryActions":4}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarController = (function () {
     AppBarController.$inject = ['$element', '$rootScope', 'pipAppBar'];
     function AppBarController($element, $rootScope, pipAppBar) {
@@ -14453,20 +14218,16 @@ var AppBarController = (function () {
         .module('pipAppBar')
         .component('pipAppbar', appbar);
 }
-
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarConfig = (function () {
     function AppBarConfig() {
     }
     return AppBarConfig;
 }());
 exports.AppBarConfig = AppBarConfig;
-
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarPartController = (function () {
     AppBarPartController.$inject = ['$scope', '$element', '$attrs', '$log', '$rootScope', 'pipAppBar'];
     function AppBarPartController($scope, $element, $attrs, $log, $rootScope, pipAppBar) {
@@ -14517,10 +14278,8 @@ var AppBarPartController = (function () {
     angular.module('pipAppBar')
         .directive('pipAppbarPart', appbarPart);
 })();
-
 },{}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AppBarConfig_1 = require("./AppBarConfig");
 exports.AppBarChangedEvent = 'pipAppBarChanged';
 var AppBarService = (function () {
@@ -14696,13 +14455,11 @@ var AppBarProvider = (function () {
 angular
     .module('pipAppBar')
     .provider('pipAppBar', AppBarProvider);
-
 },{"./AppBarConfig":7}],10:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipAppBar', ['ngMaterial', 'pipNav.Templates']);
 require("./AppBarConfig");
@@ -14710,10 +14467,8 @@ require("./AppBarService");
 require("./AppBar");
 require("./AppBarPart");
 __export(require("./AppBarService"));
-
 },{"./AppBar":6,"./AppBarConfig":7,"./AppBarPart":8,"./AppBarService":9}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbService_1 = require("./BreadcrumbService");
 var BreadcrumbService_2 = require("./BreadcrumbService");
 var SearchService_1 = require("../search/SearchService");
@@ -14810,10 +14565,8 @@ var breadcrumb = {
 angular
     .module('pipBreadcrumb')
     .component('pipBreadcrumb', breadcrumb);
-
 },{"../search/SearchService":35,"./BreadcrumbService":13}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbItem = (function () {
     function BreadcrumbItem() {
         this.title = null;
@@ -14829,10 +14582,8 @@ var BreadcrumbConfig = (function () {
     return BreadcrumbConfig;
 }());
 exports.BreadcrumbConfig = BreadcrumbConfig;
-
 },{}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var BreadcrumbConfig_1 = require("./BreadcrumbConfig");
 exports.BreadcrumbChangedEvent = "pipBreadcrumbChanged";
 exports.BreadcrumbBackEvent = "pipBreadcrumbBack";
@@ -14925,21 +14676,17 @@ var BreadcrumbProvider = (function () {
 angular
     .module('pipBreadcrumb')
     .provider('pipBreadcrumb', BreadcrumbProvider);
-
 },{"./BreadcrumbConfig":12}],14:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipBreadcrumb', ['ngMaterial', 'pipNav.Templates', 'pipNav.Translate']);
 require("./Breadcrumb");
 require("./BreadcrumbService");
 __export(require("./BreadcrumbService"));
-
 },{"./Breadcrumb":11,"./BreadcrumbService":13}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavService = (function () {
     NavService.$inject = ['$injector'];
     function NavService($injector) {
@@ -14978,7 +14725,6 @@ var NavService = (function () {
 angular
     .module('pipNavService', [])
     .service('pipNavService', NavService);
-
 },{}],16:[function(require,module,exports){
 {
     translateFilter.$inject = ['$injector'];
@@ -14994,7 +14740,6 @@ angular
         .module('pipNav.Translate', [])
         .filter('translate', translateFilter);
 }
-
 },{}],17:[function(require,module,exports){
 {
     var DropdownController = (function () {
@@ -15069,10 +14814,8 @@ angular
         .module('pipDropdown', ['pipNav.Templates'])
         .component('pipDropdown', dropdown);
 }
-
 },{}],18:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var NavHeaderController = (function () {
         NavHeaderController.$inject = ['$element', '$scope', '$log', '$rootScope', '$timeout', 'pipNavHeader', 'navConstant'];
@@ -15211,10 +14954,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipNavHeader')
         .component('pipNavHeader', navHeader);
 }
-
 },{}],19:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavHeaderConfig = (function () {
     function NavHeaderConfig() {
     }
@@ -15222,10 +14963,8 @@ var NavHeaderConfig = (function () {
 }());
 exports.NavHeaderConfig = NavHeaderConfig;
 ;
-
 },{}],20:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavHeaderConfig_1 = require("./NavHeaderConfig");
 exports.NavHeaderChangedEvent = 'pipNavHeaderChanged';
 var NavHeaderService = (function () {
@@ -15435,25 +15174,19 @@ var NavHeaderProvider = (function () {
 angular
     .module('pipNavHeader')
     .provider('pipNavHeader', NavHeaderProvider);
-
 },{"./NavHeaderConfig":19}],21:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavHeader', ['ngMaterial', 'pipNav.Templates']);
 require("./NavHeaderService");
 require("./NavHeader");
 __export(require("./NavHeaderService"));
-
 },{"./NavHeader":18,"./NavHeaderService":20}],22:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],23:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavService_1 = require("../sidenav/SideNavService");
 var NavIconService_1 = require("./NavIconService");
 var NavIconBindings = {
@@ -15525,10 +15258,8 @@ var NavIcon = {
 angular
     .module('pipNavIcon')
     .component('pipNavIcon', NavIcon);
-
 },{"../sidenav/SideNavService":39,"./NavIconService":25}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavIconConfig = (function () {
     function NavIconConfig() {
     }
@@ -15536,10 +15267,8 @@ var NavIconConfig = (function () {
 }());
 exports.NavIconConfig = NavIconConfig;
 ;
-
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var NavIconConfig_1 = require("./NavIconConfig");
 exports.NavIconClickedEvent = 'pipNavIconClicked';
 exports.NavIconChangedEvent = 'pipNavIconChanged';
@@ -15658,13 +15387,11 @@ var NavIconProvider = (function () {
 angular
     .module('pipNavIcon')
     .provider('pipNavIcon', NavIconProvider);
-
 },{"./NavIconConfig":24}],26:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavIcon', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavIconConfig");
 require("./INavIconService");
@@ -15672,13 +15399,11 @@ require("./NavIconService");
 require("./NavIcon");
 __export(require("./NavIconConfig"));
 __export(require("./NavIconService"));
-
 },{"./INavIconService":22,"./NavIcon":23,"./NavIconConfig":24,"./NavIconService":25}],27:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./dependencies/TranslateFilter");
 require("./language/LanguagePickerDirective");
 require("./dropdown/Dropdown");
@@ -15721,7 +15446,6 @@ __export(require("./breadcrumb"));
 __export(require("./sidenav"));
 __export(require("./icon"));
 __export(require("./header"));
-
 },{"./actions":5,"./appbar":10,"./breadcrumb":14,"./common/NavService":15,"./dependencies/TranslateFilter":16,"./dropdown/Dropdown":17,"./header":21,"./icon":26,"./language/LanguagePickerDirective":28,"./menu":31,"./search":36,"./sidenav":41,"./tabs/Tabs":42}],28:[function(require,module,exports){
 {
     var LanguagePickerDirectiveController = (function () {
@@ -15768,10 +15492,8 @@ __export(require("./header"));
     ])
         .component('pipLanguagePicker', languagePickerDirective);
 }
-
 },{}],29:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 (function () {
     var NavMenuController = (function () {
         NavMenuController.$inject = ['$scope', '$window', '$location', '$rootScope', '$timeout', 'pipSideNav', 'pipNavMenu', '$element', '$injector', 'navConstant'];
@@ -15945,10 +15667,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipNavMenu')
         .directive('pipNavMenu', navMenuDirective);
 })();
-
 },{}],30:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.NavMenuChangedEvent = 'pipNavMenuChanged';
 var NavMenuService = (function () {
     function NavMenuService(config, $rootScope) {
@@ -16050,21 +15770,15 @@ var NavMenuProvider = (function () {
 angular
     .module('pipNavMenu')
     .provider('pipNavMenu', NavMenuProvider);
-
 },{}],31:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipNavMenu', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./NavMenuService");
 require("./NavMenu");
-
 },{"./NavMenu":29,"./NavMenuService":30}],32:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],33:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SearchService_1 = require("./SearchService");
 var SearchBarController = (function () {
     SearchBarController.$inject = ['$element', '$rootScope', 'pipSearch'];
@@ -16156,20 +15870,16 @@ var SearchBar = {
 angular
     .module('pipSearchBar')
     .component('pipSearchBar', SearchBar);
-
 },{"./SearchService":35}],34:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SearchConfig = (function () {
     function SearchConfig() {
     }
     return SearchConfig;
 }());
 exports.SearchConfig = SearchConfig;
-
 },{}],35:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SearchConfig_1 = require("./SearchConfig");
 exports.OpenSearchEvent = 'pipOpenSearch';
 exports.CloseSearchEvent = 'pipCloseSearch';
@@ -16279,19 +15989,15 @@ var SearchProvider = (function () {
 }());
 angular.module('pipSearchBar')
     .provider('pipSearch', SearchProvider);
-
 },{"./SearchConfig":34}],36:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSearchBar', ['ngMaterial', 'pipNav.Translate', 'pipNav.Templates']);
 require("./SearchConfig");
 require("./ISearchService");
 require("./SearchService");
 require("./SearchBar");
-
 },{"./ISearchService":32,"./SearchBar":33,"./SearchConfig":34,"./SearchService":35}],37:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavService_1 = require("../sidenav/SideNavService");
 var SideNavState_1 = require("./SideNavState");
 var SideNavController = (function () {
@@ -16455,7 +16161,6 @@ var SideNavBindings = {
         .module('pipSideNav')
         .component('pipSidenav', sideNav);
 })();
-
 },{"../sidenav/SideNavService":39,"./SideNavState":40}],38:[function(require,module,exports){
 {
     sidenavPartDirective.$inject = ['ngIfDirective'];
@@ -16506,11 +16211,9 @@ var SideNavBindings = {
         .module('pipSideNav')
         .directive('pipSidenavPart', sidenavPartDirective);
 }
-
 },{}],39:[function(require,module,exports){
 "use strict";
 hookSideNavEvents.$inject = ['$rootScope', 'pipSideNav'];
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavState_1 = require("./SideNavState");
 exports.SideNavChangedEvent = 'pipSideNavChanged';
 exports.SideNavStateChangedEvent = 'pipSideNavStateChanged';
@@ -16740,10 +16443,8 @@ angular
     .module('pipSideNav')
     .provider('pipSideNav', SideNavProvider)
     .run(hookSideNavEvents);
-
 },{"./SideNavState":40}],40:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SideNavStateNames = (function () {
     function SideNavStateNames() {
     }
@@ -16813,23 +16514,19 @@ var SideNavConfig = (function () {
     return SideNavConfig;
 }());
 exports.SideNavConfig = SideNavConfig;
-
 },{}],41:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSideNav', ['ngMaterial', 'pipNav.Templates']);
 require("./SideNavState");
 require("./SideNavService");
 require("./SideNavPart");
 require("./SideNav");
 __export(require("./SideNavService"));
-
 },{"./SideNav":37,"./SideNavPart":38,"./SideNavService":39,"./SideNavState":40}],42:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var PipTab = (function () {
     function PipTab() {
     }
@@ -17009,7 +16706,6 @@ exports.PipTab = PipTab;
         .module('pipTabs', ['pipNav.Templates'])
         .component('pipTabs', Tabs);
 }
-
 },{}],43:[function(require,module,exports){
 (function(module) {
 try {
@@ -17042,6 +16738,18 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('breadcrumb/Breadcrumb.html',
+    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!$ctrl._media(\'xs\')"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span><span class="pip-breadcrumb-item {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" ng-repeat-start="item in $ctrl.config.items" ng-click="$ctrl.onClick(item)" ng-init="stepWidth = 100/($ctrl.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !$ctrl.actionsVisible(item)">{{ item.title | translate }}</span><div ng-if="$last && $ctrl.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-click="$ctrl.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{ item.title | translate }}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="$ctrl.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{ subItem.icon }}"></md-icon><span>{{ subItem.title | translate }}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span></div><div style="position: relative;" ng-if="$ctrl._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="$ctrl.config.items && $ctrl.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span> <span class="breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span> <span ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" class="breadcrumb-accent {{ ($ctrl.config.items && $ctrl.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{ $ctrl.config.items[$ctrl.config.items.length - 1].title | translate }}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="$ctrl.config.items && $ctrl.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.config.items" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0"><md-button ng-click="$ctrl.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{ item.icon }}"></md-icon><span>{{ item.title | translate }}</span></md-button></md-menu-item><md-menu-item ng-if="$ctrl.config.text"><md-button tabindex="5"><span class="text-grey">{{ $ctrl.config.text | translate }}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('appbar/AppBar.html',
     '<md-toolbar class="{{ $ctrl.config.classes.join(\' \') }}" ng-if="$ctrl.config.visible" ng-transclude=""></md-toolbar>');
 }]);
@@ -17054,8 +16762,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('breadcrumb/Breadcrumb.html',
-    '<div class="pip-breadcrumb-block"><div class="text-overflow" ng-if="!$ctrl._media(\'xs\')"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span><span class="pip-breadcrumb-item {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" ng-repeat-start="item in $ctrl.config.items" ng-click="$ctrl.onClick(item)" ng-init="stepWidth = 100/($ctrl.config.items.length + 1)" ng-class="{\'cursor-pointer\': !$last}" ng-style="{\'max-width\': stepWidth + \'%\'}"><span ng-if="!$last || !$ctrl.actionsVisible(item)">{{ item.title | translate }}</span><div ng-if="$last && $ctrl.actionsVisible(item)" style="display: inline-block; position: relative;"><md-menu md-offset="0 44"><span class="layout-row pip-breadcrumb-item-menu cursor-pointer {{ $last ? \'breadcrumb-accent\' : \'\' }}" ng-click="$ctrl.onOpenMenu($mdOpenMenu, $event)" md-ink-ripple="" aria-label="open breadcrumb actions">{{ item.title | translate }}<md-icon class="pip-triangle-down" md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="4"><md-menu-item ng-if="!subItem.divider" ng-repeat-start="subItem in item.subActions"><md-button ng-click="$ctrl.onSubActionClick(subItem)" ng-if="!action.divider" tabindex="4"><md-icon md-menu-align-target="" ng-if="subItem.icon" md-svg-icon="{{ subItem.icon }}"></md-icon><span>{{ subItem.title | translate }}</span></md-button></md-menu-item><md-menu-divider ng-if="subItem.divider" ng-repeat-end=""></md-menu-divider></md-menu-content></md-menu></div></span><md-icon ng-repeat-end="" md-svg-icon="icons:chevron-right" ng-hide="$last"></md-icon><span class="pip-title breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span></div><div style="position: relative;" ng-if="$ctrl._media(\'xs\')"><md-menu md-offset="0 44"><span class="pip-mobile-breadcrumb layout-row" ng-click="$ctrl.config.items && $ctrl.config.items.length > 1 ? $mdOpenMenu() : return"><span class="text-overflow"><span ng-if="$ctrl.config.criteria" ng-click="$ctrl.openSearch()">{{ $ctrl.config.criteria }} -</span> <span class="breadcrumb-accent" ng-if="$ctrl.config.text">{{ $ctrl.config.text | translate }}</span> <span ng-if="$ctrl.config.items && $ctrl.config.items.length > 0" class="breadcrumb-accent {{ ($ctrl.config.items && $ctrl.config.items.length > 1) ? \'cursor-pointer\' : \'\' }}">{{ $ctrl.config.items[$ctrl.config.items.length - 1].title | translate }}</span></span><md-icon class="pip-triangle-down cursor-pointer breadcrumb-accent" md-svg-icon="icons:triangle-down" ng-if="$ctrl.config.items && $ctrl.config.items.length > 1"></md-icon></span><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.config.items" ng-if="$ctrl.config.items && $ctrl.config.items.length > 0"><md-button ng-click="$ctrl.onClick(item)" tabindex="5"><md-icon md-menu-align-target="" ng-if="item.icon" md-svg-icon="{{ item.icon }}"></md-icon><span>{{ item.title | translate }}</span></md-button></md-menu-item><md-menu-item ng-if="$ctrl.config.text"><md-button tabindex="5"><span class="text-grey">{{ $ctrl.config.text | translate }}</span></md-button></md-menu-item></md-menu-content></md-menu></div></div>');
+  $templateCache.put('header/NavHeader.html',
+    '<md-toolbar ng-show="$ctrl.showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="$ctrl.onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="$ctrl.imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="$ctrl.onUserClick()" tabindex="-1">{{ $ctrl.title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ $ctrl.subtitle | translate }}</div></div></md-toolbar>');
 }]);
 })();
 
@@ -17143,24 +16851,10 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('header/NavHeader.html',
-    '<md-toolbar ng-show="$ctrl.showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="$ctrl.onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="$ctrl.imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="$ctrl.onUserClick()" tabindex="-1">{{ $ctrl.title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ $ctrl.subtitle | translate }}</div></div></md-toolbar>');
-}]);
-})();
-
 
 
 },{}]},{},[43,27])(43)
 });
-
-
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).themes = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
@@ -17204,7 +16898,6 @@ module.run(['$templateCache', function($templateCache) {
         .module('pipTheme.BootBarn.Cool', ['ngMaterial'])
         .config(configureBootBarnCoolTheme);
 }
-
 },{}],2:[function(require,module,exports){
 {
     configureBootBarnMonochromeTheme.$inject = ['$mdThemingProvider'];
@@ -17247,7 +16940,6 @@ module.run(['$templateCache', function($templateCache) {
         .module('pipTheme.BootBarn.Monochrome', ['ngMaterial'])
         .config(configureBootBarnMonochromeTheme);
 }
-
 },{}],3:[function(require,module,exports){
 {
     configureBootBarnWarmTheme.$inject = ['$mdThemingProvider'];
@@ -17295,10 +16987,8 @@ module.run(['$templateCache', function($templateCache) {
         .module('pipTheme.BootBarn.Warm', ['ngMaterial'])
         .config(configureBootBarnWarmTheme);
 }
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./BootBarnCoolTheme");
 require("./BootBarnWarmTheme");
 require("./BootBarnMonochromeTheme");
@@ -17308,11 +16998,9 @@ angular.module('pipTheme.BootBarn', [
     'pipTheme.BootBarn.Cool',
     'pipTheme.BootBarn.Monochrome',
 ]);
-
 },{"./BootBarnCoolTheme":1,"./BootBarnMonochromeTheme":2,"./BootBarnWarmTheme":3}],5:[function(require,module,exports){
 "use strict";
 initTheme.$inject = ['pipTheme'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThemeRootVar = "$theme";
 exports.ThemeChangedEvent = "pipThemeChanged";
 exports.ThemeResetPage = "pipResetPage";
@@ -17436,17 +17124,14 @@ angular
     .module('pipTheme')
     .provider('pipTheme', ThemeProvider)
     .run(initTheme);
-
 },{}],6:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipTheme', ['ngMaterial']);
 require("./ThemeService");
 __export(require("./ThemeService"));
-
 },{"./ThemeService":5}],7:[function(require,module,exports){
 {
     configureDefaultAmberTheme.$inject = ['$mdThemingProvider'];
@@ -17483,7 +17168,6 @@ __export(require("./ThemeService"));
         .module('pipTheme.Amber', ['ngMaterial'])
         .config(configureDefaultAmberTheme);
 }
-
 },{}],8:[function(require,module,exports){
 {
     configureDefaultBlueTheme.$inject = ['$mdThemingProvider'];
@@ -17529,7 +17213,6 @@ __export(require("./ThemeService"));
         .module('pipTheme.Blue', ['ngMaterial'])
         .config(configureDefaultBlueTheme);
 }
-
 },{}],9:[function(require,module,exports){
 {
     configureDefaultGreenTheme.$inject = ['$mdThemingProvider'];
@@ -17570,7 +17253,6 @@ __export(require("./ThemeService"));
         .module('pipTheme.Green', ['ngMaterial'])
         .config(configureDefaultGreenTheme);
 }
-
 },{}],10:[function(require,module,exports){
 {
     configureDefaultGreyTheme.$inject = ['$mdThemingProvider'];
@@ -17607,7 +17289,6 @@ __export(require("./ThemeService"));
         .module('pipTheme.Grey', ['ngMaterial'])
         .config(configureDefaultGreyTheme);
 }
-
 },{}],11:[function(require,module,exports){
 {
     configureDefaultNavyTheme.$inject = ['$mdThemingProvider'];
@@ -17644,7 +17325,6 @@ __export(require("./ThemeService"));
         .module('pipTheme.Navy', ['ngMaterial'])
         .config(configureDefaultNavyTheme);
 }
-
 },{}],12:[function(require,module,exports){
 {
     configureDefaultOrangeTheme.$inject = ['$mdThemingProvider'];
@@ -17684,7 +17364,6 @@ __export(require("./ThemeService"));
         .module('pipTheme.Orange', ['ngMaterial'])
         .config(configureDefaultOrangeTheme);
 }
-
 },{}],13:[function(require,module,exports){
 {
     configureDefaultPinkTheme.$inject = ['$mdThemingProvider'];
@@ -17725,11 +17404,9 @@ __export(require("./ThemeService"));
         .module('pipTheme.Pink', ['ngMaterial'])
         .config(configureDefaultPinkTheme);
 }
-
 },{}],14:[function(require,module,exports){
 "use strict";
 configureDefaultTheme.$inject = ['$mdThemingProvider'];
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./DefaultBlueTheme");
 require("./DefaultPinkTheme");
 require("./DefaultAmberTheme");
@@ -17753,26 +17430,20 @@ angular
     'pipTheme.Grey'
 ])
     .config(configureDefaultTheme);
-
 },{"./DefaultAmberTheme":7,"./DefaultBlueTheme":8,"./DefaultGreenTheme":9,"./DefaultGreyTheme":10,"./DefaultNavyTheme":11,"./DefaultOrangeTheme":12,"./DefaultPinkTheme":13}],15:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./common");
 require("./default");
 require("./bootbarn");
 __export(require("./common"));
-
 },{"./bootbarn":4,"./common":6,"./default":14}]},{},[15])(15)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).errors = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorPageConfig = (function () {
     function ErrorPageConfig() {
     }
@@ -17842,10 +17513,8 @@ var SupportedBrowsers = (function () {
     return SupportedBrowsers;
 }());
 exports.SupportedBrowsers = SupportedBrowsers;
-
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ErrorPageConfig_1 = require("./ErrorPageConfig");
 var ErrorPageConfigService = (function () {
     ErrorPageConfigService.$inject = ['config'];
@@ -17903,7 +17572,6 @@ var ErrorPageConfigProvider = (function () {
         .module('pipErrorPageConfigService', [])
         .provider('pipErrorPageConfigService', ErrorPageConfigProvider);
 })();
-
 },{"./ErrorPageConfig":1}],3:[function(require,module,exports){
 (function () {
     var ClearErrorsLink = (function () {
@@ -17944,10 +17612,8 @@ var ErrorPageConfigProvider = (function () {
         .module('pipClearErrors', [])
         .directive('pipClearErrors', clearErrorsDirective);
 })();
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FormErrorsService = (function () {
     FormErrorsService.$inject = ['$rootScope'];
     function FormErrorsService($rootScope) {
@@ -18044,13 +17710,11 @@ var FormErrorsService = (function () {
         .module('pipFormErrors', [])
         .service('pipFormErrors', FormErrorsService);
 })();
-
 },{}],5:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipErrors.Pages', [
     'ngMaterial'
@@ -18074,13 +17738,11 @@ angular
     'pipFormErrors'
 ]);
 __export(require("./error_pages/ErrorPageConfig"));
-
 },{"./error_pages/ErrorPageConfig":1,"./error_pages/ErrorPageConfigService":2,"./form_errors/ClearErrorsDirective":3,"./form_errors/FormErrorsService":4,"./maintenance/MaintenanceErrorPage":6,"./missing_route/MissingRouteErrorPage":7,"./no_connection/NoConnectionErrorPage":8,"./no_connection_panel/NoConnectionPanel":9,"./unknown/UnknownErrorPage":10,"./unsupported/UnsupportedErrorPage":11}],6:[function(require,module,exports){
 "use strict";
 configureMaintenanceErrorPageRoute.$inject = ['$stateProvider'];
 initMaintenanceErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
 setMaintenanceErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsMaintenanceState = 'errors_maintenance';
 exports.MaintenanceErrorEvent = 'pipMaintenanceError';
 var MaintenanceError = (function () {
@@ -18174,13 +17836,11 @@ function setMaintenanceErrorPageResources($injector) {
         .run(initMaintenanceErrorPage)
         .run(setMaintenanceErrorPageResources);
 })();
-
 },{}],7:[function(require,module,exports){
 "use strict";
 configureMissingRouteErrorPageRoute.$inject = ['$stateProvider'];
 initMissingRouteErrorPage.$inject = ['$rootScope', '$state', '$injector', 'pipErrorPageConfigService'];
 setMissingRouteErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsMissingRouteState = 'errors_missing_route';
 exports.StateNotFoundEvent = '$stateNotFound';
 var MissingRouteErrorState = (function () {
@@ -18278,13 +17938,11 @@ function setMissingRouteErrorPageResources($injector) {
         .run(initMissingRouteErrorPage)
         .run(setMissingRouteErrorPageResources);
 })();
-
 },{}],8:[function(require,module,exports){
 "use strict";
 configureNoConnectionErrorPageRoute.$inject = ['$injector', '$stateProvider'];
 initNoConnectionErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
 setNoConnectionErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsConnectionState = 'errors_no_connection';
 exports.ErrorsConnectionEvent = 'pipNoConnectionError';
 var NoConnectionError = (function () {
@@ -18365,7 +18023,6 @@ function setNoConnectionErrorPageResources($injector) {
         .run(initNoConnectionErrorPage)
         .run(setNoConnectionErrorPageResources);
 })();
-
 },{}],9:[function(require,module,exports){
 (function () {
     var NoConnectionPanelController = (function () {
@@ -18395,13 +18052,11 @@ function setNoConnectionErrorPageResources($injector) {
         };
     });
 })();
-
 },{}],10:[function(require,module,exports){
 "use strict";
 configureUnknownErrorPageRoute.$inject = ['$injector', '$stateProvider'];
 initUnknownErrorPage.$inject = ['$rootScope', '$state', 'pipErrorPageConfigService'];
 setUnknownErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsUnknownState = 'errors_unknown';
 exports.ErrorsUnknownEvent = 'pipUnknownError';
 var UnknownErrorDetails = (function () {
@@ -18493,13 +18148,11 @@ function setUnknownErrorPageResources($injector) {
         .run(initUnknownErrorPage)
         .run(setUnknownErrorPageResources);
 })();
-
 },{}],11:[function(require,module,exports){
 "use strict";
 configureUnsupportedErrorPageRoute.$inject = ['$stateProvider'];
 initUnsupportedErrorPage.$inject = ['$rootScope', '$state', '$injector', 'pipErrorPageConfigService'];
 setUnsupportedErrorPageResources.$inject = ['$injector'];
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorsUnsupportedState = 'errors_unsupported';
 exports.ErrorsUnsupportedEvent = 'pipUnsupportedError';
 var UnsupportedError = (function () {
@@ -18604,7 +18257,6 @@ function setUnsupportedErrorPageResources($injector) {
         .run(initUnsupportedErrorPage)
         .run(setUnsupportedErrorPageResources);
 })();
-
 },{}],12:[function(require,module,exports){
 (function(module) {
 try {
@@ -18649,8 +18301,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('unsupported/UnsupportedErrorPage.html',
-    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$ctrl.media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$ctrl.media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div></div>');
+  $templateCache.put('no_connection_panel/NoConnectionPanel.html',
+    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{$ctrl.error.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.error.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.error.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="$ctrl.onRetry($event)">{{::\'ERROR_NO_CONNECTION_RETRY\' | translate}}</md-button></div></div>');
 }]);
 })();
 
@@ -18673,8 +18325,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('no_connection_panel/NoConnectionPanel.html',
-    '<div class="pip-error-page pip-error layout-column layout-align-center-center flex"><img src="{{$ctrl.error.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.error.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.error.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="RETRY" class="md-accent" ng-click="$ctrl.onRetry($event)">{{::\'ERROR_NO_CONNECTION_RETRY\' | translate}}</md-button></div></div>');
+  $templateCache.put('unsupported/UnsupportedErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><div class="pip-error-text">{{::$ctrl.errorConfig.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.errorConfig.SubTitle | translate}}</div><div class="pip-error-details layout-row layout-align-center-center" ng-if="$ctrl.media(\'gt-xs\')"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div><div class="pip-error-details" ng-if="$ctrl.media(\'xs\')"><div class="layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/ie.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.microsoft.com/en-us/download/internet-explorer-11-for-windows-7-details.aspx">{{::\'ERROR_UNSUPPORTED_IE\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_IE_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/fm.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.mozilla.org/ru/firefox/new/">{{::\'ERROR_UNSUPPORTED_FM\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_FM_VER\' | translate}}</p></div></div></div><div class="tm16 layout-row layout-align-center-center"><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/gc.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="https://www.google.com/chrome/browser/desktop/index.html?platform=win64#">{{::\'ERROR_UNSUPPORTED_GC\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_GC_VER\' | translate}}</p></div></div><div class="pip-error-details-item layout-column layout-align-center-center"><div style="background-image: url(\'images/o.svg\');" class="pip-pic"></div><div class="h64 tp16 bp16"><a class="text-body2 m0" target="_blank" href="http://www.opera.com/ru/download">{{::\'ERROR_UNSUPPORTED_O\' | translate}}</a><p class="text-body1 m0">{{::\'ERROR_UNSUPPORTED_O_VER\' | translate}}</p></div></div></div></div></div></div>');
 }]);
 })();
 
@@ -18683,11 +18335,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[12,5])(12)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).charts = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var BarChartBindings = {
         series: '<pipSeries',
@@ -18881,10 +18530,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipBarCharts', [])
         .component('pipBarChart', BarChart);
 }
-
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ChartColorsService = (function () {
         ChartColorsService.$inject = ['$mdColorPalette'];
@@ -18922,14 +18569,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipChartColors', [])
         .service('pipChartColors', ChartColorsService);
 }
-
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var ChartLegendBindings = {
         series: '<pipSeries',
@@ -19019,7 +18662,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipChartLegends', [])
         .component('pipChartLegend', ChartLegend);
 }
-
 },{}],5:[function(require,module,exports){
 angular.module('pipCharts', [
     'pipBarCharts',
@@ -19029,10 +18671,8 @@ angular.module('pipCharts', [
     'pipChartColors',
     'pipCharts.Templates'
 ]);
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LineChartBindings = {
         series: '<pipSeries',
@@ -19493,10 +19133,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipLineCharts', [])
         .component('pipLineChart', LineChart);
 }
-
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var PieChartBindings = {
         series: '<pipSeries',
@@ -19695,8 +19333,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipPieCharts', [])
         .component('pipPieChart', PieChart);
 }
-
 },{}],8:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('bar_chart/BarChart.html',
+    '<div class="bar-chart">\n' +
+    '    <svg ></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
+}]);
+})();
+
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -19726,22 +19379,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar_chart/BarChart.html',
-    '<div class="bar-chart">\n' +
-    '    <svg ></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -19795,8 +19432,6 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[8,1,2,3,4,5,6,7])(8)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).locations = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
     translateFilter.$inject = ['$injector'];
@@ -19811,7 +19446,6 @@ module.run(['$templateCache', function($templateCache) {
         .module('pipLocations.Translate', [])
         .filter('translate', translateFilter);
 }
-
 },{}],2:[function(require,module,exports){
 angular.module('pipLocations', [
     'pipLocation',
@@ -19821,7 +19455,6 @@ angular.module('pipLocations', [
     'pipLocationEdit',
     'pipLocations.Translate'
 ]);
-
 },{}],3:[function(require,module,exports){
 {
     var LocationBindings = {
@@ -19945,14 +19578,10 @@ angular.module('pipLocations', [
         .module("pipLocation", [])
         .component('pipLocation', LocationComponent);
 }
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LocationEditDialogController_1 = (function () {
         function LocationEditDialogController_1($scope, $rootScope, $timeout, $mdDialog, locationPos, locationName) {
@@ -20139,26 +19768,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .run(LocationDialogRun)
         .service('pipLocationEditDialog', LocationDialogService);
 }
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var LocationDialogParams = (function () {
     function LocationDialogParams() {
     }
     return LocationDialogParams;
 }());
 exports.LocationDialogParams = LocationDialogParams;
-
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipLocationEditDialog', ['ngMaterial', 'pipLocations.Templates']);
 require("./LocationDialog");
-
 },{"./LocationDialog":5}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var LocationEditBindings = {
         pipLocationName: '=',
@@ -20337,7 +19960,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module("pipLocationEdit", ['pipLocationEditDialog'])
         .component('pipLocationEdit', LocationEdit);
 }
-
 },{}],9:[function(require,module,exports){
 {
     var LocationIpBindings = {
@@ -20439,7 +20061,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module("pipLocationIp", [])
         .component('pipLocationIp', LocationIp);
 }
-
 },{}],10:[function(require,module,exports){
 {
     var LocationMapBindings = {
@@ -20553,7 +20174,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module("pipLocationMap", [])
         .component('pipLocationMap', LocationMap);
 }
-
 },{}],11:[function(require,module,exports){
 (function(module) {
 try {
@@ -20671,8 +20291,6 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[11,1,2,4,7,5,6,8,9,10,3])(11)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).files = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (process,global){
 (function (global, factory) {
@@ -20772,7 +20390,7 @@ function applyEach$1(eachfn) {
         var go = initialParams(function (args, callback) {
             var that = this;
             return eachfn(fns, function (fn, cb) {
-                fn.apply(that, args.concat(cb));
+                fn.apply(that, args.concat([cb]));
             }, callback);
         });
         if (args.length) {
@@ -20877,7 +20495,8 @@ function baseGetTag(value) {
   if (value == null) {
     return value === undefined ? undefinedTag : nullTag;
   }
-  return (symToStringTag && symToStringTag in Object(value))
+  value = Object(value);
+  return (symToStringTag && symToStringTag in value)
     ? getRawTag(value)
     : objectToString(value);
 }
@@ -21007,10 +20626,6 @@ function isLength(value) {
 function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
-
-// A temporary value used to identify if the loop should be broken.
-// See #1064, #1293
-var breakLoop = {};
 
 /**
  * This method returns `undefined`.
@@ -21316,7 +20931,7 @@ var freeProcess = moduleExports$1 && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
-    return freeProcess && freeProcess.binding && freeProcess.binding('util');
+    return freeProcess && freeProcess.binding('util');
   } catch (e) {}
 }());
 
@@ -21521,6 +21136,10 @@ function onlyOnce(fn) {
     };
 }
 
+// A temporary value used to identify if the loop should be broken.
+// See #1064, #1293
+var breakLoop = {};
+
 function _eachOfLimit(limit) {
     return function (obj, iteratee, callback) {
         callback = once(callback || noop);
@@ -21605,10 +21224,10 @@ function eachOfArrayLike(coll, iteratee, callback) {
         callback(null);
     }
 
-    function iteratorCallback(err, value) {
+    function iteratorCallback(err) {
         if (err) {
             callback(err);
-        } else if (++completed === length || value === breakLoop) {
+        } else if (++completed === length) {
             callback(null);
         }
     }
@@ -22197,7 +21816,7 @@ var auto = function (tasks, concurrency, callback) {
     var runningTasks = 0;
     var hasError = false;
 
-    var listeners = Object.create(null);
+    var listeners = {};
 
     var readyTasks = [];
 
@@ -22225,7 +21844,7 @@ var auto = function (tasks, concurrency, callback) {
 
         arrayEach(dependencies, function (dependencyName) {
             if (!tasks[dependencyName]) {
-                throw new Error('async.auto task `' + key + '` has a non-existent dependency `' + dependencyName + '` in ' + dependencies.join(', '));
+                throw new Error('async.auto task `' + key + '` has a non-existent dependency in ' + dependencies.join(', '));
             }
             addListener(dependencyName, function () {
                 remainingDependencies--;
@@ -22287,7 +21906,7 @@ var auto = function (tasks, concurrency, callback) {
                 });
                 safeResults[key] = args;
                 hasError = true;
-                listeners = Object.create(null);
+                listeners = [];
 
                 callback(err, safeResults);
             } else {
@@ -22504,17 +22123,15 @@ function asciiToArray(string) {
 
 /** Used to compose unicode character classes. */
 var rsAstralRange = '\\ud800-\\udfff';
-var rsComboMarksRange = '\\u0300-\\u036f';
-var reComboHalfMarksRange = '\\ufe20-\\ufe2f';
-var rsComboSymbolsRange = '\\u20d0-\\u20ff';
-var rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;
+var rsComboMarksRange = '\\u0300-\\u036f\\ufe20-\\ufe23';
+var rsComboSymbolsRange = '\\u20d0-\\u20f0';
 var rsVarRange = '\\ufe0e\\ufe0f';
 
 /** Used to compose unicode capture groups. */
 var rsZWJ = '\\u200d';
 
 /** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
-var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboMarksRange + rsComboSymbolsRange + rsVarRange + ']');
 
 /**
  * Checks if `string` contains Unicode symbols.
@@ -22529,15 +22146,13 @@ function hasUnicode(string) {
 
 /** Used to compose unicode character classes. */
 var rsAstralRange$1 = '\\ud800-\\udfff';
-var rsComboMarksRange$1 = '\\u0300-\\u036f';
-var reComboHalfMarksRange$1 = '\\ufe20-\\ufe2f';
-var rsComboSymbolsRange$1 = '\\u20d0-\\u20ff';
-var rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1;
+var rsComboMarksRange$1 = '\\u0300-\\u036f\\ufe20-\\ufe23';
+var rsComboSymbolsRange$1 = '\\u20d0-\\u20f0';
 var rsVarRange$1 = '\\ufe0e\\ufe0f';
 
 /** Used to compose unicode capture groups. */
 var rsAstral = '[' + rsAstralRange$1 + ']';
-var rsCombo = '[' + rsComboRange$1 + ']';
+var rsCombo = '[' + rsComboMarksRange$1 + rsComboSymbolsRange$1 + ']';
 var rsFitz = '\\ud83c[\\udffb-\\udfff]';
 var rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')';
 var rsNonAstral = '[^' + rsAstralRange$1 + ']';
@@ -22931,7 +22546,6 @@ function queue(worker, concurrency, payload) {
 
     var workers = 0;
     var workersList = [];
-    var isProcessing = false;
     var q = {
         _tasks: new DLL(),
         concurrency: concurrency,
@@ -22955,12 +22569,6 @@ function queue(worker, concurrency, payload) {
             _insert(data, true, callback);
         },
         process: function () {
-            // Avoid trying to start too many processing operations. This can occur
-            // when callbacks resolve synchronously (#1267).
-            if (isProcessing) {
-                return;
-            }
-            isProcessing = true;
             while (!q.paused && workers < q.concurrency && q._tasks.length) {
                 var tasks = [],
                     data = [];
@@ -22985,7 +22593,6 @@ function queue(worker, concurrency, payload) {
                 var cb = onlyOnce(_next(tasks));
                 worker(data, cb);
             }
-            isProcessing = false;
         },
         length: function () {
             return q._tasks.length;
@@ -23007,7 +22614,12 @@ function queue(worker, concurrency, payload) {
                 return;
             }
             q.paused = false;
-            setImmediate$1(q.process);
+            var resumeCount = Math.min(q.concurrency, q._tasks.length);
+            // Need to call q.process once per concurrent
+            // worker to preserve full concurrency after pause
+            for (var w = 1; w <= resumeCount; w++) {
+                setImmediate$1(q.process);
+            }
         }
     };
     return q;
@@ -23218,9 +22830,9 @@ var seq$1 = rest(function seq(functions) {
         }
 
         reduce(functions, args, function (newargs, fn, cb) {
-            fn.apply(that, newargs.concat(rest(function (err, nextargs) {
+            fn.apply(that, newargs.concat([rest(function (err, nextargs) {
                 cb(err, nextargs);
-            })));
+            })]));
         }, function (err, results) {
             cb.apply(that, [err].concat(results));
         });
@@ -23383,30 +22995,36 @@ var constant = rest(function (values) {
     });
 });
 
-function _createTester(check, getResult) {
-    return function (eachfn, arr, iteratee, cb) {
-        cb = cb || noop;
-        var testPassed = false;
-        var testResult;
-        eachfn(arr, function (value, _, callback) {
-            iteratee(value, function (err, result) {
-                if (err) {
-                    callback(err);
-                } else if (check(result) && !testResult) {
-                    testPassed = true;
-                    testResult = getResult(true, value);
-                    callback(null, breakLoop);
+function _createTester(eachfn, check, getResult) {
+    return function (arr, limit, iteratee, cb) {
+        function done() {
+            if (cb) {
+                cb(null, getResult(false));
+            }
+        }
+        function wrappedIteratee(x, _, callback) {
+            if (!cb) return callback();
+            iteratee(x, function (err, v) {
+                // Check cb as another iteratee may have resolved with a
+                // value or error since we started this iteratee
+                if (cb && (err || check(v))) {
+                    if (err) cb(err);else cb(err, getResult(true, x));
+                    cb = iteratee = false;
+                    callback(err, breakLoop);
                 } else {
                     callback();
                 }
             });
-        }, function (err) {
-            if (err) {
-                cb(err);
-            } else {
-                cb(null, testPassed ? testResult : getResult(false));
-            }
-        });
+        }
+        if (arguments.length > 3) {
+            cb = cb || noop;
+            eachfn(arr, limit, wrappedIteratee, done);
+        } else {
+            cb = iteratee;
+            cb = cb || noop;
+            iteratee = limit;
+            eachfn(arr, wrappedIteratee, done);
+        }
     };
 }
 
@@ -23449,7 +23067,7 @@ function _findGetResult(v, x) {
  *     // result now equals the first file in the list that exists
  * });
  */
-var detect = doParallel(_createTester(identity, _findGetResult));
+var detect = _createTester(eachOf, identity, _findGetResult);
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs a maximum of `limit` async operations at a
@@ -23473,7 +23091,7 @@ var detect = doParallel(_createTester(identity, _findGetResult));
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
+var detectLimit = _createTester(eachOfLimit, identity, _findGetResult);
 
 /**
  * The same as [`detect`]{@link module:Collections.detect} but runs only a single async operation at a time.
@@ -23495,11 +23113,11 @@ var detectLimit = doParallelLimit(_createTester(identity, _findGetResult));
  * (iteratee) or the value `undefined` if none passed. Invoked with
  * (err, result).
  */
-var detectSeries = doLimit(detectLimit, 1);
+var detectSeries = _createTester(eachOfSeries, identity, _findGetResult);
 
 function consoleFunc(name) {
     return rest(function (fn, args) {
-        fn.apply(null, args.concat(rest(function (err, args) {
+        fn.apply(null, args.concat([rest(function (err, args) {
             if (typeof console === 'object') {
                 if (err) {
                     if (console.error) {
@@ -23511,7 +23129,7 @@ function consoleFunc(name) {
                     });
                 }
             }
-        })));
+        })]));
     });
 }
 
@@ -23897,7 +23515,7 @@ function notId(v) {
  *     // if result is true then every file exists
  * });
  */
-var every = doParallel(_createTester(notId, notId));
+var every = _createTester(eachOf, notId, notId);
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs a maximum of `limit` async operations at a time.
@@ -23919,7 +23537,7 @@ var every = doParallel(_createTester(notId, notId));
  * `iteratee` functions have finished. Result will be either `true` or `false`
  * depending on the values of the async tests. Invoked with (err, result).
  */
-var everyLimit = doParallelLimit(_createTester(notId, notId));
+var everyLimit = _createTester(eachOfLimit, notId, notId);
 
 /**
  * The same as [`every`]{@link module:Collections.every} but runs only a single async operation at a time.
@@ -24297,14 +23915,14 @@ function memoize(fn, hasher) {
             queues[key].push(callback);
         } else {
             queues[key] = [callback];
-            fn.apply(null, args.concat(rest(function (args) {
+            fn.apply(null, args.concat([rest(function (args) {
                 memo[key] = args;
                 var q = queues[key];
                 delete queues[key];
                 for (var i = 0, l = q.length; i < l; i++) {
                     q[i].apply(null, args);
                 }
-            })));
+            })]));
         }
     });
     memoized.memo = memo;
@@ -25127,7 +24745,7 @@ var retryable = function (opts, task) {
     }
     return initialParams(function (args, callback) {
         function taskFn(cb) {
-            task.apply(null, args.concat(cb));
+            task.apply(null, args.concat([cb]));
         }
 
         if (opts) retry(opts, taskFn, callback);else retry(taskFn, callback);
@@ -25232,7 +24850,7 @@ function series(tasks, callback) {
  *     // if result is true then at least one of the files exists
  * });
  */
-var some = doParallel(_createTester(Boolean, identity));
+var some = _createTester(eachOf, Boolean, identity);
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs a maximum of `limit` async operations at a time.
@@ -25255,7 +24873,7 @@ var some = doParallel(_createTester(Boolean, identity));
  * Result will be either `true` or `false` depending on the values of the async
  * tests. Invoked with (err, result).
  */
-var someLimit = doParallelLimit(_createTester(Boolean, identity));
+var someLimit = _createTester(eachOfLimit, Boolean, identity);
 
 /**
  * The same as [`some`]{@link module:Collections.some} but runs only a single async operation at a time.
@@ -26151,14 +25769,12 @@ process.umask = function() { return 0; };
 
 },{}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ButtonsUpload = (function () {
     function ButtonsUpload() {
     }
     return ButtonsUpload;
 }());
 exports.ButtonsUpload = ButtonsUpload;
-
 },{}],4:[function(require,module,exports){
 {
     translateFilter.$inject = ['$injector'];
@@ -26173,10 +25789,8 @@ exports.ButtonsUpload = ButtonsUpload;
         .module('pipFiles.Translate', [])
         .filter('translate', translateFilter);
 }
-
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileFailBindings = {
     buttons: '<?pipButtons',
     name: '<pipName',
@@ -26207,10 +25821,8 @@ var fileFailComponent = {
 angular
     .module('pipFiles.FailUpload', [])
     .component('pipFailUpload', fileFailComponent);
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./service/FileUploadService");
 require("./service/MultiuploadResult");
 require("./model/FileModel");
@@ -26229,7 +25841,6 @@ angular
     'pipFiles.FailUpload',
     'pipFiles.Select'
 ]);
-
 },{"./fail/FileFail":5,"./model/FileModel":7,"./select/FileSelect":8,"./service/FileUploadService":9,"./service/MultiuploadResult":12,"./start/FileStart":13,"./success/FileSuccess":14,"./upload/FileUpload":15}],7:[function(require,module,exports){
 {
     fileModelDirective.$inject = ['$parse'];
@@ -26255,7 +25866,6 @@ angular
         .module('pipFiles.Model', [])
         .directive('fileModel', fileModelDirective);
 }
-
 },{}],8:[function(require,module,exports){
 {
     var FileSelectBindings = {
@@ -26294,10 +25904,8 @@ angular
         .module('pipFiles.Select', [])
         .component('pipFileSelect', fileSelectDirective);
 }
-
 },{}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState_1 = require("./FileUploadState");
 var async = require('async');
 var FileUploadService = (function () {
@@ -26407,34 +26015,26 @@ var FileUploadService = (function () {
 angular
     .module('pipFiles.Service', [])
     .service('pipFileUpload', FileUploadService);
-
 },{"./FileUploadState":10,"async":1}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadState;
 (function (FileUploadState) {
     FileUploadState[FileUploadState["Uploading"] = 0] = "Uploading";
     FileUploadState[FileUploadState["Completed"] = 1] = "Completed";
     FileUploadState[FileUploadState["Failed"] = 2] = "Failed";
 })(FileUploadState = exports.FileUploadState || (exports.FileUploadState = {}));
-
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var MultiuploadResult = (function () {
     function MultiuploadResult() {
     }
     return MultiuploadResult;
 }());
 exports.MultiuploadResult = MultiuploadResult;
-
 },{}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileStartBindings = {
     buttons: '<?pipButtons',
     name: '<pipName',
@@ -26465,10 +26065,8 @@ var fileStartDirective = {
 angular
     .module('pipFiles.StartUpload', [])
     .component('pipStartUpload', fileStartDirective);
-
 },{}],14:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileSuccessBindings = {
     buttons: '=?pipButtons',
     name: '=pipName',
@@ -26492,10 +26090,8 @@ var fileSuccessDirective = {
 angular
     .module('pipFiles.SuccessUpload', [])
     .component('pipSuccesUpload', fileSuccessDirective);
-
 },{}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var FileUploadButtons = (function () {
     function FileUploadButtons() {
     }
@@ -26565,7 +26161,6 @@ var fileUploadDirective = {
 angular
     .module('pipFiles.FileUpload', [])
     .component('pipFileUpload', fileUploadDirective);
-
 },{}],16:[function(require,module,exports){
 (function(module) {
 try {
@@ -26758,11 +26353,8 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[16,3,4,5,6,7,8,9,10,11,12,13,14,15])(16)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).dashboard = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AddTileDialog = (function () {
     function AddTileDialog() {
     }
@@ -26806,10 +26398,8 @@ var AddTileDialogController = (function () {
     return AddTileDialogController;
 }());
 exports.AddTileDialogController = AddTileDialogController;
-
 },{}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var AddTileDialogController_1 = require("./AddTileDialogController");
 {
     var setTranslations = function ($injector) {
@@ -26878,28 +26468,19 @@ var AddTileDialogController_1 = require("./AddTileDialogController");
         .config(setTranslations)
         .provider('pipAddTileDialog', AddTileDialogProvider);
 }
-
 },{"./AddTileDialogController":1}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipAddDashboardTileDialog', ['ngMaterial']);
 require("./AddTileDialogController");
 require("./AddTileProvider");
-
 },{"./AddTileDialogController":1,"./AddTileProvider":2}],4:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var CalendarTileController = (function (_super) {
@@ -26950,20 +26531,16 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDashboard')
         .component('pipCalendarTile', CalendarTile);
 }
-
 },{"../menu_tile/MenuTileService":17}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var DashboardTile = (function () {
     function DashboardTile() {
     }
     return DashboardTile;
 }());
 exports.DashboardTile = DashboardTile;
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var TileColors = (function () {
     function TileColors() {
     }
@@ -27013,7 +26590,6 @@ var TileConfigDialogController = (function () {
     return TileConfigDialogController;
 }());
 exports.TileConfigDialogController = TileConfigDialogController;
-
 },{}],7:[function(require,module,exports){
 {
     var TileConfigExtendComponentBindings = {
@@ -27060,10 +26636,8 @@ exports.TileConfigDialogController = TileConfigDialogController;
         .module('pipConfigDashboardTileDialog')
         .component('pipTileConfigExtendComponent', pipTileConfigComponent);
 }
-
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var ConfigDialogController_1 = require("./ConfigDialogController");
 {
     var setTranslations = function ($injector) {
@@ -27119,19 +26693,15 @@ var ConfigDialogController_1 = require("./ConfigDialogController");
         .config(setTranslations)
         .service('pipTileConfigDialogService', TileConfigDialogService);
 }
-
 },{"./ConfigDialogController":6}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipConfigDashboardTileDialog', ['ngMaterial']);
 require("./ConfigDialogController");
 require("./ConfigDialogService");
 require("./ConfigDialogExtendComponent");
-
 },{"./ConfigDialogController":6,"./ConfigDialogExtendComponent":7,"./ConfigDialogService":8}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var setTranslations = function ($injector) {
         var pipTranslate = $injector.has('pipTranslateProvider') ? $injector.get('pipTranslateProvider') : null;
@@ -27333,10 +26903,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .config(setTranslations)
         .component('pipDashboard', Dashboard);
 }
-
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var DraggableTileService_1 = require("./DraggableTileService");
 var TileGroupService_1 = require("../tile_group/TileGroupService");
 exports.DEFAULT_TILE_WIDTH = 150;
@@ -27829,10 +27397,8 @@ var DEFAULT_OPTIONS = {
     angular.module('pipDraggableTiles')
         .component('pipDraggableGrid', DragComponent);
 }
-
 },{"../tile_group/TileGroupService":24,"./DraggableTileService":12}],12:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 function IDragTileConstructor(constructor, options) {
     return new constructor(options);
 }
@@ -27964,27 +27530,18 @@ angular
         return newTile;
     };
 });
-
 },{}],13:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipDraggableTiles', []);
 require("./DraggableTileService");
 require("./Draggable");
-
 },{"./Draggable":11,"./DraggableTileService":12}],14:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var EventTileController = (function (_super) {
@@ -28099,10 +27656,8 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDashboard')
         .component('pipEventTile', EventTile);
 }
-
 },{"../menu_tile/MenuTileService":17}],15:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./tile_group/index");
 require("./draggable");
 require("./menu_tile");
@@ -28132,7 +27687,6 @@ require("./picture_slider_tile/PictureSliderTile");
 require("./position_tile/PositionTile");
 require("./statistics_tile/StatisticsTile");
 require("./dashboard/Dashboard");
-
 },{"./add_tile_dialog":3,"./calendar_tile/CalendarTile":4,"./common_tile/Tile":5,"./config_tile_dialog":9,"./dashboard/Dashboard":10,"./draggable":13,"./event_tile/EventTile":14,"./menu_tile":18,"./note_tile/NoteTile":19,"./picture_slider_tile/PictureSliderTile":20,"./position_tile/PositionTile":21,"./statistics_tile/StatisticsTile":22,"./tile_group/index":25,"./utility/TileTemplateUtility":26}],16:[function(require,module,exports){
 {
     var TileMenu = function () {
@@ -28145,20 +27699,13 @@ require("./dashboard/Dashboard");
         .module('pipMenuTile')
         .directive('pipTileMenu', TileMenu);
 }
-
 },{}],17:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Tile_1 = require("../common_tile/Tile");
 var MenuTileService = (function (_super) {
     __extends(MenuTileService, _super);
@@ -28229,32 +27776,23 @@ exports.MenuTileService = MenuTileService;
         .module('pipMenuTile')
         .provider('pipMenuTile', MenuTileProvider);
 }
-
 },{"../common_tile/Tile":5}],18:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipMenuTile', []);
 require("./MenuTileDirective");
 require("./MenuTileService");
 __export(require("./MenuTileService"));
-
 },{"./MenuTileDirective":16,"./MenuTileService":17}],19:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var NoteTileController = (function (_super) {
@@ -28305,20 +27843,13 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDashboard')
         .component('pipNoteTile', NoteTile);
 }
-
 },{"../menu_tile/MenuTileService":17}],20:[function(require,module,exports){
 'use strict';
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var PictureSliderController = (function (_super) {
@@ -28366,20 +27897,13 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDashboard')
         .component('pipPictureSliderTile', PictureSliderTile);
 }
-
 },{"../menu_tile/MenuTileService":17}],21:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var PositionTileController = (function (_super) {
@@ -28471,20 +27995,13 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDashboard')
         .component('pipPositionTile', PositionTile);
 }
-
 },{"../menu_tile/MenuTileService":17}],22:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var MenuTileService_1 = require("../menu_tile/MenuTileService");
 {
     var SMALL_CHART_1 = 70;
@@ -28529,7 +28046,6 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDashboard')
         .component('pipStatisticsTile', StatisticsTile);
 }
-
 },{"../menu_tile/MenuTileService":17}],23:[function(require,module,exports){
 {
     function DraggableTileLink($scope, $elem, $attr) {
@@ -28558,10 +28074,8 @@ var MenuTileService_1 = require("../menu_tile/MenuTileService");
         .module('pipDraggableTilesGroup')
         .directive('pipDraggableTiles', DraggableTiles);
 }
-
 },{}],24:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 function ITilesGridConstructor(constructor, tiles, options, columns, elem) {
     return new constructor(tiles, options, columns, elem);
 }
@@ -28992,18 +28506,14 @@ angular
         return newGrid;
     };
 });
-
 },{}],25:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipDraggableTilesGroup', []);
 require("./TileGroupDirective");
 require("./TileGroupService");
-
 },{"./TileGroupDirective":23,"./TileGroupService":24}],26:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 {
     var tileTemplateService = (function () {
         tileTemplateService.$inject = ['$interpolate', '$compile', '$templateRequest'];
@@ -29071,7 +28581,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .service('pipTileTemplate', tileTemplateService)
         .directive('pipImageLoad', ImageLoad);
 }
-
 },{}],27:[function(require,module,exports){
 (function(module) {
 try {
@@ -29272,14 +28781,11 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[15,27])(27)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).settings = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./service");
 require("./page");
 angular.module('pipSettings', [
@@ -29287,10 +28793,8 @@ angular.module('pipSettings', [
     'pipSettings.Page'
 ]);
 __export(require("./service"));
-
 },{"./page":4,"./service":11}],2:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsPageSelectedTab_1 = require("../service/SettingsPageSelectedTab");
 var SettingsPageController = (function () {
     SettingsPageController.$inject = ['$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
@@ -29347,7 +28851,6 @@ var SettingsPageController = (function () {
 angular
     .module('pipSettings.Page')
     .controller('pipSettingsPageController', SettingsPageController);
-
 },{"../service/SettingsPageSelectedTab":7}],3:[function(require,module,exports){
 {
     configureSettingsPageRoutes.$inject = ['$stateProvider'];
@@ -29364,10 +28867,8 @@ angular
     angular.module('pipSettings.Page')
         .config(configureSettingsPageRoutes);
 }
-
 },{}],4:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSettings.Page', [
     'ui.router',
     'pipSettings.Service',
@@ -29378,14 +28879,10 @@ angular.module('pipSettings.Page', [
 ]);
 require("./SettingsPage");
 require("./SettingsPageRoutes");
-
 },{"./SettingsPage":2,"./SettingsPageRoutes":3}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsConfig = (function () {
     function SettingsConfig() {
         this.tabs = [];
@@ -29396,10 +28893,8 @@ var SettingsConfig = (function () {
     return SettingsConfig;
 }());
 exports.SettingsConfig = SettingsConfig;
-
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsPageSelectedTab = (function () {
     function SettingsPageSelectedTab() {
         this.tabIndex = 0;
@@ -29407,10 +28902,8 @@ var SettingsPageSelectedTab = (function () {
     return SettingsPageSelectedTab;
 }());
 exports.SettingsPageSelectedTab = SettingsPageSelectedTab;
-
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsConfig_1 = require("./SettingsConfig");
 var SettingsService = (function () {
     SettingsService.$inject = ['config'];
@@ -29554,10 +29047,8 @@ var SettingsProvider = (function () {
 angular
     .module('pipSettings.Service')
     .provider('pipSettings', SettingsProvider);
-
 },{"./SettingsConfig":6}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsStateConfig = (function () {
     function SettingsStateConfig() {
         this.auth = false;
@@ -29565,23 +29056,19 @@ var SettingsStateConfig = (function () {
     return SettingsStateConfig;
 }());
 exports.SettingsStateConfig = SettingsStateConfig;
-
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsTab = (function () {
     function SettingsTab() {
     }
     return SettingsTab;
 }());
 exports.SettingsTab = SettingsTab;
-
 },{}],11:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipSettings.Service', []);
 require("./SettingsConfig");
 require("./SettingsPageSelectedTab");
@@ -29592,7 +29079,6 @@ __export(require("./SettingsConfig"));
 __export(require("./SettingsPageSelectedTab"));
 __export(require("./SettingsStateConfig"));
 __export(require("./SettingsTab"));
-
 },{"./SettingsConfig":6,"./SettingsPageSelectedTab":7,"./SettingsService":8,"./SettingsStateConfig":9,"./SettingsTab":10}],12:[function(require,module,exports){
 (function(module) {
 try {
@@ -29643,8 +29129,6 @@ module.run(['$templateCache', function($templateCache) {
 },{}]},{},[12,1,4,2,3,11,5,6,7,8,9,10])(12)
 });
 
-
-
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.pip || (g.pip = {})).help = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 {
     filter.$inject = ['$injector'];
@@ -29658,13 +29142,11 @@ module.run(['$templateCache', function($templateCache) {
     angular.module('pipHelp.Translate', [])
         .filter('translate', filter);
 }
-
 },{}],2:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 require("./service");
 require("./page");
 angular.module('pipHelp', [
@@ -29672,10 +29154,8 @@ angular.module('pipHelp', [
     'pipHelp.Page'
 ]);
 __export(require("./service"));
-
 },{"./page":5,"./service":12}],3:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpPageSelectedTab_1 = require("../service/HelpPageSelectedTab");
 var HelpPageController = (function () {
     HelpPageController.$inject = ['$log', '$state', '$rootScope', '$timeout', 'pipNavService', 'pipHelp'];
@@ -29733,7 +29213,6 @@ var HelpPageController = (function () {
 angular
     .module('pipHelp.Page')
     .controller('pipHelpPageController', HelpPageController);
-
 },{"../service/HelpPageSelectedTab":7}],4:[function(require,module,exports){
 {
     configureHelpPageRoutes.$inject = ['$stateProvider'];
@@ -29750,10 +29229,8 @@ angular
     angular.module('pipHelp.Page')
         .config(configureHelpPageRoutes);
 }
-
 },{}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 angular.module('pipHelp.Page', [
     'ui.router',
     'pipHelp.Service',
@@ -29764,10 +29241,8 @@ angular.module('pipHelp.Page', [
 ]);
 require("./HelpPage");
 require("./HelpPageRoutes");
-
 },{"./HelpPage":3,"./HelpPageRoutes":4}],6:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpConfig = (function () {
     function HelpConfig() {
         this.tabs = [];
@@ -29778,20 +29253,16 @@ var HelpConfig = (function () {
     return HelpConfig;
 }());
 exports.HelpConfig = HelpConfig;
-
 },{}],7:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpPageSelectedTab = (function () {
     function HelpPageSelectedTab() {
     }
     return HelpPageSelectedTab;
 }());
 exports.HelpPageSelectedTab = HelpPageSelectedTab;
-
 },{}],8:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpConfig_1 = require("./HelpConfig");
 var HelpService = (function () {
     HelpService.$inject = ['_config'];
@@ -29936,10 +29407,8 @@ var HelpProvider = (function () {
 angular
     .module('pipHelp.Service')
     .provider('pipHelp', HelpProvider);
-
 },{"./HelpConfig":6}],9:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpStateConfig = (function () {
     function HelpStateConfig() {
         this.auth = false;
@@ -29947,27 +29416,21 @@ var HelpStateConfig = (function () {
     return HelpStateConfig;
 }());
 exports.HelpStateConfig = HelpStateConfig;
-
 },{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 var HelpTab = (function () {
     function HelpTab() {
     }
     return HelpTab;
 }());
 exports.HelpTab = HelpTab;
-
 },{}],11:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],12:[function(require,module,exports){
 "use strict";
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 angular
     .module('pipHelp.Service', []);
 require("./HelpConfig");
@@ -29979,7 +29442,6 @@ __export(require("./HelpConfig"));
 __export(require("./HelpPageSelectedTab"));
 __export(require("./HelpTab"));
 __export(require("./HelpStateConfig"));
-
 },{"./HelpConfig":6,"./HelpPageSelectedTab":7,"./HelpService":8,"./HelpStateConfig":9,"./HelpTab":10}],13:[function(require,module,exports){
 (function(module) {
 try {
@@ -30027,7 +29489,5 @@ module.run(['$templateCache', function($templateCache) {
 
 },{}]},{},[13,1,2,3,4,5,6,7,8,9,10,11,12])(13)
 });
-
-
 
 //# sourceMappingURL=pip-webui.js.map
