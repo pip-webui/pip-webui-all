@@ -6150,6 +6150,8 @@ md-sidenav.md-closed .pip-sticky-nav-header {
 .pip-sticky-nav-menu {
   width: 100%;
   position: relative; }
+  .pip-sticky-nav-menu md-list-item.md-no-proxy, .pip-sticky-nav-menu md-list-item .md-no-style {
+    padding: 0px; }
   .pip-sticky-nav-menu .sidenav-list {
     padding-top: 0px !important; }
   .pip-sticky-nav-menu .md-subheader {
