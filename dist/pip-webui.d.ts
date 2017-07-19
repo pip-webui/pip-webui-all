@@ -420,8 +420,6 @@ export interface IImageSliderService {
 
 
 
-var marked: any;
-
 
 export interface IPopoverService {
     show(p: Object): void;
@@ -430,6 +428,8 @@ export interface IPopoverService {
 }
 
 
+
+var marked: any;
 
 
 
@@ -469,7 +469,6 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
-
 
 
 
@@ -547,6 +546,7 @@ export interface IDateFormatService {
 }
 export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
+
 
 
 
@@ -719,6 +719,47 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+
+
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
 
 export class AppBarConfig {
     visible: boolean;
@@ -752,77 +793,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 
 
 
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-}
-
-export const BreadcrumbChangedEvent: string;
-export const BreadcrumbBackEvent: string;
-
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
-
-
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
-
-
-
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-
-export const NavIconClickedEvent: string;
-export const NavIconChangedEvent: string;
 
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
@@ -859,6 +829,36 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
+
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
+}
+
+
+
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
 
 
 export interface INavMenuService {
@@ -905,6 +905,13 @@ export class NavMenuConfig {
 }
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
+
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
+}
 
 
 export interface ISearchService {
@@ -1003,16 +1010,18 @@ export class SideNavConfig {
     visible: boolean;
 }
 
-export class PipTab {
-    id: string;
-    name?: string;
-    count: number;
-    title: string;
-}
-
 }
 
 declare module pip.themes {
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1031,15 +1040,6 @@ export interface IThemeProvider extends IThemeService, ng.IServiceProvider {
 export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
 export let ThemeResetPage: string;
-
-
-
-
-
-
-
-
-
 
 }
 
@@ -1083,15 +1083,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
-class HttpResponseInterceptor implements ng.IHttpInterceptor {
-    private $q;
-    private $location;
-    private $rootScope;
-    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
-    responseError: (rejection: any) => ng.IPromise<any>;
-}
-function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
-
 
 
 export interface IFormErrorsService {
@@ -1103,18 +1094,27 @@ export interface IFormErrorsService {
     goToUnhandledErrorPage(error: any): any;
 }
 
+class HttpResponseInterceptor implements ng.IHttpInterceptor {
+    private $q;
+    private $location;
+    private $rootScope;
+    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
+    responseError: (rejection: any) => ng.IPromise<any>;
+}
+function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
+
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
-
-export let ErrorsMissingRouteState: string;
-export let StateNotFoundEvent: string;
-
-export let ErrorsUnknownState: string;
-export let ErrorsUnknownEvent: string;
 
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
 
+export let ErrorsMissingRouteState: string;
+export let StateNotFoundEvent: string;
+
+
+export let ErrorsUnknownState: string;
+export let ErrorsUnknownEvent: string;
 
 export let ErrorsUnsupportedState: string;
 export let ErrorsUnsupportedEvent: string;
@@ -1140,9 +1140,6 @@ declare module pip.locations {
 
 
 
-
-let google: any;
-
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1155,6 +1152,9 @@ export class LocationDialogParams {
 }
 
 
+
+let google: any;
+
 }
 
 declare module pip.files {
@@ -1163,6 +1163,7 @@ export class ButtonsUpload {
     title: string;
     click: Function;
 }
+
 
 
 
@@ -1186,7 +1187,6 @@ export class MultiuploadResult {
     error: any;
     id: string;
 }
-
 
 
 
@@ -1257,7 +1257,6 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
 }
 
 
-
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
 export const UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
@@ -1303,6 +1302,7 @@ export class DragTileService implements IDragTileService {
     getOptions(): any;
     setOptions(options: any): any;
 }
+
 
 
 
