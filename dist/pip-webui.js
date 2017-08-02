@@ -14121,8 +14121,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('information/InformationDialog.html',
-    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{ $ctrl.theme }}"><div class="pip-header"><h3>{{:: $ctrl.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ $ctrl.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="$ctrl.onOk()">{{ $ctrl.ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('options/OptionsDialog.html',
+    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{ $ctrl.theme }}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{ ::$ctrl.title | translate }}</h3><div ng-show="$ctrl.checkboxOptionCaption" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="$ctrl.isCheckboxOption" aria-label="CHECKBOX">{{ ::$ctrl.checkboxOptionCaption | translate }}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="$ctrl.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="$ctrl.onKeyPress($event)" tabindex="0"><div ng-repeat="option in $ctrl.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'$ctrl.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == $ctrl.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{ option.icon }}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{ ::option.title | translate }}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{ ::option.title | translate }}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="$ctrl.onCancel()">{{ ::$ctrl.cancel | translate }}</md-button><md-button class="pip-submit md-accent" ng-click="$ctrl.onSelect()">{{ ::$ctrl.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -14133,8 +14133,8 @@ try {
   module = angular.module('pipDialogs.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('options/OptionsDialog.html',
-    '<md-dialog class="pip-dialog pip-options-dialog layout-column" min-width="400" md-theme="{{ $ctrl.theme }}"><md-dialog-content class="pip-body lp0 tp0 rp0 bp24 pip-scroll"><div class="pip-header"><h3>{{ ::$ctrl.title | translate }}</h3><div ng-show="$ctrl.checkboxOptionCaption" class="header-option text-subhead1 divider-bottom"><md-checkbox ng-model="$ctrl.isCheckboxOption" aria-label="CHECKBOX">{{ ::$ctrl.checkboxOptionCaption | translate }}</md-checkbox></div></div><div class="pip-content"><md-radio-group ng-model="$ctrl.selectedOptionName" class="pip-list md-primary" md-no-ink="true" ng-keypress="$ctrl.onKeyPress($event)" tabindex="0"><div ng-repeat="option in $ctrl.options" class="pip-list-item" md-ink-ripple="" ui-event="{ click: \'$ctrl.onOptionSelect($event, option)\' }" ng-class="{ selected: option.name == $ctrl.selectedOptionName }"><div class="pip-list-item item-padding"><md-icon class="pip-option-icon" md-svg-icon="icons:{{ option.icon }}" ng-if="option.icon"></md-icon><div class="pip-option-title">{{ ::option.title | translate }}</div><md-radio-button ng-value="option.name" tabindex="-1" aria-label="{{ ::option.title | translate }}"></md-radio-button></div></div></md-radio-group></div></md-dialog-content><div class="pip-footer"><div><md-button class="pip-cancel" ng-click="$ctrl.onCancel()">{{ ::$ctrl.cancel | translate }}</md-button><md-button class="pip-submit md-accent" ng-click="$ctrl.onSelect()">{{ ::$ctrl.ok | translate }}</md-button></div></div></md-dialog>');
+  $templateCache.put('information/InformationDialog.html',
+    '<md-dialog class="pip-dialog pip-information-dialog layout-column" width="400" md-theme="{{ $ctrl.theme }}"><div class="pip-header"><h3>{{:: $ctrl.title | translate }}</h3></div><div class="pip-body"><div class="pip-content">{{ $ctrl.content }}</div></div><div class="pip-footer"><div><md-button class="md-accent" ng-click="$ctrl.onOk()">{{ $ctrl.ok | translate }}</md-button></div></div></md-dialog>');
 }]);
 })();
 
@@ -17281,18 +17281,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('sidenav/SideNav.html',
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="$ctrl.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('language/LanguagePicker.html',
     '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{ $ctrl.value | translate }}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in $ctrl.languages"><md-button ng-click="$ctrl.onLanguageClick(language)" tabindex="7">{{ language | translate }}</md-button></md-menu-item></md-menu-content></md-menu>');
 }]);
@@ -17317,8 +17305,8 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('tabs/Tabs.html',
-    '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
+  $templateCache.put('search/SearchBar.html',
+    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
 }]);
 })();
 
@@ -17329,8 +17317,20 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('search/SearchBar.html',
-    '<div class="md-toolbar-tools pip-search-container" ng-if="$ctrl.enabled"><div class="layout-row pip-search-selected"><md-button class="md-icon-button" tabindex="6" aria-label="start search" ng-click="$ctrl.onClick()"><md-icon md-svg-icon="icons:search"></md-icon></md-button><input class="pip-search-text flex" type="search" tabindex="6" ng-model="$ctrl.search.text" ng-keydown="$ctrl.onKeyDown($event)"><md-button class="md-icon-button" tabindex="6" aria-label="clear search" ng-click="$ctrl.clear()"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div><div class="md-toolbar-tools layout-row layout-align-end-center flex-fixed lp0 rp0" ng-if="!$ctrl.enabled"><md-button class="md-icon-button" tabindex="5" aria-label="start search" ng-click="$ctrl.enable()"><md-icon md-svg-icon="icons:search"></md-icon></md-button></div>');
+  $templateCache.put('sidenav/SideNav.html',
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="$ctrl.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('tabs/Tabs.html',
+    '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
 }]);
 })();
 
@@ -18814,8 +18814,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('missing_route/MissingRouteErrorPage.html',
-    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.config.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.config.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="$ctrl.onContinue($event)">{{::\'ERROR_MISSING_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{$ctrl.url}}">{{::\'ERROR_MISSING_ROUTE_TRY_AGAIN\' | translate }}: {{$ctrl.url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{$ctrl.urlBack}}">{{::\'ERROR_MISSING_ROUTE_GO_BACK\' | translate }}: {{$ctrl.urlBack}}</a></div></div></div>');
+  $templateCache.put('maintenance/MaintenanceErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_MAINTENANCE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_MAINTENANCE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="$ctrl.timeoutInterval">{{::\'ERROR_MAINTENANCE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="$ctrl.isCordova"><md-button class="md-accent" ng-click="$ctrl.onClose($event)" aria-label="CLOSE">{{::\'ERROR_MAINTENANCE_CLOSE\' | translate}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -18826,8 +18826,8 @@ try {
   module = angular.module('pipErrors.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('maintenance/MaintenanceErrorPage.html',
-    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::\'ERROR_MAINTENANCE_TITLE\' | translate}}</div><div class="pip-error-subtext">{{::\'ERROR_MAINTENANCE_SUBTITLE\' | translate}}</div><div class="pip-error-subtext" ng-if="$ctrl.timeoutInterval">{{::\'ERROR_MAINTENANCE_TRY_AGAIN\' | translate}} {{timeoutInterval}} sec.</div><div class="pip-error-actions h48 layout-column layout-align-center-center" ng-if="$ctrl.isCordova"><md-button class="md-accent" ng-click="$ctrl.onClose($event)" aria-label="CLOSE">{{::\'ERROR_MAINTENANCE_CLOSE\' | translate}}</md-button></div></div></div>');
+  $templateCache.put('missing_route/MissingRouteErrorPage.html',
+    '<div class="pip-error-scroll-body pip-scroll"><div class="pip-error pip-error-page layout-column flex layout-align-center-center"><img src="{{$ctrl.config.Image}}" class="pip-pic block"><div class="pip-error-text">{{::$ctrl.config.Title | translate}}</div><div class="pip-error-subtext">{{::$ctrl.config.SubTitle | translate}}</div><div class="pip-error-actions h48 layout-column layout-align-center-center"><md-button aria-label="CONTINUE" class="md-accent" ng-click="$ctrl.onContinue($event)">{{::\'ERROR_MISSING_ROUTE_CONTINUE\' | translate}}</md-button></div><div class="h48" ng-if="url"><a ng-href="{{$ctrl.url}}">{{::\'ERROR_MISSING_ROUTE_TRY_AGAIN\' | translate }}: {{$ctrl.url}}</a></div><div class="h48" ng-if="urlBack"><a ng-href="{{$ctrl.urlBack}}">{{::\'ERROR_MISSING_ROUTE_GO_BACK\' | translate }}: {{$ctrl.urlBack}}</a></div></div></div>');
 }]);
 })();
 
@@ -19946,22 +19946,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie_chart/PieChart.html',
-    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line_chart/LineChart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': $ctrl.showXAxis, \'visible-y-axis\': $ctrl.showYAxis}">\n' +
@@ -19981,6 +19965,22 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '<pip-chart-legend pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie_chart/PieChart.html',
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
 }]);
 })();
 
@@ -20775,30 +20775,6 @@ try {
   module = angular.module('pipLocations.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('location_edit/LocationEdit.html',
-    '<md-input-container class="md-block">\n' +
-    '    <label>{{ \'LOCATION\' | translate }}</label>\n' +
-    '    <input ng-model="$ctrl.pipLocationName" ng-disabled="$ctrl.ngDisabled"/>\n' +
-    '</md-input-container>\n' +
-    '<div class="pip-location-empty" layout="column" layout-align="center center">\n' +
-    '    <md-button class="md-raised" ng-disabled="$ctrl.ngDisabled" ng-click="$ctrl.onSetLocation()"\n' +
-    '            aria-label="LOCATION_ADD_LOCATION">\n' +
-    '            <span class="icon-location"></span> {{\'LOCATION_ADD_LOCATION\' | translate }}\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '<div class="pip-location-container" tabindex="{{ $ctrl.ngDisabled ? -1 : 0 }}" \n' +
-    '    ng-click="$ctrl.onMapClick($event)" ng-keypress="$ctrl.onMapKeyPress($event)">\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipLocations.Templates');
-} catch (e) {
-  module = angular.module('pipLocations.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('location_dialog/LocationDialog.html',
     '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{$ctrl.theme}}">\n' +
     '\n' +
@@ -20847,6 +20823,30 @@ module.run(['$templateCache', function($templateCache) {
     '    </div>\n' +
     '</md-dialog>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipLocations.Templates');
+} catch (e) {
+  module = angular.module('pipLocations.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('location_edit/LocationEdit.html',
+    '<md-input-container class="md-block">\n' +
+    '    <label>{{ \'LOCATION\' | translate }}</label>\n' +
+    '    <input ng-model="$ctrl.pipLocationName" ng-disabled="$ctrl.ngDisabled"/>\n' +
+    '</md-input-container>\n' +
+    '<div class="pip-location-empty" layout="column" layout-align="center center">\n' +
+    '    <md-button class="md-raised" ng-disabled="$ctrl.ngDisabled" ng-click="$ctrl.onSetLocation()"\n' +
+    '            aria-label="LOCATION_ADD_LOCATION">\n' +
+    '            <span class="icon-location"></span> {{\'LOCATION_ADD_LOCATION\' | translate }}\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '<div class="pip-location-container" tabindex="{{ $ctrl.ngDisabled ? -1 : 0 }}" \n' +
+    '    ng-click="$ctrl.onMapClick($event)" ng-keypress="$ctrl.onMapKeyPress($event)">\n' +
+    '</div>');
 }]);
 })();
 
@@ -27003,6 +27003,43 @@ try {
   module = angular.module('pipFiles.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('success/FileSuccess.html',
+    '<div class="pip-files pip-progress-files">\n' +
+    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
+    '    <div class="layout-row">\n' +
+    '        <div class="pip-progress-icon bb-green">\n' +
+    '            <md-icon md-svg-icon="icons:check"></md-icon>\n' +
+    '        </div>\n' +
+    '        <div class="pip-progress-content">\n' +
+    '            <h3 class="pip-title">\n' +
+    '                Uploaded {{::vm.type}} successfully!\n' +
+    '            </h3>\n' +
+    '        \n' +
+    '            <div class="color-secondary-text pip-subtitle">\n' +
+    '                {{vm.name}}\n' +
+    '            </div>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0">\n' +
+    '        <div>\n' +
+    '           <md-button class="md-accent" \n' +
+    '                       ng-repeat="start in vm.buttons" ng-click="start.click()">\n' +
+    '                {{start.title}}\n' +
+    '            </md-button> \n' +
+    '        </div>\n' +
+    '    </div>  \n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('start/FileStart.html',
     '<div class="pip-files pip-progress-files">\n' +
     '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
@@ -27037,43 +27074,6 @@ module.run(['$templateCache', function($templateCache) {
     '                       ng-repeat="start in $ctrl.buttons" ng-click="start.click()">\n' +
     '                {{start.title}}\n' +
     '            </md-button>\n' +
-    '        </div>\n' +
-    '    </div>  \n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipFiles.Templates');
-} catch (e) {
-  module = angular.module('pipFiles.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('success/FileSuccess.html',
-    '<div class="pip-files pip-progress-files">\n' +
-    '  <div class="pip-body pip-scroll pip-progress-body"> \n' +
-    '    <div class="layout-row">\n' +
-    '        <div class="pip-progress-icon bb-green">\n' +
-    '            <md-icon md-svg-icon="icons:check"></md-icon>\n' +
-    '        </div>\n' +
-    '        <div class="pip-progress-content">\n' +
-    '            <h3 class="pip-title">\n' +
-    '                Uploaded {{::vm.type}} successfully!\n' +
-    '            </h3>\n' +
-    '        \n' +
-    '            <div class="color-secondary-text pip-subtitle">\n' +
-    '                {{vm.name}}\n' +
-    '            </div>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '  </div>\n' +
-    '  <div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0">\n' +
-    '        <div>\n' +
-    '           <md-button class="md-accent" \n' +
-    '                       ng-repeat="start in vm.buttons" ng-click="start.click()">\n' +
-    '                {{start.title}}\n' +
-    '            </md-button> \n' +
     '        </div>\n' +
     '    </div>  \n' +
     '</div>');
@@ -29533,6 +29533,18 @@ try {
   module = angular.module('pipDashboard.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('picture_slider_tile/PictureSliderTile.html',
+    '<div class="widget-box pip-picture-slider-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ $ctrl.options.title }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('note_tile/ConfigDialogExtension.html',
     '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container><md-input-container class="w-stretch tm0"><label>Text:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
     '    </textarea></md-input-container></div>');
@@ -29558,30 +29570,6 @@ try {
   module = angular.module('pipDashboard.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('picture_slider_tile/PictureSliderTile.html',
-    '<div class="widget-box pip-picture-slider-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ $ctrl.options.title }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('statistics_tile/StatisticsTile.html',
-    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.series && !$ctrl.reset"><pip-pie-chart pip-series="$ctrl.options.series" ng-if="!$ctrl.options.chartType || $ctrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="$ctrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('position_tile/ConfigDialogExtension.html',
     '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Location name:</label> <input type="text" ng-model="$ctrl.locationName"></md-input-container></div>');
 }]);
@@ -29596,6 +29584,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('position_tile/PositionTile.html',
     '<div class="pip-position-widget widget-box p0 layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="position-absolute-right-top" ng-if="!$ctrl.options.locationName"><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none" ng-if="$ctrl.options.locationName"><span class="flex text-overflow">{{ $ctrl.options.locationName }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><pip-location-map class="flex" ng-if="$ctrl.showPosition" pip-stretch="true" pip-rebind="true" pip-location-pos="$ctrl.options.location"></pip-location-map></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('statistics_tile/StatisticsTile.html',
+    '<div class="widget-box pip-statistics-widget layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }"><div class="widget-heading layout-row layout-align-start-center flex-none"><span class="widget-title flex-auto text-overflow">{{ $ctrl.options.title || $ctrl.options.name }}</span><pip-tile-menu></pip-tile-menu></div><div class="widget-content flex-auto layout-row layout-align-center-center" ng-if="$ctrl.options.series && !$ctrl.reset"><pip-pie-chart pip-series="$ctrl.options.series" ng-if="!$ctrl.options.chartType || $ctrl.options.chartType == \'pie\'" pip-donut="true" pip-pie-size="$ctrl.chartSize" pip-show-total="true" pip-centered="true"></pip-pie-chart></div></div>');
 }]);
 })();
 
@@ -29624,12 +29624,42 @@ __export(require("./service"));
 Object.defineProperty(exports, "__esModule", { value: true });
 var SettingsPageSelectedTab_1 = require("../service/SettingsPageSelectedTab");
 var SettingsPageController = (function () {
-    SettingsPageController.$inject = ['$state', 'pipNavService', 'pipSettings', '$rootScope', '$timeout'];
-    function SettingsPageController($state, pipNavService, pipSettings, $rootScope, $timeout) {
+    SettingsPageController.$inject = ['$state', '$rootScope', '$injector', '$timeout', '$location', 'pipNavService', 'pipSettings', 'pipMedia'];
+    function SettingsPageController($state, $rootScope, $injector, $timeout, $location, pipNavService, pipSettings, pipMedia) {
         var _this = this;
         this.$state = $state;
-        this.tabs = _.filter(pipSettings.getTabs(), function (tab) {
-            if (tab.visible === true && (tab.access ? tab.access($rootScope['$user'], tab) : true)) {
+        this.$rootScope = $rootScope;
+        this.$injector = $injector;
+        this.$timeout = $timeout;
+        this.$location = $location;
+        this.pipNavService = pipNavService;
+        this.pipSettings = pipSettings;
+        this.pipMedia = pipMedia;
+        this.translateInit();
+        this.mediaSizeGtSm = this.pipMedia('gt-sm');
+        this.initTabs();
+        if (!this.pipMedia('gt-sm')) {
+            this.details = $location.search().details == 'details' ? true : false;
+        }
+        else {
+            this.details = false;
+            this.$location.search('details', 'main');
+        }
+        this.cleanUpFunc = $rootScope.$on('pipMainResized', function () {
+            if (_this.mediaSizeGtSm !== _this.pipMedia('gt-sm')) {
+                _this.mediaSizeGtSm = _this.pipMedia('gt-sm');
+                if (_this.pipMedia('gt-sm')) {
+                    _this.details = false;
+                }
+                _this.appHeader();
+            }
+        });
+        this.appHeader();
+    }
+    SettingsPageController.prototype.initTabs = function () {
+        var _this = this;
+        this.tabs = _.filter(this.pipSettings.getTabs(), function (tab) {
+            if (tab.visible === true && (tab.access ? tab.access(_this.$rootScope['$user'], tab) : true)) {
                 return tab;
             }
         });
@@ -29638,27 +29668,70 @@ var SettingsPageController = (function () {
         if (this.$state.current.name !== 'settings') {
             this.initSelect(this.$state.current.name);
         }
-        else if (this.$state.current.name === 'settings' && pipSettings.getDefaultTab()) {
-            this.initSelect(pipSettings.getDefaultTab().state);
+        else if (this.$state.current.name === 'settings' && this.pipSettings.getDefaultTab()) {
+            this.initSelect(this.pipSettings.getDefaultTab().state);
         }
         else {
-            $timeout(function () {
-                if (pipSettings.getDefaultTab()) {
-                    _this.initSelect(pipSettings.getDefaultTab().state);
+            this.$timeout(function () {
+                if (_this.pipSettings.getDefaultTab()) {
+                    _this.initSelect(_this.pipSettings.getDefaultTab().state);
                 }
-                if (!pipSettings.getDefaultTab() && _this.tabs.length > 0) {
+                if (!_this.pipSettings.getDefaultTab() && _this.tabs.length > 0) {
                     _this.initSelect(_this.tabs[0].state);
                 }
             });
         }
-        pipNavService.icon.showMenu();
-        pipNavService.breadcrumb.text = "Settings";
-        pipNavService.actions.hide();
-        pipNavService.appbar.removeShadow();
-        this.onDropdownSelect = function (state) {
-            _this.onNavigationSelect(state.state);
-        };
-    }
+    };
+    SettingsPageController.prototype.translateInit = function () {
+        this._pipTranslate = this.$injector.has('pipTranslate') ? this.$injector.get('pipTranslate') : null;
+        if (this._pipTranslate && this._pipTranslate.setTranslations) {
+            this._pipTranslate.setTranslations('en', {
+                PIP_SETTINGS: 'Settings',
+                PIP_SETTINGS_DETAILS: 'Settings details'
+            });
+            this._pipTranslate.setTranslations('ru', {
+                PIP_SETTINGS: 'Настройки',
+                PIP_SETTINGS_DETAILS: 'Подробно'
+            });
+        }
+    };
+    SettingsPageController.prototype.toMainFromDetails = function () {
+        this.$location.search('details', 'main');
+        this.details = false;
+        this.appHeader();
+    };
+    SettingsPageController.prototype.appHeader = function () {
+        var _this = this;
+        this.pipNavService.breadcrumb.breakpoint = 'gt-sm';
+        if (!this.pipMedia('gt-sm')) {
+            var detailsTitle = this.selected && this.selected.tab ? this.selected.tab.title : 'PIP_SETTINGS_DETAILS';
+            if (this.details) {
+                this.pipNavService.icon.showBack(function () {
+                    _this.toMainFromDetails();
+                });
+                this.pipNavService.breadcrumb.items = [
+                    {
+                        title: "PIP_SETTINGS", click: function () {
+                            _this.toMainFromDetails();
+                        }
+                    },
+                    {
+                        title: detailsTitle, click: function () { }, subActions: []
+                    }
+                ];
+            }
+            else {
+                this.pipNavService.icon.showMenu();
+                this.pipNavService.breadcrumb.text = "PIP_SETTINGS";
+            }
+        }
+        else {
+            this.pipNavService.icon.showMenu();
+            this.pipNavService.breadcrumb.text = "PIP_SETTINGS";
+        }
+        this.pipNavService.actions.hide();
+        this.pipNavService.appbar.removeShadow();
+    };
     SettingsPageController.prototype.initSelect = function (state) {
         this.selected.tab = _.find(this.tabs, function (tab) {
             return tab.state === state;
@@ -29669,8 +29742,10 @@ var SettingsPageController = (function () {
     };
     SettingsPageController.prototype.onNavigationSelect = function (state) {
         this.initSelect(state);
-        if (this.selected.tab) {
-            this.$state.go(state);
+        if (!this.pipMedia('gt-sm')) {
+            this.details = true;
+            this.$location.search('details', 'details');
+            this.appHeader();
         }
     };
     return SettingsPageController;
@@ -29684,7 +29759,7 @@ angular
     function configureSettingsPageRoutes($stateProvider) {
         $stateProvider
             .state('settings', {
-            url: '/settings?party_id',
+            url: '/settings?user_id&details',
             auth: true,
             controllerAs: 'vm',
             controller: 'pipSettingsPageController',
@@ -29815,6 +29890,8 @@ var SettingsProvider = (function () {
         this._config.tabs.push({
             state: this.getFullStateName(tabObj.state),
             title: tabObj.title,
+            icon: tabObj.icon,
+            iconClass: tabObj.iconClass,
             index: tabObj.index || 100000,
             access: tabObj.access,
             visible: tabObj.visible !== false,
@@ -29923,6 +30000,46 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('page/SettingsPage.html',
+    '\n' +
+    '<div class="pip-main-menu pip-settings" ng-class="{\'pip-single-content\': vm.details}">\n' +
+    '	<div class="pip-menu">\n' +
+    '        <div class="pip-list-container pip-scroll divider-top">\n' +
+    '\n' +
+    '			<md-list class="pip-ref-list tp0 pip-settings-list"                 \n' +
+    '                pip-selected="vm.selected.tabIndex"\n' +
+    '                pip-selected-watch="vm.selected.navId"\n' +
+    '                pip-select="vm.onNavigationSelect($event.id)">\n' +
+    '\n' +
+    '				<md-list-item  class="pip-ref-list-item pointer divider-bottom pip-selectable" \n' +
+    '                        ng-repeat="tab in vm.tabs track by tab.state" \n' +
+    '                        pip-id="{{:: tab.state }}" md-ink-ripple>\n' +
+    '\n' +
+    '					<div ng-click="vm.onNavigationSelect(tab.state)" class="layout-row layout-align-start-center flex">\n' +
+    '						<div class="pip-settings-icon layout-row layout-align-start-center {{ tab.iconClass ? tab.iconClass : \'pip-settings-icon-color\'}}" \n' +
+    '                            ng-if="tab.icon">\n' +
+    '							<md-icon class="" md-svg-icon="{{ tab.icon }}"></md-icon>\n' +
+    '						</div>\n' +
+    '						<div class="pip-content {{ tab.icon ? \'\' : \'pip-settings-without-icon\' }}">\n' +
+    '							<p class="pip-title text-overflow flex">\n' +
+    '								{{ ::tab.title | translate }}\n' +
+    '							</p>\n' +
+    '						</div>\n' +
+    '                        <div class="pip-ref-list-item-end-icon">\n' +
+    '                            <md-icon class="" md-svg-icon="icons:chevron-right"></md-icon>\n' +
+    '                        </div>\n' +
+    '					</div>\n' +
+    '				</md-list-item>\n' +
+    '			</md-list>\n' +
+    '\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '    <div class="pip-content-container">\n' +
+    '        <pip-document>\n' +
+    '            <div class="pip-body tp24-flex layout-column flex" ui-view></div>\n' +
+    '        </pip-document>\n' +
+    '	</div>\n' +
+    '</div>        \n' +
+    '<!--    \n' +
     '<md-toolbar class="pip-appbar-ext"></md-toolbar>\n' +
     '<pip-document width="800" min-height="400"\n' +
     '              class="pip-settings">\n' +
@@ -29955,7 +30072,7 @@ module.run(['$templateCache', function($templateCache) {
     '         ng-show="vm.manager === false || !vm.tabs || vm.tabs.length < 1">\n' +
     '        {{::\'ERROR_400\' | translate}}\n' +
     '    </div>\n' +
-    '</pip-document>');
+    '</pip-document>-->');
 }]);
 })();
 
