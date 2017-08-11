@@ -53,6 +53,49 @@ export const SessionOpenedEvent = "pipSessionOpened";
 export const SessionClosedEvent = "pipSessionClosed";
 
 
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+
+
+
 export interface ITranslateService {
     language: string;
     use(language: string): string;
@@ -173,49 +216,6 @@ export let ResetAreaRootVar: string;
 
 
 
-
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-
-
 }
 
 declare module pip.buttons {
@@ -321,15 +321,6 @@ declare module pip.behaviors {
 
 
 
-
-export interface IDraggableService {
-    inputEvent(event: any): any;
-}
-
-
-
-
-
 export interface IKeyboardShortcuts {
     [key: string]: Shortcut;
 }
@@ -400,6 +391,15 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
+
+
+export interface IDraggableService {
+    inputEvent(event: any): any;
+}
+
+
+
+
 }
 
 declare module pip.controls {
@@ -432,6 +432,7 @@ export interface IPopoverService {
 
 
 
+
 export interface IToastService {
     showNextToast(): void;
     showToast(toast: Toast): void;
@@ -459,7 +460,6 @@ export class Toast {
 }
 
 
-
 }
 
 declare module pip.lists {
@@ -471,13 +471,6 @@ declare module pip.lists {
 declare module pip.dates {
 
 
-
-
-
-export const IntervalTimeRange = 30;
-export const MinutesInHour = 60;
-export const HoursInDay = 24;
-export const MillisecondsInSecond = 1000;
 
 
 
@@ -556,9 +549,31 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 }
 
 
+
+
+export const IntervalTimeRange = 30;
+export const MinutesInHour = 60;
+export const HoursInDay = 24;
+export const MillisecondsInSecond = 1000;
+
 }
 
 declare module pip.dialogs {
+
+
+export class ConfirmationDialogParams {
+    event?: MouseEvent;
+    ok?: string;
+    title?: string;
+    cancel?: string;
+}
+
+
+export interface IConfirmationDialogService {
+    show(params: ConfirmationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
 
 
 export class ErrorDetailsDialogParams {
@@ -573,7 +588,6 @@ export interface IErrorDetailsDialogService {
 }
 
 
-
 export interface IInformationDialogService {
     show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
@@ -586,20 +600,6 @@ export class InformationDialogParams {
     title?: string;
     message: string;
     item?: any;
-}
-
-
-
-export class ConfirmationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    cancel?: string;
-}
-
-
-export interface IConfirmationDialogService {
-    show(params: ConfirmationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
@@ -862,6 +862,7 @@ export class NavIconConfig {
 export const NavIconClickedEvent: string;
 export const NavIconChangedEvent: string;
 
+
 export interface INavMenuService {
     sections: NavMenuSection[];
     defaultIcon: string;
@@ -908,7 +909,6 @@ export class NavMenuConfig {
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
-
 export interface ISearchService {
     config: SearchConfig;
     criteria: string;
@@ -937,6 +937,13 @@ export const OpenSearchEvent = "pipOpenSearch";
 export const CloseSearchEvent = "pipCloseSearch";
 export const SearchChangedEvent = "pipSearchChanged";
 export const SearchActivatedEvent = "pipSearchActivated";
+
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
+}
 
 
 export interface ISideNavService {
@@ -1005,13 +1012,6 @@ export class SideNavConfig {
     visible: boolean;
 }
 
-export class PipTab {
-    id: string;
-    name?: string;
-    count: number;
-    title: string;
-}
-
 }
 
 declare module pip.themes {
@@ -1068,9 +1068,6 @@ class HttpResponseInterceptor implements ng.IHttpInterceptor {
 }
 function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
 
-export let ErrorsMaintenanceState: string;
-export let MaintenanceErrorEvent: string;
-
 export class ErrorPageConfig {
     Active: boolean;
     Name: string;
@@ -1108,8 +1105,14 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
+
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
+
+export let ErrorsConnectionState: string;
+export let ErrorsConnectionEvent: string;
 
 
 export let ErrorsUnknownState: string;
@@ -1117,9 +1120,6 @@ export let ErrorsUnknownEvent: string;
 
 export let ErrorsUnsupportedState: string;
 export let ErrorsUnsupportedEvent: string;
-
-export let ErrorsConnectionState: string;
-export let ErrorsConnectionEvent: string;
 
 }
 
@@ -1142,6 +1142,9 @@ declare module pip.locations {
 
 
 
+
+let google: any;
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1153,9 +1156,6 @@ export class LocationDialogParams {
     locationName: string;
 }
 
-let google: any;
-
-
 
 }
 
@@ -1165,8 +1165,6 @@ export class ButtonsUpload {
     title: string;
     click: Function;
 }
-
-
 
 
 
@@ -1189,6 +1187,8 @@ export class MultiuploadResult {
     error: any;
     id: string;
 }
+
+
 
 
 
@@ -1221,6 +1221,7 @@ export interface IAddTileDialogService {
 export interface IAddTileDialogprovider {
     configWidgetList(list: [AddTileDialog[]]): void;
 }
+
 
 
 
@@ -1258,7 +1259,6 @@ export class DashboardTile implements IDashboardTile {
     size: Object | string | number;
     constructor();
 }
-
 
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
@@ -1310,6 +1310,7 @@ export class DragTileService implements IDragTileService {
 
 
 
+
 export class MenuTileService extends DashboardTile {
     menu: any;
     constructor();
@@ -1319,11 +1320,11 @@ export class MenuTileService extends DashboardTile {
 
 
 
+
 export interface ITileTemplateService {
     getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
     setImageMarginCSS($element: any, image: any): void;
 }
-
 
 
 
@@ -1393,7 +1394,6 @@ export class TilesGridService implements ITilesGridService {
     updateTileOptions(opts: any): any;
 }
 
-
 }
 
 declare module pip.settings {
@@ -1454,10 +1454,6 @@ export class SettingsTab {
 
 declare module pip.help {
 
-
-
-
-
 export class HelpConfig {
     defaultTab: string;
     tabs: HelpTab[];
@@ -1503,6 +1499,10 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
+
+
+
+
 
 
 }
