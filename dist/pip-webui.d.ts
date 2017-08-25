@@ -53,49 +53,6 @@ export const SessionOpenedEvent = "pipSessionOpened";
 export const SessionClosedEvent = "pipSessionClosed";
 
 
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-
-
-
 export interface ITranslateService {
     language: string;
     use(language: string): string;
@@ -152,6 +109,49 @@ export class Translation {
     translateSetWithPrefix(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
+
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
+
+
 
 
 
@@ -432,7 +432,6 @@ export interface IPopoverService {
 
 
 
-
 export interface IToastService {
     showNextToast(): void;
     showToast(toast: Toast): void;
@@ -460,6 +459,7 @@ export class Toast {
 }
 
 
+
 }
 
 declare module pip.lists {
@@ -469,7 +469,6 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
-
 
 
 
@@ -559,6 +558,7 @@ export const MinutesInHour = 60;
 export const HoursInDay = 24;
 export const MillisecondsInSecond = 1000;
 
+
 }
 
 declare module pip.dialogs {
@@ -578,6 +578,7 @@ export interface IConfirmationDialogService {
 
 
 
+
 export class ErrorDetailsDialogParams {
     event?: MouseEvent;
     dismissButton?: string;
@@ -588,7 +589,6 @@ export class ErrorDetailsDialogParams {
 export interface IErrorDetailsDialogService {
     show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
-
 
 
 export interface IInformationDialogService {
@@ -784,6 +784,7 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -795,7 +796,6 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
-
 
 
 
@@ -912,36 +912,6 @@ export class NavMenuConfig {
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
-
-
 export interface ISideNavService {
     readonly config: SideNavConfig;
     readonly classes: string[];
@@ -1014,6 +984,36 @@ export class PipTab {
     count: number;
     title: string;
 }
+
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 }
 
@@ -1115,9 +1115,9 @@ export let MaintenanceErrorEvent: string;
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
 
+
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
-
 
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
@@ -1145,6 +1145,8 @@ export interface IChartColorsService {
 declare module pip.locations {
 
 
+
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1156,9 +1158,7 @@ export class LocationDialogParams {
     locationName: string;
 }
 
-
 let google: any;
-
 
 
 }
@@ -1169,7 +1169,6 @@ export class ButtonsUpload {
     title: string;
     click: Function;
 }
-
 
 
 
@@ -1192,6 +1191,7 @@ export class MultiuploadResult {
     error: any;
     id: string;
 }
+
 
 
 
@@ -1228,6 +1228,18 @@ export interface IAddTileDialogprovider {
 
 
 
+export interface IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+}
+export class DashboardTile implements IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+    constructor();
+}
+
 export class TileConfigDialogController {
     params: any;
     extensionUrl: any;
@@ -1249,6 +1261,7 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     extensionUrl?: string;
     event?: any;
 }
+
 
 
 export const DEFAULT_TILE_WIDTH: number;
@@ -1299,19 +1312,6 @@ export class DragTileService implements IDragTileService {
 
 
 
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-}
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
-}
-
-
 
 
 export class MenuTileService extends DashboardTile {
@@ -1320,7 +1320,6 @@ export class MenuTileService extends DashboardTile {
     callAction(actionName: any, params: any, item: any): void;
     changeSize(params: any): void;
 }
-
 
 
 
@@ -1393,6 +1392,7 @@ export class TilesGridService implements ITilesGridService {
     updateTileOptions(opts: any): any;
 }
 
+
 export interface ITileTemplateService {
     getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
     setImageMarginCSS($element: any, image: any): void;
@@ -1401,9 +1401,6 @@ export interface ITileTemplateService {
 }
 
 declare module pip.settings {
-
-
-
 
 
 export interface ISettingsService {
@@ -1454,9 +1451,15 @@ export class SettingsTab {
     stateConfig: SettingsStateConfig;
 }
 
+
+
+
 }
 
 declare module pip.help {
+
+
+
 
 
 export class HelpConfig {
@@ -1504,9 +1507,6 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
-
-
-
 
 
 }
