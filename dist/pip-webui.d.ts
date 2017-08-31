@@ -420,6 +420,8 @@ export interface IImageSliderService {
 
 
 
+var marked: any;
+
 
 export interface IPopoverService {
     show(p: Object): void;
@@ -428,8 +430,6 @@ export interface IPopoverService {
 }
 
 
-
-var marked: any;
 
 
 
@@ -469,6 +469,8 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
+
 
 
 
@@ -552,12 +554,10 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
 export const MillisecondsInSecond = 1000;
-
 
 }
 
@@ -576,6 +576,19 @@ export interface IConfirmationDialogService {
     show(params: ConfirmationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
+
+
+
+export class ErrorDetailsDialogParams {
+    event?: MouseEvent;
+    dismissButton?: string;
+    error: any;
+}
+
+
+export interface IErrorDetailsDialogService {
+    show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
 
 
 export interface IInformationDialogService {
@@ -621,19 +634,6 @@ export class OptionsDialogParams {
 export class OptionsDialogResult {
     option: OptionsDialogData;
     isCheckboxOption: boolean;
-}
-
-
-
-export class ErrorDetailsDialogParams {
-    event?: MouseEvent;
-    dismissButton?: string;
-    error: any;
-}
-
-
-export interface IErrorDetailsDialogService {
-    show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
@@ -754,6 +754,19 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+
 
 export class BreadcrumbItem {
     title: string;
@@ -784,20 +797,37 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
+
+
+export interface INavIconService {
+    readonly config: NavIconConfig;
+    showMenu(callbackOrEvent?: any): void;
+    showIcon(icon: string, callbackOrEvent?: any): void;
+    showBack(callbackOrEvent?: any): void;
+    showImage(imageUrl: string, callbackOrEvent?: any): void;
+    hide(): void;
+}
+export interface INavIconProvider extends ng.IServiceProvider {
+    config: NavIconConfig;
+    setMenu(callbackOrEvent?: any): void;
+    setIcon(icon: string, callbackOrEvent?: any): void;
+    setBack(callbackOrEvent?: any): void;
+    setImage(imageUrl: string, callbackOrEvent?: any): void;
+    clear(): void;
 }
 
 
 
+export class NavIconConfig {
+    type: string;
+    imageUrl: string;
+    icon: string;
+    click: () => void;
+    event: string;
+}
+
+export const NavIconClickedEvent: string;
+export const NavIconChangedEvent: string;
 
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
@@ -834,37 +864,6 @@ export class NavHeaderConfig {
 }
 
 export let NavHeaderChangedEvent: string;
-
-export interface INavIconService {
-    readonly config: NavIconConfig;
-    showMenu(callbackOrEvent?: any): void;
-    showIcon(icon: string, callbackOrEvent?: any): void;
-    showBack(callbackOrEvent?: any): void;
-    showImage(imageUrl: string, callbackOrEvent?: any): void;
-    hide(): void;
-}
-export interface INavIconProvider extends ng.IServiceProvider {
-    config: NavIconConfig;
-    setMenu(callbackOrEvent?: any): void;
-    setIcon(icon: string, callbackOrEvent?: any): void;
-    setBack(callbackOrEvent?: any): void;
-    setImage(imageUrl: string, callbackOrEvent?: any): void;
-    clear(): void;
-}
-
-
-
-export class NavIconConfig {
-    type: string;
-    imageUrl: string;
-    icon: string;
-    click: () => void;
-    event: string;
-}
-
-export const NavIconClickedEvent: string;
-export const NavIconChangedEvent: string;
-
 
 export interface INavMenuService {
     sections: NavMenuSection[];
@@ -912,6 +911,7 @@ export class NavMenuConfig {
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
+
 export interface ISearchService {
     config: SearchConfig;
     criteria: string;
@@ -940,13 +940,6 @@ export const OpenSearchEvent = "pipOpenSearch";
 export const CloseSearchEvent = "pipCloseSearch";
 export const SearchChangedEvent = "pipSearchChanged";
 export const SearchActivatedEvent = "pipSearchActivated";
-
-export class PipTab {
-    id: string;
-    name?: string;
-    count: number;
-    title: string;
-}
 
 
 export interface ISideNavService {
@@ -1015,6 +1008,13 @@ export class SideNavConfig {
     visible: boolean;
 }
 
+export class PipTab {
+    id: string;
+    name?: string;
+    count: number;
+    title: string;
+}
+
 }
 
 declare module pip.themes {
@@ -1049,6 +1049,7 @@ export let ThemeResetPage: string;
 }
 
 declare module pip.errors {
+
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1087,7 +1088,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     setSupportedBrowsers(browsers: SupportedBrowsers): void;
     configs: ErrorPageConfigs;
 }
-
 
 class HttpResponseInterceptor implements ng.IHttpInterceptor {
     private $q;
@@ -1145,6 +1145,7 @@ export interface IChartColorsService {
 declare module pip.locations {
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1157,9 +1158,8 @@ export class LocationDialogParams {
 }
 
 
-
-
 let google: any;
+
 
 }
 
@@ -1169,7 +1169,6 @@ export class ButtonsUpload {
     title: string;
     click: Function;
 }
-
 
 
 
@@ -1193,6 +1192,7 @@ export class MultiuploadResult {
     error: any;
     id: string;
 }
+
 
 
 
@@ -1314,7 +1314,6 @@ export class DragTileService implements IDragTileService {
 
 
 
-
 export class MenuTileService extends DashboardTile {
     menu: any;
     constructor();
@@ -1323,6 +1322,13 @@ export class MenuTileService extends DashboardTile {
 }
 
 
+
+
+
+export interface ITileTemplateService {
+    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
+    setImageMarginCSS($element: any, image: any): void;
+}
 
 
 
@@ -1390,12 +1396,6 @@ export class TilesGridService implements ITilesGridService {
     swapTiles(movedTile: any, beforeTile: any): any;
     removeTile(removeTile: any): any;
     updateTileOptions(opts: any): any;
-}
-
-
-export interface ITileTemplateService {
-    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
-    setImageMarginCSS($element: any, image: any): void;
 }
 
 }
