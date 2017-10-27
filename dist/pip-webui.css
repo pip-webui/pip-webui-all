@@ -2871,7 +2871,7 @@ body.pip-windows .pip-scroll ::-webkit-scrollbar-thumb {
   .pip-xs .pip-document.pip-single-content .pip-content-container {
     left: 0; }
 
-@media (max-width: 1200px) {
+@media (max-width: 1500px) {
   .pip-lg .pip-document {
     position: absolute;
     top: 0;
