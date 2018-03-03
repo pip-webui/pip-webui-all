@@ -425,12 +425,12 @@ export interface IImageSliderService {
 var marked: any;
 
 
+
 export interface IPopoverService {
     show(p: Object): void;
     hide(): void;
     resize(): void;
 }
-
 
 
 
@@ -471,6 +471,9 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
+
+
 
 
 
@@ -552,14 +555,11 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 }
 
 
-
-
-
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
 export const MillisecondsInSecond = 1000;
+
 
 }
 
@@ -580,7 +580,6 @@ export interface IConfirmationDialogService {
 
 
 
-
 export class ErrorDetailsDialogParams {
     event?: MouseEvent;
     dismissButton?: string;
@@ -591,6 +590,7 @@ export class ErrorDetailsDialogParams {
 export interface IErrorDetailsDialogService {
     show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
+
 
 
 export interface IInformationDialogService {
@@ -605,37 +605,6 @@ export class InformationDialogParams {
     title?: string;
     message: string;
     item?: any;
-}
-
-
-
-export interface IOptionsDialogService {
-    show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
-}
-
-
-export class OptionsDialogData {
-    icon: string;
-    name: string;
-    title: string;
-    active: boolean;
-}
-
-export class OptionsDialogParams {
-    event?: MouseEvent;
-    title?: string;
-    ok?: string;
-    cancel?: string;
-    options?: OptionsDialogData[];
-    selectedOption?: OptionsDialogData;
-    selectedOptionName?: string;
-    isCheckboxOption?: boolean;
-    checkboxOptionCaption?: string;
-}
-
-export class OptionsDialogResult {
-    option: OptionsDialogData;
-    isCheckboxOption: boolean;
 }
 
 
@@ -666,6 +635,37 @@ export class OptionsBigDialogParams {
 
 export class OptionsBigDialogResult {
     option: OptionsBigDialogData;
+    isCheckboxOption: boolean;
+}
+
+
+
+export interface IOptionsDialogService {
+    show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
+}
+
+
+export class OptionsDialogData {
+    icon: string;
+    name: string;
+    title: string;
+    active: boolean;
+}
+
+export class OptionsDialogParams {
+    event?: MouseEvent;
+    title?: string;
+    ok?: string;
+    cancel?: string;
+    options?: OptionsDialogData[];
+    selectedOption?: OptionsDialogData;
+    selectedOptionName?: string;
+    isCheckboxOption?: boolean;
+    checkboxOptionCaption?: string;
+}
+
+export class OptionsDialogResult {
+    option: OptionsDialogData;
     isCheckboxOption: boolean;
 }
 
@@ -725,36 +725,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    breakpoint: string;
-}
-
-export const BreadcrumbChangedEvent: string;
-export const BreadcrumbBackEvent: string;
-
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    breakpoint: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-
 export class AppBarConfig {
     visible: boolean;
     parts: any;
@@ -798,6 +768,36 @@ export interface INavService {
     reset(): void;
 }
 
+
+
+
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    breakpoint: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    breakpoint: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
 
 
 
@@ -1053,26 +1053,6 @@ export let ThemeResetPage: string;
 declare module pip.errors {
 
 
-class HttpResponseInterceptor implements ng.IHttpInterceptor {
-    private $q;
-    private $location;
-    private $rootScope;
-    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
-    responseError: (rejection: any) => ng.IPromise<any>;
-}
-function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
-
-
-
-export interface IFormErrorsService {
-    errorsWithHint(field: any): any;
-    touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
-    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
-    resetFieldsErrors(form: ng.IFormController, field: any): void;
-    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
-    goToUnhandledErrorPage(error: any): any;
-}
-
 export class ErrorPageConfig {
     Active: boolean;
     Name: string;
@@ -1112,6 +1092,26 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
+class HttpResponseInterceptor implements ng.IHttpInterceptor {
+    private $q;
+    private $location;
+    private $rootScope;
+    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
+    responseError: (rejection: any) => ng.IPromise<any>;
+}
+function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
+
+
+
+export interface IFormErrorsService {
+    errorsWithHint(field: any): any;
+    touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
+    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
+    resetFieldsErrors(form: ng.IFormController, field: any): void;
+    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
+    goToUnhandledErrorPage(error: any): any;
+}
+
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
 
@@ -1121,9 +1121,9 @@ export let StateNotFoundEvent: string;
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
 
+
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
-
 
 export let ErrorsUnsupportedState: string;
 export let ErrorsUnsupportedEvent: string;
@@ -1149,6 +1149,7 @@ declare module pip.locations {
 
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1159,7 +1160,6 @@ export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
-
 
 let google: any;
 
@@ -1232,17 +1232,28 @@ export interface IAddTileDialogprovider {
 
 
 
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
+export class TileConfigDialogController {
+    params: any;
+    extensionUrl: any;
+    $mdDialog: angular.material.IDialogService;
+    colors: string[];
+    sizes: any;
+    sizeId: string;
+    onCancel: Function;
+    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
+    onApply(updatedData: any): void;
 }
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
+
+
+export interface ITileConfigService {
+    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
 }
+export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
+    dialogClass?: string;
+    extensionUrl?: string;
+    event?: any;
+}
+
 
 
 export const DEFAULT_TILE_WIDTH: number;
@@ -1292,29 +1303,17 @@ export class DragTileService implements IDragTileService {
 }
 
 
-export class TileConfigDialogController {
-    params: any;
-    extensionUrl: any;
-    $mdDialog: angular.material.IDialogService;
-    colors: string[];
-    sizes: any;
-    sizeId: string;
-    onCancel: Function;
-    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
-    onApply(updatedData: any): void;
+export interface IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
 }
-
-
-export interface ITileConfigService {
-    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
+export class DashboardTile implements IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+    constructor();
 }
-export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
-    dialogClass?: string;
-    extensionUrl?: string;
-    event?: any;
-}
-
-
 
 
 
@@ -1328,11 +1327,6 @@ export class MenuTileService extends DashboardTile {
 
 
 
-
-export interface ITileTemplateService {
-    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
-    setImageMarginCSS($element: any, image: any): void;
-}
 
 
 
@@ -1400,6 +1394,12 @@ export class TilesGridService implements ITilesGridService {
     swapTiles(movedTile: any, beforeTile: any): any;
     removeTile(removeTile: any): any;
     updateTileOptions(opts: any): any;
+}
+
+
+export interface ITileTemplateService {
+    getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
+    setImageMarginCSS($element: any, image: any): void;
 }
 
 }
