@@ -580,21 +580,6 @@ export interface IConfirmationDialogService {
 
 
 
-export interface IInformationDialogService {
-    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-
-export class InformationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    message: string;
-    item?: any;
-}
-
-
 
 export class ErrorDetailsDialogParams {
     event?: MouseEvent;
@@ -608,34 +593,18 @@ export interface IErrorDetailsDialogService {
 }
 
 
-
-export interface IOptionsDialogService {
-    show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
+export interface IInformationDialogService {
+    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
-export class OptionsDialogData {
-    icon: string;
-    name: string;
-    title: string;
-    active: boolean;
-}
 
-export class OptionsDialogParams {
+export class InformationDialogParams {
     event?: MouseEvent;
-    title?: string;
     ok?: string;
-    cancel?: string;
-    options?: OptionsDialogData[];
-    selectedOption?: OptionsDialogData;
-    selectedOptionName?: string;
-    isCheckboxOption?: boolean;
-    checkboxOptionCaption?: string;
-}
-
-export class OptionsDialogResult {
-    option: OptionsDialogData;
-    isCheckboxOption: boolean;
+    title?: string;
+    message: string;
+    item?: any;
 }
 
 
@@ -666,6 +635,37 @@ export class OptionsBigDialogParams {
 
 export class OptionsBigDialogResult {
     option: OptionsBigDialogData;
+    isCheckboxOption: boolean;
+}
+
+
+
+export interface IOptionsDialogService {
+    show(params: OptionsDialogParams, successCallback?: (result: OptionsDialogResult) => void, cancelCallback?: () => void): any;
+}
+
+
+export class OptionsDialogData {
+    icon: string;
+    name: string;
+    title: string;
+    active: boolean;
+}
+
+export class OptionsDialogParams {
+    event?: MouseEvent;
+    title?: string;
+    ok?: string;
+    cancel?: string;
+    options?: OptionsDialogData[];
+    selectedOption?: OptionsDialogData;
+    selectedOptionName?: string;
+    isCheckboxOption?: boolean;
+    checkboxOptionCaption?: string;
+}
+
+export class OptionsDialogResult {
+    option: OptionsDialogData;
     isCheckboxOption: boolean;
 }
 
@@ -756,19 +756,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
 
 export class BreadcrumbItem {
     title: string;
@@ -796,6 +783,19 @@ export interface IBreadcrumbService {
 }
 export interface IBreadcrumbProvider extends ng.IServiceProvider {
     text: string;
+}
+
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
 }
 
 
@@ -978,6 +978,7 @@ export const SideNavChangedEvent = "pipSideNavChanged";
 export const SideNavStateChangedEvent = "pipSideNavStateChanged";
 export const OpenSideNavEvent = "pipOpenSideNav";
 export const CloseSideNavEvent = "pipCloseSideNav";
+export const ToggleSideNavEvent = "pipToggleSideNav";
 
 export class SideNavStateNames {
     static Toggle: string;
@@ -1052,6 +1053,7 @@ export let ThemeResetPage: string;
 
 declare module pip.errors {
 
+
 export class ErrorPageConfig {
     Active: boolean;
     Name: string;
@@ -1102,7 +1104,6 @@ export interface IFormErrorsService {
     goToUnhandledErrorPage(error: any): any;
 }
 
-
 class HttpResponseInterceptor implements ng.IHttpInterceptor {
     private $q;
     private $location;
@@ -1121,9 +1122,9 @@ export let StateNotFoundEvent: string;
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
 
+
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
-
 
 export let ErrorsUnsupportedState: string;
 export let ErrorsUnsupportedEvent: string;
@@ -1131,6 +1132,7 @@ export let ErrorsUnsupportedEvent: string;
 }
 
 declare module pip.charts {
+
 
 
 export interface IChartColorsService {
@@ -1142,10 +1144,10 @@ export interface IChartColorsService {
 
 
 
-
 }
 
 declare module pip.locations {
+
 
 
 export interface ILocationDialogService {
@@ -1160,9 +1162,8 @@ export class LocationDialogParams {
 }
 
 
-
-
 let google: any;
+
 
 }
 
@@ -1244,6 +1245,29 @@ export class DashboardTile implements IDashboardTile {
     constructor();
 }
 
+export class TileConfigDialogController {
+    params: any;
+    extensionUrl: any;
+    $mdDialog: angular.material.IDialogService;
+    colors: string[];
+    sizes: any;
+    sizeId: string;
+    onCancel: Function;
+    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
+    onApply(updatedData: any): void;
+}
+
+
+export interface ITileConfigService {
+    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
+}
+export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
+    dialogClass?: string;
+    extensionUrl?: string;
+    event?: any;
+}
+
+
 
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
@@ -1291,29 +1315,6 @@ export class DragTileService implements IDragTileService {
     setOptions(options: any): any;
 }
 
-
-
-export class TileConfigDialogController {
-    params: any;
-    extensionUrl: any;
-    $mdDialog: angular.material.IDialogService;
-    colors: string[];
-    sizes: any;
-    sizeId: string;
-    onCancel: Function;
-    constructor(params: any, extensionUrl: any, $mdDialog: angular.material.IDialogService);
-    onApply(updatedData: any): void;
-}
-
-
-export interface ITileConfigService {
-    show(params: ITileConfigDialogOptions, successCallback?: (key) => void, cancelCallback?: () => void): any;
-}
-export interface ITileConfigDialogOptions extends angular.material.IDialogOptions {
-    dialogClass?: string;
-    extensionUrl?: string;
-    event?: any;
-}
 
 
 
@@ -1463,6 +1464,9 @@ export class SettingsTab {
 declare module pip.help {
 
 
+
+
+
 export class HelpConfig {
     defaultTab: string;
     tabs: HelpTab[];
@@ -1508,9 +1512,6 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
-
-
-
 
 
 }

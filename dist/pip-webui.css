@@ -2983,6 +2983,9 @@ body.pip-windows .pip-scroll ::-webkit-scrollbar-thumb {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.87);
   letter-spacing: 0.005em; }
+  .pip-tiles .pip-tiles-heading {
+    margin: 0 auto;
+    max-width: 100%; }
   .pip-tiles .pip-tiles-container {
     margin: 0 auto;
     max-width: 100%;
