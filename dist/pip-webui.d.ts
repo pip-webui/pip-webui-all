@@ -12,6 +12,69 @@ function addRedirectStateDecorator($provide: any): void;
 
 export let RoutingVar: string;
 
+
+
+export interface ICodes {
+    hash(value: string): number;
+    verification(): string;
+}
+
+export interface IFormat {
+    sample(value: string, maxLength: number): string;
+    sprintf(message: string, ...args: any[]): string;
+    filterToString(filter: any): string;
+    arrayToString(array: string[]): string;
+    enumToArray(obj: any): any[];
+}
+
+
+export interface IPageResetService {
+    reset(): void;
+    resetArea(area: string): void;
+}
+
+export interface IScrollService {
+    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
+}
+
+export interface ISystemInfo {
+    browserName: string;
+    browserVersion: string;
+    platform: string;
+    os: string;
+    isDesktop(): boolean;
+    isMobile(): boolean;
+    isCordova(): boolean;
+    isSupported(supported?: any): boolean;
+}
+
+export interface ITags {
+    normalizeOne(tag: string): string;
+    compressOne(tag: string): string;
+    equal(tag1: string, tag2: string): boolean;
+    normalizeAll(tags: any): string[];
+    compressAll(tags: any): string[];
+    extract(entity: any, searchFields?: string[]): string[];
+}
+
+export interface ITimerService {
+    isStarted(): boolean;
+    addEvent(event: string, timeout: number): void;
+    removeEvent(event: string): void;
+    clearEvents(): void;
+    start(): void;
+    stop(): void;
+}
+
+export let ResetPageEvent: string;
+export let ResetAreaEvent: string;
+export let ResetRootVar: string;
+export let ResetAreaRootVar: string;
+
+
+
+
+
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 
@@ -153,69 +216,6 @@ export class Translation {
     translateSetWithPrefix2(prefix: string, keys: string[], keyProp: string, valueProp: string): any[];
 }
 
-
-
-export interface ICodes {
-    hash(value: string): number;
-    verification(): string;
-}
-
-export interface IFormat {
-    sample(value: string, maxLength: number): string;
-    sprintf(message: string, ...args: any[]): string;
-    filterToString(filter: any): string;
-    arrayToString(array: string[]): string;
-    enumToArray(obj: any): any[];
-}
-
-
-export interface IPageResetService {
-    reset(): void;
-    resetArea(area: string): void;
-}
-
-export interface IScrollService {
-    scrollTo(parentElement: any, childElement: any, animationDuration: any): void;
-}
-
-export interface ISystemInfo {
-    browserName: string;
-    browserVersion: string;
-    platform: string;
-    os: string;
-    isDesktop(): boolean;
-    isMobile(): boolean;
-    isCordova(): boolean;
-    isSupported(supported?: any): boolean;
-}
-
-export interface ITags {
-    normalizeOne(tag: string): string;
-    compressOne(tag: string): string;
-    equal(tag1: string, tag2: string): boolean;
-    normalizeAll(tags: any): string[];
-    compressAll(tags: any): string[];
-    extract(entity: any, searchFields?: string[]): string[];
-}
-
-export interface ITimerService {
-    isStarted(): boolean;
-    addEvent(event: string, timeout: number): void;
-    removeEvent(event: string): void;
-    clearEvents(): void;
-    start(): void;
-    stop(): void;
-}
-
-export let ResetPageEvent: string;
-export let ResetAreaEvent: string;
-export let ResetRootVar: string;
-export let ResetAreaRootVar: string;
-
-
-
-
-
 }
 
 declare module pip.buttons {
@@ -331,6 +331,7 @@ export interface IDraggableService {
 
 
 
+
 export interface IKeyboardShortcuts {
     [key: string]: Shortcut;
 }
@@ -401,11 +402,9 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
-
 }
 
 declare module pip.controls {
-
 
 
 export interface IImageSliderService {
@@ -421,8 +420,6 @@ export interface IImageSliderService {
 
 
 
-
-var marked: any;
 
 
 export interface IPopoverService {
@@ -462,6 +459,9 @@ export class Toast {
 }
 
 
+
+var marked: any;
+
 }
 
 declare module pip.lists {
@@ -471,6 +471,7 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
 
 
 
@@ -555,7 +556,6 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
@@ -590,21 +590,6 @@ export class ErrorDetailsDialogParams {
 
 export interface IErrorDetailsDialogService {
     show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-export interface IInformationDialogService {
-    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-
-export class InformationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    message: string;
-    item?: any;
 }
 
 
@@ -670,9 +655,99 @@ export class OptionsDialogResult {
 }
 
 
+export interface IInformationDialogService {
+    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
+
+export class InformationDialogParams {
+    event?: MouseEvent;
+    ok?: string;
+    title?: string;
+    message: string;
+    item?: any;
+}
+
+
 }
 
 declare module pip.nav {
+
+export interface INavService {
+    appbar: IAppBarService;
+    icon: INavIconService;
+    breadcrumb: IBreadcrumbService;
+    actions: IActionsService;
+    search: ISearchService;
+    sidenav: ISideNavService;
+    header: INavHeaderService;
+    menu: INavMenuService;
+    reset(): void;
+}
+
+
+
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    breakpoint: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    breakpoint: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
+export class AppBarConfig {
+    visible: boolean;
+    parts: any;
+    classes: string[];
+}
+
+
+export const AppBarChangedEvent: string;
+
+export interface IAppBarService {
+    readonly config: AppBarConfig;
+    readonly classes: string[];
+    parts: any;
+    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
+    hide(): void;
+    addShadow(...breakpoints: string[]): void;
+    removeShadow(): void;
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+export interface IAppBarProvider extends ng.IServiceProvider {
+    config: AppBarConfig;
+    parts: any;
+    classes: string[];
+    addClass(...classes: string[]): void;
+    removeClass(...classes: string[]): void;
+    part(part: string, value: any): void;
+}
+
 
 
 export const ActionsChangedEvent: string;
@@ -725,81 +800,6 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
-export class AppBarConfig {
-    visible: boolean;
-    parts: any;
-    classes: string[];
-}
-
-
-export const AppBarChangedEvent: string;
-
-export interface IAppBarService {
-    readonly config: AppBarConfig;
-    readonly classes: string[];
-    parts: any;
-    show(parts?: any, classes?: string[], shadowBreakpoints?: string[]): void;
-    hide(): void;
-    addShadow(...breakpoints: string[]): void;
-    removeShadow(): void;
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-export interface IAppBarProvider extends ng.IServiceProvider {
-    config: AppBarConfig;
-    parts: any;
-    classes: string[];
-    addClass(...classes: string[]): void;
-    removeClass(...classes: string[]): void;
-    part(part: string, value: any): void;
-}
-
-
-
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    breakpoint: string;
-}
-
-export const BreadcrumbChangedEvent: string;
-export const BreadcrumbBackEvent: string;
-
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    breakpoint: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
-export interface INavService {
-    appbar: IAppBarService;
-    icon: INavIconService;
-    breadcrumb: IBreadcrumbService;
-    actions: IActionsService;
-    search: ISearchService;
-    sidenav: ISideNavService;
-    header: INavHeaderService;
-    menu: INavMenuService;
-    reset(): void;
-}
-
-
-
 
 export interface INavHeaderService {
     readonly config: NavHeaderConfig;
@@ -837,6 +837,7 @@ export class NavHeaderConfig {
 
 export let NavHeaderChangedEvent: string;
 
+
 export interface INavIconService {
     readonly config: NavIconConfig;
     showMenu(callbackOrEvent?: any): void;
@@ -866,7 +867,6 @@ export class NavIconConfig {
 
 export const NavIconClickedEvent: string;
 export const NavIconChangedEvent: string;
-
 
 export interface INavMenuService {
     sections: NavMenuSection[];
@@ -912,36 +912,6 @@ export class NavMenuConfig {
 }
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
-
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
 
 
 export interface ISideNavService {
@@ -1011,6 +981,36 @@ export class SideNavConfig {
     visible: boolean;
 }
 
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
+
 export class PipTab {
     id: string;
     name?: string;
@@ -1054,6 +1054,17 @@ export let ThemeResetPage: string;
 declare module pip.errors {
 
 
+
+
+export interface IFormErrorsService {
+    errorsWithHint(field: any): any;
+    touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
+    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
+    resetFieldsErrors(form: ng.IFormController, field: any): void;
+    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
+    goToUnhandledErrorPage(error: any): any;
+}
+
 export class ErrorPageConfig {
     Active: boolean;
     Name: string;
@@ -1093,16 +1104,21 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
+export let ErrorsMissingRouteState: string;
+export let StateNotFoundEvent: string;
+
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
+
+export let ErrorsUnknownState: string;
+export let ErrorsUnknownEvent: string;
+
+export let ErrorsConnectionState: string;
+export let ErrorsConnectionEvent: string;
 
 
-export interface IFormErrorsService {
-    errorsWithHint(field: any): any;
-    touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
-    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
-    resetFieldsErrors(form: ng.IFormController, field: any): void;
-    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
-    goToUnhandledErrorPage(error: any): any;
-}
+export let ErrorsUnsupportedState: string;
+export let ErrorsUnsupportedEvent: string;
 
 class HttpResponseInterceptor implements ng.IHttpInterceptor {
     private $q;
@@ -1112,22 +1128,6 @@ class HttpResponseInterceptor implements ng.IHttpInterceptor {
     responseError: (rejection: any) => ng.IPromise<any>;
 }
 function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
-
-export let ErrorsMaintenanceState: string;
-export let MaintenanceErrorEvent: string;
-
-export let ErrorsMissingRouteState: string;
-export let StateNotFoundEvent: string;
-
-export let ErrorsConnectionState: string;
-export let ErrorsConnectionEvent: string;
-
-
-export let ErrorsUnknownState: string;
-export let ErrorsUnknownEvent: string;
-
-export let ErrorsUnsupportedState: string;
-export let ErrorsUnsupportedEvent: string;
 
 }
 
@@ -1150,6 +1150,9 @@ declare module pip.locations {
 
 
 
+let google: any;
+
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1162,19 +1165,16 @@ export class LocationDialogParams {
 }
 
 
-let google: any;
-
-
 }
 
 declare module pip.files {
+
+
 
 export class ButtonsUpload {
     title: string;
     click: Function;
 }
-
-
 
 
 
@@ -1204,6 +1204,7 @@ export class MultiuploadResult {
 
 declare module pip.dashboard {
 
+
 export class AddTileDialog {
     title: string;
     icon: string;
@@ -1230,7 +1231,6 @@ export interface IAddTileDialogService {
 export interface IAddTileDialogprovider {
     configWidgetList(list: [AddTileDialog[]]): void;
 }
-
 
 
 export interface IDashboardTile {
