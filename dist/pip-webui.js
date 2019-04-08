@@ -11157,7 +11157,9 @@ module.run(['$templateCache', function($templateCache) {
         return DateChanges;
     }());
     var DateController = (function () {
+        DateController.$inject = ['$injector', '$scope'];
         function DateController($injector, $scope) {
+            "ngInject";
             this.localeDate = moment.localeData();
             this.momentMonths = angular.isArray(this.localeDate['_months']) ? this.localeDate['_months'] : this.localeDate['_months'].format;
             this.momentDays = angular.isArray(this.localeDate['_weekdays']) ? this.localeDate['_weekdays'] : this.localeDate['_weekdays'].format;
@@ -12547,7 +12549,9 @@ __export(require("./IDateConvertService"));
         return DateRangeChanges;
     }());
     var DateRangeController = (function () {
+        DateRangeController.$inject = ['$mdMedia', '$timeout', '$scope', '$element', '$rootScope', '$injector'];
         function DateRangeController($mdMedia, $timeout, $scope, $element, $rootScope, $injector) {
+            "ngInject";
             var _this = this;
             this.$mdMedia = $mdMedia;
             this.$timeout = $timeout;
@@ -12910,7 +12914,9 @@ angular.module('pipDates', [
         return TimeRangeChanges;
     }());
     var TimeRangeController = (function () {
+        TimeRangeController.$inject = ['$scope', '$attrs', '$element'];
         function TimeRangeController($scope, $attrs, $element) {
+            "ngInject";
             this.data = new TimeRangeData();
             this.defineStartDate();
             this.defineEndDate();
@@ -12989,7 +12995,9 @@ exports.MillisecondsInSecond = 1000;
         return TimeRangeEditChanges;
     }());
     var TimeRangeEditController = (function () {
+        TimeRangeEditController.$inject = ['$injector', 'pipDateConvert', '$scope', '$element'];
         function TimeRangeEditController($injector, pipDateConvert, $scope, $element) {
+            "ngInject";
             this.$injector = $injector;
             this.pipDateConvert = pipDateConvert;
             this.$scope = $scope;
