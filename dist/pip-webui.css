@@ -3736,6 +3736,9 @@ md-list-item .pip-markdown h1, md-list-item .pip-markdown h2, md-list-item .pip-
     .pip-toast.pip-error .md-toast-content {
       background-color: #ff5252; }
 
+.clickable {
+  cursor: pointer !important; }
+
 @media (max-width: 768px) {
   .pip-toast.pip-column-toast .md-toast-content::before {
     min-height: 0px !important; }
@@ -3796,7 +3799,7 @@ pip-routing-progress {
   pip-routing-progress .path {
     stroke-dasharray: 1, 200;
     stroke-dashoffset: 0;
-    animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+    animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
     stroke-linecap: round; }
 
 @keyframes rotate {
