@@ -16,6 +16,7 @@ gulp.task('build-ts', function () {
     return gulp.src([
         '../pip-webui-services/dist/pip-webui-services.d.ts',
         '../pip-webui-buttons/dist/pip-webui-buttons.d.ts',
+        '../pip-webui-cache/dist/pip-webui-cache.d.ts',
         '../pip-webui-landing/dist/pip-webui-landing.d.ts',
         '../pip-webui-headers/dist/pip-webui-headers.d.ts',
         '../pip-webui-layouts/dist/pip-webui-layouts.d.ts',
@@ -43,6 +44,7 @@ gulp.task('build-js-dev', function () {
     return gulp.src([
         '../pip-webui-services/dist/pip-webui-services.js',
         '../pip-webui-buttons/dist/pip-webui-buttons.js',
+        '../pip-webui-cache/dist/pip-webui-cache.js',
         '../pip-webui-landing/dist/pip-webui-landing.js',
         '../pip-webui-headers/dist/pip-webui-headers.js',
         '../pip-webui-layouts/dist/pip-webui-layouts.js',
@@ -72,6 +74,7 @@ gulp.task('build-js-prod', function () {
     return gulp.src([
         '../pip-webui-services/dist/pip-webui-services.min.js',
         '../pip-webui-buttons/dist/pip-webui-buttons.min.js',
+        '../pip-webui-cache/dist/pip-webui-cache.min.js',
         '../pip-webui-landing/dist/pip-webui-landing.min.js',
         '../pip-webui-headers/dist/pip-webui-headers.min.js',
         '../pip-webui-layouts/dist/pip-webui-layouts.min.js',
@@ -104,6 +107,7 @@ gulp.task('build-css-dev', function () {
         '../pip-webui-landing/dist/pip-webui-landing.css',
         '../pip-webui-headers/dist/pip-webui-headers.css',
         '../pip-webui-buttons/dist/pip-webui-buttons.css',
+        '../pip-webui-cache/dist/pip-webui-cache.css',
         '../pip-webui-services/dist/pip-webui-services.css',
         '../pip-webui-layouts/dist/pip-webui-layouts.css',
         '../pip-webui-split/dist/pip-webui-split.css',
@@ -132,6 +136,7 @@ gulp.task('build-css-prod', function () {
         '../pip-webui-landing/dist/pip-webui-landing.min.css',
         '../pip-webui-headers/dist/pip-webui-headers.min.css',
         '../pip-webui-buttons/dist/pip-webui-buttons.min.css',
+        '../pip-webui-cache/dist/pip-webui-cache.min.css',
         '../pip-webui-services/dist/pip-webui-services.min.css',
         '../pip-webui-layouts/dist/pip-webui-layouts.min.css',
         '../pip-webui-split/dist/pip-webui-split.min.css',
