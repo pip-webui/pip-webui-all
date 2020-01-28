@@ -226,6 +226,99 @@ declare module pip.buttons {
 
 }
 
+declare module pip.cache {
+
+export interface ICacheConfigService {
+    enableLogs: boolean;
+    models: CacheModel[];
+    prefix: string;
+}
+export class CacheConfigService implements ICacheConfigService {
+    enableLogs: boolean;
+    models: CacheModel[];
+    prefix: string;
+    constructor(enableLogs: boolean, models: CacheModel[], prefix: string);
+}
+export interface ICacheConfigProvider {
+    enableLogs: boolean;
+    models: CacheModel[];
+    prefix: string;
+}
+
+
+export class CacheCollectionParams {
+    offset?: number;
+    limit?: number;
+}
+export class CacheInterceptorOptions {
+    maxAge?: number;
+}
+export class CacheModel {
+    name: string;
+    options: {
+        maxAge: number;
+        key?: string;
+    };
+    interceptors: {
+        item?: {
+            match: RegExp;
+            options?: CacheInterceptorOptions;
+            getKey: (groups: any) => any;
+        };
+        collection?: {
+            match: RegExp;
+            options?: CacheInterceptorOptions;
+            responseModify?: {
+                responseToItems: (resp: any) => any[];
+                itemsToResponse: (items: any[]) => any;
+            };
+            getParams?: (params: any) => CacheCollectionParams;
+        };
+    };
+}
+
+export interface ICacheService {
+    models: CacheModel[];
+    getItem(modelName: string, key: any, options?: CacheInterceptorOptions): Promise<any>;
+    getItems(modelName: string, params?: CacheCollectionParams, options?: CacheInterceptorOptions): Promise<any[]>;
+    setItem(modelName: string, item: any, options?: {
+        removeTotal?: boolean;
+    }): Promise<any>;
+    setItems(modelName: string, items: any[], payload?: {
+        params?: CacheCollectionParams;
+        options?: CacheInterceptorOptions;
+    }): Promise<any[]>;
+    deleteItems(modelName: string, keys: any[]): Promise<any>;
+    clear(model?: string | string[]): Promise<any>;
+}
+export class CacheService implements ICacheService {
+    private config;
+    private openedDbs;
+    constructor(config: ICacheConfigProvider);
+    private getDbName(modelName);
+    private getDb(model);
+    private getModel(modelName);
+    readonly models: CacheModel[];
+    getItem(modelName: string, key: any, options?: CacheInterceptorOptions): Promise<any>;
+    getItems(modelName: string, params?: CacheCollectionParams, options?: CacheInterceptorOptions): Promise<any[]>;
+    setItem(modelName: string, item: any, options?: {
+        removeTotal?: boolean;
+    }): Promise<any>;
+    setItems(modelName: string, items: any[], payload?: {
+        params?: CacheCollectionParams;
+        options?: CacheInterceptorOptions;
+    }): Promise<any[]>;
+    deleteItems(modelName: string, keys: any[]): Promise<any>;
+    clear(model?: string | string[]): Promise<any>;
+}
+export interface ICacheProvider {
+    models: CacheModel[];
+    registerModel(model: CacheModel): boolean;
+}
+
+
+}
+
 declare module pip.layouts {
 
 
@@ -914,6 +1007,36 @@ export class NavMenuConfig {
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
+
+
 export interface ISideNavService {
     readonly config: SideNavConfig;
     readonly classes: string[];
@@ -980,36 +1103,6 @@ export class SideNavConfig {
     backdrop: boolean;
     visible: boolean;
 }
-
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
 
 export class PipTab {
     id: string;
@@ -1150,7 +1243,6 @@ declare module pip.locations {
 
 
 
-
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1161,6 +1253,7 @@ export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
+
 
 let google: any;
 
@@ -1268,6 +1361,7 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
 }
 
 
+
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
 export const UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
@@ -1313,7 +1407,6 @@ export class DragTileService implements IDragTileService {
     getOptions(): any;
     setOptions(options: any): any;
 }
-
 
 
 

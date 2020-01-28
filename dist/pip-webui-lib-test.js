@@ -1,4 +1,4 @@
-//  Chance.js 1.0.10
+//  Chance.js 1.0.18
 //  http://chancejs.com
 //  (c) 2013 Victor Quinn
 //  Chance may be freely distributed or modified under the MIT license.
@@ -12,6 +12,15 @@
     var CHARS_LOWER = 'abcdefghijklmnopqrstuvwxyz';
     var CHARS_UPPER = CHARS_LOWER.toUpperCase();
     var HEX_POOL  = NUMBERS + "abcdef";
+
+    // Errors
+    function UnsupportedError(message) {
+        this.name = 'UnsupportedError';
+        this.message = message || 'This feature is not supported on this platform';
+    }
+
+    UnsupportedError.prototype = new Error();
+    UnsupportedError.prototype.constructor = UnsupportedError;
 
     // Cached array helpers
     var slice = Array.prototype.slice;
@@ -63,7 +72,7 @@
         return this;
     }
 
-    Chance.prototype.VERSION = "1.0.10";
+    Chance.prototype.VERSION = "1.0.18";
 
     // Random helper functions
     function initOptions(options, defaults) {
@@ -78,6 +87,10 @@
         }
 
         return options;
+    }
+
+    function range(size) {
+        return Array.apply(null, Array(size)).map(function (_, i) {return i;});
     }
 
     function testRange(test, errorMessage) {
@@ -133,20 +146,43 @@
         return this.random() * 100 < options.likelihood;
     };
 
+    Chance.prototype.falsy = function (options) {
+        // return a random falsy value
+        options = initOptions(options, {pool: [false, null, 0, NaN, '']})
+        var pool = options.pool,
+            index = this.integer({min: 0, max: pool.length}),
+            value = pool[index];
+
+        return value;
+    }
+
+    Chance.prototype.animal = function (options){
+      //returns a random animal
+      options = initOptions(options);
+
+      if(typeof options.type !== 'undefined'){
+        //if user does not put in a valid animal type, user will get an error
+        testRange(
+           !this.get("animals")[options.type.toLowerCase()],
+           "Please pick from desert, ocean, grassland, forest, zoo, pets, farm."
+         );
+         //if user does put in valid animal type, will return a random animal of that type
+          return this.pick(this.get("animals")[options.type.toLowerCase()]);
+      }
+       //if user does not put in any animal type, will return a random animal regardless
+      var animalTypeArray = ["desert","forest","ocean","zoo","farm","pet","grassland"];
+      return this.pick(this.get("animals")[this.pick(animalTypeArray)]);
+    };
+
     /**
      *  Return a random character.
      *
-     *  @param {Object} [options={}] can specify a character pool, only alpha,
-     *    only symbols, and casing (lower or upper)
+     *  @param {Object} [options={}] can specify a character pool or alpha,
+     *    numeric, symbols and casing (lower or upper)
      *  @returns {String} a single random character
-     *  @throws {RangeError} Can only specify alpha or symbols, not both
      */
     Chance.prototype.character = function (options) {
         options = initOptions(options);
-        testRange(
-            options.alpha && options.symbols,
-            "Chance: Cannot specify both alpha and symbols."
-        );
 
         var symbols = "!@#$%^&*()[]",
             letters, pool;
@@ -161,12 +197,20 @@
 
         if (options.pool) {
             pool = options.pool;
-        } else if (options.alpha) {
-            pool = letters;
-        } else if (options.symbols) {
-            pool = symbols;
         } else {
-            pool = letters + NUMBERS + symbols;
+            pool = '';
+            if (options.alpha) {
+                pool += letters;
+            }
+            if (options.numeric) {
+                pool += NUMBERS;
+            }
+            if (options.symbols) {
+                pool += symbols;
+            }
+            if (!pool) {
+                pool = letters + NUMBERS + symbols;
+            }
         }
 
         return pool.charAt(this.natural({max: (pool.length - 1)}));
@@ -246,7 +290,7 @@
      *  chance.natural({min: 1, max: 3});
      *  would return either 1, 2, or 3.
      *
-     *  @param {Object} [options={}] can specify a min and/or maxm or a numerals count.
+     *  @param {Object} [options={}] can specify a min and/or max or a numerals count.
      *  @returns {Number} a single random integer number
      *  @throws {RangeError} min cannot be greater than max
      */
@@ -258,7 +302,74 @@
           options.max = Math.pow(10, options.numerals) - 1;
         }
         testRange(options.min < 0, "Chance: Min cannot be less than zero.");
+
+        if (options.exclude) {
+            testRange(!Array.isArray(options.exclude), "Chance: exclude must be an array.")
+
+            for (const exclusion of options.exclude) {
+                testRange(!Number.isInteger(exclusion), "Chance: exclude must be numbers.")
+            }
+
+            let random = options.min + this.natural({max: options.max - options.min - options.exclude.length})
+            for (const exclusion of options.exclude.sort()) {
+                if (random < exclusion) {
+                    break
+                }
+                random++
+            }
+            return random
+        }
         return this.integer(options);
+    };
+
+    /**
+     *  Return a random prime number
+     *
+     *  NOTE the max and min are INCLUDED in the range.
+     *
+     *  @param {Object} [options={}] can specify a min and/or max
+     *  @returns {Number} a single random prime number
+     *  @throws {RangeError} min cannot be greater than max nor negative
+     */
+    Chance.prototype.prime = function (options) {
+        options = initOptions(options, {min: 0, max: 10000});
+        testRange(options.min < 0, "Chance: Min cannot be less than zero.");
+        testRange(options.min > options.max, "Chance: Min cannot be greater than Max.");
+
+        var lastPrime = data.primes[data.primes.length - 1];
+        if (options.max > lastPrime) {
+            for (var i = lastPrime + 2; i <= options.max; ++i) {
+                if (this.is_prime(i)) {
+                    data.primes.push(i);
+                }
+            }
+        }
+        var targetPrimes = data.primes.filter(function (prime) {
+            return prime >= options.min && prime <= options.max;
+        });
+        return this.pick(targetPrimes);
+    };
+
+    /**
+     * Determine whether a given number is prime or not.
+     */
+    Chance.prototype.is_prime = function (n) {
+        if (n % 1 || n < 2) {
+            return false;
+        }
+        if (n % 2 === 0) {
+            return n === 2;
+        }
+        if (n % 3 === 0) {
+            return n === 3;
+        }
+        var m = Math.sqrt(n);
+        for (var i = 5; i <= m; i += 6) {
+            if (n % i === 0 || n % (i + 2) === 0) {
+                return false;
+            }
+        }
+        return true;
     };
 
     /**
@@ -282,6 +393,16 @@
 		return integer.toString(16);
     };
 
+    Chance.prototype.letter = function(options) {
+        options = initOptions(options, {casing: 'lower'});
+        var pool = "abcdefghijklmnopqrstuvwxyz";
+        var letter = this.character({pool: pool});
+        if (options.casing === 'upper') {
+            letter = letter.toUpperCase();
+        }
+        return letter;
+    }
+
     /**
      *  Return a random string
      *
@@ -296,6 +417,132 @@
             text = this.n(this.character, length, options);
 
         return text.join("");
+    };
+
+    function CopyToken(c) {
+        this.c = c
+    }
+
+    CopyToken.prototype = {
+        substitute: function () {
+            return this.c
+        }
+    }
+
+    function EscapeToken(c) {
+        this.c = c
+    }
+
+    EscapeToken.prototype = {
+        substitute: function () {
+            if (!/[{}\\]/.test(this.c)) {
+                throw new Error('Invalid escape sequence: "\\' + this.c + '".')
+            }
+            return this.c
+        }
+    }
+
+    function ReplaceToken(c) {
+        this.c = c
+    }
+
+    ReplaceToken.prototype = {
+        replacers: {
+            '#': function (chance) { return chance.character({ pool: NUMBERS }) },
+            'A': function (chance) { return chance.character({ pool: CHARS_UPPER }) },
+            'a': function (chance) { return chance.character({ pool: CHARS_LOWER }) },
+        },
+
+        substitute: function (chance) {
+            var replacer = this.replacers[this.c]
+            if (!replacer) {
+                throw new Error('Invalid replacement character: "' + this.c + '".')
+            }
+            return replacer(chance)
+        }
+    }
+
+    function parseTemplate(template) {
+        var tokens = []
+        var mode = 'identity'
+        for (var i = 0; i<template.length; i++) {
+            var c = template[i]
+            switch (mode) {
+                case 'escape':
+                    tokens.push(new EscapeToken(c))
+                    mode = 'identity'
+                    break
+                case 'identity':
+                    if (c === '{') {
+                        mode = 'replace'
+                    } else if (c === '\\') {
+                        mode = 'escape'
+                    } else {
+                        tokens.push(new CopyToken(c))
+                    }
+                    break
+                case 'replace':
+                    if (c === '}') {
+                        mode = 'identity'
+                    } else {
+                        tokens.push(new ReplaceToken(c))
+                    }
+                    break
+            }
+        }
+        return tokens
+    }
+
+    /**
+     *  Return a random string matching the given template.
+     *
+     *  The template consists of any number of "character replacement" and
+     *  "character literal" sequences. A "character replacement" sequence
+     *  starts with a left brace, has any number of special replacement
+     *  characters, and ends with a right brace. A character literal can be any
+     *  character except a brace or a backslash. A literal brace or backslash
+     *  character can be included in the output by escaping with a backslash.
+     *
+     *  The following replacement characters can be used in a replacement
+     *  sequence:
+     *
+     *      "#": a random digit
+     *      "a": a random lower case letter
+     *      "A": a random upper case letter
+     *
+     *  Example: chance.template('{AA###}-{##}')
+     *
+     *  @param {String} template string.
+     *  @returns {String} a random string matching the template.
+     */
+    Chance.prototype.template = function (template) {
+        if (!template) {
+            throw new Error('Template string is required')
+        }
+        var self = this
+        return parseTemplate(template)
+            .map(function (token) { return token.substitute(self) })
+            .join('');
+    };
+
+
+    /**
+     *  Return a random buffer
+     *
+     *  @param {Object} [options={}] can specify a length
+     *  @returns {Buffer} a buffer of random length
+     *  @throws {RangeError} length cannot be less than zero
+     */
+    Chance.prototype.buffer = function (options) {
+        if (typeof Buffer === 'undefined') {
+            throw new UnsupportedError('Sorry, the buffer() function is not supported on your platform');
+        }
+        options = initOptions(options, { length: this.natural({min: 5, max: 20}) });
+        testRange(options.length < 0, "Chance: Length cannot be less than zero.");
+        var length = options.length;
+        var content = this.n(this.character, length, options);
+
+        return Buffer.from(content);
     };
 
     // -- End Basics --
@@ -427,23 +674,37 @@
         if (!count || count === 1) {
             return [ this.pickone(arr) ];
         } else {
-            return this.shuffle(arr).slice(0, count);
+            var array = arr.slice(0);
+            var end = array.length;
+
+            return this.n(function () {
+                var index = this.natural({max: --end});
+                var value = array[index];
+                array[index] = array[end];
+                return value;
+            }, Math.min(end, count));
         }
     };
 
     Chance.prototype.shuffle = function (arr) {
-        var old_array = arr.slice(0),
-            new_array = [],
+        var new_array = [],
             j = 0,
-            length = Number(old_array.length);
+            length = Number(arr.length),
+            source_indexes = range(length),
+            last_source_index = length - 1,
+            selected_source_index;
 
         for (var i = 0; i < length; i++) {
             // Pick a random index from the array
-            j = this.natural({max: old_array.length - 1});
+            selected_source_index = this.natural({max: last_source_index});
+            j = source_indexes[selected_source_index];
+
             // Add it to the new array
-            new_array[i] = old_array[j];
-            // Remove that element from the original array
-            old_array.splice(j, 1);
+            new_array[i] = arr[j];
+
+            // Mark the source index as used
+            source_indexes[selected_source_index] = source_indexes[last_source_index];
+            last_source_index -= 1;
         }
 
         return new_array;
@@ -535,7 +796,7 @@
         text = this.capitalize(text);
 
         // Make sure punctuation has a usable value
-        if (punctuation !== false && !/^[\.\?;!:]$/.test(punctuation)) {
+        if (punctuation !== false && !/^[.?;!:]$/.test(punctuation)) {
             punctuation = '.';
         }
 
@@ -733,8 +994,19 @@
     };
 
     Chance.prototype.last = function (options) {
-        options = initOptions(options, {nationality: 'en'});
+      options = initOptions(options, {nationality: '*'});
+      if (options.nationality === "*") {
+        var allLastNames = []
+        var lastNames = this.get("lastNames")
+        Object.keys(lastNames).forEach(function(key){
+          allLastNames = allLastNames.concat(lastNames[key])
+        })
+        return this.pick(allLastNames)
+      }
+      else {
         return this.pick(this.get("lastNames")[options.nationality.toLowerCase()]);
+      }
+
     };
 
     Chance.prototype.israelId=function(){
@@ -910,6 +1182,23 @@
             ssn = this.string({pool: ssn_pool, length: 4});
         }
         return ssn;
+    };
+
+    // Aadhar is similar to ssn, used in India to uniquely identify a person
+    Chance.prototype.aadhar = function (options) {
+        options = initOptions(options, {onlyLastFour: false, separatedByWhiteSpace: true});
+        var aadhar_pool = "1234567890",
+            aadhar,
+            whiteSpace = options.separatedByWhiteSpace ? ' ' : '';
+
+        if(!options.onlyLastFour) {
+            aadhar = this.string({pool: aadhar_pool, length: 4}) + whiteSpace +
+            this.string({pool: aadhar_pool, length: 4}) + whiteSpace +
+            this.string({pool: aadhar_pool, length: 4});
+        } else {
+            aadhar = this.string({pool: aadhar_pool, length: 4});
+        }
+        return aadhar;
     };
 
     // Return the list of available name suffixes
@@ -1224,8 +1513,25 @@
         return this.word({length: options.length}) + '@' + (options.domain || this.domain());
     };
 
+    /**
+     * #Description:
+     * ===============================================
+     * Generate a random Facebook id, aka fbid.
+     *
+     * NOTE: At the moment (Sep 2017), Facebook ids are
+     * "numeric strings" of length 16.
+     * However, Facebook Graph API documentation states that
+     * "it is extremely likely to change over time".
+     * @see https://developers.facebook.com/docs/graph-api/overview/
+     *
+     * #Examples:
+     * ===============================================
+     * chance.fbid() => '1000035231661304'
+     *
+     * @return [string] facebook id
+     */
     Chance.prototype.fbid = function () {
-        return parseInt('10000' + this.natural({max: 100000000000}), 10);
+        return '10000' + this.string({pool: "1234567890", length: 11});
     };
 
     Chance.prototype.google_analytics = function () {
@@ -1316,6 +1622,15 @@
       }
     };
 
+    Chance.prototype.loremPicsum = function (options) {
+        options = initOptions(options, { width: 500, height: 500, greyscale: false, blurred: false });
+
+        var greyscale = options.greyscale ? 'g/' : '';
+        var query = options.blurred ? '/?blur' : '/?random';
+
+        return 'https://picsum.photos/' + greyscale + options.width + '/' + options.height + query;
+    }
+
     // -- End Web --
 
     // -- Location --
@@ -1359,7 +1674,7 @@
     Chance.prototype.country = function (options) {
         options = initOptions(options);
         var country = this.pick(this.countries());
-        return options.full ? country.name : country.abbreviation;
+        return options.raw ? country : options.full ? country.name : country.abbreviation;
     };
 
     Chance.prototype.depth = function (options) {
@@ -1477,9 +1792,7 @@
                     ]);
                     phone = options.formatted || numPick;
                 }
-
                 break;
-
             case 'us':
                 var areacode = this.areacode(options).toString();
                 var exchange = this.natural({ min: 2, max: 9 }).toString() +
@@ -1487,6 +1800,20 @@
                     this.natural({ min: 0, max: 9 }).toString();
                 var subscriber = this.natural({ min: 1000, max: 9999 }).toString(); // this could be random [0-9]{4}
                 phone = options.formatted ? areacode + ' ' + exchange + '-' + subscriber : areacode + exchange + subscriber;
+                break;
+            case 'br':
+                var areaCode = this.pick(["11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "24", "27", "28", "31", "32", "33", "34", "35", "37", "38", "41", "42", "43", "44", "45", "46", "47", "48", "49", "51", "53", "54", "55", "61", "62", "63", "64", "65", "66", "67", "68", "69", "71", "73", "74", "75", "77", "79", "81", "82", "83", "84", "85", "86", "87", "88", "89", "91", "92", "93", "94", "95", "96", "97", "98", "99"]);
+                var prefix;
+                if (options.mobile) {
+                    // Brasilian official reference (mobile): http://www.anatel.gov.br/setorregulado/plano-de-numeracao-brasileiro?id=330
+                    prefix = '9' + self.string({ pool: '0123456789', length: 4});
+                } else {
+                    // Brasilian official reference: http://www.anatel.gov.br/setorregulado/plano-de-numeracao-brasileiro?id=331
+                    prefix = this.natural({ min: 2000, max: 5999 }).toString();
+                }
+                var mcdu = self.string({ pool: '0123456789', length: 4});
+                phone = options.formatted ? '(' + areaCode + ') ' + prefix + '-' + mcdu : areaCode + prefix + mcdu;
+                break;
         }
         return phone;
     };
@@ -1500,6 +1827,25 @@
         var ldu = this.natural({max: 9}) + this.character({alpha: true, casing: "upper"}) + this.natural({max: 9});
 
         return fsa + " " + ldu;
+    };
+
+    Chance.prototype.postcode = function () {
+        // Area
+        var area = this.pick(this.get("postcodeAreas")).code;
+        // District
+        var district = this.natural({max: 9});
+        // Sub-District
+        var subDistrict = this.bool() ? this.character({alpha: true, casing: "upper"}) : "";
+        // Outward Code
+        var outward = area + district + subDistrict;
+        // Sector
+        var sector = this.natural({max: 9});
+        // Unit
+        var unit = this.character({alpha: true, casing: "upper"}) + this.character({alpha: true, casing: "upper"});
+        // Inward Code
+        var inward = sector + unit;
+
+        return outward + " " + inward;
     };
 
     Chance.prototype.counties = function (options) {
@@ -1552,6 +1898,7 @@
                 }
                 break;
             case 'it':
+            case 'mx':
                 states = this.get("country_regions")[options.country.toLowerCase()];
                 break;
             case 'uk':
@@ -2066,7 +2413,71 @@
 
     // -- End Regional
 
+    // -- Music --
+
+    Chance.prototype.note = function(options) {
+      // choices for 'notes' option:
+      // flatKey - chromatic scale with flat notes (default)
+      // sharpKey - chromatic scale with sharp notes
+      // flats - just flat notes
+      // sharps - just sharp notes
+      // naturals - just natural notes
+      // all - naturals, sharps and flats
+      options = initOptions(options, { notes : 'flatKey'});
+      var scales = {
+        naturals: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+        flats: ['D♭', 'E♭', 'G♭', 'A♭', 'B♭'],
+        sharps: ['C♯', 'D♯', 'F♯', 'G♯', 'A♯']
+      };
+      scales.all = scales.naturals.concat(scales.flats.concat(scales.sharps))
+      scales.flatKey = scales.naturals.concat(scales.flats)
+      scales.sharpKey = scales.naturals.concat(scales.sharps)
+      return this.pickone(scales[options.notes]);
+    }
+
+    Chance.prototype.midi_note = function(options) {
+      var min = 0;
+      var max = 127;
+      options = initOptions(options, { min : min, max : max });
+      return this.integer({min: options.min, max: options.max});
+    }
+
+    Chance.prototype.chord_quality = function(options) {
+      options = initOptions(options, { jazz: true });
+      var chord_qualities = ['maj', 'min', 'aug', 'dim'];
+      if (options.jazz){
+        chord_qualities = [
+          'maj7',
+          'min7',
+          '7',
+          'sus',
+          'dim',
+          'ø'
+        ];
+      }
+      return this.pickone(chord_qualities);
+    }
+
+    Chance.prototype.chord = function (options) {
+      options = initOptions(options);
+      return this.note(options) + this.chord_quality(options);
+    }
+
+    Chance.prototype.tempo = function (options) {
+      var min = 40;
+      var max = 320;
+      options = initOptions(options, {min: min, max: max});
+      return this.integer({min: options.min, max: options.max});
+    }
+
+    // -- End Music
+
     // -- Miscellaneous --
+
+    // Coin - Flip, flip, flipadelphia
+    Chance.prototype.coin = function() {
+      return this.bool() ? "heads" : "tails";
+    }
 
     // Dice - For all the board game geeks out there, myself included ;)
     function diceFn (range) {
@@ -2303,7 +2714,9 @@
                 // Data taken from http://www.dati.gov.it/dataset/comune-di-firenze_0163
                 "it": ["Adolfo", "Alberto", "Aldo", "Alessandro", "Alessio", "Alfredo", "Alvaro", "Andrea", "Angelo", "Angiolo", "Antonino", "Antonio", "Attilio", "Benito", "Bernardo", "Bruno", "Carlo", "Cesare", "Christian", "Claudio", "Corrado", "Cosimo", "Cristian", "Cristiano", "Daniele", "Dario", "David", "Davide", "Diego", "Dino", "Domenico", "Duccio", "Edoardo", "Elia", "Elio", "Emanuele", "Emiliano", "Emilio", "Enrico", "Enzo", "Ettore", "Fabio", "Fabrizio", "Federico", "Ferdinando", "Fernando", "Filippo", "Francesco", "Franco", "Gabriele", "Giacomo", "Giampaolo", "Giampiero", "Giancarlo", "Gianfranco", "Gianluca", "Gianmarco", "Gianni", "Gino", "Giorgio", "Giovanni", "Giuliano", "Giulio", "Giuseppe", "Graziano", "Gregorio", "Guido", "Iacopo", "Jacopo", "Lapo", "Leonardo", "Lorenzo", "Luca", "Luciano", "Luigi", "Manuel", "Marcello", "Marco", "Marino", "Mario", "Massimiliano", "Massimo", "Matteo", "Mattia", "Maurizio", "Mauro", "Michele", "Mirko", "Mohamed", "Nello", "Neri", "Niccolò", "Nicola", "Osvaldo", "Otello", "Paolo", "Pier Luigi", "Piero", "Pietro", "Raffaele", "Remo", "Renato", "Renzo", "Riccardo", "Roberto", "Rolando", "Romano", "Salvatore", "Samuele", "Sandro", "Sergio", "Silvano", "Simone", "Stefano", "Thomas", "Tommaso", "Ubaldo", "Ugo", "Umberto", "Valerio", "Valter", "Vasco", "Vincenzo", "Vittorio"],
                 // Data taken from http://www.svbkindernamen.nl/int/nl/kindernamen/index.html
-                "nl": ["Aaron","Abel","Adam","Adriaan","Albert","Alexander","Ali","Arjen","Arno","Bart","Bas","Bastiaan","Benjamin","Bob", "Boris","Bram","Brent","Cas","Casper","Chris","Christiaan","Cornelis","Daan","Daley","Damian","Dani","Daniel","Daniël","David","Dean","Dirk","Dylan","Egbert","Elijah","Erik","Erwin","Evert","Ezra","Fabian","Fedde","Finn","Florian","Floris","Frank","Frans","Frederik","Freek","Geert","Gerard","Gerben","Gerrit","Gijs","Guus","Hans","Hendrik","Henk","Herman","Hidde","Hugo","Jaap","Jan Jaap","Jan-Willem","Jack","Jacob","Jan","Jason","Jasper","Jayden","Jelle","Jelte","Jens","Jeroen","Jesse","Jim","Job","Joep","Johannes","John","Jonathan","Joris","Joshua","Joël","Julian","Kees","Kevin","Koen","Lars","Laurens","Leendert","Lennard","Lodewijk","Luc","Luca","Lucas","Lukas","Luuk","Maarten","Marcus","Martijn","Martin","Matthijs","Maurits","Max","Mees","Melle","Mick","Mika","Milan","Mohamed","Mohammed","Morris","Muhammed","Nathan","Nick","Nico","Niek","Niels","Noah","Noud","Olivier","Oscar","Owen","Paul","Pepijn","Peter","Pieter","Pim","Quinten","Reinier","Rens","Robin","Ruben","Sam","Samuel","Sander","Sebastiaan","Sem","Sep","Sepp","Siem","Simon","Stan","Stef","Steven","Stijn","Sven","Teun","Thijmen","Thijs","Thomas","Tijn","Tim","Timo","Tobias","Tom","Victor","Vince","Willem","Wim","Wouter","Yusuf"]
+                "nl": ["Aaron","Abel","Adam","Adriaan","Albert","Alexander","Ali","Arjen","Arno","Bart","Bas","Bastiaan","Benjamin","Bob", "Boris","Bram","Brent","Cas","Casper","Chris","Christiaan","Cornelis","Daan","Daley","Damian","Dani","Daniel","Daniël","David","Dean","Dirk","Dylan","Egbert","Elijah","Erik","Erwin","Evert","Ezra","Fabian","Fedde","Finn","Florian","Floris","Frank","Frans","Frederik","Freek","Geert","Gerard","Gerben","Gerrit","Gijs","Guus","Hans","Hendrik","Henk","Herman","Hidde","Hugo","Jaap","Jan Jaap","Jan-Willem","Jack","Jacob","Jan","Jason","Jasper","Jayden","Jelle","Jelte","Jens","Jeroen","Jesse","Jim","Job","Joep","Johannes","John","Jonathan","Joris","Joshua","Joël","Julian","Kees","Kevin","Koen","Lars","Laurens","Leendert","Lennard","Lodewijk","Luc","Luca","Lucas","Lukas","Luuk","Maarten","Marcus","Martijn","Martin","Matthijs","Maurits","Max","Mees","Melle","Mick","Mika","Milan","Mohamed","Mohammed","Morris","Muhammed","Nathan","Nick","Nico","Niek","Niels","Noah","Noud","Olivier","Oscar","Owen","Paul","Pepijn","Peter","Pieter","Pim","Quinten","Reinier","Rens","Robin","Ruben","Sam","Samuel","Sander","Sebastiaan","Sem","Sep","Sepp","Siem","Simon","Stan","Stef","Steven","Stijn","Sven","Teun","Thijmen","Thijs","Thomas","Tijn","Tim","Timo","Tobias","Tom","Victor","Vince","Willem","Wim","Wouter","Yusuf"],
+                // Data taken from https://fr.wikipedia.org/wiki/Liste_de_pr%C3%A9noms_fran%C3%A7ais_et_de_la_francophonie
+                "fr": ["Aaron","Abdon","Abel","Abélard","Abelin","Abondance","Abraham","Absalon","Acace","Achaire","Achille","Adalard","Adalbald","Adalbéron","Adalbert","Adalric","Adam","Adegrin","Adel","Adelin","Andelin","Adelphe","Adam","Adéodat","Adhémar","Adjutor","Adolphe","Adonis","Adon","Adrien","Agapet","Agathange","Agathon","Agilbert","Agénor","Agnan","Aignan","Agrippin","Aimable","Aimé","Alain","Alban","Albin","Aubin","Albéric","Albert","Albertet","Alcibiade","Alcide","Alcée","Alcime","Aldonce","Aldric","Aldéric","Aleaume","Alexandre","Alexis","Alix","Alliaume","Aleaume","Almine","Almire","Aloïs","Alphée","Alphonse","Alpinien","Alverède","Amalric","Amaury","Amandin","Amant","Ambroise","Amédée","Amélien","Amiel","Amour","Anaël","Anastase","Anatole","Ancelin","Andéol","Andoche","André","Andoche","Ange","Angelin","Angilbe","Anglebert","Angoustan","Anicet","Anne","Annibal","Ansbert","Anselme","Anthelme","Antheaume","Anthime","Antide","Antoine","Antonius","Antonin","Apollinaire","Apollon","Aquilin","Arcade","Archambaud","Archambeau","Archange","Archibald","Arian","Ariel","Ariste","Aristide","Armand","Armel","Armin","Arnould","Arnaud","Arolde","Arsène","Arsinoé","Arthaud","Arthème","Arthur","Ascelin","Athanase","Aubry","Audebert","Audouin","Audran","Audric","Auguste","Augustin","Aurèle","Aurélien","Aurian","Auxence","Axel","Aymard","Aymeric","Aymon","Aymond","Balthazar","Baptiste","Barnabé","Barthélemy","Bartimée","Basile","Bastien","Baudouin","Bénigne","Benjamin","Benoît","Bérenger","Bérard","Bernard","Bertrand","Blaise","Bon","Boniface","Bouchard","Brice","Brieuc","Bruno","Brunon","Calixte","Calliste","Camélien","Camille","Camillien","Candide","Caribert","Carloman","Cassandre","Cassien","Cédric","Céleste","Célestin","Célien","Césaire","César","Charles","Charlemagne","Childebert","Chilpéric","Chrétien","Christian","Christodule","Christophe","Chrysostome","Clarence","Claude","Claudien","Cléandre","Clément","Clotaire","Côme","Constance","Constant","Constantin","Corentin","Cyprien","Cyriaque","Cyrille","Cyril","Damien","Daniel","David","Delphin","Denis","Désiré","Didier","Dieudonné","Dimitri","Dominique","Dorian","Dorothée","Edgard","Edmond","Édouard","Éleuthère","Élie","Élisée","Émeric","Émile","Émilien","Emmanuel","Enguerrand","Épiphane","Éric","Esprit","Ernest","Étienne","Eubert","Eudes","Eudoxe","Eugène","Eusèbe","Eustache","Évariste","Évrard","Fabien","Fabrice","Falba","Félicité","Félix","Ferdinand","Fiacre","Fidèle","Firmin","Flavien","Flodoard","Florent","Florentin","Florestan","Florian","Fortuné","Foulques","Francisque","François","Français","Franciscus","Francs","Frédéric","Fulbert","Fulcran","Fulgence","Gabin","Gabriel","Gaël","Garnier","Gaston","Gaspard","Gatien","Gaud","Gautier","Gédéon","Geoffroy","Georges","Géraud","Gérard","Gerbert","Germain","Gervais","Ghislain","Gilbert","Gilles","Girart","Gislebert","Gondebaud","Gonthier","Gontran","Gonzague","Grégoire","Guérin","Gui","Guillaume","Gustave","Guy","Guyot","Hardouin","Hector","Hédelin","Hélier","Henri","Herbert","Herluin","Hervé","Hilaire","Hildebert","Hincmar","Hippolyte","Honoré","Hubert","Hugues","Innocent","Isabeau","Isidore","Jacques","Japhet","Jason","Jean","Jeannel","Jeannot","Jérémie","Jérôme","Joachim","Joanny","Job","Jocelyn","Joël","Johan","Jonas","Jonathan","Joseph","Josse","Josselin","Jourdain","Jude","Judicaël","Jules","Julien","Juste","Justin","Lambert","Landry","Laurent","Lazare","Léandre","Léon","Léonard","Léopold","Leu","Loup","Leufroy","Libère","Liétald","Lionel","Loïc","Longin","Lorrain","Lorraine","Lothaire","Louis","Loup","Luc","Lucas","Lucien","Ludolphe","Ludovic","Macaire","Malo","Mamert","Manassé","Marc","Marceau","Marcel","Marcelin","Marius","Marseille","Martial","Martin","Mathurin","Matthias","Mathias","Matthieu","Maugis","Maurice","Mauricet","Maxence","Maxime","Maximilien","Mayeul","Médéric","Melchior","Mence","Merlin","Mérovée","Michaël","Michel","Moïse","Morgan","Nathan","Nathanaël","Narcisse","Néhémie","Nestor","Nestor","Nicéphore","Nicolas","Noé","Noël","Norbert","Normand","Normands","Octave","Odilon","Odon","Oger","Olivier","Oury","Pacôme","Palémon","Parfait","Pascal","Paterne","Patrice","Paul","Pépin","Perceval","Philémon","Philibert","Philippe","Philothée","Pie","Pierre","Pierrick","Prosper","Quentin","Raoul","Raphaël","Raymond","Régis","Réjean","Rémi","Renaud","René","Reybaud","Richard","Robert","Roch","Rodolphe","Rodrigue","Roger","Roland","Romain","Romuald","Roméo","Rome","Ronan","Roselin","Salomon","Samuel","Savin","Savinien","Scholastique","Sébastien","Séraphin","Serge","Séverin","Sidoine","Sigebert","Sigismond","Silvère","Simon","Siméon","Sixte","Stanislas","Stéphane","Stephan","Sylvain","Sylvestre","Tancrède","Tanguy","Taurin","Théodore","Théodose","Théophile","Théophraste","Thibault","Thibert","Thierry","Thomas","Timoléon","Timothée","Titien","Tonnin","Toussaint","Trajan","Tristan","Turold","Tim","Ulysse","Urbain","Valentin","Valère","Valéry","Venance","Venant","Venceslas","Vianney","Victor","Victorien","Victorin","Vigile","Vincent","Vital","Vitalien","Vivien","Waleran","Wandrille","Xavier","Xénophon","Yves","Zacharie","Zaché","Zéphirin"]
             },
 
             "female": {
@@ -2311,7 +2724,9 @@
                 // Data taken from http://www.dati.gov.it/dataset/comune-di-firenze_0162
                 "it": ["Ada", "Adriana", "Alessandra", "Alessia", "Alice", "Angela", "Anna", "Anna Maria", "Annalisa", "Annita", "Annunziata", "Antonella", "Arianna", "Asia", "Assunta", "Aurora", "Barbara", "Beatrice", "Benedetta", "Bianca", "Bruna", "Camilla", "Carla", "Carlotta", "Carmela", "Carolina", "Caterina", "Catia", "Cecilia", "Chiara", "Cinzia", "Clara", "Claudia", "Costanza", "Cristina", "Daniela", "Debora", "Diletta", "Dina", "Donatella", "Elena", "Eleonora", "Elisa", "Elisabetta", "Emanuela", "Emma", "Eva", "Federica", "Fernanda", "Fiorella", "Fiorenza", "Flora", "Franca", "Francesca", "Gabriella", "Gaia", "Gemma", "Giada", "Gianna", "Gina", "Ginevra", "Giorgia", "Giovanna", "Giulia", "Giuliana", "Giuseppa", "Giuseppina", "Grazia", "Graziella", "Greta", "Ida", "Ilaria", "Ines", "Iolanda", "Irene", "Irma", "Isabella", "Jessica", "Laura", "Lea", "Letizia", "Licia", "Lidia", "Liliana", "Lina", "Linda", "Lisa", "Livia", "Loretta", "Luana", "Lucia", "Luciana", "Lucrezia", "Luisa", "Manuela", "Mara", "Marcella", "Margherita", "Maria", "Maria Cristina", "Maria Grazia", "Maria Luisa", "Maria Pia", "Maria Teresa", "Marina", "Marisa", "Marta", "Martina", "Marzia", "Matilde", "Melissa", "Michela", "Milena", "Mirella", "Monica", "Natalina", "Nella", "Nicoletta", "Noemi", "Olga", "Paola", "Patrizia", "Piera", "Pierina", "Raffaella", "Rebecca", "Renata", "Rina", "Rita", "Roberta", "Rosa", "Rosanna", "Rossana", "Rossella", "Sabrina", "Sandra", "Sara", "Serena", "Silvana", "Silvia", "Simona", "Simonetta", "Sofia", "Sonia", "Stefania", "Susanna", "Teresa", "Tina", "Tiziana", "Tosca", "Valentina", "Valeria", "Vanda", "Vanessa", "Vanna", "Vera", "Veronica", "Vilma", "Viola", "Virginia", "Vittoria"],
                 // Data taken from http://www.svbkindernamen.nl/int/nl/kindernamen/index.html
-                "nl": ["Ada", "Arianne", "Afke", "Amanda", "Amber", "Amy", "Aniek", "Anita", "Anja", "Anna", "Anne", "Annelies", "Annemarie", "Annette", "Anouk", "Astrid", "Aukje", "Barbara", "Bianca", "Carla", "Carlijn", "Carolien", "Chantal", "Charlotte", "Claudia", "Daniëlle", "Debora", "Diane", "Dora", "Eline", "Elise", "Ella", "Ellen", "Emma", "Esmee", "Evelien", "Esther", "Erica", "Eva", "Femke", "Fleur", "Floor", "Froukje", "Gea", "Gerda", "Hanna", "Hanneke", "Heleen", "Hilde", "Ilona", "Ina", "Inge", "Ingrid", "Iris", "Isabel", "Isabelle", "Janneke", "Jasmijn", "Jeanine", "Jennifer", "Jessica", "Johanna", "Joke", "Julia", "Julie", "Karen", "Karin", "Katja", "Kim", "Lara", "Laura", "Lena", "Lianne", "Lieke", "Lilian", "Linda", "Lisa", "Lisanne", "Lotte", "Louise", "Maaike", "Manon", "Marga", "Maria", "Marissa", "Marit", "Marjolein", "Martine", "Marleen", "Melissa", "Merel", "Miranda", "Michelle", "Mirjam", "Mirthe", "Naomi", "Natalie", 'Nienke', "Nina", "Noortje", "Olivia", "Patricia", "Paula", "Paulien", "Ramona", "Ria", "Rianne", "Roos", "Rosanne", "Ruth", "Sabrina", "Sandra", "Sanne", "Sara", "Saskia", "Silvia", "Sofia", "Sophie", "Sonja", "Suzanne", "Tamara", "Tess", "Tessa", "Tineke", "Valerie", "Vanessa", "Veerle", "Vera", "Victoria", "Wendy", "Willeke", "Yvonne", "Zoë"]
+                "nl": ["Ada", "Arianne", "Afke", "Amanda", "Amber", "Amy", "Aniek", "Anita", "Anja", "Anna", "Anne", "Annelies", "Annemarie", "Annette", "Anouk", "Astrid", "Aukje", "Barbara", "Bianca", "Carla", "Carlijn", "Carolien", "Chantal", "Charlotte", "Claudia", "Daniëlle", "Debora", "Diane", "Dora", "Eline", "Elise", "Ella", "Ellen", "Emma", "Esmee", "Evelien", "Esther", "Erica", "Eva", "Femke", "Fleur", "Floor", "Froukje", "Gea", "Gerda", "Hanna", "Hanneke", "Heleen", "Hilde", "Ilona", "Ina", "Inge", "Ingrid", "Iris", "Isabel", "Isabelle", "Janneke", "Jasmijn", "Jeanine", "Jennifer", "Jessica", "Johanna", "Joke", "Julia", "Julie", "Karen", "Karin", "Katja", "Kim", "Lara", "Laura", "Lena", "Lianne", "Lieke", "Lilian", "Linda", "Lisa", "Lisanne", "Lotte", "Louise", "Maaike", "Manon", "Marga", "Maria", "Marissa", "Marit", "Marjolein", "Martine", "Marleen", "Melissa", "Merel", "Miranda", "Michelle", "Mirjam", "Mirthe", "Naomi", "Natalie", 'Nienke', "Nina", "Noortje", "Olivia", "Patricia", "Paula", "Paulien", "Ramona", "Ria", "Rianne", "Roos", "Rosanne", "Ruth", "Sabrina", "Sandra", "Sanne", "Sara", "Saskia", "Silvia", "Sofia", "Sophie", "Sonja", "Suzanne", "Tamara", "Tess", "Tessa", "Tineke", "Valerie", "Vanessa", "Veerle", "Vera", "Victoria", "Wendy", "Willeke", "Yvonne", "Zoë"],
+                // Data taken from https://fr.wikipedia.org/wiki/Liste_de_pr%C3%A9noms_fran%C3%A7ais_et_de_la_francophonie
+                "fr": ["Abdon","Abel","Abigaëlle","Abigaïl","Acacius","Acanthe","Adalbert","Adalsinde","Adegrine","Adélaïde","Adèle","Adélie","Adeline","Adeltrude","Adolphe","Adonis","Adrastée","Adrehilde","Adrienne","Agathe","Agilbert","Aglaé","Aignan","Agneflète","Agnès","Agrippine","Aimé","Alaine","Alaïs","Albane","Albérade","Alberte","Alcide","Alcine","Alcyone","Aldegonde","Aleth","Alexandrine","Alexine","Alice","Aliénor","Aliette","Aline","Alix","Alizé","Aloïse","Aloyse","Alphonsine","Althée","Amaliane","Amalthée","Amande","Amandine","Amant","Amarande","Amaranthe","Amaryllis","Ambre","Ambroisie","Amélie","Améthyste","Aminte","Anaël","Anaïs","Anastasie","Anatole","Ancelin","Andrée","Anémone","Angadrême","Angèle","Angeline","Angélique","Angilbert","Anicet","Annabelle","Anne","Annette","Annick","Annie","Annonciade","Ansbert","Anstrudie","Anthelme","Antigone","Antoinette","Antonine","Aphélie","Apolline","Apollonie","Aquiline","Arabelle","Arcadie","Archange","Argine","Ariane","Aricie","Ariel","Arielle","Arlette","Armance","Armande","Armandine","Armelle","Armide","Armelle","Armin","Arnaud","Arsène","Arsinoé","Artémis","Arthur","Ascelin","Ascension","Assomption","Astarté","Astérie","Astrée","Astrid","Athalie","Athanasie","Athina","Aube","Albert","Aude","Audrey","Augustine","Aure","Aurélie","Aurélien","Aurèle","Aurore","Auxence","Aveline","Abigaëlle","Avoye","Axelle","Aymard","Azalée","Adèle","Adeline","Barbe","Basilisse","Bathilde","Béatrice","Béatrix","Bénédicte","Bérengère","Bernadette","Berthe","Bertille","Beuve","Blanche","Blanc","Blandine","Brigitte","Brune","Brunehilde","Callista","Camille","Capucine","Carine","Caroline","Cassandre","Catherine","Cécile","Céleste","Célestine","Céline","Chantal","Charlène","Charline","Charlotte","Chloé","Christelle","Christiane","Christine","Claire","Clara","Claude","Claudine","Clarisse","Clémence","Clémentine","Cléo","Clio","Clotilde","Coline","Conception","Constance","Coralie","Coraline","Corentine","Corinne","Cyrielle","Daniel","Daniel","Daphné","Débora","Delphine","Denise","Diane","Dieudonné","Dominique","Doriane","Dorothée","Douce","Édith","Edmée","Éléonore","Éliane","Élia","Éliette","Élisabeth","Élise","Ella","Élodie","Éloïse","Elsa","Émeline","Émérance","Émérentienne","Émérencie","Émilie","Emma","Emmanuelle","Emmelie","Ernestine","Esther","Estelle","Eudoxie","Eugénie","Eulalie","Euphrasie","Eusébie","Évangéline","Eva","Ève","Évelyne","Fanny","Fantine","Faustine","Félicie","Fernande","Flavie","Fleur","Flore","Florence","Florie","Fortuné","France","Francia","Françoise","Francine","Gabrielle","Gaëlle","Garance","Geneviève","Georgette","Gerberge","Germaine","Gertrude","Gisèle","Guenièvre","Guilhemine","Guillemette","Gustave","Gwenael","Hélène","Héloïse","Henriette","Hermine","Hermione","Hippolyte","Honorine","Hortense","Huguette","Ines","Irène","Irina","Iris","Isabeau","Isabelle","Iseult","Isolde","Ismérie","Jacinthe","Jacqueline","Jade","Janine","Jeanne","Jocelyne","Joëlle","Joséphine","Judith","Julia","Julie","Jules","Juliette","Justine","Katy","Kathy","Katie","Laura","Laure","Laureline","Laurence","Laurene","Lauriane","Laurianne","Laurine","Léa","Léna","Léonie","Léon","Léontine","Lorraine","Lucie","Lucienne","Lucille","Ludivine","Lydie","Lydie","Megane","Madeleine","Magali","Maguelone","Mallaury","Manon","Marceline","Margot","Marguerite","Marianne","Marie","Myriam","Marie","Marine","Marion","Marlène","Marthe","Martine","Mathilde","Maud","Maureen","Mauricette","Maxime","Mélanie","Melissa","Mélissandre","Mélisande","Mélodie","Michel","Micheline","Mireille","Miriam","Moïse","Monique","Morgane","Muriel","Mylène","Nadège","Nadine","Nathalie","Nicole","Nicolette","Nine","Noël","Noémie","Océane","Odette","Odile","Olive","Olivia","Olympe","Ombline","Ombeline","Ophélie","Oriande","Oriane","Ozanne","Pascale","Pascaline","Paule","Paulette","Pauline","Priscille","Prisca","Prisque","Pécine","Pélagie","Pénélope","Perrine","Pétronille","Philippine","Philomène","Philothée","Primerose","Prudence","Pulchérie","Quentine","Quiéta","Quintia","Quintilla","Rachel","Raphaëlle","Raymonde","Rebecca","Régine","Réjeanne","René","Rita","Rita","Rolande","Romane","Rosalie","Rose","Roseline","Sabine","Salomé","Sandra","Sandrine","Sarah","Ségolène","Séverine","Sibylle","Simone","Sixt","Solange","Soline","Solène","Sophie","Stéphanie","Suzanne","Sylvain","Sylvie","Tatiana","Thaïs","Théodora","Thérèse","Tiphaine","Ursule","Valentine","Valérie","Véronique","Victoire","Victorine","Vinciane","Violette","Virginie","Viviane","Xavière","Yolande","Ysaline","Yvette","Yvonne","Zélie","Zita","Zoé"]
             }
         },
 
@@ -2320,8 +2735,21 @@
                 // Data taken from http://www.dati.gov.it/dataset/comune-di-firenze_0164 (first 1000)
             "it": ["Acciai", "Aglietti", "Agostini", "Agresti", "Ahmed", "Aiazzi", "Albanese", "Alberti", "Alessi", "Alfani", "Alinari", "Alterini", "Amato", "Ammannati", "Ancillotti", "Andrei", "Andreini", "Andreoni", "Angeli", "Anichini", "Antonelli", "Antonini", "Arena", "Ariani", "Arnetoli", "Arrighi", "Baccani", "Baccetti", "Bacci", "Bacherini", "Badii", "Baggiani", "Baglioni", "Bagni", "Bagnoli", "Baldassini", "Baldi", "Baldini", "Ballerini", "Balli", "Ballini", "Balloni", "Bambi", "Banchi", "Bandinelli", "Bandini", "Bani", "Barbetti", "Barbieri", "Barchielli", "Bardazzi", "Bardelli", "Bardi", "Barducci", "Bargellini", "Bargiacchi", "Barni", "Baroncelli", "Baroncini", "Barone", "Baroni", "Baronti", "Bartalesi", "Bartoletti", "Bartoli", "Bartolini", "Bartoloni", "Bartolozzi", "Basagni", "Basile", "Bassi", "Batacchi", "Battaglia", "Battaglini", "Bausi", "Becagli", "Becattini", "Becchi", "Becucci", "Bellandi", "Bellesi", "Belli", "Bellini", "Bellucci", "Bencini", "Benedetti", "Benelli", "Beni", "Benini", "Bensi", "Benucci", "Benvenuti", "Berlincioni", "Bernacchioni", "Bernardi", "Bernardini", "Berni", "Bernini", "Bertelli", "Berti", "Bertini", "Bessi", "Betti", "Bettini", "Biagi", "Biagini", "Biagioni", "Biagiotti", "Biancalani", "Bianchi", "Bianchini", "Bianco", "Biffoli", "Bigazzi", "Bigi", "Biliotti", "Billi", "Binazzi", "Bindi", "Bini", "Biondi", "Bizzarri", "Bocci", "Bogani", "Bolognesi", "Bonaiuti", "Bonanni", "Bonciani", "Boncinelli", "Bondi", "Bonechi", "Bongini", "Boni", "Bonini", "Borchi", "Boretti", "Borghi", "Borghini", "Borgioli", "Borri", "Borselli", "Boschi", "Bottai", "Bracci", "Braccini", "Brandi", "Braschi", "Bravi", "Brazzini", "Breschi", "Brilli", "Brizzi", "Brogelli", "Brogi", "Brogioni", "Brunelli", "Brunetti", "Bruni", "Bruno", "Brunori", "Bruschi", "Bucci", "Bucciarelli", "Buccioni", "Bucelli", "Bulli", "Burberi", "Burchi", "Burgassi", "Burroni", "Bussotti", "Buti", "Caciolli", "Caiani", "Calabrese", "Calamai", "Calamandrei", "Caldini", "Calo'", "Calonaci", "Calosi", "Calvelli", "Cambi", "Camiciottoli", "Cammelli", "Cammilli", "Campolmi", "Cantini", "Capanni", "Capecchi", "Caponi", "Cappelletti", "Cappelli", "Cappellini", "Cappugi", "Capretti", "Caputo", "Carbone", "Carboni", "Cardini", "Carlesi", "Carletti", "Carli", "Caroti", "Carotti", "Carrai", "Carraresi", "Carta", "Caruso", "Casalini", "Casati", "Caselli", "Casini", "Castagnoli", "Castellani", "Castelli", "Castellucci", "Catalano", "Catarzi", "Catelani", "Cavaciocchi", "Cavallaro", "Cavallini", "Cavicchi", "Cavini", "Ceccarelli", "Ceccatelli", "Ceccherelli", "Ceccherini", "Cecchi", "Cecchini", "Cecconi", "Cei", "Cellai", "Celli", "Cellini", "Cencetti", "Ceni", "Cenni", "Cerbai", "Cesari", "Ceseri", "Checcacci", "Checchi", "Checcucci", "Cheli", "Chellini", "Chen", "Cheng", "Cherici", "Cherubini", "Chiaramonti", "Chiarantini", "Chiarelli", "Chiari", "Chiarini", "Chiarugi", "Chiavacci", "Chiesi", "Chimenti", "Chini", "Chirici", "Chiti", "Ciabatti", "Ciampi", "Cianchi", "Cianfanelli", "Cianferoni", "Ciani", "Ciapetti", "Ciappi", "Ciardi", "Ciatti", "Cicali", "Ciccone", "Cinelli", "Cini", "Ciobanu", "Ciolli", "Cioni", "Cipriani", "Cirillo", "Cirri", "Ciucchi", "Ciuffi", "Ciulli", "Ciullini", "Clemente", "Cocchi", "Cognome", "Coli", "Collini", "Colombo", "Colzi", "Comparini", "Conforti", "Consigli", "Conte", "Conti", "Contini", "Coppini", "Coppola", "Corsi", "Corsini", "Corti", "Cortini", "Cosi", "Costa", "Costantini", "Costantino", "Cozzi", "Cresci", "Crescioli", "Cresti", "Crini", "Curradi", "D'Agostino", "D'Alessandro", "D'Amico", "D'Angelo", "Daddi", "Dainelli", "Dallai", "Danti", "Davitti", "De Angelis", "De Luca", "De Marco", "De Rosa", "De Santis", "De Simone", "De Vita", "Degl'Innocenti", "Degli Innocenti", "Dei", "Del Lungo", "Del Re", "Di Marco", "Di Stefano", "Dini", "Diop", "Dobre", "Dolfi", "Donati", "Dondoli", "Dong", "Donnini", "Ducci", "Dumitru", "Ermini", "Esposito", "Evangelisti", "Fabbri", "Fabbrini", "Fabbrizzi", "Fabbroni", "Fabbrucci", "Fabiani", "Facchini", "Faggi", "Fagioli", "Failli", "Faini", "Falciani", "Falcini", "Falcone", "Fallani", "Falorni", "Falsini", "Falugiani", "Fancelli", "Fanelli", "Fanetti", "Fanfani", "Fani", "Fantappie'", "Fantechi", "Fanti", "Fantini", "Fantoni", "Farina", "Fattori", "Favilli", "Fedi", "Fei", "Ferrante", "Ferrara", "Ferrari", "Ferraro", "Ferretti", "Ferri", "Ferrini", "Ferroni", "Fiaschi", "Fibbi", "Fiesoli", "Filippi", "Filippini", "Fini", "Fioravanti", "Fiore", "Fiorentini", "Fiorini", "Fissi", "Focardi", "Foggi", "Fontana", "Fontanelli", "Fontani", "Forconi", "Formigli", "Forte", "Forti", "Fortini", "Fossati", "Fossi", "Francalanci", "Franceschi", "Franceschini", "Franchi", "Franchini", "Franci", "Francini", "Francioni", "Franco", "Frassineti", "Frati", "Fratini", "Frilli", "Frizzi", "Frosali", "Frosini", "Frullini", "Fusco", "Fusi", "Gabbrielli", "Gabellini", "Gagliardi", "Galanti", "Galardi", "Galeotti", "Galletti", "Galli", "Gallo", "Gallori", "Gambacciani", "Gargani", "Garofalo", "Garuglieri", "Gashi", "Gasperini", "Gatti", "Gelli", "Gensini", "Gentile", "Gentili", "Geri", "Gerini", "Gheri", "Ghini", "Giachetti", "Giachi", "Giacomelli", "Gianassi", "Giani", "Giannelli", "Giannetti", "Gianni", "Giannini", "Giannoni", "Giannotti", "Giannozzi", "Gigli", "Giordano", "Giorgetti", "Giorgi", "Giovacchini", "Giovannelli", "Giovannetti", "Giovannini", "Giovannoni", "Giuliani", "Giunti", "Giuntini", "Giusti", "Gonnelli", "Goretti", "Gori", "Gradi", "Gramigni", "Grassi", "Grasso", "Graziani", "Grazzini", "Greco", "Grifoni", "Grillo", "Grimaldi", "Grossi", "Gualtieri", "Guarducci", "Guarino", "Guarnieri", "Guasti", "Guerra", "Guerri", "Guerrini", "Guidi", "Guidotti", "He", "Hoxha", "Hu", "Huang", "Iandelli", "Ignesti", "Innocenti", "Jin", "La Rosa", "Lai", "Landi", "Landini", "Lanini", "Lapi", "Lapini", "Lari", "Lascialfari", "Lastrucci", "Latini", "Lazzeri", "Lazzerini", "Lelli", "Lenzi", "Leonardi", "Leoncini", "Leone", "Leoni", "Lepri", "Li", "Liao", "Lin", "Linari", "Lippi", "Lisi", "Livi", "Lombardi", "Lombardini", "Lombardo", "Longo", "Lopez", "Lorenzi", "Lorenzini", "Lorini", "Lotti", "Lu", "Lucchesi", "Lucherini", "Lunghi", "Lupi", "Madiai", "Maestrini", "Maffei", "Maggi", "Maggini", "Magherini", "Magini", "Magnani", "Magnelli", "Magni", "Magnolfi", "Magrini", "Malavolti", "Malevolti", "Manca", "Mancini", "Manetti", "Manfredi", "Mangani", "Mannelli", "Manni", "Mannini", "Mannucci", "Manuelli", "Manzini", "Marcelli", "Marchese", "Marchetti", "Marchi", "Marchiani", "Marchionni", "Marconi", "Marcucci", "Margheri", "Mari", "Mariani", "Marilli", "Marinai", "Marinari", "Marinelli", "Marini", "Marino", "Mariotti", "Marsili", "Martelli", "Martinelli", "Martini", "Martino", "Marzi", "Masi", "Masini", "Masoni", "Massai", "Materassi", "Mattei", "Matteini", "Matteucci", "Matteuzzi", "Mattioli", "Mattolini", "Matucci", "Mauro", "Mazzanti", "Mazzei", "Mazzetti", "Mazzi", "Mazzini", "Mazzocchi", "Mazzoli", "Mazzoni", "Mazzuoli", "Meacci", "Mecocci", "Meini", "Melani", "Mele", "Meli", "Mengoni", "Menichetti", "Meoni", "Merlini", "Messeri", "Messina", "Meucci", "Miccinesi", "Miceli", "Micheli", "Michelini", "Michelozzi", "Migliori", "Migliorini", "Milani", "Miniati", "Misuri", "Monaco", "Montagnani", "Montagni", "Montanari", "Montelatici", "Monti", "Montigiani", "Montini", "Morandi", "Morandini", "Morelli", "Moretti", "Morganti", "Mori", "Morini", "Moroni", "Morozzi", "Mugnai", "Mugnaini", "Mustafa", "Naldi", "Naldini", "Nannelli", "Nanni", "Nannini", "Nannucci", "Nardi", "Nardini", "Nardoni", "Natali", "Ndiaye", "Nencetti", "Nencini", "Nencioni", "Neri", "Nesi", "Nesti", "Niccolai", "Niccoli", "Niccolini", "Nigi", "Nistri", "Nocentini", "Noferini", "Novelli", "Nucci", "Nuti", "Nutini", "Oliva", "Olivieri", "Olmi", "Orlandi", "Orlandini", "Orlando", "Orsini", "Ortolani", "Ottanelli", "Pacciani", "Pace", "Paci", "Pacini", "Pagani", "Pagano", "Paggetti", "Pagliai", "Pagni", "Pagnini", "Paladini", "Palagi", "Palchetti", "Palloni", "Palmieri", "Palumbo", "Pampaloni", "Pancani", "Pandolfi", "Pandolfini", "Panerai", "Panichi", "Paoletti", "Paoli", "Paolini", "Papi", "Papini", "Papucci", "Parenti", "Parigi", "Parisi", "Parri", "Parrini", "Pasquini", "Passeri", "Pecchioli", "Pecorini", "Pellegrini", "Pepi", "Perini", "Perrone", "Peruzzi", "Pesci", "Pestelli", "Petri", "Petrini", "Petrucci", "Pettini", "Pezzati", "Pezzatini", "Piani", "Piazza", "Piazzesi", "Piazzini", "Piccardi", "Picchi", "Piccini", "Piccioli", "Pieraccini", "Pieraccioni", "Pieralli", "Pierattini", "Pieri", "Pierini", "Pieroni", "Pietrini", "Pini", "Pinna", "Pinto", "Pinzani", "Pinzauti", "Piras", "Pisani", "Pistolesi", "Poggesi", "Poggi", "Poggiali", "Poggiolini", "Poli", "Pollastri", "Porciani", "Pozzi", "Pratellesi", "Pratesi", "Prosperi", "Pruneti", "Pucci", "Puccini", "Puccioni", "Pugi", "Pugliese", "Puliti", "Querci", "Quercioli", "Raddi", "Radu", "Raffaelli", "Ragazzini", "Ranfagni", "Ranieri", "Rastrelli", "Raugei", "Raveggi", "Renai", "Renzi", "Rettori", "Ricci", "Ricciardi", "Ridi", "Ridolfi", "Rigacci", "Righi", "Righini", "Rinaldi", "Risaliti", "Ristori", "Rizzo", "Rocchi", "Rocchini", "Rogai", "Romagnoli", "Romanelli", "Romani", "Romano", "Romei", "Romeo", "Romiti", "Romoli", "Romolini", "Rontini", "Rosati", "Roselli", "Rosi", "Rossetti", "Rossi", "Rossini", "Rovai", "Ruggeri", "Ruggiero", "Russo", "Sabatini", "Saccardi", "Sacchetti", "Sacchi", "Sacco", "Salerno", "Salimbeni", "Salucci", "Salvadori", "Salvestrini", "Salvi", "Salvini", "Sanesi", "Sani", "Sanna", "Santi", "Santini", "Santoni", "Santoro", "Santucci", "Sardi", "Sarri", "Sarti", "Sassi", "Sbolci", "Scali", "Scarpelli", "Scarselli", "Scopetani", "Secci", "Selvi", "Senatori", "Senesi", "Serafini", "Sereni", "Serra", "Sestini", "Sguanci", "Sieni", "Signorini", "Silvestri", "Simoncini", "Simonetti", "Simoni", "Singh", "Sodi", "Soldi", "Somigli", "Sorbi", "Sorelli", "Sorrentino", "Sottili", "Spina", "Spinelli", "Staccioli", "Staderini", "Stefanelli", "Stefani", "Stefanini", "Stella", "Susini", "Tacchi", "Tacconi", "Taddei", "Tagliaferri", "Tamburini", "Tanganelli", "Tani", "Tanini", "Tapinassi", "Tarchi", "Tarchiani", "Targioni", "Tassi", "Tassini", "Tempesti", "Terzani", "Tesi", "Testa", "Testi", "Tilli", "Tinti", "Tirinnanzi", "Toccafondi", "Tofanari", "Tofani", "Tognaccini", "Tonelli", "Tonini", "Torelli", "Torrini", "Tosi", "Toti", "Tozzi", "Trambusti", "Trapani", "Tucci", "Turchi", "Ugolini", "Ulivi", "Valente", "Valenti", "Valentini", "Vangelisti", "Vanni", "Vannini", "Vannoni", "Vannozzi", "Vannucchi", "Vannucci", "Ventura", "Venturi", "Venturini", "Vestri", "Vettori", "Vichi", "Viciani", "Vieri", "Vigiani", "Vignoli", "Vignolini", "Vignozzi", "Villani", "Vinci", "Visani", "Vitale", "Vitali", "Viti", "Viviani", "Vivoli", "Volpe", "Volpi", "Wang", "Wu", "Xu", "Yang", "Ye", "Zagli", "Zani", "Zanieri", "Zanobini", "Zecchi", "Zetti", "Zhang", "Zheng", "Zhou", "Zhu", "Zingoni", "Zini", "Zoppi"],
             // http://www.voornamelijk.nl/meest-voorkomende-achternamen-in-nederland-en-amsterdam/
-            "nl":["Albers", "Alblas", "Appelman", "Baars", "Baas", "Bakker", "Blank", "Bleeker", "Blok", "Blom", "Boer", "Boers", "Boldewijn", "Boon", "Boot", "Bos", "Bosch", "Bosma", "Bosman", "Bouma", "Bouman", "Bouwman", "Brands", "Brouwer", "Burger", "Buijs", "Buitenhuis", "Ceder", "Cohen", "Dekker", "Dekkers", "Dijkman", "Dijkstra", "Driessen", "Drost", "Engel", "Evers", "Faber", "Franke", "Gerritsen", "Goedhart", "Goossens", "Groen", "Groenenberg", "Groot", "Haan", "Hart", "Heemskerk", "Hendriks", "Hermans", "Hoekstra", "Hofman", "Hopman", "Huisman", "Jacobs", "Jansen", "Janssen", "Jonker", "Jaspers", "Keijzer", "Klaassen", "Klein", "Koek", "Koenders", "Kok", "Kool", "Koopman", "Koopmans", "Koning", "Koster", "Kramer", "Kroon", "Kuijpers", "Kuiper", "Kuipers", "Kurt", "Koster", "Kwakman", "Los", "Lubbers", "Maas", "Markus", "Martens", "Meijer", "Mol", "Molenaar", "Mulder", "Nieuwenhuis", "Peeters", "Peters", "Pengel", "Pieters", "Pool", "Post", "Postma", "Prins", "Pronk", "Reijnders", "Rietveld", "Roest", "Roos", "Sanders", "Schaap", "Scheffer", "Schenk", "Schilder", "Schipper", "Schmidt", "Scholten", "Schouten", "Schut", "Schutte", "Schuurman", "Simons", "Smeets", "Smit", "Smits", "Snel", "Swinkels", "Tas", "Terpstra", "Timmermans", "Tol", "Tromp", "Troost", "Valk", "Veenstra", "Veldkamp", "Verbeek", "Verheul", "Verhoeven", "Vermeer", "Vermeulen", "Verweij", "Vink", "Visser", "Voorn", "Vos", "Wagenaar", "Wiersema", "Willems", "Willemsen", "Witteveen", "Wolff", "Wolters", "Zijlstra", "Zwart", "de Beer", "de Boer", "de Bruijn", "de Bruin", "de Graaf", "de Groot", "de Haan", "de Haas", "de Jager", "de Jong", "de Jonge", "de Koning", "de Lange", "de Leeuw", "de Ridder", "de Rooij", "de Ruiter", "de Vos", "de Vries", "de Waal", "de Wit", "de Zwart", "van Beek", "van Boven", "van Dam", "van Dijk", "van Dongen", "van Doorn", "van Egmond", "van Eijk", "van Es", "van Gelder", "van Gelderen", "van Houten", "van Hulst", "van Kempen", "van Kesteren", "van Leeuwen", "van Loon", "van Mill", "van Noord", "van Ommen", "van Ommeren", "van Oosten", "van Oostveen", "van Rijn", "van Schaik", "van Veen", "van Vliet", "van Wijk", "van Wijngaarden", "van den Poel", "van de Pol", "van den Ploeg", "van de Ven", "van den Berg", "van den Bosch", "van den Brink", "van den Broek", "van den Heuvel", "van der Heijden", "van der Horst", "van der Hulst", "van der Kroon", "van der Laan", "van der Linden", "van der Meer", "van der Meij", "van der Meulen", "van der Molen", "van der Sluis", "van der Spek", "van der Veen", "van der Velde", "van der Velden", "van der Vliet", "van der Wal"]
+            "nl":["Albers", "Alblas", "Appelman", "Baars", "Baas", "Bakker", "Blank", "Bleeker", "Blok", "Blom", "Boer", "Boers", "Boldewijn", "Boon", "Boot", "Bos", "Bosch", "Bosma", "Bosman", "Bouma", "Bouman", "Bouwman", "Brands", "Brouwer", "Burger", "Buijs", "Buitenhuis", "Ceder", "Cohen", "Dekker", "Dekkers", "Dijkman", "Dijkstra", "Driessen", "Drost", "Engel", "Evers", "Faber", "Franke", "Gerritsen", "Goedhart", "Goossens", "Groen", "Groenenberg", "Groot", "Haan", "Hart", "Heemskerk", "Hendriks", "Hermans", "Hoekstra", "Hofman", "Hopman", "Huisman", "Jacobs", "Jansen", "Janssen", "Jonker", "Jaspers", "Keijzer", "Klaassen", "Klein", "Koek", "Koenders", "Kok", "Kool", "Koopman", "Koopmans", "Koning", "Koster", "Kramer", "Kroon", "Kuijpers", "Kuiper", "Kuipers", "Kurt", "Koster", "Kwakman", "Los", "Lubbers", "Maas", "Markus", "Martens", "Meijer", "Mol", "Molenaar", "Mulder", "Nieuwenhuis", "Peeters", "Peters", "Pengel", "Pieters", "Pool", "Post", "Postma", "Prins", "Pronk", "Reijnders", "Rietveld", "Roest", "Roos", "Sanders", "Schaap", "Scheffer", "Schenk", "Schilder", "Schipper", "Schmidt", "Scholten", "Schouten", "Schut", "Schutte", "Schuurman", "Simons", "Smeets", "Smit", "Smits", "Snel", "Swinkels", "Tas", "Terpstra", "Timmermans", "Tol", "Tromp", "Troost", "Valk", "Veenstra", "Veldkamp", "Verbeek", "Verheul", "Verhoeven", "Vermeer", "Vermeulen", "Verweij", "Vink", "Visser", "Voorn", "Vos", "Wagenaar", "Wiersema", "Willems", "Willemsen", "Witteveen", "Wolff", "Wolters", "Zijlstra", "Zwart", "de Beer", "de Boer", "de Bruijn", "de Bruin", "de Graaf", "de Groot", "de Haan", "de Haas", "de Jager", "de Jong", "de Jonge", "de Koning", "de Lange", "de Leeuw", "de Ridder", "de Rooij", "de Ruiter", "de Vos", "de Vries", "de Waal", "de Wit", "de Zwart", "van Beek", "van Boven", "van Dam", "van Dijk", "van Dongen", "van Doorn", "van Egmond", "van Eijk", "van Es", "van Gelder", "van Gelderen", "van Houten", "van Hulst", "van Kempen", "van Kesteren", "van Leeuwen", "van Loon", "van Mill", "van Noord", "van Ommen", "van Ommeren", "van Oosten", "van Oostveen", "van Rijn", "van Schaik", "van Veen", "van Vliet", "van Wijk", "van Wijngaarden", "van den Poel", "van de Pol", "van den Ploeg", "van de Ven", "van den Berg", "van den Bosch", "van den Brink", "van den Broek", "van den Heuvel", "van der Heijden", "van der Horst", "van der Hulst", "van der Kroon", "van der Laan", "van der Linden", "van der Meer", "van der Meij", "van der Meulen", "van der Molen", "van der Sluis", "van der Spek", "van der Veen", "van der Velde", "van der Velden", "van der Vliet", "van der Wal"],
+            // https://surnames.behindthename.com/top/lists/england-wales/1991
+            "uk":["Smith","Jones","Williams","Taylor","Brown","Davies","Evans","Wilson","Thomas","Johnson","Roberts","Robinson","Thompson","Wright","Walker","White","Edwards","Hughes","Green","Hall","Lewis","Harris","Clarke","Patel","Jackson","Wood","Turner","Martin","Cooper","Hill","Ward","Morris","Moore","Clark","Lee","King","Baker","Harrison","Morgan","Allen","James","Scott","Phillips","Watson","Davis","Parker","Price","Bennett","Young","Griffiths","Mitchell","Kelly","Cook","Carter","Richardson","Bailey","Collins","Bell","Shaw","Murphy","Miller","Cox","Richards","Khan","Marshall","Anderson","Simpson","Ellis","Adams","Singh","Begum","Wilkinson","Foster","Chapman","Powell","Webb","Rogers","Gray","Mason","Ali","Hunt","Hussain","Campbell","Matthews","Owen","Palmer","Holmes","Mills","Barnes","Knight","Lloyd","Butler","Russell","Barker","Fisher","Stevens","Jenkins","Murray","Dixon","Harvey","Graham","Pearson","Ahmed","Fletcher","Walsh","Kaur","Gibson","Howard","Andrews","Stewart","Elliott","Reynolds","Saunders","Payne","Fox","Ford","Pearce","Day","Brooks","West","Lawrence","Cole","Atkinson","Bradley","Spencer","Gill","Dawson","Ball","Burton","O'brien","Watts","Rose","Booth","Perry","Ryan","Grant","Wells","Armstrong","Francis","Rees","Hayes","Hart","Hudson","Newman","Barrett","Webster","Hunter","Gregory","Carr","Lowe","Page","Marsh","Riley","Dunn","Woods","Parsons","Berry","Stone","Reid","Holland","Hawkins","Harding","Porter","Robertson","Newton","Oliver","Reed","Kennedy","Williamson","Bird","Gardner","Shah","Dean","Lane","Cooke","Bates","Henderson","Parry","Burgess","Bishop","Walton","Burns","Nicholson","Shepherd","Ross","Cross","Long","Freeman","Warren","Nicholls","Hamilton","Byrne","Sutton","Mcdonald","Yates","Hodgson","Robson","Curtis","Hopkins","O'connor","Harper","Coleman","Watkins","Moss","Mccarthy","Chambers","O'neill","Griffin","Sharp","Hardy","Wheeler","Potter","Osborne","Johnston","Gordon","Doyle","Wallace","George","Jordan","Hutchinson","Rowe","Burke","May","Pritchard","Gilbert","Willis","Higgins","Read","Miles","Stevenson","Stephenson","Hammond","Arnold","Buckley","Walters","Hewitt","Barber","Nelson","Slater","Austin","Sullivan","Whitehead","Mann","Frost","Lambert","Stephens","Blake","Akhtar","Lynch","Goodwin","Barton","Woodward","Thomson","Cunningham","Quinn","Barnett","Baxter","Bibi","Clayton","Nash","Greenwood","Jennings","Holt","Kemp","Poole","Gallagher","Bond","Stokes","Tucker","Davidson","Fowler","Heath","Norman","Middleton","Lawson","Banks","French","Stanley","Jarvis","Gibbs","Ferguson","Hayward","Carroll","Douglas","Dickinson","Todd","Barlow","Peters","Lucas","Knowles","Hartley","Miah","Simmons","Morton","Alexander","Field","Morrison","Norris","Townsend","Preston","Hancock","Thornton","Baldwin","Burrows","Briggs","Parkinson","Reeves","Macdonald","Lamb","Black","Abbott","Sanders","Thorpe","Holden","Tomlinson","Perkins","Ashton","Rhodes","Fuller","Howe","Bryant","Vaughan","Dale","Davey","Weston","Bartlett","Whittaker","Davison","Kent","Skinner","Birch","Morley","Daniels","Glover","Howell","Cartwright","Pugh","Humphreys","Goddard","Brennan","Wall","Kirby","Bowen","Savage","Bull","Wong","Dobson","Smart","Wilkins","Kirk","Fraser","Duffy","Hicks","Patterson","Bradshaw","Little","Archer","Warner","Waters","O'sullivan","Farrell","Brookes","Atkins","Kay","Dodd","Bentley","Flynn","John","Schofield","Short","Haynes","Wade","Butcher","Henry","Sanderson","Crawford","Sheppard","Bolton","Coates","Giles","Gould","Houghton","Gibbons","Pratt","Manning","Law","Hooper","Noble","Dyer","Rahman","Clements","Moran","Sykes","Chan","Doherty","Connolly","Joyce","Franklin","Hobbs","Coles","Herbert","Steele","Kerr","Leach","Winter","Owens","Duncan","Naylor","Fleming","Horton","Finch","Fitzgerald","Randall","Carpenter","Marsden","Browne","Garner","Pickering","Hale","Dennis","Vincent","Chadwick","Chandler","Sharpe","Nolan","Lyons","Hurst","Collier","Peacock","Howarth","Faulkner","Rice","Pollard","Welch","Norton","Gough","Sinclair","Blackburn","Bryan","Conway","Power","Cameron","Daly","Allan","Hanson","Gardiner","Boyle","Myers","Turnbull","Wallis","Mahmood","Sims","Swift","Iqbal","Pope","Brady","Chamberlain","Rowley","Tyler","Farmer","Metcalfe","Hilton","Godfrey","Holloway","Parkin","Bray","Talbot","Donnelly","Nixon","Charlton","Benson","Whitehouse","Barry","Hope","Lord","North","Storey","Connor","Potts","Bevan","Hargreaves","Mclean","Mistry","Bruce","Howells","Hyde","Parkes","Wyatt","Fry","Lees","O'donnell","Craig","Forster","Mckenzie","Humphries","Mellor","Carey","Ingram","Summers","Leonard"],
+            // https://surnames.behindthename.com/top/lists/germany/2017
+            "de": ["Müller","Schmidt","Schneider","Fischer","Weber","Meyer","Wagner","Becker","Schulz","Hoffmann","Schäfer","Koch","Bauer","Richter","Klein","Wolf","Schröder","Neumann","Schwarz","Zimmermann","Braun","Krüger","Hofmann","Hartmann","Lange","Schmitt","Werner","Schmitz","Krause","Meier","Lehmann","Schmid","Schulze","Maier","Köhler","Herrmann","König","Walter","Mayer","Huber","Kaiser","Fuchs","Peters","Lang","Scholz","Möller","Weiß","Jung","Hahn","Schubert","Vogel","Friedrich","Keller","Günther","Frank","Berger","Winkler","Roth","Beck","Lorenz","Baumann","Franke","Albrecht","Schuster","Simon","Ludwig","Böhm","Winter","Kraus","Martin","Schumacher","Krämer","Vogt","Stein","Jäger","Otto","Sommer","Groß","Seidel","Heinrich","Brandt","Haas","Schreiber","Graf","Schulte","Dietrich","Ziegler","Kuhn","Kühn","Pohl","Engel","Horn","Busch","Bergmann","Thomas","Voigt","Sauer","Arnold","Wolff","Pfeiffer"],
+            // http://www.japantimes.co.jp/life/2009/10/11/lifestyle/japans-top-100-most-common-family-names/
+            "jp": ["Sato","Suzuki","Takahashi","Tanaka","Watanabe","Ito","Yamamoto","Nakamura","Kobayashi","Kato","Yoshida","Yamada","Sasaki","Yamaguchi","Saito","Matsumoto","Inoue","Kimura","Hayashi","Shimizu","Yamazaki","Mori","Abe","Ikeda","Hashimoto","Yamashita","Ishikawa","Nakajima","Maeda","Fujita","Ogawa","Goto","Okada","Hasegawa","Murakami","Kondo","Ishii","Saito","Sakamoto","Endo","Aoki","Fujii","Nishimura","Fukuda","Ota","Miura","Fujiwara","Okamoto","Matsuda","Nakagawa","Nakano","Harada","Ono","Tamura","Takeuchi","Kaneko","Wada","Nakayama","Ishida","Ueda","Morita","Hara","Shibata","Sakai","Kudo","Yokoyama","Miyazaki","Miyamoto","Uchida","Takagi","Ando","Taniguchi","Ohno","Maruyama","Imai","Takada","Fujimoto","Takeda","Murata","Ueno","Sugiyama","Masuda","Sugawara","Hirano","Kojima","Otsuka","Chiba","Kubo","Matsui","Iwasaki","Sakurai","Kinoshita","Noguchi","Matsuo","Nomura","Kikuchi","Sano","Onishi","Sugimoto","Arai"],
+            // http://www.lowchensaustralia.com/names/popular-spanish-names.htm
+            "es": ["Garcia","Fernandez","Lopez","Martinez","Gonzalez","Rodriguez","Sanchez","Perez","Martin","Gomez","Ruiz","Diaz","Hernandez","Alvarez","Jimenez","Moreno","Munoz","Alonso","Romero","Navarro","Gutierrez","Torres","Dominguez","Gil","Vazquez","Blanco","Serrano","Ramos","Castro","Suarez","Sanz","Rubio","Ortega","Molina","Delgado","Ortiz","Morales","Ramirez","Marin","Iglesias","Santos","Castillo","Garrido","Calvo","Pena","Cruz","Cano","Nunez","Prieto","Diez","Lozano","Vidal","Pascual","Ferrer","Medina","Vega","Leon","Herrero","Vicente","Mendez","Guerrero","Fuentes","Campos","Nieto","Cortes","Caballero","Ibanez","Lorenzo","Pastor","Gimenez","Saez","Soler","Marquez","Carrasco","Herrera","Montero","Arias","Crespo","Flores","Andres","Aguilar","Hidalgo","Cabrera","Mora","Duran","Velasco","Rey","Pardo","Roman","Vila","Bravo","Merino","Moya","Soto","Izquierdo","Reyes","Redondo","Marcos","Carmona","Menendez"],
+            // Data taken from https://fr.wikipedia.org/wiki/Liste_des_noms_de_famille_les_plus_courants_en_France
+            "fr": ["Martin","Bernard","Thomas","Petit","Robert","Richard","Durand","Dubois","Moreau","Laurent","Simon","Michel","Lefèvre","Leroy","Roux","David","Bertrand","Morel","Fournier","Girard","Bonnet","Dupont","Lambert","Fontaine","Rousseau","Vincent","Müller","Lefèvre","Faure","André","Mercier","Blanc","Guérin","Boyer","Garnier","Chevalier","François","Legrand","Gauthier","Garcia","Perrin","Robin","Clément","Morin","Nicolas","Henry","Roussel","Matthieu","Gautier","Masson","Marchand","Duval","Denis","Dumont","Marie","Lemaire","Noël","Meyer","Dufour","Meunier","Brun","Blanchard","Giraud","Joly","Rivière","Lucas","Brunet","Gaillard","Barbier","Arnaud","Martínez","Gérard","Roche","Renard","Schmitt","Roy","Leroux","Colin","Vidal","Caron","Picard","Roger","Fabre","Aubert","Lemoine","Renaud","Dumas","Lacroix","Olivier","Philippe","Bourgeois","Pierre","Benoît","Rey","Leclerc","Payet","Rolland","Leclercq","Guillaume","Lecomte","López","Jean","Dupuy","Guillot","Hubert","Berger","Carpentier","Sánchez","Dupuis","Moulin","Louis","Deschamps","Huet","Vasseur","Perez","Boucher","Fleury","Royer","Klein","Jacquet","Adam","Paris","Poirier","Marty","Aubry","Guyot","Carré","Charles","Renault","Charpentier","Ménard","Maillard","Baron","Bertin","Bailly","Hervé","Schneider","Fernández","Le GallGall","Collet","Léger","Bouvier","Julien","Prévost","Millet","Perrot","Daniel","Le RouxRoux","Cousin","Germain","Breton","Besson","Langlois","Rémi","Le GoffGoff","Pelletier","Lévêque","Perrier","Leblanc","Barré","Lebrun","Marchal","Weber","Mallet","Hamon","Boulanger","Jacob","Monnier","Michaud","Rodríguez","Guichard","Gillet","Étienne","Grondin","Poulain","Tessier","Chevallier","Collin","Chauvin","Da SilvaSilva","Bouchet","Gay","Lemaître","Bénard","Maréchal","Humbert","Reynaud","Antoine","Hoarau","Perret","Barthélemy","Cordier","Pichon","Lejeune","Gilbert","Lamy","Delaunay","Pasquier","Carlier","LaporteLaporte"]
         },
+
+        // Data taken from http://geoportal.statistics.gov.uk/datasets/ons-postcode-directory-latest-centroids
+        postcodeAreas: [{code: 'AB'}, {code: 'AL'}, {code: 'B'}, {code: 'BA'}, {code: 'BB'}, {code: 'BD'}, {code: 'BH'}, {code: 'BL'}, {code: 'BN'}, {code: 'BR'}, {code: 'BS'}, {code: 'BT'}, {code: 'CA'}, {code: 'CB'}, {code: 'CF'}, {code: 'CH'}, {code: 'CM'}, {code: 'CO'}, {code: 'CR'}, {code: 'CT'}, {code: 'CV'}, {code: 'CW'}, {code: 'DA'}, {code: 'DD'}, {code: 'DE'}, {code: 'DG'}, {code: 'DH'}, {code: 'DL'}, {code: 'DN'}, {code: 'DT'}, {code: 'DY'}, {code: 'E'}, {code: 'EC'}, {code: 'EH'}, {code: 'EN'}, {code: 'EX'}, {code: 'FK'}, {code: 'FY'}, {code: 'G'}, {code: 'GL'}, {code: 'GU'}, {code: 'GY'}, {code: 'HA'}, {code: 'HD'}, {code: 'HG'}, {code: 'HP'}, {code: 'HR'}, {code: 'HS'}, {code: 'HU'}, {code: 'HX'}, {code: 'IG'}, {code: 'IM'}, {code: 'IP'}, {code: 'IV'}, {code: 'JE'}, {code: 'KA'}, {code: 'KT'}, {code: 'KW'}, {code: 'KY'}, {code: 'L'}, {code: 'LA'}, {code: 'LD'}, {code: 'LE'}, {code: 'LL'}, {code: 'LN'}, {code: 'LS'}, {code: 'LU'}, {code: 'M'}, {code: 'ME'}, {code: 'MK'}, {code: 'ML'}, {code: 'N'}, {code: 'NE'}, {code: 'NG'}, {code: 'NN'}, {code: 'NP'}, {code: 'NR'}, {code: 'NW'}, {code: 'OL'}, {code: 'OX'}, {code: 'PA'}, {code: 'PE'}, {code: 'PH'}, {code: 'PL'}, {code: 'PO'}, {code: 'PR'}, {code: 'RG'}, {code: 'RH'}, {code: 'RM'}, {code: 'S'}, {code: 'SA'}, {code: 'SE'}, {code: 'SG'}, {code: 'SK'}, {code: 'SL'}, {code: 'SM'}, {code: 'SN'}, {code: 'SO'}, {code: 'SP'}, {code: 'SR'}, {code: 'SS'}, {code: 'ST'}, {code: 'SW'}, {code: 'SY'}, {code: 'TA'}, {code: 'TD'}, {code: 'TF'}, {code: 'TN'}, {code: 'TQ'}, {code: 'TR'}, {code: 'TS'}, {code: 'TW'}, {code: 'UB'}, {code: 'W'}, {code: 'WA'}, {code: 'WC'}, {code: 'WD'}, {code: 'WF'}, {code: 'WN'}, {code: 'WR'}, {code: 'WS'}, {code: 'WV'}, {code: 'YO'}, {code: 'ZE'}],
 
         // Data taken from https://github.com/umpirsky/country-list/blob/master/data/en_US/country.json
         countries: [{"name":"Afghanistan","abbreviation":"AF"},{"name":"Åland Islands","abbreviation":"AX"},{"name":"Albania","abbreviation":"AL"},{"name":"Algeria","abbreviation":"DZ"},{"name":"American Samoa","abbreviation":"AS"},{"name":"Andorra","abbreviation":"AD"},{"name":"Angola","abbreviation":"AO"},{"name":"Anguilla","abbreviation":"AI"},{"name":"Antarctica","abbreviation":"AQ"},{"name":"Antigua & Barbuda","abbreviation":"AG"},{"name":"Argentina","abbreviation":"AR"},{"name":"Armenia","abbreviation":"AM"},{"name":"Aruba","abbreviation":"AW"},{"name":"Ascension Island","abbreviation":"AC"},{"name":"Australia","abbreviation":"AU"},{"name":"Austria","abbreviation":"AT"},{"name":"Azerbaijan","abbreviation":"AZ"},{"name":"Bahamas","abbreviation":"BS"},{"name":"Bahrain","abbreviation":"BH"},{"name":"Bangladesh","abbreviation":"BD"},{"name":"Barbados","abbreviation":"BB"},{"name":"Belarus","abbreviation":"BY"},{"name":"Belgium","abbreviation":"BE"},{"name":"Belize","abbreviation":"BZ"},{"name":"Benin","abbreviation":"BJ"},{"name":"Bermuda","abbreviation":"BM"},{"name":"Bhutan","abbreviation":"BT"},{"name":"Bolivia","abbreviation":"BO"},{"name":"Bosnia & Herzegovina","abbreviation":"BA"},{"name":"Botswana","abbreviation":"BW"},{"name":"Brazil","abbreviation":"BR"},{"name":"British Indian Ocean Territory","abbreviation":"IO"},{"name":"British Virgin Islands","abbreviation":"VG"},{"name":"Brunei","abbreviation":"BN"},{"name":"Bulgaria","abbreviation":"BG"},{"name":"Burkina Faso","abbreviation":"BF"},{"name":"Burundi","abbreviation":"BI"},{"name":"Cambodia","abbreviation":"KH"},{"name":"Cameroon","abbreviation":"CM"},{"name":"Canada","abbreviation":"CA"},{"name":"Canary Islands","abbreviation":"IC"},{"name":"Cape Verde","abbreviation":"CV"},{"name":"Caribbean Netherlands","abbreviation":"BQ"},{"name":"Cayman Islands","abbreviation":"KY"},{"name":"Central African Republic","abbreviation":"CF"},{"name":"Ceuta & Melilla","abbreviation":"EA"},{"name":"Chad","abbreviation":"TD"},{"name":"Chile","abbreviation":"CL"},{"name":"China","abbreviation":"CN"},{"name":"Christmas Island","abbreviation":"CX"},{"name":"Cocos (Keeling) Islands","abbreviation":"CC"},{"name":"Colombia","abbreviation":"CO"},{"name":"Comoros","abbreviation":"KM"},{"name":"Congo - Brazzaville","abbreviation":"CG"},{"name":"Congo - Kinshasa","abbreviation":"CD"},{"name":"Cook Islands","abbreviation":"CK"},{"name":"Costa Rica","abbreviation":"CR"},{"name":"Côte d'Ivoire","abbreviation":"CI"},{"name":"Croatia","abbreviation":"HR"},{"name":"Cuba","abbreviation":"CU"},{"name":"Curaçao","abbreviation":"CW"},{"name":"Cyprus","abbreviation":"CY"},{"name":"Czech Republic","abbreviation":"CZ"},{"name":"Denmark","abbreviation":"DK"},{"name":"Diego Garcia","abbreviation":"DG"},{"name":"Djibouti","abbreviation":"DJ"},{"name":"Dominica","abbreviation":"DM"},{"name":"Dominican Republic","abbreviation":"DO"},{"name":"Ecuador","abbreviation":"EC"},{"name":"Egypt","abbreviation":"EG"},{"name":"El Salvador","abbreviation":"SV"},{"name":"Equatorial Guinea","abbreviation":"GQ"},{"name":"Eritrea","abbreviation":"ER"},{"name":"Estonia","abbreviation":"EE"},{"name":"Ethiopia","abbreviation":"ET"},{"name":"Falkland Islands","abbreviation":"FK"},{"name":"Faroe Islands","abbreviation":"FO"},{"name":"Fiji","abbreviation":"FJ"},{"name":"Finland","abbreviation":"FI"},{"name":"France","abbreviation":"FR"},{"name":"French Guiana","abbreviation":"GF"},{"name":"French Polynesia","abbreviation":"PF"},{"name":"French Southern Territories","abbreviation":"TF"},{"name":"Gabon","abbreviation":"GA"},{"name":"Gambia","abbreviation":"GM"},{"name":"Georgia","abbreviation":"GE"},{"name":"Germany","abbreviation":"DE"},{"name":"Ghana","abbreviation":"GH"},{"name":"Gibraltar","abbreviation":"GI"},{"name":"Greece","abbreviation":"GR"},{"name":"Greenland","abbreviation":"GL"},{"name":"Grenada","abbreviation":"GD"},{"name":"Guadeloupe","abbreviation":"GP"},{"name":"Guam","abbreviation":"GU"},{"name":"Guatemala","abbreviation":"GT"},{"name":"Guernsey","abbreviation":"GG"},{"name":"Guinea","abbreviation":"GN"},{"name":"Guinea-Bissau","abbreviation":"GW"},{"name":"Guyana","abbreviation":"GY"},{"name":"Haiti","abbreviation":"HT"},{"name":"Honduras","abbreviation":"HN"},{"name":"Hong Kong SAR China","abbreviation":"HK"},{"name":"Hungary","abbreviation":"HU"},{"name":"Iceland","abbreviation":"IS"},{"name":"India","abbreviation":"IN"},{"name":"Indonesia","abbreviation":"ID"},{"name":"Iran","abbreviation":"IR"},{"name":"Iraq","abbreviation":"IQ"},{"name":"Ireland","abbreviation":"IE"},{"name":"Isle of Man","abbreviation":"IM"},{"name":"Israel","abbreviation":"IL"},{"name":"Italy","abbreviation":"IT"},{"name":"Jamaica","abbreviation":"JM"},{"name":"Japan","abbreviation":"JP"},{"name":"Jersey","abbreviation":"JE"},{"name":"Jordan","abbreviation":"JO"},{"name":"Kazakhstan","abbreviation":"KZ"},{"name":"Kenya","abbreviation":"KE"},{"name":"Kiribati","abbreviation":"KI"},{"name":"Kosovo","abbreviation":"XK"},{"name":"Kuwait","abbreviation":"KW"},{"name":"Kyrgyzstan","abbreviation":"KG"},{"name":"Laos","abbreviation":"LA"},{"name":"Latvia","abbreviation":"LV"},{"name":"Lebanon","abbreviation":"LB"},{"name":"Lesotho","abbreviation":"LS"},{"name":"Liberia","abbreviation":"LR"},{"name":"Libya","abbreviation":"LY"},{"name":"Liechtenstein","abbreviation":"LI"},{"name":"Lithuania","abbreviation":"LT"},{"name":"Luxembourg","abbreviation":"LU"},{"name":"Macau SAR China","abbreviation":"MO"},{"name":"Macedonia","abbreviation":"MK"},{"name":"Madagascar","abbreviation":"MG"},{"name":"Malawi","abbreviation":"MW"},{"name":"Malaysia","abbreviation":"MY"},{"name":"Maldives","abbreviation":"MV"},{"name":"Mali","abbreviation":"ML"},{"name":"Malta","abbreviation":"MT"},{"name":"Marshall Islands","abbreviation":"MH"},{"name":"Martinique","abbreviation":"MQ"},{"name":"Mauritania","abbreviation":"MR"},{"name":"Mauritius","abbreviation":"MU"},{"name":"Mayotte","abbreviation":"YT"},{"name":"Mexico","abbreviation":"MX"},{"name":"Micronesia","abbreviation":"FM"},{"name":"Moldova","abbreviation":"MD"},{"name":"Monaco","abbreviation":"MC"},{"name":"Mongolia","abbreviation":"MN"},{"name":"Montenegro","abbreviation":"ME"},{"name":"Montserrat","abbreviation":"MS"},{"name":"Morocco","abbreviation":"MA"},{"name":"Mozambique","abbreviation":"MZ"},{"name":"Myanmar (Burma)","abbreviation":"MM"},{"name":"Namibia","abbreviation":"NA"},{"name":"Nauru","abbreviation":"NR"},{"name":"Nepal","abbreviation":"NP"},{"name":"Netherlands","abbreviation":"NL"},{"name":"New Caledonia","abbreviation":"NC"},{"name":"New Zealand","abbreviation":"NZ"},{"name":"Nicaragua","abbreviation":"NI"},{"name":"Niger","abbreviation":"NE"},{"name":"Nigeria","abbreviation":"NG"},{"name":"Niue","abbreviation":"NU"},{"name":"Norfolk Island","abbreviation":"NF"},{"name":"North Korea","abbreviation":"KP"},{"name":"Northern Mariana Islands","abbreviation":"MP"},{"name":"Norway","abbreviation":"NO"},{"name":"Oman","abbreviation":"OM"},{"name":"Pakistan","abbreviation":"PK"},{"name":"Palau","abbreviation":"PW"},{"name":"Palestinian Territories","abbreviation":"PS"},{"name":"Panama","abbreviation":"PA"},{"name":"Papua New Guinea","abbreviation":"PG"},{"name":"Paraguay","abbreviation":"PY"},{"name":"Peru","abbreviation":"PE"},{"name":"Philippines","abbreviation":"PH"},{"name":"Pitcairn Islands","abbreviation":"PN"},{"name":"Poland","abbreviation":"PL"},{"name":"Portugal","abbreviation":"PT"},{"name":"Puerto Rico","abbreviation":"PR"},{"name":"Qatar","abbreviation":"QA"},{"name":"Réunion","abbreviation":"RE"},{"name":"Romania","abbreviation":"RO"},{"name":"Russia","abbreviation":"RU"},{"name":"Rwanda","abbreviation":"RW"},{"name":"Samoa","abbreviation":"WS"},{"name":"San Marino","abbreviation":"SM"},{"name":"São Tomé and Príncipe","abbreviation":"ST"},{"name":"Saudi Arabia","abbreviation":"SA"},{"name":"Senegal","abbreviation":"SN"},{"name":"Serbia","abbreviation":"RS"},{"name":"Seychelles","abbreviation":"SC"},{"name":"Sierra Leone","abbreviation":"SL"},{"name":"Singapore","abbreviation":"SG"},{"name":"Sint Maarten","abbreviation":"SX"},{"name":"Slovakia","abbreviation":"SK"},{"name":"Slovenia","abbreviation":"SI"},{"name":"Solomon Islands","abbreviation":"SB"},{"name":"Somalia","abbreviation":"SO"},{"name":"South Africa","abbreviation":"ZA"},{"name":"South Georgia & South Sandwich Islands","abbreviation":"GS"},{"name":"South Korea","abbreviation":"KR"},{"name":"South Sudan","abbreviation":"SS"},{"name":"Spain","abbreviation":"ES"},{"name":"Sri Lanka","abbreviation":"LK"},{"name":"St. Barthélemy","abbreviation":"BL"},{"name":"St. Helena","abbreviation":"SH"},{"name":"St. Kitts & Nevis","abbreviation":"KN"},{"name":"St. Lucia","abbreviation":"LC"},{"name":"St. Martin","abbreviation":"MF"},{"name":"St. Pierre & Miquelon","abbreviation":"PM"},{"name":"St. Vincent & Grenadines","abbreviation":"VC"},{"name":"Sudan","abbreviation":"SD"},{"name":"Suriname","abbreviation":"SR"},{"name":"Svalbard & Jan Mayen","abbreviation":"SJ"},{"name":"Swaziland","abbreviation":"SZ"},{"name":"Sweden","abbreviation":"SE"},{"name":"Switzerland","abbreviation":"CH"},{"name":"Syria","abbreviation":"SY"},{"name":"Taiwan","abbreviation":"TW"},{"name":"Tajikistan","abbreviation":"TJ"},{"name":"Tanzania","abbreviation":"TZ"},{"name":"Thailand","abbreviation":"TH"},{"name":"Timor-Leste","abbreviation":"TL"},{"name":"Togo","abbreviation":"TG"},{"name":"Tokelau","abbreviation":"TK"},{"name":"Tonga","abbreviation":"TO"},{"name":"Trinidad & Tobago","abbreviation":"TT"},{"name":"Tristan da Cunha","abbreviation":"TA"},{"name":"Tunisia","abbreviation":"TN"},{"name":"Turkey","abbreviation":"TR"},{"name":"Turkmenistan","abbreviation":"TM"},{"name":"Turks & Caicos Islands","abbreviation":"TC"},{"name":"Tuvalu","abbreviation":"TV"},{"name":"U.S. Outlying Islands","abbreviation":"UM"},{"name":"U.S. Virgin Islands","abbreviation":"VI"},{"name":"Uganda","abbreviation":"UG"},{"name":"Ukraine","abbreviation":"UA"},{"name":"United Arab Emirates","abbreviation":"AE"},{"name":"United Kingdom","abbreviation":"GB"},{"name":"United States","abbreviation":"US"},{"name":"Uruguay","abbreviation":"UY"},{"name":"Uzbekistan","abbreviation":"UZ"},{"name":"Vanuatu","abbreviation":"VU"},{"name":"Vatican City","abbreviation":"VA"},{"name":"Venezuela","abbreviation":"VE"},{"name":"Vietnam","abbreviation":"VN"},{"name":"Wallis & Futuna","abbreviation":"WF"},{"name":"Western Sahara","abbreviation":"EH"},{"name":"Yemen","abbreviation":"YE"},{"name":"Zambia","abbreviation":"ZM"},{"name":"Zimbabwe","abbreviation":"ZW"}],
@@ -3574,6 +4002,40 @@
                 { name: "Calabria", abbreviation: "CAL" },
                 { name: "Sicilia", abbreviation: "SIC" },
                 { name: "Sardegna", abbreviation: "SAR" }
+            ],
+            mx: [
+                { name: 'Aguascalientes', abbreviation: 'AGU' },
+                { name: 'Baja California', abbreviation: 'BCN' },
+                { name: 'Baja California Sur', abbreviation: 'BCS' },
+                { name: 'Campeche', abbreviation: 'CAM' },
+                { name: 'Chiapas', abbreviation: 'CHP' },
+                { name: 'Chihuahua', abbreviation: 'CHH' },
+                { name: 'Ciudad de México', abbreviation: 'DIF' },
+                { name: 'Coahuila', abbreviation: 'COA' },
+                { name: 'Colima', abbreviation: 'COL' },
+                { name: 'Durango', abbreviation: 'DUR' },
+                { name: 'Guanajuato', abbreviation: 'GUA' },
+                { name: 'Guerrero', abbreviation: 'GRO' },
+                { name: 'Hidalgo', abbreviation: 'HID' },
+                { name: 'Jalisco', abbreviation: 'JAL' },
+                { name: 'México', abbreviation: 'MEX' },
+                { name: 'Michoacán', abbreviation: 'MIC' },
+                { name: 'Morelos', abbreviation: 'MOR' },
+                { name: 'Nayarit', abbreviation: 'NAY' },
+                { name: 'Nuevo León', abbreviation: 'NLE' },
+                { name: 'Oaxaca', abbreviation: 'OAX' },
+                { name: 'Puebla', abbreviation: 'PUE' },
+                { name: 'Querétaro', abbreviation: 'QUE' },
+                { name: 'Quintana Roo', abbreviation: 'ROO' },
+                { name: 'San Luis Potosí', abbreviation: 'SLP' },
+                { name: 'Sinaloa', abbreviation: 'SIN' },
+                { name: 'Sonora', abbreviation: 'SON' },
+                { name: 'Tabasco', abbreviation: 'TAB' },
+                { name: 'Tamaulipas', abbreviation: 'TAM' },
+                { name: 'Tlaxcala', abbreviation: 'TLA' },
+                { name: 'Veracruz', abbreviation: 'VER' },
+                { name: 'Yucatán', abbreviation: 'YUC' },
+                { name: 'Zacatecas', abbreviation: 'ZAC' }
             ]
         },
 
@@ -6288,7 +6750,7 @@
             "Civil Engineer",
             "Claims Manager",
             "Clinical Research Assistant",
-            "Collections Manager.",
+            "Collections Manager",
             "Compliance Manager",
             "Comptroller",
             "Computer Manager",
@@ -6616,7 +7078,33 @@
             "Vendor Relations Director",
             "Viticulturist",
             "Warehouse Manager"
-        ]
+        ],
+        animals : {
+          //list of ocean animals comes from https://owlcation.com/stem/list-of-ocean-animals
+          "ocean" : ["Acantharea","Anemone","Angelfish King","Ahi Tuna","Albacore","American Oyster","Anchovy","Armored Snail","Arctic Char","Atlantic Bluefin Tuna","Atlantic Cod","Atlantic Goliath Grouper","Atlantic Trumpetfish","Atlantic Wolffish","Baleen Whale","Banded Butterflyfish","Banded Coral Shrimp","Banded Sea Krait","Barnacle","Barndoor Skate","Barracuda","Basking Shark","Bass","Beluga Whale","Bluebanded Goby","Bluehead Wrasse","Bluefish","Bluestreak Cleaner-Wrasse","Blue Marlin","Blue Shark","Blue Spiny Lobster","Blue Tang","Blue Whale","Broadclub Cuttlefish","Bull Shark","Chambered Nautilus","Chilean Basket Star","Chilean Jack Mackerel","Chinook Salmon","Christmas Tree Worm","Clam","Clown Anemonefish","Clown Triggerfish","Cod","Coelacanth","Cockscomb Cup Coral","Common Fangtooth","Conch","Cookiecutter Shark","Copepod","Coral","Corydoras","Cownose Ray","Crab","Crown-of-Thorns Starfish","Cushion Star","Cuttlefish","California Sea Otters","Dolphin","Dolphinfish","Dory","Devil Fish","Dugong","Dumbo Octopus","Dungeness Crab","Eccentric Sand Dollar","Edible Sea Cucumber","Eel","Elephant Seal","Elkhorn Coral","Emperor Shrimp","Estuarine Crocodile","Fathead Sculpin","Fiddler Crab","Fin Whale","Flameback","Flamingo Tongue Snail","Flashlight Fish","Flatback Turtle","Flatfish","Flying Fish","Flounder","Fluke","French Angelfish","Frilled Shark","Fugu (also called Pufferfish)","Gar","Geoduck","Giant Barrel Sponge","Giant Caribbean Sea Anemone","Giant Clam","Giant Isopod","Giant Kingfish","Giant Oarfish","Giant Pacific Octopus","Giant Pyrosome","Giant Sea Star","Giant Squid","Glowing Sucker Octopus","Giant Tube Worm","Goblin Shark","Goosefish","Great White Shark","Greenland Shark","Grey Atlantic Seal","Grouper","Grunion","Guineafowl Puffer","Haddock","Hake","Halibut","Hammerhead Shark","Hapuka","Harbor Porpoise","Harbor Seal","Hatchetfish","Hawaiian Monk Seal","Hawksbill Turtle","Hector's Dolphin","Hermit Crab","Herring","Hoki","Horn Shark","Horseshoe Crab","Humpback Anglerfish","Humpback Whale","Icefish","Imperator Angelfish","Irukandji Jellyfish","Isopod","Ivory Bush Coral","Japanese Spider Crab","Jellyfish","John Dory","Juan Fernandez Fur Seal","Killer Whale","Kiwa Hirsuta","Krill","Lagoon Triggerfish","Lamprey","Leafy Seadragon","Leopard Seal","Limpet","Ling","Lionfish","Lions Mane Jellyfish","Lobe Coral","Lobster","Loggerhead Turtle","Longnose Sawshark","Longsnout Seahorse","Lophelia Coral","Marrus Orthocanna","Manatee","Manta Ray","Marlin","Megamouth Shark","Mexican Lookdown","Mimic Octopus","Moon Jelly","Mollusk","Monkfish","Moray Eel","Mullet","Mussel","Megaladon","Napoleon Wrasse","Nassau Grouper","Narwhal","Nautilus","Needlefish","Northern Seahorse","North Atlantic Right Whale","Northern Red Snapper","Norway Lobster","Nudibranch","Nurse Shark","Oarfish","Ocean Sunfish","Oceanic Whitetip Shark","Octopus","Olive Sea Snake","Orange Roughy","Ostracod","Otter","Oyster","Pacific Angelshark","Pacific Blackdragon","Pacific Halibut","Pacific Sardine","Pacific Sea Nettle Jellyfish","Pacific White Sided Dolphin","Pantropical Spotted Dolphin","Patagonian Toothfish","Peacock Mantis Shrimp","Pelagic Thresher Shark","Penguin","Peruvian Anchoveta","Pilchard","Pink Salmon","Pinniped","Plankton","Porpoise","Polar Bear","Portuguese Man o' War","Pycnogonid Sea Spider","Quahog","Queen Angelfish","Queen Conch","Queen Parrotfish","Queensland Grouper","Ragfish","Ratfish","Rattail Fish","Ray","Red Drum","Red King Crab","Ringed Seal","Risso's Dolphin","Ross Seals","Sablefish","Salmon","Sand Dollar","Sandbar Shark","Sawfish","Sarcastic Fringehead","Scalloped Hammerhead Shark","Seahorse","Sea Cucumber","Sea Lion","Sea Urchin","Seal","Shark","Shortfin Mako Shark","Shovelnose Guitarfish","Shrimp","Silverside Fish","Skipjack Tuna","Slender Snipe Eel","Smalltooth Sawfish","Smelts","Sockeye Salmon","Southern Stingray","Sponge","Spotted Porcupinefish","Spotted Dolphin","Spotted Eagle Ray","Spotted Moray","Squid","Squidworm","Starfish","Stickleback","Stonefish","Stoplight Loosejaw","Sturgeon","Swordfish","Tan Bristlemouth","Tasseled Wobbegong","Terrible Claw Lobster","Threespot Damselfish","Tiger Prawn","Tiger Shark","Tilefish","Toadfish","Tropical Two-Wing Flyfish","Tuna","Umbrella Squid","Velvet Crab","Venus Flytrap Sea Anemone","Vigtorniella Worm","Viperfish","Vampire Squid","Vaquita","Wahoo","Walrus","West Indian Manatee","Whale","Whale Shark","Whiptail Gulper","White-Beaked Dolphin","White-Ring Garden Eel","White Shrimp","Wobbegong","Wrasse","Wreckfish","Xiphosura","Yellowtail Damselfish","Yelloweye Rockfish","Yellow Cup Black Coral","Yellow Tube Sponge","Yellowfin Tuna","Zebrashark","Zooplankton"],
+          //list of desert, grassland, and forest animals comes from http://www.skyenimals.com/
+          "desert" : ["Aardwolf","Addax","African Wild Ass","Ant","Antelope","Armadillo","Baboon","Badger","Bat","Bearded Dragon","Beetle","Bird","Black-footed Cat","Boa","Brown Bear","Bustard","Butterfly","Camel","Caracal","Caracara","Caterpillar","Centipede","Cheetah","Chipmunk","Chuckwalla","Climbing Mouse","Coati","Cobra","Cotton Rat","Cougar","Courser","Crane Fly","Crow","Dassie Rat","Dove","Dunnart","Eagle","Echidna","Elephant","Emu","Falcon","Fly","Fox","Frogmouth","Gecko","Geoffroy's Cat","Gerbil","Grasshopper","Guanaco","Gundi","Hamster","Hawk","Hedgehog","Hyena","Hyrax","Jackal","Kangaroo","Kangaroo Rat","Kestrel","Kowari","Kultarr","Leopard","Lion","Macaw","Meerkat","Mouse","Oryx","Ostrich","Owl","Pronghorn","Python","Rabbit","Raccoon","Rattlesnake","Rhinoceros","Sand Cat","Spectacled Bear","Spiny Mouse","Starling","Stick Bug","Tarantula","Tit","Toad","Tortoise","Tyrant Flycatcher","Viper","Vulture","Waxwing","Xerus","Zebra"],
+          "grassland" : ["Aardvark","Aardwolf","Accentor","African Buffalo","African Wild Dog","Alpaca","Anaconda","Ant","Anteater","Antelope","Armadillo","Baboon","Badger","Bandicoot","Barbet","Bat","Bee","Bee-eater","Beetle","Bird","Bison","Black-footed Cat","Black-footed Ferret","Bluebird","Boa","Bowerbird","Brown Bear","Bush Dog","Bushshrike","Bustard","Butterfly","Buzzard","Caracal","Caracara","Cardinal","Caterpillar","Cheetah","Chipmunk","Civet","Climbing Mouse","Clouded Leopard","Coati","Cobra","Cockatoo","Cockroach","Common Genet","Cotton Rat","Cougar","Courser","Coyote","Crane","Crane Fly","Cricket","Crow","Culpeo","Death Adder","Deer","Deer Mouse","Dingo","Dinosaur","Dove","Drongo","Duck","Duiker","Dunnart","Eagle","Echidna","Elephant","Elk","Emu","Falcon","Finch","Flea","Fly","Flying Frog","Fox","Frog","Frogmouth","Garter Snake","Gazelle","Gecko","Geoffroy's Cat","Gerbil","Giant Tortoise","Giraffe","Grasshopper","Grison","Groundhog","Grouse","Guanaco","Guinea Pig","Hamster","Harrier","Hartebeest","Hawk","Hedgehog","Helmetshrike","Hippopotamus","Hornbill","Hyena","Hyrax","Impala","Jackal","Jaguar","Jaguarundi","Kangaroo","Kangaroo Rat","Kestrel","Kultarr","Ladybug","Leopard","Lion","Macaw","Meerkat","Mouse","Newt","Oryx","Ostrich","Owl","Pangolin","Pheasant","Prairie Dog","Pronghorn","Przewalski's Horse","Python","Quoll","Rabbit","Raven","Rhinoceros","Shelduck","Sloth Bear","Spectacled Bear","Squirrel","Starling","Stick Bug","Tamandua","Tasmanian Devil","Thornbill","Thrush","Toad","Tortoise"],
+          "forest" : ["Agouti","Anaconda","Anoa","Ant","Anteater","Antelope","Armadillo","Asian Black Bear","Aye-aye","Babirusa","Baboon","Badger","Bandicoot","Banteng","Barbet","Basilisk","Bat","Bearded Dragon","Bee","Bee-eater","Beetle","Bettong","Binturong","Bird-of-paradise","Bongo","Bowerbird","Bulbul","Bush Dog","Bushbaby","Bushshrike","Butterfly","Buzzard","Caecilian","Cardinal","Cassowary","Caterpillar","Centipede","Chameleon","Chimpanzee","Cicada","Civet","Clouded Leopard","Coati","Cobra","Cockatoo","Cockroach","Colugo","Cotinga","Cotton Rat","Cougar","Crane Fly","Cricket","Crocodile","Crow","Cuckoo","Cuscus","Death Adder","Deer","Dhole","Dingo","Dinosaur","Drongo","Duck","Duiker","Eagle","Echidna","Elephant","Finch","Flat-headed Cat","Flea","Flowerpecker","Fly","Flying Frog","Fossa","Frog","Frogmouth","Gaur","Gecko","Gorilla","Grison","Hawaiian Honeycreeper","Hawk","Hedgehog","Helmetshrike","Hornbill","Hyrax","Iguana","Jackal","Jaguar","Jaguarundi","Kestrel","Ladybug","Lemur","Leopard","Lion","Macaw","Mandrill","Margay","Monkey","Mouse","Mouse Deer","Newt","Okapi","Old World Flycatcher","Orangutan","Owl","Pangolin","Peafowl","Pheasant","Possum","Python","Quokka","Rabbit","Raccoon","Red Panda","Red River Hog","Rhinoceros","Sloth Bear","Spectacled Bear","Squirrel","Starling","Stick Bug","Sun Bear","Tamandua","Tamarin","Tapir","Tarantula","Thrush","Tiger","Tit","Toad","Tortoise","Toucan","Trogon","Trumpeter","Turaco","Turtle","Tyrant Flycatcher","Viper","Vulture","Wallaby","Warbler","Wasp","Waxwing","Weaver","Weaver-finch","Whistler","White-eye","Whydah","Woodswallow","Worm","Wren","Xenops","Yellowjacket","Accentor","African Buffalo","American Black Bear","Anole","Bird","Bison","Boa","Brown Bear","Chipmunk","Common Genet","Copperhead","Coyote","Deer Mouse","Dormouse","Elk","Emu","Fisher","Fox","Garter Snake","Giant Panda","Giant Tortoise","Groundhog","Grouse","Guanaco","Himalayan Tahr","Kangaroo","Koala","Numbat","Quoll","Raccoon dog","Tasmanian Devil","Thornbill","Turkey","Vole","Weasel","Wildcat","Wolf","Wombat","Woodchuck","Woodpecker"],
+          //list of farm animals comes from https://www.buzzle.com/articles/farm-animals-list.html
+          "farm" : ["Alpaca","Buffalo","Banteng","Cow","Cat","Chicken","Carp","Camel","Donkey","Dog","Duck","Emu","Goat","Gayal","Guinea","Goose","Horse","Honey","Llama","Pig","Pigeon","Rhea","Rabbit","Sheep","Silkworm","Turkey","Yak","Zebu"],
+          //list of pet animals comes from https://www.dogbreedinfo.com/pets/pet.htm
+          "pet" : ["Bearded Dragon","Birds","Burro","Cats","Chameleons","Chickens","Chinchillas","Chinese Water Dragon","Cows","Dogs","Donkey","Ducks","Ferrets","Fish","Geckos","Geese","Gerbils","Goats","Guinea Fowl","Guinea Pigs","Hamsters","Hedgehogs","Horses","Iguanas","Llamas","Lizards","Mice","Mule","Peafowl","Pigs and Hogs","Pigeons","Ponies","Pot Bellied Pig","Rabbits","Rats","Sheep","Skinks","Snakes","Stick Insects","Sugar Gliders","Tarantula","Turkeys","Turtles"],
+          //list of zoo animals comes from https://bronxzoo.com/animals
+          "zoo" : ["Aardvark","African Wild Dog","Aldabra Tortoise","American Alligator","American Bison","Amur Tiger","Anaconda","Andean Condor","Asian Elephant","Baby Doll Sheep","Bald Eagle","Barred Owl","Blue Iguana","Boer Goat","California Sea Lion","Caribbean Flamingo","Chinchilla","Collared Lemur","Coquerel's Sifaka","Cuban Amazon Parrot","Ebony Langur","Fennec Fox","Fossa","Gelada","Giant Anteater","Giraffe","Gorilla","Grizzly Bear","Henkel's Leaf-tailed Gecko","Indian Gharial","Indian Rhinoceros","King Cobra","King Vulture","Komodo Dragon","Linne's Two-toed Sloth","Lion","Little Penguin","Madagascar Tree Boa","Magellanic Penguin","Malayan Tapir","Malayan Tiger","Matschies Tree Kangaroo","Mini Donkey","Monarch Butterfly","Nile crocodile","North American Porcupine","Nubian Ibex","Okapi","Poison Dart Frog","Polar Bear","Pygmy Marmoset","Radiated Tortoise","Red Panda","Red Ruffed Lemur","Ring-tailed Lemur","Ring-tailed Mongoose","Rock Hyrax","Small Clawed Asian Otter","Snow Leopard","Snowy Owl","Southern White-faced Owl","Southern White Rhinocerous","Squirrel Monkey","Tufted Puffin","White Cheeked Gibbon","White-throated Bee Eater","Zebra"]
+        },
+        primes: [
+            // 1230 first primes, i.e. all primes up to the first one greater than 10000, inclusive.
+            2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251,257,263,269,271,277,281,283,293,307,311,313,317,331,337,347,349,353,359,367,373,379,383,389,397,401,409,419,421,431,433,439,443,449,457,461,463,467,479,487,491,499,503,509,521,523,541,547,557,563,569,571,577,587,593,599,601,607,613,617,619,631,641,643,647,653,659,661,673,677,683,691,701,709,719,727,733,739,743,751,757,761,769,773,787,797,809,811,821,823,827,829,839,853,857,859,863,877,881,883,887,907,911,919,929,937,941,947,953,967,971,977,983,991,997,1009,1013,1019,1021,1031,1033,1039,1049,1051,1061,1063,1069,1087,1091,1093,1097,1103,1109,1117,1123,1129,1151,1153,1163,1171,1181,1187,1193,1201,1213,1217,1223,1229,1231,1237,1249,1259,1277,1279,1283,1289,1291,1297,1301,1303,1307,1319,1321,1327,1361,1367,1373,1381,1399,1409,1423,1427,1429,1433,1439,1447,1451,1453,1459,1471,1481,1483,1487,1489,1493,1499,1511,1523,1531,1543,1549,1553,1559,1567,1571,1579,1583,1597,1601,1607,1609,1613,1619,1621,1627,1637,1657,1663,1667,1669,1693,1697,1699,1709,1721,1723,1733,1741,1747,1753,1759,1777,1783,1787,1789,1801,1811,1823,1831,1847,1861,1867,1871,1873,1877,1879,1889,1901,1907,1913,1931,1933,1949,1951,1973,1979,1987,1993,1997,1999,2003,2011,2017,2027,2029,2039,2053,2063,2069,2081,2083,2087,2089,2099,2111,2113,2129,2131,2137,2141,2143,2153,2161,2179,2203,2207,2213,2221,2237,2239,2243,2251,2267,2269,2273,2281,2287,2293,2297,2309,2311,2333,2339,2341,2347,2351,2357,2371,2377,2381,2383,2389,2393,2399,2411,2417,2423,2437,2441,2447,2459,2467,2473,2477,2503,2521,2531,2539,2543,2549,2551,2557,2579,2591,2593,2609,2617,2621,2633,2647,2657,2659,2663,2671,2677,2683,2687,2689,2693,2699,2707,2711,2713,2719,2729,2731,2741,2749,2753,2767,2777,2789,2791,2797,2801,2803,2819,2833,2837,2843,2851,2857,2861,2879,2887,2897,2903,2909,2917,2927,2939,2953,2957,2963,2969,2971,2999,3001,3011,3019,3023,3037,3041,3049,3061,3067,3079,3083,3089,3109,3119,3121,3137,3163,3167,3169,3181,3187,3191,3203,3209,3217,3221,3229,3251,3253,3257,3259,3271,3299,3301,3307,3313,3319,3323,3329,3331,3343,3347,3359,3361,3371,3373,3389,3391,3407,3413,3433,3449,3457,3461,3463,3467,3469,3491,3499,3511,3517,3527,3529,3533,3539,3541,3547,3557,3559,3571,3581,3583,3593,3607,3613,3617,3623,3631,3637,3643,3659,3671,3673,3677,3691,3697,3701,3709,3719,3727,3733,3739,3761,3767,3769,3779,3793,3797,3803,3821,3823,3833,3847,3851,3853,3863,3877,3881,3889,3907,3911,3917,3919,3923,3929,3931,3943,3947,3967,3989,4001,4003,4007,4013,4019,4021,4027,4049,4051,4057,4073,4079,4091,4093,4099,4111,4127,4129,4133,4139,4153,4157,4159,4177,4201,4211,4217,4219,4229,4231,4241,4243,4253,4259,4261,4271,4273,4283,4289,4297,4327,4337,4339,4349,4357,4363,4373,4391,4397,4409,4421,4423,4441,4447,4451,4457,4463,4481,4483,4493,4507,4513,4517,4519,4523,4547,4549,4561,4567,4583,4591,4597,4603,4621,4637,4639,4643,4649,4651,4657,4663,4673,4679,4691,4703,4721,4723,4729,4733,4751,4759,4783,4787,4789,4793,4799,4801,4813,4817,4831,4861,4871,4877,4889,4903,4909,4919,4931,4933,4937,4943,4951,4957,4967,4969,4973,4987,4993,4999,5003,5009,5011,5021,5023,5039,5051,5059,5077,5081,5087,5099,5101,5107,5113,5119,5147,5153,5167,5171,5179,5189,5197,5209,5227,5231,5233,5237,5261,5273,5279,5281,5297,5303,5309,5323,5333,5347,5351,5381,5387,5393,5399,5407,5413,5417,5419,5431,5437,5441,5443,5449,5471,5477,5479,5483,5501,5503,5507,5519,5521,5527,5531,5557,5563,5569,5573,5581,5591,5623,5639,5641,5647,5651,5653,5657,5659,5669,5683,5689,5693,5701,5711,5717,5737,5741,5743,5749,5779,5783,5791,5801,5807,5813,5821,5827,5839,5843,5849,5851,5857,5861,5867,5869,5879,5881,5897,5903,5923,5927,5939,5953,5981,5987,6007,6011,6029,6037,6043,6047,6053,6067,6073,6079,6089,6091,6101,6113,6121,6131,6133,6143,6151,6163,6173,6197,6199,6203,6211,6217,6221,6229,6247,6257,6263,6269,6271,6277,6287,6299,6301,6311,6317,6323,6329,6337,6343,6353,6359,6361,6367,6373,6379,6389,6397,6421,6427,6449,6451,6469,6473,6481,6491,6521,6529,6547,6551,6553,6563,6569,6571,6577,6581,6599,6607,6619,6637,6653,6659,6661,6673,6679,6689,6691,6701,6703,6709,6719,6733,6737,6761,6763,6779,6781,6791,6793,6803,6823,6827,6829,6833,6841,6857,6863,6869,6871,6883,6899,6907,6911,6917,6947,6949,6959,6961,6967,6971,6977,6983,6991,6997,7001,7013,7019,7027,7039,7043,7057,7069,7079,7103,7109,7121,7127,7129,7151,7159,7177,7187,7193,7207,7211,7213,7219,7229,7237,7243,7247,7253,7283,7297,7307,7309,7321,7331,7333,7349,7351,7369,7393,7411,7417,7433,7451,7457,7459,7477,7481,7487,7489,7499,7507,7517,7523,7529,7537,7541,7547,7549,7559,7561,7573,7577,7583,7589,7591,7603,7607,7621,7639,7643,7649,7669,7673,7681,7687,7691,7699,7703,7717,7723,7727,7741,7753,7757,7759,7789,7793,7817,7823,7829,7841,7853,7867,7873,7877,7879,7883,7901,7907,7919,7927,7933,7937,7949,7951,7963,7993,8009,8011,8017,8039,8053,8059,8069,8081,8087,8089,8093,8101,8111,8117,8123,8147,8161,8167,8171,8179,8191,8209,8219,8221,8231,8233,8237,8243,8263,8269,8273,8287,8291,8293,8297,8311,8317,8329,8353,8363,8369,8377,8387,8389,8419,8423,8429,8431,8443,8447,8461,8467,8501,8513,8521,8527,8537,8539,8543,8563,8573,8581,8597,8599,8609,8623,8627,8629,8641,8647,8663,8669,8677,8681,8689,8693,8699,8707,8713,8719,8731,8737,8741,8747,8753,8761,8779,8783,8803,8807,8819,8821,8831,8837,8839,8849,8861,8863,8867,8887,8893,8923,8929,8933,8941,8951,8963,8969,8971,8999,9001,9007,9011,9013,9029,9041,9043,9049,9059,9067,9091,9103,9109,9127,9133,9137,9151,9157,9161,9173,9181,9187,9199,9203,9209,9221,9227,9239,9241,9257,9277,9281,9283,9293,9311,9319,9323,9337,9341,9343,9349,9371,9377,9391,9397,9403,9413,9419,9421,9431,9433,9437,9439,9461,9463,9467,9473,9479,9491,9497,9511,9521,9533,9539,9547,9551,9587,9601,9613,9619,9623,9629,9631,9643,9649,9661,9677,9679,9689,9697,9719,9721,9733,9739,9743,9749,9767,9769,9781,9787,9791,9803,9811,9817,9829,9833,9839,9851,9857,9859,9871,9883,9887,9901,9907,9923,9929,9931,9941,9949,9967,9973,10007
+        ],
+        emotions: [
+            "love",
+            "joy",
+            "surprise",
+            "anger",
+            "sadness",
+            "fear"
+        ],
     };
 
     var o_hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -6630,6 +7118,7 @@
 
       return result;
     });
+
 
     function _copyObject(source, target) {
       var keys = o_keys(source);
@@ -6793,6 +7282,10 @@
             d2 = 0;
         }
         return ''+n[0]+n[1]+'.'+n[2]+n[3]+n[4]+'.'+n[5]+n[6]+n[7]+'/0001-'+d1+d2;
+    };
+
+    Chance.prototype.emotion = function () {
+        return this.pick(this.get("emotions"));
     };
 
     // -- End Miscellaneous --
