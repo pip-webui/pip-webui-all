@@ -229,15 +229,17 @@ declare module pip.buttons {
 declare module pip.cache {
 
 export interface ICacheConfigService {
+    enabled: boolean;
     enableLogs: boolean;
     models: CacheModel[];
     prefix: string;
 }
 export class CacheConfigService implements ICacheConfigService {
+    enabled: boolean;
     enableLogs: boolean;
     models: CacheModel[];
     prefix: string;
-    constructor(enableLogs: boolean, models: CacheModel[], prefix: string);
+    constructor(enabled: boolean, enableLogs: boolean, models: CacheModel[], prefix: string);
 }
 export interface ICacheConfigProvider {
     enableLogs: boolean;

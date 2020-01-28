@@ -11899,7 +11899,8 @@ return Dexie;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var CacheConfigService = (function () {
-    function CacheConfigService(enableLogs, models, prefix) {
+    function CacheConfigService(enabled, enableLogs, models, prefix) {
+        this.enabled = enabled;
         this.enableLogs = enableLogs;
         this.models = models;
         this.prefix = prefix;
@@ -11910,6 +11911,7 @@ exports.CacheConfigService = CacheConfigService;
 var CacheConfigProvider = (function () {
     function CacheConfigProvider() {
         "ngInject";
+        this.enabled = true;
         this.enableLogs = false;
         this.models = [];
         this.prefix = 'PipCache';
@@ -11917,7 +11919,7 @@ var CacheConfigProvider = (function () {
     CacheConfigProvider.prototype.$get = function () {
         "ngInject";
         if (this._service == null) {
-            this._service = new CacheConfigService(this.enableLogs, this.models, this.prefix);
+            this._service = new CacheConfigService(this.enabled, this.enableLogs, this.models, this.prefix);
         }
         return this._service;
     };
@@ -11932,7 +11934,7 @@ configureInterceptor.$inject = ['$httpProvider'];
 Object.defineProperty(exports, "__esModule", { value: true });
 function configureInterceptor($httpProvider) {
     "ngInject";
-    $httpProvider.interceptors.push(['$q', 'pipCache', function ($q, pipCache) {
+    $httpProvider.interceptors.push(['$q', 'pipCache', 'pipCacheConfig', function ($q, pipCache, pipCacheConfig) {
         var getDefaultParams = function (params) {
             var ret = {};
             if (params) {
@@ -11947,6 +11949,9 @@ function configureInterceptor($httpProvider) {
         };
         return {
             request: function (config) {
+                if (!pipCacheConfig.enabled) {
+                    return config;
+                }
                 var _loop_1 = function (model) {
                     var _loop_2 = function (ik) {
                         var interceptor = model.interceptors[ik];
