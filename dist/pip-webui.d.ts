@@ -914,36 +914,6 @@ export class NavMenuConfig {
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
-
-
 export interface ISideNavService {
     readonly config: SideNavConfig;
     readonly classes: string[];
@@ -1010,6 +980,36 @@ export class SideNavConfig {
     backdrop: boolean;
     visible: boolean;
 }
+
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 export class PipTab {
     id: string;
@@ -1150,6 +1150,7 @@ declare module pip.locations {
 
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1160,7 +1161,6 @@ export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
-
 
 let google: any;
 
@@ -1268,7 +1268,6 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
 }
 
 
-
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
 export const UPDATE_GROUPS_EVENT = "pipUpdateDashboardGroupsConfig";
@@ -1314,6 +1313,7 @@ export class DragTileService implements IDragTileService {
     getOptions(): any;
     setOptions(options: any): any;
 }
+
 
 
 
