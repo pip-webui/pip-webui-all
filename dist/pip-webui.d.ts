@@ -231,64 +231,69 @@ declare module pip.cache {
 export interface ICacheConfigService {
     enabled: boolean;
     enableLogs: boolean;
-    models: CacheModel[];
+    models: PipCacheModel[];
     prefix: string;
 }
 export class CacheConfigService implements ICacheConfigService {
     enabled: boolean;
     enableLogs: boolean;
-    models: CacheModel[];
+    models: PipCacheModel[];
     prefix: string;
-    constructor(enabled: boolean, enableLogs: boolean, models: CacheModel[], prefix: string);
+    constructor(enabled: boolean, enableLogs: boolean, models: PipCacheModel[], prefix: string);
 }
 export interface ICacheConfigProvider {
     enableLogs: boolean;
-    models: CacheModel[];
+    models: PipCacheModel[];
     prefix: string;
 }
 
 
-export class CacheCollectionParams {
+export class PipCachePaginationParams {
     offset?: number;
     limit?: number;
 }
-export class CacheInterceptorOptions {
+export function extractPaginationDefault(params: any): [PipCachePaginationParams, any];
+export class PipCacheInterceptorOptions {
     maxAge?: number;
 }
-export class CacheModel {
+export class PipCacheInterceptorSettings {
+    match: RegExp;
+    options?: PipCacheInterceptorOptions;
+}
+export class PipCacheInterceptorItemSettings extends PipCacheInterceptorSettings {
+    getKey: (groups: any) => any;
+}
+export class PipCacheInterceptorCollectionSettings extends PipCacheInterceptorSettings {
+    responseModify?: {
+        responseToItems: (resp: any) => any[];
+        itemsToResponse: (items: any[]) => any;
+    };
+}
+export class PipCacheModel {
     name: string;
     options: {
         maxAge: number;
         key?: string;
     };
     interceptors: {
-        item?: {
-            match: RegExp;
-            options?: CacheInterceptorOptions;
-            getKey: (groups: any) => any;
-        };
-        collection?: {
-            match: RegExp;
-            options?: CacheInterceptorOptions;
-            responseModify?: {
-                responseToItems: (resp: any) => any[];
-                itemsToResponse: (items: any[]) => any;
-            };
-            getParams?: (params: any) => CacheCollectionParams;
-        };
+        item?: PipCacheInterceptorItemSettings;
+        collection?: PipCacheInterceptorCollectionSettings;
     };
 }
 
 export interface ICacheService {
-    models: CacheModel[];
-    getItem(modelName: string, key: any, options?: CacheInterceptorOptions): Promise<any>;
-    getItems(modelName: string, params?: CacheCollectionParams, options?: CacheInterceptorOptions): Promise<any[]>;
+    models: PipCacheModel[];
+    getItem(modelName: string, key: any, options?: PipCacheInterceptorOptions): Promise<any>;
+    getItems(modelName: string, payload?: {
+        httpParams?: any;
+        interceptor?: PipCacheInterceptorCollectionSettings;
+    }): Promise<any[]>;
     setItem(modelName: string, item: any, options?: {
         removeTotal?: boolean;
     }): Promise<any>;
     setItems(modelName: string, items: any[], payload?: {
-        params?: CacheCollectionParams;
-        options?: CacheInterceptorOptions;
+        httpParams?: any;
+        interceptor?: PipCacheInterceptorCollectionSettings;
     }): Promise<any[]>;
     deleteItems(modelName: string, keys: any[]): Promise<any>;
     clear(model?: string | string[]): Promise<any>;
@@ -300,22 +305,25 @@ export class CacheService implements ICacheService {
     private getDbName(modelName);
     private getDb(model);
     private getModel(modelName);
-    readonly models: CacheModel[];
-    getItem(modelName: string, key: any, options?: CacheInterceptorOptions): Promise<any>;
-    getItems(modelName: string, params?: CacheCollectionParams, options?: CacheInterceptorOptions): Promise<any[]>;
+    readonly models: PipCacheModel[];
+    getItem(modelName: string, key: any, options?: PipCacheInterceptorOptions): Promise<any>;
+    getItems(modelName: string, payload?: {
+        httpParams?: any;
+        interceptor?: PipCacheInterceptorCollectionSettings;
+    }): Promise<any[]>;
     setItem(modelName: string, item: any, options?: {
         removeTotal?: boolean;
     }): Promise<any>;
     setItems(modelName: string, items: any[], payload?: {
-        params?: CacheCollectionParams;
-        options?: CacheInterceptorOptions;
+        httpParams?: any;
+        interceptor?: PipCacheInterceptorCollectionSettings;
     }): Promise<any[]>;
     deleteItems(modelName: string, keys: any[]): Promise<any>;
     clear(model?: string | string[]): Promise<any>;
 }
 export interface ICacheProvider {
-    models: CacheModel[];
-    registerModel(model: CacheModel): boolean;
+    models: PipCacheModel[];
+    registerModel(model: PipCacheModel): boolean;
 }
 
 
@@ -571,6 +579,7 @@ declare module pip.dates {
 
 
 
+
 export class DateRangeType {
     static Year: string;
     static Month: string;
@@ -646,7 +655,6 @@ export interface IDateFormatService {
 }
 export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
-
 
 
 
