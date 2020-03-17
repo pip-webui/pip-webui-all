@@ -1017,36 +1017,6 @@ export class NavMenuConfig {
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
 
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
-
-
 export interface ISideNavService {
     readonly config: SideNavConfig;
     readonly classes: string[];
@@ -1113,6 +1083,36 @@ export class SideNavConfig {
     backdrop: boolean;
     visible: boolean;
 }
+
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 export class PipTab {
     id: string;
@@ -1238,12 +1238,12 @@ declare module pip.charts {
 
 
 
-
 export interface IChartColorsService {
     getMaterialColor(index: number, colors: string[]): string;
     materialColorToRgba(color: string): string;
     generateMaterialColors(): string[];
 }
+
 
 
 
@@ -1336,6 +1336,18 @@ export interface IAddTileDialogprovider {
 
 
 
+export interface IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+}
+export class DashboardTile implements IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+    constructor();
+}
+
 export class TileConfigDialogController {
     params: any;
     extensionUrl: any;
@@ -1356,19 +1368,6 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     dialogClass?: string;
     extensionUrl?: string;
     event?: any;
-}
-
-
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-}
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
 }
 
 
@@ -1422,14 +1421,15 @@ export class DragTileService implements IDragTileService {
 
 
 
+
+
+
 export class MenuTileService extends DashboardTile {
     menu: any;
     constructor();
     callAction(actionName: any, params: any, item: any): void;
     changeSize(params: any): void;
 }
-
-
 
 
 
