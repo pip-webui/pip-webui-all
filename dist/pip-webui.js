@@ -10854,7 +10854,9 @@ __export(require("./ShortcutsService"));
     }());
     var DEFAULT_COLORS_1 = ['purple', 'lightgreen', 'green', 'darkred', 'pink', 'yellow', 'cyan'];
     var ColorPickerController = (function () {
+        ColorPickerController.$inject = ['$scope', '$element', '$attrs', '$timeout'];
         function ColorPickerController($scope, $element, $attrs, $timeout) {
+            "ngInject";
             this.$scope = $scope;
             this.$element = $element;
             this.$timeout = $timeout;
@@ -10901,6 +10903,7 @@ __export(require("./ShortcutsService"));
 {
     translateFilter.$inject = ['$injector'];
     function translateFilter($injector) {
+        "ngInject";
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         return function (key) {
             return pipTranslate ? pipTranslate['translate'](key) || key : key;
@@ -10917,6 +10920,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     var pipImageSliderController_1 = (function () {
         pipImageSliderController_1.$inject = ['$scope', '$element', '$attrs', '$parse', '$timeout', '$interval', 'pipImageSlider'];
         function pipImageSliderController_1($scope, $element, $attrs, $parse, $timeout, $interval, pipImageSlider) {
+            "ngInject";
             var _this = this;
             this.$scope = $scope;
             this.$element = $element;
@@ -10954,6 +10958,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 pipImageSlider.removeSlider($attrs.id);
             });
         }
+        pipImageSliderController_1.prototype.$onInit = function () { };
         pipImageSliderController_1.prototype.nextBlock = function () {
             this.restartInterval();
             this._newIndex = this._index + 1 === this._blocks.length ? 0 : this._index + 1;
@@ -11018,6 +11023,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     var ImageSliderService = (function () {
         ImageSliderService.$inject = ['$timeout'];
         function ImageSliderService($timeout) {
+            "ngInject";
             this.$timeout = $timeout;
             this.ANIMATION_DURATION = 550;
             this._sliders = {};
@@ -11083,6 +11089,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     var SliderButtonController_1 = (function () {
         SliderButtonController_1.$inject = ['$element', 'pipImageSlider'];
         function SliderButtonController_1($element, pipImageSlider) {
+            "ngInject";
             var _this = this;
             $element.on('click', function () {
                 if (!_this.sliderId() || !_this.direction()) {
@@ -11091,6 +11098,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 pipImageSlider.getSliderScope(_this.sliderId()).vm[_this.direction() + 'Block']();
             });
         }
+        SliderButtonController_1.prototype.$onInit = function () { };
         return SliderButtonController_1;
     }());
     var SliderButton = function () {
@@ -11105,7 +11113,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         };
     };
     angular
-        .module('pipSliderButton', [])
+        .module('pipSliderButton', ['pipImageSlider.Service'])
         .directive('pipSliderButton', SliderButton);
 }
 },{}],6:[function(require,module,exports){
@@ -11115,6 +11123,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     var SliderIndicatorController_1 = (function () {
         SliderIndicatorController_1.$inject = ['$element', 'pipImageSlider'];
         function SliderIndicatorController_1($element, pipImageSlider) {
+            "ngInject";
             var _this = this;
             $element.css('cursor', 'pointer');
             $element.on('click', function () {
@@ -11124,6 +11133,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 pipImageSlider.getSliderScope(_this.sliderId()).vm.slideTo(_this.slideTo());
             });
         }
+        SliderIndicatorController_1.prototype.$onInit = function () { };
         return SliderIndicatorController_1;
     }());
     var SliderIndicator = function () {
@@ -11138,7 +11148,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
         };
     };
     angular
-        .module('pipSliderIndicator', [])
+        .module('pipSliderIndicator', ['pipImageSlider.Service'])
         .directive('pipSliderIndicator', SliderIndicator);
 }
 },{}],7:[function(require,module,exports){
@@ -11172,6 +11182,7 @@ angular.module('pipControls', [
 },{"./color_picker/ColorPicker":1,"./dependencies/TranslateFilter":2,"./image_slider":7,"./markdown/Markdown":9,"./popover":12,"./progress/RoutingProgress":13,"./toast":16}],9:[function(require,module,exports){
 {
     var ConfigTranslations = function ($injector) {
+        "ngInject";
         var pipTranslate = $injector.has('pipTranslate') ? $injector.get('pipTranslate') : null;
         if (pipTranslate) {
             pipTranslate.setTranslations('en', {
@@ -11296,7 +11307,9 @@ angular.module('pipControls', [
         params: '<pipParams'
     };
     var PopoverController = (function () {
+        PopoverController.$inject = ['$scope', '$rootScope', '$element', '$timeout', '$compile', '$templateRequest'];
         function PopoverController($scope, $rootScope, $element, $timeout, $compile, $templateRequest) {
+            "ngInject";
             var _this = this;
             this.$scope = $scope;
             this.$timeout = $timeout;
@@ -11333,6 +11346,7 @@ angular.module('pipControls', [
                 _this.onResize();
             });
         }
+        PopoverController.prototype.$onInit = function () { };
         PopoverController.prototype.backdropClick = function () {
             if (this.params.cancelCallback) {
                 this.params.cancelCallback();
@@ -11400,6 +11414,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
     var PopoverService = (function () {
         PopoverService.$inject = ['$compile', '$rootScope', '$timeout'];
         function PopoverService($compile, $rootScope, $timeout) {
+            "ngInject";
             this.$compile = $compile;
             this.$rootScope = $rootScope;
             this.$timeout = $timeout;
@@ -11449,7 +11464,9 @@ require("./PopoverService");
         logoUrl: '@'
     };
     var RoutingController = (function () {
+        RoutingController.$inject = ['$scope', '$element'];
         function RoutingController($scope, $element) {
+            "ngInject";
             this.$element = $element;
         }
         RoutingController.prototype.$postLink = function () {
@@ -11707,8 +11724,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('popover/Popover.html',
-    '<div class="pip-popover" ng-click="$ctrl.params.onPopoverClick($event)"></div>');
+  $templateCache.put('progress/RoutingProgress.html',
+    '<div class="layout-column layout-align-center-center" ng-show="$ctrl.showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
 }]);
 })();
 
@@ -11719,8 +11736,8 @@ try {
   module = angular.module('pipControls.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('progress/RoutingProgress.html',
-    '<div class="layout-column layout-align-center-center" ng-show="$ctrl.showProgress()"><div class="loader"><svg class="circular" viewbox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle></svg></div><img src="" height="40" width="40" class="pip-img"><md-progress-circular md-diameter="96" class="fix-ie"></md-progress-circular></div>');
+  $templateCache.put('popover/Popover.html',
+    '<div class="pip-popover" ng-click="$ctrl.params.onPopoverClick($event)"></div>');
 }]);
 })();
 
@@ -17915,18 +17932,6 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dropdown/Dropdown.html',
-    '<md-toolbar class="md-subhead color-primary-bg {{ $ctrl.themeClass}}" ng-if="$ctrl.show()" ng-class="{\'md-whiteframe-3dp\': $ctrl.media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="$ctrl.selectedIndex" tabindex="15" ng-disabled="$ctrl.disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.selectedIndex)"><md-option ng-repeat="action in $ctrl.actions" value="{{ ::$index }}" ng-selected="$ctrl.activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('header/NavHeader.html',
     '<md-toolbar ng-show="$ctrl.showHeader" class="layout-row layout-align-start-center"><div class="flex-fixed pip-sticky-nav-header-user"><md-button class="md-icon-button" ng-click="$ctrl.onUserClick()" aria-label="current user" tabindex="-1"><img src="" class="pip-sticky-nav-header-user-image" ng-class="$ctrl.imageCss"></md-button></div><div class="pip-sticky-nav-header-user-text"><div class="pip-sticky-nav-header-user-pri" ng-click="$ctrl.onUserClick()" tabindex="-1">{{ $ctrl.title | translate }}</div><div class="pip-sticky-nav-header-user-sec">{{ $ctrl.subtitle | translate }}</div></div></md-toolbar>');
 }]);
@@ -17951,32 +17956,20 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dropdown/Dropdown.html',
+    '<md-toolbar class="md-subhead color-primary-bg {{ $ctrl.themeClass}}" ng-if="$ctrl.show()" ng-class="{\'md-whiteframe-3dp\': $ctrl.media(\'xs\')}"><div class="pip-divider"></div><md-select ng-model="$ctrl.selectedIndex" tabindex="15" ng-disabled="$ctrl.disabled()" md-container-class="pip-full-width-dropdown" aria-label="DROPDOWN" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.selectedIndex)"><md-option ng-repeat="action in $ctrl.actions" value="{{ ::$index }}" ng-selected="$ctrl.activeIndex == $index ? true : false">{{ (action.title || action.name || action) | translate }}</md-option></md-select></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('language/LanguagePicker.html',
     '<md-menu md-position-mode="target-right target"><span class="pip-language" ng-click="$mdOpenMenu()" aria-label="language selection">{{ $ctrl.value | translate }}<md-icon md-svg-icon="icons:triangle-down"></md-icon></span><md-menu-content width="3"><md-menu-item ng-repeat="language in $ctrl.languages"><md-button ng-click="$ctrl.onLanguageClick(language)" tabindex="7">{{ language | translate }}</md-button></md-menu-item></md-menu-content></md-menu>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('menu/NavMenu.html',
-    '<div ng-if="$ctrl.sections && $ctrl.sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="$ctrl.onExpand()" ng-disabled="!$ctrl.isCollapsed" tabindex="-1" ng-if="$ctrl.expandedButton"><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-left" ng-if="$ctrl.pipSideNav.state.isExpanded"></md-icon><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-right" ng-if="!$ctrl.pipSideNav.state.isExpanded"></md-icon></md-list-item><md-divider ng-show="$ctrl.expandedButton"></md-divider><div class="pip-section" ng-repeat="section in $ctrl.sections" xxxng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !$ctrl.isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="$ctrl.pipSideNav.state.isExpanded" class="pip-sticky-nav-menu-title section-title">{{ ::section.title | translate }}</span><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="!$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && section.icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ $ctrl.defaultIcon }}" ng-if="!$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && !section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ $ctrl.defaultIcon }}" ng-if="$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && !section.icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" tabindex="-1" ng-repeat="link in section.links" ng-class="{\'active\': $ctrl.isActive(link)}"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-disabled="link.access && !link.access(link)" ng-click="$ctrl.clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-if="!$ctrl.sideNavState.showIconTooltype || !link.tooltipText || $ctrl.pipSideNav.state.isExpanded" ng-hide="!link.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-hide="!link.icon" ng-if="$ctrl.sideNavState.showIconTooltype && link.tooltipText && !$ctrl.pipSideNav.state.isExpanded"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::link.tooltipText || link.title | translate }}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{ ::link.title | translate }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{ link.count }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipNav.Templates');
-} catch (e) {
-  module = angular.module('pipNav.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('sidenav/SideNav.html',
-    '<md-sidenav class="md-sidenav-left" md-is-locked-open="$ctrl.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
 }]);
 })();
 
@@ -17999,8 +17992,32 @@ try {
   module = angular.module('pipNav.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('sidenav/SideNav.html',
+    '<md-sidenav class="md-sidenav-left" md-is-locked-open="$ctrl.sidenavState.isLockedOpen" md-component-id="pip-sticky-sidenav" ng-transclude=""></md-sidenav>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('tabs/Tabs.html',
     '<md-toolbar ng-if="$ctrl.pipMedia" class="pip-nav color-primary-bg {{ $ctrl.themeClass }}" ng-class="{\'pip-visible\': $ctrl.show(), \'pip-shadow\': $ctrl.showShadow()}"><md-tabs class="color-primary-bg" ng-if="$ctrl.pipMedia($ctrl.breakpoints)" md-selected="$ctrl.activeIndex" ng-class="{\'disabled\': $ctrl.isDisabled()}" md-stretch-tabs="true" md-dynamic-height="true"><md-tab ng-repeat="tab in $ctrl.tabs track by $index" ng-disabled="$ctrl.tabDisabled($index)" md-on-select="$ctrl.onSelect($index)"><md-tab-label>{{:: tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-tab-label></md-tab></md-tabs><div class="md-subhead pip-tabs-content color-primary-bg" ng-if="!$ctrl.pipMedia($ctrl.breakpoints)"><div class="pip-divider position-top m0"></div><md-select ng-model="$ctrl.activeIndex" ng-disabled="$ctrl.isDisabled()" md-container-class="pip-full-width-dropdown" aria-label="SELECT" md-ink-ripple="" md-on-close="$ctrl.onSelect($ctrl.activeIndex)"><md-option ng-repeat="tab in $ctrl.tabs track by $index" class="pip-tab-option" value="{{ ::$index }}">{{ ::tab.nameLocal }}<div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 0 && tab.counts <= 99">{{ tab.counts }}</div><div class="pip-tabs-badge color-badge-bg" ng-if="tab.counts > 99">!</div></md-option></md-select></div></md-toolbar>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipNav.Templates');
+} catch (e) {
+  module = angular.module('pipNav.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('menu/NavMenu.html',
+    '<div ng-if="$ctrl.sections && $ctrl.sections.length"><md-list class="sidenav-list" pip-focused="" pip-focused-tabindex="10" pip-with-hidden="true"><md-list-item class="no-border pip-sticky-nav-menu-item pip-sticky-nav-expanded-button" ng-click="$ctrl.onExpand()" ng-disabled="!$ctrl.isCollapsed" tabindex="-1" ng-if="$ctrl.expandedButton"><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-left" ng-if="$ctrl.pipSideNav.state.isExpanded"></md-icon><md-icon class="pip-sticky-nav-menu-icon" md-svg-icon="icons:chevron-right" ng-if="!$ctrl.pipSideNav.state.isExpanded"></md-icon></md-list-item><md-divider ng-show="$ctrl.expandedButton"></md-divider><div class="pip-section" ng-repeat="section in $ctrl.sections" xxxng-hide="section.access && !section.access(section)"><md-divider ng-show="$index > 0 && !$ctrl.isSectionEmpty(section.links)"></md-divider><md-subheader ng-show="section.title" style="height: 48px;"><span ng-if="$ctrl.pipSideNav.state.isExpanded" class="pip-sticky-nav-menu-title section-title">{{ ::section.title | translate }}</span><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="!$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ section.icon }}" ng-if="$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && section.icon"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ $ctrl.defaultIcon }}" ng-if="!$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && !section.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon section-icon" md-svg-icon="{{ $ctrl.defaultIcon }}" ng-if="$ctrl.sideNavState.showIconTooltype && !$ctrl.expanded && !section.icon"><md-tooltip md-visible="showTooltip" class="md-secondary">{{ ::section.tooltipText || section.title | translate }}</md-tooltip></md-icon></md-subheader><md-list-item class="no-border pip-sticky-nav-menu-item pip-focusable" tabindex="-1" ng-repeat="link in section.links" ng-class="{\'active\': $ctrl.isActive(link)}"><md-button class="layout-row layout-align-start-center pip-button-block" tabindex="-1" ng-disabled="link.access && !link.access(link)" ng-click="$ctrl.clickLink($event, link)"><div class="pip-sticky-nav-menu-icon-block"><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-if="!$ctrl.sideNavState.showIconTooltype || !link.tooltipText || $ctrl.pipSideNav.state.isExpanded" ng-hide="!link.icon"></md-icon><md-icon class="pip-sticky-nav-menu-icon flex-fixed" md-svg-icon="{{ link.icon }}" ng-hide="!link.icon" ng-if="$ctrl.sideNavState.showIconTooltype && link.tooltipText && !$ctrl.pipSideNav.state.isExpanded"><md-tooltip md-visible="showTooltip" md-direction="right" class="sidenav-icon-tooltip">{{ ::link.tooltipText || link.title | translate }}</md-tooltip></md-icon></div><div class="pip-sticky-nav-menu-title">{{ ::link.title | translate }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count < 100">{{ link.count }}</div><div class="pip-sticky-nav-menu-badge {{ link.badgeStyle ? link.badgeStyle : \'color-badge-bg\' }} flex-fixed" ng-if="link.count && link.count > 99">!</div></md-button></md-list-item></div></md-list></div>');
 }]);
 })();
 
@@ -21483,8 +21500,8 @@ try {
   module = angular.module('pipLocations.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('location_dialog/LocationDialog.html',
-    '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{$ctrl.theme}}"><div class="pip-header layout-column layout-align-start-start"><md-progress-linear ng-show="$ctrl.transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><h3 class="flex">{{ \'LOCATION_SET_LOCATION\' | translate }}</h3></div><div class="pip-footer"><div class="layout-row layout-align-start-center"><md-button class="md-accent" ng-click="$ctrl.onAddPin()" ng-show="$ctrl.locationPos == null" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_ADD_PIN\' }}">{{ ::\'LOCATION_ADD_PIN\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onRemovePin()" ng-show="$ctrl.locationPos != null" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_REMOVE_PIN\' }}">{{ ::\'LOCATION_REMOVE_PIN\' | translate }}</md-button></div><div class="flex"></div><div class="layout-row layout-align-end-center"><md-button ng-click="$ctrl.onCancel()" aria-label="{{ ::\'CANCEL\' }}">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onApply()" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'APPLY\' }}">{{ ::\'APPLY\' | translate }}</md-button></div></div><div class="pip-body"><div class="pip-location-container"></div><md-button class="md-icon-button md-fab pip-zoom-in" ng-click="$ctrl.onZoomIn()" aria-label="{{ ::\'LOCATION_ZOOM_IN\' }}"><md-icon md-svg-icon="icons:plus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-zoom-out" ng-click="$ctrl.onZoomOut()" aria-label="{{ ::\'LOCATION_ZOOM_OUT\' }}"><md-icon md-svg-icon="icons:minus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-set-location" ng-click="$ctrl.onSetLocation()" aria-label="{{ ::\'LOCATION_SET_LOCATION\' }}" ng-show="supportSet" ng-disabled="transaction.busy()"><md-icon md-svg-icon="icons:target"></md-icon></md-button></div></md-dialog>');
+  $templateCache.put('location_edit/LocationEdit.html',
+    '<md-input-container class="md-block"><label>{{ \'LOCATION\' | translate }}</label> <input ng-model="$ctrl.pipLocationName" ng-disabled="$ctrl.ngDisabled"></md-input-container><div class="pip-location-empty" layout="column" layout-align="center center"><md-button class="md-raised" ng-disabled="$ctrl.ngDisabled" ng-click="$ctrl.onSetLocation()" aria-label="LOCATION_ADD_LOCATION"><span class="icon-location"></span> {{\'LOCATION_ADD_LOCATION\' | translate }}</md-button></div><div class="pip-location-container" tabindex="{{ $ctrl.ngDisabled ? -1 : 0 }}" ng-click="$ctrl.onMapClick($event)" ng-keypress="$ctrl.onMapKeyPress($event)"></div>');
 }]);
 })();
 
@@ -21495,8 +21512,8 @@ try {
   module = angular.module('pipLocations.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('location_edit/LocationEdit.html',
-    '<md-input-container class="md-block"><label>{{ \'LOCATION\' | translate }}</label> <input ng-model="$ctrl.pipLocationName" ng-disabled="$ctrl.ngDisabled"></md-input-container><div class="pip-location-empty" layout="column" layout-align="center center"><md-button class="md-raised" ng-disabled="$ctrl.ngDisabled" ng-click="$ctrl.onSetLocation()" aria-label="LOCATION_ADD_LOCATION"><span class="icon-location"></span> {{\'LOCATION_ADD_LOCATION\' | translate }}</md-button></div><div class="pip-location-container" tabindex="{{ $ctrl.ngDisabled ? -1 : 0 }}" ng-click="$ctrl.onMapClick($event)" ng-keypress="$ctrl.onMapKeyPress($event)"></div>');
+  $templateCache.put('location_dialog/LocationDialog.html',
+    '<md-dialog class="pip-dialog pip-location-edit-dialog layout-column" md-theme="{{$ctrl.theme}}"><div class="pip-header layout-column layout-align-start-start"><md-progress-linear ng-show="$ctrl.transaction.busy()" md-mode="indeterminate" class="pip-progress-top"></md-progress-linear><h3 class="flex">{{ \'LOCATION_SET_LOCATION\' | translate }}</h3></div><div class="pip-footer"><div class="layout-row layout-align-start-center"><md-button class="md-accent" ng-click="$ctrl.onAddPin()" ng-show="$ctrl.locationPos == null" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_ADD_PIN\' }}">{{ ::\'LOCATION_ADD_PIN\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onRemovePin()" ng-show="$ctrl.locationPos != null" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'LOCATION_REMOVE_PIN\' }}">{{ ::\'LOCATION_REMOVE_PIN\' | translate }}</md-button></div><div class="flex"></div><div class="layout-row layout-align-end-center"><md-button ng-click="$ctrl.onCancel()" aria-label="{{ ::\'CANCEL\' }}">{{ ::\'CANCEL\' | translate }}</md-button><md-button class="md-accent" ng-click="$ctrl.onApply()" ng-disabled="$ctrl.transaction.busy()" aria-label="{{ ::\'APPLY\' }}">{{ ::\'APPLY\' | translate }}</md-button></div></div><div class="pip-body"><div class="pip-location-container"></div><md-button class="md-icon-button md-fab pip-zoom-in" ng-click="$ctrl.onZoomIn()" aria-label="{{ ::\'LOCATION_ZOOM_IN\' }}"><md-icon md-svg-icon="icons:plus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-zoom-out" ng-click="$ctrl.onZoomOut()" aria-label="{{ ::\'LOCATION_ZOOM_OUT\' }}"><md-icon md-svg-icon="icons:minus"></md-icon></md-button><md-button class="md-icon-button md-fab pip-set-location" ng-click="$ctrl.onSetLocation()" aria-label="{{ ::\'LOCATION_SET_LOCATION\' }}" ng-show="supportSet" ng-disabled="transaction.busy()"><md-icon md-svg-icon="icons:target"></md-icon></md-button></div></md-dialog>');
 }]);
 })();
 
@@ -27569,18 +27586,6 @@ try {
   module = angular.module('pipFiles.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('file_select/FileSelect.html',
-    '<div class="pip-file-select"><form id="inp_form" class="pip-hidden-form"><input type="file" file-model="$ctrl.localFile" id="inp_file" ng-model="$ctrl.localFile"></form><md-button class="md-raised md-accent pip-button" ng-click="$ctrl.onUploadButtonClick()" ng-if="!$ctrl.localFile">Choose File</md-button><div ng-if="$ctrl.localFile.name" class="pip-file layout-row layout-align-start-center"><md-icon md-svg-icon="icons:document" class="pip-icon"></md-icon><div class="flex"><div class="text-body2 text-overflow">{{$ctrl.localFile.name}}</div><div ng-if="$ctrl.localFile.size" class="color-secondary-text">{{$ctrl.localFile.size}}</div></div><md-button ng-click="$ctrl.onDeleteButtonClick()" class="md-icon-button"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipFiles.Templates');
-} catch (e) {
-  module = angular.module('pipFiles.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('file_start/FileStart.html',
     '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon bb-orange"><md-icon md-svg-icon="icons:play"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title">Uploading {{::$ctrl.type}}</h3><div class="color-secondary-text pip-subtitle">{{$ctrl.name}}</div><div><md-progress-linear md-mode="determinate" class="md-accent" value="{{$ctrl.progress}}" ng-if="$ctrl.progress < 100"></md-progress-linear><md-progress-linear md-mode="indeterminate" class="md-accent" ng-if="$ctrl.progress == 100"></md-progress-linear></div></div></div></div><div class="pip-footer layout-row layout-align-end-center" ng-if="$ctrl.buttons"><div><md-button class="md-accent" ng-repeat="start in $ctrl.buttons" ng-click="start.click()">{{start.title}}</md-button></div></div></div>');
 }]);
@@ -27593,8 +27598,8 @@ try {
   module = angular.module('pipFiles.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('file_success/FileSuccess.html',
-    '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon bb-green"><md-icon md-svg-icon="icons:check"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title">Uploaded {{::vm.type}} successfully!</h3><div class="color-secondary-text pip-subtitle">{{vm.name}}</div></div></div></div><div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0"><div><md-button class="md-accent" ng-repeat="start in vm.buttons" ng-click="start.click()">{{start.title}}</md-button></div></div></div>');
+  $templateCache.put('file_select/FileSelect.html',
+    '<div class="pip-file-select"><form id="inp_form" class="pip-hidden-form"><input type="file" file-model="$ctrl.localFile" id="inp_file" ng-model="$ctrl.localFile"></form><md-button class="md-raised md-accent pip-button" ng-click="$ctrl.onUploadButtonClick()" ng-if="!$ctrl.localFile">Choose File</md-button><div ng-if="$ctrl.localFile.name" class="pip-file layout-row layout-align-start-center"><md-icon md-svg-icon="icons:document" class="pip-icon"></md-icon><div class="flex"><div class="text-body2 text-overflow">{{$ctrl.localFile.name}}</div><div ng-if="$ctrl.localFile.size" class="color-secondary-text">{{$ctrl.localFile.size}}</div></div><md-button ng-click="$ctrl.onDeleteButtonClick()" class="md-icon-button"><md-icon md-svg-icon="icons:cross-circle"></md-icon></md-button></div></div>');
 }]);
 })();
 
@@ -27607,6 +27612,18 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('file_upload/FileUpload.html',
     '<div><pip-succes-upload ng-if="$ctrl.state == 1 && (!$ctrl.buttons || $ctrl.uploadButtons)" pip-name="$ctrl.name" pip-type="$ctrl.type" pip-buttons="$ctrl.buttons"></pip-succes-upload><pip-fail-upload ng-if="$ctrl.state == 2" pip-name="$ctrl.name" pip-type="$ctrl.type" pip-error="$ctrl.error" pip-buttons="$ctrl.failButtons"></pip-fail-upload><pip-start-upload ng-if="$ctrl.state == 0" pip-name="$ctrl.name" pip-type="$ctrl.type" pip-progress="$ctrl.progress" pip-buttons="$ctrl.startButtons"></pip-start-upload></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipFiles.Templates');
+} catch (e) {
+  module = angular.module('pipFiles.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('file_success/FileSuccess.html',
+    '<div class="pip-files pip-progress-files"><div class="pip-body pip-scroll pip-progress-body"><div class="layout-row"><div class="pip-progress-icon bb-green"><md-icon md-svg-icon="icons:check"></md-icon></div><div class="pip-progress-content"><h3 class="pip-title">Uploaded {{::vm.type}} successfully!</h3><div class="color-secondary-text pip-subtitle">{{vm.name}}</div></div></div></div><div class="pip-footer layout-row layout-align-end-center" ng-if="vm.buttons && vm.buttons.length > 0"><div><md-button class="md-accent" ng-repeat="start in vm.buttons" ng-click="start.click()">{{start.title}}</md-button></div></div></div>');
 }]);
 })();
 
@@ -29972,18 +29989,6 @@ try {
   module = angular.module('pipDashboard.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('dashboard/Dashboard.html',
-    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="$ctrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="$ctrl.groupedWidgets" pip-tiles-context="$ctrl.widgetsContext" pip-draggable-grid="$ctrl.draggableGridOptions" pip-group-menu-actions="$ctrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('draggable/Draggable.html',
     '<div class="pip-draggable-holder"><div class="pip-draggable-group" ng-repeat="group in $ctrl.groups" data-group-id="{{ $index }}" pip-draggable-tiles="group.source"><div class="pip-draggable-group-title layout-row layout-align-start-center"><div class="title-input-container" ng-click="$ctrl.onTitleClick(group, $event)"><input ng-if="group.editingName" ng-blur="$ctrl.onBlurTitleInput(group)" ng-keypress="$ctrl.onKyepressTitleInput(group, $event)" ng-model="group.title"><div class="text-overflow flex-none" ng-if="!group.editingName">{{ group.title }}</div></div><md-button class="md-icon-button flex-none layout-align-center-center" ng-show="group.editingName" ng-click="$ctrl.cancelEditing(group)" aria-label="Cancel"><md-icon md-svg-icon="icons:cross"></md-icon></md-button><md-menu class="flex-none layout-column" md-position-mode="target-right target" ng-show="!group.editingName"><md-button class="md-icon-button flex-none layout-align-center-center" ng-click="$mdOpenMenu(); groupId = $index" aria-label="Menu"><md-icon md-svg-icon="icons:dots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="action in $ctrl.groupMenuActions"><md-button ng-click="action.callback(groupId)">{{ action.title }}</md-button></md-menu-item></md-menu-content></md-menu></div></div><div class="pip-draggable-group fict-group layout-align-center-center layout-column tm16"><div class="fict-group-text-container"><md-icon md-svg-icon="icons:plus"></md-icon>{{ \'DROP_TO_CREATE_NEW_GROUP\' | translate }}</div></div></div>');
 }]);
@@ -30021,6 +30026,30 @@ try {
   module = angular.module('pipDashboard.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('dashboard/Dashboard.html',
+    '<md-button class="md-accent md-raised md-fab layout-column layout-align-center-center" aria-label="Add component" ng-click="$ctrl.addComponent()"><md-icon md-svg-icon="icons:plus" class="md-headline centered-add-icon"></md-icon></md-button><div class="pip-draggable-grid-holder"><pip-draggable-grid pip-tiles-templates="$ctrl.groupedWidgets" pip-tiles-context="$ctrl.widgetsContext" pip-draggable-grid="$ctrl.draggableGridOptions" pip-group-menu-actions="$ctrl.groupMenuActions"></pip-draggable-grid><md-progress-circular md-mode="indeterminate" class="progress-ring"></md-progress-circular></div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('menu_tile/MenuTile.html',
+    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipDashboard.Templates');
+} catch (e) {
+  module = angular.module('pipDashboard.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('note_tile/ConfigDialogExtension.html',
     '<div class="w-stretch"><md-input-container class="w-stretch bm0"><label>Title:</label> <input type="text" ng-model="$ctrl.title"></md-input-container><md-input-container class="w-stretch tm0"><label>Text:</label> <textarea type="text" ng-model="$ctrl.text">\n' +
     '    </textarea></md-input-container></div>');
@@ -30048,18 +30077,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('picture_slider_tile/PictureSliderTile.html',
     '<div class="widget-box pip-picture-slider-widget {{ $ctrl.color }} layout-column layout-fill" ng-class="{ small: $ctrl.options.size.colSpan == 1 && $ctrl.options.size.rowSpan == 1, medium: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 1, big: $ctrl.options.size.colSpan == 2 && $ctrl.options.size.rowSpan == 2 }" index="{{ $ctrl.index }}" group="{{ $ctrl.group }}"><div class="widget-heading lp16 rp8 layout-row layout-align-end-center flex-none"><span class="flex text-overflow">{{ $ctrl.options.title }}</span><pip-tile-menu ng-if="!$ctrl.options.hideMenu"></pip-tile-menu></div><div class="slider-container"><div pip-image-slider="" pip-animation-type="\'fading\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'fading\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div><div pip-image-slider="" pip-animation-type="\'carousel\'" pip-animation-interval="$ctrl.animationInterval" ng-if="$ctrl.animationType == \'carousel\'"><div class="pip-animation-block" ng-repeat="slide in $ctrl.options.slides"><img ng-src="{{ slide.image }}" alt="{{ slide.image }}" pip-image-load="$ctrl.onImageLoad($event)"><p class="slide-text" ng-if="slide.text">{{ slide.text }}</p></div></div></div></div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipDashboard.Templates');
-} catch (e) {
-  module = angular.module('pipDashboard.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('menu_tile/MenuTile.html',
-    '<md-menu class="widget-menu" md-position-mode="target-right target"><md-button class="md-icon-button flex-none" ng-click="$mdOpenMenu()" aria-label="Menu"><md-icon md-svg-icon="icons:vdots"></md-icon></md-button><md-menu-content width="4"><md-menu-item ng-repeat="item in $ctrl.menu"><md-button ng-if="!item.submenu" ng-click="$ctrl.callAction(item.action, item.params, item)">{{:: item.title }}</md-button><md-menu ng-if="item.submenu"><md-button ng-click="$ctrl.callAction(item.action)">{{:: item.title }}</md-button><md-menu-content><md-menu-item ng-repeat="subitem in item.submenu"><md-button ng-click="$ctrl.callAction(subitem.action, subitem.params, subitem)">{{:: subitem.title }}</md-button></md-menu-item></md-menu-content></md-menu></md-menu-item></md-menu-content></md-menu>');
 }]);
 })();
 
