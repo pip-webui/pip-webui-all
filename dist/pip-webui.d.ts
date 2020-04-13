@@ -525,8 +525,6 @@ export interface IImageSliderService {
 
 
 
-var marked: any;
-
 
 export interface IPopoverService {
     show(p: Object): void;
@@ -535,6 +533,8 @@ export interface IPopoverService {
 }
 
 
+
+var marked: any;
 
 
 
@@ -574,6 +574,7 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
 
 
 
@@ -658,7 +659,6 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
@@ -667,6 +667,20 @@ export const MillisecondsInSecond = 1000;
 }
 
 declare module pip.dialogs {
+
+
+
+export class ConfirmationDialogParams {
+    event?: MouseEvent;
+    ok?: string;
+    title?: string;
+    cancel?: string;
+}
+
+
+export interface IConfirmationDialogService {
+    show(params: ConfirmationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
 
 
 
@@ -725,20 +739,6 @@ export class OptionsDialogParams {
 export class OptionsDialogResult {
     option: OptionsDialogData;
     isCheckboxOption: boolean;
-}
-
-
-
-export class ConfirmationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    cancel?: string;
-}
-
-
-export interface IConfirmationDialogService {
-    show(params: ConfirmationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
 
 
@@ -828,6 +828,36 @@ export interface IActionsProvider extends ng.IServiceProvider {
 
 
 
+export class BreadcrumbItem {
+    title: string;
+    click?: (item: BreadcrumbItem) => void;
+    subActions?: SimpleActionItem[];
+}
+export class BreadcrumbConfig {
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    breakpoint: string;
+}
+
+export const BreadcrumbChangedEvent: string;
+export const BreadcrumbBackEvent: string;
+
+export interface IBreadcrumbService {
+    config: BreadcrumbConfig;
+    text: string;
+    items: BreadcrumbItem[];
+    criteria: string;
+    breakpoint: string;
+    showText(text: string, criteria?: string): void;
+    showItems(items: BreadcrumbItem[], criteria?: string): void;
+}
+export interface IBreadcrumbProvider extends ng.IServiceProvider {
+    text: string;
+}
+
+
+
 export class AppBarConfig {
     visible: boolean;
     parts: any;
@@ -859,36 +889,6 @@ export interface IAppBarProvider extends ng.IServiceProvider {
 }
 
 
-
-export class BreadcrumbItem {
-    title: string;
-    click?: (item: BreadcrumbItem) => void;
-    subActions?: SimpleActionItem[];
-}
-export class BreadcrumbConfig {
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    breakpoint: string;
-}
-
-export const BreadcrumbChangedEvent: string;
-export const BreadcrumbBackEvent: string;
-
-export interface IBreadcrumbService {
-    config: BreadcrumbConfig;
-    text: string;
-    items: BreadcrumbItem[];
-    criteria: string;
-    breakpoint: string;
-    showText(text: string, criteria?: string): void;
-    showItems(items: BreadcrumbItem[], criteria?: string): void;
-}
-export interface IBreadcrumbProvider extends ng.IServiceProvider {
-    text: string;
-}
-
-
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -900,7 +900,6 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
-
 
 
 
@@ -940,6 +939,7 @@ export class NavHeaderConfig {
 
 export let NavHeaderChangedEvent: string;
 
+
 export interface INavIconService {
     readonly config: NavIconConfig;
     showMenu(callbackOrEvent?: any): void;
@@ -970,6 +970,35 @@ export class NavIconConfig {
 export const NavIconClickedEvent: string;
 export const NavIconChangedEvent: string;
 
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 export interface INavMenuService {
     sections: NavMenuSection[];
@@ -1016,35 +1045,6 @@ export class NavMenuConfig {
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
 
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
 
 
 export interface ISideNavService {
@@ -1156,7 +1156,6 @@ export let ThemeResetPage: string;
 
 declare module pip.errors {
 
-
 export class ErrorPageConfig {
     Active: boolean;
     Name: string;
@@ -1198,6 +1197,7 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
 
 
 
+
 export interface IFormErrorsService {
     errorsWithHint(field: any): any;
     touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
@@ -1206,15 +1206,6 @@ export interface IFormErrorsService {
     setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
     goToUnhandledErrorPage(error: any): any;
 }
-
-class HttpResponseInterceptor implements ng.IHttpInterceptor {
-    private $q;
-    private $location;
-    private $rootScope;
-    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
-    responseError: (rejection: any) => ng.IPromise<any>;
-}
-function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
 
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
@@ -1229,13 +1220,21 @@ export let ErrorsConnectionEvent: string;
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
 
+class HttpResponseInterceptor implements ng.IHttpInterceptor {
+    private $q;
+    private $location;
+    private $rootScope;
+    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
+    responseError: (rejection: any) => ng.IPromise<any>;
+}
+function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
+
 export let ErrorsUnsupportedState: string;
 export let ErrorsUnsupportedEvent: string;
 
 }
 
 declare module pip.charts {
-
 
 
 export interface IChartColorsService {
@@ -1247,9 +1246,11 @@ export interface IChartColorsService {
 
 
 
+
 }
 
 declare module pip.locations {
+
 
 
 export interface ILocationDialogService {
@@ -1262,7 +1263,6 @@ export class LocationDialogParams {
     locationPos: any;
     locationName: string;
 }
-
 
 
 let google: any;
@@ -1307,7 +1307,6 @@ export class MultiuploadResult {
 
 declare module pip.dashboard {
 
-
 export class AddTileDialog {
     title: string;
     icon: string;
@@ -1334,6 +1333,7 @@ export interface IAddTileDialogService {
 export interface IAddTileDialogprovider {
     configWidgetList(list: [AddTileDialog[]]): void;
 }
+
 
 
 export interface IDashboardTile {
@@ -1434,7 +1434,6 @@ export class MenuTileService extends DashboardTile {
 
 
 
-
 export interface TilesGridConstructor {
     new (tiles: any, options: any, columns: any, elem: any): any;
 }
@@ -1506,9 +1505,13 @@ export interface ITileTemplateService {
     setImageMarginCSS($element: any, image: any): void;
 }
 
+
 }
 
 declare module pip.settings {
+
+
+
 
 
 export interface ISettingsService {
@@ -1558,9 +1561,6 @@ export class SettingsTab {
     visible: boolean;
     stateConfig: SettingsStateConfig;
 }
-
-
-
 
 }
 
