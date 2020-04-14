@@ -1,17 +1,5 @@
 declare module pip.services {
 
-export let StateVar: string;
-export let PrevStateVar: string;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
-
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 
@@ -51,6 +39,18 @@ export interface ISessionProvider extends ng.IServiceProvider {
 export const SessionRootVar = "$session";
 export const SessionOpenedEvent = "pipSessionOpened";
 export const SessionClosedEvent = "pipSessionClosed";
+
+export let StateVar: string;
+export let PrevStateVar: string;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
 
 
 export interface ITransactionService {
@@ -373,6 +373,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export const MainResizedEvent = "pipMainResized";
 export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
@@ -411,12 +417,6 @@ export const MainBreakpointStatuses: MediaBreakpointStatuses;
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
 
-
-
-
-
-
-
 }
 
 declare module pip.behaviors {
@@ -426,7 +426,6 @@ declare module pip.behaviors {
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
-
 
 
 
@@ -505,6 +504,7 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
+
 }
 
 declare module pip.controls {
@@ -525,6 +525,8 @@ export interface IImageSliderService {
 
 
 
+var marked: any;
+
 
 export interface IPopoverService {
     show(p: Object): void;
@@ -533,8 +535,6 @@ export interface IPopoverService {
 }
 
 
-
-var marked: any;
 
 
 
@@ -574,6 +574,7 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
 
 
 
@@ -654,7 +655,6 @@ export interface IDateFormatService {
 }
 export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProvider {
 }
-
 
 
 
@@ -1126,6 +1126,19 @@ export class PipTab {
 declare module pip.themes {
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 export interface IThemeService {
     theme: string;
     use(language: string): string;
@@ -1139,22 +1152,10 @@ export let ThemeRootVar: string;
 export let ThemeChangedEvent: string;
 export let ThemeResetPage: string;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 declare module pip.errors {
+
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1194,7 +1195,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     setSupportedBrowsers(browsers: SupportedBrowsers): void;
     configs: ErrorPageConfigs;
 }
-
 
 
 
@@ -1252,6 +1252,7 @@ export interface IChartColorsService {
 declare module pip.locations {
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1264,20 +1265,18 @@ export class LocationDialogParams {
 }
 
 
+
 let google: any;
-
-
 
 }
 
 declare module pip.files {
 
+
 export class ButtonsUpload {
     title: string;
     click: Function;
 }
-
-
 
 
 
@@ -1303,10 +1302,10 @@ export class MultiuploadResult {
     id: string;
 }
 
+
 }
 
 declare module pip.dashboard {
-
 
 export class AddTileDialog {
     title: string;
@@ -1336,6 +1335,7 @@ export interface IAddTileDialogprovider {
 }
 
 
+
 export interface IDashboardTile {
     options: any;
     color: string;
@@ -1347,7 +1347,6 @@ export class DashboardTile implements IDashboardTile {
     size: Object | string | number;
     constructor();
 }
-
 
 export class TileConfigDialogController {
     params: any;
@@ -1371,16 +1370,6 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     event?: any;
 }
 
-
-
-
-
-export class MenuTileService extends DashboardTile {
-    menu: any;
-    constructor();
-    callAction(actionName: any, params: any, item: any): void;
-    changeSize(params: any): void;
-}
 
 
 export const DEFAULT_TILE_WIDTH: number;
@@ -1428,6 +1417,18 @@ export class DragTileService implements IDragTileService {
     getOptions(): any;
     setOptions(options: any): any;
 }
+
+
+
+
+
+export class MenuTileService extends DashboardTile {
+    menu: any;
+    constructor();
+    callAction(actionName: any, params: any, item: any): void;
+    changeSize(params: any): void;
+}
+
 
 
 
@@ -1499,7 +1500,6 @@ export class TilesGridService implements ITilesGridService {
     removeTile(removeTile: any): any;
     updateTileOptions(opts: any): any;
 }
-
 
 export interface ITileTemplateService {
     getTemplate(source: any, tpl?: any, tileScope?: any, strictCompile?: any): any;
