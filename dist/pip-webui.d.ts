@@ -53,49 +53,6 @@ function addRedirectStateDecorator($provide: any): void;
 export let RoutingVar: string;
 
 
-export interface ITransactionService {
-    create(scope?: string): Transaction;
-    get(scope?: string): Transaction;
-}
-
-export class Transaction {
-    private _scope;
-    private _id;
-    private _operation;
-    private _error;
-    private _progress;
-    constructor(scope: string);
-    readonly scope: string;
-    readonly id: string;
-    readonly operation: string;
-    readonly progress: number;
-    readonly error: TransactionError;
-    readonly errorMessage: string;
-    reset(): void;
-    busy(): boolean;
-    failed(): boolean;
-    aborted(id: string): boolean;
-    begin(operation: string): string;
-    update(progress: number): void;
-    abort(): void;
-    end(error?: any): void;
-}
-
-export class TransactionError {
-    code: string;
-    message: string;
-    details: any;
-    cause: string;
-    stack_trace: string;
-    constructor(error?: any);
-    reset(): void;
-    empty(): boolean;
-    decode(error: any): void;
-}
-
-
-
-
 export interface ITranslateService {
     language: string;
     use(language: string): string;
@@ -213,6 +170,49 @@ export let ResetRootVar: string;
 export let ResetAreaRootVar: string;
 
 
+
+
+
+
+export interface ITransactionService {
+    create(scope?: string): Transaction;
+    get(scope?: string): Transaction;
+}
+
+export class Transaction {
+    private _scope;
+    private _id;
+    private _operation;
+    private _error;
+    private _progress;
+    constructor(scope: string);
+    readonly scope: string;
+    readonly id: string;
+    readonly operation: string;
+    readonly progress: number;
+    readonly error: TransactionError;
+    readonly errorMessage: string;
+    reset(): void;
+    busy(): boolean;
+    failed(): boolean;
+    aborted(id: string): boolean;
+    begin(operation: string): string;
+    update(progress: number): void;
+    abort(): void;
+    end(error?: any): void;
+}
+
+export class TransactionError {
+    code: string;
+    message: string;
+    details: any;
+    cause: string;
+    stack_trace: string;
+    constructor(error?: any);
+    reset(): void;
+    empty(): boolean;
+    decode(error: any): void;
+}
 
 
 
@@ -373,6 +373,12 @@ export interface IAuxPanelProvider extends ng.IServiceProvider {
 }
 
 
+
+
+
+
+
+
 export const MainResizedEvent = "pipMainResized";
 export const LayoutResizedEvent = "pipLayoutResized";
 export class MediaBreakpoints {
@@ -410,12 +416,6 @@ export const MainBreakpointStatuses: MediaBreakpointStatuses;
 
 export function addResizeListener(element: any, listener: any): void;
 export function removeResizeListener(element: any, listener: any): void;
-
-
-
-
-
-
 
 }
 
@@ -578,6 +578,7 @@ declare module pip.dates {
 
 
 
+
 export class DateRangeType {
     static Year: string;
     static Month: string;
@@ -657,17 +658,15 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
+
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
 export const MillisecondsInSecond = 1000;
 
-
-
 }
 
 declare module pip.dialogs {
-
 
 
 export class ConfirmationDialogParams {
@@ -694,6 +693,7 @@ export class ErrorDetailsDialogParams {
 export interface IErrorDetailsDialogService {
     show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
 }
+
 
 
 export interface IInformationDialogService {
@@ -971,36 +971,6 @@ export const NavIconClickedEvent: string;
 export const NavIconChangedEvent: string;
 
 
-
-export interface ISearchService {
-    config: SearchConfig;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
-    clear(): void;
-    open(): void;
-    close(): void;
-    toggle(): void;
-}
-export interface ISearchProvider extends ng.IServiceProvider {
-}
-
-
-export class SearchConfig {
-    visible: boolean;
-    criteria: string;
-    params: any;
-    history: string[];
-    callback: (criteria: string) => void;
-}
-
-export const OpenSearchEvent = "pipOpenSearch";
-export const CloseSearchEvent = "pipCloseSearch";
-export const SearchChangedEvent = "pipSearchChanged";
-export const SearchActivatedEvent = "pipSearchActivated";
-
 export interface INavMenuService {
     sections: NavMenuSection[];
     defaultIcon: string;
@@ -1045,6 +1015,36 @@ export class NavMenuConfig {
 }
 
 export const NavMenuChangedEvent = "pipNavMenuChanged";
+
+
+export interface ISearchService {
+    config: SearchConfig;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+    set(callback: (criteria: string) => void, criteria?: string, params?: any, history?: string[]): void;
+    clear(): void;
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+export interface ISearchProvider extends ng.IServiceProvider {
+}
+
+
+export class SearchConfig {
+    visible: boolean;
+    criteria: string;
+    params: any;
+    history: string[];
+    callback: (criteria: string) => void;
+}
+
+export const OpenSearchEvent = "pipOpenSearch";
+export const CloseSearchEvent = "pipCloseSearch";
+export const SearchChangedEvent = "pipSearchChanged";
+export const SearchActivatedEvent = "pipSearchActivated";
 
 
 export interface ISideNavService {
@@ -1156,6 +1156,7 @@ export let ThemeResetPage: string;
 
 declare module pip.errors {
 
+
 export class ErrorPageConfig {
     Active: boolean;
     Name: string;
@@ -1195,7 +1196,6 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
-
 class HttpResponseInterceptor implements ng.IHttpInterceptor {
     private $q;
     private $location;
@@ -1216,18 +1216,18 @@ export interface IFormErrorsService {
     goToUnhandledErrorPage(error: any): any;
 }
 
-export let ErrorsMaintenanceState: string;
-export let MaintenanceErrorEvent: string;
-
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
 
+export let ErrorsMaintenanceState: string;
+export let MaintenanceErrorEvent: string;
 
 export let ErrorsConnectionState: string;
 export let ErrorsConnectionEvent: string;
 
 export let ErrorsUnknownState: string;
 export let ErrorsUnknownEvent: string;
+
 
 export let ErrorsUnsupportedState: string;
 export let ErrorsUnsupportedEvent: string;
@@ -1252,6 +1252,7 @@ export interface IChartColorsService {
 declare module pip.locations {
 
 
+
 export interface ILocationDialogService {
     show(params: LocationDialogParams, successCallback?: any, cancelCallback?: any): void;
 }
@@ -1264,9 +1265,8 @@ export class LocationDialogParams {
 }
 
 
-
-
 let google: any;
+
 
 }
 
@@ -1335,6 +1335,7 @@ export interface IAddTileDialogprovider {
 }
 
 
+
 export interface IDashboardTile {
     options: any;
     color: string;
@@ -1368,6 +1369,16 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     dialogClass?: string;
     extensionUrl?: string;
     event?: any;
+}
+
+
+
+
+export class MenuTileService extends DashboardTile {
+    menu: any;
+    constructor();
+    callAction(actionName: any, params: any, item: any): void;
+    changeSize(params: any): void;
 }
 
 
@@ -1417,17 +1428,6 @@ export class DragTileService implements IDragTileService {
     setOptions(options: any): any;
 }
 
-
-
-
-
-
-export class MenuTileService extends DashboardTile {
-    menu: any;
-    constructor();
-    callAction(actionName: any, params: any, item: any): void;
-    changeSize(params: any): void;
-}
 
 
 
@@ -1520,6 +1520,9 @@ export interface ISettingsService {
     getTabs(): SettingsTab[];
 }
 export interface ISettingsProvider extends ng.IServiceProvider {
+    stateProvider: {
+        state: Function;
+    };
     getDefaultTab(): SettingsTab;
     addTab(tabObj: SettingsTab): void;
     setDefaultTab(name: string): void;
