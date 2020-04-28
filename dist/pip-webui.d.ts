@@ -1,17 +1,5 @@
 declare module pip.services {
 
-export let StateVar: string;
-export let PrevStateVar: string;
-
-
-let RedirectedStates: any;
-function decorateRedirectStateProvider($delegate: any): any;
-function addRedirectStateProviderDecorator($provide: any): void;
-function decorateRedirectStateService($delegate: any, $timeout: any): any;
-function addRedirectStateDecorator($provide: any): void;
-
-export let RoutingVar: string;
-
 export let IdentityRootVar: string;
 export let IdentityChangedEvent: string;
 
@@ -215,6 +203,18 @@ export let ResetAreaRootVar: string;
 
 
 
+
+export let StateVar: string;
+export let PrevStateVar: string;
+
+
+let RedirectedStates: any;
+function decorateRedirectStateProvider($delegate: any): any;
+function addRedirectStateProviderDecorator($provide: any): void;
+function decorateRedirectStateService($delegate: any, $timeout: any): any;
+function addRedirectStateDecorator($provide: any): void;
+
+export let RoutingVar: string;
 
 }
 
@@ -423,11 +423,10 @@ declare module pip.behaviors {
 
 
 
+
 export interface IDraggableService {
     inputEvent(event: any): any;
 }
-
-
 
 
 
@@ -505,6 +504,7 @@ export class Shortcut {
 
 export let ShortcutsChangedEvent: string;
 
+
 }
 
 declare module pip.controls {
@@ -574,6 +574,7 @@ declare module pip.lists {
 }
 
 declare module pip.dates {
+
 
 
 
@@ -658,7 +659,6 @@ export interface IDateFormatProvider extends IDateFormatService, ng.IServiceProv
 
 
 
-
 export const IntervalTimeRange = 30;
 export const MinutesInHour = 60;
 export const HoursInDay = 24;
@@ -693,21 +693,6 @@ export class ErrorDetailsDialogParams {
 
 export interface IErrorDetailsDialogService {
     show(params: ErrorDetailsDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-export interface IInformationDialogService {
-    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
-}
-
-
-
-export class InformationDialogParams {
-    event?: MouseEvent;
-    ok?: string;
-    title?: string;
-    message: string;
-    item?: any;
 }
 
 
@@ -770,6 +755,21 @@ export class OptionsBigDialogParams {
 export class OptionsBigDialogResult {
     option: OptionsBigDialogData;
     isCheckboxOption: boolean;
+}
+
+
+export interface IInformationDialogService {
+    show(params: InformationDialogParams, successCallback?: () => void, cancelCallback?: () => void): any;
+}
+
+
+
+export class InformationDialogParams {
+    event?: MouseEvent;
+    ok?: string;
+    title?: string;
+    message: string;
+    item?: any;
 }
 
 
@@ -889,6 +889,7 @@ export interface IBreadcrumbProvider extends ng.IServiceProvider {
 }
 
 
+
 export interface INavService {
     appbar: IAppBarService;
     icon: INavIconService;
@@ -900,7 +901,6 @@ export interface INavService {
     menu: INavMenuService;
     reset(): void;
 }
-
 
 
 
@@ -969,7 +969,6 @@ export class NavIconConfig {
 
 export const NavIconClickedEvent: string;
 export const NavIconChangedEvent: string;
-
 
 export interface INavMenuService {
     sections: NavMenuSection[];
@@ -1045,6 +1044,7 @@ export const OpenSearchEvent = "pipOpenSearch";
 export const CloseSearchEvent = "pipCloseSearch";
 export const SearchChangedEvent = "pipSearchChanged";
 export const SearchActivatedEvent = "pipSearchActivated";
+
 
 
 export interface ISideNavService {
@@ -1126,6 +1126,10 @@ export class PipTab {
 declare module pip.themes {
 
 
+
+
+
+
 export interface IThemeService {
     theme: string;
     use(language: string): string;
@@ -1148,34 +1152,10 @@ export let ThemeResetPage: string;
 
 
 
-
-
-
-
 }
 
 declare module pip.errors {
 
-
-
-export interface IFormErrorsService {
-    errorsWithHint(field: any): any;
-    touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
-    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
-    resetFieldsErrors(form: ng.IFormController, field: any): void;
-    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
-    goToUnhandledErrorPage(error: any): any;
-}
-
-
-class HttpResponseInterceptor implements ng.IHttpInterceptor {
-    private $q;
-    private $location;
-    private $rootScope;
-    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
-    responseError: (rejection: any) => ng.IPromise<any>;
-}
-function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
 
 export class ErrorPageConfig {
     Active: boolean;
@@ -1216,14 +1196,34 @@ export interface IErrorPageConfigProvider extends ng.IServiceProvider {
     configs: ErrorPageConfigs;
 }
 
+
+
+export interface IFormErrorsService {
+    errorsWithHint(field: any): any;
+    touchedErrorsWithHint(form: ng.IFormController, field: any, notSubmited?: boolean): any;
+    resetFormErrors(form: ng.IFormController, errors?: boolean): void;
+    resetFieldsErrors(form: ng.IFormController, field: any): void;
+    setFormError(form: ng.IFormController, error: any, errorFieldMap: any): void;
+    goToUnhandledErrorPage(error: any): any;
+}
+
+class HttpResponseInterceptor implements ng.IHttpInterceptor {
+    private $q;
+    private $location;
+    private $rootScope;
+    constructor($q: ng.IQService, $location: ng.ILocationService, $rootScope: ng.IRootScopeService);
+    responseError: (rejection: any) => ng.IPromise<any>;
+}
+function configureHttpInterceptor($stateProvider: ng.ui.IStateProvider, $httpProvider: ng.IHttpProvider): void;
+
 export let ErrorsMaintenanceState: string;
 export let MaintenanceErrorEvent: string;
 
-export let ErrorsConnectionState: string;
-export let ErrorsConnectionEvent: string;
-
 export let ErrorsMissingRouteState: string;
 export let StateNotFoundEvent: string;
+
+export let ErrorsConnectionState: string;
+export let ErrorsConnectionEvent: string;
 
 
 export let ErrorsUnknownState: string;
@@ -1335,6 +1335,20 @@ export interface IAddTileDialogprovider {
 }
 
 
+
+export interface IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+}
+export class DashboardTile implements IDashboardTile {
+    options: any;
+    color: string;
+    size: Object | string | number;
+    constructor();
+}
+
+
 export class TileConfigDialogController {
     params: any;
     extensionUrl: any;
@@ -1357,20 +1371,6 @@ export interface ITileConfigDialogOptions extends angular.material.IDialogOption
     event?: any;
 }
 
-
-
-
-export interface IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-}
-export class DashboardTile implements IDashboardTile {
-    options: any;
-    color: string;
-    size: Object | string | number;
-    constructor();
-}
 
 export const DEFAULT_TILE_WIDTH: number;
 export const DEFAULT_TILE_HEIGHT: number;
@@ -1570,6 +1570,9 @@ export class SettingsTab {
 declare module pip.help {
 
 
+
+
+
 export class HelpConfig {
     defaultTab: string;
     tabs: HelpTab[];
@@ -1615,9 +1618,6 @@ export interface IHelpProvider extends ng.IServiceProvider {
     setDefaultTab(name: string): void;
     getFullStateName(state: string): string;
 }
-
-
-
 
 
 }
